@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/ant-1.6.2.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/ant-junit-1.6.2.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/antlr-oaa.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/backport-util-concurrent.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/dom4j-1.5.2.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/java-getopt-1.0.8.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/jsch.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/junit-3.8.1.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/log4j-1.2.7.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/oaa2.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/oaa2webl.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/sphinx/sphinx4-1.0beta/lib/sphinx4.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/sphinx/sphinx4-1.0beta/lib/HUB4_8gau_13dCep_16k_40mel_133Hz_6855Hz.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/sphinx/sphinx4-1.0beta/lib/RM1_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/sphinx/sphinx4-1.0beta/lib/TIDIGITS_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/sphinx/sphinx4-1.0beta/lib/WSJ_8gau_13dCep_8kHz_31mel_200Hz_3500Hz.jar"/>
+	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/sphinx/sphinx4-1.0beta/lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
