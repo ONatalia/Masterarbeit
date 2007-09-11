@@ -2,22 +2,36 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/ant-1.6.2.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/ant-junit-1.6.2.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/antlr-oaa.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/backport-util-concurrent.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/dom4j-1.5.2.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/java-getopt-1.0.8.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/jsch.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/junit-3.8.1.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/log4j-1.2.7.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/oaa2.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/oaa2.3.2/lib/jar/oaa2webl.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/sphinx/sphinx4-1.0beta/lib/sphinx4.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/sphinx/sphinx4-1.0beta/lib/HUB4_8gau_13dCep_16k_40mel_133Hz_6855Hz.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/sphinx/sphinx4-1.0beta/lib/RM1_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/sphinx/sphinx4-1.0beta/lib/TIDIGITS_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/sphinx/sphinx4-1.0beta/lib/WSJ_8gau_13dCep_8kHz_31mel_200Hz_3500Hz.jar"/>
-	<classpathentry kind="lib" path="/home/timo/Arbeit/uni-potsdam/inpro/sphinx/sphinx4-1.0beta/lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+	<classpathentry kind="lib" path="/opt/java/ant-1.6.2.jar"/>
+	<classpathentry kind="lib" path="/opt/java/ant-junit-1.6.2.jar"/>
+	<classpathentry kind="lib" path="/opt/java/antlr-oaa.jar"/>
+	<classpathentry kind="lib" path="/opt/java/backport-util-concurrent.jar"/>
+	<classpathentry kind="lib" path="/opt/java/dom4j-1.5.2.jar"/>
+	<classpathentry kind="lib" path="/opt/java/java-getopt-1.0.8.jar"/>
+	<classpathentry kind="lib" path="/opt/java/jsch.jar"/>
+	<classpathentry kind="lib" path="/opt/java/junit-3.8.1.jar"/>
+	<classpathentry kind="lib" path="/opt/java/log4j-1.2.7.jar"/>
+	<classpathentry kind="lib" path="/opt/java/oaa2.jar"/>
+	<classpathentry kind="lib" path="/opt/java/oaa2webl.jar"/>
+	<classpathentry kind="lib" path="/opt/java/sphinx4.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/opt/pkg/sphinx/doc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/opt/java/HUB4_8gau_13dCep_16k_40mel_133Hz_6855Hz.jar"/>
+	<classpathentry kind="lib" path="/opt/java/RM1_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+	<classpathentry kind="lib" path="/opt/java/TIDIGITS_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+	<classpathentry kind="lib" path="/opt/java/WSJ_8gau_13dCep_8kHz_31mel_200Hz_3500Hz.jar"/>
+	<classpathentry kind="lib" path="/opt/java/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+	<classpathentry kind="lib" path="/opt/java/jmf.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/opt/pkg/jmf/doc/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/opt/java/weka.jar" sourcepath="/opt/pkg/weka/weka-src.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/opt/pkg/weka/doc/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
