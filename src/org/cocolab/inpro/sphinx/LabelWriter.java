@@ -24,7 +24,7 @@ import edu.cmu.sphinx.recognizer.StateListener;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.result.ResultListener;
 import edu.cmu.sphinx.decoder.search.Token;
-//import edu.cmu.sphinx.tools.batch.BatchModeRecognizer;
+import edu.cmu.sphinx.tools.batch.BatchModeRecognizer;
 import edu.cmu.sphinx.util.BatchItem;
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.Resetable;
@@ -69,7 +69,7 @@ public class LabelWriter
     private String fileBaseName = "";
 
     // when in batch mode, get filenames from the batch processor
-    //private BatchModeRecognizer batchProcessor;
+    private BatchModeRecognizer batchProcessor;
     
     private boolean wordAlignment = true;
     private boolean phoneAlignment = true;
@@ -132,13 +132,12 @@ public class LabelWriter
         
         fileOutput = ps.getBoolean(PROP_FILE_OUTPUT, false);
         fileBaseName = ps.getString(PROP_FILE_BASE_NAME, "");
-/*
         try {
         	batchProcessor = (BatchModeRecognizer) ps.getComponent(PROP_BATCH_PROCESSOR, BatchModeRecognizer.class);
         } catch (PropertyException e) {
         	batchProcessor = null;
         }
-*/        
+        
         wordAlignment = ps.getBoolean(PROP_WORD_ALIGNMENT, false);
         phoneAlignment = ps.getBoolean(PROP_PHONE_ALIGNMENT, false);
 
@@ -169,7 +168,7 @@ public class LabelWriter
     	PrintStream output = null;
     	if (fileOutput) {
 			String filename = fileBaseName;
-/*			if (batchProcessor != null) {
+			if (batchProcessor != null) {
 				BatchItem bi = batchProcessor.getCurrentBatchItem();
 				if (bi != null) {
 					filename = bi.getFilename();
@@ -179,7 +178,6 @@ public class LabelWriter
 					filename = null;
 				}
 			}
-*/
 			// if old and new filenames are different
 			if (((lastFileName == null) && (filename != null)) 
 					|| !lastFileName.equals(filename)) {
@@ -331,10 +329,10 @@ public class LabelWriter
     
     private boolean newFile() {
     	String filename = null;
-/*    	if (batchProcessor != null) {
+    	if (batchProcessor != null) {
     		filename = batchProcessor.getCurrentBatchItem().getFilename();
     	}
-*/    	if ((filename != null) && !filename.equals(lastFileName)) {
+    	if ((filename != null) && !filename.equals(lastFileName)) {
     		lastFileName = filename;
     		return true;
     	}
