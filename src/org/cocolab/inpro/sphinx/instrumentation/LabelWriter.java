@@ -8,7 +8,7 @@
  * WARRANTIES.
  *
  */
-package org.cocolab.inpro.sphinx;
+package org.cocolab.inpro.sphinx.instrumentation;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;

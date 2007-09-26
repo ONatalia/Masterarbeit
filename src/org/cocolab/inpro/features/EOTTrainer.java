@@ -1,4 +1,4 @@
-package org.cocolab.inpro.incrementalwavfile;
+package org.cocolab.inpro.features;
 
 import weka.core.Instance;
 
@@ -20,5 +20,5 @@ public class EOTTrainer extends EOTFeatureAggregator {
 		inst.setClassValue(remainingTime);
 		return inst;
 	}
-	
+
 }

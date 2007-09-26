@@ -1,4 +1,4 @@
-package org.cocolab.inpro.sphinx;
+package org.cocolab.inpro.sphinx.frontend;
 
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
@@ -33,6 +33,7 @@ public class DataThrottle extends BaseDataProcessor {
      */
     public void register(String name, Registry registry)
             throws PropertyException {
+    	super.register(name, registry);
         registry.register(PROP_SPEED, PropertyType.DOUBLE);
     }
     
