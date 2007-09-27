@@ -1,5 +1,7 @@
 package org.cocolab.inpro.features;
 
+import java.io.IOException;
+
 import weka.core.Instance;
 
 public class EOTTrainer extends EOTFeatureAggregator {
@@ -11,7 +13,17 @@ public class EOTTrainer extends EOTFeatureAggregator {
 	}
 	
 	public void loadGoldStandard(String filename) {
-		EOT = 2.4; //FIXME: TODO: extract last sample from file in filename and convert to time value
+		if (filename != null) {
+			try {
+				filename = filename.replaceAll("\\.\\w+$", ".ortho");
+				filename = filename.replaceAll("/data/", "/par/");
+				String labelLine = LabelFile.getLastLine(filename);
+				EOT = LabelFile.getStopTime(labelLine);
+			} catch (IOException e) {
+				EOT = 0.f;
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public Instance getCurrentInstance() {

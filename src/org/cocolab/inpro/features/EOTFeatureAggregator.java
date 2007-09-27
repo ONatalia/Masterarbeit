@@ -5,7 +5,9 @@ import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 
-public class EOTFeatureAggregator {
+import edu.cmu.sphinx.util.props.Resetable;
+
+public class EOTFeatureAggregator implements Resetable {
 	
 	private final static int NUMBER_OF_ATTRIBUTES = 5; 
 	
@@ -18,10 +20,10 @@ public class EOTFeatureAggregator {
 	
 	protected Instances instances;
 	
-	double timeIntoTurnValue = -1.0;
-	int wordsIntoTurnValue = -1;
-	double timeIntoLastWordValue = -1.0;
-	double currentFrameEnergyValue = -1.0;
+	double timeIntoTurnValue;
+	int wordsIntoTurnValue;
+	double timeIntoLastWordValue;
+	double currentFrameEnergyValue;
 	
 	public EOTFeatureAggregator() {
 		timeIntoTurnAttribute = new Attribute("timeIntoTurn");
@@ -37,6 +39,7 @@ public class EOTFeatureAggregator {
 		attInfo.addElement(timeToEOT);
 		instances = new Instances("eotFeatures", attInfo, 0);
 		instances.setClass(timeToEOT);
+		reset();
 	}
 	
 	protected Instance getNewestFeatures() {
@@ -68,5 +71,12 @@ public class EOTFeatureAggregator {
 	
 	public void setCurrentFrameEnergy(double logEnergy) {
 		currentFrameEnergyValue = logEnergy;
+	}
+
+	public void reset() {
+		timeIntoTurnValue = -1.0;
+		wordsIntoTurnValue = -1;
+		timeIntoLastWordValue = -1.0;
+		currentFrameEnergyValue = -1.0;
 	}
 }

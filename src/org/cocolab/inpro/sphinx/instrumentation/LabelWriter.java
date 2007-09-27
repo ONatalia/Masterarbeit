@@ -15,6 +15,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cocolab.inpro.batch.BatchModeRecognizer;
+
 import edu.cmu.sphinx.linguist.SearchState;
 import edu.cmu.sphinx.linguist.flat.ExtendedUnitState;
 import edu.cmu.sphinx.linguist.flat.PronunciationState;
@@ -24,7 +26,6 @@ import edu.cmu.sphinx.recognizer.StateListener;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.result.ResultListener;
 import edu.cmu.sphinx.decoder.search.Token;
-import edu.cmu.sphinx.tools.batch.BatchModeRecognizer;
 import edu.cmu.sphinx.util.BatchItem;
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.Resetable;
