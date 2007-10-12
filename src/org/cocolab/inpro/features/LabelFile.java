@@ -14,12 +14,12 @@ public class LabelFile {
      * @param batchFile the batch file to read
      * @param skip the number of lines to skip between items
      *
-     * @return a List of the lines in a batch file
+     * @return a List of the lines in a label file
      */
-    public static List getLines(String batchFile, int skip) throws IOException {
+    public static List<String> getLines(String labelFile, int skip) throws IOException {
         int curCount = skip;
-        List list = new ArrayList();
-        BufferedReader reader = new BufferedReader(new FileReader(batchFile));
+        List<String> list = new ArrayList<String>();
+        BufferedReader reader = new BufferedReader(new FileReader(labelFile));
         
         String line = null;
         
@@ -36,8 +36,8 @@ public class LabelFile {
     }
     
     public static String getLastLine(String labelFile) throws IOException {
-    	List lines = getLines(labelFile, 0);
-    	return (String) lines.get(lines.size() - 1);
+    	List<String> lines = getLines(labelFile, 0);
+    	return lines.get(lines.size() - 1);
     }
     
     private static String getTokenInLine(String labelLine, int token) {
