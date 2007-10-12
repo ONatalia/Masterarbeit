@@ -11,12 +11,13 @@ public class EOTTrainer extends EOTFeatureAggregator {
 	public EOTTrainer() {
 		System.out.println(instances);
 	}
-	
+
 	public void loadGoldStandard(String filename) {
 		if (filename != null) {
 			try {
 				filename = filename.replaceAll("\\.\\w+$", ".ortho");
 				filename = filename.replaceAll("/data/", "/par/");
+				filename = filename.replaceAll("file:", "");
 				String labelLine = LabelFile.getLastLine(filename);
 				EOT = LabelFile.getStopTime(labelLine);
 			} catch (IOException e) {
@@ -25,11 +26,16 @@ public class EOTTrainer extends EOTFeatureAggregator {
 			}
 		}
 	}
-	
+
 	public Instance getCurrentInstance() {
 		Instance inst = getNewestFeatures();
 		double remainingTime = EOT - getTimeIntoTurn();
-		inst.setClassValue(remainingTime);
+		if (CLUSTERED_TIME) {
+			inst.setClassValue(EOTBins.eotBin(remainingTime));
+		}
+		else {
+			inst.setClassValue(remainingTime);
+		}
 		return inst;
 	}
 

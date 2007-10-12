@@ -16,7 +16,10 @@ public class EOTFeatureAggregator implements Resetable {
 	private Attribute timeIntoLastWordAttribute;
 	private Attribute currentFrameEnergyAttribute;
 	
+	protected final static boolean CLUSTERED_TIME = true; // FIXME: this should be configurable (maybe via constructor) 
+	
 	private Attribute timeToEOT;
+	private Attribute clusteredTimeToEOT;
 	
 	protected Instances instances;
 	
@@ -25,20 +28,34 @@ public class EOTFeatureAggregator implements Resetable {
 	double timeIntoLastWordValue;
 	double currentFrameEnergyValue;
 	
+	
 	public EOTFeatureAggregator() {
-		timeIntoTurnAttribute = new Attribute("timeIntoTurn");
-		wordsIntoTurnAttribute = new Attribute("wordsIntoTurn");
-		timeIntoLastWordAttribute = new Attribute("timeIntoLastWord");
-		currentFrameEnergyAttribute = new Attribute("currentFrameEnergy");
-		timeToEOT = new Attribute("timeToEOT");
 		FastVector attInfo = new FastVector(NUMBER_OF_ATTRIBUTES);
+		timeIntoTurnAttribute = new Attribute("timeIntoTurn");
 		attInfo.addElement(timeIntoTurnAttribute);
+		wordsIntoTurnAttribute = new Attribute("wordsIntoTurn");
 		attInfo.addElement(wordsIntoTurnAttribute);
+		timeIntoLastWordAttribute = new Attribute("timeIntoLastWord");
 		attInfo.addElement(timeIntoLastWordAttribute);
+		currentFrameEnergyAttribute = new Attribute("currentFrameEnergy");
 		attInfo.addElement(currentFrameEnergyAttribute);
-		attInfo.addElement(timeToEOT);
+
+		
+		if (CLUSTERED_TIME) {
+			clusteredTimeToEOT = EOTBins.eotBinsAttribute();
+			attInfo.addElement(clusteredTimeToEOT);
+		}
+		else {
+			timeToEOT = new Attribute("timeToEOT");
+			attInfo.addElement(timeToEOT);
+		}
 		instances = new Instances("eotFeatures", attInfo, 0);
-		instances.setClass(timeToEOT);
+		if (CLUSTERED_TIME) {
+			instances.setClass(clusteredTimeToEOT);
+		}
+		else {
+			instances.setClass(timeToEOT);			
+		}
 		reset();
 	}
 	
