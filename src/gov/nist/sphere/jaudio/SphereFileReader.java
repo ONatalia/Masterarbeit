@@ -118,11 +118,16 @@ public class SphereFileReader extends AudioFileReader {
     // Save byte header since this method must return the stream opened at byte 0.
     byte[] bytes = null;
     AudioFileFormat audioFileFormat = getAudioFileFormat(inputStream, bytes);
-//			SequenceInputStream sequenceInputStream =
-//			new SequenceInputStream( new ByteArrayInputStream( bytes ), inputStream );
     return new AudioInputStream(inputStream,
             audioFileFormat.getFormat(), audioFileFormat.getFrameLength());
   }
+  
+  public AudioInputStream getPCMAudioInputStream(InputStream inputStream) 
+				throws UnsupportedAudioFileException, IOException {
+	  	return assertPCMAudio(getAudioInputStream(inputStream));
+  }
+ 
+  
 
   /** Return the AudioInputStream from the given File. */
   public AudioInputStream getAudioInputStream(File file)
@@ -138,7 +143,13 @@ public class SphereFileReader extends AudioFileReader {
       throw e;
     }
   }
+  
+  public AudioInputStream getPCMAudioInputStream(File file) 
+				throws UnsupportedAudioFileException, IOException {
+	  return assertPCMAudio(getAudioInputStream(file));
+  }
 
+  
   /** Return the AudioInputStream from the given URL. */
   public AudioInputStream getAudioInputStream(URL url)
           throws UnsupportedAudioFileException, IOException {
@@ -153,7 +164,35 @@ public class SphereFileReader extends AudioFileReader {
       throw e;
     }
   }
+  
+  public AudioInputStream getPCMAudioInputStream(URL url) 
+  								throws UnsupportedAudioFileException, IOException {
+	  return assertPCMAudio(getAudioInputStream(url));
+  }
 
+  /*
+   * check if ais is PCM and convert it to PCM if necessary
+   * kudos to http://www.kl.unibe.ch/sec2/gymbield/unterricht/Faecher/Informatik/Java/Sound.htm
+   */
+  public AudioInputStream assertPCMAudio(AudioInputStream ais) {
+		AudioFormat format = ais.getFormat();
+		if ((format.getEncoding() == AudioFormat.Encoding.ULAW)
+		 || (format.getEncoding() == AudioFormat.Encoding.ALAW)) 
+		{
+			AudioFormat tmp = new AudioFormat(
+					AudioFormat.Encoding.PCM_SIGNED,
+					format.getSampleRate(), 
+					format.getSampleSizeInBits() * 2,
+					format.getChannels(), 
+					format.getFrameSize() * 2, 
+					format.getFrameRate(), 
+					true);
+			ais = AudioSystem.getAudioInputStream(tmp, ais);
+			format = tmp;
+		}
+		return ais;
+	}
+  
   public final SphereHeader getSphereHeader() {
     return header;
   }
@@ -185,26 +224,43 @@ public class SphereFileReader extends AudioFileReader {
   }
 
   private void addToByteHeader(StringBuffer buffer, String line) {
-    int start = buffer.length();
-    int end = start + line.length() + 1;
-    buffer.replace(start, end, line + "\n");
+	int start = buffer.length();
+	int end = start + line.length() + 1;
+	buffer.replace(start, end, line + "\n");
   }
   
-
+  public void playFile(String filename) {
+	  File file = new File(filename);
+	  playFile(file);
+  }
+  
+  /*
+   * play a file, primarily useful to check audio functionality
+   * @author: timo
+   */
+  public void playFile(File file) {
+	  try {
+		System.out.println(getAudioFileFormat(file));
+	    audioInputStream = getPCMAudioInputStream(file);
+	    audioFormat = audioInputStream.getFormat();
+	    DataLine.Info dli = new DataLine.Info(SourceDataLine.class, audioFormat);
+	    sourceDataLine = (SourceDataLine) AudioSystem.getLine(dli);
+	    new PlayThread().start();
+	  } catch (Exception e) {
+	    e.printStackTrace();
+	  }
+	  
+  }
+  
   public static void main(String[] args) {
-//    File file = new File("res/sample_vm.nis");
-    File file = new File("res/sample_swbd.sph");
     SphereFileReader sfr = new SphereFileReader();
+//    sfr.playFile("res/sample_vm.nis");
+    sfr.playFile("res/sample_swbd.sph");
     try {
-      System.out.println(sfr.getAudioFileFormat(file));
-      sfr.audioInputStream = sfr.getAudioInputStream(file);
-      sfr.audioFormat = sfr.audioInputStream.getFormat();
-      DataLine.Info dli = new DataLine.Info(SourceDataLine.class, sfr.audioFormat);
-      sfr.sourceDataLine = (SourceDataLine) AudioSystem.getLine(dli);
-      sfr.new PlayThread().start();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+		Thread.sleep(5000);
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
     System.out.println(sfr.header);
   }
 
