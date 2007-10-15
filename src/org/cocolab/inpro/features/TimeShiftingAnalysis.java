@@ -3,6 +3,14 @@ package org.cocolab.inpro.features;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+
+/**
+ * class to perform linear regression and mean calculation; 
+ * ideal for incrementally added data points. old data points 
+ * can be discarded automatically using setMaxLag()
+ * @author timo
+ *
+ */
 public class TimeShiftingAnalysis {
 
 	// linear regression of y(t) = a*t + b
