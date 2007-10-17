@@ -277,13 +277,13 @@ public class LabelWriter
      * @param list list of tokens
      * @return 
      */
-    private String tokenListToAlignment(List list) {
+    private String tokenListToAlignment(List<Token> list) {
 		StringBuffer sb = new StringBuffer(); 
 		
 		// iterate over the list and print the associated times
         for (int i = list.size() - 1; i > 0; i--) {
-            Token token = (Token) list.get(i);
-            Token nextToken = (Token) list.get(i - 1);
+            Token token = list.get(i);
+            Token nextToken = list.get(i - 1);
             sb.append(token.getFrameNumber() / 100.0); // a frame always lasts 10ms
             sb.append("\t");
             sb.append(nextToken.getFrameNumber() / 100.0);
@@ -306,7 +306,16 @@ public class LabelWriter
         return sb.toString();
     }
 
-    private String writeAlignment(List list, PrintStream stream, String lastAlignment, boolean timestamp) {
+    /**
+     * write labels of aligned segments or words  
+     * to stream if it differs from lastAlignment
+     * @param list
+     * @param stream
+     * @param lastAlignment
+     * @param timestamp
+     * @return
+     */
+    private String writeAlignment(List<Token> list, PrintStream stream, String lastAlignment, boolean timestamp) {
     	String alignment = tokenListToAlignment(list);
     	if (!alignment.equals(lastAlignment)) {
     		if (timestamp) {
@@ -317,6 +326,11 @@ public class LabelWriter
     		lastAlignment = alignment;
     	}
     	return alignment;
+    }
+    
+    private void messageZeitGeist(List<Token> list, PrintStream stream, String lastAlignment, boolean timestamp) {
+    	// TODO: voilà, hier soll der Zeitgeist benachrichtigt werden.
+    	// er müsste jeweils da aufgerufen werden, wo zur Zeit writeAlignment() aufgerufen wird
     }
     
     private void dumpAllStates(Result result) {
@@ -356,7 +370,7 @@ public class LabelWriter
     		}
     		boolean timestamp = !result.isFinal();
     		if (wordAlignment) {
-    			List list = getBestWordTokens(result);
+    			List<Token> list = getBestWordTokens(result);
     			if (newfile) {
     				if ((wordAlignmentStream != null) && fileOutput) { wordAlignmentStream.close(); }
     				wordAlignmentStream = setStream("wordalignment");
@@ -364,7 +378,7 @@ public class LabelWriter
     			lastWordAlignment = writeAlignment(list, wordAlignmentStream, lastWordAlignment, timestamp);
     		}
     		if (phoneAlignment) {
-    			List list = getBestPhoneTokens(result);
+    			List<Token> list = getBestPhoneTokens(result);
     			if (newfile) {
     				if ((phoneAlignmentStream != null) && fileOutput) { phoneAlignmentStream.close(); }
     				phoneAlignmentStream = setStream("phonealignment");
