@@ -284,9 +284,9 @@ public class LabelWriter
         for (int i = list.size() - 1; i > 0; i--) {
             Token token = list.get(i);
             Token nextToken = list.get(i - 1);
-            sb.append(token.getFrameNumber() / 100.0); // a frame always lasts 10ms
+            sb.append(token.getFrameNumber() / 100.0); // a frame always lasts 10ms (FIXME, better be configurable)
             sb.append("\t");
-            sb.append(nextToken.getFrameNumber() / 100.0);
+            sb.append(nextToken.getFrameNumber() / 100.0); // dito
             sb.append("\t");
             // depending on whether word, filler or other, dump the string-representation
             SearchState state = token.getSearchState();
