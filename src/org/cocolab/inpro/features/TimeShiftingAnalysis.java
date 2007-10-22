@@ -3,6 +3,8 @@ package org.cocolab.inpro.features;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import edu.cmu.sphinx.util.props.Resetable;
+
 
 /**
  * class to perform linear regression and mean calculation; 
@@ -11,22 +13,22 @@ import java.util.LinkedList;
  * @author timo
  *
  */
-public class TimeShiftingAnalysis {
+public class TimeShiftingAnalysis implements Resetable {
 
 	// linear regression of y(t) = a*t + b
 	// using data points (t1, x1), (t2, x2), ...
 	
 	// container for the data points, newest data is always stored in front
-	LinkedList<DataPoint> dataPoints;
+	protected LinkedList<DataPoint> dataPoints;
 	
 	// maximum lag of the oldest datapoint compared to the newest data point
-	int maxLag;
+	protected int maxLag;
 	
-	boolean dirty = false;
+	protected boolean dirty = false;
 	
-	double slope;
-	double intercept;
-	double mean;
+	protected double slope;
+	protected double intercept;
+	protected double mean;
 	
 	public TimeShiftingAnalysis(int maxLag) {
 		dataPoints = new LinkedList<DataPoint>();
@@ -64,7 +66,7 @@ public class TimeShiftingAnalysis {
 		removeOldPoints();
 	}
 	
-	private void doRegression() {
+	protected void doRegression() {
 		if (dirty) {
 			// sums of t and x
 			double st = 0.0;
@@ -114,15 +116,8 @@ public class TimeShiftingAnalysis {
 	}
 	
 	
-	/* utility class for data points */
-	private class DataPoint {
-		int t;
-		double x;
-		
-		DataPoint(int t, double x) {
-			this.t = t;
-			this.x = x;
-		}
+	public void reset() {
+		dataPoints.clear();		
 	}
 	
 	public String toString() {
@@ -156,6 +151,17 @@ public class TimeShiftingAnalysis {
 		System.out.println("\tadding point (5, 1.0)");		
 		tsa.add(5, 1.0);
 		System.out.println(tsa);
+	}
+
+	/* utility class for data points */
+	private class DataPoint {
+		int t;
+		double x;
+		
+		DataPoint(int t, double x) {
+			this.t = t;
+			this.x = x;
+		}
 	}
 	
 }
