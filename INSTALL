@@ -34,6 +34,11 @@ While you are there, also grab the different acoustic models
 (HUB4, RM1, TIDIGITS and WSJ) and add them to the class path
 as well. 
 
+1a. German Acoustic Model:
+
+get it via ssh at helios:/home/timo/KCoRS_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
+and at it to your CLASSPATH.
+
 2. OAA (2.3.2):
 
 get it at http://www.ai.sri.com/oaa/distribution/v2.3/2.3.2/
