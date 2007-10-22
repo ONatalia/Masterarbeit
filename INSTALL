@@ -1,0 +1,70 @@
+_____________________________________________________________
+  _                                         _           _   
+ (_)_ __  _ __  _ __ ___    _ __  _ __ ___ (_) ___  ___| |_ 
+ | | '_ \| '_ \| '__/ _ \  | '_ \| '__/ _ \| |/ _ \/ __| __|
+ | | | | | |_) | | | (_) | | |_) | | | (_) | |  __/ (__| |_ 
+ |_|_| |_| .__/|_|  \___/  | .__/|_|  \___// |\___|\___|\__|
+         |_|               |_|           |__/               
+_____________________________________________________________
+
+Installation instructions for the JAVA programs in the inpro 
+project (thus mainly the ASR and closely connected modules).
+
+For the moment there are no build instructions, because we use
+Eclipse with Subclipse installed as our build environment.
+Figure it out yourself.
+
+Dependencies:
+=============
+
+1. Sphinx4 (1.0beta):
+
+get it at http://sourceforge.net/project/showfiles.php?group_id=1904&package_id=117949
+
+The current (20071022) nightly builds will likely not work, 
+as the configuration management of current Sphinx4 has been 
+heavily reworked. 
+
+You can either download and build the source distribution
+or just download the binary distribution. All you need is
+the library sphinx4.jar that you want to add to your 
+CLASSPATH.
+
+While you are there, also grab the different acoustic models
+(HUB4, RM1, TIDIGITS and WSJ) and add them to the class path
+as well. 
+
+2. OAA (2.3.2):
+
+get it at http://www.ai.sri.com/oaa/distribution/v2.3/2.3.2/
+
+You will definitely need the facilitator (in runtime/
+/facilitator/) and likely the debugger (in runtime/debug/ and
+runtime/debug_c/) to run the modules that require to talk
+via the OAA.
+
+Also, add the libraries in lib/jar to your CLASSPATH.
+( oaa2.jar and antlr-oaa.jar are the only needed ones from the 
+OAA-project. The other needed libraries may also be 
+installable via your package manager).
+
+3. Java Media Framework (2.1.1):
+
+get it at http://java.sun.com/products/java-media/jmf/2.1.1/download.html
+
+You may want to install the version optimized for your OS/
+architecture. Add jmf.jar to your CLASSPATH.
+
+4. weka (3.5.x), not yet used.
+
+get it at http://www.cs.waikato.ac.nz/ml/weka/index_downloading.html
+
+Add weka.jar to your CLASSPATH.
+
+5. drej (1.2) 
+
+get it at http://www.gregdennis.com/drej/
+
+and add it to your CLASSPATH. It also requires vecmath.jar,
+available from https://java3d.dev.java.net/binary-builds.html,
+which must be added to your CLASSPATH as well.
