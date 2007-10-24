@@ -26,15 +26,19 @@ public class EOTTrainer extends EOTFeatureAggregator {
 			}
 		}
 	}
+	
+	public double getEOTDistance() {
+		return EOT - ((double) framesIntoTurnValue) / 100.0f;
+	}
 
 	public Instance getCurrentInstance() {
 		Instance inst = getNewestFeatures();
 		double remainingTime = EOT - getTimeIntoTurn();
 		if (CLUSTERED_TIME) {
-			inst.setClassValue(EOTBins.eotBin(remainingTime));
+			inst.setValue(clusteredTimeToEOT, EOTBins.eotBin(remainingTime));
 		}
-		else {
-			inst.setClassValue(remainingTime);
+		if (CONTINUOUS_TIME) {
+			inst.setValue(timeToEOT, remainingTime);
 		}
 		return inst;
 	}

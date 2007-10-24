@@ -9,11 +9,10 @@ import edu.cmu.sphinx.util.props.Resetable;
 
 public class EOTFeatureAggregator implements Resetable {
 	
-	private final static int NUMBER_OF_ATTRIBUTES = 14; 
-	
-	private Attribute timeIntoTurnAttribute; 
+	private Attribute framesIntoTurnAttribute;
 	private Attribute wordsIntoTurnAttribute;
-	private Attribute timeIntoLastWordAttribute;
+	private Attribute framesIntoLastWordAttribute;
+	private Attribute asrResultsLagAttribute;
 	private Attribute currentFrameEnergyAttribute;
 	private Attribute frameEnergy50msMeanAttribute;
 	private Attribute frameEnergy50msSlopeAttribute;
@@ -25,77 +24,102 @@ public class EOTFeatureAggregator implements Resetable {
 	private Attribute frameEnergy200msSlopeAttribute;
 	private Attribute frameEnergy200msPredictAttribute;
 	
-	protected final static boolean CLUSTERED_TIME = true; // FIXME: this should be configurable (maybe via constructor) 
+	protected final static boolean CLUSTERED_TIME = true; // FIXME: this should be configurable (maybe via configurable)
+	protected final static boolean CONTINUOUS_TIME = true; // FIXME: this should be configurable (via configurable interface)
 	
-	private Attribute timeToEOT;
-	private Attribute clusteredTimeToEOT;
+	protected Attribute timeToEOT;
+	protected Attribute clusteredTimeToEOT;
 	
 	protected Instances instances;
 	
 	int framesIntoTurnValue;
 	int wordsIntoTurnValue;
 	int framesIntoLastWordValue;
+	int asrResultsLagValue;
 	double currentFrameEnergyValue;
 	TimeShiftingAnalysis frameEnergy50ms = new TimeShiftingAnalysis(5);
 	TimeShiftingAnalysis frameEnergy100ms = new TimeShiftingAnalysis(10);
 	TimeShiftingAnalysis frameEnergy200ms = new TimeShiftingAnalysis(20); 
 	
+	int numAttributes;
 	
 	public EOTFeatureAggregator() {
-		FastVector attInfo = new FastVector(NUMBER_OF_ATTRIBUTES);
-		timeIntoTurnAttribute = new Attribute("timeIntoTurn");
-		attInfo.addElement(timeIntoTurnAttribute);
+		numAttributes = 0;
+		FastVector attInfo = new FastVector();
+		framesIntoTurnAttribute = new Attribute("timeIntoTurn");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(framesIntoTurnAttribute);
 		wordsIntoTurnAttribute = new Attribute("wordsIntoTurn");
+		attInfo.setCapacity(++numAttributes);
 		attInfo.addElement(wordsIntoTurnAttribute);
-		timeIntoLastWordAttribute = new Attribute("timeIntoLastWord");
-		attInfo.addElement(timeIntoLastWordAttribute);
+		framesIntoLastWordAttribute = new Attribute("timeIntoLastWord");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(framesIntoLastWordAttribute);
+		asrResultsLagAttribute = new Attribute("asrResultsLag");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(asrResultsLagAttribute);
+		
 		currentFrameEnergyAttribute = new Attribute("currentFrameEnergy");
+		attInfo.setCapacity(++numAttributes);
 		attInfo.addElement(currentFrameEnergyAttribute);
 
 		frameEnergy50msMeanAttribute = new Attribute("frameEnergy50msMean");
+		attInfo.setCapacity(++numAttributes);
 		attInfo.addElement(frameEnergy50msMeanAttribute);
 		frameEnergy50msSlopeAttribute = new Attribute("frameEnergy50msSlope");
+		attInfo.setCapacity(++numAttributes);
 		attInfo.addElement(frameEnergy50msSlopeAttribute);
 		frameEnergy50msPredictAttribute = new Attribute("frameEnergy50msPredict");
+		attInfo.setCapacity(++numAttributes);
 		attInfo.addElement(frameEnergy50msPredictAttribute);
 
 		frameEnergy100msMeanAttribute = new Attribute("frameEnergy100msMean");
+		attInfo.setCapacity(++numAttributes);
 		attInfo.addElement(frameEnergy100msMeanAttribute);
 		frameEnergy100msSlopeAttribute = new Attribute("frameEnergy100msSlope");
+		attInfo.setCapacity(++numAttributes);
 		attInfo.addElement(frameEnergy100msSlopeAttribute);
 		frameEnergy100msPredictAttribute = new Attribute("frameEnergy100msPredict");
+		attInfo.setCapacity(++numAttributes);
 		attInfo.addElement(frameEnergy100msPredictAttribute);
 
 		frameEnergy200msMeanAttribute = new Attribute("frameEnergy200msMean");
+		attInfo.setCapacity(++numAttributes);
 		attInfo.addElement(frameEnergy200msMeanAttribute);
 		frameEnergy200msSlopeAttribute = new Attribute("frameEnergy200msSlope");
+		attInfo.setCapacity(++numAttributes);
 		attInfo.addElement(frameEnergy200msSlopeAttribute);
 		frameEnergy200msPredictAttribute = new Attribute("frameEnergy200msPredict");
+		attInfo.setCapacity(++numAttributes);
 		attInfo.addElement(frameEnergy200msPredictAttribute);
 
 		if (CLUSTERED_TIME) {
 			clusteredTimeToEOT = EOTBins.eotBinsAttribute();
+			attInfo.setCapacity(++numAttributes);
 			attInfo.addElement(clusteredTimeToEOT);
 		}
-		else {
+		if (CONTINUOUS_TIME) {
 			timeToEOT = new Attribute("timeToEOT");
+			attInfo.setCapacity(++numAttributes);
 			attInfo.addElement(timeToEOT);
 		}
 		instances = new Instances("eotFeatures", attInfo, 0);
+		if (CONTINUOUS_TIME) {
+			instances.setClass(timeToEOT);			
+		}
 		if (CLUSTERED_TIME) {
 			instances.setClass(clusteredTimeToEOT);
-		}
-		else {
-			instances.setClass(timeToEOT);			
 		}
 		reset();
 	}
 	
 	protected Instance getNewestFeatures() {
-		Instance instance = new Instance(NUMBER_OF_ATTRIBUTES);
-		instance.setValue(timeIntoTurnAttribute, ((double) framesIntoTurnValue) / 100.0);
+		Instance instance = new Instance(numAttributes);
+		instance.setValue(framesIntoTurnAttribute, ((double) framesIntoTurnValue) / 100.0);
 		instance.setValue(wordsIntoTurnAttribute, wordsIntoTurnValue);
-		instance.setValue(timeIntoLastWordAttribute, ((double) framesIntoLastWordValue) / 100.0);
+		instance.setValue(framesIntoLastWordAttribute, ((double) framesIntoLastWordValue) / 100.0);
+		instance.setValue(asrResultsLagAttribute, asrResultsLagValue);
+		
 		instance.setValue(currentFrameEnergyAttribute, currentFrameEnergyValue);
 		instance.setValue(frameEnergy50msMeanAttribute, 
 						  frameEnergy50ms.getMean());
@@ -131,6 +155,10 @@ public class EOTFeatureAggregator implements Resetable {
 		return framesIntoTurnValue;
 	}
 
+	public void setASRResultsLag(int frames) {
+		asrResultsLagValue = frames;
+	}
+
 	public double getTimeIntoTurn() {
 		return ((double) framesIntoTurnValue) / 100.0; // FIXME: this should be configurable 
 	}
@@ -159,4 +187,5 @@ public class EOTFeatureAggregator implements Resetable {
 		frameEnergy100ms.reset();
 		frameEnergy200ms.reset();
 	}
+
 }
