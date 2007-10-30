@@ -240,7 +240,7 @@ public class LabelWriter
     private List<Token> getBestPhoneTokens(Result result) {
 		List<Token> list = new ArrayList<Token>();
     	Token token = result.getBestToken();
-		// recover the path of visited word- and silence-tokens in the best token
+		// recover the visited segmental tokens in the best path
     	list.add(token);
     	while (token != null) {
 			SearchState searchState = token.getSearchState(); 
