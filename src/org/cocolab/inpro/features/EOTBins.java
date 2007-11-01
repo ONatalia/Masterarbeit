@@ -14,13 +14,27 @@ public class EOTBins {
 	private final static double[] EOT_BIN_ENDS = {
 		2.561, 1.281, 0.641, 0.321, 0.161, 0.081, 0.041, 0.001, -0.039, -0.079, -0.159, -Double.MAX_VALUE
 	};
-*/
+	public final static String[] EOT_BINS = {
+		"moreThan640ms", "640to161ms", "161to81ms", "80to1ms", "0to38msAgo", "40to119msAgo", "moreThan120msAgo" 
+	};
+	
+	private final static double[] EOT_BIN_ENDS = {0.641, 0.161, 0.081, 0.001, -0.039, -0.119, -Double.MAX_VALUE}; 
 
 	public final static String[] EOT_BINS = {
 		"moreThan640ms", "640to161ms", "161to81ms", "80to1ms", "0to38msAgo", "40to119msAgo", "moreThan120msAgo" 
 	};
 	
 	private final static double[] EOT_BIN_ENDS = {0.641, 0.161, 0.081, 0.001, -0.039, -0.119, -Double.MAX_VALUE}; 
+	
+*/
+	
+	public final static String[] EOT_BINS = {
+		"notYet", "now"
+	};
+	
+	private final static double[] EOT_BIN_ENDS = {
+		0.101, -Double.MAX_VALUE
+	};
 	
 	public static Attribute eotBinsAttribute() {
 		FastVector binnedTimesToEOT = new FastVector(EOT_BINS.length);
