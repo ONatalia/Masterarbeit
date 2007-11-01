@@ -15,6 +15,6 @@ public interface SignalFeatureListener extends EventListener, Resetable {
      * @param logEnergy log energy of the frame
      *
      */
-     public void newSignalFeatures(double logEnergy);
+     public void newSignalFeatures(double logEnergy, boolean voicing, double pitch);
      
 }

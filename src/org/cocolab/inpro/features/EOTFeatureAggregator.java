@@ -24,6 +24,18 @@ public class EOTFeatureAggregator implements Resetable {
 	private Attribute frameEnergy200msSlopeAttribute;
 	private Attribute frameEnergy200msPredictAttribute;
 	
+	private Attribute currentVoicingAttribute;
+	private Attribute currentPitchAttribute;
+	private Attribute pitch50msMeanAttribute;
+	private Attribute pitch50msSlopeAttribute;
+	private Attribute pitch50msPredictAttribute;
+	private Attribute pitch100msMeanAttribute;
+	private Attribute pitch100msSlopeAttribute;
+	private Attribute pitch100msPredictAttribute;
+	private Attribute pitch200msMeanAttribute;
+	private Attribute pitch200msSlopeAttribute;
+	private Attribute pitch200msPredictAttribute;
+	
 	protected final static boolean CLUSTERED_TIME = true; // FIXME: this should be configurable (maybe via configurable)
 	protected final static boolean CONTINUOUS_TIME = true; // FIXME: this should be configurable (via configurable interface)
 	
@@ -39,7 +51,12 @@ public class EOTFeatureAggregator implements Resetable {
 	double currentFrameEnergyValue;
 	TimeShiftingAnalysis frameEnergy50ms = new TimeShiftingAnalysis(5);
 	TimeShiftingAnalysis frameEnergy100ms = new TimeShiftingAnalysis(10);
-	TimeShiftingAnalysis frameEnergy200ms = new TimeShiftingAnalysis(20); 
+	TimeShiftingAnalysis frameEnergy200ms = new TimeShiftingAnalysis(20);
+	boolean currentVoicingValue;
+	double currentPitchValue;
+	TimeShiftingAnalysis pitch50ms = new TimeShiftingAnalysis(5);
+	TimeShiftingAnalysis pitch100ms = new TimeShiftingAnalysis(10);
+	TimeShiftingAnalysis pitch200ms = new TimeShiftingAnalysis(20);
 	
 	int numAttributes;
 	
@@ -92,7 +109,44 @@ public class EOTFeatureAggregator implements Resetable {
 		frameEnergy200msPredictAttribute = new Attribute("frameEnergy200msPredict");
 		attInfo.setCapacity(++numAttributes);
 		attInfo.addElement(frameEnergy200msPredictAttribute);
+		
+		currentVoicingAttribute = new Attribute("currentVoicing");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(currentVoicingAttribute);
+		currentPitchAttribute = new Attribute("currentPitch");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(currentPitchAttribute);
 
+		pitch50msMeanAttribute = new Attribute("pitch50msMean");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(pitch50msMeanAttribute);
+		pitch50msSlopeAttribute = new Attribute("pitch50msSlope");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(pitch50msSlopeAttribute);
+		pitch50msPredictAttribute = new Attribute("pitch50msPredict");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(pitch50msPredictAttribute);
+
+		pitch100msMeanAttribute = new Attribute("pitch100msMean");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(pitch100msMeanAttribute);
+		pitch100msSlopeAttribute = new Attribute("pitch100msSlope");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(pitch100msSlopeAttribute);
+		pitch100msPredictAttribute = new Attribute("pitch100msPredict");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(pitch100msPredictAttribute);
+
+		pitch200msMeanAttribute = new Attribute("pitch200msMean");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(pitch200msMeanAttribute);
+		pitch200msSlopeAttribute = new Attribute("pitch200msSlope");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(pitch200msSlopeAttribute);
+		pitch200msPredictAttribute = new Attribute("pitch200msPredict");
+		attInfo.setCapacity(++numAttributes);
+		attInfo.addElement(pitch200msPredictAttribute);
+		
 		if (CLUSTERED_TIME) {
 			clusteredTimeToEOT = EOTBins.eotBinsAttribute();
 			attInfo.setCapacity(++numAttributes);
@@ -141,7 +195,30 @@ public class EOTFeatureAggregator implements Resetable {
 						  frameEnergy200ms.getSlope());
 		instance.setValue(frameEnergy200msPredictAttribute, 
 						  frameEnergy200ms.predictValueAt(framesIntoTurnValue));
+		
+		instance.setValue(currentVoicingAttribute, currentVoicingValue ? 1.0 : 0.0);
+		instance.setValue(currentPitchAttribute, currentPitchValue);
+		instance.setValue(pitch50msMeanAttribute, 
+						  pitch50ms.getMean());
+		instance.setValue(pitch50msSlopeAttribute, 
+						  pitch50ms.getSlope());
+		instance.setValue(pitch50msPredictAttribute, 
+						  pitch50ms.predictValueAt(framesIntoTurnValue));
 
+		instance.setValue(pitch100msMeanAttribute, 
+						  pitch100ms.getMean());
+		instance.setValue(pitch100msSlopeAttribute, 
+						  pitch100ms.getSlope());
+		instance.setValue(pitch100msPredictAttribute, 
+						  pitch100ms.predictValueAt(framesIntoTurnValue));
+
+		instance.setValue(pitch200msMeanAttribute, 
+						  pitch200ms.getMean());
+		instance.setValue(pitch200msSlopeAttribute, 
+						  pitch200ms.getSlope());
+		instance.setValue(pitch200msPredictAttribute, 
+						  pitch200ms.predictValueAt(framesIntoTurnValue));
+		
 		instance.setDataset(instances);
 		instance.setClassMissing();
 		return instance;
@@ -178,6 +255,17 @@ public class EOTFeatureAggregator implements Resetable {
 		frameEnergy200ms.add(framesIntoTurnValue, logEnergy);
 	}
 
+	public void setCurrentVoicing(boolean voicing) {
+		currentVoicingValue = voicing;
+	}
+
+	public void setCurrentPitch(double pitch) {
+		currentPitchValue = pitch;
+		pitch50ms.add(framesIntoTurnValue, pitch);
+		pitch100ms.add(framesIntoTurnValue, pitch);
+		pitch200ms.add(framesIntoTurnValue, pitch);
+	}
+
 	public void reset() {
 		framesIntoTurnValue = -1;
 		wordsIntoTurnValue = -1;
@@ -186,6 +274,9 @@ public class EOTFeatureAggregator implements Resetable {
 		frameEnergy50ms.reset();
 		frameEnergy100ms.reset();
 		frameEnergy200ms.reset();
+		pitch50ms.reset();
+		pitch100ms.reset();
+		pitch200ms.reset();
 	}
 
 }
