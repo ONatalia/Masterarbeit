@@ -25,6 +25,7 @@ import java.util.List;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.sound.sampled.spi.AudioFileReader;
 
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
@@ -36,6 +37,7 @@ import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.Registry;
+import gov.nist.sphere.jaudio.SphereFileReader;
 
 public class PitchTracker extends BaseDataProcessor {
 	
@@ -172,25 +174,32 @@ public class PitchTracker extends BaseDataProcessor {
             if (args.length > 0) {
                 audioFileURL = new File(args[0]).toURI().toURL();
             } else {
-                audioFileURL = new URL("file:res/telescope.wav");
+                audioFileURL = new URL("file:res/12345.wav");
             }
 
             URL configURL = PitchTracker.class.getResource("config.xml");
-
             System.out.println("Loading Pitch Tracker...\n");
 
             ConfigurationManager cm = new ConfigurationManager(configURL);
-
             FrontEnd fe = (FrontEnd) cm.lookup("frontEnd");
             fe.initialize();
             
             System.out.println("Tracking " + audioFileURL.getFile());
-            System.out.println(AudioSystem.getAudioFileFormat(audioFileURL));
 
             StreamDataSource reader = (StreamDataSource) cm.lookup("streamDataSource");
+
+            AudioInputStream ais;
             
-            AudioInputStream ais 
-                = AudioSystem.getAudioInputStream(audioFileURL);
+			if (audioFileURL.getFile().endsWith(".sph") ||
+				audioFileURL.getFile().endsWith(".SPH") ||
+				audioFileURL.getFile().endsWith(".nis") ||
+				audioFileURL.getFile().endsWith(".NIS")) {
+				AudioFileReader sfr = new SphereFileReader(); 
+				ais = sfr.getAudioInputStream(audioFileURL);
+			} else {
+	            System.err.println(AudioSystem.getAudioFileFormat(audioFileURL));
+				ais = AudioSystem.getAudioInputStream(audioFileURL);
+			}
             
             /* set the stream data source to read from the audio file */
             reader.setInputStream(ais, audioFileURL.getFile());
@@ -205,7 +214,7 @@ public class PitchTracker extends BaseDataProcessor {
             }
             
         } catch (IOException e) {
-            System.err.println("Problem when loading IncrementalWavFile: " + e);
+            System.err.println("Problem when loading PitchTracker: " + e);
             e.printStackTrace();
         } catch (UnsupportedAudioFileException e) {
             System.err.println("Audio file format not supported: " + e);
