@@ -213,7 +213,7 @@ public class LabelWriter
      * @param result the result to analyse
      * @return List of word tokens on the best path
      */
-    private List<Token> getBestWordTokens(Result result) {
+    public static List<Token> getBestWordTokens(Result result) {
 		List<Token> list = new ArrayList<Token>();
     	Token token = result.getBestToken();
 		// recover the path of visited word- and silence-tokens in the best token
@@ -237,7 +237,7 @@ public class LabelWriter
      * @param result the result to analyse
      * @return List of phone tokens on the best path
      */
-    private List<Token> getBestPhoneTokens(Result result) {
+    public static List<Token> getBestPhoneTokens(Result result) {
 		List<Token> list = new ArrayList<Token>();
     	Token token = result.getBestToken();
 		// recover the visited segmental tokens in the best path
@@ -260,7 +260,7 @@ public class LabelWriter
      * @param result the result to analyse
      * @return List of all tokens on the best path
      */
-    private List<Token> getAllBestTokens(Result result) {
+    public static List<Token> getAllBestTokens(Result result) {
 		List<Token> list = new ArrayList<Token>();
     	Token token = result.getBestToken();
 		// recover the path of visited word- and silence-tokens in the best token
@@ -277,7 +277,7 @@ public class LabelWriter
      * @param list list of tokens
      * @return 
      */
-    private String tokenListToAlignment(List<Token> list) {
+    public static String tokenListToAlignment(List<Token> list) {
 		StringBuffer sb = new StringBuffer(); 
 		
 		// iterate over the list and print the associated times
