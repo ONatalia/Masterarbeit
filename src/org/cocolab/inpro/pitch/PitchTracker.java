@@ -1,5 +1,19 @@
 package org.cocolab.inpro.pitch;
 
+/**
+ * Data Processor for voicing-decision and pitch tracking
+ * 
+ * uses the AMDF (average magnitude difference function) approach
+ * as outlined in: 
+ * Ying, Jamieson, Michell: A Probabilistic Approach to AMDF Pitch Detection, ICSLP 1996
+ * 
+ * pitch tracking usually has several steps:
+ * - preprocessing (e. g. low pass filtering)
+ * - period candidate generation (amdf, auto-correlation, cross-correlation, normalized cross-correlation)
+ * - candidate refinement (e. g. thresholding of candidates)
+ * - voicing decision and final path determination (dynamic programming, ...)
+ * 
+ */
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +46,8 @@ public class PitchTracker extends BaseDataProcessor {
 	private int samplingFrequency = 16000; // TODO: parametrisieren
 	private int maxLobeWidth = 400; // FIXME: must be configurable: 20kHz->100, 16kHz->80, ...
 	
+	
+	// calculate amdf of a given signal and downsample the signal on the way
 	public double[] amdf(double[] samples) {
 		double[] amdf = new double[maxSamples + 2];
 		Arrays.fill(amdf, 0, minSamples, 0.0f);
@@ -58,8 +74,10 @@ public class PitchTracker extends BaseDataProcessor {
 		return amdf;
 	}
 	
+	// generate candidates from the amdf following the marker selection in
+	// Ying, Jamieson, Michell: A Probabilistic Approach to AMDF Pitch Detection, ICSLP 1996
 	public List<Double> candidates(double[] amdf) {
-		// fliegt raus, sobald die Kandidatenkür besser wird
+		// find the highest peak in the amdf
 		double global_max = 0.0f;
 		for (int i = minSamples; i < maxSamples; i++) {
 			if (amdf[i] > global_max) {
@@ -115,6 +133,11 @@ public class PitchTracker extends BaseDataProcessor {
 		return candidates;
 	}
 	
+	double selectCandidate(List<Double> candidates) {
+		// always select the first candidate for the time being
+		return candidates.get(0).doubleValue();
+	}
+	
 	@Override
 	public Data getData() throws DataProcessingException {
 		Data input = getPredecessor().getData();
@@ -125,7 +148,7 @@ public class PitchTracker extends BaseDataProcessor {
 			double pitch = -1.0f;
 			boolean voiced = !candidates.isEmpty();
 			if (voiced) {
-				pitch = candidates.get(0).doubleValue();
+				pitch = selectCandidate(candidates);
 			}
 			input = new PitchedDoubleData((DoubleData) input, voiced, pitch);
 		}
