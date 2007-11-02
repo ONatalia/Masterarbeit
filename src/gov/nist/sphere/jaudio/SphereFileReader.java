@@ -57,7 +57,7 @@ public class SphereFileReader extends AudioFileReader {
   protected AudioFileFormat getAudioFileFormat(InputStream inputStream, byte[] bytes)
           throws UnsupportedAudioFileException, IOException {
     InputStreamReader isr = new InputStreamReader(inputStream, "US-ASCII");
-    LineNumberReader lnr = new LineNumberReader(isr);
+    LineNumberReader lnr = new LineNumberReader(isr, 1);
 
     String line = lnr.readLine();
     String line2 = lnr.readLine();
@@ -115,33 +115,29 @@ public class SphereFileReader extends AudioFileReader {
    */
   public AudioInputStream getAudioInputStream(InputStream inputStream)
           throws UnsupportedAudioFileException, IOException {
-    // Save byte header since this method must return the stream opened at byte 0.
+/*    // Save byte header since this method must return the stream opened at byte 0.
     byte[] bytes = null;
     AudioFileFormat audioFileFormat = getAudioFileFormat(inputStream, bytes);
     return new AudioInputStream(inputStream,
-            audioFileFormat.getFormat(), audioFileFormat.getFrameLength());
+            audioFileFormat.getFormat(), audioFileFormat.getFrameLength()); */
+    return null;
   }
   
-  public AudioInputStream getPCMAudioInputStream(InputStream inputStream) 
+/*  public AudioInputStream getPCMAudioInputStream(InputStream inputStream) 
 				throws UnsupportedAudioFileException, IOException {
 	  	return assertPCMAudio(getAudioInputStream(inputStream));
   }
- 
-  
+ */
 
   /** Return the AudioInputStream from the given File. */
   public AudioInputStream getAudioInputStream(File file)
           throws UnsupportedAudioFileException, IOException {
     InputStream inputStream = new FileInputStream(file);
-    try {
-      return getAudioInputStream(inputStream);
-    } catch (UnsupportedAudioFileException e) {
-      inputStream.close();
-      throw e;
-    } catch (IOException e) {
-      inputStream.close();
-      throw e;
-    }
+    AudioFileFormat audioFileFormat = getAudioFileFormat(inputStream);
+    inputStream = new FileInputStream(file);
+    inputStream.skip(1024);
+    return new AudioInputStream(inputStream,
+            audioFileFormat.getFormat(), audioFileFormat.getFrameLength());
   }
   
   public AudioInputStream getPCMAudioInputStream(File file) 
@@ -154,15 +150,11 @@ public class SphereFileReader extends AudioFileReader {
   public AudioInputStream getAudioInputStream(URL url)
           throws UnsupportedAudioFileException, IOException {
     InputStream inputStream = url.openStream();
-    try {
-      return getAudioInputStream(inputStream);
-    } catch (UnsupportedAudioFileException e) {
-      inputStream.close();
-      throw e;
-    } catch (IOException e) {
-      inputStream.close();
-      throw e;
-    }
+    AudioFileFormat audioFileFormat = getAudioFileFormat(inputStream);
+    inputStream = url.openStream();
+    inputStream.skip(1024);
+    return new AudioInputStream(inputStream,
+            audioFileFormat.getFormat(), audioFileFormat.getFrameLength());
   }
   
   public AudioInputStream getPCMAudioInputStream(URL url) 
