@@ -20,8 +20,6 @@
     <component name="frontEnd" type="edu.cmu.sphinx.frontend.FrontEnd">
         <propertylist name="pipeline">
             <item>streamDataSource</item>
-<!--            <item>preemphasizer</item> -->
-            <item>windower</item>
             <item>pitchTracker</item>
         </propertylist>
     </component>
@@ -31,12 +29,8 @@
         <property name="sampleRate" value="16000"/>
         <property name="bitsPerSample" value="16"/>
         <property name="bigEndianData" value="false"/>
+        <property name="bytesPerRead" value="320"/> <!-- 10ms -->
         <property name="signedData" value="true"/>
-    </component>
-    
-    <component name="windower" 
-               type="edu.cmu.sphinx.frontend.window.RaisedCosineWindower">
-        <property name="alpha" value="0"/> 
     </component>
     
     <component name="pitchTracker" 
