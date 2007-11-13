@@ -29,6 +29,7 @@ public class SphereHeader {
   private final static String CHANNEL_COUNT = "channel_count";
   public final static String SAMPLE_CODING_PCM = "pcm";
   public final static String SAMPLE_CODING_ULAW = "ulaw";
+  public final static String SAMPLE_CODING_ALAW = "alaw";
   public final static String SAMPLE_CODING_DEFAULT = SAMPLE_CODING_PCM;
 
 	  
@@ -117,7 +118,8 @@ public class SphereHeader {
         sampleCoding = SAMPLE_CODING_DEFAULT;
       } else {
         String value = shi.getValue();
-        if (value.equals(SAMPLE_CODING_PCM) || value.equals(SAMPLE_CODING_ULAW))
+        if (value.equals(SAMPLE_CODING_PCM) || value.equals(SAMPLE_CODING_ULAW)
+        									|| value.equals(SAMPLE_CODING_ALAW))
           sampleCoding = value;
         else
           throw new SphereException("Incorrect header: illegal value for sample_coding");

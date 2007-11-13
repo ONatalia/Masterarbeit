@@ -19,6 +19,9 @@ import java.util.regex.Pattern;
  * a 1024 bytes header.
  *
  * @author Christophe Laprun, NIST [chris.laprun@nist.gov]
+ * @author Timo Baumann, some fixes
+ * 
+ * KNOWN ERRORS: ALAW-encoding does not yet work
  */
 public class SphereFileReader extends AudioFileReader {
 
@@ -99,9 +102,11 @@ public class SphereFileReader extends AudioFileReader {
         format = new AudioFormat(encoding, (float) sampleRate, resolution,
                 channelCount, channelCount * header.getSampleNBytes(), sampleRate, isBigEndian);
       } catch (SphereException e) {
+    	e.printStackTrace();
         throw new UnsupportedAudioFileException(e.getMessage());
       }
     } else {
+      System.err.println(header);
       throw new UnsupportedAudioFileException("incorrect header format");
     }
 
@@ -194,6 +199,8 @@ public class SphereFileReader extends AudioFileReader {
       return AudioFormat.Encoding.PCM_SIGNED;
     if (type.equals(SphereHeader.SAMPLE_CODING_ULAW))
       return AudioFormat.Encoding.ULAW;
+    if (type.equals(SphereHeader.SAMPLE_CODING_ALAW))
+        return AudioFormat.Encoding.ALAW;
     throw new SphereException("unsupported encoding");
   }
 
@@ -247,18 +254,26 @@ public class SphereFileReader extends AudioFileReader {
   public static void main(String[] args) {
     SphereFileReader sfr = new SphereFileReader();
 //    sfr.playFile("res/sample_vm.nis");
-    sfr.playFile("res/sample_swbd.sph");
-    try {
-		Thread.sleep(5000);
-	} catch (InterruptedException e) {
-		e.printStackTrace();
-	}
+    String fileName = "res/sample_swbd.sph";
+    if (args.length > 0) {
+    	fileName = args[0];
+    }
+    sfr.playFile(fileName);
+    sfr.playing = true;
+    while (sfr.playing) {
+	    try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+    }
     System.out.println(sfr.header);
   }
 
-  AudioInputStream audioInputStream;
-  AudioFormat audioFormat;
-  SourceDataLine sourceDataLine;
+  private AudioInputStream audioInputStream;
+  private AudioFormat audioFormat;
+  private SourceDataLine sourceDataLine;
+  private boolean playing; // player is still running
   
 //=============================================//
 //Inner class to play back the data from the
@@ -268,6 +283,7 @@ class PlayThread extends Thread{
 
   public void run(){
     try{
+      Thread.sleep(100);
       sourceDataLine.open(audioFormat);
       sourceDataLine.start();
 
@@ -289,7 +305,7 @@ class PlayThread extends Thread{
       // data line to empty.
       sourceDataLine.drain();
       sourceDataLine.close();
-
+      playing = false;
       //Prepare to playback another file
     }catch (Exception e) {
       e.printStackTrace();
