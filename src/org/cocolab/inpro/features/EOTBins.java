@@ -26,14 +26,20 @@ public class EOTBins {
 	
 	private final static double[] EOT_BIN_ENDS = {0.641, 0.161, 0.081, 0.001, -0.039, -0.119, -Double.MAX_VALUE}; 
 	
-*/
-	
 	public final static String[] EOT_BINS = {
 		"notYet", "now"
 	};
 	
 	private final static double[] EOT_BIN_ENDS = {
 		0.101, -Double.MAX_VALUE
+	};
+*/ 
+	public final static String[] EOT_BINS = {
+		"notYet", "soon", "now"
+	};
+	
+	private final static double[] EOT_BIN_ENDS = {
+		0.101, -0.050, -Double.MAX_VALUE
 	};
 	
 	public static Attribute eotBinsAttribute() {
