@@ -55,7 +55,7 @@ public class TimeShiftingAnalysis implements Resetable {
 	
 	private void removeOldPoints() {
 		if (maxLag > 0) {
-			while (dataPoints.getLast().t < currentTime - maxLag) {
+			while (!dataPoints.isEmpty() && (dataPoints.getLast().t < currentTime - maxLag)) {
 				dataPoints.removeLast();
 				dirty = true;
 			}
