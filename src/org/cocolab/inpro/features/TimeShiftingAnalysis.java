@@ -21,8 +21,10 @@ public class TimeShiftingAnalysis implements Resetable {
 	// container for the data points, newest data is always stored in front
 	protected LinkedList<DataPoint> dataPoints;
 	
-	// maximum lag of the oldest datapoint compared to the newest data point
+	// maximum lag of the oldest datapoint compared to the current time
 	protected int maxLag;
+	
+	protected int currentTime = 0;
 	
 	protected boolean dirty = false;
 	
@@ -42,14 +44,18 @@ public class TimeShiftingAnalysis implements Resetable {
 	public void add(int t, double x) {
 		// add data point and remove data points, that are more than maxLag ago
 		dataPoints.addFirst(new DataPoint(t, x));
-		removeOldPoints();
+		shiftTime(t);
 		dirty = true;
 	}
 	
+	public void shiftTime(int t) {
+		currentTime = t;
+		removeOldPoints();
+	}
+	
 	private void removeOldPoints() {
-		int t = dataPoints.getFirst().t; 
 		if (maxLag > 0) {
-			while (dataPoints.getLast().t < t - maxLag) {
+			while (dataPoints.getLast().t < currentTime - maxLag) {
 				dataPoints.removeLast();
 				dirty = true;
 			}
@@ -117,7 +123,8 @@ public class TimeShiftingAnalysis implements Resetable {
 	
 	
 	public void reset() {
-		dataPoints.clear();		
+		dataPoints.clear();	
+		currentTime = 0;
 	}
 	
 	public String toString() {
