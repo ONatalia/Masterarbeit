@@ -3,7 +3,6 @@ package org.cocolab.inpro.sphinx;
 import java.io.IOException;
 
 import edu.cmu.sphinx.decoder.search.SearchManager;
-import edu.cmu.sphinx.frontend.DataEndSignal;
 import edu.cmu.sphinx.frontend.DataProcessingException;
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.result.Result;
@@ -27,59 +26,50 @@ public class NoSearch implements SearchManager {
 
 	public static final String PROP_FRONTEND = "frontend";
 
-	Result emptyResult = new Result(null, null, 0, false, null);
+	protected static final Result emptyResult = new Result(null, null, 0, false, null);
 	
 	FrontEnd fe;
 	
 	String name;
 	
     public void allocate() throws IOException {
-		// TODO Auto-generated method stub
-		
+		// ignore
 	}
 
 	public void deallocate() {
-		// TODO Auto-generated method stub
-		
+		// ignore
 	}
 
 	public Result recognize(int nFrames) {
 		// TODO Auto-generated method stub
+		Result result = null;
 		for (int i = 0; i < nFrames; i++) {
 			try {
-				if (fe.getData() instanceof DataEndSignal) {
-					emptyResult = null;
-				}
+				result = (fe.getData() == null) ? null : emptyResult;
 			} catch (DataProcessingException e) {
 				e.printStackTrace();
-				emptyResult = null;
 			}
 		}
-		return emptyResult;
+		return result;
 	}
 
 	public void startRecognition() {
-		// TODO Auto-generated method stub
-		
+		// ignore
 	}
 
 	public void stopRecognition() {
-		// TODO Auto-generated method stub
-		
+		// ignore
 	}
 
 	public String getName() {
-		// TODO Auto-generated method stub
 		return name;
 	}
 
 	public void newProperties(PropertySheet ps) throws PropertyException {
         fe = (FrontEnd) ps.getComponent(PROP_FRONTEND, FrontEnd.class);
-		
 	}
 
 	public void register(String name, Registry registry) throws PropertyException {
-		// TODO Auto-generated method stub
         this.name = name;
         registry.register(PROP_FRONTEND, PropertyType.COMPONENT);		
 	}
