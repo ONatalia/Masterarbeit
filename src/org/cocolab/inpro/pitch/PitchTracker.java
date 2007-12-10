@@ -420,7 +420,7 @@ public class PitchTracker extends BaseDataProcessor {
 //            			 || (debugCounter == 47) || (debugCounter == 44);
             		if (debug) System.out.println("Frame " + debugCounter + ": ");
             	//System.out.println(d.toString());
-            		double pitch = ((PitchedDoubleData) d).getPitch();
+            		double pitch = ((PitchedDoubleData) d).getPitchHz();
             		System.out.printf((Locale) null, "%7.3f", pitch);
             		System.out.print("\t");
             		if (!referencePitch.isEmpty()) {
