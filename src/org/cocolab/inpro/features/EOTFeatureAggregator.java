@@ -10,7 +10,8 @@ import edu.cmu.sphinx.util.props.Resetable;
 public class EOTFeatureAggregator implements Resetable {
 	
 	private static final int[] energyRegressionSteps = {5, 10, 20, 50, 100, 200};
-	private static final int[] pitchRegressionSteps = {5, 10, 20, 50, 100, 200};
+	private static final int[] voicedEnergyRegressionSteps = {50, 100, 200, 500};
+	private static final int[] pitchRegressionSteps = {5, 10, 20, 50, 100, 200, 500};
 	
 	private static final String[] regressionParams = {"Mean", "Slope", "MSE", "Prediction", "PredictionError", "Range"};
 
@@ -22,6 +23,7 @@ public class EOTFeatureAggregator implements Resetable {
 	private Attribute currentFrameEnergyAttribute;
 	// for each time in energyRegressions: mean, slope, mse, predictionError, range
 	private Attribute[] energyRegressionAttributes;
+	private Attribute[] voicedEnergyRegressionAttributes;
 	
 	private Attribute currentVoicingAttribute;
 	private Attribute currentPitchAttribute;
@@ -43,6 +45,7 @@ public class EOTFeatureAggregator implements Resetable {
 */
 	double currentFrameEnergyValue;
 	TimeShiftingAnalysis[] energyRegressions;
+	TimeShiftingAnalysis[] voicedEnergyRegressions;
 	boolean currentVoicingValue;
 	double currentPitchValue;
 	TimeShiftingAnalysis[] pitchRegressions;
@@ -103,6 +106,8 @@ public class EOTFeatureAggregator implements Resetable {
 
 		energyRegressionAttributes = createRegressionAttributesFor(energyRegressionSteps, "energy", attInfo);
 		energyRegressions = createRegressions(energyRegressionSteps);
+		voicedEnergyRegressionAttributes = createRegressionAttributesFor(voicedEnergyRegressionSteps, "voicedEnergy", attInfo);
+		voicedEnergyRegressions = createRegressions(voicedEnergyRegressionSteps);
 		
 		currentVoicingAttribute = new Attribute("currentVoicing");
 		attInfo.addElement(currentVoicingAttribute);
@@ -143,6 +148,7 @@ public class EOTFeatureAggregator implements Resetable {
 		instance.setValue(currentFrameEnergyAttribute, currentFrameEnergyValue);
 		
 		setRegressionValues(energyRegressionAttributes, energyRegressions, instance);
+		setRegressionValues(voicedEnergyRegressionAttributes, voicedEnergyRegressions, instance);
 		
 		instance.setValue(currentVoicingAttribute, currentVoicingValue ? 1.0 : 0.0);
 		instance.setValue(currentPitchAttribute, currentPitchValue);
@@ -182,6 +188,9 @@ public class EOTFeatureAggregator implements Resetable {
 		currentFrameEnergyValue = logEnergy;
 		for (TimeShiftingAnalysis tsa : energyRegressions) {
 			tsa.add(framesIntoTurnValue, logEnergy);
+			if (currentVoicingValue) {
+				tsa.add(framesIntoTurnValue, logEnergy);
+			}
 		}
 	}
 
