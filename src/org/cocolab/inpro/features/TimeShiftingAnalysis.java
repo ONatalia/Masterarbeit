@@ -31,6 +31,8 @@ public class TimeShiftingAnalysis implements Resetable {
 	protected double slope;
 	protected double intercept;
 	protected double mean;
+	protected double range;
+	protected double mse;
 	
 	public TimeShiftingAnalysis(int maxLag) {
 		dataPoints = new LinkedList<DataPoint>();
@@ -75,28 +77,43 @@ public class TimeShiftingAnalysis implements Resetable {
 	protected void doRegression() {
 		if (dirty) {
 			// sums of t and x
-			double st = 0.0;
-			double sx = 0.0;
-			double stt = 0.0;
-			double stx = 0.0;
-			int n = 0;
+			// see, for example, http://en.wikipedia.org/w/index.php?title=Least_squares&oldid=176674204
+			int sumT = 0;
+			double sumX = 0;
+			int sumTT = 0;
+			double sumTX = 0;
+			double sumXX = 0;
+			// find largest and smallest data points
 			Iterator<DataPoint> dataIt = dataPoints.listIterator();
+			DataPoint maxDP = null;
+			DataPoint minDP = null;;
+			int n = 0;
 			while (dataIt.hasNext()) {
 				DataPoint dp = dataIt.next();
-				st += dp.t;
-				sx += dp.x;
-				stt += dp.t * dp.t;
-				stx += dp.t * dp.x;
+				sumT += dp.t;
+				sumTT += dp.t * dp.t;
+				sumX += dp.x;
+				sumTX += dp.t * dp.x;
+				sumXX += dp.x * dp.x;
+				if ((maxDP != null) && (dp.x > maxDP.x)) {
+					maxDP = dp;
+				}
+				if ((minDP != null) && (dp.x < minDP.x)) {
+					minDP = dp;
+				}
 				n++;
 			}
-			assert n > 0;
+			double sumSqDevTX = (n * sumTX - sumT * sumX);
+			double sumSqDevT = (n * sumTT - sumT * sumT);
+			double sumSqDevX = (n * sumXX - (sumX * sumX)); 
 			if (n > 1) {
-				slope = (n * stx - st * sx) / (n * stt - st * st);
-				intercept = (sx - slope * st) / n;
-				// while we're there, also compute the mean, 
-				// even though it doesn't have anything to do with regression
+				slope = sumSqDevTX / sumSqDevT;
+				intercept = (sumX - slope * sumT) / n;
 			}
-			mean = sx / n;
+			// while we're there, also compute the mean and rmse
+			mean = (sumX / n);
+			range = (maxDP != null) ? (maxDP.x - minDP.x) : 0;
+			mse = ((sumSqDevX) - (sumSqDevT) * (slope * slope)) / (n*n); 
 			dirty = false;
 		}
 	}
@@ -116,11 +133,24 @@ public class TimeShiftingAnalysis implements Resetable {
 		return mean;		
 	}
 	
+	public double getRange() {
+		doRegression();
+		return range;
+	}
+	
+	public double getMSE() {
+		doRegression();
+		return mse;
+	}
+	
 	public double predictValueAt(int t) {
 		doRegression();
 		return intercept + t * slope;
 	}
 	
+	public double getLastValue() {
+		return dataPoints.isEmpty() ? 0 : dataPoints.getLast().x;
+	}
 	
 	public void reset() {
 		dataPoints.clear();	
@@ -129,13 +159,19 @@ public class TimeShiftingAnalysis implements Resetable {
 	
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		sb.append("y(t) = ");
+		sb.append("data points:\n");
+		sb.append(dataPoints.toString());
+		sb.append("\ny(t) = ");
 		sb.append(getSlope());
 		sb.append(" * t + ");
 		sb.append(getIntercept());
 		sb.append("\nmean: ");
 		sb.append(getMean());
-		sb.append("; value at 0: ");
+		sb.append("\nrange: ");
+		sb.append(getRange());
+		sb.append("\nMSE of regression: ");
+		sb.append(getMSE());
+		sb.append("\nvalue at 0: ");
 		sb.append(predictValueAt(0));
 		return sb.toString();
 	}
@@ -158,6 +194,20 @@ public class TimeShiftingAnalysis implements Resetable {
 		System.out.println("\tadding point (5, 1.0)");		
 		tsa.add(5, 1.0);
 		System.out.println(tsa);
+		tsa.reset();
+		tsa.setMaxLag(10);
+		tsa.add(0, -1.0);
+		tsa.add(1, -1.0);
+		tsa.add(2, 4.0);
+		tsa.add(3, -1.0);
+		tsa.add(4, -1.0);
+		System.out.println(tsa);
+		tsa.reset();
+		tsa.setMaxLag(10);
+		for (int i = 0; i < 10; i++) {			
+			tsa.add(i, Math.random() * 100);
+		}
+		System.out.println(tsa);
 	}
 
 	/* utility class for data points */
@@ -168,6 +218,10 @@ public class TimeShiftingAnalysis implements Resetable {
 		DataPoint(int t, double x) {
 			this.t = t;
 			this.x = x;
+		}
+		
+		public String toString() {
+			return this.t + ", " + this.x + "\n";
 		}
 	}
 	

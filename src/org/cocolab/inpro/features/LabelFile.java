@@ -47,8 +47,9 @@ public class LabelFile {
     
     private static double getTokenAsTime(String labelLine, int tokenID) {
     	String token = getTokenInLine(labelLine, tokenID);
-    	int samples = Integer.parseInt(token);
-    	double time = ((double) samples) / 16000.f; // FIXME: should not be hardcoded  
+//    	int samples = Integer.parseInt(token); // FIXME: should be configurable if samples or time in seconds is used
+//    	double time = ((double) samples) / 16000.f; // FIXME: should not be hardcoded  
+    	double time = Double.parseDouble(token);
     	return time;
     }
 

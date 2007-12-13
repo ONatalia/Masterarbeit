@@ -16,7 +16,8 @@ public class EOTTrainer extends EOTFeatureAggregator {
 		if (filename != null) {
 			try {
 				filename = filename.replaceAll("\\.\\w+$", ".ortho");
-				filename = filename.replaceAll("/data/", "/par/");
+//				filename = filename.replaceAll("/data/", "/par/");
+				filename = filename.replaceAll("/data/", "/annot/ortho/");
 				filename = filename.replaceAll("file:", "");
 				String labelLine = LabelFile.getLastLine(filename);
 				EOT = LabelFile.getStopTime(labelLine);
