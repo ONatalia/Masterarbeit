@@ -12,6 +12,8 @@ package org.cocolab.inpro.sphinx.instrumentation;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -324,15 +326,65 @@ public class LabelWriter
     		}
     		stream.println(alignment);
     		lastAlignment = alignment;
+			messageZeitGeist(list);
+
     	}
     	return alignment;
     }
     
-    private void messageZeitGeist(List<Token> list, PrintStream stream, String lastAlignment, boolean timestamp) {
+    private void messageZeitGeist(List<Token> list) {
     	// TODO: voilà, hier soll der Zeitgeist benachrichtigt werden.
     	// er müsste jeweils da aufgerufen werden, wo zur Zeit writeAlignment() aufgerufen wird
+    	StringBuffer sb = new StringBuffer();
+//    	sb.append("<dialogue id='test-01'>");
+    	sb.append("<event time='");
+    	sb.append(step * 10);
+    	sb.append("' originator='speech recognition'>");
+    	
+		// iterate over the list and print the associated times
+        for (int i = list.size() - 1; i > 0; i--) {
+            Token token = list.get(i);
+            Token nextToken = list.get(i - 1);
+            sb.append("<event time='");
+            sb.append(token.getFrameNumber() * 10);
+            sb.append("' duration='");
+            sb.append((nextToken.getFrameNumber() - token.getFrameNumber()) * 10);
+            sb.append("'>");
+            // depending on whether word, filler or other, dump the string-representation
+            SearchState state = token.getSearchState();
+            String event;
+            if (state instanceof PronunciationState) {
+            	PronunciationState pronunciationState = (PronunciationState) state;
+            	event = pronunciationState.getPronunciation().getWord().toString();
+            }
+            else if (state instanceof ExtendedUnitState) {
+            	ExtendedUnitState unitState = (ExtendedUnitState) state;
+            	event = unitState.getUnit().getName();
+            }
+            else {
+            	event = state.toString();
+            }
+            //event.replace("<", " ").replace(">", " ");
+            sb.append(event.replace("<", " ").replace(">", " "));
+            sb.append("</event>");
+    	}    	
+    	sb.append("</event>");
+//    	sb.append("</dialogue>");
+    	Socket sock;
+    	PrintWriter pw = null;
+    	try {
+			sock = new Socket("localhost", 8000); // FIXME: should be configurable
+			pw = new PrintWriter(sock.getOutputStream());
+	    	pw.print(sb.toString());
+	    	System.err.print(sb.toString());
+	    	pw.close();
+	    	sock.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
     }
     
+
     private void dumpAllStates(Result result) {
     	List<Token> list = getAllBestTokens(result);
 		// iterate over the list and dump the tokens
@@ -385,6 +437,7 @@ public class LabelWriter
     			}
     			lastPhoneAlignment = writeAlignment(list, phoneAlignmentStream, lastPhoneAlignment, timestamp);
     		}
+    		
     	}
     	step += stepWidth;
     }
