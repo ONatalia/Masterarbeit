@@ -77,14 +77,13 @@ public class EOTFeatureAggregator implements Resetable {
 	
 	private void setRegressionValues(Attribute[] atts, TimeShiftingAnalysis[] tsas, Instance instance) {
 		// when more parameters are added, this procedure has to be changed
-		assert regressionParams.length == 6;  
-		assert atts.length == tsas.length * 6;
+		assert regressionParams.length == 5;  
+		assert atts.length == tsas.length * 5;
 		int i = 0;
 		for (TimeShiftingAnalysis tsa : tsas) {
 			instance.setValue(atts[i++], tsa.getMean());
 			instance.setValue(atts[i++], tsa.getSlope());
 			instance.setValue(atts[i++], tsa.getMSE());
-			instance.setValue(atts[i++], tsa.predictValueAt(framesIntoTurnValue));
 			instance.setValue(atts[i++], tsa.predictValueAt(framesIntoTurnValue) - tsa.getLastValue());
 			instance.setValue(atts[i++], tsa.getRange());
 		}
