@@ -86,19 +86,24 @@ public class TimeShiftingAnalysis implements Resetable {
 			// find largest and smallest data points
 			Iterator<DataPoint> dataIt = dataPoints.listIterator();
 			DataPoint maxDP = null;
-			DataPoint minDP = null;;
+			DataPoint minDP = null;
 			int n = 0;
+			boolean first = true;
 			while (dataIt.hasNext()) {
 				DataPoint dp = dataIt.next();
+				if (first) {
+					maxDP = dp;
+					minDP = dp;
+				}
 				sumT += dp.t;
 				sumTT += dp.t * dp.t;
 				sumX += dp.x;
 				sumTX += dp.t * dp.x;
 				sumXX += dp.x * dp.x;
-				if ((maxDP != null) && (dp.x > maxDP.x)) {
+				if (dp.x > maxDP.x) {
 					maxDP = dp;
 				}
-				if ((minDP != null) && (dp.x < minDP.x)) {
+				if (dp.x < minDP.x) {
 					minDP = dp;
 				}
 				n++;
@@ -110,7 +115,7 @@ public class TimeShiftingAnalysis implements Resetable {
 				slope = sumSqDevTX / sumSqDevT;
 				intercept = (sumX - slope * sumT) / n;
 			}
-			// while we're there, also compute the mean and rmse
+			// while we're there, also compute the mean, range and mse
 			mean = (sumX / n);
 			range = (maxDP != null) ? (maxDP.x - minDP.x) : 0;
 			mse = ((sumSqDevX) - (sumSqDevT) * (slope * slope)) / (n*n); 
@@ -150,6 +155,10 @@ public class TimeShiftingAnalysis implements Resetable {
 	
 	public double getLastValue() {
 		return dataPoints.isEmpty() ? 0 : dataPoints.getLast().x;
+	}
+	
+	public boolean hasValidData() {
+		return dataPoints.size() > 1; // a regression of just one data point is useless
 	}
 	
 	public void reset() {
