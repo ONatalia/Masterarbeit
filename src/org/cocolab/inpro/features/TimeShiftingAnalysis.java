@@ -94,6 +94,7 @@ public class TimeShiftingAnalysis implements Resetable {
 				if (first) {
 					maxDP = dp;
 					minDP = dp;
+					first = false;
 				}
 				sumT += dp.t;
 				sumTT += dp.t * dp.t;
