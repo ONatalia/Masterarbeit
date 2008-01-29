@@ -212,7 +212,7 @@ public class EOTFeatureAggregator implements Resetable {
 	public void setCurrentPitch(double pitch) {
 		currentPitchValue = pitch;
 		for (TimeShiftingAnalysis tsa : pitchRegressions) {
-			if (pitch > 0.0) {
+			if (currentVoicingValue) {
 				tsa.add(framesIntoTurnValue, pitch);
 			} else {
 				tsa.shiftTime(framesIntoTurnValue);
