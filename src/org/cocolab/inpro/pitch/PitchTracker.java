@@ -44,6 +44,7 @@ import edu.cmu.sphinx.frontend.util.StreamDataSource;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.PropertyType;
 import edu.cmu.sphinx.util.props.Registry;
 
 public class PitchTracker extends BaseDataProcessor {
@@ -53,7 +54,9 @@ public class PitchTracker extends BaseDataProcessor {
 	private int maxLag = 320; // entspricht f0 von 50 Hz bei 16 kHz Abtastung
 	private int samplingFrequency = 16000; // TODO: parametrisieren
 	
-	private double candidateScoreThreshold = 0.15;
+	final static private String PROP_CAND_SCORE_THRESHOLD = "scoreThreshold";
+	
+	private double candidateScoreThreshold = 0.15; // default set by newProperties()
 	
 	private double[] signalBuffer;
 	
@@ -224,11 +227,13 @@ public class PitchTracker extends BaseDataProcessor {
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		// add tracking parameters here
+		candidateScoreThreshold = ps.getDouble(PROP_CAND_SCORE_THRESHOLD, 0.15);
 	}
 
 	public void register(String name, Registry registry) throws PropertyException {
 		super.register(name, registry);
 		// add tracking parameters here
+		registry.register(PROP_CAND_SCORE_THRESHOLD, PropertyType.DOUBLE);
 	}
 
 	/**************************
