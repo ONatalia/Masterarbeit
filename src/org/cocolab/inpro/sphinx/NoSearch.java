@@ -3,8 +3,10 @@ package org.cocolab.inpro.sphinx;
 import java.io.IOException;
 
 import edu.cmu.sphinx.decoder.search.SearchManager;
+import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DataProcessingException;
 import edu.cmu.sphinx.frontend.FrontEnd;
+import edu.cmu.sphinx.frontend.Signal;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -45,7 +47,12 @@ public class NoSearch implements SearchManager {
 		Result result = null;
 		for (int i = 0; i < nFrames; i++) {
 			try {
-				result = (fe.getData() == null) ? null : emptyResult;
+				Data d = fe.getData();
+				// only send results for new data, not for signals
+				while ((d != null) && (d instanceof Signal)) {
+					d = fe.getData();
+				}
+				result = (d != null) ? emptyResult : null;
 			} catch (DataProcessingException e) {
 				e.printStackTrace();
 			}
