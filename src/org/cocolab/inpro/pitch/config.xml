@@ -36,6 +36,8 @@
     <component name="pitchTracker" 
                type="org.cocolab.inpro.pitch.PitchTracker">
         <property name="scoreThreshold" value="0.15"/>
+        <property name="minimumPitch" value="50"/>
+        <property name="maximumPitch" value="500"/>
     </component>
         
 </config>
