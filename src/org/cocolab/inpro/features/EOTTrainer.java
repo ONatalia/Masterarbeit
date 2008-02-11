@@ -11,7 +11,7 @@ public class EOTTrainer extends EOTFeatureAggregator {
 	private double stopTime;
 
 	public void loadGoldStandard(String filename) {
-		if (filename != null) {
+		if ((CLUSTERED_TIME || CONTINUOUS_TIME) && filename != null) {
 			try {
 				filename = filename.replaceAll("\\.\\w+$", ".lab");
 //				filename = filename.replaceAll("/data/", "/par/");

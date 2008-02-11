@@ -122,7 +122,7 @@ public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeat
 	public void createFeatures() {
 		FastVector attInfo = new FastVector(1000); // allow for a lot of elements, trim later on
 		if (includeFrameCount) {
-			framesIntoAudioAttribute = new Attribute("timeIntoTurn");
+			framesIntoAudioAttribute = new Attribute("timeIntoAudio");
 			attInfo.addElement(framesIntoAudioAttribute);
 		}
 /*		wordsIntoTurnAttribute = new Attribute("wordsIntoTurn");
@@ -191,7 +191,9 @@ public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeat
 		setRegressionValues(pitchRegressionAttributes, pitchRegressions, instance);
 
 		instance.setDataset(instances);
-		instance.setClassMissing();
+		if (CLUSTERED_TIME || CONTINUOUS_TIME) {
+			instance.setClassMissing();
+		}
 		return instance;
 	}
 
