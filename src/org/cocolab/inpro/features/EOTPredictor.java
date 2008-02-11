@@ -4,10 +4,17 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 
+import edu.cmu.sphinx.util.props.PropertyException;
+import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.PropertyType;
+import edu.cmu.sphinx.util.props.Registry;
+
 import weka.classifiers.Classifier;
 import weka.core.Instance;
 
 public class EOTPredictor extends EOTFeatureAggregator {
+
+	private final static String PROP_CLASSIFIER = "classifier";
 
 	private Classifier classifier;
 	
@@ -27,11 +34,18 @@ public class EOTPredictor extends EOTFeatureAggregator {
 		}
 	}
 	
-	public double getCurrentPrediction() {
+	public String getCurrentPrediction() {
 		Instance inst = getNewestFeatures();
 		double index = classifyInstance(inst);
 // currently we do regression and do not need to lookup time predictions from class indices		
-		return index;
+		int c = (new Double(index)).intValue();
+		if (CLUSTERED_TIME) {
+			return turnBin.value(c);
+		}
+		else {
+			return "" + c;
+		}
+
 	}
 	
 	/**
@@ -48,6 +62,16 @@ public class EOTPredictor extends EOTFeatureAggregator {
 			e.printStackTrace();
 		}
 		return classIndex;
+	}
+	
+	public void newProperties(PropertySheet ps) throws PropertyException {
+		super.newProperties(ps);
+		loadClassifier(ps.getString(PROP_CLASSIFIER, ""));
+	}
+	
+	public void register(String name, Registry registry) throws PropertyException {
+		super.register(name, registry);
+		registry.register(PROP_CLASSIFIER, PropertyType.STRING);
 	}
 	
 }

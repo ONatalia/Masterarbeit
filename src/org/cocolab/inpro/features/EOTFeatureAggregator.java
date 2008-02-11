@@ -1,47 +1,66 @@
 package org.cocolab.inpro.features;
 
+import java.util.List;
+
+import org.cocolab.inpro.sphinx.instrumentation.SignalFeatureListener;
+
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 
+import edu.cmu.sphinx.util.props.Configurable;
+import edu.cmu.sphinx.util.props.PropertyException;
+import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.PropertyType;
+import edu.cmu.sphinx.util.props.Registry;
 import edu.cmu.sphinx.util.props.Resetable;
 
-public class EOTFeatureAggregator implements Resetable {
+public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeatureListener {
 	
-	private static final int[] energyRegressionSteps = {5, 10, 20, 50, 100, 200};
-	private static final int[] voicedEnergyRegressionSteps = {50, 100, 200, 500};
-	private static final int[] pitchRegressionSteps = {5, 10, 20, 50, 100, 200, 500};
+	private static final String PROP_PITCH_WINDOWS_LIST = "pitchWindows";
+	private static final String PROP_ENERGY_WINDOWS_LIST = "energyWindows";
+	private static final String PROP_VENERGY_WINDOWS_LIST = "vEnergyWindows";
 	
-	private static final String[] regressionParams = {"Mean", "Slope", "MSE", "PredictionError", "Range"};
+	private static final String PROP_CLUSTER_TIME = "clusterTime";
+	private static final String PROP_CONTINUOUS_TIME = "continuousTime";
+	
+	private static final String PROP_FRAME_COUNT = "timeIntoAudio";
+		
+	private static final int[] noSteps = {};
 
-	private Attribute framesIntoTurnAttribute;
+	private int[] energyRegressionSteps;
+	private int[] voicedEnergyRegressionSteps;
+	private int[] pitchRegressionSteps;
+
+	private static final String[] regressionParams = {"Mean", "Slope", "MSE", "PredictionError", "Range", "MeanDelta", "MinPos", "MaxPos"};
+	
+	protected Attribute framesIntoAudioAttribute;
+	boolean includeFrameCount;
 /*	private Attribute wordsIntoTurnAttribute;
 	private Attribute framesIntoLastWordAttribute;
-	private Attribute asrResultsLagAttribute;
 */
 	private Attribute currentFrameEnergyAttribute;
-	// for each time in energyRegressions: mean, slope, mse, predictionError, range
+	// for each time in energyRegressions: mean, slope, mse, predictionError, range, meanDelta, minPos, maxPos
 	private Attribute[] energyRegressionAttributes;
 	private Attribute[] voicedEnergyRegressionAttributes;
 	
 	private Attribute currentVoicingAttribute;
 	private Attribute currentPitchAttribute;
-	// for each time in pitchRegressions: mean, slope, mse, predictionError, range
+	// for each time in pitchRegressions: mean, slope, mse, predictionError, range, meanDelta, minPos, maxPos
 	private Attribute[] pitchRegressionAttributes; 
 	
-	protected final static boolean CLUSTERED_TIME = false; // FIXME: this should be configurable (maybe via configurable)
-	protected final static boolean CONTINUOUS_TIME = true; // FIXME: this should be configurable (via configurable interface)
+	protected boolean CLUSTERED_TIME; 
+	protected boolean CONTINUOUS_TIME; 
 	
 	protected Attribute timeToEOT;
-	protected Attribute clusteredTimeToEOT;
+	protected Attribute turnBin;
 	
 	protected Instances instances;
 	
-	int framesIntoTurnValue;
+	int framesIntoAudioValue;
 /*	int wordsIntoTurnValue;
 	int framesIntoLastWordValue;
-	int asrResultsLagValue;
 */
 	double currentFrameEnergyValue;
 	TimeShiftingAnalysis[] energyRegressions;
@@ -51,6 +70,7 @@ public class EOTFeatureAggregator implements Resetable {
 	TimeShiftingAnalysis[] pitchRegressions;
 	
 	int numAttributes;
+	protected String name;
 	
 	private static Attribute[] createRegressionAttributesFor(int[] steps, String name, FastVector attInfo) {
 		Attribute[] attributes = new Attribute[regressionParams.length * steps.length];
@@ -77,40 +97,45 @@ public class EOTFeatureAggregator implements Resetable {
 	
 	private void setRegressionValues(Attribute[] atts, TimeShiftingAnalysis[] tsas, Instance instance) {
 		// when more parameters are added, this procedure has to be changed
-		assert regressionParams.length == 5;  
-		assert atts.length == tsas.length * 5;
+		final int regressionParameters = 8; 
+		assert regressionParams.length == regressionParameters; 
+		assert atts.length == tsas.length * regressionParameters;
 		int i = 0;
 		for (TimeShiftingAnalysis tsa : tsas) {
 			if (tsa.hasValidData()) {
 				instance.setValue(atts[i++], tsa.getMean());
 				instance.setValue(atts[i++], tsa.getSlope());
 				instance.setValue(atts[i++], tsa.getMSE());
-				instance.setValue(atts[i++], tsa.predictValueAt(framesIntoTurnValue) - tsa.getLastValue());
+				instance.setValue(atts[i++], tsa.predictValueAt(framesIntoAudioValue) - tsa.getLatestValue());
 				instance.setValue(atts[i++], tsa.getRange());
+				instance.setValue(atts[i++], tsa.getMeanStepDifference());
+				instance.setValue(atts[i++], tsa.getMinPosition());
+				instance.setValue(atts[i++], tsa.getMaxPosition());
 			} else {
-				for (int j = 0; j < 5; j++) {
+				for (int j = 0; j < regressionParameters; j++) {
 					instance.setMissing(atts[i++]);
 				}
 			}
 		}
 	}
 	
-	public EOTFeatureAggregator() {
-		FastVector attInfo = new FastVector(10000); // allow for a lot of elements, trim later on
-		framesIntoTurnAttribute = new Attribute("timeIntoTurn");
-		attInfo.addElement(framesIntoTurnAttribute);
+	public void createFeatures() {
+		FastVector attInfo = new FastVector(1000); // allow for a lot of elements, trim later on
+		if (includeFrameCount) {
+			framesIntoAudioAttribute = new Attribute("timeIntoTurn");
+			attInfo.addElement(framesIntoAudioAttribute);
+		}
 /*		wordsIntoTurnAttribute = new Attribute("wordsIntoTurn");
 		attInfo.addElement(wordsIntoTurnAttribute);
 		framesIntoLastWordAttribute = new Attribute("timeIntoLastWord");
 		attInfo.addElement(framesIntoLastWordAttribute);
-		asrResultsLagAttribute = new Attribute("asrResultsLag");
-		attInfo.addElement(asrResultsLagAttribute);
 */		
 		currentFrameEnergyAttribute = new Attribute("currentFrameEnergy");
 		attInfo.addElement(currentFrameEnergyAttribute);
 
 		energyRegressionAttributes = createRegressionAttributesFor(energyRegressionSteps, "energy", attInfo);
 		energyRegressions = createRegressions(energyRegressionSteps);
+
 		voicedEnergyRegressionAttributes = createRegressionAttributesFor(voicedEnergyRegressionSteps, "voicedEnergy", attInfo);
 		voicedEnergyRegressions = createRegressions(voicedEnergyRegressionSteps);
 		
@@ -123,29 +148,30 @@ public class EOTFeatureAggregator implements Resetable {
 		pitchRegressions = createRegressions(pitchRegressionSteps);
 		
 		if (CLUSTERED_TIME) {
-			clusteredTimeToEOT = EOTBins.eotBinsAttribute();
-			attInfo.addElement(clusteredTimeToEOT);
+			turnBin = EOTBins.turnBinsAttribute();
+			attInfo.addElement(turnBin);
 		}
 		if (CONTINUOUS_TIME) {
 			timeToEOT = new Attribute("timeToEOT");
 			attInfo.addElement(timeToEOT);
 		}
 		instances = new Instances("eotFeatures", attInfo, 0);
-//		instances.setClass(framesIntoTurnAttribute);
 		if (CONTINUOUS_TIME) {
 			instances.setClass(timeToEOT);			
 		}
 		if (CLUSTERED_TIME) {
-			instances.setClass(clusteredTimeToEOT);
+			instances.setClass(turnBin);
 		}
 		attInfo.trimToSize();
 		numAttributes = attInfo.size();
 		reset();
 	}
 	
-	protected Instance getNewestFeatures() {
+	public Instance getNewestFeatures() {
 		Instance instance = new Instance(numAttributes);
-		instance.setValue(framesIntoTurnAttribute, ((double) framesIntoTurnValue) / 100.0);
+		if (includeFrameCount) {
+			instance.setValue(framesIntoAudioAttribute, getTimeIntoAudio());
+		}
 /*		instance.setValue(wordsIntoTurnAttribute, wordsIntoTurnValue);
 		instance.setValue(framesIntoLastWordAttribute, ((double) framesIntoLastWordValue) / 100.0);
 		instance.setValue(asrResultsLagAttribute, asrResultsLagValue);
@@ -168,23 +194,15 @@ public class EOTFeatureAggregator implements Resetable {
 		instance.setClassMissing();
 		return instance;
 	}
-	
-	public void setFramesIntoTurn(int f) {
-		framesIntoTurnValue = f;
-	}
-	
-	public double getFramesIntoTurn() {
-		return framesIntoTurnValue;
+
+	public double getTimeIntoAudio() {
+		return ((double) framesIntoAudioValue) / 100.f; // FIXME: the frame rate should be configurable 
 	}
 /*
 	public void setASRResultsLag(int frames) {
 		asrResultsLagValue = frames;
 	}
-*/
-	public double getTimeIntoTurn() {
-		return ((double) framesIntoTurnValue) / 100.0; // FIXME: the frame rate should be configurable 
-	}
-/*	
+
 	public void setWordsIntoTurn(int wordsIntoTurn) {
 		wordsIntoTurnValue = wordsIntoTurn;
 	}
@@ -196,11 +214,11 @@ public class EOTFeatureAggregator implements Resetable {
 	public void setCurrentFrameEnergy(double logEnergy) {
 		currentFrameEnergyValue = logEnergy;
 		for (TimeShiftingAnalysis tsa : energyRegressions) {
-			tsa.add(framesIntoTurnValue, logEnergy);
+			tsa.add(framesIntoAudioValue, logEnergy);
 		}
 		if (currentVoicingValue) {
 			for (TimeShiftingAnalysis tsa : voicedEnergyRegressions) {
-				tsa.add(framesIntoTurnValue, logEnergy);
+				tsa.add(framesIntoAudioValue, logEnergy);
 			}
 		}
 	}
@@ -213,24 +231,93 @@ public class EOTFeatureAggregator implements Resetable {
 		currentPitchValue = pitch;
 		for (TimeShiftingAnalysis tsa : pitchRegressions) {
 			if (currentVoicingValue) {
-				tsa.add(framesIntoTurnValue, pitch);
+				tsa.add(framesIntoAudioValue, pitch);
 			} else {
-				tsa.shiftTime(framesIntoTurnValue);
+				tsa.shiftTime(framesIntoAudioValue);
 			}
 		}
 	}	
+	
+	private void reset(TimeShiftingAnalysis[] tsas) {
+		if (tsas != null) {
+			for (TimeShiftingAnalysis tsa : tsas) {
+				tsa.reset();
+			}
+		}
+	}
 
 	public void reset() {
-		framesIntoTurnValue = -1;
+		framesIntoAudioValue = -1;
 /*		wordsIntoTurnValue = -1;
 		framesIntoLastWordValue = -1;
 */		currentFrameEnergyValue = -1.0;
-		for (TimeShiftingAnalysis tsa : energyRegressions) {
-			tsa.reset();
+		reset(energyRegressions);
+		reset(pitchRegressions);
+		reset(voicedEnergyRegressions);
+	}
+
+	private int[] regressionArrayForList(List l) {
+		if (l == null) {
+			return noSteps;
 		}
-		for (TimeShiftingAnalysis tsa : pitchRegressions) {
-			tsa.reset();
+		int[] array = new int[l.size()];
+		for (int i = 0; i < l.size(); i++) {
+			array[i] = Integer.parseInt(l.get(i).toString());
 		}
+		return array;
+	}
+	
+	public void printArffHeader() {
+		System.out.println(instances.toString());
+	}
+
+	/* * * * * * * * *
+	 * configurable  *
+	 * * * * * * * * */
+	
+	public void newProperties(PropertySheet ps) throws PropertyException {
+		List l = ps.getStrings(PROP_PITCH_WINDOWS_LIST);
+		pitchRegressionSteps = regressionArrayForList(l);
+		l = ps.getStrings(PROP_ENERGY_WINDOWS_LIST);
+		energyRegressionSteps = regressionArrayForList(l);
+		l = ps.getStrings(PROP_VENERGY_WINDOWS_LIST);
+		voicedEnergyRegressionSteps = regressionArrayForList(l);
+		CLUSTERED_TIME = ps.getBoolean(PROP_CLUSTER_TIME, false);
+		CONTINUOUS_TIME = ps.getBoolean(PROP_CONTINUOUS_TIME, false);
+		includeFrameCount = ps.getBoolean(PROP_FRAME_COUNT, true);
+		createFeatures();
+	}
+
+	public void register(String name, Registry registry) throws PropertyException {
+		this.name = name;
+		registry.register(PROP_PITCH_WINDOWS_LIST, PropertyType.STRING_LIST);
+		registry.register(PROP_ENERGY_WINDOWS_LIST, PropertyType.STRING_LIST);
+		registry.register(PROP_VENERGY_WINDOWS_LIST, PropertyType.STRING_LIST);
+		registry.register(PROP_CLUSTER_TIME, PropertyType.BOOLEAN);
+		registry.register(PROP_CONTINUOUS_TIME, PropertyType.BOOLEAN);
+		registry.register(PROP_FRAME_COUNT, PropertyType.BOOLEAN);
+	}
+
+	public String getName() {
+		return name;
+	}
+	
+	public double getCurrentEnergy() {
+		return currentFrameEnergyValue;
+	}
+	
+	public double getCurrentPitch() {
+		return currentPitchValue;
+	}
+
+	/* * * * * * * * * * * * * *
+	 * signal feature listener *
+	 * * * * * * * * * * * * * */
+	public void newSignalFeatures(double logEnergy, boolean voicing, double pitch) {
+		framesIntoAudioValue++;
+		setCurrentVoicing(voicing);
+		setCurrentFrameEnergy(logEnergy);
+		setCurrentPitch(pitch);
 	}
 
 }

@@ -18,6 +18,8 @@ import weka.core.FastVector;
 
 public class EOTBins {
 	
+	// FIXME: binning should be configurable
+	
 	public final static String[] SOT_BINS = {
 		"sil"
 	};
@@ -31,7 +33,7 @@ public class EOTBins {
 	};
 	
 	private final static double[] EOT_BIN_ENDS = {
-		0.51, -0.050, -Double.MAX_VALUE
+		0.051, -0.050, -Double.MAX_VALUE
 	};
 	
 	/*  
@@ -49,7 +51,7 @@ public class EOTBins {
 	/*
 	 * return a weka attribute with values for all turn-bins (EOT_BINS u SOT_BINS)
 	 */
-	public static Attribute turnBinsAttribute() {
+	public static Attribute turnBinsAttribute(String name) {
 		FastVector turnBins = new FastVector(SOT_BINS.length + EOT_BINS.length);
 		for (int i = 0; i < SOT_BINS.length; i++) {
 			turnBins.addElement(SOT_BINS[i]);
@@ -59,8 +61,12 @@ public class EOTBins {
 				turnBins.addElement(EOT_BINS[i]);
 			}
 		}
-		Attribute a = new Attribute("turnBins", turnBins);
+		Attribute a = new Attribute(name, turnBins);
 		return a;		
+	}
+	
+	public static Attribute turnBinsAttribute() {
+		return turnBinsAttribute("turnBin");
 	}
 	
 	/**

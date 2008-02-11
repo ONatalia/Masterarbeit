@@ -10,22 +10,6 @@ public class EOTTrainer extends EOTFeatureAggregator {
 	private double startTime;
 	private double stopTime;
 
-	public EOTTrainer() {
-		System.out.println(instances);
-	}
-
-	protected Instance getNewestFeatures() {
-		Instance instance = super.getNewestFeatures();
-		double timeIntoTurn = getTimeIntoTurn();
-		double remainingTime = stopTime - getTimeIntoAudio();
-		if ((timeIntoTurn >= 0.f) && (!EOTBins.turnState(timeIntoTurn, remainingTime).equals("sil"))) {
-			instance.setValue(framesIntoTurnAttribute, timeIntoTurn);
-		} else {
-			instance.setValue(framesIntoTurnAttribute, 0.f);
-		}
-		return instance;
-	}
-	
 	public void loadGoldStandard(String filename) {
 		if (filename != null) {
 			try {
@@ -66,7 +50,7 @@ public class EOTTrainer extends EOTFeatureAggregator {
 		double timeIntoTurn = getTimeIntoTurn();
 		double remainingTime = stopTime - getTimeIntoAudio();
 		if (CLUSTERED_TIME) {
-			inst.setValue(clusteredTimeToEOT, EOTBins.turnState(timeIntoTurn, remainingTime));
+			inst.setValue(turnBin, EOTBins.turnState(timeIntoTurn, remainingTime));
 		}
 		if (CONTINUOUS_TIME) {
 			inst.setValue(timeToEOT, remainingTime);
