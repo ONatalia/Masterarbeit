@@ -65,6 +65,20 @@ public class PitchTracker extends BaseDataProcessor {
 	private static boolean debug = false;
 
 	/**************************
+	 * pre processing
+	 **************************/
+
+    private double signalPower(double[] samples) {
+        assert samples.length > 0;
+        double sumOfSquares = 0.0f;
+        for (int i = 0; i < samples.length; i++) {
+            double sample = samples[i];
+            sumOfSquares += sample * sample;
+        }
+        return  Math.sqrt((double)sumOfSquares/samples.length);
+    }
+
+	/**************************
 	 * lag scoring
 	 **************************/
 
@@ -199,6 +213,7 @@ public class PitchTracker extends BaseDataProcessor {
 		Data input = getPredecessor().getData();
 		if (input instanceof DoubleData) {
 			double[] newSamples = ((DoubleData) input).getValues();
+			double signalPower = signalPower(newSamples);
 			if (signalBuffer == null) {
 				signalBuffer = new double[maxLag * 2 + 2];
 				Arrays.fill(signalBuffer, 0);
@@ -206,18 +221,21 @@ public class PitchTracker extends BaseDataProcessor {
 			else {
 				System.arraycopy(signalBuffer, newSamples.length, signalBuffer, 0, signalBuffer.length - newSamples.length);
 				System.arraycopy(newSamples, 0, signalBuffer, signalBuffer.length - newSamples.length, newSamples.length);
-				double[] lagScoreFunction = cmn(smdsf(signalBuffer));
-				List<Candidate> candidates = qualityThresheldCandidates(lagScoreFunction);
+				boolean voiced = false;
 				double pitchHz = -1.0f;
-				boolean voiced = !candidates.isEmpty();
-				if (voiced) {
-					int lag = simplisticCandidateSelection(candidates);
-					pitchHz = ((double) samplingFrequency) / lag;
-				} else {
-					lastBestLag = -1;
+				if (signalPower > 1) { // TODO: better silence detection, maybe?
+					double[] lagScoreFunction = cmn(smdsf(signalBuffer));
+					List<Candidate> candidates = qualityThresheldCandidates(lagScoreFunction);
+					voiced = !candidates.isEmpty();
+					if (voiced) {
+						int lag = simplisticCandidateSelection(candidates);
+						pitchHz = ((double) samplingFrequency) / lag;
+					} else {
+						lastBestLag = -1;
+					}
 				}
 //				System.err.print("\r\t\t\t\t\t" + pitchHz + "\r");
-				input = new PitchedDoubleData((DoubleData) input, voiced, pitchHz);
+				input = new PitchedDoubleData((DoubleData) input, voiced, pitchHz, signalPower);
 			}
 		}
 		return input;
@@ -342,8 +360,8 @@ public class PitchTracker extends BaseDataProcessor {
             /* set the stream data source to read from the audio file */
             reader.setInputStream(ais, audioFileURL.getFile());
             
-//            speedTest(fe);
-        	functionalTest(args, fe);
+            speedTest(fe);
+//        	functionalTest(args, fe);
         } catch (IOException e) {
             System.err.println("Problem when loading PitchTracker: " + e);
             e.printStackTrace();

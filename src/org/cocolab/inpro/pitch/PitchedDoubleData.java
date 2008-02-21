@@ -8,23 +8,26 @@ public class PitchedDoubleData extends DoubleData {
 	
 	boolean voiced;
 	double pitchHz;
-	
+	double power;
+
 	public PitchedDoubleData(double[] values, int sampleRate, long collectTime, long firstSampleNumber) {
 		super(values, sampleRate, collectTime, firstSampleNumber);
 	}
 	
 	public PitchedDoubleData(double[] values, int sampleRate, 
 							 long collectTime, long firstSampleNumber, 
-							 boolean voiced, double pitch) {
+							 boolean voiced, double pitch, double power) {
 		super(values, sampleRate, collectTime, firstSampleNumber);
 		this.voiced = voiced;
 		this.pitchHz = pitch;
+		this.power = power;
 	}
 	
-	public PitchedDoubleData(DoubleData data, boolean voiced, double pitch) {
+	public PitchedDoubleData(DoubleData data, boolean voiced, double pitch, double power) {
 		super(data.getValues(), data.getSampleRate(), data.getCollectTime(), data.getFirstSampleNumber());
 		this.voiced = voiced;
 		this.pitchHz = pitch;
+		this.power = power;
 	}
 	
 	public boolean isVoiced() {
@@ -38,11 +41,15 @@ public class PitchedDoubleData extends DoubleData {
 	public double getPitchCentTo110Hz() {
 		return CENT_CONST * Math.log(this.pitchHz / 110);
 	}
+	
+	public double getEnergy() {
+		return power;
+	}
 
 	public String toString() {
 		return "PitchedDoubleData: " + 
 			   (voiced ? ("voiced, pitch in Hz: " + pitchHz + ", in cent relative to 110Hz: " + getPitchCentTo110Hz()) : "voiceless" ) + 
-			   ", data cointained: " + super.toString();
+			   ", mean power: " + power + ", data cointained: " + super.toString();
 	}
 	
 }
