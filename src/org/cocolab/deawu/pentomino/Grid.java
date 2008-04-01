@@ -1,4 +1,4 @@
-package org.cocolab.daewu.pentomino;
+package org.cocolab.deawu.pentomino;
 
 import java.awt.Graphics;
 

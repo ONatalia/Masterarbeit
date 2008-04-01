@@ -1,4 +1,4 @@
-package org.cocolab.daewu.pentomino;
+package org.cocolab.deawu.pentomino;
 
 public class Point extends java.awt.Point implements Cloneable {
 
