@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.lang.String;
 
-class BoxSet2 {
+class Tile {
    private final int     N = 5;               // number of boxes making up the piece
    private Box[]   boxes = new Box[N];
    private int[][] defVectors = new int[2][N];
@@ -17,7 +17,7 @@ class BoxSet2 {
       boolean placed;
       String name;
 
-   BoxSet2(int s, Color c, int x0, int y0,
+   Tile(int s, Color c, int x0, int y0,
          int i1, int j1, int i2, int j2, int i3, int j3, int i4, int j4, String name) {
       
       this.defVectors[0][0] = 0;
@@ -178,7 +178,7 @@ class BoxSet2 {
                    m[mi+k][mj+L] != this && m[mi+k][mj+L] != null) {    // don't count spaces occupied by _this_ or not occupied at all
                   for (int z = 0; z<c.length; z++) {
                 	  	// das:
-                     if (m[mi+k][mj+L] != "true" && m[mi+k][mj+L] != "false" && ((BoxSet2) m[mi+k][mj+L]).color == c[z]) {
+                     if (m[mi+k][mj+L] != "true" && m[mi+k][mj+L] != "false" && ((Tile) m[mi+k][mj+L]).color == c[z]) {
                         cOK[z] = false;
                         break;
                      }
