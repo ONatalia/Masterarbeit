@@ -10,15 +10,6 @@ public class Point extends java.awt.Point implements Cloneable {
       super(p.x, p.y);
    }
    
-   public Object clone() {
-       //      try {
-         return super.clone();
-	 // }
-      /*      catch (CloneNotSupportedException e) {
-         return null;
-	 }*/
-   }
-
    public String toString() {
       return "("+this.x+", "+this.y+")";
    }

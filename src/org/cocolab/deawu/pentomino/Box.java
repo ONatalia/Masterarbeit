@@ -30,8 +30,9 @@ public class Box implements Cloneable {
    }
 
    public boolean selected(Point p) {
-      if (p.x >= this.corner.x && p.x <= this.corner.x +this.dim.x-1 &&
-            p.y >= this.corner.y && p.y <= this.corner.y +this.dim.y -1) {
+      if (p.x >= this.corner.x && p.x <= this.corner.x + this.dim.x - 1 &&
+          p.y >= this.corner.y && p.y <= this.corner.y + this.dim.y - 1)
+      {
          return true;
       } else {
          return false;

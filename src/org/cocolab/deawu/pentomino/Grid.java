@@ -1,12 +1,17 @@
 package org.cocolab.deawu.pentomino;
 
 import java.awt.Graphics;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 
 class Grid {
 	
-	private static final Object OUTSIDE = "false";
-	private static final Object INSIDE = "true";
+	static final Object OUTSIDE = "-";
+	static final Object INSIDE = "x";
 
 	private Point pos; // position of the grid in the graphic context
 	private int scale; // size of each field in the tray
@@ -14,25 +19,49 @@ class Grid {
 	Point dim; // dimension of the tray, *NOT pixels*
 	Object[][] tray;
 	
-	void init(int x0, int y0, int scale) {
+	void init(int x0, int y0, int scale, int nx, int ny) {
 		this.pos = new Point(x0, y0);
 		this.scale = scale;
+		this.dim = new Point(nx, ny); /* treat like (x,y) -- (width, height) */
+		this.tray = new Object[nx][ny];
 	}
 	
 	Grid(int x0, int y0, int scale, String patternFile) {
 		URL patternURL = Grid.class.getResource(patternFile);
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(patternURL.openStream()));
+			// the first line (hopefully) contains the dimensions of the tray
+			String firstLine = reader.readLine();
+			String[] lineTokens = firstLine.split("\\s+");
+			int nx = new Integer(lineTokens[0]).intValue();
+			int ny = new Integer(lineTokens[1]).intValue();
+			// initialize the tray
+			init(x0, y0, scale, nx, ny);
+			for (int y = 0; y < ny; y++) {
+				String line = reader.readLine();
+				for (int x = 0; x < nx; x++) {
+					if (Character.toString(line.charAt(x)).equals(INSIDE)) {
+						tray[x][y] = INSIDE;
+					} else {
+						tray[x][y] = OUTSIDE;
+					}
+				}
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	Grid(int x0, int y0, int scale, int nj, int ni) {
-		// for elephant, overwrite initial values:
-		this.pos = new Point(x0, y0);
-		this.scale = scale;
-		this.dim = new Point(nj, ni); /* treat like (x,y) -- (width, height) */
-		this.tray = new Object[nj][ni];
-
+	// draw an elephant if no pattern file is given
+	Grid(int x0, int y0, int scale) {
+		int nx = 11;
+		int ny = 9;
+		init(x0, y0, scale, nx, ny);
+		
 		// added by das:
-		for (int i = 0; i < ni; i++)
-			for (int j = 0; j < nj; j++) {
+		for (int i = 0; i < ny; i++)
+			for (int j = 0; j < nx; j++) {
 				this.tray[j][i] = INSIDE;
 			}
 		// cut out elements that are not part of the elephant:
@@ -82,8 +111,7 @@ class Grid {
 			for (int j = 0; j < dim.x; j++)
 				// das:
 				if (this.tray[j][i] != OUTSIDE)
-					g.drawRect(pos.x + j * scale, pos.y + i * scale, scale,
-							scale);
+					g.drawRect(pos.x + j * scale, pos.y + i * scale, scale, scale);
 	}
 
 	public Point index(Point p) {

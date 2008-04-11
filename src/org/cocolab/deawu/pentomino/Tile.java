@@ -151,7 +151,7 @@ class Tile {
          mj = index0.y +defVectors[1][i];
          // das:
          if (mi < 0 || mi >= dim.x || mj < 0 || mj >= dim.y ||
-               (m[mi][mj] != "true" && m[mi][mj] != null))
+               (m[mi][mj] != Grid.INSIDE && m[mi][mj] != null))
             fit = false;
       }
       return fit;
@@ -178,7 +178,10 @@ class Tile {
                    m[mi+k][mj+L] != this && m[mi+k][mj+L] != null) {    // don't count spaces occupied by _this_ or not occupied at all
                   for (int z = 0; z<c.length; z++) {
                 	  	// das:
-                     if (m[mi+k][mj+L] != "true" && m[mi+k][mj+L] != "false" && ((Tile) m[mi+k][mj+L]).color == c[z]) {
+                     if (m[mi+k][mj+L] == Grid.INSIDE 
+                     && m[mi+k][mj+L] == Grid.OUTSIDE
+                     && ((Tile) m[mi+k][mj+L]).color == c[z])
+                     {
                         cOK[z] = false;
                         break;
                      }
