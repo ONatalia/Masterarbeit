@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -154,14 +153,12 @@ public class LabelWriter implements Configurable,
         wordAlignment = ps.getBoolean(PROP_WORD_ALIGNMENT, false);
         phoneAlignment = ps.getBoolean(PROP_PHONE_ALIGNMENT, false);
 
-        if (!fileOutput) {
-        	if (wordAlignment) {
-        		wordAlignmentStream = System.out;
-        	}
-        	if (phoneAlignment) {
-        		phoneAlignmentStream = System.out;
-        	}
-        }
+    	if (wordAlignment) {
+    		wordAlignmentStream = setStream("wordalignment");
+    	}
+    	if (phoneAlignment) {
+    		phoneAlignmentStream = setStream("phonealignment");
+    	}
         
         zeitgeistOutput = ps.getBoolean(PROP_ZEITGEIST_OUTPUT, false);
         zeitgeistPort = ps.getInt(PROP_ZEITGEIST_PORT, 2000);
@@ -182,7 +179,7 @@ public class LabelWriter implements Configurable,
     private PrintStream setStream(String extension) {
     	PrintStream output = null;
     	if (fileOutput) {
-			String filename = fileBaseName;
+			String filename = null;
 			if (batchProcessor != null) {
 				BatchItem bi = batchProcessor.getCurrentBatchItem();
 				if (bi != null) {
@@ -192,10 +189,11 @@ public class LabelWriter implements Configurable,
 				else {
 					filename = null;
 				}
+			} else {
+				filename = fileBaseName;
 			}
 			// if old and new filenames are different
-			if (((lastFileName == null) && (filename != null)) 
-					|| !lastFileName.equals(filename)) {
+//			if (((lastFileName == null) && (filename != null)) || !lastFileName.equals(filename)) {
 				filename += ("." + extension);
 				try {
 					output = new PrintStream(filename); 
@@ -203,7 +201,7 @@ public class LabelWriter implements Configurable,
 					System.err.println("Unable to open file " + filename);
 					output = System.out;
 				}
-			}
+//			}
     	}
     	else {
     		output = System.out;
@@ -231,7 +229,10 @@ public class LabelWriter implements Configurable,
 		List<Token> list = new ArrayList<Token>();
     	Token token = result.getBestToken();
 		// recover the path of visited word- and silence-tokens in the best token
-		while (token != null) {
+    	if (token != null) { 
+    		System.out.println(token.getSearchState());
+    	}
+    	while (token != null) {
 			SearchState searchState = token.getSearchState(); 
             if ((searchState instanceof PronunciationState) // each word starts with a PronunciationState
             || ((searchState instanceof ExtendedUnitState) // each pause starts with a unit that is a filler 
@@ -429,6 +430,7 @@ public class LabelWriter implements Configurable,
     		boolean timestamp = !result.isFinal();
     		if (wordAlignment) {
     			List<Token> list = getBestWordTokens(result);
+
     			if (newfile) {
     				if ((wordAlignmentStream != null) && fileOutput) { wordAlignmentStream.close(); }
     				wordAlignmentStream = setStream("wordalignment");
