@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Deque;
+import java.util.Queue;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -269,14 +269,14 @@ public class PitchTracker extends BaseDataProcessor {
 	 * main 
 	 **************************/
 	
-	private static Deque<Double> getReferencePitch(String filename) {
-		Deque<Double> referencePitch = new LinkedList<Double>();
+	private static Queue<Double> getReferencePitch(String filename) {
+		Queue<Double> referencePitch = new LinkedList<Double>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			while (br.ready()) {
 				String line = br.readLine();
 				if (!line.matches("^#")) { // allow comments in pitch file
-					referencePitch.addLast(new Double(line));
+					referencePitch.add(new Double(line));
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -290,7 +290,7 @@ public class PitchTracker extends BaseDataProcessor {
 	}
 	
 	public static void functionalTest(String[] args, BaseDataProcessor fe) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException, DataProcessingException {
-    	Deque<Double> referencePitch;
+    	Queue<Double> referencePitch;
     	if (args.length > 1) {
         	referencePitch = getReferencePitch(args[1]);
         } else {
@@ -308,7 +308,7 @@ public class PitchTracker extends BaseDataProcessor {
         		System.out.printf((Locale) null, "%7.3f", pitch);
         		System.out.print("\t");
         		if (!referencePitch.isEmpty()) {
-        			double refPitch = referencePitch.removeFirst().doubleValue();
+        			double refPitch = referencePitch.remove().doubleValue();
         			System.out.printf((Locale) null, "%8.3f", refPitch);
         			if (Math.abs(pitch - refPitch) > 20) {
         				System.out.print("\t!!!");
@@ -360,8 +360,8 @@ public class PitchTracker extends BaseDataProcessor {
             /* set the stream data source to read from the audio file */
             reader.setInputStream(ais, audioFileURL.getFile());
             
-            speedTest(fe);
-//        	functionalTest(args, fe);
+//            speedTest(fe);
+        	functionalTest(args, fe);
         } catch (IOException e) {
             System.err.println("Problem when loading PitchTracker: " + e);
             e.printStackTrace();
