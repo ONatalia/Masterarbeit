@@ -16,18 +16,20 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.cocolab.inpro.batch.BatchModeRecognizer;
 
 import edu.cmu.sphinx.linguist.SearchState;
-import edu.cmu.sphinx.linguist.flat.ExtendedUnitState;
-import edu.cmu.sphinx.linguist.flat.PronunciationState;
+import edu.cmu.sphinx.linguist.UnitSearchState;
+import edu.cmu.sphinx.linguist.WordSearchState;
 import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.recognizer.RecognizerState;
 import edu.cmu.sphinx.recognizer.StateListener;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.result.ResultListener;
+import edu.cmu.sphinx.decoder.search.ActiveList;
 import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.util.BatchItem;
 import edu.cmu.sphinx.util.props.Configurable;
@@ -218,6 +220,7 @@ public class LabelWriter implements Configurable,
         return name;
     }
     
+    Token lastBestToken = new Token(null, 0);
     
     /**
      * get the word-tokens on the best path
@@ -225,17 +228,43 @@ public class LabelWriter implements Configurable,
      * @param result the result to analyse
      * @return List of word tokens on the best path
      */
-    public static List<Token> getBestWordTokens(Result result) {
+    public List<Token> getBestWordTokens(Result result) {
 		List<Token> list = new ArrayList<Token>();
-    	Token token = result.getBestToken();
+// <<<<<<< .mine
+/*    	Token currentToken = result.getBestToken();
+    	Token runningToken = currentToken;
+    	while ((lastBestToken != runningToken) && (runningToken != null)) {
+    		runningToken = runningToken.getPredecessor();
+    	}
+    	if (runningToken == null) {
+    		System.err.println("new best token");
+    	} else if (runningToken == lastBestToken) {
+    		System.err.println("new token " + currentToken.toString() + " is extension to token " + lastBestToken.toString());
+    	} else { assert (false); }
+    	if (currentToken != null) { lastBestToken = currentToken; }
+    	assert (lastBestToken != null); */
+    	ActiveList al = result.getActiveTokens();
+    	System.err.println("Printing " + al.size() + " results: ");
+    	Iterator alIter = al.iterator();
+		// recover the path of visited word- and silence-tokens in the best token 
+		int i = 0;
+		Token token;
+		while ((alIter.hasNext()) && i <= 5) {
+		i++;
+		System.err.println("next best hypothesis");
+		token = (Token) alIter.next();
+    	while (token != null) {
+// =======
+    	token = result.getBestToken();
 		// recover the path of visited word- and silence-tokens in the best token
     	if (token != null) { 
     		System.out.println(token.getSearchState());
     	}
     	while (token != null) {
+// >>>>>>> .r408
 			SearchState searchState = token.getSearchState(); 
-            if ((searchState instanceof PronunciationState) // each word starts with a PronunciationState
-            || ((searchState instanceof ExtendedUnitState) // each pause starts with a unit that is a filler 
+            if ((searchState instanceof WordSearchState) // each word starts with a PronunciationState
+            || ((searchState instanceof UnitSearchState) // each pause starts with a unit that is a filler 
 //            	&& ((ExtendedUnitState) searchState).getUnit().isFiller())) 
             	&& list.isEmpty())) {
             	// add these tokens to the list
@@ -243,6 +272,7 @@ public class LabelWriter implements Configurable,
             }
             token = token.getPredecessor();
         }
+	}} /**/
 		return list;
     }
     
@@ -259,7 +289,7 @@ public class LabelWriter implements Configurable,
     	list.add(token);
     	while (token != null) {
 			SearchState searchState = token.getSearchState(); 
-            if (searchState instanceof ExtendedUnitState) {
+            if (searchState instanceof UnitSearchState) {
             	// add these tokens to the list
         	    list.add(token);
             }
@@ -288,12 +318,12 @@ public class LabelWriter implements Configurable,
     
     public static String stringForSearchState(SearchState state) {
         String event;
-        if (state instanceof PronunciationState) {
-        	PronunciationState pronunciationState = (PronunciationState) state;
+        if (state instanceof WordSearchState) {
+        	WordSearchState pronunciationState = (WordSearchState) state;
         	event = pronunciationState.getPronunciation().getWord().toString();
         }
-        else if (state instanceof ExtendedUnitState) {
-        	ExtendedUnitState unitState = (ExtendedUnitState) state;
+        else if (state instanceof UnitSearchState) {
+        	UnitSearchState unitState = (UnitSearchState) state;
         	event = unitState.getUnit().getName();
         }
         else {
