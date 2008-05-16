@@ -23,10 +23,34 @@ public class Box implements Cloneable {
    }
 
    public void draw(Graphics g) {
-      g.setColor(color);
+      g.setColor(color.brighter());
       g.fillRect(corner.x, corner.y, dim.x, dim.y);
-      g.setColor(Color.black);
-      g.drawRect(corner.x, corner.y, dim.x, dim.y);
+   }
+   
+   public void draw(Graphics g, boolean left, boolean right, boolean top, boolean bottom) {
+	   draw(g);
+	   Color borderColor = Color.black;
+	   Color nonBorderColor = color.darker();
+	   g.setColor(left ? borderColor : nonBorderColor);
+	   if (left) 
+		   g.drawLine(corner.x, corner.y, corner.x, corner.y + dim.y);
+	   else 
+		   g.drawLine(corner.x, corner.y + 1, corner.x, corner.y + dim.y - 1);
+	   g.setColor(right ? borderColor : nonBorderColor);
+	   if (right)
+		   g.drawLine(corner.x + dim.x , corner.y, corner.x + dim.x, corner.y + dim.y);
+	   else 
+		   g.drawLine(corner.x + dim.x , corner.y + 1, corner.x + dim.x, corner.y + dim.y - 1);
+	   g.setColor(top ? borderColor : nonBorderColor);
+	   if (top) 
+		   g.drawLine(corner.x, corner.y, corner.x + dim.x, corner.y);
+	   else
+		   g.drawLine(corner.x + 1, corner.y, corner.x + dim.x - 1, corner.y);
+	   g.setColor(bottom ? borderColor : nonBorderColor);
+	   if (bottom)
+		   g.drawLine(corner.x, corner.y + dim.y, corner.x + dim.x, corner.y + dim.y);
+	   else
+		   g.drawLine(corner.x + 1, corner.y + dim.y, corner.x + dim.x - 1, corner.y + dim.y);
    }
 
    public boolean selected(Point p) {
