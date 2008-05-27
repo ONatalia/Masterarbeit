@@ -45,6 +45,10 @@ words hypothesis'). Clients are expected to solve this goal
 immediately and reply with different goals (For example 
 something like idKEYWORD('hypothesis') )
 
+das, 270508: to get IncrementalWavFile to run, minimally you need to put a
+link to bin/org into InPro directory:
+           ln -s bin/org org
+Otherwise certain config files are not found.
 
 
 2. Batch Mode Recognizer
