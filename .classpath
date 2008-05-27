@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="higgins-lib"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/opt/java/sphinx4.jar" sourcepath="/sphinx4-1.0beta">
+	<classpathentry kind="lib" path="/opt/java/sphinx4.jar" sourcepath="/opt/java/sphinx4.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/opt/pkg/sphinx/doc/"/>
 		</attributes>
@@ -23,12 +24,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="/opt/java/drej.jar" sourcepath="/opt/java/drej.jar"/>
-	<classpathentry kind="lib" path="/opt/java/HUB4_8gau_13dCep_16k_40mel_133Hz_6855Hz.jar"/>
 	<classpathentry kind="lib" path="/opt/java/RM1_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="lib" path="/opt/java/TIDIGITS_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="lib" path="/opt/java/WSJ_8gau_13dCep_8kHz_31mel_200Hz_3500Hz.jar"/>
 	<classpathentry kind="lib" path="/opt/java/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-	<classpathentry kind="lib" path="/home/timo/inpro/sphinx/KCoRS_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+	<classpathentry kind="lib" path="/opt/java/KCoRS_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/vecmath1.2.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/usr/share/doc/libvecmath1.2-java/api/"/>
@@ -39,5 +39,7 @@
 	<classpathentry kind="lib" path="/opt/java/dom4j-1.5.2.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/junit-3.8.1.1.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/backport-util-concurrent-2.2.jar"/>
+	<classpathentry kind="lib" path="/home/timo/inpro/higgins/broker/broker.jar"/>
+	<classpathentry kind="lib" path="/opt/java/voxforgeDE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
