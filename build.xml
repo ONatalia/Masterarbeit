@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="Inpro">
+    <property environment="env"/>
+    <property name="ECLIPSE_HOME" value="/usr/lib/eclipse"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.5"/>
+    <property name="source" value="1.5"/>
+    <path id="Inpro.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="/opt/java/sphinx4.jar"/>
+        <pathelement location="/opt/java/oaa2.jar"/>
+        <pathelement location="/opt/java/jmf.jar"/>
+        <pathelement location="/opt/java/weka.jar"/>
+        <pathelement location="/opt/java/drej.jar"/>
+        <pathelement location="/opt/java/RM1_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+        <pathelement location="/opt/java/TIDIGITS_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+        <pathelement location="/opt/java/WSJ_8gau_13dCep_8kHz_31mel_200Hz_3500Hz.jar"/>
+        <pathelement location="/opt/java/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+        <pathelement location="/opt/java/KCoRS_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+        <pathelement location="/usr/share/java/vecmath1.2.jar"/>
+        <pathelement location="/opt/java/antlr-oaa.jar"/>
+        <pathelement location="/usr/share/java/log4j-1.2.jar"/>
+        <pathelement location="/opt/java/dom4j-1.5.2.jar"/>
+        <pathelement location="/usr/share/java/junit.jar"/>
+        <pathelement location="/usr/share/java/backport-util-concurrent-2.2.jar"/>
+        <pathelement location="/opt/java/voxforgeDE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+        <pathelement location="res/broker.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src" excludes="**/*.launch, **/*.java"/>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="Inpro.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="Pentominoes">
+        <java classname="org.cocolab.deawu.pentomino.Pentominoes" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="TimeShiftingAnalysis">
+        <java classname="org.cocolab.inpro.features.TimeShiftingAnalysis" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="WekaTest">
+        <java classname="test.org.cocolab.inpro.agents.weka.WekaTest" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="SphereFileReader">
+        <java classname="gov.nist.sphere.jaudio.SphereFileReader" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="EOTBins">
+        <java classname="org.cocolab.inpro.features.EOTBins" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="RTPDispatcherAgent">
+        <java classname="org.cocolab.inpro.agents.dispatcher.RTPDispatcherAgent" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="MonitorStateToFile">
+        <java classname="org.cocolab.inpro.agents.monitor.MonitorStateToFile" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="PitchTracker">
+        <java classname="org.cocolab.inpro.pitch.PitchTracker" failonerror="true" fork="yes">
+            <arg line="res/pitchwave.wav"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="DigitsMicroLive">
+        <java classname="org.cocolab.inpro.incrementalwavfile.IncrementalWavFile" failonerror="true" fork="yes">
+            <jvmarg line="-Xmx800m"/>
+            <arg line="-c digits.config.xml file:/home/timo/Desktop/de43-01.wav"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="SphinxBroker">
+        <java classname="org.cocolab.inpro.higgins.application.SphinxBroker" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="BaSynthesisAgent">
+        <java classname="org.cocolab.inpro.agents.synthesis.BaSynthesisAgent" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="CapturePlayback">
+        <java classname="test.rtp.rx.CapturePlayback" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="G2P">
+        <java classname="test.org.cocolab.inpro.g2ptest.G2P" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="NewWordNotifierAgent">
+        <java classname="org.cocolab.inpro.sphinx.instrumentation.NewWordNotifierAgent" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Pentominoes (1)">
+        <java classname="sun.applet.AppletViewer" dir="." failonerror="true" fork="yes">
+            <arg line="Pentominoes (1).html"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="BatchModeRecognizer">
+        <java classname="org.cocolab.inpro.batch.BatchModeRecognizer" failonerror="true" fork="yes">
+            <arg line="src/org/cocolab/inpro/incrementalwavfile/digits.config.xml /home/timo/corpora/swbd.channels.lst"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="SpeakerMonitorRx">
+        <java classname="org.cocolab.inpro.rtp.monitor.SpeakerMonitorRx" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="PentoClient">
+        <java classname="org.cocolab.deawu.pentomino.PentoClient" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="FeatureExtraction">
+        <java classname="org.cocolab.inpro.incrementalwavfile.IncrementalWavFile" failonerror="true" fork="yes">
+            <jvmarg line="-Xmx500M"/>
+            <arg line="-c features.config.xml http://www.ling.uni-potsdam.de/~timo/tmp/DE_1234.wav"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="SleepyWrapper">
+        <java classname="org.cocolab.inpro.agents.sleepywrapper.SleepyWrapper" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+</project>
