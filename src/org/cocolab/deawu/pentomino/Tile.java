@@ -5,6 +5,13 @@ import java.awt.Color;
 import java.lang.String;
 
 class Tile {
+	
+	static final String CCW_ROTATE_COMMAND = "ccwRotate";
+	static final String CW_ROTATE_COMMAND = "cwRotate";
+	static final String HORIZONTAL_FLIP_COMMAND = "hFlip";
+	static final String VERTICAL_FLIP_COMMAND = "vFlip";
+	
+
    private final int     N = 5;               // number of boxes making up the piece
    private Box[]   boxes = new Box[N];
    private int[][] defVectors = new int[2][N];
@@ -70,10 +77,13 @@ class Tile {
    }
 
    
-   public boolean selected(Point p) {
+   public boolean matchesPosition(Point p) {
       boolean s;
-      s = (boxes[0]).selected(p) || (boxes[1]).selected(p) ||
-         (boxes[2]).selected(p) || (boxes[3]).selected(p) || (boxes[4]).selected(p);
+      s = (boxes[0]).matchesPosition(p) || 
+          (boxes[1]).matchesPosition(p) ||
+          (boxes[2]).matchesPosition(p) || 
+          (boxes[3]).matchesPosition(p) || 
+          (boxes[4]).matchesPosition(p);
       return s;
    }
    
@@ -121,6 +131,20 @@ class Tile {
     	  }
     	  boxes[i].draw(g, drawLeft, drawRight, drawTop, drawBottom);
       }
+   }
+   
+   public void doCommand(String command) {
+		if (command.equals(VERTICAL_FLIP_COMMAND))
+			vFlip();
+		else if (command.equals(HORIZONTAL_FLIP_COMMAND))
+			hFlip();
+		else if (command.equals(CW_ROTATE_COMMAND))
+			cwRotate();
+		else if (command.equals(CCW_ROTATE_COMMAND))
+			ccwRotate();
+		else 
+			throw new RuntimeException("Illegal command for tile manipulation");
+
    }
 
    public void hFlip() {
@@ -225,6 +249,10 @@ class Tile {
          m[mi][mj] = null;
       }
       placed = false;
+   }
+   
+   public String toString() {
+	   return "tile: " + this.name + "\n";
    }
 
 }

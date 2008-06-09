@@ -52,8 +52,12 @@ public class Box implements Cloneable {
 	   else
 		   g.drawLine(corner.x + 1, corner.y + dim.y, corner.x + dim.x - 1, corner.y + dim.y);
    }
-
+   
    public boolean selected(Point p) {
+	   return matchesPosition(p);
+   }
+
+   public boolean matchesPosition(Point p) {
       if (p.x >= this.corner.x && p.x <= this.corner.x + this.dim.x - 1 &&
           p.y >= this.corner.y && p.y <= this.corner.y + this.dim.y - 1)
       {

@@ -1,5 +1,6 @@
 package org.cocolab.deawu.pentomino;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -107,6 +108,7 @@ class Grid {
 	}
 
 	public void draw(Graphics g) {
+		g.setColor(Color.gray);
 		for (int i = 0; i < dim.y; i++)
 			for (int j = 0; j < dim.x; j++)
 				// das:
