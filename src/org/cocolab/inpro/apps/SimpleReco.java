@@ -25,8 +25,8 @@ public class SimpleReco {
 		switch (clp.getMode()) {
 			case CommandLineParser.MICROPHONE_MODE:
 				Microphone mic = (Microphone) cm.lookup("microphone");
-				fe.setPredecessor(mic);
 				mic.initialize();
+				fe.setPredecessor(mic);
 				if (!mic.startRecording()) {
 					System.err.println("Could not open microphone. Exiting...");
 					System.exit(1);
@@ -34,7 +34,8 @@ public class SimpleReco {
 			break;
 			case CommandLineParser.FILE_MODE:
 				StreamDataSource sds = (StreamDataSource) cm.lookup("streamDataSource");
-				//fe.setPredecessor(sds);
+				sds.initialize();
+				fe.setPredecessor(sds);
 				URL audioURL = clp.getAudioURL();
 				AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);
 	            sds.setInputStream(ais, audioURL.getFile());
