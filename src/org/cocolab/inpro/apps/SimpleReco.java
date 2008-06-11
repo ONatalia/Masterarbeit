@@ -9,7 +9,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.sphinx.frontend.RTPDataSource;
 
-import edu.cmu.sphinx.frontend.DataProcessor;
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
@@ -25,8 +24,9 @@ public class SimpleReco {
 		switch (clp.getMode()) {
 			case CommandLineParser.MICROPHONE_MODE:
 				Microphone mic = (Microphone) cm.lookup("microphone");
-				mic.initialize();
-				fe.setPredecessor(mic);
+				FrontEnd micfe = (FrontEnd) cm.lookup("microFrontend");
+				micfe.initialize();
+				fe.setPredecessor(micfe);
 				if (!mic.startRecording()) {
 					System.err.println("Could not open microphone. Exiting...");
 					System.exit(1);
@@ -42,6 +42,7 @@ public class SimpleReco {
 			break;
 			case CommandLineParser.RTP_MODE:
 				RTPDataSource rtp = (RTPDataSource) cm.lookup("RTPDataSource");
+				rtp.initialize();
 				fe.setPredecessor(rtp);
 				// TODO: add configuration for RTP connection
 			break;
@@ -57,14 +58,16 @@ public class SimpleReco {
     	recognizer.allocate();
     	System.err.println("Setting up frontend...\n");
     	setupSource(cm, clp);
-        Result result = recognizer.recognize();
-        if (result != null) {
-            System.err.println("\nRESULT: " + result.getBestToken().getWordPath() + "\n");
-        } else {
-            System.err.println("Result: null\n");
-        }
-        recognizer.deallocate();
-
+    	System.err.println("Starting recognition, use Ctrl-C to stop...\n");
+    	Result result;
+    	do {
+	    	result = recognizer.recognize();
+	        if (result != null) {
+	            System.err.println("RESULT: " + result.toString() + "\n");
+	        } else {
+	            System.err.println("Result: null\n");
+	        }
+    	} while (result.getDataFrames().length > 4);
     }
 
 }

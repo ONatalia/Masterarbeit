@@ -36,7 +36,7 @@
 	<!-- The minimum amount of time in speech (in milliseconds) to be considered as utterance start -->
 	<property name="startSpeech" value="200" />
 	<!-- The amount of time in silence (in milliseconds) to be considered as utterance end -->
-	<property name="endSilence" value="1000" />
+	<property name="endSilence" value="500" />
 	<!-- The amount of time (in milliseconds) before speech start to be included as speech data. -->
 	<property name="speechLeader" value="100" />
 	<!-- The amount of time (in milliseconds) after speech ends to be included as speech data. -->
@@ -107,7 +107,6 @@
         <property name="absoluteBeamWidth" value="${absoluteWordBeamWidth}"/>
         <property name="relativeBeamWidth" value="${relativeWordBeamWidth}"/>
     </component>
-    
     
     <component name="activeList" 
              type="edu.cmu.sphinx.decoder.search.SortingActiveListFactory">
@@ -215,12 +214,17 @@
     <!-- The frontend configuration                               -->
     <!-- ******************************************************** -->
     
-    <component name="frontend" type="edu.cmu.sphinx.frontend.FrontEnd">
+    <component name="microFrontend" type="edu.cmu.sphinx.frontend.FrontEnd">
         <propertylist name="pipeline">
-<!--        <item>microphone</item> -->
+			<item>microphone</item> 
 			<item>speechClassifier</item>
 			<item>speechMarker</item>
 			<item>nonSpeechDataFilter</item>
+        </propertylist>
+    </component>
+    
+    <component name="frontend" type="edu.cmu.sphinx.frontend.FrontEnd">
+        <propertylist name="pipeline">
             <item>preemphasizer</item>
             <item>windower</item>
             <item>fft</item>
@@ -256,12 +260,11 @@
         <property name="destPort" value="42102"/>
     </component>
 
-	<component name="speechClassifier"
-		type="edu.cmu.sphinx.frontend.endpoint.SpeechClassifier">
+	<component name="speechClassifier" type="edu.cmu.sphinx.frontend.endpoint.SpeechClassifier">
 		<property name="threshold" value="${threshold}" />
 	</component>
 
-	<component name="speechMarker" type="org.cocolab.inpro.higgins.SpeechMarker">
+	<component name="speechMarker" type="edu.cmu.sphinx.frontend.endpoint.SpeechMarker">
 		<property name="startSpeech" value="${startSpeech}" />
 		<property name="endSilence" value="${endSilence}" />
 		<property name="speechLeader" value="${speechLeader}" />
