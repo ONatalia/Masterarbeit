@@ -22,7 +22,7 @@
 			<attribute name="javadoc_location" value="file:/opt/pkg/weka/doc/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/opt/java/drej.jar" sourcepath="/opt/java/drej.jar"/>
+	<classpathentry kind="lib" path="/opt/java/drej.jar"/>
 	<classpathentry kind="lib" path="/opt/java/RM1_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="lib" path="/opt/java/TIDIGITS_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="lib" path="/opt/java/WSJ_8gau_13dCep_8kHz_31mel_200Hz_3500Hz.jar"/>
@@ -36,9 +36,11 @@
 	<classpathentry kind="lib" path="/opt/java/antlr-oaa.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/log4j-1.2.jar"/>
 	<classpathentry kind="lib" path="/opt/java/dom4j-1.5.2.jar"/>
-	<classpathentry kind="lib" path="/usr/share/java/junit.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/backport-util-concurrent-2.2.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/junit.jar"/>
+	<classpathentry kind="lib" path="/opt/java/maryclient.jar" sourcepath="/opt/pkg/mary/java/de"/>
 	<classpathentry kind="lib" path="/opt/java/voxforgeDE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="lib" path="res/broker.jar"/>
+	<classpathentry kind="lib" path="/opt/java/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

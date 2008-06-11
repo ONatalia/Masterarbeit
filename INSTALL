@@ -36,8 +36,15 @@ as well.
 
 1a. German Acoustic Model:
 
-get it via ssh at helios:/home/timo/KCoRS_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
-and at it to your CLASSPATH.
+Several acoustic models are available from helios:/home/timo/tmp/
+
+KCoRS_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
+Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
+
+Acoustic models for German may also be available from Voxforge. 
+See http://www.voxforge.org/home/downloads/ for details.
+
+copy the models you want/need and put them in /opt/java/
 
 2. OAA (2.3.2):
 
