@@ -5,24 +5,32 @@ import java.net.URL;
 
 public class CommandLineParser {
 
-	public static final int UNSPECIFIED_MODE = 0;
-	public static final int FILE_MODE = 1;
-	public static final int MICROPHONE_MODE = 2;
-	public static final int RTP_MODE = 3;
+	public static final int UNSPECIFIED_INPUT = 0;
+	public static final int FILE_INPUT = 1;
+	public static final int MICROPHONE_INPUT = 2;
+	public static final int RTP_INPUT = 3;
 	
-	int mode;
+	public static final int NO_OUTPUT = 0;
+	public static final int OAA_OUTPUT = 1;
+	
+	int inputMode;
+	int outputMode;
 	URL configURL;
 	URL audioURL;
+	int rtpPort;
+	String rtpSrcIP;
+	int rtpSrcPort;
 	boolean success;
 	
 	CommandLineParser(String[] args) {
 		success = false;
 		try {
-			mode = UNSPECIFIED_MODE;
+			inputMode = UNSPECIFIED_INPUT;
+			outputMode = NO_OUTPUT;
 			configURL = CommandLineParser.class.getResource("config.xml");
 			audioURL = new URL("file:res/DE_1234.wav");
 			parse(args);
-			if (mode == UNSPECIFIED_MODE) {
+			if (inputMode == UNSPECIFIED_INPUT) {
 				printUsage();
 				System.err.println("Must specify one of -M, -R, or -F");
 			} else {
@@ -40,9 +48,13 @@ public class CommandLineParser {
 		System.err.println("options:");
 		System.err.println("    -h			   this screen");
 		System.err.println("    -c <configURL> sphinx configuration file to use (has a reasonable default)");
+		System.err.println("input selection:");
 		System.err.println("    -M             read data from microphone");
-		System.err.println("    -R             read data from RTP");
+		System.err.println("    -R <port> <srcIP> <srcPort> read data from RTP");
 		System.err.println("    -F <fileURL>   read data from sound file with given URL");
+		System.err.println("output selection:");
+		System.err.println("    -A             send messages via OAA");
+		
 	}
 	
 	void parse(String[] args) throws MalformedURLException {
@@ -56,15 +68,29 @@ public class CommandLineParser {
 				configURL = new URL(args[i]);
 			}
 			else if (args[i].equals("-M")) { 
-				mode = MICROPHONE_MODE;
+				inputMode = MICROPHONE_INPUT;
 			}
 			else if (args[i].equals("-R")) {
-				mode = RTP_MODE;
+				inputMode = RTP_INPUT;
+				i++;
+				rtpPort = Integer.parseInt(args[i]);
+				i++;
+				rtpSrcIP = args[i];
+				i++;
+				rtpSrcPort = Integer.parseInt(args[i]);
 			}
 			else if (args[i].equals("-F")) {
+				inputMode = FILE_INPUT;
 				i++;
-				mode = FILE_MODE;
 				audioURL = new URL(args[i]);
+			}
+			else if (args[i].equals("-A")) {
+				outputMode |= OAA_OUTPUT;
+			}
+			else {
+				printUsage();
+				System.err.println("Illegal argument: " + args[i]);
+				System.exit(1);
 			}
 		}
 	}
@@ -81,8 +107,12 @@ public class CommandLineParser {
 		return audioURL;
 	}
 	
-	int getMode() {
-		return mode;
+	int getInputMode() {
+		return inputMode;
+	}
+	
+	int getOutputMode() {
+		return outputMode;
 	}
 	
 }

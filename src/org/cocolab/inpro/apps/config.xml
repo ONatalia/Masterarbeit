@@ -59,8 +59,8 @@
             <item>speedTracker </item>
             <item>memoryTracker </item>
 <!--
-            <item>labelWriter </item>
             <item>newWordNotifierAgent </item>
+            <item>labelWriter </item>
 -->
         </propertylist>
     </component>
@@ -237,9 +237,8 @@
     <!-- The frontend configuration                               -->
     <!-- ******************************************************** -->
     
-    <component name="microFrontend" type="edu.cmu.sphinx.frontend.FrontEnd">
+    <component name="endpointing" type="edu.cmu.sphinx.frontend.FrontEnd">
         <propertylist name="pipeline">
-			<item>microphone</item> 
 			<item>speechClassifier</item>
 			<item>speechMarker</item>
 			<item>nonSpeechDataFilter</item>
@@ -278,9 +277,12 @@
     
     <component name="RTPDataSource" 
                type="org.cocolab.inpro.sphinx.frontend.RTPDataSource">
+<!--
+THESE ARE SET AT RUNTIME!
         <property name="sourceIP" value="127.0.1.1"/>
-        <property name="sourcePort" value="42100"/>
-        <property name="destPort" value="42102"/>
+        <property name="sourcePort" value="42000"/>
+        <property name="destPort" value="42002"/>
+-->
     </component>
 
 	<component name="speechClassifier" type="edu.cmu.sphinx.frontend.endpoint.SpeechClassifier">

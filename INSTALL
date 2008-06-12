@@ -36,7 +36,9 @@ as well.
 
 1a. German Acoustic Model:
 
-Several acoustic models are available from helios:/home/timo/tmp/
+get it via ssh at helios:/home/timo/KCoRS_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
+and at it to your CLASSPATH. There may be more current models around and you may
+also want to look on www.voxforge.org for acoustic models
 
 KCoRS_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
 Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
@@ -67,7 +69,7 @@ get it at http://java.sun.com/products/java-media/jmf/2.1.1/download.html
 You may want to install the version optimized for your OS/
 architecture. Add jmf.jar to your CLASSPATH.
 
-4. weka (3.5.x), not yet used.
+4. weka (3.5.x)
 
 get it at http://www.cs.waikato.ac.nz/ml/weka/index_downloading.html
 
@@ -80,3 +82,15 @@ get it at http://www.gregdennis.com/drej/
 and add it to your CLASSPATH. It also requires vecmath.jar,
 available from https://java3d.dev.java.net/binary-builds.html,
 which must be added to your CLASSPATH as well.
+
+6. maryclient (3.5+)
+
+get it from http://mary.dfki.de/
+
+you must have a mary server running if you run an application that
+uses mary (none yet)
+
+7. some more libraries (dom4j, junit, log4j, ...)
+
+these should be installable through your system's package manager 
+as they are fairly standard libraries

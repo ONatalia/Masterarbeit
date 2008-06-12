@@ -8,6 +8,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.sphinx.frontend.RTPDataSource;
+import org.cocolab.inpro.sphinx.instrumentation.NewWordNotifierAgent;
 
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.Microphone;
@@ -21,18 +22,31 @@ public class SimpleReco {
 
 	private static void setupSource(ConfigurationManager cm, CommandLineParser clp) throws InstantiationException, PropertyException, UnsupportedAudioFileException, IOException {
     	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
-		switch (clp.getMode()) {
-			case CommandLineParser.MICROPHONE_MODE:
+		switch (clp.getInputMode()) {
+			case CommandLineParser.MICROPHONE_INPUT:
 				Microphone mic = (Microphone) cm.lookup("microphone");
-				FrontEnd micfe = (FrontEnd) cm.lookup("microFrontend");
-				micfe.initialize();
-				fe.setPredecessor(micfe);
+				FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
+				endpoint.setPredecessor(mic);
+				endpoint.initialize();
+				fe.setPredecessor(endpoint);
 				if (!mic.startRecording()) {
 					System.err.println("Could not open microphone. Exiting...");
 					System.exit(1);
 				}
 			break;
-			case CommandLineParser.FILE_MODE:
+			case CommandLineParser.RTP_INPUT:
+				RTPDataSource rtp = (RTPDataSource) cm.lookup("RTPDataSource");
+				cm.setProperty("RTPDataSource",	"destPort", "" + clp.rtpPort);
+				cm.setProperty("RTPDataSource",	"sourceIP", clp.rtpSrcIP);
+				cm.setProperty("RTPDataSource",	"sourcePort", "" + clp.rtpSrcPort);
+				rtp.initialize();
+				endpoint = (FrontEnd) cm.lookup("endpointing");
+				endpoint.setPredecessor(rtp);
+				endpoint.initialize();
+				fe.setPredecessor(endpoint);
+				// TODO: add configuration for RTP connection
+			break;
+			case CommandLineParser.FILE_INPUT:
 				StreamDataSource sds = (StreamDataSource) cm.lookup("streamDataSource");
 				sds.initialize();
 				fe.setPredecessor(sds);
@@ -40,12 +54,13 @@ public class SimpleReco {
 				AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);
 	            sds.setInputStream(ais, audioURL.getFile());
 			break;
-			case CommandLineParser.RTP_MODE:
-				RTPDataSource rtp = (RTPDataSource) cm.lookup("RTPDataSource");
-				rtp.initialize();
-				fe.setPredecessor(rtp);
-				// TODO: add configuration for RTP connection
-			break;
+		}
+	}
+
+	private static void setupDrain(ConfigurationManager cm, CommandLineParser clp) throws InstantiationException, PropertyException {
+		if ((clp.getOutputMode() & CommandLineParser.OAA_OUTPUT) == CommandLineParser.OAA_OUTPUT) {
+			@SuppressWarnings("unused")
+			NewWordNotifierAgent nwna = (NewWordNotifierAgent) cm.lookup("newWordNotifierAgent");
 		}
 	}
 
@@ -56,8 +71,10 @@ public class SimpleReco {
     	System.err.println("Loading recognizer...\n");
     	Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
     	recognizer.allocate();
-    	System.err.println("Setting up frontend...\n");
+    	System.err.println("Setting up source...\n");
     	setupSource(cm, clp);
+    	System.err.println("Setting up drain...\n");
+    	setupDrain(cm, clp);
     	System.err.println("Starting recognition, use Ctrl-C to stop...\n");
     	Result result;
     	do {
