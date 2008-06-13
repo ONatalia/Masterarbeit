@@ -7,8 +7,9 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.cocolab.inpro.audio.AudioUtils;
-import org.cocolab.inpro.sphinx.frontend.RTPDataSource;
+import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 import org.cocolab.inpro.sphinx.instrumentation.NewWordNotifierAgent;
+
 
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.Microphone;
@@ -20,7 +21,7 @@ import edu.cmu.sphinx.util.props.PropertyException;
 
 public class SimpleReco {
 
-	private static void setupSource(ConfigurationManager cm, CommandLineParser clp) throws InstantiationException, PropertyException, UnsupportedAudioFileException, IOException {
+	protected static void setupSource(ConfigurationManager cm, CommandLineParser clp) throws InstantiationException, PropertyException, UnsupportedAudioFileException, IOException {
     	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
 		switch (clp.getInputMode()) {
 			case CommandLineParser.MICROPHONE_INPUT:
@@ -35,16 +36,13 @@ public class SimpleReco {
 				}
 			break;
 			case CommandLineParser.RTP_INPUT:
-				RTPDataSource rtp = (RTPDataSource) cm.lookup("RTPDataSource");
-				cm.setProperty("RTPDataSource",	"destPort", "" + clp.rtpPort);
-				cm.setProperty("RTPDataSource",	"sourceIP", clp.rtpSrcIP);
-				cm.setProperty("RTPDataSource",	"sourcePort", "" + clp.rtpSrcPort);
+				RtpRecvProcessor rtp = (RtpRecvProcessor) cm.lookup("RTPDataSource");
+				cm.setProperty("RTPDataSource",	"recvPort", "" + clp.rtpPort);
 				rtp.initialize();
 				endpoint = (FrontEnd) cm.lookup("endpointing");
 				endpoint.setPredecessor(rtp);
 				endpoint.initialize();
 				fe.setPredecessor(endpoint);
-				// TODO: add configuration for RTP connection
 			break;
 			case CommandLineParser.FILE_INPUT:
 				StreamDataSource sds = (StreamDataSource) cm.lookup("streamDataSource");
@@ -57,7 +55,7 @@ public class SimpleReco {
 		}
 	}
 
-	private static void setupDrain(ConfigurationManager cm, CommandLineParser clp) throws InstantiationException, PropertyException {
+	private static void setupMonitors(ConfigurationManager cm, CommandLineParser clp) throws InstantiationException, PropertyException {
 		if ((clp.getOutputMode() & CommandLineParser.OAA_OUTPUT) == CommandLineParser.OAA_OUTPUT) {
 			@SuppressWarnings("unused")
 			NewWordNotifierAgent nwna = (NewWordNotifierAgent) cm.lookup("newWordNotifierAgent");
@@ -73,8 +71,8 @@ public class SimpleReco {
     	recognizer.allocate();
     	System.err.println("Setting up source...\n");
     	setupSource(cm, clp);
-    	System.err.println("Setting up drain...\n");
-    	setupDrain(cm, clp);
+    	System.err.println("Setting up monitors...\n");
+    	setupMonitors(cm, clp);
     	System.err.println("Starting recognition, use Ctrl-C to stop...\n");
     	Result result;
     	do {

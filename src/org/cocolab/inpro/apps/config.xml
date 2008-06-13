@@ -276,7 +276,7 @@
     </component>
     
     <component name="RTPDataSource" 
-               type="org.cocolab.inpro.sphinx.frontend.RTPDataSource">
+               type="org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor">
 <!--
 THESE ARE SET AT RUNTIME!
         <property name="sourceIP" value="127.0.1.1"/>

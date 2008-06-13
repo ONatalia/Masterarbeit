@@ -18,8 +18,6 @@ public class CommandLineParser {
 	URL configURL;
 	URL audioURL;
 	int rtpPort;
-	String rtpSrcIP;
-	int rtpSrcPort;
 	boolean success;
 	
 	CommandLineParser(String[] args) {
@@ -50,7 +48,7 @@ public class CommandLineParser {
 		System.err.println("    -c <configURL> sphinx configuration file to use (has a reasonable default)");
 		System.err.println("input selection:");
 		System.err.println("    -M             read data from microphone");
-		System.err.println("    -R <port> <srcIP> <srcPort> read data from RTP");
+		System.err.println("    -R <port>      read data from RTP");
 		System.err.println("    -F <fileURL>   read data from sound file with given URL");
 		System.err.println("output selection:");
 		System.err.println("    -A             send messages via OAA");
@@ -74,10 +72,6 @@ public class CommandLineParser {
 				inputMode = RTP_INPUT;
 				i++;
 				rtpPort = Integer.parseInt(args[i]);
-				i++;
-				rtpSrcIP = args[i];
-				i++;
-				rtpSrcPort = Integer.parseInt(args[i]);
 			}
 			else if (args[i].equals("-F")) {
 				inputMode = FILE_INPUT;
