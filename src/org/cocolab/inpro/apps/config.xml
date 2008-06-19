@@ -343,7 +343,6 @@ THESE ARE SET AT RUNTIME!
 
     <component name="newWordNotifierAgent"
 		type="org.cocolab.inpro.sphinx.instrumentation.NewWordNotifierAgent">
-    	<property name="identity" value="antonia"/>
         <property name="recognizer" value="${recognizer}"/>
     </component>
 
