@@ -12,17 +12,20 @@ public class CommandLineParser {
 	
 	public static final int NO_OUTPUT = 0;
 	public static final int OAA_OUTPUT = 1;
+	public static final int TED_OUTPUT = 2;
 	
-	int inputMode;
-	int outputMode;
 	URL configURL;
+	boolean verbose;
+	int inputMode;
 	URL audioURL;
 	int rtpPort;
+	int outputMode;
 	boolean success;
 	
 	CommandLineParser(String[] args) {
 		success = false;
 		try {
+			verbose = false;
 			inputMode = UNSPECIFIED_INPUT;
 			outputMode = NO_OUTPUT;
 			configURL = CommandLineParser.class.getResource("config.xml");
@@ -46,13 +49,14 @@ public class CommandLineParser {
 		System.err.println("options:");
 		System.err.println("    -h			   this screen");
 		System.err.println("    -c <configURL> sphinx configuration file to use (has a reasonable default)");
+		System.err.println("    -v             more verbose output (speed and memory tracker)");
 		System.err.println("input selection:");
 		System.err.println("    -M             read data from microphone");
 		System.err.println("    -R <port>      read data from RTP");
 		System.err.println("    -F <fileURL>   read data from sound file with given URL");
 		System.err.println("output selection:");
 		System.err.println("    -A             send messages via OAA");
-		
+		System.err.println("    -T             send incremental hypotheses to TEDview");
 	}
 	
 	void parse(String[] args) throws MalformedURLException {
@@ -64,6 +68,9 @@ public class CommandLineParser {
 			else if (args[i].equals("-c")) {
 				i++;
 				configURL = new URL(args[i]);
+			}
+			else if (args[i].equals("-v")) {
+				verbose = true;
 			}
 			else if (args[i].equals("-M")) { 
 				inputMode = MICROPHONE_INPUT;
@@ -81,6 +88,9 @@ public class CommandLineParser {
 			else if (args[i].equals("-A")) {
 				outputMode |= OAA_OUTPUT;
 			}
+			else if (args[i].equals("-T")) {
+				outputMode |= TED_OUTPUT;
+			}
 			else {
 				printUsage();
 				System.err.println("Illegal argument: " + args[i]);
@@ -91,6 +101,10 @@ public class CommandLineParser {
 	
 	boolean parsedSuccessfully() {
 		return success;
+	}
+	
+	boolean verbose() {
+		return verbose;
 	}
 	
 	URL getConfigURL() {

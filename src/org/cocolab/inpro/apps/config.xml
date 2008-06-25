@@ -56,11 +56,12 @@
                type="edu.cmu.sphinx.recognizer.Recognizer">
         <property name="decoder" value="decoder"/>
         <propertylist name="monitors">
+<!--
             <item>speedTracker </item>
             <item>memoryTracker </item>
-<!--
             <item>newWordNotifierAgent </item>
             <item>labelWriter </item>
+			<item>TEDviewNotifier</item>
 -->
         </propertylist>
     </component>
@@ -277,12 +278,6 @@
     
     <component name="RTPDataSource" 
                type="org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor">
-<!--
-THESE ARE SET AT RUNTIME!
-        <property name="sourceIP" value="127.0.1.1"/>
-        <property name="sourcePort" value="42000"/>
-        <property name="destPort" value="42002"/>
--->
     </component>
 
 	<component name="speechClassifier" type="edu.cmu.sphinx.frontend.endpoint.SpeechClassifier">
@@ -332,13 +327,18 @@ THESE ARE SET AT RUNTIME!
         <property name="recognizer" value="${recognizer}"/>
         <property name="intermediateResults" value="true"/>
         <property name="finalResult" value="false"/> 
-        <property name="wordAlignment" value="false"/>
-        <property name="phoneAlignment" value="true"/>
+        <property name="wordAlignment" value="true"/>
+        <property name="phoneAlignment" value="false"/>
         <property name="step" value="${step}"/>
         <property name="fileOutput" value="false"/>
         <property name="fileBaseName" value=""/>
-        <property name="zeitgeistOutput" value="false"/>
-        <property name="zeitgeistPort" value="2000"/>
+    </component>
+    
+    <component name="TEDviewNotifier" type="org.cocolab.inpro.sphinx.instrumentation.TEDviewNotifier">
+    	<property name="recognizer" value="${recognizer}"/>
+        <property name="intermediateResults" value="true"/>
+        <property name="wordAlignment" value="true"/>
+        <property name="phoneAlignment" value="false"/>
     </component>
 
     <component name="newWordNotifierAgent"

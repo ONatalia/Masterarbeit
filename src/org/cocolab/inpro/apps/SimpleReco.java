@@ -8,8 +8,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
-import org.cocolab.inpro.sphinx.instrumentation.NewWordNotifierAgent;
-
 
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.Microphone;
@@ -57,8 +55,14 @@ public class SimpleReco {
 
 	private static void setupMonitors(ConfigurationManager cm, CommandLineParser clp) throws InstantiationException, PropertyException {
 		if ((clp.getOutputMode() & CommandLineParser.OAA_OUTPUT) == CommandLineParser.OAA_OUTPUT) {
-			@SuppressWarnings("unused")
-			NewWordNotifierAgent nwna = (NewWordNotifierAgent) cm.lookup("newWordNotifierAgent");
+			cm.lookup("newWordNotifierAgent");
+		}
+		if ((clp.getOutputMode() & CommandLineParser.TED_OUTPUT) == CommandLineParser.TED_OUTPUT) {
+			cm.lookup("TEDviewNotifier");
+		}
+		if (clp.verbose()) {
+			cm.lookup("memoryTracker");
+			cm.lookup("speedTracker");
 		}
 	}
 
