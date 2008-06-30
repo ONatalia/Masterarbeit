@@ -11,12 +11,8 @@
 package org.cocolab.inpro.sphinx.instrumentation;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.cocolab.inpro.batch.BatchModeRecognizer;
@@ -29,7 +25,6 @@ import edu.cmu.sphinx.recognizer.RecognizerState;
 import edu.cmu.sphinx.recognizer.StateListener;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.result.ResultListener;
-import edu.cmu.sphinx.decoder.search.ActiveList;
 import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.util.BatchItem;
 import edu.cmu.sphinx.util.props.Configurable;
@@ -61,29 +56,23 @@ public class LabelWriter implements Configurable,
     public final static String PROP_FILE_OUTPUT = "fileOutput";
     public final static String PROP_FILE_BASE_NAME = "fileBaseName";
 
-    public final static String PROP_ZEITGEIST_OUTPUT = "zeitgeistOutput";
-    public final static String PROP_ZEITGEIST_PORT = "zeitgeistPort";
-    
     // ------------------------------
     // Configuration data
     // ------------------------------
     private String name;
     private Recognizer recognizer;
     
-    private boolean intermediateResults = false;
-    private boolean finalResult = true;
+    protected boolean intermediateResults = false;
+    protected boolean finalResult = true;
     
     private boolean fileOutput = false;
     private String fileBaseName = "";
     
-    private boolean zeitgeistOutput = false;
-    private int zeitgeistPort = 2000;
-    
     // when in batch mode, get filenames from the batch processor
     private BatchModeRecognizer batchProcessor;
     
-    private boolean wordAlignment = true;
-    private boolean phoneAlignment = true;
+    protected boolean wordAlignment = true;
+    protected boolean phoneAlignment = true;
     
     private String lastWordAlignment = "";
     private String lastPhoneAlignment = "";
@@ -96,8 +85,8 @@ public class LabelWriter implements Configurable,
     /**
      * counts the number of recognition steps
      */
-    private int step = 0;
-    private int stepWidth = 1;
+    protected int step = 0;
+    protected int stepWidth = 1;
     
     /*
      * (non-Javadoc)
@@ -117,8 +106,6 @@ public class LabelWriter implements Configurable,
         registry.register(PROP_PHONE_ALIGNMENT, PropertyType.BOOLEAN);
         registry.register(PROP_FILE_OUTPUT, PropertyType.BOOLEAN);
         registry.register(PROP_FILE_BASE_NAME, PropertyType.STRING);
-        registry.register(PROP_ZEITGEIST_OUTPUT, PropertyType.BOOLEAN);
-        registry.register(PROP_ZEITGEIST_PORT, PropertyType.INT);
     }
 
     /*
@@ -161,9 +148,6 @@ public class LabelWriter implements Configurable,
     	if (phoneAlignment) {
     		phoneAlignmentStream = setStream("phonealignment");
     	}
-        
-        zeitgeistOutput = ps.getBoolean(PROP_ZEITGEIST_OUTPUT, false);
-        zeitgeistPort = ps.getInt(PROP_ZEITGEIST_PORT, 2000);
     }
 
 
@@ -243,7 +227,7 @@ public class LabelWriter implements Configurable,
     	} else { assert (false); }
     	if (currentToken != null) { lastBestToken = currentToken; }
     	assert (lastBestToken != null); */
-    	ActiveList al = result.getActiveTokens();
+/*    	ActiveList al = result.getActiveTokens();
     	System.err.println("Printing " + al.size() + " results: ");
     	Iterator alIter = al.iterator();
 		// recover the path of visited word- and silence-tokens in the best token 
@@ -253,14 +237,14 @@ public class LabelWriter implements Configurable,
 		i++;
 		System.err.println("next best hypothesis");
 		token = (Token) alIter.next();
-    	while (token != null) {
+    	while (token != null) { */
 // =======
-    	token = result.getBestToken();
+    	Token token = result.getBestToken();
 		// recover the path of visited word- and silence-tokens in the best token
-    	if (token != null) { 
+  /*  	if (token != null) { 
     		System.out.println(token.getSearchState());
     	}
-    	while (token != null) {
+    */	while (token != null) {
 // >>>>>>> .r408
 			SearchState searchState = token.getSearchState(); 
             if ((searchState instanceof WordSearchState) // each word starts with a PronunciationState
@@ -268,11 +252,11 @@ public class LabelWriter implements Configurable,
 //            	&& ((ExtendedUnitState) searchState).getUnit().isFiller())) 
             	&& list.isEmpty())) {
             	// add these tokens to the list
-        	    list.add(token);
+        	    list.add(0, token);
             }
             token = token.getPredecessor();
         }
-	}} /**/
+	/*}} /**/
 		return list;
     }
     
@@ -340,20 +324,22 @@ public class LabelWriter implements Configurable,
      */
     public static String tokenListToAlignment(List<Token> list) {
 		StringBuffer sb = new StringBuffer(); 
-		
-		// iterate over the list and print the associated times
-        for (int i = list.size() - 1; i > 0; i--) {
-            Token token = list.get(i);
-            Token nextToken = list.get(i - 1);
-            sb.append(token.getFrameNumber() / 100.0); // a frame always lasts 10ms 
-            sb.append("\t");
-            sb.append(nextToken.getFrameNumber() / 100.0); // dito
-            sb.append("\t");
-            // depending on whether word, filler or other, dump the string-representation
-            SearchState state = token.getSearchState();
-            sb.append(stringForSearchState(state)); 
-            sb.append("\n");
-        }
+		if (list.size() > 0) {
+			// iterate over the list and print the associated times
+			Token lastToken = list.get(0);
+	        for (int i = 1; i < list.size() - 1; i++) {
+	            Token token = list.get(i);
+	            sb.append(lastToken.getFrameNumber() / 100.0); // a frame always lasts 10ms 
+	            sb.append("\t");
+	            sb.append(token.getFrameNumber() / 100.0); // dito
+	            sb.append("\t");
+	            // depending on whether word, filler or other, dump the string-representation
+	            SearchState state = token.getSearchState();
+	            sb.append(stringForSearchState(state)); 
+	            sb.append("\n");
+	            lastToken = token;
+	        }
+		}
         return sb.toString();
     }
 
@@ -366,61 +352,18 @@ public class LabelWriter implements Configurable,
      * @param timestamp
      * @return
      */
-    private String writeAlignment(List<Token> list, PrintStream stream, String lastAlignment, boolean timestamp, String origin) {
+    private String writeAlignment(List<Token> list, PrintStream stream, String lastAlignment, boolean timestamp) {
     	String alignment = tokenListToAlignment(list);
-    	if (!alignment.equals(lastAlignment)) {
+//    	if (!alignment.equals(lastAlignment)) {
     		if (timestamp) {
     			stream.print("Time: ");
     			stream.println(step / 100.0);
     		}
     		stream.println(alignment);
     		lastAlignment = alignment;
-    		if (zeitgeistOutput) {
-    			messageZeitGeist(list, origin);
-    		}
-    	}
+//    	}
     	return alignment;
     }
-    
-    private void messageZeitGeist(List<Token> list, String origin) {
-    	// er müsste jeweils da aufgerufen werden, wo zur Zeit writeAlignment() aufgerufen wird
-    	StringBuffer sb = new StringBuffer();
-//    	sb.append("<dialogue id='test-01'>");
-    	sb.append("<event time='");
-    	sb.append(step * 10);
-    	sb.append("' originator='");
-    	sb.append(origin);
-    	sb.append("'>");
-    	
-		// iterate over the list and print the associated times
-        for (int i = list.size() - 1; i > 0; i--) {
-            Token token = list.get(i);
-            Token nextToken = list.get(i - 1);
-            sb.append("<event time='");
-            sb.append(token.getFrameNumber() * 10);
-            sb.append("' duration='");
-            sb.append((nextToken.getFrameNumber() - token.getFrameNumber()) * 10);
-            sb.append("'>");
-            // depending on whether word, filler or other, dump the string-representation
-            SearchState state = token.getSearchState();
-            String event = stringForSearchState(state);
-            sb.append(event.replace("<", " ").replace(">", " "));
-            sb.append("</event>");
-    	}    	
-    	sb.append("</event>");
-//    	sb.append("</dialogue>");
-		try {
-			Socket sock = new Socket("localhost", zeitgeistPort);
-			PrintWriter writer = new PrintWriter(sock.getOutputStream());
-	    	writer.print(sb.toString());
-	    	writer.close();
-	    	sock.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("Could not open connection to zeitgeist (no further attempts will be made)!");
-			zeitgeistOutput = false;
-		} 
-    }    
 
     public void dumpAllStates(Result result) {
     	List<Token> list = getAllBestTokens(result);
@@ -465,7 +408,7 @@ public class LabelWriter implements Configurable,
     				if ((wordAlignmentStream != null) && fileOutput) { wordAlignmentStream.close(); }
     				wordAlignmentStream = setStream("wordalignment");
     			}
-    			lastWordAlignment = writeAlignment(list, wordAlignmentStream, lastWordAlignment, timestamp, "asr_words");
+    			lastWordAlignment = writeAlignment(list, wordAlignmentStream, lastWordAlignment, timestamp);
     		}
     		if (phoneAlignment) {
     			List<Token> list = getBestPhoneTokens(result);
@@ -473,7 +416,7 @@ public class LabelWriter implements Configurable,
     				if ((phoneAlignmentStream != null) && fileOutput) { phoneAlignmentStream.close(); }
     				phoneAlignmentStream = setStream("phonealignment");
     			}
-    			lastPhoneAlignment = writeAlignment(list, phoneAlignmentStream, lastPhoneAlignment, timestamp, "asr_phones");
+    			lastPhoneAlignment = writeAlignment(list, phoneAlignmentStream, lastPhoneAlignment, timestamp);
     		}
     		
     	}
