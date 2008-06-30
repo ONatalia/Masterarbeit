@@ -3,7 +3,41 @@ package org.cocolab.inpro.sphinx.frontend;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 
+import edu.cmu.sphinx.frontend.DoubleData;
+
 public class ConversionUtil {
+	
+	public static byte[] doubleDataToBytes(DoubleData dd) {
+		long collectTime = dd.getCollectTime();
+		long firstSampleNumber = dd.getFirstSampleNumber();
+		int sampleRate = dd.getSampleRate();
+		double[] da = dd.getValues();
+		byte[] ba = new byte[20 + // 2 * ByteUtil.NUM_BYTES_IN_LONG + 
+		                          // 1 * ByteUtil.NUM_BYTES_IN_INT +
+		                     da.length * 2]; // ByteUtil.NUM_BYTES_IN_SHORT];
+		ByteBuffer bb = ByteBuffer.wrap(ba);
+		bb.putLong(collectTime);
+		bb.putLong(firstSampleNumber);
+		bb.putInt(sampleRate);
+		for (double d : da) {
+			short s = (short) d;
+			bb.putShort(s);
+		}
+		return ba;
+	}
+	
+	public static DoubleData bytesToDoubleData(byte[] ba) {
+		ByteBuffer bb = ByteBuffer.wrap(ba);
+		long collectTime = bb.getLong();
+		long firstSampleNumber = bb.getLong();
+		int sampleRate = bb.getInt();
+		double[] da = new double[(ba.length - 20) / 2];
+		for (int i = 0; i < da.length; i++) {
+			short s = bb.getShort();
+			da[i] = (double) s; 
+		}
+		return new DoubleData(da, sampleRate, collectTime, firstSampleNumber);
+	}
 
 	public static byte[] doublesToBytes(double[] da) {
 		ByteBuffer bb = ByteBuffer.allocate(da.length * 8);

@@ -27,10 +27,10 @@ import gov.nist.jrtp.RtpSession;
 
 public class SimpleRTP {
 
-	private static DataProcessor getSource(ConfigurationManager cm, CommandLineParser clp) throws InstantiationException, PropertyException, UnsupportedAudioFileException, IOException {
+	private static DataProcessor getSource(ConfigurationManager cm, RTPCommandLineParser clp) throws InstantiationException, PropertyException, UnsupportedAudioFileException, IOException {
 		DataProcessor dp = null;
 		switch (clp.getInputMode()) {
-			case CommandLineParser.MICROPHONE_INPUT:
+			case RTPCommandLineParser.MICROPHONE_INPUT:
 				Microphone mic = (Microphone) cm.lookup("microphone");
 				mic.initialize();
 				if (!mic.startRecording()) {
@@ -39,7 +39,7 @@ public class SimpleRTP {
 				}
 				dp = mic;
 			break;
-			case CommandLineParser.FILE_INPUT:
+			case RTPCommandLineParser.FILE_INPUT:
 				StreamDataSource sds = (StreamDataSource) cm.lookup("streamDataSource");
 				sds.initialize();
 				URL audioURL = clp.getAudioURL();
@@ -47,25 +47,23 @@ public class SimpleRTP {
 	            sds.setInputStream(ais, audioURL.getFile());
 	            dp = sds;
 			break;
-			case CommandLineParser.RTP_INPUT:
-				System.err.println("RTP input to RTP output? You're kidding me!");
-				System.exit(1);
-			break;
 		}
 		return dp;
 	}
 	
-	private static void drainAndSend(DataProcessor dp) throws DataProcessingException, SocketException, UnknownHostException, IOException, RtpException {
+	private static void drainAndSend(DataProcessor dp, RTPCommandLineParser clp) throws DataProcessingException, SocketException, UnknownHostException, IOException, RtpException {
 		// setup RTP session 
-		RtpSession rs = new RtpSession(InetAddress.getLocalHost(), 41000, "141.89.97.19", 42000);
+		RtpSession rs = new RtpSession(InetAddress.getLocalHost(), 
+									   clp.getLocalPort(),
+									   clp.getDestinationAddress(), 
+									   clp.getDestinationPort());
 		RtpPacket rp = new RtpPacket();
 		// process frontend content
 		Data d;
 		while ((d = dp.getData()) != null) {
 			if (d instanceof DoubleData) {
 				DoubleData dd = (DoubleData) d;
-				double[] da = dd.getValues();
-				byte[] ba = ConversionUtil.doublesToBytes(da);
+				byte[] ba = ConversionUtil.doubleDataToBytes(dd);
 				rp.setPayload(ba, ba.length);
 				rs.sendRtpPacket(rp);
 			}
@@ -73,12 +71,12 @@ public class SimpleRTP {
 	}
 	
 	public static void main(String[] args) throws IOException, PropertyException, InstantiationException, DataProcessingException, RtpException, UnsupportedAudioFileException {
-    	CommandLineParser clp = new CommandLineParser(args);
+    	RTPCommandLineParser clp = new RTPCommandLineParser(args);
     	if (!clp.parsedSuccessfully()) { System.exit(1); }
     	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
     	System.err.println("Loading frontend...\n");
     	DataProcessor dp = getSource(cm, clp); 
-    	drainAndSend(dp);
+    	drainAndSend(dp, clp);
 	}
 
 }
