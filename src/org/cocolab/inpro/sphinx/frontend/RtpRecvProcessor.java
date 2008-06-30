@@ -30,7 +30,6 @@ public class RtpRecvProcessor extends BaseDataProcessor {
 	public final static String PROP_SAMPLING_RATE = "samplingRate";
 	
 	private int recvPort = 42000;
-	private int samplingRate = 16000;
 	
 	// temporarily store used when RTP data flows in more quickly than can be processed
 	private BlockingQueue<Data> q;
@@ -90,14 +89,12 @@ public class RtpRecvProcessor extends BaseDataProcessor {
 	public void register(String name, Registry registry) throws PropertyException {
 		super.register(name, registry);
 		registry.register(PROP_RTP_RECV_PORT, PropertyType.INT);
-		registry.register(PROP_SAMPLING_RATE, PropertyType.INT);
 	}
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		recvPort = ps.getInt(PROP_RTP_RECV_PORT, recvPort);
-		samplingRate = ps.getInt(PROP_SAMPLING_RATE, samplingRate);
 	}
 
 	/* * the handler for incoming RTP packets * */
@@ -111,11 +108,10 @@ public class RtpRecvProcessor extends BaseDataProcessor {
 	
 	public void handleRtpPacketEvent(RtpPacketEvent e) {
 		RtpPacket rp = e.getRtpPacket();
-		byte[] bPayload = rp.getPayload();
-		double[] dPayload = ConversionUtil.bytesToDoubles(bPayload);
-		DoubleData data = new DoubleData(dPayload, samplingRate, 0, sampleNumber);
+		byte[] payload = rp.getPayload();
+		DoubleData data = ConversionUtil.bytesToDoubleData(payload);
 		q.add(data);
-		sampleNumber += dPayload.length;
+		sampleNumber = data.getFirstSampleNumber() + data.getValues().length;
 	}
 
 	public void handleRtpErrorEvent(RtpErrorEvent e) {
