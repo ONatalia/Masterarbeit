@@ -6,8 +6,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
 
 class Grid {
 	
