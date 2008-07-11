@@ -27,6 +27,7 @@ public class SimpleReco {
 				FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
 				endpoint.setPredecessor(mic);
 				endpoint.initialize();
+				mic.initialize();
 				fe.setPredecessor(endpoint);
 				if (!mic.startRecording()) {
 					System.err.println("Could not open microphone. Exiting...");

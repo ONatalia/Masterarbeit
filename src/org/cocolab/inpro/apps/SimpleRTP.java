@@ -76,6 +76,7 @@ public class SimpleRTP {
     	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
     	System.err.println("Loading frontend...\n");
     	DataProcessor dp = getSource(cm, clp); 
+    	System.err.println("Now sending data...\n");
     	drainAndSend(dp, clp);
 	}
 
