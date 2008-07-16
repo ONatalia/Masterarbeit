@@ -1,11 +1,11 @@
-package org.cocolab.inpro.pitch;
+/*
+ * Copyright 2007-2008 Timo Baumann and the Inpro Project 
+ * released under the terms of the GNU general public license
+ */
+ package org.cocolab.inpro.pitch;
 
 /**
  * Data Processor for voicing-decision and pitch tracking
- * 
- * uses the AMDF (average magnitude difference function) and some heuristics based 
- * on:  
- * Ying, Jamieson, Michell: A Probabilistic Approach to AMDF Pitch Detection, ICSLP 1996
  * 
  * pitch tracking usually consists of several steps:
  * - preprocessing (e. g. low pass filtering)
@@ -17,7 +17,6 @@ package org.cocolab.inpro.pitch;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
@@ -59,6 +58,7 @@ public class PitchTracker extends BaseDataProcessor {
 	final static private String PROP_MAX_PITCH_HZ = "maximumPitch";
 	
 	private double candidateScoreThreshold = 0.15; // default set by newProperties()
+	private double energyThreshold = 30;
 	
 	private double[] signalBuffer;
 	
@@ -142,14 +142,14 @@ public class PitchTracker extends BaseDataProcessor {
 	/**
 	 * pick global minima in the lagScoreFunction that are smaller than threshold as candidates 
 	 */
-	private List<Candidate> qualityThresheldCandidates(double[] lagScoreFunction) {
-		List<Candidate> candidates = new ArrayList<Candidate>(); 
+	private List<PitchCandidate> qualityThresheldCandidates(double[] lagScoreFunction) {
+		List<PitchCandidate> candidates = new ArrayList<PitchCandidate>(); 
 		for (int lag = minLag + 1; lag < maxLag - 1; lag++) {
 			// all minima at or below threshold
 			if ((lagScoreFunction[lag] <= candidateScoreThreshold) &&
 				(lagScoreFunction[lag - 1] > lagScoreFunction[lag]) &&
 				(lagScoreFunction[lag] < lagScoreFunction[lag + 1])) {
-					candidates.add(new Candidate(lag, lagScoreFunction[lag]));
+					candidates.add(new PitchCandidate(lag, lagScoreFunction[lag]));
 			}
 		}
 		return candidates;
@@ -161,10 +161,10 @@ public class PitchTracker extends BaseDataProcessor {
 	
 	private int lastBestLag = -1;
 	
-	private int trackingCandidateSelection(List<Candidate> candidates) {
+	private int trackingCandidateSelection(List<PitchCandidate> candidates) {
 		int lag;
 		// check if there is a candidate corresponding to the last best candidate
-		for (Iterator<Candidate> iter = candidates.iterator(); iter.hasNext(); ) {
+		for (Iterator<PitchCandidate> iter = candidates.iterator(); iter.hasNext(); ) {
 			lag = iter.next().lag; 
 			if (Math.abs(lag - lastBestLag) < 10) { // TODO: for higher lags (lower freqs), this must be higher than for lower freqs
 				lastBestLag = lag;
@@ -177,7 +177,7 @@ public class PitchTracker extends BaseDataProcessor {
 		return lag;
 	}
 	
-	private static int simplisticCandidateSelection(List<Candidate> candidates) {
+	private static int simplisticCandidateSelection(List<PitchCandidate> candidates) {
 		// select the first candidate (with the highest f0)
 		return candidates.get(0).lag;
 	}
@@ -191,21 +191,7 @@ public class PitchTracker extends BaseDataProcessor {
 		return lag;
 	}
 	
-	/**************************
-	 * Candidate class
-	 **************************/
-
-	private class Candidate {
-		int lag;
-		double score;
-		
-		Candidate(int lag, double score) {
-			this.lag = lag;
-			this.score = score;
-		}
-	}
-	
-	/**************************
+/**************************
 	 * high level pitch tracker
 	 **************************/
 
@@ -223,9 +209,10 @@ public class PitchTracker extends BaseDataProcessor {
 				System.arraycopy(newSamples, 0, signalBuffer, signalBuffer.length - newSamples.length, newSamples.length);
 				boolean voiced = false;
 				double pitchHz = -1.0f;
-				if (signalPower > 1) { // TODO: better silence detection, maybe?
+				List<PitchCandidate> candidates = null;
+				if (signalPower > energyThreshold) { // TODO: better silence detection, maybe?
 					double[] lagScoreFunction = cmn(smdsf(signalBuffer));
-					List<Candidate> candidates = qualityThresheldCandidates(lagScoreFunction);
+					candidates = qualityThresheldCandidates(lagScoreFunction);
 					voiced = !candidates.isEmpty();
 					if (voiced) {
 						int lag = simplisticCandidateSelection(candidates);
@@ -235,7 +222,7 @@ public class PitchTracker extends BaseDataProcessor {
 					}
 				}
 //				System.err.print("\r\t\t\t\t\t" + pitchHz + "\r");
-				input = new PitchedDoubleData((DoubleData) input, voiced, pitchHz, signalPower);
+				input = new PitchedDoubleData((DoubleData) input, voiced, pitchHz, candidates, signalPower);
 			}
 		}
 		return input;
@@ -279,9 +266,6 @@ public class PitchTracker extends BaseDataProcessor {
 					referencePitch.add(new Double(line));
 				}
 			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
