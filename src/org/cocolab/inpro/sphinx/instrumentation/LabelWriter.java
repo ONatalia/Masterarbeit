@@ -359,7 +359,11 @@ public class LabelWriter implements Configurable,
     			stream.print("Time: ");
     			stream.println(step / 100.0);
     		}
-    		stream.println(alignment);
+    		if (alignment.equals("")) {
+    			stream.println("0.0\t" + step / 100.0 + "\t<sil>\n");
+    		} else {
+    			stream.println(alignment);
+    		}
     		lastAlignment = alignment;
 //    	}
     	return alignment;
