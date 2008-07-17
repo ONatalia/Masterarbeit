@@ -20,7 +20,7 @@
     <property name="absoluteWordBeamWidth" value="50"/>
     <property name="relativeWordBeamWidth" value="1E-60"/>
     <property name="wordInsertionProbability"    value="1E-16"/>
-    <property name="languageWeight"              value="5"/>
+    <property name="languageWeight"              value="11"/>
     <property name="silenceInsertionProbability" value=".1"/> 
     <property name="skip"                        value="0"/>
     <property name="logLevel"                    value="WARNING"/>
@@ -57,10 +57,10 @@
         <property name="decoder" value="decoder"/>
         <propertylist name="monitors">
 <!--
+            <item>labelWriter </item>
             <item>speedTracker </item>
             <item>memoryTracker </item>
             <item>newWordNotifierAgent </item>
-            <item>labelWriter </item>
 			<item>TEDviewNotifier</item>
 -->
         </propertylist>

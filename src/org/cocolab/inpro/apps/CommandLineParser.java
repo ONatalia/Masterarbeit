@@ -13,6 +13,7 @@ public class CommandLineParser {
 	public static final int NO_OUTPUT = 0;
 	public static final int OAA_OUTPUT = 1;
 	public static final int TED_OUTPUT = 2;
+	public static final int LABEL_OUTPUT = 4;
 	
 	URL configURL;
 	boolean verbose;
@@ -57,6 +58,7 @@ public class CommandLineParser {
 		System.err.println("output selection:");
 		System.err.println("    -A             send messages via OAA");
 		System.err.println("    -T             send incremental hypotheses to TEDview");
+		System.err.println("    -L             output incremental label-alignments using LabelWriter to stdout");
 	}
 	
 	void parse(String[] args) throws MalformedURLException {
@@ -90,6 +92,9 @@ public class CommandLineParser {
 			}
 			else if (args[i].equals("-T")) {
 				outputMode |= TED_OUTPUT;
+			}
+			else if (args[i].equals("-L")) {
+				outputMode |= LABEL_OUTPUT;
 			}
 			else {
 				printUsage();

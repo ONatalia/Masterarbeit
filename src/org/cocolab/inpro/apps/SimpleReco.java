@@ -61,6 +61,9 @@ public class SimpleReco {
 		if ((clp.getOutputMode() & CommandLineParser.TED_OUTPUT) == CommandLineParser.TED_OUTPUT) {
 			cm.lookup("TEDviewNotifier");
 		}
+		if ((clp.getOutputMode() & CommandLineParser.LABEL_OUTPUT) == CommandLineParser.LABEL_OUTPUT) {
+			cm.lookup("labelWriter");
+		}
 		if (clp.verbose()) {
 			cm.lookup("memoryTracker");
 			cm.lookup("speedTracker");
