@@ -6,12 +6,12 @@ package org.cocolab.inpro.pitch;
 
 import java.util.List;
 
+import org.cocolab.inpro.pitch.util.PitchUtils;
+
 import edu.cmu.sphinx.frontend.DoubleData;
 
 public class PitchedDoubleData extends DoubleData {
 
-	private static final double CENT_CONST = 1731.2340490667560888319096172; // 1200 / ln(2)
-	
 	boolean voiced;
 	double pitchHz;
 	double power;
@@ -38,6 +38,11 @@ public class PitchedDoubleData extends DoubleData {
 		this.candidates = candidates;
 	}
 	
+	public void setPitchInCent(double cent, boolean voiced) {
+		this.voiced = voiced;
+		this.pitchHz = PitchUtils.centToHz(cent);
+	}
+	
 	public boolean isVoiced() {
 		return voiced;
 	}
@@ -47,7 +52,7 @@ public class PitchedDoubleData extends DoubleData {
 	}
 	
 	public double getPitchCentTo110Hz() {
-		return CENT_CONST * Math.log(this.pitchHz / 110);
+		return PitchUtils.hzToCent(this.pitchHz);
 	}
 	
 	public double getEnergy() {

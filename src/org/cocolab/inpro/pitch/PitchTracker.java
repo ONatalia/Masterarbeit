@@ -57,12 +57,12 @@ public class PitchTracker extends BaseDataProcessor {
 	final static private String PROP_MIN_PITCH_HZ = "minimumPitch";
 	final static private String PROP_MAX_PITCH_HZ = "maximumPitch";
 	
-	private double candidateScoreThreshold = 0.15; // default set by newProperties()
+	private double candidateScoreThreshold = 0.30; // default set by newProperties()
 	private double energyThreshold = 30;
 	
 	private double[] signalBuffer;
 	
-	private static boolean debug = false;
+	protected static boolean debug = false;
 
 	/**************************
 	 * pre processing
@@ -101,7 +101,6 @@ public class PitchTracker extends BaseDataProcessor {
 		return amdf;
 	}
 	
-/**/
 	public double[] smdsf(double[] signal) {
 		double[] smdsf = new double[maxLag];
 		int numSamples = signal.length;
@@ -115,7 +114,7 @@ public class PitchTracker extends BaseDataProcessor {
 		}
 		return smdsf;
 	}
-/**
+
 	
 /**/
 	/**************************
@@ -149,11 +148,12 @@ public class PitchTracker extends BaseDataProcessor {
 			if ((lagScoreFunction[lag] <= candidateScoreThreshold) &&
 				(lagScoreFunction[lag - 1] > lagScoreFunction[lag]) &&
 				(lagScoreFunction[lag] < lagScoreFunction[lag + 1])) {
-					candidates.add(new PitchCandidate(lag, lagScoreFunction[lag]));
+					candidates.add(new PitchCandidate(lag, lagScoreFunction[lag], samplingFrequency));
 			}
 		}
 		return candidates;
 	}
+	
 	
 	/**************************
 	 * candidate selection
@@ -182,6 +182,16 @@ public class PitchTracker extends BaseDataProcessor {
 		return candidates.get(0).lag;
 	}
 	
+	private static PitchCandidate bestCandidateSelection(List<PitchCandidate> candidates) {
+		PitchCandidate bestCandidate = candidates.get(0);
+		for (PitchCandidate candidate : candidates) {
+			if (candidate.score < bestCandidate.score) {
+				bestCandidate = candidate;
+			}
+		}
+		return bestCandidate;
+	}
+	
 	/**************************
 	 * interpolation of selected lag
 	 **************************/
@@ -191,7 +201,7 @@ public class PitchTracker extends BaseDataProcessor {
 		return lag;
 	}
 	
-/**************************
+	/**************************
 	 * high level pitch tracker
 	 **************************/
 
@@ -227,7 +237,7 @@ public class PitchTracker extends BaseDataProcessor {
 		}
 		return input;
 	}
-
+	
 	/**************************
 	 * Configurable
 	 **************************/
@@ -288,7 +298,8 @@ public class PitchTracker extends BaseDataProcessor {
 //        		debug = (debugCounter == 45) || (debugCounter == 46)
 //        			 || (debugCounter == 47) || (debugCounter == 44);
         		if (debug) System.out.println("Frame " + debugCounter + ": ");
-        		double pitch = ((PitchedDoubleData) d).getPitchHz();
+        		PitchedDoubleData pdd = (PitchedDoubleData) d;
+        		double pitch = pdd.isVoiced() ? pdd.getPitchHz() : -1.0;
         		System.out.printf((Locale) null, "%7.3f", pitch);
         		System.out.print("\t");
         		if (!referencePitch.isEmpty()) {
