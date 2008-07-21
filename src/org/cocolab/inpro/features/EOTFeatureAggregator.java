@@ -1,5 +1,12 @@
 package org.cocolab.inpro.features;
 
+/**
+ * implements SignalFeatureListener and derives acoustic features 
+ * (that may or may not be) useful for EOT detection
+ * 
+ * 
+ */
+
 import java.util.List;
 
 import org.cocolab.inpro.sphinx.instrumentation.SignalFeatureListener;
@@ -33,7 +40,13 @@ public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeat
 	private int[] voicedEnergyRegressionSteps;
 	private int[] pitchRegressionSteps;
 
-	private static final String[] regressionParams = {"Mean", "Slope", "MSE", "PredictionError", "Range", "MeanDelta", "MinPos", "MaxPos"};
+	private static final String[] regressionParams = {"Mean", "Slope", "MSE", 
+													  "PredictionError", "Range", "MeanDelta", 
+													  "MinPos", "MaxPos",
+													  "MinToLast", "MaxToLast",
+													  "UpCount", "DownCount", "SameCount", "PeakCount", 
+													  "CountTendency", 
+													  "Wesseling"};
 	
 	protected Attribute framesIntoAudioAttribute;
 	boolean includeFrameCount;
@@ -111,6 +124,14 @@ public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeat
 				instance.setValue(atts[i++], tsa.getMeanStepDifference());
 				instance.setValue(atts[i++], tsa.getMinPosition());
 				instance.setValue(atts[i++], tsa.getMaxPosition());
+				instance.setValue(atts[i++], tsa.getLatestValue() - tsa.getMin());
+				instance.setValue(atts[i++], tsa.getMax() - tsa.getLatestValue());
+				instance.setValue(atts[i++], tsa.getUpCount());
+				instance.setValue(atts[i++], tsa.getDownCount());
+				instance.setValue(atts[i++], tsa.getSameCount());
+				instance.setValue(atts[i++], tsa.getPeakCount());
+				instance.setValue(atts[i++], tsa.getUpCount() - tsa.getDownCount());
+				instance.setValue(atts[i++], tsa.getWesseling());
 			} else {
 				for (int j = 0; j < regressionParameters; j++) {
 					instance.setMissing(atts[i++]);

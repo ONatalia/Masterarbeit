@@ -31,11 +31,13 @@ public class TimeShiftingAnalysis implements Resetable {
 	protected double slope;
 	protected double intercept;
 	protected double mean;
+	protected double stddev;
 	protected double range;
 	protected double mse;
 	protected double meanDifference;
-	protected double minPos;
-	protected double maxPos;
+	protected double minPos, maxPos;
+	protected double max, min;
+	protected int up, down, same, peaks;
 	
 	public TimeShiftingAnalysis(int maxLag) {
 		dataPoints = new LinkedList<DataPoint>();
@@ -88,13 +90,16 @@ public class TimeShiftingAnalysis implements Resetable {
 			int sumTT = 0;
 			double sumTX = 0;
 			double sumXX = 0;
+			up = 0; down = 0; same = -1; peaks = 0;
 			// find largest and smallest data points
 			Iterator<DataPoint> dataIt = dataPoints.listIterator();
 			DataPoint maxDP = dataPoints.getFirst();
 			DataPoint minDP = maxDP;
-			double accumulatedDifferences = 0.0; // summs the differences between values (skewness of curve) 
+			double accumulatedDifferences = 0.0; // sums the differences between values (skewness of curve) 
 			double lastX = maxDP.x; // for the summation of deltas
+			double lastDelta = 0;
 			int n = 0; // number of data points in list
+			// newest data is first in list, oldest is last (that's why values for up and down are kind of unintuitive)
 			while (dataIt.hasNext()) {
 				DataPoint dp = dataIt.next();
 				sumT += dp.t;
@@ -102,7 +107,21 @@ public class TimeShiftingAnalysis implements Resetable {
 				sumX += dp.x;
 				sumTX += dp.t * dp.x;
 				sumXX += dp.x * dp.x;
-				accumulatedDifferences += Math.abs(dp.x - lastX);
+				double delta = dp.x - lastX;
+				if (delta * lastDelta < 0) { // Vorzeichenwechsel
+					peaks++;
+				}
+				accumulatedDifferences += Math.abs(delta);
+				if (Math.abs(delta) < 0.98) {
+					same++;
+				} else {
+					if (delta > 0) {
+						down++;
+					} else {
+						up++;
+					}
+				}
+				lastDelta = delta;
 				lastX = dp.x;
 				if (dp.x > maxDP.x) {
 					maxDP = dp;
@@ -121,6 +140,7 @@ public class TimeShiftingAnalysis implements Resetable {
 			}
 			// while we're there, also compute some other measures
 			mean = (sumX / n);
+			stddev = Math.sqrt((sumXX / n) - mean * mean);
 			meanDifference = accumulatedDifferences / ((double) (n - 1));
 			mse = ((sumSqDevX) - (sumSqDevT) * (slope * slope)) / (n*n);
 			range = (maxDP != null) ? (maxDP.x - minDP.x) : 0;
@@ -128,6 +148,8 @@ public class TimeShiftingAnalysis implements Resetable {
 			int timeSpanned = maxLag;
 			minPos = ((double) (minDP.t - dataPoints.getLast().t)) / ((timeSpanned != 0) ? timeSpanned : 1);
 			maxPos = ((double) (maxDP.t - dataPoints.getLast().t)) / ((timeSpanned != 0) ? timeSpanned : 1);
+			max = maxDP.x;
+			min = minDP.x;
 		}
 	}
 
@@ -162,11 +184,23 @@ public class TimeShiftingAnalysis implements Resetable {
 	}
 	
 	public double getMinPosition() {
+		doRegression();
 		return minPos;
 	}
 	
 	public double getMaxPosition() {
+		doRegression();
 		return maxPos;
+	}
+	
+	public double getMin() {
+		doRegression();
+		return min;
+	}
+	
+	public double getMax() {
+		doRegression();
+		return max;
 	}
 	
 	public double predictValueAt(int t) {
@@ -176,6 +210,31 @@ public class TimeShiftingAnalysis implements Resetable {
 	
 	public double getLatestValue() {
 		return dataPoints.isEmpty() ? 0 : dataPoints.getFirst().x;
+	}
+	
+	public double getWesseling() {
+		doRegression();
+		return (getLatestValue() - mean) / stddev;
+	}
+	
+	public int getUpCount() {
+		doRegression();
+		return up;
+	}
+	
+	public int getDownCount() {
+		doRegression();
+		return down;
+	}
+	
+	public int getSameCount() {
+		doRegression();
+		return same;
+	}
+	
+	public int getPeakCount() {
+		doRegression();
+		return peaks;
 	}
 	
 	public boolean hasValidData() {
@@ -199,6 +258,16 @@ public class TimeShiftingAnalysis implements Resetable {
 		sb.append(getIntercept());
 		sb.append("\nmean: ");
 		sb.append(getMean());
+		sb.append("\nstddev: ");
+		sb.append(stddev);
+		sb.append("\nup: ");
+		sb.append(up);
+		sb.append("\ndown: ");
+		sb.append(down);
+		sb.append("\nsame: ");
+		sb.append(same);
+		sb.append("\npeakCount: ");
+		sb.append(peaks);
 		sb.append("\nrange: ");
 		sb.append(getRange());
 		sb.append("\nMSE of regression: ");
@@ -211,6 +280,12 @@ public class TimeShiftingAnalysis implements Resetable {
 		sb.append(getMaxPosition());
 		sb.append("\nvalue at 0: ");
 		sb.append(predictValueAt(0));
+		sb.append("\ndifference min to last value: ");
+		sb.append(getLatestValue() - getMin());
+		sb.append("\ndifference max to last value: ");
+		sb.append(getMax() - getLatestValue());
+		sb.append("\nWesseling value: ");
+		sb.append(getWesseling());
 		sb.append("\nerror for prediction at last value: ");
 		sb.append(predictValueAt(dataPoints.getFirst().t) - getLatestValue());
 		return sb.toString();
