@@ -48,6 +48,7 @@ public class SimpleReco {
 				sds.initialize();
 				fe.setPredecessor(sds);
 				URL audioURL = clp.getAudioURL();
+				System.err.println("input from " + audioURL.toString() + "\n");
 				AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);
 	            sds.setInputStream(ais, audioURL.getFile());
 			break;
