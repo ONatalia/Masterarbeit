@@ -57,6 +57,7 @@
         <property name="decoder" value="decoder"/>
         <propertylist name="monitors">
 <!--
+            <item>incASRConfidenceFeatureWriter</item>
             <item>labelWriter </item>
             <item>speedTracker </item>
             <item>memoryTracker </item>
@@ -282,6 +283,7 @@
 
 	<component name="speechClassifier" type="edu.cmu.sphinx.frontend.endpoint.SpeechClassifier">
 		<property name="threshold" value="${threshold}" />
+		<property name="debug" value="false" /> <!-- this is *very* verbose -->
 	</component>
 
 	<component name="speechMarker" type="edu.cmu.sphinx.frontend.endpoint.SpeechMarker">
@@ -332,6 +334,11 @@
         <property name="step" value="${step}"/>
         <property name="fileOutput" value="false"/>
         <property name="fileBaseName" value=""/>
+    </component>
+    
+    <component name="incASRConfidenceFeatureWriter" 
+    	type="org.cocolab.inpro.sphinx.instrumentation.IncASRConfidenceFeatureWriter">
+    	<property name="recognizer" value="${recognizer}"/>
     </component>
     
     <component name="TEDviewNotifier" type="org.cocolab.inpro.sphinx.instrumentation.TEDviewNotifier">

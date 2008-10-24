@@ -1,16 +1,13 @@
 package org.cocolab.inpro.sphinx.instrumentation;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
 
-import org.cocolab.inpro.batch.BatchModeRecognizer;
 
 import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.linguist.SearchState;
-import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -73,31 +70,6 @@ public class TEDviewNotifier extends LabelWriter {
 			}
     	}
     }    
-
-    /**
-     * write labels of aligned segments or words  
-     * to stream if it differs from lastAlignment
-     * @param list
-     * @param stream
-     * @param lastAlignment
-     * @param timestamp
-     * @return
-     */
-    private String writeAlignment(List<Token> list, PrintStream stream, String lastAlignment, boolean timestamp, String origin) {
-    	String alignment = tokenListToAlignment(list);
-    	if (!alignment.equals(lastAlignment)) {
-    		if (timestamp) {
-    			stream.print("Time: ");
-    			stream.println(step / 100.0);
-    		}
-    		stream.println(alignment);
-    		lastAlignment = alignment;
-    		if (zeitgeistOutput) {
-    			messageZeitGeist(list, origin);
-    		}
-    	}
-    	return alignment;
-    }
 
     public void newResult(Result result) {
     	if (zeitgeistOutput && ((intermediateResults == !result.isFinal()) 

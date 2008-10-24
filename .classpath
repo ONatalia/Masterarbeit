@@ -42,5 +42,6 @@
 	<classpathentry kind="lib" path="/opt/java/voxforgeDE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="lib" path="res/broker.jar"/>
 	<classpathentry kind="lib" path="/opt/java/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+	<classpathentry kind="lib" path="res/jrtp_1.0a.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

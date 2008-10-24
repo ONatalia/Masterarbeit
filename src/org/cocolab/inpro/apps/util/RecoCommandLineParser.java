@@ -1,54 +1,22 @@
-package org.cocolab.inpro.apps;
+package org.cocolab.inpro.apps.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class CommandLineParser {
+public class RecoCommandLineParser extends CommonCommandLineParser {
 
-	public static final int UNSPECIFIED_INPUT = 0;
-	public static final int FILE_INPUT = 1;
-	public static final int MICROPHONE_INPUT = 2;
-	public static final int RTP_INPUT = 3;
-	
-	public static final int NO_OUTPUT = 0;
-	public static final int OAA_OUTPUT = 1;
-	public static final int TED_OUTPUT = 2;
-	public static final int LABEL_OUTPUT = 4;
-	
-	URL configURL;
-	boolean verbose;
-	int inputMode;
-	URL audioURL;
-	int rtpPort;
-	int outputMode;
-	boolean success;
-	
-	CommandLineParser(String[] args) {
-		success = false;
-		try {
-			verbose = false;
-			inputMode = UNSPECIFIED_INPUT;
-			outputMode = NO_OUTPUT;
-			configURL = CommandLineParser.class.getResource("config.xml");
-			audioURL = new URL("file:res/DE_1234.wav");
-			parse(args);
-			if (inputMode == UNSPECIFIED_INPUT) {
-				printUsage();
-				System.err.println("Must specify one of -M, -R, or -F");
-			} else {
-				success = true;
-			}
-		} catch (Exception e) {
-			printUsage();
-			e.printStackTrace();
-		}
+	public RecoCommandLineParser(String[] args) {
+		super(args);
 	}
+
+	public int rtpPort;
+	int outputMode;
 	
 	void printUsage() {
 		System.err.println("simple sphinx recognizer for the inpro project");
 		System.err.println("usage: java org.cocolab.inpro.apps.SimpleReco");
 		System.err.println("options:");
-		System.err.println("    -h			   this screen");
+		System.err.println("    -h	           this screen");
 		System.err.println("    -c <configURL> sphinx configuration file to use (has a reasonable default)");
 		System.err.println("    -v             more verbose output (speed and memory tracker)");
 		System.err.println("input selection:");
@@ -59,6 +27,20 @@ public class CommandLineParser {
 		System.err.println("    -A             send messages via OAA");
 		System.err.println("    -T             send incremental hypotheses to TEDview");
 		System.err.println("    -L             output incremental label-alignments using LabelWriter to stdout");
+	}
+	
+	/*
+	 * check whether the configuration is valid
+	 */
+	boolean checkConfiguration() {
+		boolean success = false;
+		if (inputMode == UNSPECIFIED_INPUT) {
+			printUsage();
+			System.err.println("Must specify one of -M, -R, or -F");
+		} else {
+			success = true;
+		}
+		return success;
 	}
 	
 	void parse(String[] args) throws MalformedURLException {
@@ -104,28 +86,9 @@ public class CommandLineParser {
 		}
 	}
 	
-	boolean parsedSuccessfully() {
-		return success;
+	public boolean matchesOutputMode(int mode) {
+		return (outputMode & mode) == mode;
 	}
 	
-	boolean verbose() {
-		return verbose;
-	}
-	
-	URL getConfigURL() {
-		return configURL;
-	}
-	
-	URL getAudioURL() {
-		return audioURL;
-	}
-	
-	int getInputMode() {
-		return inputMode;
-	}
-	
-	int getOutputMode() {
-		return outputMode;
-	}
-	
+
 }

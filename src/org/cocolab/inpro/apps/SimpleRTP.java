@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import org.cocolab.inpro.apps.util.RTPCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.sphinx.frontend.ConversionUtil;
 
@@ -66,6 +67,12 @@ public class SimpleRTP {
 				byte[] ba = ConversionUtil.doubleDataToBytes(dd);
 				rp.setPayload(ba, ba.length);
 				rs.sendRtpPacket(rp);
+				try {
+					Thread.sleep(5); // sleep for half a frame
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 	}

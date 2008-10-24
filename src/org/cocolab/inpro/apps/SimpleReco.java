@@ -6,6 +6,7 @@ import java.net.URL;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import org.cocolab.inpro.apps.util.RecoCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 
@@ -19,10 +20,10 @@ import edu.cmu.sphinx.util.props.PropertyException;
 
 public class SimpleReco {
 
-	protected static void setupSource(ConfigurationManager cm, CommandLineParser clp) throws InstantiationException, PropertyException, UnsupportedAudioFileException, IOException {
+	protected static void setupSource(ConfigurationManager cm, RecoCommandLineParser clp) throws InstantiationException, PropertyException, UnsupportedAudioFileException, IOException {
     	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
 		switch (clp.getInputMode()) {
-			case CommandLineParser.MICROPHONE_INPUT:
+			case RecoCommandLineParser.MICROPHONE_INPUT:
 				Microphone mic = (Microphone) cm.lookup("microphone");
 				FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
 				endpoint.setPredecessor(mic);
@@ -34,7 +35,7 @@ public class SimpleReco {
 					System.exit(1);
 				}
 			break;
-			case CommandLineParser.RTP_INPUT:
+			case RecoCommandLineParser.RTP_INPUT:
 				RtpRecvProcessor rtp = (RtpRecvProcessor) cm.lookup("RTPDataSource");
 				cm.setProperty("RTPDataSource",	"recvPort", "" + clp.rtpPort);
 				rtp.initialize();
@@ -43,7 +44,7 @@ public class SimpleReco {
 				endpoint.initialize();
 				fe.setPredecessor(endpoint);
 			break;
-			case CommandLineParser.FILE_INPUT:
+			case RecoCommandLineParser.FILE_INPUT:
 				StreamDataSource sds = (StreamDataSource) cm.lookup("streamDataSource");
 				sds.initialize();
 				fe.setPredecessor(sds);
@@ -55,15 +56,18 @@ public class SimpleReco {
 		}
 	}
 
-	private static void setupMonitors(ConfigurationManager cm, CommandLineParser clp) throws InstantiationException, PropertyException {
-		if ((clp.getOutputMode() & CommandLineParser.OAA_OUTPUT) == CommandLineParser.OAA_OUTPUT) {
+	private static void setupMonitors(ConfigurationManager cm, RecoCommandLineParser clp) throws InstantiationException, PropertyException {
+		if (clp.matchesOutputMode(RecoCommandLineParser.OAA_OUTPUT)) {
 			cm.lookup("newWordNotifierAgent");
 		}
-		if ((clp.getOutputMode() & CommandLineParser.TED_OUTPUT) == CommandLineParser.TED_OUTPUT) {
+		if (clp.matchesOutputMode(RecoCommandLineParser.TED_OUTPUT)) {
 			cm.lookup("TEDviewNotifier");
 		}
-		if ((clp.getOutputMode() & CommandLineParser.LABEL_OUTPUT) == CommandLineParser.LABEL_OUTPUT) {
+		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
 			cm.lookup("labelWriter");
+		}
+		if (clp.matchesOutputMode(RecoCommandLineParser.INCFEATS_OUTPUT)) {
+			cm.lookup("incASRConfidenceFeatureWriter");
 		}
 		if (clp.verbose()) {
 			cm.lookup("memoryTracker");
@@ -72,7 +76,7 @@ public class SimpleReco {
 	}
 
 	public static void main(String[] args) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException {
-    	CommandLineParser clp = new CommandLineParser(args);
+    	RecoCommandLineParser clp = new RecoCommandLineParser(args);
     	if (!clp.parsedSuccessfully()) { System.exit(1); }
     	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
     	System.err.println("Loading recognizer...\n");

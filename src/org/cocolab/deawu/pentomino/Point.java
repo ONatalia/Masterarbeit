@@ -1,5 +1,6 @@
 package org.cocolab.deawu.pentomino;
 
+@SuppressWarnings("serial")
 public class Point extends java.awt.Point implements Cloneable {
 
    Point (int x, int y) {
