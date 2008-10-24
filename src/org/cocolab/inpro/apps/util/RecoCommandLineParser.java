@@ -27,6 +27,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -A             send messages via OAA");
 		System.err.println("    -T             send incremental hypotheses to TEDview");
 		System.err.println("    -L             output incremental label-alignments using LabelWriter to stdout");
+		System.err.println("    -I             incrementally output features (hopefully) useful for ASR confidence evaluation to stdout");
 	}
 	
 	/*
@@ -77,6 +78,9 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-L")) {
 				outputMode |= LABEL_OUTPUT;
+			}
+			else if (args[i].equals("-I")) {
+				outputMode |= INCFEATS_OUTPUT;
 			}
 			else {
 				printUsage();

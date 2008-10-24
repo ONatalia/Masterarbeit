@@ -16,6 +16,7 @@ public abstract class CommonCommandLineParser {
 	public static final int LABEL_OUTPUT = 4;
 	public static final int SPEAKER_OUTPUT = 8;
 	public static final int FILE_OUTPUT = 16;
+	public static final int INCFEATS_OUTPUT = 32;
 	
 	URL configURL;
 	boolean verbose;
