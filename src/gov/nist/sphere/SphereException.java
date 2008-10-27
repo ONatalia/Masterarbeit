@@ -11,7 +11,12 @@ package gov.nist.sphere;
 
 public class SphereException extends Exception {
 
-  public SphereException() {
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1742671446264506086L;
+
+public SphereException() {
     super();
   }
 

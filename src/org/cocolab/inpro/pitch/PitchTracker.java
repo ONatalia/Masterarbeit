@@ -161,7 +161,7 @@ public class PitchTracker extends BaseDataProcessor {
 	
 	private int lastBestLag = -1;
 	
-	private int trackingCandidateSelection(List<PitchCandidate> candidates) {
+	int trackingCandidateSelection(List<PitchCandidate> candidates) {
 		int lag;
 		// check if there is a candidate corresponding to the last best candidate
 		for (Iterator<PitchCandidate> iter = candidates.iterator(); iter.hasNext(); ) {
@@ -182,7 +182,7 @@ public class PitchTracker extends BaseDataProcessor {
 		return candidates.get(0).lag;
 	}
 	
-	private static PitchCandidate bestCandidateSelection(List<PitchCandidate> candidates) {
+	static PitchCandidate bestCandidateSelection(List<PitchCandidate> candidates) {
 		PitchCandidate bestCandidate = candidates.get(0);
 		for (PitchCandidate candidate : candidates) {
 			if (candidate.score < bestCandidate.score) {

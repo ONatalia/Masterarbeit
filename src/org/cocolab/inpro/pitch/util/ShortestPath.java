@@ -102,6 +102,12 @@ public class ShortestPath<NodeType> {
 	}
 	
 	private class PriorityQueue<T> extends LinkedList<T> {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -5163827055251838392L;
+
+		@SuppressWarnings("unchecked")
 		public T poll() {
 			if (isEmpty()) return null;
 			int min = 0;
