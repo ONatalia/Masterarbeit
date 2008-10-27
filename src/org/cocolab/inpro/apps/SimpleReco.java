@@ -24,16 +24,27 @@ public class SimpleReco {
     	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
 		switch (clp.getInputMode()) {
 			case RecoCommandLineParser.MICROPHONE_INPUT:
-				Microphone mic = (Microphone) cm.lookup("microphone");
+				final Microphone mic = (Microphone) cm.lookup("microphone");
 				FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
 				endpoint.setPredecessor(mic);
 				endpoint.initialize();
-				mic.initialize();
-				fe.setPredecessor(endpoint);
+				Runnable micInitializer = new Runnable() {
+					public void run() {
+						mic.initialize();
+					}
+				};
+				new Thread(micInitializer).start();
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} // allow the microphone 3 seconds to initialize
 				if (!mic.startRecording()) {
 					System.err.println("Could not open microphone. Exiting...");
 					System.exit(1);
 				}
+				fe.setPredecessor(endpoint);
 			break;
 			case RecoCommandLineParser.RTP_INPUT:
 				RtpRecvProcessor rtp = (RtpRecvProcessor) cm.lookup("RTPDataSource");
