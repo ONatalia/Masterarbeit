@@ -110,7 +110,7 @@ public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeat
 	
 	private void setRegressionValues(Attribute[] atts, TimeShiftingAnalysis[] tsas, Instance instance) {
 		// when more parameters are added, this procedure has to be changed
-		final int regressionParameters = 8; 
+		final int regressionParameters = 16; 
 		assert regressionParams.length == regressionParameters; 
 		assert atts.length == tsas.length * regressionParameters;
 		int i = 0;
