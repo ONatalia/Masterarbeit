@@ -11,8 +11,11 @@ import edu.cmu.sphinx.linguist.dictionary.Word;
 public class ResultUtil {
 	
 	public static List<String> getWordSequence(Token token) {
+		return getWordSequence(token, false);
+	}
+	
+	public static List<String> getWordSequence(Token token, boolean wantFiller) {
 		List<String> returnList = new LinkedList<String>();
-		boolean wantFiller = false;
 		while (token != null) {
             if (token.isWord()) {
                 WordSearchState wordState =
