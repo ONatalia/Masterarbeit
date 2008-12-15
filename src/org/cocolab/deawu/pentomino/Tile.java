@@ -109,27 +109,7 @@ class Tile {
    }
 
    public void draw(Graphics g) {
-      for (int i = 0; i < N; i++) {
-    	  Box current = boxes[i];
-    	  Point left = new Point(current.corner.x - current.dim.x, current.corner.y);
-    	  Point right = new Point(current.corner.x + current.dim.x, current.corner.y);
-    	  Point top = new Point(current.corner.x, current.corner.y - current.dim.y);
-    	  Point bottom = new Point(current.corner.x, current.corner.y + current.dim.y);
-    	  boolean drawLeft = true;
-    	  boolean drawRight = true;
-    	  boolean drawTop = true;
-    	  boolean drawBottom = true;
-    	  for (int j = 0; j < N; j++) {
-    		  if (i != j) {
-    			  Point otherCorner = boxes[j].corner;
-    			  drawLeft = otherCorner.equals(left) ? false : drawLeft;
-    			  drawRight = otherCorner.equals(right) ? false : drawRight;
-    			  drawTop = otherCorner.equals(top) ? false : drawTop;
-    			  drawBottom = otherCorner.equals(bottom) ? false : drawBottom;
-    		  }
-    	  }
-    	  boxes[i].draw(g, drawLeft, drawRight, drawTop, drawBottom);
-      }
+	  draw(g, false); // do not print labels if no parameter was given
    }
 
    /* Alternative draw method.  Takes a boolean as additional parameter
