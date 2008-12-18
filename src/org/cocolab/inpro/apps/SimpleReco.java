@@ -2,6 +2,11 @@ package org.cocolab.inpro.apps;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
+import java.util.Iterator;
+//import java.util.Set;
+//import java.util.ArrayList;
+//import java.util.HashSet;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -10,11 +15,18 @@ import org.cocolab.inpro.apps.util.RecoCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 
+
+import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
 import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
+//import edu.cmu.sphinx.result.Lattice;
+//import edu.cmu.sphinx.result.LatticeOptimizer;
+//import edu.cmu.sphinx.result.Sausage;
+//import edu.cmu.sphinx.result.SausageMaker;
+//import edu.cmu.sphinx.result.ConfusionSet;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertyException;
 
@@ -102,7 +114,46 @@ public class SimpleReco {
     	do {
 	    	result = recognizer.recognize();
 	        if (result != null) {
+	        	// Normal Output
 	            System.err.println("RESULT: " + result.toString() + "\n");
+				// N-Best Writing...
+//	            List list = result.getResultTokens();
+//	        	Iterator it = list.iterator();
+//	        	while (it.hasNext()) {
+//	        		Token t = (Token) it.next();
+//		        	System.err.println("RESULT: " + t.getWordPath() + "\n");
+//	        	}
+				// Uniqued N-Best Writing...
+//	            List list = result.getResultTokens();
+//	            Set set = new HashSet();
+//	        	Iterator it = list.iterator();
+//	        	while (it.hasNext()) {
+//	        		Token t = (Token) it.next();
+//	        		set.add(t.getWordPath());
+//	        	}
+//	            ArrayList ulist = new ArrayList(set);
+//	        	Iterator uit = ulist.iterator();
+//	        	while (uit.hasNext()) {
+//		        	System.err.println("RESULT: " + uit.next() + "\n");
+//	        	}
+	        	// Lattice Optimizing...
+//	        	Lattice lat = new Lattice(result);
+//	        	LatticeOptimizer lo = new LatticeOptimizer(lat);
+//	        	lo.optimize();
+//	        	List allPaths = lat.allPaths();
+//	        	Iterator pathIterator = allPaths.iterator();
+//	        	while (pathIterator.hasNext()) {
+//		        	System.err.println("Something: " + pathIterator.next() + "\n");
+//	        	}
+				// Sausage Making...
+//	        	SausageMaker sm = new SausageMaker(lat);
+//	        	Sausage sau = sm.makeSausage();
+//	        	Iterator csi = sau.confusionSetIterator();
+//	        	while (csi.hasNext()) {
+//	        		ConfusionSet cs = (ConfusionSet) csi.next();
+//		        	System.err.println("ConfusionSet: " + cs.toString() + "\n");
+//	        	}
+//	        	System.err.println("HIER IST SCHLUSS\n");
 	        } else {
 	            System.err.println("Result: null\n");
 	        }
