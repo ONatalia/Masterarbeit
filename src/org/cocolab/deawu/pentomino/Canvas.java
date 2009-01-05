@@ -1,18 +1,17 @@
 package org.cocolab.deawu.pentomino;
 
-import java.awt.Dimension;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import edu.cmu.sphinx.util.props.Resetable;
 
 public abstract class Canvas extends JPanel implements ActionListener, Resetable {
+
+	static final int RELATIVE_WIDTH = 30; // measured in boxes
+	static final int RELATIVE_HEIGHT = 20;
 
 	protected Tile[] tiles;
 	int scale = 20;
@@ -20,13 +19,15 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	protected Tile activeTile;
 	Point clickOffset = new Point(0, 0);
 
+	Color selectedColor = Color.green;
+	Color normalColor = Color.gray;
+
+	
 	boolean paintLabels;
 	
 	protected abstract Tile[] createTiles();
-
+		
 	public Canvas() {
-		setSize(10 * scale, 10 * scale);
-		setMinimumSize(new Dimension(scale, scale));
 		tiles = createTiles();
 	}
 	
@@ -68,6 +69,94 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 		}
 	}
 
+	boolean tileSelectRel(double x, double y) {
+		return tileSelect(translateBlockToPixel(x), translateBlockToPixel(y));
+	}
+	
+	/*
+	 * given the screen coordinates (x,y), return whether a tile has been selected and store the selected tile in activeTile
+	 */
+	boolean tileSelect(int x, int y) {
+		boolean selectionSuccessful = false;
+		// deal with tiles
+		Point p = new Point(x, y);
+		draggingTile = null;
+		// Placed pieces appear to be underneath non-placed ones, 
+		// so non-placed pieces get the first chance at being selected.
+		for (Tile tile : tiles) {
+			if (!tile.placed && tile.matchesPosition(p)) {
+				draggingTile = tile;
+				break;
+			}
+		}
+		// if no unplaced tile has been selected, try to select a placed tile 
+		if (draggingTile == null) {
+			for (Tile tile : tiles) {
+				if (tile.placed && tile.matchesPosition(p)) {
+					draggingTile = tile;
+					break;
+				}
+			}
+		}
+		// if another piece is still selected, unselect it
+		if (activeTile != null) {
+			System.out.println("Unselected: " + activeTile.defaultRefPoint
+					+ " " + activeTile.name);
+			if (!activeTile.placed) {
+				activeTile.setColor(normalColor);
+			}
+			activeTile = null;
+		}
+		if (draggingTile != null) {
+			System.out.println("Selected: " + draggingTile.defaultRefPoint + " "
+					+ draggingTile.name);
+			if (draggingTile.placed) {
+				draggingTile.unplace();
+			}
+			draggingTile.setColor(selectedColor);
+			clickOffset.copy(p);
+			clickOffset.sub(draggingTile.refPoint);
+			selectionSuccessful = true;
+		}
+		return selectionSuccessful;
+	}
+			
+	void tileReleaseRel(double x, double y) {
+		tileRelease(translateBlockToPixel(x), translateBlockToPixel(y));
+	}
+	
+	/*
+	 * release an active tile at screen coordinates x,y
+	 */
+	void tileRelease(int x, int y) {
+		if (draggingTile != null) {
+			activeTile = draggingTile;
+			/* next line: don't allow selection for flips or rotates while a piece is in the Grid */
+			if (activeTile.placed) {
+				activeTile = null;
+			}
+			draggingTile = null; // nothing to drag anymore
+		}
+	}
+	
+	public void tileMoveRel(double x, double y) {
+		tileMove(translateBlockToPixel(x), translateBlockToPixel(y));
+	}
+	
+	void tileMove(int x, int y) {
+		if (draggingTile != null) {
+			Point p = new Point(x, y);
+			p.sub(clickOffset);
+			draggingTile.setPos(p);
+		}
+	}
+	
+	public void tileMove(Point p) {
+		tileMove(p.x, p.y);
+	}
+	
+
+	
 	/**
 	 * translate coordinates given in blocks into coordinates given in pixels
 	 * @param t
@@ -79,23 +168,6 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 
 	double translatePixelToBlock(int t) {
 		return ((double) t) / ((double) scale);
-	}
-	
-	void addButton(String label, String command, int num) {
-		JButton b = new JButton(label);
-		b.setActionCommand(command);
-		b.addActionListener(this);
-		b.setFocusPainted(false);
-		int xpos = num * 7 + 2;
-		int width = scale * 5;
-		b.setBounds(xpos * scale, scale, width, scale * 2);
-		add(b);
-		for (MouseListener ml : b.getMouseListeners()) {
-			b.removeMouseListener(ml);
-		}	
-		for (MouseMotionListener mml :b.getMouseMotionListeners()) {
-			b.removeMouseMotionListener(mml);
-		}
 	}
 	
 

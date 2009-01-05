@@ -10,6 +10,7 @@ public abstract class Tile {
 	Point defaultRefPoint = new Point(0, 0);   // defaultRefPoint can be used for resetting
 	Color   color, defaultColor;         // defaultColor    can be used for resetting
 	int     scale;
+	boolean placed;
 
 	// draw the tile, if l is true, the label should be drawn
 	public abstract void draw(Graphics g, boolean l);
@@ -18,10 +19,7 @@ public abstract class Tile {
 		draw(g, true); // do not print labels if no parameter was given
 	}
 
-	public boolean matchesPosition(Point p) {
-		// by default, nothing matches
-		return false;
-	}
+	abstract public boolean matchesPosition(Point p);
 
 	public void setColor(Color c) {
 		this.color = c;
@@ -38,5 +36,7 @@ public abstract class Tile {
 	public void doCommand(String command) {
 		throw new RuntimeException("Illegal command for tile manipulation");
 	}
+	
+	abstract public void unplace();
 
 }

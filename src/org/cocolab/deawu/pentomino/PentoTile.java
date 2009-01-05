@@ -11,7 +11,6 @@ class PentoTile extends Tile {
 	static final String HORIZONTAL_FLIP_COMMAND = "hFlip";
 	static final String VERTICAL_FLIP_COMMAND = "vFlip";
 
-	boolean placed;
 	Point  clipOffset;                  // (refPoint - clipCorner)
 	Point  clipCorner;
 	Point  clipDim;
@@ -19,6 +18,8 @@ class PentoTile extends Tile {
 	private static final int BOX_COUNT = 5; // number of boxes making up the piece
 	private Box[]   boxes = new Box[BOX_COUNT];
 	private int[][] defVectors = new int[2][BOX_COUNT];
+	
+	Grid myGrid;
 	
 	protected static int[][][] TILE_BITMAPS = {
 		{{0, 0, -1, 0, 1}, {0, -1, 0, 1, -1}}, // F
@@ -287,6 +288,10 @@ class PentoTile extends Tile {
 		placed = true;
 	}
 
+	public void unplace() {
+		unplace(myGrid.tray, myGrid.index(refPoint)); 
+	}
+	
 	/*
 	 * remove the tile from the "tray" (internal data structure of "Grid")
 	 */
