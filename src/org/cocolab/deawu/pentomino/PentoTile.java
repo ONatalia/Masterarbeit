@@ -19,25 +19,56 @@ class PentoTile extends Tile {
 	private static final int BOX_COUNT = 5; // number of boxes making up the piece
 	private Box[]   boxes = new Box[BOX_COUNT];
 	private int[][] defVectors = new int[2][BOX_COUNT];
+	
+	protected static int[][][] TILE_BITMAPS = {
+		{{0, 0, -1, 0, 1}, {0, -1, 0, 1, -1}}, // F
+		{{0, 1, 0, 0, 1}, {0, -1, -1, 1, 1}}, // U
+		{{0, 0, 0, -1, 1}, {0, -1, 1, 0, 0}}, // X
+		{{0, 0, -1, 1, 1}, {0, 1, 1, 0, -1}}, // W
+		{{0, 0, 0, 0, 1}, {0, -1, 1, 2, 0}}, // Y
+		{{0, 1, 1, 0, 0}, {0, -1, 0, 1, 2}}, // N
+		{{0, -1, -1, -1, 0}, {0, -1, 0, 1, 1}}, // P
+		{{0, -1, -1, -1, 1}, {0, -2, -1, 0, 0}}, // V
+		{{0, 0, -1, 0, 1}, {0, 1, 1, -1, -1}}, // Z
+		{{0, 0, 0, -1, 1}, {0, 1, -1, -1, -1}}, // T
+		{{0, 0, 0, 0, 0}, {0, -1, -2, 1, 2}}, // I
+		{{0, 0, 0, 0, 1}, {0, 1, 2, -1, -1}} // L
 
-	PentoTile(int s, Color c, int x0, int y0,
-			int i1, int j1, int i2, int j2, int i3, int j3, int i4, int j4, String name) {
-
-		this.defVectors[0][0] = 0;
-		this.defVectors[1][0] = 0;
-		this.defVectors[0][1] = i1;
-		this.defVectors[1][1] = j1;
-		this.defVectors[0][2] = i2;
-		this.defVectors[1][2] = j2;
-		this.defVectors[0][3] = i3;
-		this.defVectors[1][3] = j3;
-		this.defVectors[0][4] = i4;
-		this.defVectors[1][4] = j4;
+/*		{0, 0, 0, -1, -1, 0, 0, 1, 1, -1}, // F
+		{0, 0, 1, -1, 0, -1, 0, 1, 1, 1}, // U
+		{0, 0, 0, -1, 0, 1, -1, 0, 1, 0}, // X
+		{0, 0, 0, 1, -1, 1, 1, 0, 1, -1}, // W
+		{0, 0, 0, -1, 0, 1, 0, 2, 1, 0}, // Y
+		{0, 0, 1, -1, 1, 0, 0, 1, 0, 2}, // N
+		{0, 0, -1, -1, -1, 0, -1, 1, 0, 1}, // P
+		{0, 0, -1, -2, -1, -1, -1, 0, 1, 0}, // V
+		{0, 0, 0, 1, -1, 1, 0, -1, 1, -1}, // Z
+		{0, 0, 0, 1, 0, -1, -1, -1, 1, -1}, // T
+		{0, 0, 0, -1, 0, -2, 0, 1, 0, 2}, // I
+		{0, 0, 0, 1, 0, 2, 0, -1, 1, -1}, // L */
+	};
+	
+	PentoTile(int s, Color c, int x0, int y0, char name) {
+		switch (name) {
+			case 'F': this.defVectors = TILE_BITMAPS[0]; break; 
+			case 'U': this.defVectors = TILE_BITMAPS[1]; break; 
+			case 'X': this.defVectors = TILE_BITMAPS[2]; break; 
+			case 'W': this.defVectors = TILE_BITMAPS[3]; break; 
+			case 'Y': this.defVectors = TILE_BITMAPS[4]; break; 
+			case 'N': this.defVectors = TILE_BITMAPS[5]; break; 
+			case 'P': this.defVectors = TILE_BITMAPS[6]; break; 
+			case 'V': this.defVectors = TILE_BITMAPS[7]; break; 
+			case 'Z': this.defVectors = TILE_BITMAPS[8]; break; 
+			case 'T': this.defVectors = TILE_BITMAPS[9]; break; 
+			case 'I': this.defVectors = TILE_BITMAPS[10]; break; 
+			case 'L': this.defVectors = TILE_BITMAPS[11]; break; 
+			default: throw new RuntimeException("ahduschaisse");
+		}
 		this.color = c;
 		this.refPoint = new Point(x0, y0);
 		this.scale = s;
-		this.name = name;
-		this.label = name;
+		this.name = new Character(name).toString();
+		this.label = this.name;
 
 		this.placed = false;
 		this.defaultRefPoint = this.refPoint;
@@ -47,7 +78,6 @@ class PentoTile extends Tile {
 
 		generate();  /* creates indiv. boxes and determines clip rectangle */
 	}
-
 
 	private void generate() {
 		Point p = new Point(0, 0);

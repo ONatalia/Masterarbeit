@@ -22,7 +22,7 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 
 	boolean paintLabels;
 	
-	abstract Tile[] createTiles();
+	protected abstract Tile[] createTiles();
 
 	public Canvas() {
 		setSize(10 * scale, 10 * scale);
