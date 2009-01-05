@@ -63,15 +63,19 @@ abstract public class CursorCanvas extends Canvas {
 		super.reset();
 	}
 	
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
+	public void paintCursor(Graphics g) {
 		if (cursorVisible) {
 			Image cursor = grabbing ? cursorGrab : cursorFree;
 			Point imagePosition = (Point) cursorPosition.clone();
 			imagePosition.sub(imageCenter);
 			g.drawImage(cursor, imagePosition.x, imagePosition.y, null);
 		}
+	}
+	
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+		paintCursor(g);
 		/* TODO (zuallerst: diesen Kommentar in die passende Klasse verschieben...
 		 * TODO:
 		 * Ein Spielscore, der beschreibt, wie gut das Spiel gelöst wird

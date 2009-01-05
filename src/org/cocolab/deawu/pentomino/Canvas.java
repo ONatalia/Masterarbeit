@@ -40,8 +40,13 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 
 	public void paintTiles(Graphics g) {
 		for (Tile tile : tiles) {
-			tile.draw(g, paintLabels);
+			if ((tile != activeTile) && (tile != draggingTile)) {
+				tile.draw(g, paintLabels);
+			}
 		}
+	}
+	
+	public void paintTopTiles(Graphics g) {
 		if (activeTile != null) {
 			activeTile.draw(g, paintLabels);
 		}
@@ -57,6 +62,7 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	public void paint(Graphics g) {
 		superPaint(g);
 		paintTiles(g);
+		paintTopTiles(g);
 	}
 
 	/**
