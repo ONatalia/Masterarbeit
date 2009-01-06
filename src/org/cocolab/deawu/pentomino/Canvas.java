@@ -4,10 +4,14 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.swing.JPanel;
 
 import edu.cmu.sphinx.util.props.Resetable;
 
+@SuppressWarnings("serial")
 public abstract class Canvas extends JPanel implements ActionListener, Resetable {
 
 	static final int RELATIVE_WIDTH = 30; // measured in boxes
@@ -38,6 +42,14 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 		repaint();
 	}
 
+	public void setLabels(List<String> labels) {
+		assert (tiles.length == labels.size());
+		Iterator<String> li = labels.iterator();
+		for (Tile t : tiles) {
+			t.setLabel(li.next());
+		}
+	}
+	
 	public void paintTiles(Graphics g) {
 		for (Tile tile : tiles) {
 			if ((tile != activeTile) && (tile != draggingTile)) {
