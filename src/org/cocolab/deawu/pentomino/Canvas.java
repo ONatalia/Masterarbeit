@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.JPanel;
 
@@ -29,8 +30,17 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	
 	boolean paintLabels;
 	
-	protected abstract Tile[] createTiles();
-		
+	protected abstract Tile[] createTiles(boolean shuffle, int numTiles, Random rnd);
+
+	protected Tile[] createTiles() {
+		// do not shuffle tiles by default
+		Random rnd = new Random();
+		// use setSeed to make reproducible randomness
+		rnd.setSeed(1);
+		Tile[] tiles = createTiles(false, 12, rnd);
+		return tiles;
+	}
+
 	public Canvas() {
 		tiles = createTiles();
 	}
