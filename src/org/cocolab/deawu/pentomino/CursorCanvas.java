@@ -223,8 +223,8 @@ abstract public class CursorCanvas extends Canvas {
 		b.addActionListener(this);
 		b.setFocusPainted(false);
 		int xpos = num * 7 + 2;
-		int width = scale * 5;
-		b.setBounds(xpos * scale, scale, width, scale * 2);
+		int width = SCALE * 5;
+		b.setBounds(xpos * SCALE, SCALE, width, SCALE * 2);
 		add(b);
 		for (MouseListener ml : b.getMouseListeners()) {
 			b.removeMouseListener(ml);

@@ -9,7 +9,6 @@ public abstract class Tile {
 	Point  refPoint = new Point(0, 0);
 	Point defaultRefPoint = new Point(0, 0);   // defaultRefPoint can be used for resetting
 	Color   color, defaultColor;         // defaultColor    can be used for resetting
-	int     scale;
 	boolean placed;
 
 	// draw the tile, if l is true, the label should be drawn
@@ -32,7 +31,7 @@ public abstract class Tile {
 	public void setPos(Point p)	{
 		refPoint = (Point) p.clone();        /* change refPoint to new coords */
 	}
- 
+	
 	public void doCommand(String command) {
 		throw new RuntimeException("Illegal command for tile manipulation");
 	}

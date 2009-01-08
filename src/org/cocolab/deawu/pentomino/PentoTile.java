@@ -11,6 +11,8 @@ class PentoTile extends Tile {
 	static final String HORIZONTAL_FLIP_COMMAND = "hFlip";
 	static final String VERTICAL_FLIP_COMMAND = "vFlip";
 
+	int     scale;
+
 	Point  clipOffset;                  // (refPoint - clipCorner)
 	Point  clipCorner;
 	Point  clipDim;
@@ -34,19 +36,6 @@ class PentoTile extends Tile {
 		{{0, 0, 0, -1, 1}, {0, 1, -1, -1, -1}}, // T
 		{{0, 0, 0, 0, 0}, {0, -1, -2, 1, 2}}, // I
 		{{0, 0, 0, 0, 1}, {0, 1, 2, -1, -1}} // L
-
-/*		{0, 0, 0, -1, -1, 0, 0, 1, 1, -1}, // F
-		{0, 0, 1, -1, 0, -1, 0, 1, 1, 1}, // U
-		{0, 0, 0, -1, 0, 1, -1, 0, 1, 0}, // X
-		{0, 0, 0, 1, -1, 1, 1, 0, 1, -1}, // W
-		{0, 0, 0, -1, 0, 1, 0, 2, 1, 0}, // Y
-		{0, 0, 1, -1, 1, 0, 0, 1, 0, 2}, // N
-		{0, 0, -1, -1, -1, 0, -1, 1, 0, 1}, // P
-		{0, 0, -1, -2, -1, -1, -1, 0, 1, 0}, // V
-		{0, 0, 0, 1, -1, 1, 0, -1, 1, -1}, // Z
-		{0, 0, 0, 1, 0, -1, -1, -1, 1, -1}, // T
-		{0, 0, 0, -1, 0, -2, 0, 1, 0, 2}, // I
-		{0, 0, 0, 1, 0, 2, 0, -1, 1, -1}, // L */
 	};
 	
 	PentoTile(int s, Color c, int x0, int y0, char name) {

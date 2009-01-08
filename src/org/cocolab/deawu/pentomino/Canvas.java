@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -18,33 +20,63 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	static final int RELATIVE_WIDTH = 30; // measured in boxes
 	static final int RELATIVE_HEIGHT = 20;
 
+	static final int SCALE = 20;
+
+	static final List<Point> positions = Arrays.asList(new Point[]{
+			new Point(2 * SCALE, 7 * SCALE), new Point(6 * SCALE, 7 * SCALE), 
+			new Point(10 * SCALE, 7 * SCALE), new Point(14 * SCALE, 7 * SCALE), 
+			new Point(19 * SCALE, 6 * SCALE), new Point(25 * SCALE, 6 * SCALE),  
+			new Point(2 * SCALE, 13 * SCALE), new Point(6 * SCALE, 14 * SCALE), 
+			new Point(10 * SCALE, 13 * SCALE), new Point(14 * SCALE, 13 * SCALE), 
+			new Point(19 * SCALE, 13 * SCALE), new Point(25 * SCALE, 12 * SCALE),  
+			new Point(2 * SCALE, 18 * SCALE), new Point(6 * SCALE, 18 * SCALE), 
+			new Point(10 * SCALE, 18 * SCALE), new Point(14 * SCALE, 18 * SCALE), 
+			new Point(19 * SCALE, 18 * SCALE), new Point(25 * SCALE, 18 * SCALE),  
+	});
+	
 	protected Tile[] tiles;
-	int scale = 20;
 	protected Tile draggingTile;
 	protected Tile activeTile;
 	Point clickOffset = new Point(0, 0);
-
 	Color selectedColor = Color.green;
 	Color normalColor = Color.gray;
 
 	
 	boolean paintLabels;
 	
-	protected abstract Tile[] createTiles(boolean shuffle, int numTiles, Random rnd);
-
-	protected Tile[] createTiles() {
-		// do not shuffle tiles by default
-		Random rnd = new Random();
-		// use setSeed to make reproducible randomness
-		rnd.setSeed(1);
-		Tile[] tiles = createTiles(false, 12, rnd);
-		return tiles;
-	}
-
 	public Canvas() {
 		tiles = createTiles();
 	}
 	
+
+	
+	protected abstract Tile[] createTiles();
+	
+	protected void shuffleTiles() {
+		Random rnd = new Random();
+		shuffleTiles(rnd);
+	}
+	
+	protected void shuffleTiles(Random rnd) {
+		shuffleTiles(rnd, positions);
+	}
+
+	private void shuffleTiles(Random rnd, List<Point> positions) {
+		Collections.shuffle(positions, rnd);
+		setPositions(positions);
+	}
+	
+	private void setPositions(List<Point> positions) {
+		if (tiles.length > positions.size()) {
+			throw new ArrayIndexOutOfBoundsException("I can only shuffle arrays with at most " + positions.size() + "tiles");
+		}
+		Iterator<Point> posIt = positions.iterator();
+		for (Tile tile: tiles) {
+			tile.setPos(posIt.next());
+			tile.defaultRefPoint = (Point) tile.refPoint.clone(); // dirty hack!!
+		}
+	}
+
 	public void reset() {
 		tiles = createTiles();
 		draggingTile = null;
@@ -191,11 +223,11 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	 * @return
 	 */
 	int translateBlockToPixel(double t) {
-		return (int) (t * scale);
+		return (int) (t * SCALE);
 	}
 
 	double translatePixelToBlock(int t) {
-		return ((double) t) / ((double) scale);
+		return ((double) t) / ((double) SCALE);
 	}
 	
 
