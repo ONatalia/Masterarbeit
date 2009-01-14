@@ -13,6 +13,9 @@ package org.cocolab.inpro.sphinx.instrumentation;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import org.cocolab.inpro.batch.BatchModeRecognizer;
@@ -55,6 +58,8 @@ public class LabelWriter implements Configurable,
     
     public final static String PROP_FILE_OUTPUT = "fileOutput";
     public final static String PROP_FILE_BASE_NAME = "fileBaseName";
+    
+    public final static String PROP_N_BEST = "nBest";
 
     // ------------------------------
     // Configuration data
@@ -67,6 +72,8 @@ public class LabelWriter implements Configurable,
     
     private boolean fileOutput = false;
     private String fileBaseName = "";
+    
+    private int nBest = 1;
     
     // when in batch mode, get filenames from the batch processor
     private BatchModeRecognizer batchProcessor;
@@ -106,6 +113,7 @@ public class LabelWriter implements Configurable,
         registry.register(PROP_PHONE_ALIGNMENT, PropertyType.BOOLEAN);
         registry.register(PROP_FILE_OUTPUT, PropertyType.BOOLEAN);
         registry.register(PROP_FILE_BASE_NAME, PropertyType.STRING);
+        registry.register(PROP_N_BEST, PropertyType.INT);
     }
 
     /*
@@ -136,6 +144,8 @@ public class LabelWriter implements Configurable,
         } catch (PropertyException e) {
         	batchProcessor = null;
         }
+        
+        nBest = ps.getInt(PROP_N_BEST, 1);
         
         stepWidth = ps.getInt(PROP_STEP_WIDTH, 1);
 
@@ -212,40 +222,9 @@ public class LabelWriter implements Configurable,
      * @param result the result to analyse
      * @return List of word tokens on the best path
      */
-    public List<Token> getBestWordTokens(Result result) {
+    public List<Token> getBestWordTokens(Token token) {
 		List<Token> list = new ArrayList<Token>();
-// <<<<<<< .mine
-/*    	Token currentToken = result.getBestToken();
-    	Token runningToken = currentToken;
-    	while ((lastBestToken != runningToken) && (runningToken != null)) {
-    		runningToken = runningToken.getPredecessor();
-    	}
-    	if (runningToken == null) {
-    		System.err.println("new best token");
-    	} else if (runningToken == lastBestToken) {
-    		System.err.println("new token " + currentToken.toString() + " is extension to token " + lastBestToken.toString());
-    	} else { assert (false); }
-    	if (currentToken != null) { lastBestToken = currentToken; }
-    	assert (lastBestToken != null); */
-/*    	ActiveList al = result.getActiveTokens();
-    	System.err.println("Printing " + al.size() + " results: ");
-    	Iterator alIter = al.iterator();
-		// recover the path of visited word- and silence-tokens in the best token 
-		int i = 0;
-		Token token;
-		while ((alIter.hasNext()) && i <= 5) {
-		i++;
-		System.err.println("next best hypothesis");
-		token = (Token) alIter.next();
-    	while (token != null) { */
-// =======
-    	Token token = result.getBestToken();
-		// recover the path of visited word- and silence-tokens in the best token
-  /*  	if (token != null) { 
-    		System.out.println(token.getSearchState());
-    	}
-    */	while (token != null) {
-// >>>>>>> .r408
+    	while (token != null) {
 			SearchState searchState = token.getSearchState(); 
             if ((searchState instanceof WordSearchState) // each word starts with a PronunciationState
             || ((searchState instanceof UnitSearchState) // each pause starts with a unit that is a filler 
@@ -256,7 +235,6 @@ public class LabelWriter implements Configurable,
             }
             token = token.getPredecessor();
         }
-	/*}} /**/
 		return list;
     }
     
@@ -354,18 +332,16 @@ public class LabelWriter implements Configurable,
      */
     private String writeAlignment(List<Token> list, PrintStream stream, String lastAlignment, boolean timestamp) {
     	String alignment = tokenListToAlignment(list);
-//    	if (!alignment.equals(lastAlignment)) {
-    		if (timestamp) {
-    			stream.print("Time: ");
-    			stream.println(step / 100.0);
-    		}
-    		if (alignment.equals("")) {
-    			stream.println("0.0\t" + step / 100.0 + "\t<sil>\n");
-    		} else {
-    			stream.println(alignment);
-    		}
-    		lastAlignment = alignment;
-//    	}
+		if (timestamp) {
+			stream.print("Time: ");
+			stream.println(step / 100.0);
+		}
+		if (alignment.equals("")) {
+			stream.println("0.0\t" + step / 100.0 + "\t<sil>\n");
+		} else {
+			stream.println(alignment);
+		}
+		lastAlignment = alignment;
     	return alignment;
     }
 
@@ -393,11 +369,10 @@ public class LabelWriter implements Configurable,
     }
     
     /*
-     * (non-Javadoc)
-     * 
      * @see edu.cmu.sphinx.result.ResultListener#newResult(edu.cmu.sphinx.result.Result)
      */
-    public void newResult(Result result) {
+    @SuppressWarnings("unchecked")
+	public void newResult(Result result) {
     	if ((intermediateResults == !result.isFinal()) 
     	|| (finalResult && result.isFinal())) {
     		boolean newfile = newFile();
@@ -405,34 +380,50 @@ public class LabelWriter implements Configurable,
     			step = 0;
     		}
     		boolean timestamp = !result.isFinal();
-    		if (wordAlignment) {
-    			List<Token> list = getBestWordTokens(result);
-
-    			if (newfile) {
-    				if ((wordAlignmentStream != null) && fileOutput) { wordAlignmentStream.close(); }
-    				wordAlignmentStream = setStream("wordalignment");
-    			}
-    			lastWordAlignment = writeAlignment(list, wordAlignmentStream, lastWordAlignment, timestamp);
+    		List<Token> nBestList = result.getResultTokens();
+    		if (nBestList.size() < 0) {
+    			System.out.println("# reverting to active tokens...");
+    			nBestList = result.getActiveTokens().getTokens();
     		}
-    		if (phoneAlignment) {
-    			List<Token> list = getBestPhoneTokens(result);
-    			if (newfile) {
-    				if ((phoneAlignmentStream != null) && fileOutput) { phoneAlignmentStream.close(); }
-    				phoneAlignmentStream = setStream("phonealignment");
-    			}
-    			lastPhoneAlignment = writeAlignment(list, phoneAlignmentStream, lastPhoneAlignment, timestamp);
+    		Collections.sort(nBestList, new TokenComparator());
+    		if (nBestList.size() > nBest) {
+    			nBestList = nBestList.subList(0, nBest);
     		}
-    		
+    		Iterator<Token> nBestIt = nBestList.iterator();
+    		while (nBestIt.hasNext()) {
+    			Token nBestToken = nBestIt.next();
+	    		if (wordAlignment) {
+	    			List<Token> wordTokenList = getBestWordTokens(nBestToken);
+	    			if (newfile) {
+	    				if ((wordAlignmentStream != null) && fileOutput) { wordAlignmentStream.close(); }
+	    				wordAlignmentStream = setStream("wordalignment");
+	    			}
+	    			lastWordAlignment = writeAlignment(wordTokenList, wordAlignmentStream, lastWordAlignment, timestamp);
+	    		}
+	    		if (phoneAlignment) {
+	    			List<Token> phoneTokenList = getBestPhoneTokens(result);
+	    			if (newfile) {
+	    				if ((phoneAlignmentStream != null) && fileOutput) { phoneAlignmentStream.close(); }
+	    				phoneAlignmentStream = setStream("phonealignment");
+	    			}
+	    			lastPhoneAlignment = writeAlignment(phoneTokenList, phoneAlignmentStream, lastPhoneAlignment, timestamp);
+	    		}
+    		}
     	}
     	step += stepWidth;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see edu.cmu.sphinx.recognizer.StateListener#statusChanged(edu.cmu.sphinx.recognizer.RecognizerState)
-     */
     public void statusChanged(RecognizerState status) {
+    }
+    
+    class TokenComparator implements Comparator<Token> {
 
+		public int compare(Token arg0, Token arg1) {
+			float score = arg1.getScore() - arg0.getScore();
+			if (score > 0) return +1;
+			if (score < 0) return -1;
+			return 0;
+		}
+    	
     }
 }

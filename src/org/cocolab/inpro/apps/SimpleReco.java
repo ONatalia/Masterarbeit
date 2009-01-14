@@ -2,11 +2,6 @@ package org.cocolab.inpro.apps;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.Iterator;
-//import java.util.Set;
-//import java.util.ArrayList;
-//import java.util.HashSet;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -15,18 +10,11 @@ import org.cocolab.inpro.apps.util.RecoCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 
-
-import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
 import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
-//import edu.cmu.sphinx.result.Lattice;
-//import edu.cmu.sphinx.result.LatticeOptimizer;
-//import edu.cmu.sphinx.result.Sausage;
-//import edu.cmu.sphinx.result.SausageMaker;
-//import edu.cmu.sphinx.result.ConfusionSet;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertyException;
 
@@ -49,7 +37,6 @@ public class SimpleReco {
 				try {
 					Thread.sleep(3000);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} // allow the microphone 3 seconds to initialize
 				if (!mic.startRecording()) {
@@ -88,6 +75,7 @@ public class SimpleReco {
 		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
 			cm.lookup("labelWriter");
+			
 		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.INCFEATS_OUTPUT)) {
 			cm.lookup("incASRConfidenceFeatureWriter");
@@ -116,13 +104,7 @@ public class SimpleReco {
 	        if (result != null) {
 	        	// Normal Output
 	            System.err.println("RESULT: " + result.toString() + "\n");
-				// N-Best Writing...
-//	            List list = result.getResultTokens();
-//	        	Iterator it = list.iterator();
-//	        	while (it.hasNext()) {
-//	        		Token t = (Token) it.next();
-//		        	System.err.println("RESULT: " + t.getWordPath() + "\n");
-//	        	}
+				// N-Best Writing... -> see LabelWriter
 				// Uniqued N-Best Writing...
 //	            List list = result.getResultTokens();
 //	            Set set = new HashSet();

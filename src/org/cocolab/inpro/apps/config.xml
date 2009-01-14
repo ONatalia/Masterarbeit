@@ -25,8 +25,9 @@
     <property name="skip"                        value="0"/>
     <property name="logLevel"                    value="WARNING"/>
 
-	<!-- This parameter determines how often listeners are called?? -->
-    <property name="step"		value="100"/>
+	<!-- This parameter determines how often intermediate results are produced 
+	     (and hence, how often resultListeners are called) -->
+    <property name="step"		value="1"/>
 
     <property name="recognizer" value="recognizer"/>
     <property name="featureMonitor" value="featureMonitor"/>
@@ -335,6 +336,7 @@
         <property name="step" value="${step}"/>
         <property name="fileOutput" value="false"/>
         <property name="fileBaseName" value=""/>
+        <property name="nBest" value="1"/>
     </component>
     
     <component name="incASRConfidenceFeatureWriter" 

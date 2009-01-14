@@ -74,8 +74,9 @@ public class TEDviewNotifier extends LabelWriter {
     public void newResult(Result result) {
     	if (zeitgeistOutput && ((intermediateResults == !result.isFinal()) 
     	|| (finalResult && result.isFinal()))) {
+    		// TODO: it would be cool to port LabelWriter's nBest handling to ZeitGeist output
     		if (wordAlignment) {
-    			List<Token> list = getBestWordTokens(result);
+    			List<Token> list = getBestWordTokens(result.getBestToken());
     			messageZeitGeist(list, "asr_words");
     		}
     		if (phoneAlignment) {
