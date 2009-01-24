@@ -4,6 +4,8 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.lang.Cloneable;
 
+import org.cocolab.deawu.Point;
+
 public class Box implements Cloneable {
 
    Point dim;

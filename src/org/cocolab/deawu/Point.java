@@ -1,13 +1,13 @@
-package org.cocolab.deawu.pentomino;
+package org.cocolab.deawu;
 
 @SuppressWarnings("serial")
 public class Point extends java.awt.Point {
 
-	Point (int x, int y) {
+	public Point (int x, int y) {
 		super(x, y);
 	}
 
-	Point (Point p) {
+	public Point (Point p) {
 		super(p.x, p.y);
 	}
 

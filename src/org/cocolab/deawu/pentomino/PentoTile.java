@@ -4,12 +4,15 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.lang.String;
 
-class PentoTile extends Tile {
+import org.cocolab.deawu.Point;
+import org.cocolab.deawu.Tile;
 
-	static final String CCW_ROTATE_COMMAND = "ccwRotate";
-	static final String CW_ROTATE_COMMAND = "cwRotate";
-	static final String HORIZONTAL_FLIP_COMMAND = "hFlip";
-	static final String VERTICAL_FLIP_COMMAND = "vFlip";
+public class PentoTile extends Tile {
+
+	public static final String CCW_ROTATE_COMMAND = "ccwRotate";
+	public static final String CW_ROTATE_COMMAND = "cwRotate";
+	public static final String HORIZONTAL_FLIP_COMMAND = "hFlip";
+	public static final String VERTICAL_FLIP_COMMAND = "vFlip";
 
 	int     scale;
 
@@ -21,7 +24,7 @@ class PentoTile extends Tile {
 	private Box[]   boxes = new Box[BOX_COUNT];
 	private int[][] defVectors = new int[2][BOX_COUNT];
 	
-	Grid myGrid;
+	private Grid myGrid;
 	
 	protected static int[][][] TILE_BITMAPS = {
 		{{0, 0, -1, 0, 1}, {0, -1, 0, 1, -1}}, // F
@@ -296,6 +299,10 @@ class PentoTile extends Tile {
 
 	public String toString() {
 		return "tile: " + this.name + "\n";
+	}
+
+	public void setMyGrid(Grid myGrid) {
+		this.myGrid = myGrid;
 	}
 
 }

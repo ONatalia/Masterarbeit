@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-class Grid {
+import org.cocolab.deawu.Point;
+
+public class Grid {
 	
 	static final Object OUTSIDE = "-";
 	static final Object INSIDE = "x";
@@ -15,8 +17,8 @@ class Grid {
 	private Point pos; // position of the grid in the graphic context
 	private int scale; // size of each field in the tray
 
-	Point dim; // dimension of the tray, *NOT pixels*
-	Object[][] tray;
+	public Point dim; // dimension of the tray, *NOT pixels*
+	public Object[][] tray;
 	
 	void init(int x0, int y0, int scale, int nx, int ny) {
 		this.pos = new Point(x0, y0);
@@ -25,7 +27,7 @@ class Grid {
 		this.tray = new Object[nx][ny];
 	}
 	
-	Grid(int x0, int y0, int scale, String patternFile) {
+	public Grid(int x0, int y0, int scale, String patternFile) {
 		URL patternURL = Grid.class.getResource(patternFile);
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(patternURL.openStream()));

@@ -1,4 +1,4 @@
-package org.cocolab.deawu.pentomino;
+package org.cocolab.deawu;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -12,17 +12,18 @@ import java.util.Random;
 
 import javax.swing.JPanel;
 
+
 import edu.cmu.sphinx.util.props.Resetable;
 
 @SuppressWarnings("serial")
 public abstract class Canvas extends JPanel implements ActionListener, Resetable {
 
-	static final int RELATIVE_WIDTH = 30; // measured in boxes
-	static final int RELATIVE_HEIGHT = 20;
+	protected static final int RELATIVE_WIDTH = 30; // measured in boxes
+	protected static final int RELATIVE_HEIGHT = 24;
 
-	static final int SCALE = 20;
+	protected static final int SCALE = 20;
 
-	static final List<Point> positions = Arrays.asList(new Point[]{
+	protected static final List<Point> positions = Arrays.asList(new Point[] {
 			new Point(2 * SCALE, 7 * SCALE), new Point(6 * SCALE, 7 * SCALE), 
 			new Point(10 * SCALE, 7 * SCALE), new Point(14 * SCALE, 7 * SCALE), 
 			new Point(19 * SCALE, 6 * SCALE), new Point(25 * SCALE, 6 * SCALE),  
@@ -42,7 +43,7 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	Color normalColor = Color.gray;
 
 	
-	boolean paintLabels;
+	public boolean labelsVisible;
 	
 	public Canvas() {
 		tiles = createTiles();
@@ -95,17 +96,17 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	public void paintTiles(Graphics g) {
 		for (Tile tile : tiles) {
 			if ((tile != activeTile) && (tile != draggingTile)) {
-				tile.draw(g, paintLabels);
+				tile.draw(g, labelsVisible);
 			}
 		}
 	}
 	
 	public void paintTopTiles(Graphics g) {
 		if (activeTile != null) {
-			activeTile.draw(g, paintLabels);
+			activeTile.draw(g, labelsVisible);
 		}
 		if (draggingTile != null) {
-			draggingTile.draw(g, paintLabels);
+			draggingTile.draw(g, labelsVisible);
 		} 
 	}
 	
@@ -129,14 +130,14 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 		}
 	}
 
-	boolean tileSelectRel(double x, double y) {
+	public boolean tileSelectRel(double x, double y) {
 		return tileSelect(translateBlockToPixel(x), translateBlockToPixel(y));
 	}
 	
 	/*
 	 * given the screen coordinates (x,y), return whether a tile has been selected and store the selected tile in activeTile
 	 */
-	boolean tileSelect(int x, int y) {
+	public boolean tileSelect(int x, int y) {
 		boolean selectionSuccessful = false;
 		// deal with tiles
 		Point p = new Point(x, y);
@@ -181,14 +182,14 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 		return selectionSuccessful;
 	}
 			
-	void tileReleaseRel(double x, double y) {
+	public void tileReleaseRel(double x, double y) {
 		tileRelease(translateBlockToPixel(x), translateBlockToPixel(y));
 	}
 	
 	/*
 	 * release an active tile at screen coordinates x,y
 	 */
-	void tileRelease(int x, int y) {
+	public void tileRelease(int x, int y) {
 		if (draggingTile != null) {
 			activeTile = draggingTile;
 			/* next line: don't allow selection for flips or rotates while a piece is in the Grid */
@@ -203,7 +204,7 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 		tileMove(translateBlockToPixel(x), translateBlockToPixel(y));
 	}
 	
-	void tileMove(int x, int y) {
+	public void tileMove(int x, int y) {
 		if (draggingTile != null) {
 			Point p = new Point(x, y);
 			p.sub(clickOffset);
@@ -222,11 +223,11 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	 * @param t
 	 * @return
 	 */
-	int translateBlockToPixel(double t) {
+	public int translateBlockToPixel(double t) {
 		return (int) (t * SCALE);
 	}
 
-	double translatePixelToBlock(int t) {
+	public double translatePixelToBlock(int t) {
 		return ((double) t) / ((double) SCALE);
 	}
 	

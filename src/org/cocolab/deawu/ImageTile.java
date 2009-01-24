@@ -1,4 +1,4 @@
-package org.cocolab.deawu.pentomino;
+package org.cocolab.deawu;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
+
 
 public class ImageTile extends Tile {
 
@@ -24,14 +25,14 @@ public class ImageTile extends Tile {
 	
 	@Override
 	public void draw(Graphics g, boolean l) {
-		g.drawImage(image, refPoint.x, refPoint.y, color, null);
+		g.drawImage(image, refPoint.x - size.x / 2, refPoint.y - size.y / 2, null, null);
 	}
 
 	@Override
 	public boolean matchesPosition(Point p) {
 		boolean s;
-		s = ((refPoint.x < p.x) && (p.x < (refPoint.x + size.x))
-		&& (refPoint.y < p.y) && (p.y < (refPoint.y + size.y)));
+		s = ((refPoint.x - size.x / 2 < p.x) && (p.x < (refPoint.x + size.x / 2))
+		&& (refPoint.y - size.y / 2 < p.y) && (p.y < (refPoint.y + size.y + size.y / 2)));
 		return s;
 	}
 

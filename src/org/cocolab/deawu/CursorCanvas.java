@@ -1,4 +1,4 @@
-package org.cocolab.deawu.pentomino;
+package org.cocolab.deawu;
 
 import java.awt.Component;
 import java.awt.Graphics;
@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
+
 
 /**
  * PentoCursorCanvas, extends Canvas with a hand cursor implementation
@@ -32,13 +33,13 @@ abstract public class CursorCanvas extends Canvas {
 
 	Image cursorGrab;
 	Image cursorFree;
-	boolean grabbing;
+	public boolean grabbing;
 	
-	Point cursorPosition = new Point(0, 0);
-	Point imageCenter;
-	boolean cursorVisible;
+	public Point cursorPosition = new Point(0, 0);
+	protected Point imageCenter;
+	public boolean cursorVisible;
 	
-	int buttonClickDelay = 400; // in milliseconds
+	public int buttonClickDelay = 400; // in milliseconds
 
 	public CursorCanvas() {
 		this(false);
@@ -187,7 +188,7 @@ abstract public class CursorCanvas extends Canvas {
 		double deltaY = distY / dist;
 		double currentX = cursorPosition.x;
 		double currentY = cursorPosition.y;
-		int speed = 2;
+		int speed = 1;
 		for (int i = 0; i <= dist; i += speed) {
 			currentX += deltaX * speed;
 			currentY += deltaY * speed;
@@ -202,7 +203,7 @@ abstract public class CursorCanvas extends Canvas {
 		cursorMoveTo(x, y);
 	}
 	
-	boolean tileSelect(int x, int y) {
+	public boolean tileSelect(int x, int y) {
 		boolean selectionSuccessful = false;
 		// deal with buttons
 		Component selectedComponent = getComponentAt(x, y);
@@ -217,7 +218,7 @@ abstract public class CursorCanvas extends Canvas {
 		return selectionSuccessful;
 	}
 
-	void addButton(String label, String command, int num) {
+	protected void addButton(String label, String command, int num) {
 		JButton b = new JButton(label);
 		b.setActionCommand(command);
 		b.addActionListener(this);

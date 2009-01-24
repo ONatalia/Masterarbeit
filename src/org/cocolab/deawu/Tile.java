@@ -1,15 +1,17 @@
-package org.cocolab.deawu.pentomino;
+package org.cocolab.deawu;
 
 import java.awt.Color;
 import java.awt.Graphics;
 
+
 public abstract class Tile {
-	String name;
-	String label;
-	Point  refPoint = new Point(0, 0);
-	Point defaultRefPoint = new Point(0, 0);   // defaultRefPoint can be used for resetting
-	Color   color, defaultColor;         // defaultColor    can be used for resetting
-	boolean placed;
+	protected String name;
+	protected String label;
+	public Point  refPoint = new Point(0, 0);
+	protected Point defaultRefPoint = new Point(0, 0);   // defaultRefPoint can be used for resetting
+	protected Color   color;         // defaultColor    can be used for resetting
+	protected Color defaultColor;
+	public boolean placed;
 
 	// draw the tile, if l is true, the label should be drawn
 	public abstract void draw(Graphics g, boolean l);
