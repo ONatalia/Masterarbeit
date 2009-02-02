@@ -125,7 +125,7 @@ public class PentoTile extends Tile {
 		}
 	}
 
-	/* Alternative draw method.  Takes a boolean as additional parameter
+	/* Takes a boolean as additional parameter
 	 * to decide whether to draw the Tile's label.
 	 * */
 	public void draw(Graphics g, boolean l) {

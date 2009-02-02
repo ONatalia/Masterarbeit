@@ -53,26 +53,30 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	
 	protected abstract Tile[] createTiles();
 	
-	protected void shuffleTiles() {
+	public void shuffleTiles() {
 		Random rnd = new Random();
 		shuffleTiles(rnd);
 	}
 	
-	protected void shuffleTiles(Random rnd) {
+	public void shuffleTiles(Long seed) {
+		shuffleTiles(new Random(seed));
+	}
+	
+	public void shuffleTiles(Random rnd) {
 		shuffleTiles(rnd, positions);
 	}
 
-	private void shuffleTiles(Random rnd, List<Point> positions) {
+	protected void shuffleTiles(Random rnd, List<Point> positions) {
 		Collections.shuffle(positions, rnd);
 		setPositions(positions);
 	}
 	
-	private void setPositions(List<Point> positions) {
+	protected void setPositions(List<Point> positions) {
 		if (tiles.length > positions.size()) {
 			throw new ArrayIndexOutOfBoundsException("I can only shuffle arrays with at most " + positions.size() + "tiles");
 		}
 		Iterator<Point> posIt = positions.iterator();
-		for (Tile tile: tiles) {
+		for (Tile tile : tiles) {
 			tile.setPos(posIt.next());
 			tile.defaultRefPoint = (Point) tile.refPoint.clone(); // dirty hack!!
 		}
