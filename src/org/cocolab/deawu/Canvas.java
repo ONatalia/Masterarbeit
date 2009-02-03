@@ -23,17 +23,17 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 
 	protected static final int SCALE = 20;
 
-	protected static final List<Point> positions = Arrays.asList(new Point[] {
-			new Point(2 * SCALE, 7 * SCALE), new Point(6 * SCALE, 7 * SCALE), 
-			new Point(10 * SCALE, 7 * SCALE), new Point(14 * SCALE, 7 * SCALE), 
-			new Point(19 * SCALE, 6 * SCALE), new Point(25 * SCALE, 6 * SCALE),  
-			new Point(2 * SCALE, 13 * SCALE), new Point(6 * SCALE, 14 * SCALE), 
-			new Point(10 * SCALE, 13 * SCALE), new Point(14 * SCALE, 13 * SCALE), 
-			new Point(19 * SCALE, 13 * SCALE), new Point(25 * SCALE, 12 * SCALE),  
-			new Point(2 * SCALE, 18 * SCALE), new Point(6 * SCALE, 18 * SCALE), 
-			new Point(10 * SCALE, 18 * SCALE), new Point(14 * SCALE, 18 * SCALE), 
-			new Point(19 * SCALE, 18 * SCALE), new Point(25 * SCALE, 18 * SCALE),  
-	});
+	protected static final Point[] defPoss = {
+		new Point(2 * SCALE, 7 * SCALE), new Point(6 * SCALE, 7 * SCALE), 
+		new Point(10 * SCALE, 7 * SCALE), new Point(14 * SCALE, 7 * SCALE), 
+		new Point(19 * SCALE, 6 * SCALE), new Point(25 * SCALE, 6 * SCALE),  
+		new Point(2 * SCALE, 13 * SCALE), new Point(6 * SCALE, 14 * SCALE), 
+		new Point(10 * SCALE, 13 * SCALE), new Point(14 * SCALE, 13 * SCALE), 
+		new Point(19 * SCALE, 13 * SCALE), new Point(25 * SCALE, 12 * SCALE),  
+		new Point(2 * SCALE, 18 * SCALE), new Point(6 * SCALE, 18 * SCALE), 
+		new Point(10 * SCALE, 18 * SCALE), new Point(14 * SCALE, 18 * SCALE), 
+		new Point(19 * SCALE, 18 * SCALE), new Point(25 * SCALE, 18 * SCALE),  
+	};
 	
 	protected Tile[] tiles;
 	protected Tile draggingTile;
@@ -49,8 +49,6 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 		tiles = createTiles();
 	}
 	
-
-	
 	protected abstract Tile[] createTiles();
 	
 	public void shuffleTiles() {
@@ -63,6 +61,8 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	}
 	
 	public void shuffleTiles(Random rnd) {
+		Point[] poss = Arrays.copyOf(defPoss, defPoss.length);
+		List<Point> positions = Arrays.asList(poss);
 		shuffleTiles(rnd, positions);
 	}
 

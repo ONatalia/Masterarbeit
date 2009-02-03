@@ -3,13 +3,15 @@ package org.cocolab.deawu;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import edu.cmu.sphinx.util.props.Resetable;
 
-public abstract class Tile {
+
+public abstract class Tile implements Resetable {
 	protected String name;
 	protected String label;
-	public Point  refPoint = new Point(0, 0);
+	public Point refPoint = new Point(0, 0);
 	protected Point defaultRefPoint = new Point(0, 0);   // defaultRefPoint can be used for resetting
-	protected Color   color;         // defaultColor    can be used for resetting
+	protected Color color;         // defaultColor    can be used for resetting
 	protected Color defaultColor;
 	public boolean placed;
 
@@ -32,6 +34,12 @@ public abstract class Tile {
 	
 	public void setPos(Point p)	{
 		refPoint = (Point) p.clone();        /* change refPoint to new coords */
+	}
+	
+	public void reset() {
+		setPos(defaultRefPoint);
+		setColor(defaultColor);
+		unplace();
 	}
 	
 	public void doCommand(String command) {

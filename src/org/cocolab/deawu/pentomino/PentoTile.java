@@ -42,21 +42,7 @@ public class PentoTile extends Tile {
 	};
 	
 	PentoTile(int s, Color c, int x0, int y0, char name) {
-		switch (name) {
-			case 'F': this.defVectors = TILE_BITMAPS[0]; break; 
-			case 'U': this.defVectors = TILE_BITMAPS[1]; break; 
-			case 'X': this.defVectors = TILE_BITMAPS[2]; break; 
-			case 'W': this.defVectors = TILE_BITMAPS[3]; break; 
-			case 'Y': this.defVectors = TILE_BITMAPS[4]; break; 
-			case 'N': this.defVectors = TILE_BITMAPS[5]; break; 
-			case 'P': this.defVectors = TILE_BITMAPS[6]; break; 
-			case 'V': this.defVectors = TILE_BITMAPS[7]; break; 
-			case 'Z': this.defVectors = TILE_BITMAPS[8]; break; 
-			case 'T': this.defVectors = TILE_BITMAPS[9]; break; 
-			case 'I': this.defVectors = TILE_BITMAPS[10]; break; 
-			case 'L': this.defVectors = TILE_BITMAPS[11]; break; 
-			default: throw new RuntimeException("ahduschaisse");
-		}
+		this.defVectors = getDefVectors(name);
 		this.color = c;
 		this.refPoint = new Point(x0, y0);
 		this.scale = s;
@@ -70,6 +56,32 @@ public class PentoTile extends Tile {
 		this.clipOffset = new Point(this.refPoint);
 
 		generate();  /* creates indiv. boxes and determines clip rectangle */
+	}
+	
+	int[][] getDefVectors(char name) {
+		int[][] vector;
+		switch (name) {
+			case 'F': vector = TILE_BITMAPS[0]; break; 
+			case 'U': vector = TILE_BITMAPS[1]; break; 
+			case 'X': vector = TILE_BITMAPS[2]; break; 
+			case 'W': vector = TILE_BITMAPS[3]; break; 
+			case 'Y': vector = TILE_BITMAPS[4]; break; 
+			case 'N': vector = TILE_BITMAPS[5]; break; 
+			case 'P': vector = TILE_BITMAPS[6]; break; 
+			case 'V': vector = TILE_BITMAPS[7]; break; 
+			case 'Z': vector = TILE_BITMAPS[8]; break; 
+			case 'T': vector = TILE_BITMAPS[9]; break; 
+			case 'I': vector = TILE_BITMAPS[10]; break; 
+			case 'L': vector = TILE_BITMAPS[11]; break; 
+			default: throw new RuntimeException("ahduschaisse");
+		}
+		int[][] returnVector = new int[2][5];
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 5; j++) {
+				returnVector[i][j] = vector[i][j];
+			}
+		}
+		return returnVector;
 	}
 
 	private void generate() {
@@ -96,6 +108,13 @@ public class PentoTile extends Tile {
 		this.clipOffset.sub(this.clipCorner);
 	}
 
+
+	@Override
+	public void reset() {
+		super.reset();
+		defVectors = getDefVectors(name.charAt(0));
+		generate();
+	}
 
 	public boolean matchesPosition(Point p) {
 		boolean s;
@@ -176,7 +195,7 @@ public class PentoTile extends Tile {
 	}
 
 	public void hFlip() {
-		System.out.println("hFlip: " + this.defaultRefPoint);
+//		System.out.println("hFlip: " + this.defaultRefPoint);
 		for (int i = 1; i<BOX_COUNT; i++) {
 			this.defVectors[1][i] = -1 * this.defVectors[1][i];
 		}
@@ -184,7 +203,7 @@ public class PentoTile extends Tile {
 	}
 
 	public void vFlip() {
-		System.out.println("vFlip: " + this.defaultRefPoint);
+//		System.out.println("vFlip: " + this.defaultRefPoint);
 		for (int i = 1; i<BOX_COUNT; i++) {
 			this.defVectors[0][i] = -1 * this.defVectors[0][i];
 		}
@@ -193,7 +212,7 @@ public class PentoTile extends Tile {
 
 	public void cwRotate() {
 		int temp;
-		System.out.println("cwRotate: " + this.defaultRefPoint);
+//		System.out.println("cwRotate: " + this.defaultRefPoint);
 		for (int i=1; i<BOX_COUNT; i++) {
 			temp = this.defVectors[0][i];
 			this.defVectors[0][i] = -1 * this.defVectors[1][i];
@@ -204,7 +223,7 @@ public class PentoTile extends Tile {
 
 	public void ccwRotate() {
 		int temp;
-		System.out.println("ccwRotate: " + this.defaultRefPoint);
+//		System.out.println("ccwRotate: " + this.defaultRefPoint);
 		for (int i=1; i<BOX_COUNT; i++) {
 			temp = this.defVectors[0][i];
 			this.defVectors[0][i] = this.defVectors[1][i];
@@ -281,7 +300,9 @@ public class PentoTile extends Tile {
 	}
 
 	public void unplace() {
-		unplace(myGrid.tray, myGrid.index(refPoint)); 
+		if (myGrid != null) {
+			unplace(myGrid.tray, myGrid.index(refPoint));
+		}
 	}
 	
 	/*
