@@ -30,7 +30,6 @@ public class PentoIcon extends PentoTile implements Icon {
 	}
 
 	public int getIconWidth() {
-		// TODO Auto-generated method stub
 		return scale * 5;
 	}
 
