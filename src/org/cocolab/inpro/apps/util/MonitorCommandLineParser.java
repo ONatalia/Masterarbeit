@@ -25,11 +25,13 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -h	           this screen");
 		System.err.println("    -v             more verbose output");
 		System.err.println("input selection:");
+		System.err.println("    -OAA           receive and interpret OAA dispatch messages");
+		System.err.println("    -RTP           receive RTP stream");
 		System.err.println("    -lp	port       optional port to listen on (default: 42000)");
 		System.err.println("    -t sphinx|raw  raw data or encoded Sphinx DoubleData (default: sphinx)");
 		System.err.println("output selection:");
 		System.err.println("    -S             speakers");
-		System.err.println("    -buf size      optional buffering size in bytes");
+		System.err.println("    -buf size      optional audio buffering size in bytes (default: 8192)");
 		System.err.println("    -F <fileURL>   dump file");
 	}
 
@@ -67,6 +69,12 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-S")) {
 				outputMode |= SPEAKER_OUTPUT;
+			}
+			else if (args[i].equals("-OAA")) {
+				inputMode = OAA_DISPATCHER_INPUT;
+			}
+			else if (args[i].equals("-RTP")) {
+				inputMode = RTP_INPUT;
 			}
 			else if (args[i].equals("-t")) {
 				i++;

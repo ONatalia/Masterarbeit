@@ -7,14 +7,17 @@ import edu.cmu.sphinx.frontend.DoubleData;
 
 public class ConversionUtil {
 	
+	public static int SPHINX_RTP_HEADER_LENGTH = 20;
+	
 	public static byte[] doubleDataToBytes(DoubleData dd) {
 		long collectTime = dd.getCollectTime();
 		long firstSampleNumber = dd.getFirstSampleNumber();
 		int sampleRate = dd.getSampleRate();
 		double[] da = dd.getValues();
-		byte[] ba = new byte[20 + // 2 * ByteUtil.NUM_BYTES_IN_LONG + 
+		byte[] ba = new byte[SPHINX_RTP_HEADER_LENGTH
+		                          // 2 * ByteUtil.NUM_BYTES_IN_LONG + 
 		                          // 1 * ByteUtil.NUM_BYTES_IN_INT +
-		                     da.length * 2]; // ByteUtil.NUM_BYTES_IN_SHORT];
+		                     + da.length * 2]; // ByteUtil.NUM_BYTES_IN_SHORT];
 		ByteBuffer bb = ByteBuffer.wrap(ba);
 		bb.putLong(collectTime);
 		bb.putLong(firstSampleNumber);

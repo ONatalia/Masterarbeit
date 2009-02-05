@@ -17,8 +17,8 @@
     
     <property name="absoluteBeamWidth"           value="500"/>
     <property name="relativeBeamWidth"           value="1E-80"/>
-    <property name="absoluteWordBeamWidth" value="50"/>
-    <property name="relativeWordBeamWidth" value="1E-60"/>
+    <property name="absoluteWordBeamWidth"       value="50"/>
+    <property name="relativeWordBeamWidth"       value="1E-60"/>
     <property name="wordInsertionProbability"    value="1E-16"/>
     <property name="languageWeight"              value="11"/>
     <property name="silenceInsertionProbability" value=".1"/> 
@@ -154,7 +154,7 @@
                 value="${silenceInsertionProbability}"/> 
         <property name="languageWeight" value="${languageWeight}"/>
         <property name="unitManager" value="unitManager"/>
-<!--		<property name="showCompilationProgress" value="true"/>		 -->
+		<property name="showCompilationProgress" value="false"/>
     </component>
     
     <component name="flatLinguist" 
@@ -282,6 +282,13 @@
     <component name="RTPDataSource" 
                type="org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor">
     </component>
+
+	<component name="oaaDispatchStream"
+	           type="org.cocolab.inpro.audio.OAADispatchStream">
+	    <property name="agentName" value="dispatchStream" />
+	    <property name="goalPrefix" value="x" />
+	    <property name="sendSilence" value="false" />
+	</component>
 
 	<component name="speechClassifier" type="edu.cmu.sphinx.frontend.endpoint.SpeechClassifier">
 		<property name="threshold" value="${threshold}" />

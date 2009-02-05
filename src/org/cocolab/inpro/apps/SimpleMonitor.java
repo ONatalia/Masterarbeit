@@ -4,8 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -15,6 +13,11 @@ import javax.sound.sampled.SourceDataLine;
 
 import org.cocolab.inpro.apps.util.CommonCommandLineParser;
 import org.cocolab.inpro.apps.util.MonitorCommandLineParser;
+import org.cocolab.inpro.audio.OAADispatchStream;
+import org.cocolab.inpro.sphinx.frontend.ConversionUtil;
+
+import edu.cmu.sphinx.util.props.ConfigurationManager;
+import edu.cmu.sphinx.util.props.PropertyException;
 
 import gov.nist.jrtp.RtpErrorEvent;
 import gov.nist.jrtp.RtpException;
@@ -31,17 +34,51 @@ public class SimpleMonitor implements RtpListener {
     SourceDataLine line;
     FileOutputStream fileStream;
 	
-	SimpleMonitor(MonitorCommandLineParser clp) throws SocketException, UnknownHostException, RtpException {
+	SimpleMonitor(MonitorCommandLineParser clp) throws RtpException, IOException, PropertyException, InstantiationException {
 		this.clp = clp;
+		System.err.println("Setting up output stream...\n");
 		if (clp.matchesOutputMode(CommonCommandLineParser.FILE_OUTPUT)) {
 			setupFileStream();
 		}
 		if (clp.matchesOutputMode(CommonCommandLineParser.SPEAKER_OUTPUT)) {
 			setupAudioLine();
 		}
-		RtpSession rs = new RtpSession(InetAddress.getLocalHost(), clp.getLocalPort());
-		rs.addRtpListener(this);
-		rs.receiveRTPPackets();
+		switch (clp.getInputMode()) {
+			case MonitorCommandLineParser.RTP_INPUT :
+				RtpSession rs = new RtpSession(InetAddress.getLocalHost(), clp.getLocalPort());
+				rs.addRtpListener(this);
+				rs.receiveRTPPackets();
+			break;
+			case MonitorCommandLineParser.OAA_DISPATCHER_INPUT : 
+		    	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
+				final OAADispatchStream ods = (OAADispatchStream) cm.lookup("oaaDispatchStream");
+				ods.initialize();
+				ods.sendSilence(false);
+				Runnable streamDrainer = new Runnable() {
+					@Override
+					public void run() {
+						byte[] b = new byte[320]; // that will fit 10 ms
+						while (true) {
+							int bytesRead = 0;
+							try {
+								bytesRead = ods.read(b, 0, b.length);
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
+							if (bytesRead > 0)
+								newData(b, 0, bytesRead);
+							try {
+								Thread.sleep(10);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				};
+				new Thread(streamDrainer).run();
+			break;
+			default: throw new RuntimeException("oups in SimpleMonitor"); 
+		}
 	}
 
 	void setupFileStream() {
@@ -77,7 +114,7 @@ public class SimpleMonitor implements RtpListener {
 		float rate = 16000.f;
 		int sampleSize = 16;
 		int channels = 1;
-		boolean bigEndian = true;
+		boolean bigEndian = false;
 		return new AudioFormat(encoding, rate, sampleSize, channels, (sampleSize/8)*channels, rate, bigEndian);
     }
     
@@ -101,7 +138,6 @@ public class SimpleMonitor implements RtpListener {
 				e.printStackTrace();
 			}
     	}
-    	
     }
 
     /************************
@@ -111,27 +147,20 @@ public class SimpleMonitor implements RtpListener {
 	public void handleRtpPacketEvent(RtpPacketEvent arg0) {
 		RtpPacket rp = arg0.getRtpPacket();
 		byte[] bytes = rp.getPayload();
-		int offset = (clp.isSphinxMode() ? 20 : 0); // dirty hack, oh well
+		int offset = (clp.isSphinxMode() ? ConversionUtil.SPHINX_RTP_HEADER_LENGTH : 0); // dirty hack, oh well
 		newData(bytes, offset, bytes.length - offset);
-		 
 	}
 
 	public void handleRtpStatusEvent(RtpStatusEvent arg0) {
-		if (clp.verbose()) { 
-			System.err.println(arg0);
-		}
+		if (clp.verbose()) System.err.println(arg0);
 	}
 
 	public void handleRtpErrorEvent(RtpErrorEvent arg0) {
-		if (clp.verbose()) { 
-			System.err.println(arg0);
-		}
+		if (clp.verbose()) System.err.println(arg0);
 	}
 
 	public void handleRtpTimeoutEvent(RtpTimeoutEvent arg0) {
-		if (clp.verbose()) { 
-			System.err.println(arg0);
-		}
+		if (clp.verbose()) System.err.println(arg0);
 	}
 	
 	/*******************
@@ -141,16 +170,8 @@ public class SimpleMonitor implements RtpListener {
     	MonitorCommandLineParser clp = new MonitorCommandLineParser(args);
     	try {
 			new SimpleMonitor(clp);
-		} catch (SocketException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (RtpException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
 }

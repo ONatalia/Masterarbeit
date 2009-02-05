@@ -11,6 +11,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.cocolab.inpro.apps.util.RTPCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
+import org.cocolab.inpro.audio.OAADispatchStream;
 import org.cocolab.inpro.sphinx.frontend.ConversionUtil;
 
 
@@ -32,8 +33,18 @@ public class SimpleRTP {
 		DataProcessor dp = null;
 		switch (clp.getInputMode()) {
 			case RTPCommandLineParser.MICROPHONE_INPUT:
-				Microphone mic = (Microphone) cm.lookup("microphone");
-				mic.initialize();
+				final Microphone mic = (Microphone) cm.lookup("microphone");
+				Runnable micInitializer = new Runnable() {
+					public void run() {
+						mic.initialize();
+					}
+				};
+				new Thread(micInitializer).start();
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} // allow the microphone 3 seconds to initialize
 				if (!mic.startRecording()) {
 					System.err.println("Could not open microphone. Exiting...");
 					System.exit(1);
@@ -47,6 +58,15 @@ public class SimpleRTP {
 				AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);
 	            sds.setInputStream(ais, audioURL.getFile());
 	            dp = sds;
+			break;
+			case RTPCommandLineParser.OAA_DISPATCHER_INPUT:
+				// TODO: check whether this functions properly
+				sds = (StreamDataSource) cm.lookup("streamDataSource");
+				sds.initialize();
+				OAADispatchStream oaads = (OAADispatchStream) cm.lookup("oaaDispatchStream");
+				oaads.initialize();
+				sds.setInputStream(oaads, "oaaDispatchStream");
+				dp = sds;
 			break;
 		}
 		return dp;
@@ -64,13 +84,13 @@ public class SimpleRTP {
 		while ((d = dp.getData()) != null) {
 			if (d instanceof DoubleData) {
 				DoubleData dd = (DoubleData) d;
+				// ba as in byte array
 				byte[] ba = ConversionUtil.doubleDataToBytes(dd);
 				rp.setPayload(ba, ba.length);
 				rs.sendRtpPacket(rp);
 				try {
 					Thread.sleep(5); // sleep for half a frame
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}

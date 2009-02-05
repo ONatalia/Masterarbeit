@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DataEndSignal;
@@ -24,10 +23,13 @@ import gov.nist.jrtp.RtpSession;
 import gov.nist.jrtp.RtpStatusEvent;
 import gov.nist.jrtp.RtpTimeoutEvent;
 
+/*
+ * our new implementation of an RTP reader using NIST JRtp , deprecates RTPDataSource
+ */
+
 public class RtpRecvProcessor extends BaseDataProcessor {
 
 	public final static String PROP_RTP_RECV_PORT = "recvPort";
-	public final static String PROP_SAMPLING_RATE = "samplingRate";
 	
 	private int recvPort = 42000;
 	
