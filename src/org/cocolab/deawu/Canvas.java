@@ -47,6 +47,7 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	
 	public Canvas() {
 		tiles = createTiles();
+		showTiles = true;
 	}
 	
 	protected abstract Tile[] createTiles();
