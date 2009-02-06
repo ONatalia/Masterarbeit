@@ -42,6 +42,8 @@ public class PentoTile extends Tile {
 	};
 	
 	PentoTile(int s, Color c, int x0, int y0, char name) {
+		if (!isValidTile(name)) 
+			throw new RuntimeException("Error in PentoTile: " + Character.toString(name) + " is not a valid type for a tile");
 		this.defVectors = getDefVectors(name);
 		this.color = c;
 		this.refPoint = new Point(x0, y0);
@@ -56,6 +58,13 @@ public class PentoTile extends Tile {
 		this.clipOffset = new Point(this.refPoint);
 
 		generate();  /* creates indiv. boxes and determines clip rectangle */
+	}
+	
+	public static boolean isValidTile(char c) {
+		return (c == 'F' || c == 'U' || c == 'X'
+			 || c == 'W' || c == 'Y' || c == 'N'
+			 || c == 'P' || c == 'V' || c == 'Z'
+			 || c == 'T' || c == 'I' || c == 'L');
 	}
 	
 	int[][] getDefVectors(char name) {

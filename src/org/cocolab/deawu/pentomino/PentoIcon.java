@@ -17,8 +17,14 @@ import org.cocolab.deawu.Point;
 
 public class PentoIcon extends PentoTile implements Icon {
 
+	public static int STANDARD_SCALE = 10;
+	
+	public PentoIcon(char name) {
+		this(STANDARD_SCALE, name);
+	}
+	
 	public PentoIcon(int s, char name) {
-		super(s, Color.RED, 0, 0, name);
+		this(s, Color.RED, name);
 	}
 	
 	public PentoIcon(int s, Color c, char name) {
@@ -39,7 +45,7 @@ public class PentoIcon extends PentoTile implements Icon {
 	}
 	
 	public static JButton newButtonFor(char c) {
-		PentoIcon pi = new PentoIcon(10, c);
+		PentoIcon pi = new PentoIcon(STANDARD_SCALE, c);
 		return new JButton(Character.toString(c), pi);
 	}
 
