@@ -41,8 +41,8 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	Point clickOffset = new Point(0, 0);
 	Color selectedColor = Color.green;
 	Color normalColor = Color.gray;
-
 	
+	private boolean showTiles;
 	public boolean labelsVisible;
 	
 	public Canvas() {
@@ -50,6 +50,11 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	}
 	
 	protected abstract Tile[] createTiles();
+	
+	public void showTiles(boolean show) {
+		showTiles = show;
+		repaint();
+	}
 	
 	public void shuffleTiles() {
 		Random rnd = new Random();
@@ -98,21 +103,25 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	}
 	
 	public void paintTiles(Graphics g) {
-		for (Tile tile : tiles) {
-			if ((tile != activeTile) && (tile != draggingTile)) {
-				tile.draw(g, labelsVisible);
+		if (showTiles) {
+			for (Tile tile : tiles) {
+				if ((tile != activeTile) && (tile != draggingTile)) {
+					tile.draw(g, labelsVisible);
+				}
 			}
 		}
 	}
 	
 	public void paintTopTiles(Graphics g) {
-		if (activeTile != null) {
-			activeTile.draw(g, labelsVisible);
+		if (showTiles) {
+			if (activeTile != null) {
+				activeTile.draw(g, labelsVisible);
+			}
+			if (draggingTile != null) {
+				draggingTile.draw(g, labelsVisible);
+			}
 		}
-		if (draggingTile != null) {
-			draggingTile.draw(g, labelsVisible);
-		} 
-	}
+	}	
 	
 	protected void superPaint(Graphics g) {
 		super.paint(g);
