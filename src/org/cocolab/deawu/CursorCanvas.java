@@ -207,7 +207,7 @@ abstract public class CursorCanvas extends Canvas {
 		boolean selectionSuccessful = false;
 		// deal with buttons
 		Component selectedComponent = getComponentAt(x, y);
-		if (selectedComponent != this) {
+		if ((selectedComponent != null) && (selectedComponent != this)) {
 			if (selectedComponent instanceof JButton) {
 				((JButton) selectedComponent).doClick(buttonClickDelay);
 			}

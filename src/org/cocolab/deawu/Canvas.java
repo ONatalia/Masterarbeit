@@ -21,7 +21,7 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	protected static final int RELATIVE_WIDTH = 30; // measured in boxes
 	protected static final int RELATIVE_HEIGHT = 24;
 
-	protected static final int SCALE = 20;
+	public static final int SCALE = 20;
 
 	protected static final Point[] defPoss = {
 		new Point(2 * SCALE, 7 * SCALE), new Point(6 * SCALE, 7 * SCALE), 
@@ -237,11 +237,11 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	 * @param t
 	 * @return
 	 */
-	public int translateBlockToPixel(double t) {
+	public static int translateBlockToPixel(double t) {
 		return (int) (t * SCALE);
 	}
 
-	public double translatePixelToBlock(int t) {
+	public static double translatePixelToBlock(int t) {
 		return ((double) t) / ((double) SCALE);
 	}
 	
