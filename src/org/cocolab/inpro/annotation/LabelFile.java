@@ -1,6 +1,7 @@
 package org.cocolab.inpro.annotation;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,34 +17,42 @@ public class LabelFile {
      * @param skip the number of lines to skip between items
      *
      * @return a List of the lines in a label file
+	 * @throws IOException 
      */
     public static List<String> getLines(String labelFile, int skip) throws IOException {
         int curCount = skip;
         List<String> list = new ArrayList<String>();
-        BufferedReader reader = new BufferedReader(new FileReader(labelFile));
-        
-        String line = null;
-        
-        while ((line = reader.readLine()) != null) {
-            if (line.length() > 0) {
-                if (++curCount >= skip) {
-                    list.add(line);
-                    curCount = 0;
-                }
-            }
-		}
-		reader.close();
+        try {
+	        BufferedReader reader = new BufferedReader(new FileReader(labelFile));
+	        
+	        String line = null;
+	        
+	        while ((line = reader.readLine()) != null) {
+	            if (line.length() > 0) {
+	                if (++curCount >= skip) {
+	                    list.add(line);
+	                    curCount = 0;
+	                }
+	            }
+			}
+			reader.close();
+        } catch (FileNotFoundException ioe) {
+        	System.err.println("File not found: " + labelFile);
+//        	ioe.printStackTrace();
+        }
         return list;
     }
     
     public static LinkedList<Label> getLabels(String labelFile) throws IOException {
     	LinkedList<Label> labels = new LinkedList<Label>();
     	List<String> lines = getLines(labelFile, 0);
+    	double stopTime = 0.0;
     	for (String line : lines) {
-    		labels.add(new Label(getStartTime(line), getStopTime(line), getLabel(line)));
+    		stopTime = getStopTime(line);
+    		labels.add(new Label(getStartTime(line), stopTime, getLabel(line)));
     	}
     	// automatically add a silence label in the end
-    	labels.add(new Label(getStopTime(lines.get(lines.size() - 1)), Long.MAX_VALUE, "sil"));
+    	labels.add(new Label(stopTime, Long.MAX_VALUE, "sil"));
     	return labels;
     }
     

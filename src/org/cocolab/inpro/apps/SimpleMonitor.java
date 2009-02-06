@@ -66,12 +66,15 @@ public class SimpleMonitor implements RtpListener {
 								e1.printStackTrace();
 							}
 							if (bytesRead > 0)
+								// no need to sleep, because the call to the microphone will already slow us down
 								newData(b, 0, bytesRead);
-							try {
-								Thread.sleep(10);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
+							else // if there is no data, then we wait a little for data to become available (instead of looping like crazy)
+								try {
+									Thread.sleep(5);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+								
 						}
 					}
 				};
@@ -109,12 +112,17 @@ public class SimpleMonitor implements RtpListener {
         line.start();
 	}
 	
-    static AudioFormat getFormat() {
+    AudioFormat getFormat() {
         AudioFormat.Encoding encoding = AudioFormat.Encoding.PCM_SIGNED;
 		float rate = 16000.f;
 		int sampleSize = 16;
 		int channels = 1;
-		boolean bigEndian = false;
+		boolean bigEndian;
+		if (clp.getInputMode() == MonitorCommandLineParser.RTP_INPUT) {
+			bigEndian = true;
+		} else {
+			bigEndian = false;
+		}
 		return new AudioFormat(encoding, rate, sampleSize, channels, (sampleSize/8)*channels, rate, bigEndian);
     }
     
