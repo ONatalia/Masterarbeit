@@ -128,10 +128,13 @@ public class LabelWriter implements Configurable,
         if (recognizer == null) {
             recognizer = newRecognizer;
             recognizer.addResultListener(this);
+            recognizer.addStateListener(this);
         } else if (recognizer != newRecognizer) {
             recognizer.removeResultListener(this);
+            recognizer.removeStateListener(this);
             recognizer = newRecognizer;
             recognizer.addResultListener(this);
+            recognizer.addStateListener(this);
         }
         
         intermediateResults = ps.getBoolean(PROP_INTERMEDIATE_RESULTS, false);
@@ -414,6 +417,9 @@ public class LabelWriter implements Configurable,
     }
 
     public void statusChanged(RecognizerState status) {
+		if (status == RecognizerState.RECOGNIZING) {
+			step = 0;
+		}
     }
     
     class TokenComparator implements Comparator<Token> {
