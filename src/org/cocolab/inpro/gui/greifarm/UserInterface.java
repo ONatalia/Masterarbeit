@@ -1,4 +1,4 @@
-package org.cocolab.deawu.greifarm;
+package org.cocolab.inpro.gui.greifarm;
 
 import java.util.Random;
 

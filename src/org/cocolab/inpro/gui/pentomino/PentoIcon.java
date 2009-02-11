@@ -1,4 +1,4 @@
-package org.cocolab.deawu.pentomino;
+package org.cocolab.inpro.gui.pentomino;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -9,7 +9,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
-import org.cocolab.deawu.Point;
+import org.cocolab.inpro.gui.Point;
 
 /*
  * encapsulate PentoTile so that it can be used as the icon on a button

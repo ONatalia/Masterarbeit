@@ -1,10 +1,10 @@
-package org.cocolab.deawu.pentomino;
+package org.cocolab.inpro.gui.pentomino;
 
 import java.awt.Graphics;
 import java.awt.Color;
 import java.lang.Cloneable;
 
-import org.cocolab.deawu.Point;
+import org.cocolab.inpro.gui.Point;
 
 public class Box implements Cloneable {
 

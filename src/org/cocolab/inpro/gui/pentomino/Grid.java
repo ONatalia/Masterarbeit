@@ -1,4 +1,4 @@
-package org.cocolab.deawu.pentomino;
+package org.cocolab.inpro.gui.pentomino;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-import org.cocolab.deawu.Point;
+import org.cocolab.inpro.gui.Point;
 
 public class Grid {
 	

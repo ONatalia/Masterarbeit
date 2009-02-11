@@ -1,14 +1,14 @@
-package org.cocolab.deawu.greifarm;
+package org.cocolab.inpro.gui.greifarm;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
 
 import javax.swing.JFrame;
 
-import org.cocolab.deawu.CursorCanvas;
-import org.cocolab.deawu.ImageTile;
-import org.cocolab.deawu.Point;
-import org.cocolab.deawu.Tile;
+import org.cocolab.inpro.gui.CursorCanvas;
+import org.cocolab.inpro.gui.ImageTile;
+import org.cocolab.inpro.gui.Point;
+import org.cocolab.inpro.gui.Tile;
 
 @SuppressWarnings("serial")
 public class GreifArm extends CursorCanvas {

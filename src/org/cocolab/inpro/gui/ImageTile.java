@@ -1,4 +1,4 @@
-package org.cocolab.deawu;
+package org.cocolab.inpro.gui;
 
 import java.awt.Graphics;
 import java.awt.Image;

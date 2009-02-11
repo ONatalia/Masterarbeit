@@ -1,4 +1,4 @@
-package org.cocolab.deawu.util;
+package org.cocolab.inpro.gui.util;
 
 import java.awt.event.ActionEvent;
 import java.util.LinkedList;

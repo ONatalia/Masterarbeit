@@ -1,4 +1,4 @@
-package org.cocolab.deawu.util;
+package org.cocolab.inpro.gui.util;
 
 import antlr_oaa.RecognitionException;
 import antlr_oaa.TokenStreamException;

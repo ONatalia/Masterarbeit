@@ -1,4 +1,4 @@
-package org.cocolab.deawu.greifarm;
+package org.cocolab.inpro.gui.greifarm;
 
 import java.awt.GridLayout;
 
@@ -8,8 +8,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.cocolab.deawu.util.OAAAction;
-import org.cocolab.deawu.util.OAAResetAction;
+import org.cocolab.inpro.gui.util.OAAAction;
+import org.cocolab.inpro.gui.util.OAAResetAction;
 
 import antlr_oaa.RecognitionException;
 import antlr_oaa.TokenStreamException;

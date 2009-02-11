@@ -1,4 +1,4 @@
-package org.cocolab.deawu;
+package org.cocolab.inpro.gui;
 
 @SuppressWarnings("serial")
 public class Point extends java.awt.Point {

@@ -1,11 +1,11 @@
-package org.cocolab.deawu.pentomino;
+package org.cocolab.inpro.gui.pentomino;
 
 import java.awt.Graphics;
 import java.awt.Color;
 import java.lang.String;
 
-import org.cocolab.deawu.Point;
-import org.cocolab.deawu.Tile;
+import org.cocolab.inpro.gui.Point;
+import org.cocolab.inpro.gui.Tile;
 
 public class PentoTile extends Tile {
 
