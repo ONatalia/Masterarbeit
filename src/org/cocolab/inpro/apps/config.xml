@@ -154,7 +154,7 @@
                 value="${silenceInsertionProbability}"/> 
         <property name="languageWeight" value="${languageWeight}"/>
         <property name="unitManager" value="unitManager"/>
-		<property name="showCompilationProgress" value="false"/>
+		<!--property name="showCompilationProgress" value="false"/-->
     </component>
     
     <component name="flatLinguist" 
