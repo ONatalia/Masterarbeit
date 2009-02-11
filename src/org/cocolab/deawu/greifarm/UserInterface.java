@@ -74,6 +74,7 @@ public class UserInterface extends AgentImpl {
 		} catch (AgentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 

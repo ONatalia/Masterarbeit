@@ -6,6 +6,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import org.cocolab.deawu.util.OAAAction;
 import org.cocolab.deawu.util.OAAResetAction;
@@ -33,15 +34,17 @@ public class WozInterface extends JFrame {
 		setTitle("GreifArm Wizard Interface");
 		setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
 		
+		add(new JTextField());
+		add(new JButton(new OAAAction(agent, "nächste VP", "nextVP(name)")));
 		add(new JButton(new OAAResetAction(agent)));
 		
 		JPanel directionPanel = new JPanel(new GridLayout(3, 2));		
-		directionPanel.add(new JButton(new OAAMoveToAction("<<<---", -3.0)));
-		directionPanel.add(new JButton(new OAAMoveToAction("--->>>", 3.0)));
-		directionPanel.add(new JButton(new OAAMoveToAction("<<--", -1.0)));
-		directionPanel.add(new JButton(new OAAMoveToAction("-->>", 1.0)));
-		directionPanel.add(new JButton(new OAAMoveToAction("<-", -0.33)));
-		directionPanel.add(new JButton(new OAAMoveToAction("->", 0.33)));
+		directionPanel.add(new JButton(new OAAMoveToAction("←←←", -3.0)));
+		directionPanel.add(new JButton(new OAAMoveToAction("→→→", 3.0)));
+		directionPanel.add(new JButton(new OAAMoveToAction("←←", -1.0)));
+		directionPanel.add(new JButton(new OAAMoveToAction("→→", 1.0)));
+		directionPanel.add(new JButton(new OAAMoveToAction("←", -0.33)));
+		directionPanel.add(new JButton(new OAAMoveToAction("→", 0.33)));
 		add(directionPanel);
 		
 		add(new JButton(new OAADropAction()));
@@ -71,6 +74,7 @@ public class WozInterface extends JFrame {
 			new WozInterface();
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 
