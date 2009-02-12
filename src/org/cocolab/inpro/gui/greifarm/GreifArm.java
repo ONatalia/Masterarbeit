@@ -16,6 +16,8 @@ public class GreifArm extends CursorCanvas {
 	public static final int RELATIVE_WIDTH = 40;
 	public static final int RELATIVE_HEIGHT = 10;
 	
+	ImageTile emptyHand;
+	
 	public GreifArm() {
 		super();
 		reset();
@@ -28,9 +30,12 @@ public class GreifArm extends CursorCanvas {
 	@Override
 	protected Tile[] createTiles() {
 		Tile[] tiles;
-		tiles = new Tile[2];
+		tiles = new Tile[3];
 		tiles[0] = new ImageTile(GreifArm.class.getResource("ball.png"));
 		tiles[1] = new ImageTile(GreifArm.class.getResource("bowl.png"));
+		emptyHand = new ImageTile(CursorCanvas.class.getResource("draggable.png"));
+		emptyHand.setVisible(false);
+		tiles[2] = emptyHand;
 		return tiles;
 	}
 	
@@ -50,6 +55,7 @@ public class GreifArm extends CursorCanvas {
 		tiles[0].setPos(new Point((int) (ballX * SCALE), 1 * SCALE));
 		cursorPosition = new Point((int) (ballX * SCALE), 1 * SCALE);
 		grabbing = true;
+		cursorVisible = true;
 		cursorPressAt((int) (ballX * SCALE), 1 * SCALE);
 		double bowlX = Math.random() * (RELATIVE_WIDTH - 2) + 1;
 		tiles[1].setPos(new Point((int) (bowlX * SCALE), (int) ((RELATIVE_HEIGHT - 1.5) * SCALE)));
@@ -77,6 +83,4 @@ public class GreifArm extends CursorCanvas {
 			e.printStackTrace();
 		}
 	}
-	
-
 }

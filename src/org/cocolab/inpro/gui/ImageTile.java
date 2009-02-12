@@ -12,6 +12,7 @@ public class ImageTile extends Tile {
 
 	Image image;
 	Point size;
+	boolean isVisible = true;
 	
 	public ImageTile(String s) throws MalformedURLException {
 		this(new URL(s));
@@ -23,9 +24,14 @@ public class ImageTile extends Tile {
 		size = new Point(image.getWidth(null), image.getHeight(null));
 	}
 	
+	public void setVisible(boolean v) {
+		isVisible = v;
+	}
+	
 	@Override
 	public void draw(Graphics g, boolean l) {
-		g.drawImage(image, refPoint.x - size.x / 2, refPoint.y - size.y / 2, null, null);
+		if (isVisible)
+			g.drawImage(image, refPoint.x - size.x / 2, refPoint.y - size.y / 2, null, null);
 	}
 
 	@Override

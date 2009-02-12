@@ -13,9 +13,7 @@ import com.sri.oaa2.icl.IclTerm;
 public class UserInterface extends AgentImpl {
 
 	Random rand;
-	
 	GreifArm greifarm;
-	
 	double greifarmPosition;
 	
 	UserInterface() throws AgentException {
@@ -36,7 +34,6 @@ public class UserInterface extends AgentImpl {
 		return "greifArmUI";
 	}
 
-	
 	@Override
 	public String getAgentCapabilities() {
 		return "[move(X),drop,reset]";
@@ -51,16 +48,19 @@ public class UserInterface extends AgentImpl {
 			greifarm.reset();
 			greifarmPosition = GreifArm.translatePixelToBlock(greifarm.cursorPosition.x);
 		} else if (str.equals("move")) {
-			double direction = ((IclFloat) goal.getTerm(0)).toDouble();
-			greifarmPosition += (rand.nextGaussian() + 2) * direction;
-			greifarmPosition = Math.min(Math.max(greifarmPosition, 0.5), GreifArm.RELATIVE_WIDTH - 0.5); 
-			System.err.println("moving to new position: " + greifarmPosition);
-			greifarm.cursorMoveSlowlyToRel(greifarmPosition, 1);
+			if (greifarm.cursorVisible) {
+				double direction = ((IclFloat) goal.getTerm(0)).toDouble();
+				greifarmPosition += (rand.nextGaussian() + 2) * direction;
+				greifarmPosition = Math.min(Math.max(greifarmPosition, 0.5), GreifArm.RELATIVE_WIDTH - 0.5); 
+				System.err.println("moving to new position: " + greifarmPosition);
+				greifarm.cursorMoveSlowlyToRel(greifarmPosition, 1);
+			}
 		} else if (str.equals("drop")) {
 			greifarm.cursorVisible = false;
 			greifarm.repaint();
+			greifarm.emptyHand.setPos(greifarm.cursorPosition);
+			greifarm.emptyHand.setVisible(true);
 			greifarm.cursorMoveSlowlyTo(greifarm.cursorPosition.x, (GreifArm.RELATIVE_HEIGHT - 1) * GreifArm.SCALE);
-
 		}
 		return result;
 	}
