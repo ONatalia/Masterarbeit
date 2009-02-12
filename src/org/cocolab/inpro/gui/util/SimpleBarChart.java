@@ -14,7 +14,7 @@ public class SimpleBarChart extends JPanel {
 	Bar[] bars;
 	double maxValue;
 	
-	SimpleBarChart() {
+	public SimpleBarChart() {
 		super();
 		maxValue = 1.0;
 		setPreferredSize(new Dimension(600, 400));
@@ -24,7 +24,7 @@ public class SimpleBarChart extends JPanel {
 		maxValue = mv;
 	}
 	
-	void setBars(Bar[] bars) {
+	public void setBars(Bar[] bars) {
 		this.bars = bars;
 		repaint();
 	}
@@ -32,7 +32,7 @@ public class SimpleBarChart extends JPanel {
 	/*
 	 * set new bars with the given values and labels
 	 */
-	void setBars(double[] values, String[] labels) {
+	public void setBars(double[] values, String[] labels) {
 		assert (values.length == labels.length);
 		Bar[] newBars = new Bar[values.length];
 		for (int i = 0; i < newBars.length; i++) {
@@ -44,7 +44,7 @@ public class SimpleBarChart extends JPanel {
 	/*
 	 * set new bars with the given values, create default labels
 	 */
-	void setBars(double[] values) {
+	public void setBars(double[] values) {
 		Bar[] newBars = new Bar[values.length];
 		for (int i = 0; i < newBars.length; i++) {
 			newBars[i] = new Bar(values[i], Integer.toString(i + 1));
@@ -55,7 +55,7 @@ public class SimpleBarChart extends JPanel {
 	/*
 	 * update the values of the bars (keep the labels)
 	 */
-	void updateBars(double[] values) {
+	public void updateBars(double[] values) {
 		assert (values.length == bars.length);
 		for (int i = 0; i < values.length; i++) {
 			bars[i].value = values[i];
