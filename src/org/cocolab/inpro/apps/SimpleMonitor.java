@@ -10,7 +10,10 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.TargetDataLine;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.cocolab.inpro.apps.util.CommonCommandLineParser;
 import org.cocolab.inpro.apps.util.MonitorCommandLineParser;
 import org.cocolab.inpro.audio.OAADispatchStream;
@@ -30,58 +33,109 @@ import gov.nist.jrtp.RtpTimeoutEvent;
 
 public class SimpleMonitor implements RtpListener {
 
+	private static final Logger logger = Logger.getLogger(SimpleMonitor.class);
+	
 	MonitorCommandLineParser clp;
     SourceDataLine line;
     FileOutputStream fileStream;
 	
 	SimpleMonitor(MonitorCommandLineParser clp) throws RtpException, IOException, PropertyException, InstantiationException {
 		this.clp = clp;
-		System.err.println("Setting up output stream...\n");
+		logger.info("Setting up output stream...\n");
 		if (clp.matchesOutputMode(CommonCommandLineParser.FILE_OUTPUT)) {
-			setupFileStream();
+			logger.info("setting up file output to file " + clp.getAudioURL().toString());
+		    setupFileStream();
 		}
 		if (clp.matchesOutputMode(CommonCommandLineParser.SPEAKER_OUTPUT)) {
-			setupAudioLine();
+			logger.info("setting up speaker output");
+			setupSpeaker();
 		}
 		switch (clp.getInputMode()) {
-			case MonitorCommandLineParser.RTP_INPUT :
+			case CommonCommandLineParser.RTP_INPUT :
 				RtpSession rs = new RtpSession(InetAddress.getLocalHost(), clp.getLocalPort());
 				rs.addRtpListener(this);
 				rs.receiveRTPPackets();
 			break;
-			case MonitorCommandLineParser.OAA_DISPATCHER_INPUT : 
-		    	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
-				final OAADispatchStream ods = (OAADispatchStream) cm.lookup("oaaDispatchStream");
-				ods.initialize();
-				ods.sendSilence(false);
-				Runnable streamDrainer = new Runnable() {
-					@Override
-					public void run() {
-						byte[] b = new byte[320]; // that will fit 10 ms
-						while (true) {
-							int bytesRead = 0;
-							try {
-								bytesRead = ods.read(b, 0, b.length);
-							} catch (IOException e1) {
-								e1.printStackTrace();
-							}
-							if (bytesRead > 0)
-								// no need to sleep, because the call to the microphone will already slow us down
-								newData(b, 0, bytesRead);
-							else // if there is no data, then we wait a little for data to become available (instead of looping like crazy)
-								try {
-									Thread.sleep(5);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-								
-						}
-					}
-				};
+			case CommonCommandLineParser.OAA_DISPATCHER_INPUT : 
+				Runnable streamDrainer = createDispatcherSource();
+				new Thread(streamDrainer).run();
+			break;
+			case CommonCommandLineParser.MICROPHONE_INPUT:
+				streamDrainer = createMicrophoneSource();
 				new Thread(streamDrainer).run();
 			break;
 			default: throw new RuntimeException("oups in SimpleMonitor"); 
 		}
+	}
+
+	Runnable createMicrophoneSource() {
+		AudioFormat format = getFormat();
+		DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+		Runnable streamDrainer = null;
+		if (!AudioSystem.isLineSupported(info)) {
+			logger.error("cannot acquire line for microphone input");
+		}
+		try {
+		    final TargetDataLine line = (TargetDataLine) AudioSystem.getLine(info);
+		    logger.info("opening microphone");
+		    line.open(format, 2048);
+			streamDrainer = new Runnable() {
+				@Override
+				public void run() {
+				    logger.info("opened microphone, now starting.");
+				    line.start();
+					byte[] b = new byte[320]; // that will fit 10 ms
+					while (true) {
+						int bytesRead = 0;
+						bytesRead = line.read(b, 0, b.length);
+						if (bytesRead > 0)
+							// no need to sleep, because the call to the microphone will already slow us down
+							newData(b, 0, bytesRead);
+						else // if there is no data, then we wait a little for data to become available (instead of looping like crazy)
+							try {
+								Thread.sleep(5);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+					}
+				}
+			};
+		} catch (LineUnavailableException ex) {
+			logger.error("cannot acquire line for microphone input");
+		}
+		return streamDrainer;
+	}
+
+	Runnable createDispatcherSource() throws IOException, PropertyException, InstantiationException {
+    	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
+		final OAADispatchStream ods = (OAADispatchStream) 
+		cm.lookup("oaaDispatchStream");
+		ods.initialize();
+		ods.sendSilence(false);
+		Runnable streamDrainer = new Runnable() {
+			@Override
+			public void run() {
+				byte[] b = new byte[320]; // that will fit 10 ms
+				while (true) {
+					int bytesRead = 0;
+					try {
+						bytesRead = ods.read(b, 0, b.length);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					if (bytesRead > 0)
+						// no need to sleep, because the call to the microphone will already slow us down
+						newData(b, 0, bytesRead);
+					else // if there is no data, then we wait a little for data to become available (instead of looping like crazy)
+						try {
+							Thread.sleep(5);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+				}
+			}
+		};	
+		return streamDrainer;
 	}
 
 	void setupFileStream() {
@@ -93,7 +147,7 @@ public class SimpleMonitor implements RtpListener {
 		}
 	}
 	
-	void setupAudioLine() {
+	void setupSpeaker() {
 		AudioFormat format = getFormat();
 		// define the required attributes for our line, 
         // and make sure a compatible line is supported.
@@ -176,10 +230,14 @@ public class SimpleMonitor implements RtpListener {
 	 *******************/
 	public static void main(String[] args) {
     	MonitorCommandLineParser clp = new MonitorCommandLineParser(args);
+    	if (!clp.parsedSuccessfully()) { System.exit(1); }
+		PropertyConfigurator.configure("log4j.properties");
     	try {
 			new SimpleMonitor(clp);
+			logger.info("up and running");
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 }

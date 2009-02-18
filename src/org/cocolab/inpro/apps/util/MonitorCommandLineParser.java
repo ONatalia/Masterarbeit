@@ -25,6 +25,7 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -h	           this screen");
 		System.err.println("    -v             more verbose output");
 		System.err.println("input selection:");
+		System.err.println("    -M             recevice from microphone");
 		System.err.println("    -OAA           receive and interpret OAA dispatch messages");
 		System.err.println("    -RTP           receive RTP stream");
 		System.err.println("    -lp	port       optional port to listen on (default: 42000)");
@@ -41,7 +42,13 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 		if (localPort == 0) { localPort = 42000; }
 		if (bufSize == 0) { bufSize = 8192; }
 		if (((outputMode & FILE_OUTPUT) == FILE_OUTPUT) & (!audioURL.getProtocol().equals("file"))) {
+			printUsage();
 			System.err.println("Can only output to file URLs!");
+			return false;
+		}
+		if (inputMode == UNSPECIFIED_INPUT) {
+			printUsage();
+			System.err.println("You need to specify the input method");
 			return false;
 		}
 		return true;
@@ -69,6 +76,9 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-S")) {
 				outputMode |= SPEAKER_OUTPUT;
+			}
+			else if (args[i].equals("-M")) {
+				inputMode = MICROPHONE_INPUT;
 			}
 			else if (args[i].equals("-OAA")) {
 				inputMode = OAA_DISPATCHER_INPUT;
