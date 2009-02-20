@@ -18,8 +18,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import org.cocolab.inpro.batch.BatchModeRecognizer;
-
 import edu.cmu.sphinx.linguist.SearchState;
 import edu.cmu.sphinx.linguist.UnitSearchState;
 import edu.cmu.sphinx.linguist.WordSearchState;
@@ -29,7 +27,6 @@ import edu.cmu.sphinx.recognizer.StateListener;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.result.ResultListener;
 import edu.cmu.sphinx.decoder.search.Token;
-import edu.cmu.sphinx.util.BatchItem;
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.Resetable;
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -50,7 +47,6 @@ public class LabelWriter implements Configurable,
     public final static String PROP_RECOGNIZER = "recognizer";
     public final static String PROP_INTERMEDIATE_RESULTS = "intermediateResults";
     public final static String PROP_FINAL_RESULT = "finalResult";
-    public final static String PROP_BATCH_PROCESSOR = "batchProcessor";
     public final static String PROP_STEP_WIDTH = "step";
     
     public final static String PROP_WORD_ALIGNMENT = "wordAlignment";
@@ -75,16 +71,11 @@ public class LabelWriter implements Configurable,
     
     private int nBest = 1;
     
-    // when in batch mode, get filenames from the batch processor
-    private BatchModeRecognizer batchProcessor;
-    
     protected boolean wordAlignment = true;
     protected boolean phoneAlignment = true;
     
     private String lastWordAlignment = "";
     private String lastPhoneAlignment = "";
-    
-    private String lastFileName = null;
     
     private PrintStream wordAlignmentStream;
     private PrintStream phoneAlignmentStream;
@@ -107,7 +98,6 @@ public class LabelWriter implements Configurable,
         registry.register(PROP_RECOGNIZER, PropertyType.COMPONENT);
         registry.register(PROP_INTERMEDIATE_RESULTS, PropertyType.BOOLEAN);
         registry.register(PROP_FINAL_RESULT, PropertyType.BOOLEAN);
-        registry.register(PROP_BATCH_PROCESSOR, PropertyType.COMPONENT);
         registry.register(PROP_STEP_WIDTH, PropertyType.INT);
         registry.register(PROP_WORD_ALIGNMENT, PropertyType.BOOLEAN);
         registry.register(PROP_PHONE_ALIGNMENT, PropertyType.BOOLEAN);
@@ -142,11 +132,6 @@ public class LabelWriter implements Configurable,
         
         fileOutput = ps.getBoolean(PROP_FILE_OUTPUT, false);
         fileBaseName = ps.getString(PROP_FILE_BASE_NAME, "");
-        try {
-        	batchProcessor = (BatchModeRecognizer) ps.getComponent(PROP_BATCH_PROCESSOR, BatchModeRecognizer.class);
-        } catch (PropertyException e) {
-        	batchProcessor = null;
-        }
         
         nBest = ps.getInt(PROP_N_BEST, 1);
         
@@ -178,31 +163,14 @@ public class LabelWriter implements Configurable,
     private PrintStream setStream(String extension) {
     	PrintStream output = null;
     	if (fileOutput) {
-			String filename = null;
-			if (batchProcessor != null) {
-				BatchItem bi = batchProcessor.getCurrentBatchItem();
-				if (bi != null) {
-					filename = bi.getFilename();
-					filename = filename.replaceAll(".wav", "");
-				}
-				else {
-					filename = null;
-				}
-			} else {
-				filename = fileBaseName;
+			String filename = fileBaseName + "." + extension;
+			try {
+				output = new PrintStream(filename); 
+			} catch (FileNotFoundException e) {
+				System.err.println("Unable to open file " + filename);
+				output = System.out;
 			}
-			// if old and new filenames are different
-//			if (((lastFileName == null) && (filename != null)) || !lastFileName.equals(filename)) {
-				filename += ("." + extension);
-				try {
-					output = new PrintStream(filename); 
-				} catch (FileNotFoundException e) {
-					System.err.println("Unable to open file " + filename);
-					output = System.out;
-				}
-//			}
-    	}
-    	else {
+    	} else {
     		output = System.out;
     	}
     	return output;
@@ -357,20 +325,6 @@ public class LabelWriter implements Configurable,
         }
     }
     
-    private boolean newFile() {
-    	String filename = null;
-    	if (batchProcessor != null) {
-    		filename = batchProcessor.getCurrentBatchItem().getFilename();
-    	}
-    	if ((filename != null) && !filename.equals(lastFileName)) {
-    		lastFileName = filename;
-    		return true;
-    	}
-    	else {
-    		return false;
-    	}
-    }
-    
     /*
      * @see edu.cmu.sphinx.result.ResultListener#newResult(edu.cmu.sphinx.result.Result)
      */
@@ -378,10 +332,6 @@ public class LabelWriter implements Configurable,
 	public void newResult(Result result) {
     	if ((intermediateResults == !result.isFinal()) 
     	|| (finalResult && result.isFinal())) {
-    		boolean newfile = newFile();
-    		if (newfile) {
-    			step = 0;
-    		}
     		boolean timestamp = !result.isFinal();
     		List<Token> nBestList = result.getResultTokens();
     		if (nBestList.size() < 0) {
@@ -397,18 +347,10 @@ public class LabelWriter implements Configurable,
     			Token nBestToken = nBestIt.next();
 	    		if (wordAlignment) {
 	    			List<Token> wordTokenList = getBestWordTokens(nBestToken);
-	    			if (newfile) {
-	    				if ((wordAlignmentStream != null) && fileOutput) { wordAlignmentStream.close(); }
-	    				wordAlignmentStream = setStream("wordalignment");
-	    			}
 	    			lastWordAlignment = writeAlignment(wordTokenList, wordAlignmentStream, lastWordAlignment, timestamp);
 	    		}
 	    		if (phoneAlignment) {
 	    			List<Token> phoneTokenList = getBestPhoneTokens(result);
-	    			if (newfile) {
-	    				if ((phoneAlignmentStream != null) && fileOutput) { phoneAlignmentStream.close(); }
-	    				phoneAlignmentStream = setStream("phonealignment");
-	    			}
 	    			lastPhoneAlignment = writeAlignment(phoneTokenList, phoneAlignmentStream, lastPhoneAlignment, timestamp);
 	    		}
     		}
