@@ -5,6 +5,7 @@ import java.awt.Graphics;
 
 import javax.swing.JFrame;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.gui.CursorCanvas;
 import org.cocolab.inpro.gui.ImageTile;
 import org.cocolab.inpro.gui.Point;
@@ -13,6 +14,8 @@ import org.cocolab.inpro.gui.Tile;
 @SuppressWarnings("serial")
 public class GreifArm extends CursorCanvas {
 
+	private static final Logger logger = Logger.getLogger(GreifArm.class);
+	
 	public static final int RELATIVE_WIDTH = 40;
 	public static final int RELATIVE_HEIGHT = 10;
 	
@@ -49,6 +52,7 @@ public class GreifArm extends CursorCanvas {
 	
 	@Override
 	public void reset() {
+		logger.info("being reset");
 		super.reset();
 		// reset to a new position
 		double ballX = Math.random() * (RELATIVE_WIDTH - 2) + 1;
@@ -57,8 +61,10 @@ public class GreifArm extends CursorCanvas {
 		grabbing = true;
 		cursorVisible = true;
 		cursorPressAt((int) (ballX * SCALE), 1 * SCALE);
+		logger.info("greifarm position is now " + cursorPosition.x);
 		double bowlX = Math.random() * (RELATIVE_WIDTH - 2) + 1;
 		tiles[1].setPos(new Point((int) (bowlX * SCALE), (int) ((RELATIVE_HEIGHT - 1.5) * SCALE)));
+		logger.info("bowl position is now " + (int) (bowlX * SCALE));
 	}
 	
 	public static void main(String[] args) {

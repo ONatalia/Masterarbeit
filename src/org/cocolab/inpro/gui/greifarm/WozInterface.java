@@ -6,8 +6,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.cocolab.inpro.gui.util.OAAAction;
 import org.cocolab.inpro.gui.util.OAAResetAction;
 
@@ -34,9 +34,9 @@ public class WozInterface extends JFrame {
 		setTitle("GreifArm Wizard Interface");
 		setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
 		
-		add(new JTextField());
+/*		add(new JTextField());
 		add(new JButton(new OAAAction(agent, "nächste VP", "nextVP(name)")));
-		add(new JButton(new OAAResetAction(agent)));
+*/		add(new JButton(new OAAResetAction(agent)));
 		
 		JPanel directionPanel = new JPanel(new GridLayout(3, 2));		
 		directionPanel.add(new JButton(new OAAMoveToAction("←←←", -3.0)));
@@ -70,6 +70,7 @@ public class WozInterface extends JFrame {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		PropertyConfigurator.configure("log4j.properties");
 		try {
 			new WozInterface();
 		} catch (Exception e) {

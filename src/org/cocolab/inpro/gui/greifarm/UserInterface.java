@@ -4,6 +4,8 @@ import java.util.Random;
 
 import javax.swing.JFrame;
 
+import org.apache.log4j.Logger;
+
 import com.sri.oaa2.agentlib.AgentException;
 import com.sri.oaa2.agentlib.AgentImpl;
 import com.sri.oaa2.icl.IclFloat;
@@ -12,6 +14,8 @@ import com.sri.oaa2.icl.IclTerm;
 
 public class UserInterface extends AgentImpl {
 
+	private static final Logger logger = Logger.getLogger(UserInterface.class);
+		
 	Random rand;
 	GreifArm greifarm;
 	double greifarmPosition;
@@ -21,6 +25,7 @@ public class UserInterface extends AgentImpl {
 		start();
 		JFrame f = new JFrame("Greifarm");
 		greifarm = new GreifArm();
+		greifarmPosition = GreifArm.translatePixelToBlock(greifarm.cursorPosition.x);
 		f.add(greifarm);
 		f.pack();
 		f.setResizable(true);
@@ -52,10 +57,13 @@ public class UserInterface extends AgentImpl {
 				double direction = ((IclFloat) goal.getTerm(0)).toDouble();
 				greifarmPosition += (rand.nextGaussian() + 2) * direction;
 				greifarmPosition = Math.min(Math.max(greifarmPosition, 0.5), GreifArm.RELATIVE_WIDTH - 0.5); 
-				System.err.println("moving to new position: " + greifarmPosition);
+				logger.info("moving. requested direction is " + direction);
+				logger.info("new position will be " + GreifArm.translateBlockToPixel(greifarmPosition));
+//				System.err.println("moving to new position: " + greifarmPosition);
 				greifarm.cursorMoveSlowlyToRel(greifarmPosition, 1);
 			}
 		} else if (str.equals("drop")) {
+			logger.info("dropping at " + GreifArm.translateBlockToPixel(greifarmPosition));
 			greifarm.cursorVisible = false;
 			greifarm.repaint();
 			greifarm.emptyHand.setPos(greifarm.cursorPosition);
