@@ -79,6 +79,7 @@ public class SimpleMonitor implements RtpListener {
 		    final TargetDataLine line = (TargetDataLine) AudioSystem.getLine(info);
 		    logger.info("opening microphone with buffer size " + clp.getBufSize());
 		    line.open(format, clp.getBufSize());
+		    logger.info("microphone actually has buffer size " + line.getBufferSize());
 			streamDrainer = new Runnable() {
 				@Override
 				public void run() {
@@ -160,6 +161,7 @@ public class SimpleMonitor implements RtpListener {
             line = (SourceDataLine) AudioSystem.getLine(info);
 		    logger.info("opening speaker with buffer size " + clp.getBufSize());
 		    line.open(format, clp.getBufSize());
+		    logger.info("speaker actually has buffer size " + line.getBufferSize());
         } catch (LineUnavailableException ex) { 
             throw new RuntimeException("Unable to open the line: " + ex);
         }
