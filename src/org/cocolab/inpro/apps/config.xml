@@ -244,6 +244,7 @@
     <component name="endpointing" type="edu.cmu.sphinx.frontend.FrontEnd">
         <propertylist name="pipeline">
 			<item>speechClassifier</item>
+			<item>speechStateVisualizer</item> 
 			<item>speechMarker</item>
 			<item>nonSpeechDataFilter</item>
         </propertylist>
@@ -295,7 +296,9 @@
 		<property name="debug" value="false" /> <!-- this is *very* verbose -->
 	</component>
 
-	<component name="speechMarker" type="edu.cmu.sphinx.frontend.endpoint.SpeechMarker">
+	<component name="speechStateVisualizer" type="org.cocolab.inpro.gui.util.SpeechStateVisualizer" />
+    
+    <component name="speechMarker" type="edu.cmu.sphinx.frontend.endpoint.SpeechMarker">
 		<property name="startSpeech" value="${startSpeech}" />
 		<property name="endSilence" value="${endSilence}" />
 		<property name="speechLeader" value="${speechLeader}" />
