@@ -338,7 +338,7 @@ public class LabelWriter implements Configurable,
     			System.out.println("# reverting to active tokens...");
     			nBestList = result.getActiveTokens().getTokens();
     		}
-    		Collections.sort(nBestList, new TokenComparator());
+    		Collections.sort(nBestList, Token.COMPARATOR);
     		if (nBestList.size() > nBest) {
     			nBestList = nBestList.subList(0, nBest);
     		}
@@ -364,14 +364,4 @@ public class LabelWriter implements Configurable,
 		}
     }
     
-    class TokenComparator implements Comparator<Token> {
-
-		public int compare(Token arg0, Token arg1) {
-			float score = arg1.getScore() - arg0.getScore();
-			if (score > 0) return +1;
-			if (score < 0) return -1;
-			return 0;
-		}
-    	
-    }
 }
