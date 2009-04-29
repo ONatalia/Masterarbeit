@@ -244,7 +244,7 @@
     <component name="endpointing" type="edu.cmu.sphinx.frontend.FrontEnd">
         <propertylist name="pipeline">
 			<item>speechClassifier</item>
-			<item>speechStateVisualizer</item> 
+<!--			<item>speechStateVisualizer</item>  -->
 			<item>speechMarker</item>
 			<item>nonSpeechDataFilter</item>
         </propertylist>
