@@ -15,19 +15,19 @@
     <!-- frequently tuned properties                              -->
     <!-- ******************************************************** --> 
     
-    <property name="absoluteBeamWidth"           value="500"/>
+    <property name="absoluteBeamWidth"           value="5000"/>
     <property name="relativeBeamWidth"           value="1E-80"/>
-    <property name="absoluteWordBeamWidth"       value="50"/>
+    <property name="absoluteWordBeamWidth"       value="500"/>
     <property name="relativeWordBeamWidth"       value="1E-60"/>
-    <property name="wordInsertionProbability"    value="1E-16"/>
-    <property name="languageWeight"              value="11"/>
+    <property name="wordInsertionProbability"    value="0.7"/>
+    <property name="languageWeight"              value="8"/>
     <property name="silenceInsertionProbability" value=".1"/> 
     <property name="skip"                        value="0"/>
     <property name="logLevel"                    value="WARNING"/>
 
 	<!-- This parameter determines how often intermediate results are produced 
 	     (and hence, how often resultListeners are called) -->
-    <property name="step"		value="1"/>
+    <property name="step"		value="3"/>
 
     <property name="recognizer" value="recognizer"/>
     <property name="featureMonitor" value="featureMonitor"/>
@@ -75,7 +75,8 @@
     
     <component name="decoder" type="edu.cmu.sphinx.decoder.Decoder">
         <property name="searchManager" value="${searchManager}"/>
-        <property name="featureBlockSize" value="${step}"/>
+        <property name="fireNonFinalResults" value="true"/>
+        <property name="featureBlockSize" value="${step}"/> 
     </component>
     
     
@@ -258,6 +259,7 @@
             <item>melFilterBank</item>
             <item>dct</item>
             <item>liveCMN</item>
+<!--            <item>batchCMN</item> -->
             <item>featureExtraction</item>
 <!--
             <item>pitchTracker</item>

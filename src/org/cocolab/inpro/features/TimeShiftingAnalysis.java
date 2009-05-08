@@ -3,7 +3,7 @@ package org.cocolab.inpro.features;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import edu.cmu.sphinx.util.props.Resetable;
+import edu.cmu.sphinx.instrumentation.Resetable;
 
 
 /**

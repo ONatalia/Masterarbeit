@@ -13,8 +13,7 @@ import edu.cmu.sphinx.frontend.DataStartSignal;
 import edu.cmu.sphinx.frontend.DoubleData;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
-import edu.cmu.sphinx.util.props.PropertyType;
-import edu.cmu.sphinx.util.props.Registry;
+import edu.cmu.sphinx.util.props.S4Integer;
 import gov.nist.jrtp.RtpErrorEvent;
 import gov.nist.jrtp.RtpListener;
 import gov.nist.jrtp.RtpPacket;
@@ -29,6 +28,7 @@ import gov.nist.jrtp.RtpTimeoutEvent;
 
 public class RtpRecvProcessor extends BaseDataProcessor {
 
+	@S4Integer(defaultValue = 42000)
 	public final static String PROP_RTP_RECV_PORT = "recvPort";
 	
 	private int recvPort = 42000;
@@ -41,7 +41,7 @@ public class RtpRecvProcessor extends BaseDataProcessor {
 	
 	private void resetFrameState() {
         sampleNumber = 0;
-		q.add(new DataStartSignal(sampleNumber));
+		q.add(new DataStartSignal(ConversionUtil.SAMPLING_RATE, sampleNumber));
 	}
 
 	/*
@@ -86,17 +86,11 @@ public class RtpRecvProcessor extends BaseDataProcessor {
 	}
 	
 	/* * configurable interface  **/
-	
-	@Override
-	public void register(String name, Registry registry) throws PropertyException {
-		super.register(name, registry);
-		registry.register(PROP_RTP_RECV_PORT, PropertyType.INT);
-	}
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
-		recvPort = ps.getInt(PROP_RTP_RECV_PORT, recvPort);
+		recvPort = ps.getInt(PROP_RTP_RECV_PORT);
 	}
 
 	/* * the handler for incoming RTP packets * */

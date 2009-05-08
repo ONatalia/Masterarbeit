@@ -2,7 +2,7 @@ package org.cocolab.inpro.sphinx.instrumentation;
 
 import java.util.EventListener;
 
-import edu.cmu.sphinx.util.props.Resetable;
+import edu.cmu.sphinx.instrumentation.Resetable;
 
 /**
  *  The listener interface for being informed when 

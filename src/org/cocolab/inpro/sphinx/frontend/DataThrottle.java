@@ -7,11 +7,11 @@ import edu.cmu.sphinx.frontend.DataStartSignal;
 import edu.cmu.sphinx.frontend.DoubleData;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
-import edu.cmu.sphinx.util.props.PropertyType;
-import edu.cmu.sphinx.util.props.Registry;
+import edu.cmu.sphinx.util.props.S4Double;
 
 public class DataThrottle extends BaseDataProcessor {
 
+	@S4Double(defaultValue = 1)
     public final static String PROP_SPEED = "speed";	// in milliseconds
 	
 	private long startTime;
@@ -28,23 +28,11 @@ public class DataThrottle extends BaseDataProcessor {
     /*
      * (non-Javadoc)
      * 
-     * @see edu.cmu.sphinx.util.props.Configurable#register(java.lang.String,
-     *      edu.cmu.sphinx.util.props.Registry)
-     */
-    public void register(String name, Registry registry)
-            throws PropertyException {
-    	super.register(name, registry);
-        registry.register(PROP_SPEED, PropertyType.DOUBLE);
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
      * @see edu.cmu.sphinx.util.props.Configurable#newProperties(edu.cmu.sphinx.util.props.PropertySheet)
      */
     public void newProperties(PropertySheet ps) throws PropertyException {
         super.newProperties(ps);
-        speed = ps.getDouble(PROP_SPEED, 1.0);
+        speed = ps.getDouble(PROP_SPEED);
     }
 	
     

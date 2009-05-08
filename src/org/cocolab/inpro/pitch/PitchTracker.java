@@ -43,8 +43,7 @@ import edu.cmu.sphinx.frontend.util.StreamDataSource;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
-import edu.cmu.sphinx.util.props.PropertyType;
-import edu.cmu.sphinx.util.props.Registry;
+import edu.cmu.sphinx.util.props.S4Double;
 
 public class PitchTracker extends BaseDataProcessor {
 	
@@ -53,8 +52,11 @@ public class PitchTracker extends BaseDataProcessor {
 	private int maxLag = 320; // entspricht f0 von 50 Hz bei 16 kHz Abtastung
 	private int samplingFrequency = 16000; // TODO: parametrisieren
 	
+	@S4Double(defaultValue = 0.15)
 	final static private String PROP_CAND_SCORE_THRESHOLD = "scoreThreshold";
+	@S4Double(defaultValue = 50)
 	final static private String PROP_MIN_PITCH_HZ = "minimumPitch";
+	@S4Double(defaultValue = 500)
 	final static private String PROP_MAX_PITCH_HZ = "maximumPitch";
 	
 	private double candidateScoreThreshold = 0.30; // default set by newProperties()
@@ -245,21 +247,13 @@ public class PitchTracker extends BaseDataProcessor {
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		// add tracking parameters here
-		candidateScoreThreshold = ps.getDouble(PROP_CAND_SCORE_THRESHOLD, 0.15);
-		double freq = ps.getDouble(PROP_MIN_PITCH_HZ, 50);
+		candidateScoreThreshold = ps.getDouble(PROP_CAND_SCORE_THRESHOLD);
+		double freq = ps.getDouble(PROP_MIN_PITCH_HZ);
 		maxLag = new Double(samplingFrequency / freq).intValue();
 		System.err.println("Setting maxLag to " + maxLag);
-		freq = ps.getDouble(PROP_MAX_PITCH_HZ, 500);
+		freq = ps.getDouble(PROP_MAX_PITCH_HZ);
 		minLag = new Double(samplingFrequency / freq).intValue();
 		System.err.println("Setting minLag to " + minLag);
-	}
-
-	public void register(String name, Registry registry) throws PropertyException {
-		super.register(name, registry);
-		// add tracking parameters here
-		registry.register(PROP_CAND_SCORE_THRESHOLD, PropertyType.DOUBLE);
-		registry.register(PROP_MIN_PITCH_HZ, PropertyType.DOUBLE);
-		registry.register(PROP_MAX_PITCH_HZ, PropertyType.DOUBLE);
 	}
 
 	/**************************

@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,14 +24,16 @@ import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.recognizer.RecognizerState;
 import edu.cmu.sphinx.recognizer.StateListener;
 import edu.cmu.sphinx.result.Result;
-import edu.cmu.sphinx.result.ResultListener;
+import edu.cmu.sphinx.decoder.ResultListener;
 import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.util.props.Configurable;
-import edu.cmu.sphinx.util.props.Resetable;
+import edu.cmu.sphinx.instrumentation.Resetable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
-import edu.cmu.sphinx.util.props.PropertyType;
-import edu.cmu.sphinx.util.props.Registry;
+import edu.cmu.sphinx.util.props.S4Boolean;
+import edu.cmu.sphinx.util.props.S4Component;
+import edu.cmu.sphinx.util.props.S4Integer;
+import edu.cmu.sphinx.util.props.S4String;
 
 /**
  * inspects the current results and writes the phone-alignment to stdout or to a file
@@ -44,24 +45,30 @@ public class LabelWriter implements Configurable,
     /**
      * A Sphinx property that defines which recognizer to monitor
      */
+	@S4Component(type = Recognizer.class)
     public final static String PROP_RECOGNIZER = "recognizer";
+	@S4Boolean(defaultValue = false)
     public final static String PROP_INTERMEDIATE_RESULTS = "intermediateResults";
+	@S4Boolean(defaultValue = true)
     public final static String PROP_FINAL_RESULT = "finalResult";
-    public final static String PROP_STEP_WIDTH = "step";
-    
+	@S4Integer(defaultValue = 1)
+	public final static String PROP_STEP_WIDTH = "step";
+    @S4Boolean(defaultValue = false)
     public final static String PROP_WORD_ALIGNMENT = "wordAlignment";
+    @S4Boolean(defaultValue = false)
     public final static String PROP_PHONE_ALIGNMENT = "phoneAlignment";
-    
+    @S4Boolean(defaultValue = false)
     public final static String PROP_FILE_OUTPUT = "fileOutput";
-    public final static String PROP_FILE_BASE_NAME = "fileBaseName";
-    
+    @S4String(defaultValue = "")
+    public final static String PROP_FILE_BASE_NAME = "fileBaseName";    
+	@S4Integer(defaultValue = 1)
     public final static String PROP_N_BEST = "nBest";
 
     // ------------------------------
     // Configuration data
     // ------------------------------
     private String name;
-    private Recognizer recognizer;
+    private Recognizer recognizer = null;
     
     protected boolean intermediateResults = false;
     protected boolean finalResult = true;
@@ -89,31 +96,10 @@ public class LabelWriter implements Configurable,
     /*
      * (non-Javadoc)
      * 
-     * @see edu.cmu.sphinx.util.props.Configurable#register(java.lang.String,
-     *      edu.cmu.sphinx.util.props.Registry)
-     */
-    public void register(String name, Registry registry)
-            throws PropertyException {
-        this.name = name;
-        registry.register(PROP_RECOGNIZER, PropertyType.COMPONENT);
-        registry.register(PROP_INTERMEDIATE_RESULTS, PropertyType.BOOLEAN);
-        registry.register(PROP_FINAL_RESULT, PropertyType.BOOLEAN);
-        registry.register(PROP_STEP_WIDTH, PropertyType.INT);
-        registry.register(PROP_WORD_ALIGNMENT, PropertyType.BOOLEAN);
-        registry.register(PROP_PHONE_ALIGNMENT, PropertyType.BOOLEAN);
-        registry.register(PROP_FILE_OUTPUT, PropertyType.BOOLEAN);
-        registry.register(PROP_FILE_BASE_NAME, PropertyType.STRING);
-        registry.register(PROP_N_BEST, PropertyType.INT);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see edu.cmu.sphinx.util.props.Configurable#newProperties(edu.cmu.sphinx.util.props.PropertySheet)
      */
     public void newProperties(PropertySheet ps) throws PropertyException {
-        Recognizer newRecognizer = (Recognizer) ps.getComponent(PROP_RECOGNIZER,
-                Recognizer.class);
+        Recognizer newRecognizer = (Recognizer) ps.getComponent(PROP_RECOGNIZER);
         
         if (recognizer == null) {
             recognizer = newRecognizer;
@@ -127,18 +113,16 @@ public class LabelWriter implements Configurable,
             recognizer.addStateListener(this);
         }
         
-        intermediateResults = ps.getBoolean(PROP_INTERMEDIATE_RESULTS, false);
-        finalResult = ps.getBoolean(PROP_FINAL_RESULT, true);
+        intermediateResults = ps.getBoolean(PROP_INTERMEDIATE_RESULTS);
+        finalResult = ps.getBoolean(PROP_FINAL_RESULT);
         
-        fileOutput = ps.getBoolean(PROP_FILE_OUTPUT, false);
-        fileBaseName = ps.getString(PROP_FILE_BASE_NAME, "");
+        fileOutput = ps.getBoolean(PROP_FILE_OUTPUT);
+        fileBaseName = ps.getString(PROP_FILE_BASE_NAME);
         
-        nBest = ps.getInt(PROP_N_BEST, 1);
-        
-        stepWidth = ps.getInt(PROP_STEP_WIDTH, 1);
+        stepWidth = ps.getInt(PROP_STEP_WIDTH);
 
-        wordAlignment = ps.getBoolean(PROP_WORD_ALIGNMENT, false);
-        phoneAlignment = ps.getBoolean(PROP_PHONE_ALIGNMENT, false);
+        wordAlignment = ps.getBoolean(PROP_WORD_ALIGNMENT);
+        phoneAlignment = ps.getBoolean(PROP_PHONE_ALIGNMENT);
 
     	if (wordAlignment) {
     		wordAlignmentStream = setStream("wordalignment");
@@ -146,6 +130,7 @@ public class LabelWriter implements Configurable,
     	if (phoneAlignment) {
     		phoneAlignmentStream = setStream("phonealignment");
     	}
+        nBest = ps.getInt(PROP_N_BEST);
     }
 
 

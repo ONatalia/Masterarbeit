@@ -13,7 +13,7 @@ import java.util.Random;
 import javax.swing.JPanel;
 
 
-import edu.cmu.sphinx.util.props.Resetable;
+import edu.cmu.sphinx.instrumentation.Resetable;
 
 @SuppressWarnings("serial")
 public abstract class Canvas extends JPanel implements ActionListener, Resetable {

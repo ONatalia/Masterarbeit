@@ -47,7 +47,10 @@ public class SimpleReco {
 			break;
 			case RecoCommandLineParser.RTP_INPUT:
 				RtpRecvProcessor rtp = (RtpRecvProcessor) cm.lookup("RTPDataSource");
-				cm.setProperty("RTPDataSource",	"recvPort", "" + clp.rtpPort);
+				// find component with name RTPDataSource, 
+				// set the component's property recvPort
+				// to the property clp.rtpPort (which is a string)
+				cm.getPropertySheet("RTPDataSource").setString("recvPort", "" + clp.rtpPort);
 				rtp.initialize();
 				endpoint = (FrontEnd) cm.lookup("endpointing");
 				endpoint.setPredecessor(rtp);
@@ -75,7 +78,6 @@ public class SimpleReco {
 		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
 			cm.lookup("labelWriter");
-			
 		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.INCFEATS_OUTPUT)) {
 			cm.lookup("incASRConfidenceFeatureWriter");
@@ -98,48 +100,16 @@ public class SimpleReco {
     	System.err.println("Setting up monitors...\n");
     	setupMonitors(cm, clp);
     	System.err.println("Starting recognition, use Ctrl-C to stop...\n");
-    	Result result;
+    	Result result = null;
     	do {
 	    	result = recognizer.recognize();
 	        if (result != null) {
 	        	// Normal Output
 	            System.err.println("RESULT: " + result.toString() + "\n");
-				// N-Best Writing... -> see LabelWriter
-				// Uniqued N-Best Writing...
-//	            List list = result.getResultTokens();
-//	            Set set = new HashSet();
-//	        	Iterator it = list.iterator();
-//	        	while (it.hasNext()) {
-//	        		Token t = (Token) it.next();
-//	        		set.add(t.getWordPath());
-//	        	}
-//	            ArrayList ulist = new ArrayList(set);
-//	        	Iterator uit = ulist.iterator();
-//	        	while (uit.hasNext()) {
-//		        	System.err.println("RESULT: " + uit.next() + "\n");
-//	        	}
-	        	// Lattice Optimizing...
-//	        	Lattice lat = new Lattice(result);
-//	        	LatticeOptimizer lo = new LatticeOptimizer(lat);
-//	        	lo.optimize();
-//	        	List allPaths = lat.allPaths();
-//	        	Iterator pathIterator = allPaths.iterator();
-//	        	while (pathIterator.hasNext()) {
-//		        	System.err.println("Something: " + pathIterator.next() + "\n");
-//	        	}
-				// Sausage Making...
-//	        	SausageMaker sm = new SausageMaker(lat);
-//	        	Sausage sau = sm.makeSausage();
-//	        	Iterator csi = sau.confusionSetIterator();
-//	        	while (csi.hasNext()) {
-//	        		ConfusionSet cs = (ConfusionSet) csi.next();
-//		        	System.err.println("ConfusionSet: " + cs.toString() + "\n");
-//	        	}
-//	        	System.err.println("HIER IST SCHLUSS\n");
 	        } else {
 	            System.err.println("Result: null\n");
 	        }
-    	} while (result.getDataFrames().length > 4);
+    	} while ((result != null) && (result.getDataFrames() != null) && (result.getDataFrames().size() > 4));
     }
 
 }

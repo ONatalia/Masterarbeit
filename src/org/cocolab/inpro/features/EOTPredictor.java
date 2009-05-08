@@ -6,14 +6,14 @@ import java.io.ObjectInputStream;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
-import edu.cmu.sphinx.util.props.PropertyType;
-import edu.cmu.sphinx.util.props.Registry;
+import edu.cmu.sphinx.util.props.S4String;
 
 import weka.classifiers.Classifier;
 import weka.core.Instance;
 
 public class EOTPredictor extends EOTFeatureAggregator {
 
+	@S4String(defaultValue = "")
 	private final static String PROP_CLASSIFIER = "classifier";
 
 	private Classifier classifier;
@@ -45,7 +45,6 @@ public class EOTPredictor extends EOTFeatureAggregator {
 		else {
 			return "" + c;
 		}
-
 	}
 	
 	/**
@@ -66,12 +65,7 @@ public class EOTPredictor extends EOTFeatureAggregator {
 	
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
-		loadClassifier(ps.getString(PROP_CLASSIFIER, ""));
-	}
-	
-	public void register(String name, Registry registry) throws PropertyException {
-		super.register(name, registry);
-		registry.register(PROP_CLASSIFIER, PropertyType.STRING);
+		loadClassifier(ps.getString(PROP_CLASSIFIER));
 	}
 	
 }

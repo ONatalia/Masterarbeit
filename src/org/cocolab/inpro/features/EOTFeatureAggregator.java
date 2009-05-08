@@ -19,9 +19,8 @@ import weka.core.Instances;
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
-import edu.cmu.sphinx.util.props.PropertyType;
-import edu.cmu.sphinx.util.props.Registry;
-import edu.cmu.sphinx.util.props.Resetable;
+import edu.cmu.sphinx.util.props.S4Boolean;
+import edu.cmu.sphinx.instrumentation.Resetable;
 
 public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeatureListener {
 	
@@ -49,6 +48,7 @@ public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeat
 													  "Wesseling"};
 	
 	protected Attribute framesIntoAudioAttribute;
+	@S4Boolean(defaultValue = true)
 	boolean includeFrameCount;
 /*	private Attribute wordsIntoTurnAttribute;
 	private Attribute framesIntoLastWordAttribute;
@@ -63,7 +63,9 @@ public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeat
 	// for each time in pitchRegressions: mean, slope, mse, predictionError, range, meanDelta, minPos, maxPos
 	private Attribute[] pitchRegressionAttributes; 
 	
+	@S4Boolean(defaultValue = false)
 	protected boolean CLUSTERED_TIME; 
+	@S4Boolean(defaultValue = false)
 	protected boolean CONTINUOUS_TIME; 
 	
 	protected Attribute timeToEOT;
@@ -279,13 +281,17 @@ public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeat
 		reset(voicedEnergyRegressions);
 	}
 
-	private int[] regressionArrayForList(List l) {
-		if (l == null) {
+	private int[] regressionArrayForList(String s) {
+		if (s == null) {
 			return noSteps;
 		}
-		int[] array = new int[l.size()];
-		for (int i = 0; i < l.size(); i++) {
-			array[i] = Integer.parseInt(l.get(i).toString());
+		String[] l = s.split(" ");
+		if (l.length == 0) {
+			return noSteps;
+		}
+		int[] array = new int[l.length];
+		for (int i = 0; i < l.length; i++) {
+			array[i] = Integer.parseInt(l[i].toString());
 		}
 		return array;
 	}
@@ -299,26 +305,16 @@ public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeat
 	 * * * * * * * * */
 	
 	public void newProperties(PropertySheet ps) throws PropertyException {
-		List l = ps.getStrings(PROP_PITCH_WINDOWS_LIST);
-		pitchRegressionSteps = regressionArrayForList(l);
-		l = ps.getStrings(PROP_ENERGY_WINDOWS_LIST);
-		energyRegressionSteps = regressionArrayForList(l);
-		l = ps.getStrings(PROP_VENERGY_WINDOWS_LIST);
-		voicedEnergyRegressionSteps = regressionArrayForList(l);
-		CLUSTERED_TIME = ps.getBoolean(PROP_CLUSTER_TIME, false);
-		CONTINUOUS_TIME = ps.getBoolean(PROP_CONTINUOUS_TIME, false);
-		includeFrameCount = ps.getBoolean(PROP_FRAME_COUNT, true);
+		String s = ps.getString(PROP_PITCH_WINDOWS_LIST);
+		pitchRegressionSteps = regressionArrayForList(s);
+		s = ps.getString(PROP_ENERGY_WINDOWS_LIST);
+		energyRegressionSteps = regressionArrayForList(s);
+		s = ps.getString(PROP_VENERGY_WINDOWS_LIST);
+		voicedEnergyRegressionSteps = regressionArrayForList(s);
+		CLUSTERED_TIME = ps.getBoolean(PROP_CLUSTER_TIME);
+		CONTINUOUS_TIME = ps.getBoolean(PROP_CONTINUOUS_TIME);
+		includeFrameCount = ps.getBoolean(PROP_FRAME_COUNT);
 		createFeatures();
-	}
-
-	public void register(String name, Registry registry) throws PropertyException {
-		this.name = name;
-		registry.register(PROP_PITCH_WINDOWS_LIST, PropertyType.STRING_LIST);
-		registry.register(PROP_ENERGY_WINDOWS_LIST, PropertyType.STRING_LIST);
-		registry.register(PROP_VENERGY_WINDOWS_LIST, PropertyType.STRING_LIST);
-		registry.register(PROP_CLUSTER_TIME, PropertyType.BOOLEAN);
-		registry.register(PROP_CONTINUOUS_TIME, PropertyType.BOOLEAN);
-		registry.register(PROP_FRAME_COUNT, PropertyType.BOOLEAN);
 	}
 
 	public String getName() {

@@ -9,27 +9,14 @@ import java.util.List;
 import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.linguist.SearchState;
 import edu.cmu.sphinx.result.Result;
-import edu.cmu.sphinx.util.props.PropertyException;
-import edu.cmu.sphinx.util.props.PropertySheet;
-import edu.cmu.sphinx.util.props.PropertyType;
-import edu.cmu.sphinx.util.props.Registry;
+import edu.cmu.sphinx.util.props.S4Integer;
 
 public class TEDviewNotifier extends LabelWriter {
     public final static String PROP_ZEITGEIST_PORT = "zeitgeistPort";
 
-    private int zeitgeistPort = 2000;
-    private boolean zeitgeistOutput = false;
-
-    public void register(String name, Registry registry) throws PropertyException {
-    	super.register(name, registry);
-    	registry.register(PROP_ZEITGEIST_PORT, PropertyType.INT);
-    }
-
-    public void newProperties(PropertySheet ps) throws PropertyException {
-        super.newProperties(ps);
-        zeitgeistPort = ps.getInt(PROP_ZEITGEIST_PORT, 2000);
-        zeitgeistOutput = true;
-    }
+    @S4Integer(defaultValue = 2000)
+    private int zeitgeistPort;
+    private boolean zeitgeistOutput = true;
 
     private void messageZeitGeist(List<Token> list, String origin) {
     	StringBuffer sb = new StringBuffer();

@@ -3,7 +3,7 @@ package org.cocolab.inpro.gui;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import edu.cmu.sphinx.util.props.Resetable;
+import edu.cmu.sphinx.instrumentation.Resetable;
 
 
 public abstract class Tile implements Resetable {
