@@ -9,6 +9,8 @@ public class ConversionUtil {
 	
 	public static int SPHINX_RTP_HEADER_LENGTH = 20;
 	
+	public static int SAMPLING_RATE = 16000;
+	
 	public static byte[] doubleDataToBytes(DoubleData dd) {
 		long collectTime = dd.getCollectTime();
 		long firstSampleNumber = dd.getFirstSampleNumber();
