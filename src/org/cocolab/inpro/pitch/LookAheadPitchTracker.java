@@ -31,6 +31,8 @@ public class LookAheadPitchTracker extends PitchTracker implements Resetable {
 
 	int lookAhead;
 	
+	List<Boolean> voicingList;
+	List<Double> pitchList;
 	PitchOptimizer pitchOptimizer;
 	
 	Queue<Data> localQueue;
@@ -57,6 +59,7 @@ public class LookAheadPitchTracker extends PitchTracker implements Resetable {
 	}
 	
 	private void fillQueue() {
+		boolean dirty = false;
 		while (framesInQueue <= lookAhead) {
 			Data data = super.getData();
 			if (data == null)
@@ -64,10 +67,16 @@ public class LookAheadPitchTracker extends PitchTracker implements Resetable {
 			if (data instanceof PitchedDoubleData) {
 				PitchedDoubleData pddata = (PitchedDoubleData) data;
 				pitchOptimizer.addCandidates(pddata.getCandidates());
+				dirty = true;
 				framesInQueue++;
 			}
 			localQueue.add(data);
-		} 
+		}
+		if (dirty) {
+			voicingList = new LinkedList<Boolean>();
+			pitchList = new LinkedList<Double>();
+			pitchOptimizer.optimize(voicingList, pitchList);
+		}
 	}
 	
 	public Data getData() throws DataProcessingException {
@@ -75,9 +84,6 @@ public class LookAheadPitchTracker extends PitchTracker implements Resetable {
 		Data data = localQueue.poll();	
 		if (data instanceof PitchedDoubleData) {
 			PitchedDoubleData pddata = (PitchedDoubleData) data;
-			List<Boolean> voicingList = new LinkedList<Boolean>();
-			List<Double> pitchList = new LinkedList<Double>();
-			pitchOptimizer.optimize(voicingList, pitchList);
 			pddata.voiced = voicingList.get(currListPos);
 			pddata.pitchHz = PitchUtils.centToHz(pitchList.get(currListPos));
 			currListPos++;
