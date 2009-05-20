@@ -1,10 +1,10 @@
-package org.cocolab.inpro.pitch;
+package org.cocolab.inpro.pitch.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.cocolab.inpro.pitch.util.ShortestPath;
+import org.cocolab.inpro.pitch.PitchCandidate;
 
 public class PitchOptimizer extends ShortestPath<PitchCandidate> {
 	
@@ -64,7 +64,7 @@ public class PitchOptimizer extends ShortestPath<PitchCandidate> {
 
 		if (lastCandidates == null) {
 			for (int frame = 0; frame < numFrames; frame++) {
-				voicingList.add(false); // ← TIMO: should this be false?
+				voicingList.add(false);
 				pitchList.add(0.0);
 			}
 		} else {
@@ -86,8 +86,6 @@ public class PitchOptimizer extends ShortestPath<PitchCandidate> {
 				values[i] = path.get(i).pitchInCent();
 			}
 			double [] valuesSmoothed = medianSmooth(values, 5);
-
-			//System.out.println("-------------");
 			
 			int i = 0;
 			for (int frame = 0; frame < numFrames; frame++) {
@@ -107,8 +105,8 @@ public class PitchOptimizer extends ShortestPath<PitchCandidate> {
 	}
 	
 	private double[] medianSmooth(double[] values, int windowsize) {
-		assert (windowsize % 2 == 1);
 		assert (windowsize >= 3);
+		assert (windowsize % 2 == 1);
 		int tailsize = windowsize / 2;
 		double[] result = new double[values.length];		
 		for (int i = 0; i < values.length; i++) {

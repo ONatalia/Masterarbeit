@@ -10,6 +10,7 @@ import org.cocolab.inpro.pitch.util.PitchUtils;
 
 import edu.cmu.sphinx.frontend.DoubleData;
 
+@SuppressWarnings("serial")
 public class PitchedDoubleData extends DoubleData {
 
 	boolean voiced;

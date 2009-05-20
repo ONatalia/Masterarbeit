@@ -125,7 +125,7 @@ public class ShortestPath<NodeType> {
 	public static void main(String[] args) {
 		Integer[] nodes = new Integer[5];
 		for (int i = 0; i < 5; i++) {
-			nodes[i] = new Integer(i);
+			nodes[i] = Integer.valueOf(i);
 		}
 		ShortestPath<Integer> sp = new ShortestPath<Integer>();
 		sp.connect(nodes[0], nodes[1], 2);

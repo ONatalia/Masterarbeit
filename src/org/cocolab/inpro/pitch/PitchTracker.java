@@ -53,11 +53,11 @@ public class PitchTracker extends BaseDataProcessor {
 	private int samplingFrequency = 16000; // TODO: parametrisieren
 	
 	@S4Double(defaultValue = 0.15)
-	final static private String PROP_CAND_SCORE_THRESHOLD = "scoreThreshold";
-	@S4Double(defaultValue = 50)
-	final static private String PROP_MIN_PITCH_HZ = "minimumPitch";
-	@S4Double(defaultValue = 500)
-	final static private String PROP_MAX_PITCH_HZ = "maximumPitch";
+	public final static String PROP_CAND_SCORE_THRESHOLD = "scoreThreshold";
+	@S4Double(defaultValue = 50.0)
+	public final static String PROP_MIN_PITCH_HZ = "minimumPitch";
+	@S4Double(defaultValue = 500.0)
+	public final static String PROP_MAX_PITCH_HZ = "maximumPitch";
 	
 	private double candidateScoreThreshold = 0.30; // default set by newProperties()
 	private double energyThreshold = 30;
@@ -249,10 +249,10 @@ public class PitchTracker extends BaseDataProcessor {
 		// add tracking parameters here
 		candidateScoreThreshold = ps.getDouble(PROP_CAND_SCORE_THRESHOLD);
 		double freq = ps.getDouble(PROP_MIN_PITCH_HZ);
-		maxLag = new Double(samplingFrequency / freq).intValue();
+		maxLag = Double.valueOf(samplingFrequency / freq).intValue();
 		System.err.println("Setting maxLag to " + maxLag);
 		freq = ps.getDouble(PROP_MAX_PITCH_HZ);
-		minLag = new Double(samplingFrequency / freq).intValue();
+		minLag = Double.valueOf(samplingFrequency / freq).intValue();
 		System.err.println("Setting minLag to " + minLag);
 	}
 
@@ -270,6 +270,7 @@ public class PitchTracker extends BaseDataProcessor {
 					referencePitch.add(new Double(line));
 				}
 			}
+			br.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
