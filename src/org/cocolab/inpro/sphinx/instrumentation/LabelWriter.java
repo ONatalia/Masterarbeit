@@ -243,7 +243,7 @@ public class LabelWriter implements Configurable,
      * @param list list of tokens
      * @return 
      */
-    public static String tokenListToAlignment(List<Token> list) {
+    public static String tokenListToAlignment(List<Token> list, int lastFrame) {
 		StringBuffer sb = new StringBuffer(); 
 		if (list.size() > 0) {
 			// iterate over the list and print the associated times
@@ -252,13 +252,16 @@ public class LabelWriter implements Configurable,
 	            Token token = list.get(i);
 	            sb.append(lastToken.getFrameNumber() / 100.0); // a frame always lasts 10ms 
 	            sb.append("\t");
-	            sb.append(token.getFrameNumber() / 100.0); // dito
+	            int endFrame = token.getFrameNumber();
+	            sb.append(endFrame / 100.0); // dito
 	            sb.append("\t");
 	            // depending on whether word, filler or other, dump the string-representation
 	            SearchState state = token.getSearchState();
 	            sb.append(stringForSearchState(state)); 
 	            sb.append("\n");
 	            lastToken = token;
+	            if (endFrame > lastFrame)
+	            	break;
 	        }
 		}
         return sb.toString();
@@ -274,7 +277,7 @@ public class LabelWriter implements Configurable,
      * @return
      */
     private String writeAlignment(List<Token> list, PrintStream stream, boolean timestamp) {
-    	String alignment = tokenListToAlignment(list);
+    	String alignment = tokenListToAlignment(list, step - fixedLag);
 		if (timestamp) {
 			stream.print("Time: ");
 			stream.println(step / 100.0);
