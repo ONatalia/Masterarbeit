@@ -64,10 +64,13 @@ public class LabelWriter implements Configurable,
 	@S4Integer(defaultValue = 1)
     public final static String PROP_N_BEST = "nBest";
 
+    @S4Integer(defaultValue = 0)
+	public final static String PROP_FIXED_LAG = "fixedLag";
+	int fixedLag;
+
     // ------------------------------
     // Configuration data
     // ------------------------------
-    private String name;
     private Recognizer recognizer = null;
     
     protected boolean intermediateResults = false;
@@ -80,9 +83,6 @@ public class LabelWriter implements Configurable,
     
     protected boolean wordAlignment = true;
     protected boolean phoneAlignment = true;
-    
-    private String lastWordAlignment = "";
-    private String lastPhoneAlignment = "";
     
     private PrintStream wordAlignmentStream;
     private PrintStream phoneAlignmentStream;
@@ -131,6 +131,7 @@ public class LabelWriter implements Configurable,
     		phoneAlignmentStream = setStream("phonealignment");
     	}
         nBest = ps.getInt(PROP_N_BEST);
+		fixedLag = ps.getInt(PROP_FIXED_LAG);
     }
 
 
@@ -141,8 +142,6 @@ public class LabelWriter implements Configurable,
      */
     public void reset() {
     	step = 0;
-    	lastWordAlignment = "";
-    	lastPhoneAlignment = "";
     }
     
     private PrintStream setStream(String extension) {
@@ -161,17 +160,6 @@ public class LabelWriter implements Configurable,
     	return output;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see edu.cmu.sphinx.util.props.Configurable#getName()
-     */
-    public String getName() {
-        return name;
-    }
-    
-    Token lastBestToken = new Token(null, 0);
-    
     /**
      * get the word-tokens on the best path
      *
@@ -200,9 +188,8 @@ public class LabelWriter implements Configurable,
      * @param result the result to analyse
      * @return List of phone tokens on the best path
      */
-    public static List<Token> getBestPhoneTokens(Result result) {
+    public static List<Token> getBestPhoneTokens(Token token) {
 		List<Token> list = new ArrayList<Token>();
-    	Token token = result.getBestToken();
 		// recover the visited segmental tokens in the best path
     	list.add(token);
     	while (token != null) {
@@ -286,7 +273,7 @@ public class LabelWriter implements Configurable,
      * @param timestamp
      * @return
      */
-    private String writeAlignment(List<Token> list, PrintStream stream, String lastAlignment, boolean timestamp) {
+    private String writeAlignment(List<Token> list, PrintStream stream, boolean timestamp) {
     	String alignment = tokenListToAlignment(list);
 		if (timestamp) {
 			stream.print("Time: ");
@@ -297,19 +284,9 @@ public class LabelWriter implements Configurable,
 		} else {
 			stream.println(alignment);
 		}
-		lastAlignment = alignment;
     	return alignment;
     }
 
-    public void dumpAllStates(Result result) {
-    	List<Token> list = getAllBestTokens(result);
-		// iterate over the list and dump the tokens
-        for (int i = list.size() - 1; i >= 0; i--) {
-            Token token = list.get(i);
-        	System.out.println(token.toString());
-        }
-    }
-    
     /*
      * @see edu.cmu.sphinx.result.ResultListener#newResult(edu.cmu.sphinx.result.Result)
      */
@@ -318,6 +295,7 @@ public class LabelWriter implements Configurable,
     	if ((intermediateResults == !result.isFinal()) 
     	|| (finalResult && result.isFinal())) {
     		boolean timestamp = !result.isFinal();
+    		// create n-best list
     		List<Token> nBestList = result.getResultTokens();
     		if (nBestList.size() < 0) {
     			System.out.println("# reverting to active tokens...");
@@ -327,16 +305,17 @@ public class LabelWriter implements Configurable,
     		if (nBestList.size() > nBest) {
     			nBestList = nBestList.subList(0, nBest);
     		}
+    		// iterate through n-best list
     		Iterator<Token> nBestIt = nBestList.iterator();
     		while (nBestIt.hasNext()) {
     			Token nBestToken = nBestIt.next();
 	    		if (wordAlignment) {
 	    			List<Token> wordTokenList = getBestWordTokens(nBestToken);
-	    			lastWordAlignment = writeAlignment(wordTokenList, wordAlignmentStream, lastWordAlignment, timestamp);
+	    			writeAlignment(wordTokenList, wordAlignmentStream, timestamp);
 	    		}
 	    		if (phoneAlignment) {
-	    			List<Token> phoneTokenList = getBestPhoneTokens(result);
-	    			lastPhoneAlignment = writeAlignment(phoneTokenList, phoneAlignmentStream, lastPhoneAlignment, timestamp);
+	    			List<Token> phoneTokenList = getBestPhoneTokens(nBestToken);
+	    			writeAlignment(phoneTokenList, phoneAlignmentStream, timestamp);
 	    		}
     		}
     	}
