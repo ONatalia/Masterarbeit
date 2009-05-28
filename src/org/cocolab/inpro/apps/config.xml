@@ -27,7 +27,7 @@
 
 	<!-- This parameter determines how often intermediate results are produced 
 	     (and hence, how often resultListeners are called) -->
-    <property name="step"		value="3"/>
+    <property name="step"		value="1"/>
 
     <property name="recognizer" value="recognizer"/>
     <property name="featureMonitor" value="featureMonitor"/>
@@ -244,10 +244,12 @@
     
     <component name="endpointing" type="edu.cmu.sphinx.frontend.FrontEnd">
         <propertylist name="pipeline">
+            <item>sessionWavWriter</item>
 			<item>speechClassifier</item>
-<!--			<item>speechStateVisualizer</item>  -->
+			<item>speechStateVisualizer</item>  
 			<item>speechMarker</item>
 			<item>nonSpeechDataFilter</item>
+			<item>utteranceWavWriter</item>
         </propertylist>
     </component>
     
@@ -291,6 +293,17 @@
 	    <property name="agentName" value="dispatchStream" />
 	    <property name="goalPrefix" value="x" />
 	    <property name="sendSilence" value="false" />
+	</component>
+
+	<component name="sessionWavWriter" 
+	           type="edu.cmu.sphinx.frontend.util.WavWriter">
+		<property name="outFilePattern" value="/tmp/session." />
+	</component>
+
+	<component name="utteranceWavWriter" 
+	           type="edu.cmu.sphinx.frontend.util.WavWriter">
+		<property name="outFilePattern" value="/tmp/utterance." />
+		<property name="captureUtterances" value="true" />
 	</component>
 
 	<component name="speechClassifier" type="edu.cmu.sphinx.frontend.endpoint.SpeechClassifier">
@@ -349,6 +362,7 @@
         <property name="fileOutput" value="false"/>
         <property name="fileBaseName" value=""/>
         <property name="nBest" value="1"/>
+        <property name="fixedLag" value="0"/>
     </component>
     
     <component name="incASRConfidenceFeatureWriter" 
