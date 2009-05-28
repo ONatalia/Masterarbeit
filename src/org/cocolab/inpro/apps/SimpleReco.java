@@ -19,7 +19,36 @@ import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertyException;
 
 public class SimpleReco {
-
+	
+	protected static void setupMicrophone(final Microphone mic) {
+		Runnable micInitializer = new Runnable() {
+			public void run() {
+				mic.initialize();
+			}
+		};
+		new Thread(micInitializer).start();
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} // allow the microphone 3 seconds to initialize
+		if (!mic.startRecording()) {
+			System.err.println("Could not open microphone. Exiting...");
+			System.exit(1);
+		}	
+		Runnable shutdownHook = new Runnable() {
+			public void run() {
+				System.err.println("Shutting down microphone.");
+				mic.stopRecording();
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException ie) {
+				}
+			}
+		};
+		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
+	}
+	
 	protected static void setupSource(ConfigurationManager cm, RecoCommandLineParser clp) throws InstantiationException, PropertyException, UnsupportedAudioFileException, IOException {
     	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
 		switch (clp.getInputMode()) {
@@ -28,21 +57,7 @@ public class SimpleReco {
 				FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
 				endpoint.setPredecessor(mic);
 				endpoint.initialize();
-				Runnable micInitializer = new Runnable() {
-					public void run() {
-						mic.initialize();
-					}
-				};
-				new Thread(micInitializer).start();
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} // allow the microphone 3 seconds to initialize
-				if (!mic.startRecording()) {
-					System.err.println("Could not open microphone. Exiting...");
-					System.exit(1);
-				}
+				setupMicrophone(mic);
 				fe.setPredecessor(endpoint);
 			break;
 			case RecoCommandLineParser.RTP_INPUT:
