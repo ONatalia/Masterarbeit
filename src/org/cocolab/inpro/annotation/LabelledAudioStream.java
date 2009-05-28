@@ -15,7 +15,6 @@ public class LabelledAudioStream extends AudioInputStream {
 	LinkedList<Label> labels;
 	
 	long positionInBytes = 0;
-	long durationInBytes;
 	long labelEndPosition = 0;
 
 	boolean newLabelFlag = true;
@@ -33,7 +32,6 @@ public class LabelledAudioStream extends AudioInputStream {
 		super(AudioUtils.getAudioStreamForURL(new URL(fileURL)), 
 			  AudioUtils.getAudioStreamForURL(new URL(fileURL)).getFormat(), 
 			  AudioUtils.getAudioStreamForURL(new URL(fileURL)).getFrameLength());
-		durationInBytes = getFormat().getFrameSize() * getFrameLength();
 		String labelFileURL = fileURL.replaceAll("\\....$", ".lab");
 		labels = LabelFile.getLabels(new URL(labelFileURL).getFile());
 		bytesPerSecond = getFormat().getSampleRate() * getFormat().getSampleSizeInBits() / 8;

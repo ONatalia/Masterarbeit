@@ -1,3 +1,4 @@
+/* (c) 2009 Timo Baumann. released as-is to the public domain. */
 package org.cocolab.inpro.gui.util;
 
 import javax.swing.ImageIcon;

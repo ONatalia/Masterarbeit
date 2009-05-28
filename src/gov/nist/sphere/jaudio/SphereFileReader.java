@@ -140,7 +140,8 @@ public class SphereFileReader extends AudioFileReader {
     InputStream inputStream = new FileInputStream(file);
     AudioFileFormat audioFileFormat = getAudioFileFormat(inputStream);
     inputStream = new FileInputStream(file);
-    inputStream.skip(1024);
+    long n = inputStream.skip(1024);
+    assert (n == 1024);
     return new AudioInputStream(inputStream,
             audioFileFormat.getFormat(), audioFileFormat.getFrameLength());
   }
@@ -157,7 +158,8 @@ public class SphereFileReader extends AudioFileReader {
     InputStream inputStream = url.openStream();
     AudioFileFormat audioFileFormat = getAudioFileFormat(inputStream);
     inputStream = url.openStream();
-    inputStream.skip(1024);
+    long n = inputStream.skip(1024);
+    assert (n == 1024);
     return new AudioInputStream(inputStream,
             audioFileFormat.getFormat(), audioFileFormat.getFrameLength());
   }
@@ -185,7 +187,6 @@ public class SphereFileReader extends AudioFileReader {
 					format.getFrameRate(), 
 					true);
 			ais = AudioSystem.getAudioInputStream(tmp, ais);
-			format = tmp;
 		}
 		return ais;
 	}
@@ -309,7 +310,7 @@ class PlayThread extends Thread{
       //Prepare to playback another file
     }catch (Exception e) {
       e.printStackTrace();
-      System.exit(0);
+      throw new RuntimeException("Can't recover from error in SphereFileReader");
     }//end catch
   }//end run
 }//end inner class PlayThread

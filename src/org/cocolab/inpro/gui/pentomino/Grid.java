@@ -48,6 +48,7 @@ public class Grid {
 					}
 				}
 			}
+			reader.close();
 			
 		} catch (IOException e) {
 			e.printStackTrace();

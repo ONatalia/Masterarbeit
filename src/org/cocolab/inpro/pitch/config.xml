@@ -35,10 +35,19 @@
     
     <component name="pitchTracker" 
                type="org.cocolab.inpro.pitch.LookAheadPitchTracker">
-        <property name="scoreThreshold" value="0.5"/>
+        <property name="scoreThreshold" value="0.4"/>
         <property name="minimumPitch" value="50"/>
         <property name="maximumPitch" value="500"/>
         <property name="lookAhead" value="2147483647"/>
     </component>
-        
-</config>
+
+<!-- 
+    <component name="pitchTracker" 
+               type="org.cocolab.inpro.pitch.PitchTracker">
+        <property name="scoreThreshold" value="0.4"/>
+        <property name="minimumPitch" value="60"/>
+        <property name="maximumPitch" value="400"/>
+    </component>
+ -->
+ 
+ </config>

@@ -38,7 +38,7 @@ public class EOTPredictor extends EOTFeatureAggregator {
 		Instance inst = getNewestFeatures();
 		double index = classifyInstance(inst);
 // currently we do regression and do not need to lookup time predictions from class indices		
-		int c = (new Double(index)).intValue();
+		int c = Double.valueOf(index).intValue();
 		if (CLUSTERED_TIME) {
 			return turnBin.value(c);
 		}

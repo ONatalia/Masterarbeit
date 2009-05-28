@@ -67,7 +67,7 @@ public class TEDviewNotifier extends LabelWriter {
     			messageZeitGeist(list, "asr_words");
     		}
     		if (phoneAlignment) {
-    			List<Token> list = getBestPhoneTokens(result);
+    			List<Token> list = getBestPhoneTokens(result.getBestToken());
     			messageZeitGeist(list, "asr_phones");
     		}
     		

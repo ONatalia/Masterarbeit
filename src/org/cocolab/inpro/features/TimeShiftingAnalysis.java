@@ -96,7 +96,7 @@ public class TimeShiftingAnalysis implements Resetable {
 			DataPoint maxDP = dataPoints.getFirst();
 			DataPoint minDP = maxDP;
 			double accumulatedDifferences = 0.0; // sums the differences between values (skewness of curve) 
-			double lastX = maxDP.x; // for the summation of deltas
+			double lastX = (maxDP != null) ? maxDP.x : 0; // for the summation of deltas
 			double lastDelta = 0;
 			int n = 0; // number of data points in list
 			// newest data is first in list, oldest is last (that's why values for up and down are kind of unintuitive)
@@ -338,7 +338,7 @@ public class TimeShiftingAnalysis implements Resetable {
 	}
 
 	/* utility class for data points */
-	private class DataPoint {
+	private static class DataPoint {
 		int t;
 		double x;
 		

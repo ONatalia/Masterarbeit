@@ -48,7 +48,7 @@ public class PentoTile extends Tile {
 		this.color = c;
 		this.refPoint = new Point(x0, y0);
 		this.scale = s;
-		this.name = new Character(name).toString();
+		this.name = Character.valueOf(name).toString();
 		this.label = this.name;
 
 		this.placed = false;

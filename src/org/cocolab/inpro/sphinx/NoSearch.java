@@ -30,8 +30,6 @@ public class NoSearch implements SearchManager {
 	@S4Component(type = FrontEnd.class)
 	FrontEnd fe;
 	
-	String name;
-	
     public void allocate() {
 		// ignore
 	}
@@ -64,10 +62,6 @@ public class NoSearch implements SearchManager {
 
 	public void stopRecognition() {
 		// ignore
-	}
-
-	public String getName() {
-		return name;
 	}
 
 	public void newProperties(PropertySheet ps) throws PropertyException {

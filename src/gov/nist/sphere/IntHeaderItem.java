@@ -13,7 +13,7 @@ public class IntHeaderItem extends SphereHeaderItem {
   }
 
   public Object getValueAsObject() {
-    return new Integer(value);
+    return Integer.valueOf(value);
   }
 
 

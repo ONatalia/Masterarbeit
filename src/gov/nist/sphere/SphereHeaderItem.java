@@ -32,7 +32,7 @@ public abstract class SphereHeaderItem {
   public abstract Object getValueAsObject();
 
   public String toString() {
-    return new String(name + " " + getValueAsString());
+    return name + " " + getValueAsString();
   }
 
   SphereHeaderItem(String name) {
