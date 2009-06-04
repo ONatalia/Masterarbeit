@@ -8,7 +8,7 @@ import edu.cmu.sphinx.instrumentation.Resetable;
 
 public abstract class Tile implements Resetable {
 	protected String name;
-	protected String label;
+	public String label;
 	public Point refPoint = new Point(0, 0);
 	protected Point defaultRefPoint = new Point(0, 0);   // defaultRefPoint can be used for resetting
 	protected Color color;         // defaultColor    can be used for resetting
