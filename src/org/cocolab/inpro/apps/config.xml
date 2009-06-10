@@ -262,7 +262,7 @@
             <item>dct</item>
             <item>liveCMN</item>
 <!--            <item>batchCMN</item> -->
-            <item>featureExtraction</item>
+            <item>mfccExtraction</item>
 <!--
             <item>pitchTracker</item>
             <item>signalFeatureExtractor</item> 
@@ -296,12 +296,14 @@
 	</component>
 
 	<component name="sessionWavWriter" 
-	           type="edu.cmu.sphinx.frontend.util.WavWriter">
+	           type="org.cocolab.inpro.sphinx.frontend.WavTEDLogger">
+		<property name="tedTrack" value="audio" />
 		<property name="outFilePattern" value="/tmp/session." />
 	</component>
 
 	<component name="utteranceWavWriter" 
-	           type="edu.cmu.sphinx.frontend.util.WavWriter">
+	           type="org.cocolab.inpro.sphinx.frontend.WavTEDLogger">
+		<property name="tedTrack" value="VADutts" />
 		<property name="outFilePattern" value="/tmp/utterance." />
 		<property name="captureUtterances" value="true" />
 	</component>
@@ -344,7 +346,7 @@
     <component name="liveCMN" 
                type="edu.cmu.sphinx.frontend.feature.LiveCMN"/>       
     
-    <component name="featureExtraction" 
+    <component name="mfccExtraction" 
                type="edu.cmu.sphinx.frontend.feature.DeltasFeatureExtractor"/>
     
     <!-- ******************************************************* -->
