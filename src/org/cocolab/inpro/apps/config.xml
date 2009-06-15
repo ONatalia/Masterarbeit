@@ -58,6 +58,7 @@
                type="edu.cmu.sphinx.recognizer.Recognizer">
         <property name="decoder" value="decoder"/>
         <propertylist name="monitors">
+        	<item>incrementalHypothesis</item>
 <!--
             <item>incASRConfidenceFeatureWriter</item>
             <item>labelWriter </item>
@@ -68,6 +69,26 @@
 -->
         </propertylist>
     </component>
+    
+    <!-- ******************************************************** -->
+    <!-- The incremental processing configuration                 -->
+    <!-- ******************************************************** --> 
+    
+    <component name="incrementalHypothesis" type="org.cocolab.inpro.incremental.CurrentHypothesis">
+        <property name="recognizer" value="${recognizer}"/>
+        <property name="asrFilter" value="fixedLag"/>
+    	<propertylist name="hypChangeListeners">
+    		<item>labelWriter2</item>
+    	</propertylist>
+    </component>
+    
+    <component name="fixedLag" type="org.cocolab.inpro.incremental.filter.FixedLagDeltifier">
+    	<property name="fixedLag" value="10"/>
+    </component>
+    
+    <component name="consoleNotifier" type="org.cocolab.inpro.incremental.listener.ConsoleNotifier" />
+
+    <component name="labelWriter2" type="org.cocolab.inpro.incremental.listener.LabelWriter" />
 
     <!-- ******************************************************** -->
     <!-- The Decoder   configuration                              -->

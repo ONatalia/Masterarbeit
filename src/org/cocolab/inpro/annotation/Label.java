@@ -1,10 +1,16 @@
 package org.cocolab.inpro.annotation;
 
+import java.util.Locale;
+
 public class Label {
 	
 	double start; // in seconds
 	double end; // in seconds
 	String label;
+	
+	public Label(String l) {
+		label = l;
+	}
 	
 	public Label(double s, double e, String l) {
 		start = s;
@@ -26,9 +32,9 @@ public class Label {
 	
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		sb.append(String.format("%.6f", start));
+		sb.append(start);
 		sb.append("\t");
-		sb.append(String.format("%.6f", end));
+		sb.append(end);
 		sb.append("\t");
 		sb.append(label);
 		sb.append("\n");
