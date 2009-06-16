@@ -7,7 +7,6 @@ import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.util.ResultUtil;
 
 import edu.cmu.sphinx.decoder.search.Token;
-import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Integer;

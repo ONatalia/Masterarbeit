@@ -38,8 +38,7 @@ public class TEDviewNotifier extends HypothesisChangeListener {
 			sock = new Socket(tedAddress, tedPort);
 			writer = new PrintWriter(sock.getOutputStream());
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("Could not open connection to TEDview (no further attempts will be made)!");
+			System.err.println("[TEDviewNotifier] Could not open connection to TEDview (no further attempts will be made)!");
 			tedOutput = false;
 		}
 	}

@@ -19,4 +19,8 @@ public abstract class IU {
 	}
 	
 	public abstract String toTEDviewXML();
+	
+	public boolean equals(IU iu) {
+		return (this.id == iu.id); 
+	}
 }

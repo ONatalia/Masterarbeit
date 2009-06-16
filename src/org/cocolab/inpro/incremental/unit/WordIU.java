@@ -26,6 +26,10 @@ public class WordIU extends IU {
 		return str.equals(l.getLabel());
 	}
 	
+	public boolean wordEquals(WordIU iu) {
+		return l.getLabel().equals(iu.l.getLabel());
+	}
+	
 	public String toTEDviewXML() {
 		return l.toTEDViewXML();
 	}

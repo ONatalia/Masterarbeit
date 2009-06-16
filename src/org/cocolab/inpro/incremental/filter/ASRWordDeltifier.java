@@ -8,6 +8,7 @@ import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.ASRResultKeeper;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
+import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.incremental.util.ResultUtil;
 
@@ -32,7 +33,7 @@ import edu.cmu.sphinx.util.props.PropertySheet;
  */
 public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeeper {
 
-	List<WordIU> wordIUs = new LinkedList<WordIU>();
+	IUList<WordIU> wordIUs = new IUList<WordIU>();
 	List<EditMessage<WordIU>> edits;
 	
 	int currentFrame;
@@ -47,8 +48,8 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	
 	protected synchronized void deltify(Token token) {
 		List<Label> newWords = getWordLabels(token);
-		List<WordIU> prevWordIUs = wordIUs;
-		wordIUs = new LinkedList<WordIU>();
+		IUList<WordIU> prevWordIUs = wordIUs;
+		wordIUs = new IUList<WordIU>();
 		// step over wordIUs and newWords to see which are equal in both
 		Iterator<Label> newIt = newWords.iterator();
 		Iterator<WordIU> prevIt = prevWordIUs.iterator();
@@ -60,11 +61,11 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				break;
 			}
 			prevIU.updateLabel(newLabel);
+			wordIUs.add(prevIU);
 			i++;
 		}
 		prevIt = prevWordIUs.listIterator(i);
 		newIt = newWords.listIterator(i);
-		wordIUs = prevWordIUs.subList(0, i);
 		// if there are words left in the prev word list, send purge notifications
 		// purge notifications have to be sent in reversed order, starting with the very last word
 		// therefore we have to put them in reverse order into a new list and only revoke them afterwards
@@ -103,7 +104,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 
 	@Override
 	public void reset() {
-		wordIUs = new LinkedList<WordIU>();
+		wordIUs = new IUList<WordIU>();
 	}
 	
 }

@@ -1,7 +1,5 @@
 package org.cocolab.inpro.annotation;
 
-import java.util.Locale;
-
 public class Label {
 	
 	double start; // in seconds
@@ -37,7 +35,6 @@ public class Label {
 		sb.append(end);
 		sb.append("\t");
 		sb.append(label);
-		sb.append("\n");
 		return sb.toString();
 	}
 	
