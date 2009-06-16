@@ -15,16 +15,20 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
 	}
 	
  	public void apply(EditMessage<IUType> edit) {
-		if (edit.type == EditType.ADD) {
-			this.add(edit.getIU());
-		} else if (edit.type == EditType.REVOKE) {
-			assert (get(size() - 1)).equals(edit.getIU());
-			this.remove(size() - 1);
-		} else if (edit.type == EditType.COMMIT) {
-			// don't do anything on commit
-		} else {
-			throw new RuntimeException("If you implement new EditTypes, you should also implement their handling!");
-		} 		
+ 		switch (edit.type) {
+ 			case ADD: 
+ 				this.add(edit.getIU()); 
+ 				break;
+ 			case REVOKE: 
+ 				assert (get(size() - 1)).equals(edit.getIU());
+ 				this.remove(size() - 1);
+ 				break;
+ 			case COMMIT:
+ 				// don't do anything on commit
+ 				break;
+ 			default:
+ 				throw new RuntimeException("If you implement new EditTypes, you should also implement their handling!");
+ 		}
  	}
  	
  	public void apply(List<EditMessage<IUType>> edits) {

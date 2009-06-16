@@ -44,8 +44,9 @@ public class WordIU extends IU {
 	
 	public String toOAAString() {
 		StringBuffer sb = new StringBuffer(Integer.toString(id));
-		sb.append(",");
+		sb.append(",'");
 		sb.append(l.getLabel());
+		sb.append("'");
 		return sb.toString();
 	}
 

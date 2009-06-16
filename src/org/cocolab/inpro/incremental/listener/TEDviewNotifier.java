@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 
@@ -38,7 +39,7 @@ public class TEDviewNotifier extends HypothesisChangeListener {
 			sock = new Socket(tedAddress, tedPort);
 			writer = new PrintWriter(sock.getOutputStream());
 		} catch (IOException e) {
-			System.err.println("[TEDviewNotifier] Could not open connection to TEDview (no further attempts will be made)!");
+			Logger.getLogger(this.getClass()).warn("Cannot connect to TEDview. I will not retry.");
 			tedOutput = false;
 		}
 	}

@@ -19,6 +19,7 @@ public abstract class IU {
 	}
 	
 	public abstract String toTEDviewXML();
+	public abstract String toOAAString();
 	
 	public boolean equals(IU iu) {
 		return (this.id == iu.id); 

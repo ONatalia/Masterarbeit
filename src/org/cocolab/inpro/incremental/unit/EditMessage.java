@@ -1,5 +1,7 @@
 package org.cocolab.inpro.incremental.unit;
 
+import com.sri.oaa2.icl.IclTerm;
+
 public class EditMessage<IUType extends IU> {
 
 	EditType type;
@@ -28,6 +30,20 @@ public class EditMessage<IUType extends IU> {
 
 	public IUType getIU() {
 		return iu;
+	}
+	
+	public IclTerm toOAAGoal() {
+		return toOAAGoal(null);
+	}
+	
+	public IclTerm toOAAGoal(String prefix) {
+		StringBuffer sb = new StringBuffer(prefix);
+		sb.append(type.oaaGoal());
+		sb.append("(");
+		sb.append(iu.toOAAString());
+		sb.append(")");
+		System.err.println(sb.toString());
+		return IclTerm.fromString(true, sb.toString());
 	}
 	
 }
