@@ -34,12 +34,18 @@ public class ASRWordDeltifier implements Configurable, Resetable {
 	List<WordIU> wordIUs = new LinkedList<WordIU>();
 	List<EditMessage<WordIU>> edits;
 	
+	int currentFrame;
+	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 	}
 	
+	protected synchronized List<Label> getWordLabels(Token token) {
+		return ResultUtil.getWordLabelSequence(token);
+	}
+	
 	protected synchronized void deltify(Token token) {
-		List<Label> newWords = ResultUtil.getWordLabelSequence(token);
+		List<Label> newWords = getWordLabels(token);
 		List<WordIU> prevWordIUs = wordIUs;
 		wordIUs = new LinkedList<WordIU>();
 		// step over wordIUs and newWords to see which are equal in both
@@ -74,6 +80,7 @@ public class ASRWordDeltifier implements Configurable, Resetable {
 	}
 
 	public synchronized void deltify(Result result) {
+		currentFrame = result.getFrameNumber();
 		deltify(result.getBestToken());
 	}
 

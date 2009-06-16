@@ -1,5 +1,11 @@
 package org.cocolab.inpro.incremental.filter;
 
+import java.util.List;
+import java.util.ListIterator;
+
+import org.cocolab.inpro.annotation.Label;
+import org.cocolab.inpro.incremental.util.ResultUtil;
+
 import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -17,13 +23,16 @@ public class FixedLagDeltifier extends ASRWordDeltifier {
 		fixedLag = ps.getInt(PROP_FIXED_LAG);
 	}
 	
-	public void deltify(Result result) {
-		Token token = result.getBestToken();
-		for (int i = 0; i < fixedLag; i++) {
-			if (token != null) 
-				token = token.getPredecessor();
+	@Override
+	protected synchronized List<Label> getWordLabels(Token token) {
+		List<Label> newWords =  ResultUtil.getWordLabelSequence(token);
+		// starting from the end...
+		ListIterator<Label> iter = newWords.listIterator(newWords.size());
+		// remove all word labels that have started within the last fixedLag frames
+		while (iter.hasPrevious() && (iter.previous().getStart() * 100.0 > currentFrame - fixedLag)) {
+			iter.remove();
 		}
-		deltify(token);
+		return newWords;
 	}
-
+	
 }
