@@ -1,6 +1,6 @@
 package org.cocolab.inpro.incremental.unit;
 
-public class IU {
+public abstract class IU {
 
 	private static int IU_idCounter = 0;
 	
@@ -17,5 +17,6 @@ public class IU {
 	public String toString() {
 		return Integer.toString(id);
 	}
-
+	
+	public abstract String toTEDviewXML();
 }

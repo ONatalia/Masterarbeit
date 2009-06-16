@@ -47,7 +47,7 @@ public class Label {
 		sb.append("' duration='");
 		sb.append(Math.round((end - start) * 1000.0));
 		sb.append("'> ");
-		sb.append(label);
+		sb.append(label.replace("<", "&lt;").replace(">", "&gt;"));
 		sb.append(" </event>");
 		return sb.toString();
 	}

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.cocolab.inpro.annotation.Label;
+import org.cocolab.inpro.incremental.ASRResultKeeper;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.WordIU;
@@ -29,7 +30,7 @@ import edu.cmu.sphinx.util.props.PropertySheet;
  * 
  * @author Timo Baumann
  */
-public class ASRWordDeltifier implements Configurable, Resetable {
+public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeeper {
 
 	List<WordIU> wordIUs = new LinkedList<WordIU>();
 	List<EditMessage<WordIU>> edits;
@@ -69,13 +70,13 @@ public class ASRWordDeltifier implements Configurable, Resetable {
 		// therefore we have to put them in reverse order into a new list and only revoke them afterwards
 		edits = new LinkedList<EditMessage<WordIU>>();
 		while (prevIt.hasNext()) {
-			edits.add(0, new EditMessage<WordIU>(EditType.revoke, prevIt.next()));
+			edits.add(0, new EditMessage<WordIU>(EditType.REVOKE, prevIt.next()));
 		}
 		// for the remaining words in the new list, add them to the old list and send add notifications
 		while (newIt.hasNext()) {
 			WordIU iu = new WordIU(newIt.next());
 			wordIUs.add(iu);
-			edits.add(new EditMessage<WordIU>(EditType.add, iu));
+			edits.add(new EditMessage<WordIU>(EditType.ADD, iu));
 		}
 	}
 
@@ -90,6 +91,14 @@ public class ASRWordDeltifier implements Configurable, Resetable {
 
 	public synchronized List<WordIU> getIUs() {
 		return wordIUs;
+	}
+	
+	public synchronized int getCurrentFrame() {
+		return currentFrame;
+	}
+	
+	public synchronized double getCurrentTime() {
+		return currentFrame * 0.01;
 	}
 
 	@Override

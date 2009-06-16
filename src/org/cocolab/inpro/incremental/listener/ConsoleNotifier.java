@@ -5,16 +5,7 @@ import java.util.List;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 
-import edu.cmu.sphinx.util.props.Configurable;
-import edu.cmu.sphinx.util.props.PropertyException;
-import edu.cmu.sphinx.util.props.PropertySheet;
-
-public class ConsoleNotifier implements Configurable, HypothesisChangeListener {
-
-	@Override
-	public void newProperties(PropertySheet ps) throws PropertyException {
-		//
-	}
+public class ConsoleNotifier extends HypothesisChangeListener {
 
 	@Override
 	public void hypChange(List<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
@@ -29,11 +20,6 @@ public class ConsoleNotifier implements Configurable, HypothesisChangeListener {
 				System.out.println(iu.toString());
 			}
 		}
-	}
-
-	@Override
-	public void reset() {
-		// ignore
 	}
 
 }
