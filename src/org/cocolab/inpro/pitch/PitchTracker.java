@@ -29,9 +29,8 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-
-import org.cocolab.inpro.audio.AudioUtils;
 
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
@@ -70,7 +69,7 @@ public class PitchTracker extends BaseDataProcessor {
 	 * pre processing
 	 **************************/
 
-    private double signalPower(double[] samples) {
+    public static double signalPower(double[] samples) {
         assert samples.length > 0;
         double sumOfSquares = 0.0f;
         for (int i = 0; i < samples.length; i++) {
@@ -345,7 +344,7 @@ public class PitchTracker extends BaseDataProcessor {
             FrontEnd fe = (FrontEnd) cm.lookup("frontEnd");
             fe.initialize();
             
-            AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioFileURL);
+            AudioInputStream ais = AudioSystem.getAudioInputStream(audioFileURL);
             StreamDataSource reader = (StreamDataSource) cm.lookup("streamDataSource");
             /* set the stream data source to read from the audio file */
             reader.setInputStream(ais, audioFileURL.getFile());

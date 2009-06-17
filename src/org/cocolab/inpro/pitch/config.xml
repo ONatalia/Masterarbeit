@@ -10,8 +10,6 @@
 
 <config>     
     
-    <property name="step"		value="1"/>
-
 
     <!-- ******************************************************** -->
     <!-- The frontend configuration                               -->

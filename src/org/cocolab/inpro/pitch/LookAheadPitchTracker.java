@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Queue;
 
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.pitch.util.PitchOptimizer;
 import org.cocolab.inpro.pitch.util.PitchUtils;
 
@@ -107,7 +107,7 @@ public class LookAheadPitchTracker extends PitchTracker implements Resetable {
             FrontEnd fe = (FrontEnd) cm.lookup("frontEnd");
             fe.initialize();
             
-            AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioFileURL);
+            AudioInputStream ais = AudioSystem.getAudioInputStream(audioFileURL);
             StreamDataSource reader = (StreamDataSource) cm.lookup("streamDataSource");
             /* set the stream data source to read from the audio file */
             reader.setInputStream(ais, audioFileURL.getFile());

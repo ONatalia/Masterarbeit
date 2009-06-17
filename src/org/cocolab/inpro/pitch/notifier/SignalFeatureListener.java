@@ -1,4 +1,4 @@
-package org.cocolab.inpro.sphinx.instrumentation;
+package org.cocolab.inpro.pitch.notifier;
 
 import java.util.EventListener;
 
