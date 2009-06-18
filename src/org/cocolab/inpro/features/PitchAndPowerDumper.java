@@ -2,7 +2,7 @@ package org.cocolab.inpro.features;
 
 import java.util.Locale;
 
-import org.cocolab.inpro.sphinx.instrumentation.SignalFeatureListener;
+import org.cocolab.inpro.pitch.notifier.SignalFeatureListener;
 
 public class PitchAndPowerDumper implements SignalFeatureListener {
 

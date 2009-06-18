@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.cocolab.inpro.incremental.util.ResultUtil;
+
 import edu.cmu.sphinx.linguist.SearchState;
 import edu.cmu.sphinx.linguist.UnitSearchState;
 import edu.cmu.sphinx.linguist.WordSearchState;
@@ -221,22 +223,6 @@ public class LabelWriter implements Configurable,
 		return list;
     }
     
-    public static String stringForSearchState(SearchState state) {
-        String event;
-        if (state instanceof WordSearchState) {
-        	WordSearchState pronunciationState = (WordSearchState) state;
-        	event = pronunciationState.getPronunciation().getWord().toString();
-        }
-        else if (state instanceof UnitSearchState) {
-        	UnitSearchState unitState = (UnitSearchState) state;
-        	event = unitState.getUnit().getName();
-        }
-        else {
-        	event = state.toString();
-        }
-        return event;
-    }
-    
     /**
      * convert a token list to an alignment string 
      * 
@@ -257,7 +243,7 @@ public class LabelWriter implements Configurable,
 	            sb.append("\t");
 	            // depending on whether word, filler or other, dump the string-representation
 	            SearchState state = token.getSearchState();
-	            sb.append(stringForSearchState(state)); 
+	            sb.append(ResultUtil.stringForSearchState(state)); 
 	            sb.append("\n");
 	            lastToken = token;
 	            if (endFrame > lastFrame)
