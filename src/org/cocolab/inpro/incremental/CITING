@@ -1,0 +1,35 @@
+This is free and open source software, released under the
+General Public License 3. Please see the file COPYING for details.
+
+The license sets the requirements for using this software.
+The requirements in this section are not legally binding; 
+however, they represent things that the author would appreciate: 
+If you write a paper based on work that uses this software, 
+please include a citation to our paper, and send a copy 
+of your paper. If you create a derivative work based on a this 
+software, tell me about it and let me know how I can get a 
+copy, and include this request if it’s appropriate.
+
+The algorithms in this software are described in
+
+  Timo Baumann, Michaela Atterer, and David Schlangen (2009).
+  "Assessing and Improving the Performance of 
+  Speech Recognition for Incremental Systems".
+  in Proceedings of NAACL-HLT 2009, Boulder, USA.
+
+  http://www.aclweb.org/anthology/N/N09/N09-1043.pdf
+
+For your convenience, a bibtex entry for the paper is given below:
+
+  @InProceedings{baumann-atterer-schlangen:2009:NAACLHLT09,
+    author    = {Baumann, Timo  and  Atterer, Michaela  and  Schlangen, David},
+    title     = {Assessing and Improving the Performance of Speech Recognition for Incremental Systems},
+    booktitle = {Proceedings of Human Language Technologies: The 2009 Annual Conference of the North American Chapter of the Association for Computational Linguistics},
+    month     = {June},
+    year      = {2009},
+    address   = {Boulder, Colorado},
+    publisher = {Association for Computational Linguistics},
+    pages     = {380--388},
+    url       = {http://www.aclweb.org/anthology/N/N09/N09-1043}
+  }
+

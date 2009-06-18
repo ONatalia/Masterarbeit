@@ -1,0 +1,48 @@
+This is free and open source software, released under the
+General Public License 3. Please see the file COPYING for details.
+
+The license sets the requirements for using this software.
+The requirements in this section are not legally binding; 
+however, they represent things that the author would appreciate: 
+If you write a paper based on work that uses this software, 
+please include a citation to one of our papers, and send a copy 
+of your paper. If you create a derivative work based on a this 
+software, tell me about it and let me know how I can get a 
+copy, and include this request if it’s appropriate.
+
+The algorithms in this software are described in the papers below. 
+Feel free to cite the paper that seems more appropriate:
+
+  Timo Baumann (2008).
+  "Simulating Spoken Dialogue With a Focus on Realistic Turn-Taking".
+  in Proceedings of the 13th ESSLLI Student Session, Boulder, USA.
+  http://www.ling.uni-potsdam.de/~timo/pub/bababa.pdf
+  
+  Gabriel Skantze and David Schlangen (2009).
+  "Incremental Dialogue Processing in a Micro-Domain".
+  in Proceedings of EACL, Athens, Greece.
+  http://www.aclweb.org/anthology/E/E09/E09-1085.pdf
+
+For your convenience, bibtex entries for the papers are given below:
+
+
+  @inProceedings{baumann2008,
+    author={Baumann, Timo},
+    title={{Simulating Spoken Dialogue With a Focus on Realistic Turn-Taking}},
+    booktitle = {Proceedings of the 13th ESSLLI Student Session},
+    year = {2008},
+    address = {Hamburg, Germany},
+  }
+
+  @InProceedings{skantze-schlangen:2009:EACL,
+    author    = {Skantze, Gabriel  and  Schlangen, David},
+    title     = {Incremental Dialogue Processing in a Micro-Domain},
+    booktitle = {Proceedings of the 12th Conference of the European Chapter of the ACL (EACL 2009)},
+    month     = {March},
+    year      = {2009},
+    address   = {Athens, Greece},
+    publisher = {Association for Computational Linguistics},
+    pages     = {745--753},
+    url       = {http://www.aclweb.org/anthology/E09-1085}
+  }
+

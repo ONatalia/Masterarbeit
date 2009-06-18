@@ -7,10 +7,12 @@ _____________________________________________________________
          |_|               |_|           |__/               
 _____________________________________________________________
 
-(c) 2007-2009 inpro project, Timo Baumann, Gabriel Skantze
+(c) 2007, 2008, 2009 inpro project, Timo Baumann, Gabriel Skantze
 funded by DFG Emmy-Noether programme
 
-please contact timo@ling.uni-potsdam.de for any questions.
+please feel free to contact timo@ling.uni-potsdam.de 
+for any questions and comments. 
+see bottom of this page for license and citation information.
 
 _________________________________________
 ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
@@ -80,6 +82,28 @@ This unfortunate procedure is necessary, as there is
 no way of passing PitchedDoubleData completely through
 the recognition process as preceding Data objects are 
 discarded by later frontend modules.
+
+_______________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+License and Citation in Scientific Work
+_______________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+This is free and open source software, released under the
+General Public License 3. Please see the file COPYING for details.
+
+The license sets the requirements for using this software.
+The requirements in this section are not legally binding; 
+however, they represent things that the author would appreciate: 
+If you write a paper based on work that uses this software, 
+please include a citation to one of our papers, and send a copy 
+of your paper. If you create a derivative work based on a this 
+software, tell me about it and let me know how I can get a 
+copy, and include this request if it’s appropriate.
+
+See the file CITING for references to our papers that describe
+this software. Feel free to cite the paper that seems more 
+appropriate.
+
 _______________________________________
 ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 [1]: 
