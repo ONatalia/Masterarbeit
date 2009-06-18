@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.unit.EditMessage;
@@ -45,7 +46,7 @@ public class TEDviewNotifier extends HypothesisChangeListener {
 	}
 
 	@Override
-	public void hypChange(List<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
+	public void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
 		if (tedOutput && (edits.size() > 0)) {
 	    	StringBuffer sb = new StringBuffer();
 	    	sb.append("<event time='");

@@ -1,5 +1,6 @@
 package org.cocolab.inpro.incremental.listener;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.cocolab.inpro.incremental.ASRResultKeeper;
@@ -21,7 +22,7 @@ public abstract class HypothesisChangeListener implements Configurable, Resetabl
 	 * this should receive a list of current IUs and 
 	 * a list of edit messages since the last call to hypChange
 	 */
-	public abstract void hypChange(List<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits);
+	public abstract void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits);
 
 	public void hypChange(ASRResultKeeper deltifier) {
 		List<EditMessage<WordIU>> edits = deltifier.getEdits();

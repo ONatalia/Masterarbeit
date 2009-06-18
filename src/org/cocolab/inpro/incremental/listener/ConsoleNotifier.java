@@ -1,5 +1,6 @@
 package org.cocolab.inpro.incremental.listener;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.cocolab.inpro.incremental.unit.EditMessage;
@@ -8,7 +9,7 @@ import org.cocolab.inpro.incremental.unit.IU;
 public class ConsoleNotifier extends HypothesisChangeListener {
 
 	@Override
-	public void hypChange(List<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
+	public void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
 		if (edits.size() > 0) {
 			System.out.println("\nThe Hypothesis has changed.");
 			System.out.println("Edits since last hypothesis:");
