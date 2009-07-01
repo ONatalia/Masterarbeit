@@ -22,6 +22,7 @@ import org.cocolab.inpro.incremental.util.ResultUtil;
 import edu.cmu.sphinx.linguist.SearchState;
 import edu.cmu.sphinx.linguist.UnitSearchState;
 import edu.cmu.sphinx.linguist.WordSearchState;
+import edu.cmu.sphinx.linguist.lextree.LexTreeLinguist;
 import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.recognizer.RecognizerState;
 import edu.cmu.sphinx.recognizer.StateListener;
@@ -196,9 +197,10 @@ public class LabelWriter implements Configurable,
     	list.add(token);
     	while (token != null) {
 			SearchState searchState = token.getSearchState(); 
-            if (searchState instanceof UnitSearchState) {
+            if ((searchState instanceof UnitSearchState)
+             && !(searchState instanceof LexTreeLinguist.LexTreeEndUnitState)){
             	// add these tokens to the list
-        	    list.add(token);
+        	    list.add(0, token);
             }
             token = token.getPredecessor();
         }
@@ -217,7 +219,7 @@ public class LabelWriter implements Configurable,
     	Token token = result.getBestToken();
 		// recover the path of visited word- and silence-tokens in the best token
 		while (token != null) {
-    	    list.add(token);
+    	    list.add(0, token);
             token = token.getPredecessor();
 		}
 		return list;
@@ -233,10 +235,10 @@ public class LabelWriter implements Configurable,
 		StringBuffer sb = new StringBuffer(); 
 		if (list.size() > 0) {
 			// iterate over the list and print the associated times
-			Token lastToken = list.get(0);
+			Token prevToken = list.get(0);
 	        for (int i = 1; i < list.size() - 1; i++) {
 	            Token token = list.get(i);
-	            sb.append(lastToken.getFrameNumber() / 100.0); // a frame always lasts 10ms 
+	            sb.append(prevToken.getFrameNumber() / 100.0); // a frame always lasts 10ms 
 	            sb.append("\t");
 	            int endFrame = token.getFrameNumber();
 	            sb.append(endFrame / 100.0); // dito
@@ -245,7 +247,7 @@ public class LabelWriter implements Configurable,
 	            SearchState state = token.getSearchState();
 	            sb.append(ResultUtil.stringForSearchState(state)); 
 	            sb.append("\n");
-	            lastToken = token;
+	            prevToken = token;
 	            if (endFrame > lastFrame)
 	            	break;
 	        }
