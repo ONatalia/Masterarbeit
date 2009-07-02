@@ -19,7 +19,7 @@ package org.cocolab.inpro.incremental.unit;
 
 public abstract class IU {
 
-	private static int IU_idCounter = 0;
+	public static int IU_idCounter = 0;
 	
 	int id;
 
