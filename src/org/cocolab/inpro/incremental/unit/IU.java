@@ -17,12 +17,16 @@
  */
 package org.cocolab.inpro.incremental.unit;
 
+import java.util.List;
+
 public abstract class IU {
 
-	public static int IU_idCounter = 0;
+	private static int IU_idCounter = 0;
 	
 	int id;
 
+	List<IU> groundedIn;
+	
 	public IU() {
 		this.id = IU.getNewID();
 	}
