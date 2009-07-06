@@ -55,11 +55,27 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	
 	int currentFrame;
 	
+	protected boolean recoFinal; // flag to avoid smoothing or fixed lags on final result
+	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 	}
 	
 	protected synchronized List<Label> getWordLabels(Token token) {
+/*		
+		if (wordState.getPronunciation() instanceof SyllableAwarePronunciation) {
+			SyllableAwarePronunciation pron = (SyllableAwarePronunciation) wordState.getPronunciation();
+			List<Unit[]> sylls = pron.getSyllables();
+			System.err.print(pron.getWord().toString() + " ");
+			for (Unit[] syll : sylls) {
+				for (Unit unit : syll) {
+					System.err.print(unit.getName() + " ");
+				}
+				System.err.print("- ");
+			}
+			System.err.println();
+		}
+*/
 		return ResultUtil.getWordLabelSequence(token);
 	}
 	
@@ -100,14 +116,16 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 
 	public synchronized void deltify(Result result) {
 		currentFrame = result.getFrameNumber();
+		if (result.isFinal())
+			recoFinal = true;
 		deltify(result.getBestToken());
 	}
 
-	public synchronized List<EditMessage<WordIU>> getEdits() {
+	public synchronized List<EditMessage<WordIU>> getWordEdits() {
 		return edits;
 	}
 
-	public synchronized List<WordIU> getIUs() {
+	public synchronized List<WordIU> getWordIUs() {
 		return wordIUs;
 	}
 	
@@ -122,6 +140,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	@Override
 	public void reset() {
 		wordIUs = new IUList<WordIU>();
+		recoFinal = false;
 	}
 	
 }

@@ -29,31 +29,37 @@ import edu.cmu.sphinx.linguist.SearchState;
 import edu.cmu.sphinx.linguist.UnitSearchState;
 import edu.cmu.sphinx.linguist.WordSearchState;
 import edu.cmu.sphinx.linguist.dictionary.Word;
+import edu.cmu.sphinx.linguist.lextree.LexTreeLinguist;
 
 public class ResultUtil {
 	
-	public static List<Label> getWordLabelSequence(Token token) {
-		return getWordLabelSequence(token, false);
-	}
-	
-	public static List<Label> getWordLabelSequence(Token token, boolean wantFiller) {
-		// first part is to traverse the token list (backwards) and find the relevant tokens
-		LinkedList<Token> wordTokenList = new LinkedList<Token>();
+	private static LinkedList<Token> getTokenList(Token token, boolean words, boolean units) {
+		LinkedList<Token> tokenList = new LinkedList<Token>();
 		if (token != null) 
 			token = token.getPredecessor(); // skip the final sentence-end token (</s>)
 		while (token != null) {
 			SearchState searchState = token.getSearchState();
-			// if the associated search state indicates a word (or a filler if we wantFiller)
-			if ((searchState instanceof WordSearchState) ||
-				(wantFiller && (searchState instanceof UnitSearchState)
-							&& ((UnitSearchState) searchState).getUnit().isFiller())) {
-				// add this token to the word token list
-				wordTokenList.add(token);
-			}
-			// TODO: also extract segments
+			// determine type of searchState and add to list if appropriate
+			if (words && (searchState instanceof WordSearchState)) {
+               	tokenList.add(token);
+			} else if (units && 
+					  (searchState instanceof UnitSearchState) && 
+					 !(searchState instanceof LexTreeLinguist.LexTreeEndUnitState)){
+        	    tokenList.add(token);
+            }
 			token = token.getPredecessor();
 		}
-		// traverse the wordTokenList backwards -- thus in time-increasing order
+		return tokenList;
+	}
+	
+	public static List<Label> getWordLabelSequence(Token token) {
+		return getWordLabelSequence(token, true);
+	}
+	
+	public static List<Label> getWordLabelSequence(Token token, boolean wantFiller) {
+		// first part is to traverse the token list (backwards) and find the relevant tokens
+		LinkedList<Token> wordTokenList = getTokenList(token, true, false);
+		// second part: traverse the wordTokenList and unitTokenList backwards -- thus in time-increasing order
 		Iterator<Token> it = wordTokenList.descendingIterator();
 		List<Label> returnList = new ArrayList<Label>(wordTokenList.size());
 		double start = 0.0;
@@ -62,9 +68,10 @@ public class ResultUtil {
 		while (it.hasNext()) {
 			Token t = it.next();
 			double end = t.getFrameNumber() / 100.0;
-			Label l = new Label(start, end,
-								stringForSearchState(t.getSearchState()));
-			returnList.add(l);
+			if (!((WordSearchState) t.getSearchState()).getPronunciation().getWord().isFiller() || wantFiller) {
+				Label l = new Label(start, end, stringForSearchState(t.getSearchState()));
+				returnList.add(l);
+			}
 			// the next label starts when the current label ends
 			start = end;
 		}
@@ -72,9 +79,15 @@ public class ResultUtil {
 	}
 	
 	public static List<String> getWordSequence(Token token) {
-		return getWordSequence(token, false);
+		return getWordSequence(token, true);
 	}
 	
+	/** 
+	 * shortcut for calling getWordLabelSequence and then using labelsToWords(); could probably be removed?
+	 * @param token
+	 * @param wantFiller
+	 * @return
+	 */
 	public static List<String> getWordSequence(Token token, boolean wantFiller) {
 		List<String> returnList = new LinkedList<String>();
 		while (token != null) {
@@ -103,7 +116,7 @@ public class ResultUtil {
         String event;
         if (state instanceof WordSearchState) {
         	WordSearchState pronunciationState = (WordSearchState) state;
-        	event = pronunciationState.getPronunciation().getWord().toString();
+        	event = pronunciationState.getPronunciation().getWord().getSpelling();
         }
         else if (state instanceof UnitSearchState) {
         	UnitSearchState unitState = (UnitSearchState) state;

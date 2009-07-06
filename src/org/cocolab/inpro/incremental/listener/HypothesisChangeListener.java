@@ -42,8 +42,8 @@ public abstract class HypothesisChangeListener implements Configurable, Resetabl
 	public abstract void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits);
 
 	public void hypChange(ASRResultKeeper deltifier) {
-		List<EditMessage<WordIU>> edits = deltifier.getEdits();
-		List<WordIU> ius = deltifier.getIUs();
+		List<EditMessage<WordIU>> edits = deltifier.getWordEdits();
+		List<WordIU> ius = deltifier.getWordIUs();
 		currentFrame = deltifier.getCurrentFrame();
 		hypChange(ius, edits);
 	}

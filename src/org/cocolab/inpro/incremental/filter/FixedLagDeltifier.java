@@ -42,12 +42,14 @@ public class FixedLagDeltifier extends ASRWordDeltifier {
 	@Override
 	protected synchronized List<Label> getWordLabels(Token token) {
 		List<Label> newWords =  ResultUtil.getWordLabelSequence(token);
-		// starting from the end...
-		ListIterator<Label> iter = newWords.listIterator(newWords.size());
-		// remove all word labels that have started within the last fixedLag frames
-		while (iter.hasPrevious() && (iter.previous().getStart() * 100.0 > currentFrame - fixedLag)) {
-			iter.remove();
-		}
+		if (!recoFinal) {
+			// starting from the end ...
+			ListIterator<Label> iter = newWords.listIterator(newWords.size());
+			// remove all word labels that have started within the last fixedLag frames
+			while (iter.hasPrevious() && (iter.previous().getStart() * 100.0 > currentFrame - fixedLag)) {
+				iter.remove();
+			}
+			}
 		return newWords;
 	}
 	

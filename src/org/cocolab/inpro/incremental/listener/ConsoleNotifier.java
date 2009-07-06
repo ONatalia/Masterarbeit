@@ -37,7 +37,9 @@ public class ConsoleNotifier extends HypothesisChangeListener {
 			for (IU iu : ius) {
 				System.out.println(iu.toString());
 			}
-		}
+		}// else {
+		//	System.out.print(".");
+		//}
 	}
 
 }

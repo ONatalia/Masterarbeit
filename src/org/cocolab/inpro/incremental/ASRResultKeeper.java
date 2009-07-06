@@ -24,9 +24,9 @@ import org.cocolab.inpro.incremental.unit.WordIU;
 
 public interface ASRResultKeeper {
 
-	public List<EditMessage<WordIU>> getEdits();
+	public List<EditMessage<WordIU>> getWordEdits();
 
-	public List<WordIU> getIUs();
+	public List<WordIU> getWordIUs();
 	
 	public int getCurrentFrame();
 	

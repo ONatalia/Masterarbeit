@@ -47,45 +47,47 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 		IUList<WordIU> prevWordIUs = wordIUs;
 		// calculate would-be edits the standard way
 		super.deltify(token); 
-		// decrease smoothing-counter in all matching enqueued edits in the smoothingQueue
-		// stop as soon as the new and enqueued edits don't match anymore 
-		Iterator<EditMessage<WordIU>> editsIter = edits.iterator();
-		Iterator<SmoothingCounter> smoothIter = smoothingQueue.iterator();
-		EditMessage<WordIU> edit = null;
-		while (smoothIter.hasNext() && editsIter.hasNext()) {
-			SmoothingCounter sc = smoothIter.next();
-			edit = editsIter.next();
-			if (sc.matches(edit)) {
-				sc.count--;
-			} else {
-				smoothIter.remove();
-				break;
+		if (!recoFinal) {
+			// decrease smoothing-counter in all matching enqueued edits in the smoothingQueue
+			// stop as soon as the new and enqueued edits don't match anymore 
+			Iterator<EditMessage<WordIU>> editsIter = edits.iterator();
+			Iterator<SmoothingCounter> smoothIter = smoothingQueue.iterator();
+			EditMessage<WordIU> edit = null;
+			while (smoothIter.hasNext() && editsIter.hasNext()) {
+				SmoothingCounter sc = smoothIter.next();
+				edit = editsIter.next();
+				if (sc.matches(edit)) {
+					sc.count--;
+				} else {
+					smoothIter.remove();
+					break;
+				}
+				edit = null;
 			}
-			edit = null;
-		}
-		// now deal with non-matching edits (kill remaining entries in smoothingQueue, enqueue for new edits)
-		while (smoothIter.hasNext()) {
-			smoothIter.next();
-			smoothIter.remove();
-		}
-		if (edit != null) 
-				smoothingQueue.add(new SmoothingCounter(edit));
-		while (editsIter.hasNext()) {
-			smoothingQueue.add(new SmoothingCounter(editsIter.next()));
-		}
-		// finally, apply edits from smoothingQueue if their counter has run out, 
-		// add them to edit list and update wordIUs
-		smoothIter = smoothingQueue.iterator();
-		edits = new LinkedList<EditMessage<WordIU>>();
-		wordIUs = prevWordIUs;
-		while (smoothIter.hasNext()) {
-			SmoothingCounter sc = smoothIter.next();
-			if (sc.count <= 0) {
-				wordIUs.apply(sc.edit);
-				edits.add(sc.edit);
+			// now deal with non-matching edits (kill remaining entries in smoothingQueue, enqueue for new edits)
+			while (smoothIter.hasNext()) {
+				smoothIter.next();
 				smoothIter.remove();
-			} else {
-				break;
+			}
+			if (edit != null) 
+					smoothingQueue.add(new SmoothingCounter(edit));
+			while (editsIter.hasNext()) {
+				smoothingQueue.add(new SmoothingCounter(editsIter.next()));
+			}
+			// finally, apply edits from smoothingQueue if their counter has run out, 
+			// add them to edit list and update wordIUs
+			smoothIter = smoothingQueue.iterator();
+			edits = new LinkedList<EditMessage<WordIU>>();
+			wordIUs = prevWordIUs;
+			while (smoothIter.hasNext()) {
+				SmoothingCounter sc = smoothIter.next();
+				if (sc.count <= 0) {
+					wordIUs.apply(sc.edit);
+					edits.add(sc.edit);
+					smoothIter.remove();
+				} else {
+					break;
+				}
 			}
 		}
 	}

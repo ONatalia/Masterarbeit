@@ -19,12 +19,12 @@ package org.cocolab.inpro.annotation;
 
 public class Label {
 	
-	double start; // in seconds
-	double end; // in seconds
-	String label;
+	private final double start; // in seconds
+	private final double end; // in seconds
+	private final String label;
 	
 	public Label(String l) {
-		label = l;
+		this(Double.NaN, Double.NaN, l);
 	}
 	
 	public Label(double s, double e, String l) {

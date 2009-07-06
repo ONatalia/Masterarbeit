@@ -39,7 +39,7 @@ public class LabelledAudioStream extends AudioInputStream {
 	}
 	
 	public String currentLabel() {
-		return labels.peek().label;
+		return labels.peek().getLabel();
 	}
 	
 	public double remainingTimeForLabel() {
