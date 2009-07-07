@@ -43,6 +43,7 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 	
 	List<SmoothingCounter> smoothingQueue = new LinkedList<SmoothingCounter>();
 	
+	@Override
 	protected synchronized void deltify(Token token) {
 		IUList<WordIU> prevWordIUs = wordIUs;
 		// calculate would-be edits the standard way
@@ -50,7 +51,7 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 		if (!recoFinal) {
 			// decrease smoothing-counter in all matching enqueued edits in the smoothingQueue
 			// stop as soon as the new and enqueued edits don't match anymore 
-			Iterator<EditMessage<WordIU>> editsIter = edits.iterator();
+			Iterator<EditMessage<WordIU>> editsIter = wordEdits.iterator();
 			Iterator<SmoothingCounter> smoothIter = smoothingQueue.iterator();
 			EditMessage<WordIU> edit = null;
 			while (smoothIter.hasNext() && editsIter.hasNext()) {
@@ -77,13 +78,13 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 			// finally, apply edits from smoothingQueue if their counter has run out, 
 			// add them to edit list and update wordIUs
 			smoothIter = smoothingQueue.iterator();
-			edits = new LinkedList<EditMessage<WordIU>>();
+			wordEdits = new LinkedList<EditMessage<WordIU>>();
 			wordIUs = prevWordIUs;
 			while (smoothIter.hasNext()) {
 				SmoothingCounter sc = smoothIter.next();
 				if (sc.count <= 0) {
 					wordIUs.apply(sc.edit);
-					edits.add(sc.edit);
+					wordEdits.add(sc.edit);
 					smoothIter.remove();
 				} else {
 					break;

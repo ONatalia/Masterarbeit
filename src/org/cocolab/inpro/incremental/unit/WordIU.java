@@ -17,52 +17,86 @@
  */
 package org.cocolab.inpro.incremental.unit;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.cocolab.inpro.annotation.Label;
+
+import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 
 public class WordIU extends IU {
 
-	// we keep start time, end time and text of the word in a label
-	Label l;
+	final Pronunciation pron;
+	final String word;
 	
-	public WordIU(String word) {
-		super();
-		l = new Label(word);
+	public WordIU(Pronunciation pron, WordIU sll, List<? extends IU> groundedIn) {
+		super(sll, groundedIn, true);
+		this.pron = pron;
+		this.word = pron.getWord().getSpelling();
 	}
 	
-	public WordIU(Label l) {
-		super();
-		this.l = l;
+	@SuppressWarnings("unchecked")
+	public List<SegmentIU> getSegments() {
+		if ((groundedIn == null) || groundedIn.size() == 0) { 
+			return null;
+		} else if (groundedIn.get(0) instanceof SegmentIU) {
+			return (List<SegmentIU>) groundedIn;
+		} else if (groundedIn.get(0) instanceof SyllableIU) {
+			List<SegmentIU> returnList = new ArrayList<SegmentIU>();
+			for (IU gIn : groundedIn) {
+				returnList.addAll((List<SegmentIU>) gIn.groundedIn);
+			}
+			return returnList;
+		} else {
+			throw new RuntimeException("I don't know how to get segments from my groundedIn list");
+		}
 	}
 	
-	public void updateLabel(Label l) {
-		assert (this.l.getLabel().equals(l.getLabel()));
-		this.l = l;
+	public void updateSegments(List<Label> newLabels) {
+		List<SegmentIU> segments = getSegments();
+		if (segments.size() != newLabels.size()) {
+			System.err.println("something is wrong:");
+			System.err.println(segments);
+			System.err.println(newLabels);
+		}
+		Iterator<Label> labelIt = newLabels.iterator();
+		for (SegmentIU segment : segments) {
+			segment.updateLabel(labelIt.next());
+		}
 	}
 	
-	public boolean wordEquals(String str) {
-		return str.equals(l.getLabel());
+	public boolean wordEquals(Pronunciation pron) {
+		return this.pron.equals(pron);
 	}
 	
 	public boolean wordEquals(WordIU iu) {
-		return l.getLabel().equals(iu.l.getLabel());
+		return pron.equals(iu.pron);
 	}
 	
 	public String toTEDviewXML() {
-		return l.toTEDViewXML();
+		double startTime = startTime();
+		return "<event time='"
+				+ Math.round(startTime * 1000.0) 
+				+ "' duration='"
+				+ Math.round((endTime() - startTime) * 1000.0)
+				+ "'> "
+				+ word.replace("<", "&lt;").replace(">", "&gt;")
+				+ " </event>";
 	}
 	
 	public String toLabelLine() {
-		return l.toString();
+		return startTime() + "\t" + endTime() + "\t" + word;
 	}
 
 	public String toString() {
-		return l.toString();
+		return toLabelLine(); // + "\n";
 	}
 	
 	public String toOAAString() {
 		StringBuffer sb = new StringBuffer(Integer.toString(id));
 		sb.append(",'");
-		sb.append(l.getLabel());
+		sb.append(word);
 		sb.append("'");
 		return sb.toString();
 	}

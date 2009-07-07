@@ -28,7 +28,8 @@ public class ConsoleNotifier extends HypothesisChangeListener {
 	@Override
 	public void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
 		if (edits.size() > 0) {
-			System.out.println("\nThe Hypothesis has changed.");
+			System.out.print("\nThe Hypothesis has changed at time: ");
+			System.out.println(currentFrame * 0.01);
 			System.out.println("Edits since last hypothesis:");
 			for (EditMessage<? extends IU> edit : edits) {
 				System.out.println(edit.toString());

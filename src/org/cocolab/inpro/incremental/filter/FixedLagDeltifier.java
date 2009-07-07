@@ -17,10 +17,10 @@
  */
 package org.cocolab.inpro.incremental.filter;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.util.ResultUtil;
 
 import edu.cmu.sphinx.decoder.search.Token;
@@ -40,17 +40,23 @@ public class FixedLagDeltifier extends ASRWordDeltifier {
 	}
 	
 	@Override
-	protected synchronized List<Label> getWordLabels(Token token) {
-		List<Label> newWords =  ResultUtil.getWordLabelSequence(token);
+	protected synchronized List<Token> getTokens(Token token) {
+		LinkedList<Token> newTokens = ResultUtil.getTokenList(token, true, true);
 		if (!recoFinal) {
 			// starting from the end ...
-			ListIterator<Label> iter = newWords.listIterator(newWords.size());
-			// remove all word labels that have started within the last fixedLag frames
-			while (iter.hasPrevious() && (iter.previous().getStart() * 100.0 > currentFrame - fixedLag)) {
+			ListIterator<Token> iter = newTokens.listIterator(newTokens.size());
+			// remove all tokens that have started within the last fixedLag frames
+			// this is a little more complex, as the start time is not available immediately
+			// but can only be deduced from the preceding token's frameNumber
+			if (iter.hasPrevious())
+				iter.previous();
+			while (iter.hasPrevious() && (iter.previous().getFrameNumber() > currentFrame - fixedLag)) {
+				iter.next();
 				iter.remove();
+				iter.previous();
 			}
-			}
-		return newWords;
+		}
+		return newTokens;
 	}
 	
 }

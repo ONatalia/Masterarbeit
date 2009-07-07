@@ -53,5 +53,14 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
 			apply(edit);
 		}
 	}
+ 	
+ 	public void add(IUType e, boolean deepSLL) {
+ 		if (deepSLL) {
+ 			e.connectSLL(get(size()));
+ 		} else {
+ 			e.setSameLevelLink(get(size()));
+ 		}
+ 		add(e);
+ 	}
 	
 }

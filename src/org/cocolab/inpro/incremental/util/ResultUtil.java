@@ -33,15 +33,19 @@ import edu.cmu.sphinx.linguist.lextree.LexTreeLinguist;
 
 public class ResultUtil {
 	
-	private static LinkedList<Token> getTokenList(Token token, boolean words, boolean units) {
+	public static LinkedList<Token> getTokenList(Token token, boolean words, boolean units) {
 		LinkedList<Token> tokenList = new LinkedList<Token>();
 		if (token != null) 
 			token = token.getPredecessor(); // skip the final sentence-end token (</s>)
 		while (token != null) {
 			SearchState searchState = token.getSearchState();
 			// determine type of searchState and add to list if appropriate
-			if (words && (searchState instanceof WordSearchState)) {
-               	tokenList.add(token);
+			if ((searchState instanceof WordSearchState)) {
+				if (((WordSearchState) searchState).getPronunciation().getWord().isSentenceStartWord()) {
+					break; // break once we reach the sentence start word
+				}
+               	if (words)
+               		tokenList.add(token);
 			} else if (units && 
 					  (searchState instanceof UnitSearchState) && 
 					 !(searchState instanceof LexTreeLinguist.LexTreeEndUnitState)){
@@ -59,12 +63,10 @@ public class ResultUtil {
 	public static List<Label> getWordLabelSequence(Token token, boolean wantFiller) {
 		// first part is to traverse the token list (backwards) and find the relevant tokens
 		LinkedList<Token> wordTokenList = getTokenList(token, true, false);
-		// second part: traverse the wordTokenList and unitTokenList backwards -- thus in time-increasing order
+		// second part: traverse the tokenList backwards -- thus in time-increasing order
 		Iterator<Token> it = wordTokenList.descendingIterator();
 		List<Label> returnList = new ArrayList<Label>(wordTokenList.size());
 		double start = 0.0;
-		if (it.hasNext()) 
-			start = it.next().getFrameNumber(); // skip the sentence-start token (<s>)
 		while (it.hasNext()) {
 			Token t = it.next();
 			double end = t.getFrameNumber() / 100.0;
