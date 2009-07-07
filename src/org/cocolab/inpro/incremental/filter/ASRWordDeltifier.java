@@ -108,7 +108,12 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 					break;
 				}
 				// if words match, update the segments with the segment boundaries from the segmentLabels list
-				prevIU.updateSegments(segmentLabels);
+				try {
+					prevIU.updateSegments(segmentLabels);
+				} finally {
+					System.err.println("the mess occurred with the following new tokens");
+					System.err.println("newTokens");
+				}
 				wordIUs.add(prevIU);
 				segmentLabels = new LinkedList<Label>();
 			} else {
@@ -138,7 +143,12 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 			} else if (newSearchState instanceof WordSearchState) {
 				Pronunciation pron = ((WordSearchState) newSearchState).getPronunciation();
 				WordIU newIU = WordUtil.wordFromPronunciation(pron);
-				newIU.updateSegments(segmentLabels);
+				try {
+					newIU.updateSegments(segmentLabels);
+				} finally {
+					System.err.println("the mess occurred with the following new tokens");
+					System.err.println("newTokens");
+				}
 				segmentLabels = new LinkedList<Label>();
 				wordIUs.add(newIU);
 				wordEdits.add(new EditMessage<WordIU>(EditType.ADD, newIU));

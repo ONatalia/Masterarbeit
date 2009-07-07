@@ -56,9 +56,12 @@ public class WordIU extends IU {
 	public void updateSegments(List<Label> newLabels) {
 		List<SegmentIU> segments = getSegments();
 		if (segments.size() != newLabels.size()) {
-			System.err.println("something is wrong:");
-			System.err.println(segments);
+			System.err.println("something is wrong when updating segments in word:");
+			System.err.println(this.toString());
+			System.err.println("I was supposed to add the following labels:");
 			System.err.println(newLabels);
+			System.err.println("but my segments are:");
+			System.err.println(segments);
 		}
 		Iterator<Label> labelIt = newLabels.iterator();
 		for (SegmentIU segment : segments) {

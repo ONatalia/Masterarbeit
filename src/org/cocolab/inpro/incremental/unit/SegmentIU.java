@@ -58,4 +58,9 @@ public class SegmentIU extends IU {
 		return l.toTEDViewXML();
 	}
 	
+	@Override
+	public String toString() {
+		return l.toString();
+	}
+	
 }
