@@ -93,7 +93,7 @@ public class WordIU extends IU {
 	}
 
 	public String toString() {
-		return toLabelLine(); // + "\n";
+		return id + "," + toLabelLine(); // + "\n";
 	}
 	
 	public String toOAAString() {

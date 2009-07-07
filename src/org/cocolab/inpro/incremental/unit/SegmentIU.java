@@ -60,7 +60,7 @@ public class SegmentIU extends IU {
 	
 	@Override
 	public String toString() {
-		return l.toString();
+		return id + "," + l.toString();
 	}
 	
 }

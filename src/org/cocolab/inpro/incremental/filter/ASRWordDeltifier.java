@@ -110,9 +110,10 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				// if words match, update the segments with the segment boundaries from the segmentLabels list
 				try {
 					prevIU.updateSegments(segmentLabels);
-				} finally {
+				} catch (Exception e) {
 					System.err.println("the mess occurred with the following new tokens");
-					System.err.println("newTokens");
+					System.err.println(newTokens);
+					throw new RuntimeException(e);
 				}
 				wordIUs.add(prevIU);
 				segmentLabels = new LinkedList<Label>();
@@ -145,9 +146,10 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				WordIU newIU = WordUtil.wordFromPronunciation(pron);
 				try {
 					newIU.updateSegments(segmentLabels);
-				} finally {
+				} catch (Exception e) {
 					System.err.println("the mess occurred with the following new tokens");
-					System.err.println("newTokens");
+					System.err.println(newTokens);
+					throw new RuntimeException(e);
 				}
 				segmentLabels = new LinkedList<Label>();
 				wordIUs.add(newIU);
