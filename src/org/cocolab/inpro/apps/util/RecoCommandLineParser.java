@@ -11,6 +11,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 
 	public int rtpPort;
 	int outputMode;
+	String referenceText;
 	
 	void printUsage() {
 		System.err.println("simple sphinx recognizer for the inpro project");
@@ -19,6 +20,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -h	           this screen");
 		System.err.println("    -c <configURL> sphinx configuration file to use (has a reasonable default)");
 		System.err.println("    -v             more verbose output (speed and memory tracker)");
+		System.err.println("    -fa <reference> do forced alignment with the given reference text");
 		System.err.println("input selection:");
 		System.err.println("    -M             read data from microphone");
 		System.err.println("    -R <port>      read data from RTP");
@@ -58,6 +60,11 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 			else if (args[i].equals("-v")) {
 				verbose = true;
 			}
+			else if (args[i].equals("-fa")) {
+				i++; 
+				referenceText = args[i];
+
+			}
 			else if (args[i].equals("-M")) { 
 				inputMode = MICROPHONE_INPUT;
 			}
@@ -93,6 +100,14 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	
 	public boolean matchesOutputMode(int mode) {
 		return (outputMode & mode) == mode;
+	}
+
+	public String getReferenceText() {
+		return referenceText;
+	}
+
+	public boolean forcedAlignment() {
+		return referenceText != null;
 	}
 	
 

@@ -10,9 +10,12 @@ import org.cocolab.inpro.apps.util.RecoCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 
+import edu.cmu.sphinx.decoder.Decoder;
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
+import edu.cmu.sphinx.linguist.Linguist;
+import edu.cmu.sphinx.linguist.language.grammar.ForcedAlignerGrammar;
 import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
@@ -108,6 +111,16 @@ public class SimpleReco {
     	if (!clp.parsedSuccessfully()) { System.exit(1); }
     	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
     	System.err.println("Loading recognizer...\n");
+    	if (clp.forcedAlignment()) { // should be if (forcedAlignment)
+    		System.err.println("Running in forced alignment mode.");
+    		System.err.println("Will try to recognize: " + clp.getReferenceText());
+        	cm.setGlobalProperty("linguist", "flatLinguist");
+        	cm.setGlobalProperty("grammar", "forcedAligner");
+	    	Linguist linguist = (Linguist) cm.lookup("flatLinguist");
+	    	linguist.allocate();
+	    	ForcedAlignerGrammar forcedAligner = (ForcedAlignerGrammar) cm.lookup("forcedAligner");
+	    	forcedAligner.setText(clp.getReferenceText());
+    	}
     	Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
     	recognizer.allocate();
     	System.err.println("Setting up source...\n");
