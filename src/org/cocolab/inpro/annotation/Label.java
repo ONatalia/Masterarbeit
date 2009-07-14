@@ -17,11 +17,30 @@
  */
 package org.cocolab.inpro.annotation;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+
 public class Label {
 	
 	private final double start; // in seconds
 	private final double end; // in seconds
 	private final String label;
+	
+	private static List<Pattern> tgPatterns = Arrays.asList( 
+		Pattern.compile("^\\s*xmin = (\\d*(\\.\\d+)?)\\s*$"), 
+		Pattern.compile("^\\s*xmax = (\\d*(\\.\\d+)?)\\s*$"), 
+		Pattern.compile("^\\s*text = \"(.*)\"\\s*$") 
+	); 
+	
+	static Label newFromTextGridLines(List<String> lines) throws IOException {
+		assert lines.size() == 3;
+		List<String> params = AnnotationUtil.interpret(lines, tgPatterns);
+		return new Label(Double.parseDouble(params.get(0)), 
+						 Double.parseDouble(params.get(1)), 
+						 params.get(2));
+	}
 	
 	public Label(String l) {
 		this(Double.NaN, Double.NaN, l);
@@ -64,6 +83,15 @@ public class Label {
 		sb.append(label.replace("<", "&lt;").replace(">", "&gt;"));
 		sb.append(" </event>");
 		return sb.toString();
+	}
+	
+
+	public static void main(String[] args) throws IOException {
+		Label l = newFromTextGridLines(Arrays.asList(
+				"        xmin = 0.910000", 
+				"        xmax = 1.970000", 
+				"        text = \"Quader\""));
+		System.out.println(l.toString());
 	}
 
 }
