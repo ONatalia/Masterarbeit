@@ -17,6 +17,8 @@
  */
 package org.cocolab.inpro.incremental.filter;
 
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -42,7 +44,6 @@ import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
-import edu.emory.mathcs.backport.java.util.Collections;
 
 
 /**
@@ -76,49 +77,76 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		return ResultUtil.getTokenList(token, true, true);
 	}
 	
+	/**
+	 * update the stored ASR-representation with information from the ASR result's given Token  
+	 * 
+	 * the actual deltification algorithm works as follows:
+	 * - we first extract all the word- and phoneme tokens from the token sequence
+	 * - we then compare the previous and the current hypothesis:
+	 *   - the beginning of the previous and this word hypothesis should be equal,
+	 *     we only need to update phoneme timings
+	 *   - eventually, the two hypotheses will differ:
+	 *     - we construct remove-edits for the remaining old words
+	 *     - we then construct the new words and add-edits for them 
+	 * 
+	 * @param token the token from which the deltification starts
+	 */
 	protected synchronized void deltify(Token token) {
 		List<Token> newTokens = getTokens(token);
-		Collections.reverse(newTokens);
-		List<WordIU> prevWordIUs = wordIUs;
-		wordIUs = new IUList<WordIU>();
+		@SuppressWarnings("unchecked")
+		List<WordIU> prevWordIUs = (List<WordIU>) wordIUs.clone();
 		// step over wordIUs and newWords to see which are equal in both
 		ListIterator<Token> newIt = newTokens.listIterator();
-		ListIterator<WordIU> prevIt = prevWordIUs.listIterator();
-		List<Label> segmentLabels = new LinkedList<Label>(); // this is where we accumulate phonemes for the word that follows
+		ListIterator<WordIU> prevWordIt = prevWordIUs.listIterator();
 		double segmentStartTime = 0.0;
 		double segmentEndTime = 0.0;
-		while (newIt.hasNext() && prevIt.hasNext()) {
+		Iterator<SegmentIU> prevSegmentIt = null;
+		boolean addSilenceWord = false;
+		while (newIt.hasNext() && prevWordIt.hasNext()) {
 			Token newToken = newIt.next();
 			SearchState newSearchState = newToken.getSearchState();
 			if (newSearchState instanceof UnitSearchState) {
 				if (newIt.hasNext()) {
 					segmentEndTime = newIt.next().getFrameNumber() * 0.01;
 					newIt.previous();
+				} else 
+					segmentEndTime = getCurrentTime();
+				String name = ((UnitSearchState) newSearchState).getUnit().getName();
+				System.err.println("1. step: looking at segment " + name);
+				// in the FA case, SIL-phonemes are not covered by SIL-words. duh.
+				if (prevSegmentIt.hasNext()) {
+					prevSegmentIt.next().updateLabel(new Label(segmentStartTime, segmentEndTime, name));
+				} else if (name.equals("SIL")) {
+					if (prevWordIt.hasNext() && prevWordIt.next().isSilence()) {
+						prevWordIt.previous();
+						prevWordIt.next().updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, name)));
+						if (prevWordIt.hasNext())
+							prevSegmentIt = prevWordIt.next().getSegments().iterator();
+						prevWordIt.previous();
+					} else {
+						prevWordIt.previous();
+						addSilenceWord = true;
+						break;
+					}
+				} else {
+					// assert false; // hmm, I don't know why, but it works without this assertion. and it doesn't hurt
 				}
-				segmentLabels.add(new Label(segmentStartTime, segmentEndTime, 
-											((UnitSearchState) newSearchState).getUnit().getName()));
 				segmentStartTime = segmentEndTime;
 			} else if (newSearchState instanceof WordSearchState) {
+				if (!prevWordIt.hasNext()) {
+					newIt.previous();
+					break;
+				}
 				Pronunciation pron = ((WordSearchState) newToken.getSearchState()).getPronunciation();
-				WordIU prevIU = prevIt.next();
+				WordIU prevIU = prevWordIt.next();
 				// check if the words match and break once we reach the point where they don't match anymore
 				if (!prevIU.wordEquals(pron)) {
-					prevIt.previous(); // go back the one word that didn't match anymore
+					prevWordIt.previous(); // go back the one word that didn't match anymore
 					newIt.previous();
 					break;
 				}
 				// if words match, update the segments with the segment boundaries from the segmentLabels list
-				try {
-					prevIU.updateSegments(segmentLabels);
-				} catch (Exception e) {
-					System.err.println("the mess occurred with the following new tokens");
-					System.err.println(newTokens);
-					throw new RuntimeException(e);
-				}
-				wordIUs.add(prevIU);
-				segmentLabels = new LinkedList<Label>();
-			} else {
-				throw new RuntimeException("Nobody expects the Spanish inquisition!");
+				prevSegmentIt = prevIU.getSegments().iterator();
 			}
 		}
 		// ok, now:
@@ -126,8 +154,15 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		// purge notifications have to be sent in reversed order, starting with the very last word
 		// therefore we put them in reverse order into a new list
 		wordEdits = new LinkedList<EditMessage<WordIU>>();
-		while (prevIt.hasNext()) {
-			wordEdits.add(0, new EditMessage<WordIU>(EditType.REVOKE, prevIt.next()));
+		while (prevWordIt.hasNext()) {
+			WordIU prevIU = prevWordIt.next();
+			wordEdits.add(0, new EditMessage<WordIU>(EditType.REVOKE, prevIU));
+		}
+		// check if we need to insert a silence
+		if (addSilenceWord) {
+			WordIU newIU = new WordIU(null);
+			newIU.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, "SIL")));
+			wordEdits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
 		}
 		// for the remaining words in the new list, add them to the old list and send add notifications
 		while (newIt.hasNext()) {
@@ -137,34 +172,49 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				if (newIt.hasNext()) {
 					segmentEndTime = newIt.next().getFrameNumber() * 0.01;
 					newIt.previous();
+				} else
+					segmentEndTime = getCurrentTime();
+				String name = ((UnitSearchState) newSearchState).getUnit().getName();
+				System.err.println("2. step: looking at segment " + name);
+				if (prevSegmentIt.hasNext()) {
+					prevSegmentIt.next().updateLabel(new Label(segmentStartTime, segmentEndTime, name));
+				} else if (name.equals("SIL")) {
+					WordIU newIU = new WordIU(null);
+					newIU.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, "SIL")));
+					wordEdits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
 				}
-				segmentLabels.add(new Label(segmentStartTime, segmentEndTime, 
-											((UnitSearchState) newSearchState).getUnit().getName()));
 				segmentStartTime = segmentEndTime;
 			} else if (newSearchState instanceof WordSearchState) {
 				Pronunciation pron = ((WordSearchState) newSearchState).getPronunciation();
 				WordIU newIU = WordUtil.wordFromPronunciation(pron);
-				try {
-					newIU.updateSegments(segmentLabels);
-				} catch (Exception e) {
-					System.err.println("the mess occurred with the following new tokens");
-					System.err.println(newTokens);
-					throw new RuntimeException(e);
-				}
-				segmentLabels = new LinkedList<Label>();
-				wordIUs.add(newIU);
+				prevSegmentIt = newIU.getSegments().iterator();
 				wordEdits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
-			} else {
-				throw new RuntimeException("Nobody expects the Spanish inquisition!");
 			}
 		}
+		wordIUs.apply(wordEdits);
 	}
 	
+	/**
+	 * update the stored ASR-representation with the new Result from ASR
+	 * 
+	 * - the current representation can afterwards be queried through getWordIUs()
+	 * - the difference from the previous state can be queried through getWordEdits()
+	 * 
+	 * the actual deltification algorithm is described in deltify(Token)
+	 * 
+	 * @param result current ASR hypothesis
+	 */
 	public synchronized void deltify(Result result) {
 		currentFrame = result.getFrameNumber();
 		if (result.isFinal())
 			recoFinal = true;
-		deltify(result.getBestToken());
+		Token t = result.getBestToken();
+		if (t != null)
+			deltify(result.getBestToken());
+		else {
+			System.err.println("there was no best token at frame " + currentFrame);
+			wordEdits = new LinkedList<EditMessage<WordIU>>();
+		}
 	}
 
 	public synchronized List<EditMessage<WordIU>> getWordEdits() {

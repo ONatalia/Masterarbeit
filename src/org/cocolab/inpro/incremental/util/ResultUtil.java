@@ -18,6 +18,7 @@
 package org.cocolab.inpro.incremental.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,23 +30,47 @@ import edu.cmu.sphinx.linguist.SearchState;
 import edu.cmu.sphinx.linguist.UnitSearchState;
 import edu.cmu.sphinx.linguist.WordSearchState;
 import edu.cmu.sphinx.linguist.dictionary.Word;
+import edu.cmu.sphinx.linguist.flat.PronunciationState;
+import edu.cmu.sphinx.linguist.flat.SentenceHMMState;
 import edu.cmu.sphinx.linguist.lextree.LexTreeLinguist;
 
 public class ResultUtil {
 	
+	/**
+	 * return a list of word and/or unit tokens extracted from a linked token list
+	 * 
+	 * if both words and units are to be returned, then the word token 
+	 * will always precede the unit tokens belonging to this word
+	 *
+	 * @param token the start token (that is, the last in time)
+	 * @param words whether word tokens should be returned
+	 * @param units whether unit tokens hsould be returned
+	 * @return a list of tokens of word and/or unit tokens
+	 */
 	public static LinkedList<Token> getTokenList(Token token, boolean words, boolean units) {
 		LinkedList<Token> tokenList = new LinkedList<Token>();
-		if (token != null) 
-			token = token.getPredecessor(); // skip the final sentence-end token (</s>)
+		if (token == null) 
+			return tokenList;
+		token = token.getPredecessor(); // skip the final sentence-end token (</s>)
+		boolean hasWordTokensLast = hasWordTokensLast(token);
+		Token cachedWordToken = null;
 		while (token != null) {
 			SearchState searchState = token.getSearchState();
 			// determine type of searchState and add to list if appropriate
 			if ((searchState instanceof WordSearchState)) {
 				if (((WordSearchState) searchState).getPronunciation().getWord().isSentenceStartWord()) {
-					break; // break once we reach the sentence start word
+			//		break; // break once we reach the sentence start word
 				}
-               	if (words)
-               		tokenList.add(token);
+               	if (words) {
+               		if (hasWordTokensLast) {
+               			if (cachedWordToken != null) {
+               				tokenList.add(cachedWordToken);
+               			}
+           				cachedWordToken = token;
+               		} else {
+               			tokenList.add(token);
+               		}
+               	}
 			} else if (units && 
 					  (searchState instanceof UnitSearchState) && 
 					 !(searchState instanceof LexTreeLinguist.LexTreeEndUnitState)){
@@ -53,7 +78,32 @@ public class ResultUtil {
             }
 			token = token.getPredecessor();
 		}
+		if (cachedWordToken != null) {
+			tokenList.add(cachedWordToken);
+		}
+		Collections.reverse(tokenList);
 		return tokenList;
+	}
+	
+	public static boolean hasWordTokensLast(Token token) {
+		boolean hasWordTokensLast;
+		SearchState searchState = token.getSearchState();
+		if (searchState instanceof LexTreeLinguist.LexTreeHMMState
+		 || searchState instanceof LexTreeLinguist.LexTreeUnitState
+		 || searchState instanceof LexTreeLinguist.LexTreeEndUnitState
+		 || searchState instanceof LexTreeLinguist.LexTreeWordState) {
+			// this is lextree
+			hasWordTokensLast = true;
+		} else if (searchState instanceof SentenceHMMState
+				|| searchState instanceof PronunciationState) {
+			// this is flat linguist
+			hasWordTokensLast = false;
+		} else {
+			// if you see this error, then you must extend the above.
+			assert false : searchState.getClass().toString();
+		    hasWordTokensLast = false;
+		}
+		return hasWordTokensLast; 
 	}
 	
 	public static List<Label> getWordLabelSequence(Token token) {
