@@ -143,6 +143,30 @@ public abstract class IU {
 		return Integer.toString(id);
 	}
 	
+	public String deepToString() {
+		StringBuffer sb = new StringBuffer("[IU of type ");
+		sb.append(this.getClass());
+		sb.append(" with content ");
+		sb.append(this.toString());
+		sb.append("\n  SLL: ");
+		if (sameLevelLink != null) {
+			sb.append(sameLevelLink.toString());
+		} else {
+			sb.append("none");
+		}
+		sb.append("\n  grounded in:\n  [");
+		if (groundedIn != null) {
+			for (IU iu : groundedIn) {
+				sb.append(iu.deepToString());
+				sb.append("  ");
+			}
+		} else {
+			sb.append("none");
+		}
+		sb.append("]\n]\n");
+		return sb.toString();
+ 	}
+	
 	public String toOAAString() {
 		return null;
 	}

@@ -30,7 +30,7 @@ public class SegmentIU extends IU {
 	}
 
 	public void updateLabel(Label l) {
-		assert (this.l.getLabel().equals(l.getLabel()));
+		assert (this.l.getLabel().equals(l.getLabel())) : "my label is " + this.l.getLabel() + ", was asked to update with " + l.getLabel();
 		this.l = l;
 	}
 	

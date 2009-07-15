@@ -18,6 +18,7 @@
 package org.cocolab.inpro.incremental.unit;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 
 public class WordIU extends IU {
 
+	final boolean isSilence;
 	final Pronunciation pron;
 	final String word;
 	
@@ -34,6 +36,21 @@ public class WordIU extends IU {
 		super(sll, groundedIn, true);
 		this.pron = pron;
 		this.word = pron.getWord().getSpelling();
+		isSilence = this.word.equals("<sil>");
+	}
+	
+	/**
+	 * create a new silent word
+	 * @param sll
+	 */
+	public WordIU(WordIU sll) {
+		super(sll, Collections.nCopies(1, 
+					new SyllableIU(null, Collections.nCopies(1, 
+								new SegmentIU("SIL", null)))), 
+			true);
+		this.pron = Pronunciation.UNKNOWN;
+		this.word = "<sil>";
+		isSilence = true;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -55,7 +72,7 @@ public class WordIU extends IU {
 	
 	public void updateSegments(List<Label> newLabels) {
 		List<SegmentIU> segments = getSegments();
-		if (segments.size() != newLabels.size()) {
+		if (segments.size() < newLabels.size()) {
 			System.err.println("something is wrong when updating segments in word:");
 			System.err.println(this.toString());
 			System.err.println("I was supposed to add the following labels:");
@@ -63,9 +80,9 @@ public class WordIU extends IU {
 			System.err.println("but my segments are:");
 			System.err.println(segments);
 		}
-		Iterator<Label> labelIt = newLabels.iterator();
-		for (SegmentIU segment : segments) {
-			segment.updateLabel(labelIt.next());
+		Iterator<SegmentIU> segIt = segments.iterator();
+		for (Label label : newLabels) {
+			segIt.next().updateLabel(label);
 		}
 	}
 	
@@ -102,6 +119,14 @@ public class WordIU extends IU {
 		sb.append(word);
 		sb.append("'");
 		return sb.toString();
+	}
+	
+	public String getWord() {
+		return word;
+	}
+	
+	public boolean isSilence() {
+		return isSilence;
 	}
 
 }

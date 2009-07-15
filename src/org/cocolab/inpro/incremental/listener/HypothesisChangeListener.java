@@ -45,7 +45,8 @@ public abstract class HypothesisChangeListener implements Configurable, Resetabl
 		List<EditMessage<WordIU>> edits = deltifier.getWordEdits();
 		List<WordIU> ius = deltifier.getWordIUs();
 		currentFrame = deltifier.getCurrentFrame();
-		hypChange(ius, edits);
+		if (ius != null && edits != null) 
+			hypChange(ius, edits);
 	}
 	
 	@Override
