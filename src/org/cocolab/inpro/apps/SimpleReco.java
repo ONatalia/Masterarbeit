@@ -10,7 +10,6 @@ import org.cocolab.inpro.apps.util.RecoCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 
-import edu.cmu.sphinx.decoder.Decoder;
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
@@ -137,7 +136,11 @@ public class SimpleReco {
 	        } else {
 	            System.err.println("Result: null\n");
 	        }
+	        if (clp.getInputMode() == RecoCommandLineParser.FILE_INPUT) {
+	        	break;
+	        }
     	} while ((result != null) && (result.getDataFrames() != null) && (result.getDataFrames().size() > 4));
+    	recognizer.deallocate();
     }
 
 }
