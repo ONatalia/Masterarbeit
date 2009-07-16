@@ -6,10 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class Tier {
+@SuppressWarnings("serial")
+public class Tier extends ArrayList<Label> {
 
 	protected String name;
-	protected List<Label> labels;
 	
 	private static List<Pattern> tgPatterns = Arrays.asList( 
 		Pattern.compile("^\\s*class = \"IntervalTier\"\\s*$"), 
@@ -21,7 +21,7 @@ public class Tier {
 	
 	static Tier newFromTextGridLines(List<String> lines) throws IOException {
 		assert lines.size() >= 5;
-		assert lines.size() - 5 % 4 == 0;
+		assert (lines.size() - 5) % 4 == 0 : lines;
 		List<String> params = AnnotationUtil.interpret(lines, tgPatterns);
 		String name = params.get(1);
 		int size = Integer.parseInt(params.get(4));
@@ -41,13 +41,13 @@ public class Tier {
 	}
 	
 	private Tier(String name, List<Label> labels) {
+		super(labels);
 		this.name = name;
-		this.labels = labels;
 	}
 	
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		for (Label l : labels) {
+		for (Label l : this) {
 			sb.append(l);
 			sb.append("\n");
 		}

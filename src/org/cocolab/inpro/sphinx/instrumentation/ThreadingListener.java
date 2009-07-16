@@ -1,6 +1,5 @@
 package org.cocolab.inpro.sphinx.instrumentation;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +48,7 @@ public class ThreadingListener implements ResultListener, ResultProducer, StateL
 			for (BlockingQueue<Result> queue : resultQueues.values()) {
 				try {
 					queue.put(result);
+					Thread.yield(); // give the other threads a chance to pick up their results 
 				} catch (InterruptedException e) {
 					logger.warn("I was interrupted while waiting to put a result into a queue");
 				}
@@ -97,7 +97,7 @@ public class ThreadingListener implements ResultListener, ResultProducer, StateL
 	
 	@Override
 	public void statusChanged(RecognizerState status) {
-		if (status == status.DEALLOCATING) {
+		if (status == RecognizerState.DEALLOCATING) {
 			for (ResultListener listener : listenerThreads.keySet()) {
 				removeResultListener(listener);
 			}

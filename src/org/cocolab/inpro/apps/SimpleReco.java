@@ -8,6 +8,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.cocolab.inpro.apps.util.RecoCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
+import org.cocolab.inpro.sphinx.decoder.FakeSearch;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 
 import edu.cmu.sphinx.frontend.FrontEnd;
@@ -110,15 +111,21 @@ public class SimpleReco {
     	if (!clp.parsedSuccessfully()) { System.exit(1); }
     	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
     	System.err.println("Loading recognizer...\n");
-    	if (clp.forcedAlignment()) { // should be if (forcedAlignment)
+    	if (clp.isRecoMode(RecoCommandLineParser.FORCED_ALIGNER_RECO)) {
     		System.err.println("Running in forced alignment mode.");
-    		System.err.println("Will try to recognize: " + clp.getReferenceText());
+    		System.err.println("Will try to recognize: " + clp.getReference());
         	cm.setGlobalProperty("linguist", "flatLinguist");
         	cm.setGlobalProperty("grammar", "forcedAligner");
 	    	Linguist linguist = (Linguist) cm.lookup("flatLinguist");
 	    	linguist.allocate();
 	    	ForcedAlignerGrammar forcedAligner = (ForcedAlignerGrammar) cm.lookup("forcedAligner");
-	    	forcedAligner.setText(clp.getReferenceText());
+	    	forcedAligner.setText(clp.getReference());
+    	} else if (clp.isRecoMode(RecoCommandLineParser.FAKE_RECO)) {
+    		System.err.println("Running in fake recognition mode.");
+    		System.err.println("Reading transcript from: " + clp.getReference());
+        	cm.setGlobalProperty("searchManager", "fakeSearch");
+        	FakeSearch fs = (FakeSearch) cm.lookup("fakeSearch");
+        	fs.setTranscript(clp.getReference());
     	}
     	Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
     	recognizer.allocate();

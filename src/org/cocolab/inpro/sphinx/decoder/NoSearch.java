@@ -1,4 +1,4 @@
-package org.cocolab.inpro.sphinx;
+package org.cocolab.inpro.sphinx.decoder;
 
 import edu.cmu.sphinx.decoder.search.SearchManager;
 import edu.cmu.sphinx.frontend.Data;
@@ -23,11 +23,11 @@ import edu.cmu.sphinx.util.props.S4Component;
 
 public class NoSearch implements SearchManager {
 
+	@S4Component(type = FrontEnd.class)
 	public static final String PROP_FRONTEND = "frontend";
 
 	protected static final Result emptyResult = new Result(null, null, 0, false, null);
 	
-	@S4Component(type = FrontEnd.class)
 	FrontEnd fe;
 	
     public void allocate() {
@@ -39,7 +39,6 @@ public class NoSearch implements SearchManager {
 	}
 
 	public Result recognize(int nFrames) {
-		// TODO Auto-generated method stub
 		Result result = null;
 		for (int i = 0; i < nFrames; i++) {
 			try {

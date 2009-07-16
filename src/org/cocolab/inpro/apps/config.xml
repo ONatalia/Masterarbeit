@@ -28,13 +28,15 @@
     <property name="step" value="1"/>
     <property name="recognizer" value="recognizer"/>
     <property name="linguist" value="lexTreeLinguist"/>
+    <property name="searchManager" value="fakeSearch"/>
 <!--
     <property name="linguist"   value="flatLinguist"/> 
-    <property name="grammar" value="forcedAligner"/>
--->
+    <property name="grammar" value="ngramGrammar"/>
     <property name="grammar" value="jsgfGrammar"/>
-    <property name="frontend" value="frontend"/>
+    <property name="grammar" value="forcedAligner"/>
     <property name="searchManager" value="searchManager"/>
+-->
+    <property name="frontend" value="frontend"/>
     <!-- The minimum amount of time in speech (in milliseconds) to be considered as utterance start -->
     <property name="startSpeech" value="200"/>
     <!-- The amount of time in silence (in milliseconds) to be considered as utterance end -->
@@ -53,11 +55,11 @@
     <component name="recognizer" type="edu.cmu.sphinx.recognizer.Recognizer">
         <property name="decoder" value="decoder"/>
         <propertylist name="monitors">
+        	<item>currentHypothesis</item>
 <!--
-        	<item>currentHypothesis</item>
         	<item>threadingListener</item>
-        	<item>currentHypothesis</item>
             <item>labelWriter </item>
+        	<item>currentHypothesis</item>
             <item>speedTracker </item>
             <item>memoryTracker </item>
             <item>newWordNotifierAgent </item>
@@ -71,14 +73,14 @@
     <!-- The incremental processing configuration                 -->
     <!-- ******************************************************** -->
     <component name="currentHypothesis" type="org.cocolab.inpro.incremental.CurrentHypothesis">
-        <property name="recognizer" value="threadingListener"/>
+        <property name="recognizer" value="recognizer"/>
 <!--
         <property name="asrFilter" value="smoothing"/>
 -->
         <propertylist name="hypChangeListeners">
+            <item>consoleNotifier</item>
             <item>labelWriter2</item>
 <!--
-            <item>consoleNotifier</item>
     		<item>tedNotifier</item>
     		<item>oaaNotifier</item>
 -->
@@ -127,6 +129,12 @@
         <property name="keepAllTokens" value="true"/>
     </component>
 -->
+
+    <component name="fakeSearch" type="org.cocolab.inpro.sphinx.decoder.FakeSearch">
+        <property name="dictionary" value="dictionary"/>
+        <property name="frontend" value="frontend"/>
+        <property name="textGrid" value=""/>
+    </component>
 
     <component name="searchManager" type="edu.cmu.sphinx.decoder.search.WordPruningBreadthFirstSearchManager">
         <property name="logMath" value="logMath"/>
@@ -370,7 +378,7 @@
         <property name="recognizer" value="${recognizer}"/>
         <property name="intermediateResults" value="true"/>
         <property name="finalResult" value="false"/>
-        <property name="wordAlignment" value="true"/>
+        <property name="wordAlignment" value="false"/>
         <property name="phoneAlignment" value="true"/>
         <property name="step" value="${step}"/>
         <property name="fileOutput" value="false"/>

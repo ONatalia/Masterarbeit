@@ -5,13 +5,18 @@ import java.net.URL;
 
 public class RecoCommandLineParser extends CommonCommandLineParser {
 
+
+	
 	public RecoCommandLineParser(String[] args) {
 		super(args);
 	}
 
+	int recoMode;
+	
 	public int rtpPort;
 	int outputMode;
 	String referenceText;
+	String referenceFile;
 	
 	void printUsage() {
 		System.err.println("simple sphinx recognizer for the inpro project");
@@ -21,6 +26,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -c <configURL> sphinx configuration file to use (has a reasonable default)");
 		System.err.println("    -v             more verbose output (speed and memory tracker)");
 		System.err.println("    -fa <reference> do forced alignment with the given reference text");
+		System.err.println("    -tg <textgrid> do fake recognition from the given reference textgrid");
 		System.err.println("input selection:");
 		System.err.println("    -M             read data from microphone");
 		System.err.println("    -R <port>      read data from RTP");
@@ -47,6 +53,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	}
 	
 	void parse(String[] args) throws MalformedURLException {
+		recoMode = REGULAR_RECO;
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-h")) {
 				printUsage();
@@ -62,8 +69,13 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-fa")) {
 				i++; 
+				recoMode = FORCED_ALIGNER_RECO;
 				referenceText = args[i];
-
+			}
+			else if (args[i].equals("-tg")) {
+				i++;
+				recoMode = FAKE_RECO;
+				referenceText = args[i];
 			}
 			else if (args[i].equals("-M")) { 
 				inputMode = MICROPHONE_INPUT;
@@ -102,13 +114,12 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		return (outputMode & mode) == mode;
 	}
 
-	public String getReferenceText() {
+	public String getReference() {
 		return referenceText;
 	}
-
-	public boolean forcedAlignment() {
-		return referenceText != null;
-	}
 	
+	public boolean isRecoMode(int mode) {
+		return recoMode == mode;
+	}
 
 }

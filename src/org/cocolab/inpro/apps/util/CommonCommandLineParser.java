@@ -11,6 +11,10 @@ public abstract class CommonCommandLineParser {
 	public static final int RTP_INPUT = 3;
 	public static final int OAA_DISPATCHER_INPUT = 4;
 	
+	public static final int REGULAR_RECO = 0;
+	public static final int FORCED_ALIGNER_RECO = 1;
+	public static final int FAKE_RECO = 2;
+	
 	public static final int NO_OUTPUT = 0;
 	public static final int OAA_OUTPUT = 1;
 	public static final int TED_OUTPUT = 2;
