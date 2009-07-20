@@ -112,7 +112,6 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				} else 
 					segmentEndTime = getCurrentTime();
 				String name = ((UnitSearchState) newSearchState).getUnit().getName();
-				System.err.println("1. step: looking at segment " + name);
 				// in the FA case, SIL-phonemes are not covered by SIL-words. duh.
 				if (prevSegmentIt.hasNext()) {
 					prevSegmentIt.next().updateLabel(new Label(segmentStartTime, segmentEndTime, name));
@@ -175,7 +174,6 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				} else
 					segmentEndTime = getCurrentTime();
 				String name = ((UnitSearchState) newSearchState).getUnit().getName();
-				System.err.println("2. step: looking at segment " + name);
 				if (prevSegmentIt.hasNext()) {
 					prevSegmentIt.next().updateLabel(new Label(segmentStartTime, segmentEndTime, name));
 				} else if (name.equals("SIL")) {
