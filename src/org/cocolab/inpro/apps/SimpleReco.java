@@ -110,7 +110,6 @@ public class SimpleReco {
     	RecoCommandLineParser clp = new RecoCommandLineParser(args);
     	if (!clp.parsedSuccessfully()) { System.exit(1); }
     	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
-    	System.err.println("Loading recognizer...\n");
     	if (clp.isRecoMode(RecoCommandLineParser.FORCED_ALIGNER_RECO)) {
     		System.err.println("Running in forced alignment mode.");
     		System.err.println("Will try to recognize: " + clp.getReference());
@@ -126,6 +125,8 @@ public class SimpleReco {
         	cm.setGlobalProperty("searchManager", "fakeSearch");
         	FakeSearch fs = (FakeSearch) cm.lookup("fakeSearch");
         	fs.setTranscript(clp.getReference());
+    	} else {
+    		System.err.println("Loading recognizer...\n");
     	}
     	Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
     	recognizer.allocate();

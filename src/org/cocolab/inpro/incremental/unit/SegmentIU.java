@@ -17,12 +17,26 @@
  */
 package org.cocolab.inpro.incremental.unit;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.cocolab.inpro.annotation.Label;
 
 public class SegmentIU extends IU {
 	
+	public static final Set<String> SILENCE = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+			"<sil>", "SIL", "<p:>", "<s>", "</s>")));
+	public static final Set<String> VOWELS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+			"@", "a", "aa:", "ai", "au", "e:", "ee", "ee:", "ei", "i:", "ii", "o:", "oo", "oy", "u:", "ui", "ui:", "uu", "y:", "yy")));
+	public static final Set<String> CONSONANTS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+			"b", "cc", "d", "f", "g", "h", "j", "k", "l", "m", "n", "nn", "p", "qq", "r", "s", "ss", "t", "v", "x", "z")));
+	
 	// we keep start time, end time and text of the segment in a label
 	Label l;
+	
+//	AcousticBaseData ad;
 	
 	public SegmentIU(String segment, SegmentIU sll) {
 		super(sll);
@@ -44,6 +58,23 @@ public class SegmentIU extends IU {
 		return l.getEnd();
 	}
 
+	public boolean isSilence() {
+		return SILENCE.contains(l.getLabel()); 
+	}
+	
+	public boolean isVowel() {
+		return VOWELS.contains(l.getLabel());
+	}
+	
+	@Override
+	public void update(EditType edit) {
+		if (edit == EditType.COMMIT) {
+			System.err.print("I am the now commited ");
+			System.err.print(isSilence() ? "silence " : isVowel() ? "vowel " : "consonant ");
+			System.err.println(toString());
+		}
+	}
+	
 	@Override
 	public String toOAAString() {
 		StringBuffer sb = new StringBuffer(Integer.toString(id));

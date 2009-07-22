@@ -74,6 +74,8 @@ public class FakeSearch extends NoSearch {
 		}
         if (!transcriptName.equals("")) {
         	loadTranscript(transcriptName);
+        } else {
+        	sortedTokenList = new TokenList();
         }
 	}
 
@@ -194,7 +196,7 @@ public class FakeSearch extends NoSearch {
 			if (listIt == null) 
 				listIt = sortedList.listIterator();
 			while (listIt.hasNext() && listIt.next().getFrameNumber() <= frameNumber) {}
-			return listIt.previous();
+			return listIt.hasPrevious() ? listIt.previous() : null;
 		}
 	}
 	

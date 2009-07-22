@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -65,6 +66,11 @@ public class TextGrid {
 			throw new IOException(e);
 		}
 		return new TextGrid(tiers);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static TextGrid newEmptyTextgrid() {
+		return new TextGrid(Collections.EMPTY_LIST);
 	}
 
 	private TextGrid(List<Tier> tiers) {
