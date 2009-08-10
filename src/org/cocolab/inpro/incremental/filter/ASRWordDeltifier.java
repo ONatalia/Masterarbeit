@@ -35,6 +35,10 @@ import org.cocolab.inpro.incremental.util.ResultUtil;
 import org.cocolab.inpro.incremental.util.WordUtil;
 
 import edu.cmu.sphinx.decoder.search.Token;
+import edu.cmu.sphinx.frontend.Data;
+import edu.cmu.sphinx.frontend.DataStartSignal;
+import edu.cmu.sphinx.frontend.Signal;
+import edu.cmu.sphinx.frontend.endpoint.SpeechStartSignal;
 import edu.cmu.sphinx.instrumentation.Resetable;
 import edu.cmu.sphinx.linguist.SearchState;
 import edu.cmu.sphinx.linguist.UnitSearchState;
@@ -65,7 +69,9 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 
 	List<EditMessage<WordIU>> wordEdits;
 	
-	int currentFrame;
+	int currentFrame = 0;
+	long currentOffset = 0;
+	long startTime = 0;
 	
 	protected boolean recoFinal; // flag to avoid smoothing or fixed lags on final result
 	
@@ -98,7 +104,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		// step over wordIUs and newWords to see which are equal in both
 		ListIterator<Token> newIt = newTokens.listIterator();
 		ListIterator<WordIU> prevWordIt = prevWordIUs.listIterator();
-		double segmentStartTime = 0.0;
+		double segmentStartTime = currentOffset * 0.001;
 		double segmentEndTime = 0.0;
 		Iterator<SegmentIU> prevSegmentIt = null;
 		boolean addSilenceWord = false;
@@ -107,8 +113,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 			SearchState newSearchState = newToken.getSearchState();
 			if (newSearchState instanceof UnitSearchState) {
 				if (newIt.hasNext()) {
-					segmentEndTime = newIt.next().getFrameNumber() * 0.01;
-					newIt.previous();
+					segmentEndTime = newIt.next().getFrameNumber() * 0.01 + currentOffset * 0.001;
 				} else 
 					segmentEndTime = getCurrentTime();
 				String name = ((UnitSearchState) newSearchState).getUnit().getName();
@@ -169,7 +174,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 			SearchState newSearchState = newToken.getSearchState();
 			if (newSearchState instanceof UnitSearchState) {
 				if (newIt.hasNext()) {
-					segmentEndTime = newIt.next().getFrameNumber() * 0.01;
+					segmentEndTime = newIt.next().getFrameNumber() * 0.01 + currentOffset * 0.001;
 					newIt.previous();
 				} else
 					segmentEndTime = getCurrentTime();
@@ -228,13 +233,24 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	}
 	
 	public synchronized double getCurrentTime() {
-		return currentFrame * 0.01;
+		return currentFrame * 0.01 + currentOffset * 0.001;
 	}
 
 	@Override
 	public void reset() {
 		wordIUs = new IUList<WordIU>();
 		recoFinal = false;
+	}
+
+	@Override
+	public void signalOccurred(Signal signal) {
+		System.err.println(signal.toString());
+		if (signal instanceof DataStartSignal) {
+			startTime = signal.getTime();
+		} else if (signal instanceof SpeechStartSignal) {
+			currentOffset = signal.getTime() - startTime;
+		}
+		
 	}
 	
 }
