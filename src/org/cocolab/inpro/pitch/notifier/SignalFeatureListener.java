@@ -21,12 +21,13 @@ package org.cocolab.inpro.pitch.notifier;
 import java.util.EventListener;
 
 import edu.cmu.sphinx.instrumentation.Resetable;
+import edu.cmu.sphinx.util.props.Configurable;
 
 /**
  *  The listener interface for being informed when 
  *  new signal features are available
  */
-public interface SignalFeatureListener extends EventListener, Resetable {
+public interface SignalFeatureListener extends Configurable, EventListener, Resetable {
 	/**
      * Method called when a new set of signal features is available
      *
@@ -35,4 +36,6 @@ public interface SignalFeatureListener extends EventListener, Resetable {
      */
      public void newSignalFeatures(double logEnergy, boolean voicing, double pitch);
      
+     public void newSignalFeatures(double logEnergy, double rBCEnergy, boolean voicing, double pitch);
+
 }

@@ -212,6 +212,7 @@ public class PitchTracker extends BaseDataProcessor {
 	double parabolicInterpolation(double[] lagScoreFunction, int lag) {
 		//TODO: implement parabolic interpolation
 		// compare http://www.iua.upf.es/~xserra/cursos/IAM/labs/lab5/lab-5.html
+		// http://ccrma.stanford.edu/~jos/parshl/Peak_Detection_Steps_3.html
 		return lag;
 	}
 	
@@ -221,6 +222,7 @@ public class PitchTracker extends BaseDataProcessor {
 
 	public Data getData() throws DataProcessingException {
 		Data input = getPredecessor().getData();
+        getTimer().start();
 		if (input instanceof DoubleData) {
 			double[] newSamples = ((DoubleData) input).getValues();
 			double signalPower = signalPower(newSamples);
@@ -249,6 +251,7 @@ public class PitchTracker extends BaseDataProcessor {
 				input = new PitchedDoubleData((DoubleData) input, voiced, pitchHz, candidates, signalPower);
 			}
 		}
+        getTimer().stop();
 		return input;
 	}
 	

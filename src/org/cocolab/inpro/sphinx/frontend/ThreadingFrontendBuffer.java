@@ -13,6 +13,8 @@ public class ThreadingFrontendBuffer extends BaseDataProcessor implements Runnab
 	
 	BlockingQueue<Data> queue = new LinkedBlockingQueue<Data>(queueCapacity);
 	
+	boolean running = true;
+	
 	Thread drainer = null;
 	
 	@Override
@@ -41,15 +43,19 @@ public class ThreadingFrontendBuffer extends BaseDataProcessor implements Runnab
 		Data data;
 		do {
 			data = getPredecessor().getData();
-			do {
-				try {
-					queue.put(data);
-					data = null;
-				} catch (InterruptedException e) {
-					// ignore interruption (just try again)
-				}
-			} while(data != null);
-		} while (true);
+			if (data == null) {
+				running = false;
+			} else {
+				do {
+					try {
+						queue.put(data);
+						data = null;
+					} catch (InterruptedException e) {
+						// ignore interruption (just try again)
+					}
+				} while(data != null);
+			}
+		} while (running);
 	}
 
 }

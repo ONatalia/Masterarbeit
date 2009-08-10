@@ -169,7 +169,7 @@ public class LabelWriter implements Configurable,
      * @param result the result to analyse
      * @return List of word tokens on the best path
      */
-    public List<Token> getBestWordTokens(Token token) {
+    protected List<Token> getBestWordTokens(Token token) {
 		List<Token> list = new ArrayList<Token>();
     	while (token != null) {
 			SearchState searchState = token.getSearchState(); 
@@ -191,7 +191,7 @@ public class LabelWriter implements Configurable,
      * @param result the result to analyse
      * @return List of phone tokens on the best path
      */
-    public static List<Token> getBestPhoneTokens(Token token) {
+    protected static List<Token> getBestPhoneTokens(Token token) {
 		List<Token> list = new ArrayList<Token>();
 		// recover the visited segmental tokens in the best path
     	list.add(token);
@@ -214,7 +214,7 @@ public class LabelWriter implements Configurable,
      * @param result the result to analyse
      * @return List of all tokens on the best path
      */
-    public static List<Token> getAllBestTokens(Result result) {
+    private static List<Token> getAllBestTokens(Result result) {
 		List<Token> list = new ArrayList<Token>();
     	Token token = result.getBestToken();
 		// recover the path of visited word- and silence-tokens in the best token
@@ -281,7 +281,6 @@ public class LabelWriter implements Configurable,
     /*
      * @see edu.cmu.sphinx.result.ResultListener#newResult(edu.cmu.sphinx.result.Result)
      */
-    @SuppressWarnings("unchecked")
 	public void newResult(Result result) {
     	if ((intermediateResults == !result.isFinal()) 
     	|| (finalResult && result.isFinal())) {
