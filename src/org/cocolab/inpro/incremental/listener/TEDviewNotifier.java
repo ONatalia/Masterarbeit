@@ -26,6 +26,7 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.WordIU;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -65,15 +66,24 @@ public class TEDviewNotifier extends HypothesisChangeListener {
 	@Override
 	public void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
 		if (tedOutput && (edits.size() > 0)) {
-	    	StringBuffer sb = new StringBuffer();
-	    	sb.append("<event time='");
-	    	sb.append(currentFrame * 10);
-	    	sb.append("' originator='asr_words'>");
+	    	StringBuffer sbWords = new StringBuffer();
+	    	sbWords.append("<event time='");
+	    	sbWords.append(Math.round(currentTime * 1000.0));
+	    	StringBuffer sbSegms = new StringBuffer(sbWords);
+	    	sbWords.append("' originator='asr_words'>");
+	    	sbSegms.append("' originator='asr_phones'>");
 	    	for (IU iu : ius) {
-	    		sb.append(iu.toTEDviewXML());
+	    		if (iu instanceof WordIU) {
+		    		sbWords.append(iu.toTEDviewXML());
+		    		for (IU iu2 : ((WordIU) iu).getSegments()) {
+		    			sbSegms.append(iu2.toTEDviewXML());
+		    		}
+	    		}
 	    	}
-	    	sb.append("</event>\n\n");
-			writer.print(sb.toString());
+	    	sbWords.append("</event>\n\n");
+	    	sbSegms.append("</event>\n\n");
+			writer.print(sbWords.toString());
+			writer.print(sbSegms.toString());
 			writer.flush();
 		}
 	}

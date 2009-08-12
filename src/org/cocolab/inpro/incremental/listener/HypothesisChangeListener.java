@@ -33,7 +33,7 @@ import edu.cmu.sphinx.util.props.PropertySheet;
 public abstract class HypothesisChangeListener implements Configurable, Resetable {
 
 	int currentFrame = 0;
-
+	double currentTime = 0.0;
 
 	/*
 	 * this should receive a list of current IUs and 
@@ -45,6 +45,7 @@ public abstract class HypothesisChangeListener implements Configurable, Resetabl
 		List<EditMessage<WordIU>> edits = deltifier.getWordEdits();
 		List<WordIU> ius = deltifier.getWordIUs();
 		currentFrame = deltifier.getCurrentFrame();
+		currentTime = deltifier.getCurrentTime(); 
 		if (ius != null && edits != null) 
 			hypChange(ius, edits);
 	}
