@@ -21,7 +21,7 @@ public class AudioUtils {
 				AudioFileReader sfr = new SphereFileReader(); 
 				ais = sfr.getAudioInputStream(audioFileURL);
 		} else {
-			System.err.println(AudioSystem.getAudioFileFormat(audioFileURL));
+			//System.err.println(AudioSystem.getAudioFileFormat(audioFileURL));
 	        ais = AudioSystem.getAudioInputStream(audioFileURL);
 		}
 		return ais;

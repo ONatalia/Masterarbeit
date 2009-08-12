@@ -23,10 +23,8 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("usage: java org.cocolab.inpro.apps.SimpleReco");
 		System.err.println("options:");
 		System.err.println("    -h	           this screen");
-		System.err.println("    -c <configURL> sphinx configuration file to use (has a reasonable default)");
+		System.err.println("    -c <URL>       sphinx configuration file to use (reasonable default)");
 		System.err.println("    -v             more verbose output (speed and memory tracker)");
-		System.err.println("    -fa <reference> do forced alignment with the given reference text");
-		System.err.println("    -tg <textgrid> do fake recognition from the given reference textgrid");
 		System.err.println("input selection:");
 		System.err.println("    -M             read data from microphone");
 		System.err.println("    -R <port>      read data from RTP");
@@ -34,8 +32,10 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("output selection:");
 		System.err.println("    -A             send messages via OAA");
 		System.err.println("    -T             send incremental hypotheses to TEDview");
-		System.err.println("    -L             output incremental label-alignments using LabelWriter to stdout");
-		System.err.println("    -I             incrementally output features (hopefully) useful for ASR confidence evaluation to stdout");
+		System.err.println("    -L             incremental output using LabelWriter");
+		System.err.println("special modes:");
+		System.err.println("    -fa <text>     do forced alignment with the given reference text");
+		System.err.println("    -tg <file>     do fake recognition from the given reference textgrid");
 	}
 	
 	/*
@@ -46,6 +46,9 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		if (inputMode == UNSPECIFIED_INPUT) {
 			printUsage();
 			System.err.println("Must specify one of -M, -R, or -F");
+		} else if ((recoMode == FAKE_RECO) && (inputMode != FILE_INPUT)) {
+			printUsage();
+			System.err.println("You can only combine faked recognition with file input. Sorry.");
 		} else {
 			success = true;
 		}

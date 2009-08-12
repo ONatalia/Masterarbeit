@@ -70,6 +70,8 @@ public abstract class CommonCommandLineParser {
 		return inputMode;
 	}
 	
-
+	public boolean isInputMode(int inputMode) {
+		return this.inputMode == inputMode;
+	}
 	
 }

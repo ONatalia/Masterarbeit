@@ -22,14 +22,14 @@ import java.util.List;
 public abstract class IU {
 	
 	public static final IU FIRST_IU = new IU() {}; 
-
 	private static int IU_idCounter = 0;
-	
-	final int id;
+	protected final int id;
 
-	IU sameLevelLink;
+	protected IU sameLevelLink;
 	
 	List<? extends IU> groundedIn;
+	
+	BaseData bd;
 	
 	/**
 	 * call this, if you want to provide a sameLevelLink and a groundedIn list

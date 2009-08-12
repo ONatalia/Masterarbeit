@@ -51,16 +51,16 @@ public class ResultUtil {
 		LinkedList<Token> tokenList = new LinkedList<Token>();
 		if (token == null) 
 			return tokenList;
-		token = token.getPredecessor(); // skip the final sentence-end token (</s>)
+		if ((token.getSearchState() instanceof WordSearchState)
+		 && ((WordSearchState) token.getSearchState()).getPronunciation().getWord().isSentenceEndWord()) {
+			token = token.getPredecessor(); // skip the final sentence-end token (</s>)
+		}
 		boolean hasWordTokensLast = hasWordTokensLast(token);
 		Token cachedWordToken = null;
 		while (token != null) {
 			SearchState searchState = token.getSearchState();
 			// determine type of searchState and add to list if appropriate
 			if ((searchState instanceof WordSearchState)) {
-				if (((WordSearchState) searchState).getPronunciation().getWord().isSentenceStartWord()) {
-			//		break; // break once we reach the sentence start word
-				}
                	if (words) {
                		if (hasWordTokensLast) {
                			if (cachedWordToken != null) {
@@ -82,6 +82,16 @@ public class ResultUtil {
 			tokenList.add(cachedWordToken);
 		}
 		Collections.reverse(tokenList);
+		// this removes leading silence when nothing has been recognized yet
+		if (((WordSearchState) tokenList.get(0).getSearchState()).getPronunciation().getWord().isSentenceStartWord()
+		) {
+			tokenList.remove(0);
+			if ((tokenList.get(0).getSearchState() instanceof UnitSearchState)
+			 && ((UnitSearchState) tokenList.get(0).getSearchState()).getUnit().isFiller()
+			) {
+				tokenList.remove(0);
+			} 
+		}
 		return tokenList;
 	}
 	

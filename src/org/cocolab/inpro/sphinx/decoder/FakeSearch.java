@@ -145,7 +145,9 @@ public class FakeSearch extends NoSearch {
 			Unit[] units = pron.getUnits();
 			for (Unit unit : units) {
 				Label unitLabel = unitIt.next();
-				assert unit.getName().equals(unitLabel.getLabel()) : "Problem with pronunciation of word " + wordLabel.toString();
+				assert unit.getName().equals(unitLabel.getLabel()) 
+					: "Problem with pronunciation of word " + wordLabel.toString() + "\n"
+					+ "dictionary says " + pron + " and TextGrid has " + unitLabel + "\n";
 				searchState = new UnitState(unit, null);
 				frameNumber = (int) Math.round(unitLabel.getStart() * 100);
 				t = t.child(searchState, 0.0f, 0.0f, 0.0f, frameNumber);

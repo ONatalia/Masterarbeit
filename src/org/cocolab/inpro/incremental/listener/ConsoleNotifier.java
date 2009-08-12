@@ -34,13 +34,13 @@ public class ConsoleNotifier extends HypothesisChangeListener {
 			for (EditMessage<? extends IU> edit : edits) {
 				System.out.println(edit.toString());
 			}
-			System.out.println("Current hypothesis is now:");
+/*			System.out.println("Current hypothesis is now:");
 			for (IU iu : ius) {
-				System.out.println(iu.toString());
-			}
-		}// else {
-		//	System.out.print(".");
-		//}
+				System.out.println(iu.deepToString());
+			} 
+*/		} else {
+			System.out.print(".");
+		}
 	}
 
 }

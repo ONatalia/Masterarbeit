@@ -23,6 +23,8 @@ import java.util.List;
 
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IUList;
+import org.cocolab.inpro.incremental.unit.SegmentIU;
+import org.cocolab.inpro.incremental.unit.SyllableIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
 import edu.cmu.sphinx.decoder.search.Token;
@@ -45,7 +47,8 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 	
 	@Override
 	protected synchronized void deltify(Token token) {
-		IUList<WordIU> prevWordIUs = wordIUs;
+		// keep a copy of the original wordIUs
+		IUList<WordIU> prevWordIUs = new IUList<WordIU>(wordIUs);
 		// calculate would-be edits the standard way
 		super.deltify(token); 
 		if (!recoFinal) {

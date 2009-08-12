@@ -36,15 +36,13 @@ public class SegmentIU extends IU {
 	// we keep start time, end time and text of the segment in a label
 	Label l;
 	
-//	AcousticBaseData ad;
-	
 	public SegmentIU(String segment, SegmentIU sll) {
 		super(sll);
 		this.l = new Label(segment);
 	}
 
 	public void updateLabel(Label l) {
-		assert (this.l.getLabel().equals(l.getLabel())) : "my label is " + this.l.getLabel() + ", was asked to update with " + l.getLabel();
+		assert (this.l.getLabel().equals(l.getLabel())) : "my label is " + this.l.toString() + ", was asked to update with " + l.toString();
 		this.l = l;
 	}
 	

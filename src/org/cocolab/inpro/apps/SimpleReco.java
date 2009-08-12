@@ -6,6 +6,8 @@ import java.net.URL;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.apps.util.RecoCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.sphinx.decoder.FakeSearch;
@@ -23,6 +25,8 @@ import edu.cmu.sphinx.util.props.PropertyException;
 
 public class SimpleReco {
 	
+	private static final Logger logger = Logger.getLogger(SimpleReco.class);
+	
 	protected static void setupMicrophone(final Microphone mic) {
 		Runnable micInitializer = new Runnable() {
 			public void run() {
@@ -36,12 +40,12 @@ public class SimpleReco {
 			e.printStackTrace();
 		} // allow the microphone 3 seconds to initialize
 		if (!mic.startRecording()) {
-			System.err.println("Could not open microphone. Exiting...");
+			logger.fatal("Could not open microphone. Exiting...");
 			System.exit(1);
 		}	
 		Runnable shutdownHook = new Runnable() {
 			public void run() {
-				System.err.println("Shutting down microphone.");
+				logger.info("Shutting down microphone.");
 				mic.stopRecording();
 				try {
 					Thread.sleep(1000);
@@ -80,7 +84,7 @@ public class SimpleReco {
 				sds.initialize();
 				fe.setPredecessor(sds);
 				URL audioURL = clp.getAudioURL();
-				System.err.println("input from " + audioURL.toString() + "\n");
+				logger.info("input from " + audioURL.toString());
 				AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);
 	            sds.setInputStream(ais, audioURL.getFile());
 			break;
@@ -107,12 +111,14 @@ public class SimpleReco {
 	}
 
 	public static void main(String[] args) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException {
+		BasicConfigurator.configure();
+		//PropertyConfigurator.configure("log4j.properties");
     	RecoCommandLineParser clp = new RecoCommandLineParser(args);
     	if (!clp.parsedSuccessfully()) { System.exit(1); }
     	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
     	if (clp.isRecoMode(RecoCommandLineParser.FORCED_ALIGNER_RECO)) {
-    		System.err.println("Running in forced alignment mode.");
-    		System.err.println("Will try to recognize: " + clp.getReference());
+    		logger.info("Running in forced alignment mode.");
+    		logger.info("Will try to recognize: " + clp.getReference());
         	cm.setGlobalProperty("linguist", "flatLinguist");
         	cm.setGlobalProperty("grammar", "forcedAligner");
 	    	Linguist linguist = (Linguist) cm.lookup("flatLinguist");
@@ -120,29 +126,31 @@ public class SimpleReco {
 	    	ForcedAlignerGrammar forcedAligner = (ForcedAlignerGrammar) cm.lookup("forcedAligner");
 	    	forcedAligner.setText(clp.getReference());
     	} else if (clp.isRecoMode(RecoCommandLineParser.FAKE_RECO)) {
-    		System.err.println("Running in fake recognition mode.");
-    		System.err.println("Reading transcript from: " + clp.getReference());
+    		logger.info("Running in fake recognition mode.");
+    		logger.info("Reading transcript from: " + clp.getReference());
         	cm.setGlobalProperty("searchManager", "fakeSearch");
         	FakeSearch fs = (FakeSearch) cm.lookup("fakeSearch");
         	fs.setTranscript(clp.getReference());
     	} else {
-    		System.err.println("Loading recognizer...\n");
+    		logger.info("Loading recognizer...");
     	}
     	Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
     	recognizer.allocate();
-    	System.err.println("Setting up source...\n");
+    	logger.info("Setting up source...");
     	setupSource(cm, clp);
-    	System.err.println("Setting up monitors...\n");
+    	logger.info("Setting up monitors...");
     	setupMonitors(cm, clp);
-    	System.err.println("Starting recognition, use Ctrl-C to stop...\n");
+    	if (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
+    		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
+    	}
     	Result result = null;
     	do {
 	    	result = recognizer.recognize();
 	        if (result != null) {
 	        	// Normal Output
-	            System.err.println("RESULT: " + result.toString() + "\n");
+	        	logger.info("RESULT: " + result.toString() + "\n");
 	        } else {
-	            System.err.println("Result: null\n");
+	        	logger.info("Result: null\n");
 	        }
 	        if (clp.getInputMode() == RecoCommandLineParser.FILE_INPUT) {
 	        	break;

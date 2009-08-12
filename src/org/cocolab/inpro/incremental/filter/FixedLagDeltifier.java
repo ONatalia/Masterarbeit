@@ -28,6 +28,10 @@ import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Integer;
 
+/* fixed lag deltifier only passes along words that have not 
+ * started with a given fixed lag
+ */
+
 public class FixedLagDeltifier extends ASRWordDeltifier {
 
     @S4Integer(defaultValue = 0)
@@ -40,20 +44,24 @@ public class FixedLagDeltifier extends ASRWordDeltifier {
 	}
 	
 	@Override
+	/*
+	 * remove *word tokens* (and corresponding unit tokens) that have started within the fixed lag 
+	 */
 	protected synchronized List<Token> getTokens(Token token) {
 		LinkedList<Token> newTokens = ResultUtil.getTokenList(token, true, true);
+		/* word tokens precede unit tokens in the list */
 		if (!recoFinal) {
-			// starting from the end ...
-			ListIterator<Token> iter = newTokens.listIterator(newTokens.size());
-			// remove all tokens that have started within the last fixedLag frames
-			// this is a little more complex, as the start time is not available immediately
-			// but can only be deduced from the preceding token's frameNumber
-			if (iter.hasPrevious())
-				iter.previous();
-			while (iter.hasPrevious() && (iter.previous().getFrameNumber() > currentFrame - fixedLag)) {
+			// start from the beginning (much easier, as word tokens now precede unit tokens)
+			ListIterator<Token> iter = newTokens.listIterator(0);
+			while (iter.hasNext()) {
+				if (iter.next().getFrameNumber() > currentFrame - fixedLag) {
+					iter.previous();
+					break;
+				}
+			}
+			while (iter.hasNext()) {
 				iter.next();
 				iter.remove();
-				iter.previous();
 			}
 		}
 		return newTokens;

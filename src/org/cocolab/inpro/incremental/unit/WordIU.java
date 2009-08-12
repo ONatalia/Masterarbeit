@@ -87,11 +87,13 @@ public class WordIU extends IU {
 	}
 	
 	public boolean wordEquals(Pronunciation pron) {
-		return this.pron.equals(pron);
+		// words are equal if their pronunciations match
+		// OR if the word is silent and the other's pronunciation is silent as well
+		return ((isSilence && pron.getWord().isFiller()) || this.pron.equals(pron));
 	}
 	
 	public boolean wordEquals(WordIU iu) {
-		return pron.equals(iu.pron);
+		return ((isSilence && iu.isSilence) || pron.equals(iu.pron));
 	}
 	
 	public String toTEDviewXML() {
