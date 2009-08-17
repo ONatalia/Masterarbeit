@@ -66,10 +66,10 @@ public class TEDviewNotifier extends HypothesisChangeListener {
 	@Override
 	public void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
 		if (tedOutput && (edits.size() > 0)) {
-	    	StringBuffer sbWords = new StringBuffer();
+	    	StringBuilder sbWords = new StringBuilder();
 	    	sbWords.append("<event time='");
-	    	sbWords.append(Math.round(currentTime * 1000.0));
-	    	StringBuffer sbSegms = new StringBuffer(sbWords);
+	    	sbWords.append(currentFrame * 10);
+	    	StringBuilder sbSegms = new StringBuilder(sbWords);
 	    	sbWords.append("' originator='asr_words'>");
 	    	sbSegms.append("' originator='asr_phones'>");
 	    	for (IU iu : ius) {

@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.cocolab.inpro.annotation.Label;
+import org.cocolab.inpro.incremental.BaseDataKeeper;
 
 import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 
@@ -32,8 +33,8 @@ public class WordIU extends IU {
 	final Pronunciation pron;
 	final String word;
 	
-	public WordIU(Pronunciation pron, WordIU sll, List<? extends IU> groundedIn) {
-		super(sll, groundedIn, true);
+	public WordIU(Pronunciation pron, WordIU sll, List<? extends IU> groundedIn, BaseDataKeeper bd) {
+		super(sll, groundedIn, true, bd);
 		this.pron = pron;
 		this.word = pron.getWord().getSpelling();
 		isSilence = this.word.equals("<sil>");
@@ -43,11 +44,11 @@ public class WordIU extends IU {
 	 * create a new silent word
 	 * @param sll
 	 */
-	public WordIU(WordIU sll) {
+	public WordIU(WordIU sll, BaseDataKeeper bd) {
 		super(sll, Collections.nCopies(1, 
 					new SyllableIU(null, Collections.nCopies(1, 
-								new SegmentIU("SIL", null)))), 
-			true);
+								new SegmentIU("SIL", null, bd)), bd)), 
+			true, bd);
 		this.pron = Pronunciation.UNKNOWN;
 		this.word = "<sil>";
 		isSilence = true;
@@ -72,14 +73,13 @@ public class WordIU extends IU {
 	
 	public void updateSegments(List<Label> newLabels) {
 		List<SegmentIU> segments = getSegments();
-		if (segments.size() < newLabels.size()) {
-			System.err.println("something is wrong when updating segments in word:");
-			System.err.println(this.toString());
-			System.err.println("I was supposed to add the following labels:");
-			System.err.println(newLabels);
-			System.err.println("but my segments are:");
-			System.err.println(segments);
-		}
+		assert (segments.size() >= newLabels.size())
+			: "something is wrong when updating segments in word:"
+			+ this.toString()
+			+ "I was supposed to add the following labels:"
+			+ newLabels
+			+ "but my segments are:"
+			+ segments;
 		Iterator<SegmentIU> segIt = segments.iterator();
 		for (Label label : newLabels) {
 			segIt.next().updateLabel(label);
@@ -98,13 +98,14 @@ public class WordIU extends IU {
 	
 	public String toTEDviewXML() {
 		double startTime = startTime();
-		return "<event time='"
-				+ Math.round(startTime * 1000.0) 
-				+ "' duration='"
-				+ Math.round((endTime() - startTime) * 1000.0)
-				+ "'> "
-				+ word.replace("<", "&lt;").replace(">", "&gt;")
-				+ " </event>";
+		StringBuilder sb = new StringBuilder("<event time='");
+		sb.append(Math.round(startTime * 1000.0));
+		sb.append("' duration='");
+		sb.append(Math.round((endTime() - startTime) * 1000.0));
+		sb.append("'> ");
+		sb.append(word.replace("<", "&lt;").replace(">", "&gt;"));
+		sb.append(" </event>");
+		return sb.toString();
 	}
 	
 	public String toLabelLine() {
@@ -116,7 +117,8 @@ public class WordIU extends IU {
 	}
 	
 	public String toOAAString() {
-		StringBuffer sb = new StringBuffer(Integer.toString(id));
+		StringBuilder sb = new StringBuilder();
+		sb.append(id);
 		sb.append(",'");
 		sb.append(word);
 		sb.append("'");

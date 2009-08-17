@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-package org.cocolab.inpro.incremental.filter;
+package org.cocolab.inpro.incremental.deltifier;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -23,14 +23,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.ASRResultKeeper;
+import org.cocolab.inpro.incremental.BaseDataKeeper;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.SegmentIU;
-import org.cocolab.inpro.incremental.unit.SyllableIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.incremental.util.ResultUtil;
 import org.cocolab.inpro.incremental.util.WordUtil;
@@ -38,6 +37,7 @@ import org.cocolab.inpro.incremental.util.WordUtil;
 import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.frontend.DataStartSignal;
 import edu.cmu.sphinx.frontend.Signal;
+import edu.cmu.sphinx.frontend.SignalListener;
 import edu.cmu.sphinx.frontend.endpoint.SpeechStartSignal;
 import edu.cmu.sphinx.instrumentation.Resetable;
 import edu.cmu.sphinx.linguist.SearchState;
@@ -61,18 +61,18 @@ import edu.cmu.sphinx.util.props.PropertySheet;
  * 
  * @author Timo Baumann
  */
-public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeeper {
+public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeeper, SignalListener {
 
 	IUList<WordIU> wordIUs = new IUList<WordIU>();
-//	IUList<SyllableIU> syllableIUs = new IUList<SyllableIU>();
-//	IUList<SegmentIU> segmentIUs = new IUList<SegmentIU>();
+	
+	public BaseDataKeeper bd;
 
 	List<EditMessage<WordIU>> wordEdits;
 	
 //	private static final Logger logger = Logger.getLogger(ASRWordDeltifier.class);
 	
 	int currentFrame = 0;
-	long currentOffset = 0;
+	int currentOffset = 0; // measured in centiseconds / frames
 	long startTime = 0;
 	
 	protected boolean recoFinal; // flag to avoid smoothing or fixed lags on final result
@@ -123,7 +123,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		// step over wordIUs and newWords to see which are equal in both
 		ListIterator<Token> newIt = newTokens.listIterator();
 		ListIterator<WordIU> currWordIt = currWordIUs.listIterator();
-		double segmentStartTime = currentOffset * 0.001;
+		double segmentStartTime = currentOffset * 0.01;
 		double segmentEndTime = 0.0;
 		List<SegmentIU> emptyList = Collections.emptyList(); // needed to initialize prevSegmentIt with an empty non-null iterator
 		Iterator<SegmentIU> currSegmentIt = emptyList.iterator();
@@ -179,7 +179,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		}
 		// check if we need to insert a silence in the end (this happens when SIL does not have its own word token) 
 		if (addSilenceWord) {
-			WordIU newIU = new WordIU(null);
+			WordIU newIU = new WordIU(null, bd);
 			newIU.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, "SIL")));
 			wordEdits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
 		}
@@ -190,7 +190,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 			/* on WordSearchStates, we build an IU and add it */
 			if (newSearchState instanceof WordSearchState) {
 				Pronunciation pron = ((WordSearchState) newSearchState).getPronunciation();
-				WordIU newIU = WordUtil.wordFromPronunciation(pron);
+				WordIU newIU = WordUtil.wordFromPronunciation(pron, bd);
 				currSegmentIt = newIU.getSegments().iterator();
 				wordEdits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
 			} else 
@@ -202,7 +202,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				if (currSegmentIt.hasNext()) {
 					currSegmentIt.next().updateLabel(new Label(segmentStartTime, segmentEndTime, name));
 				} else if (name.equals("SIL")) {
-					WordIU newIU = new WordIU(null);
+					WordIU newIU = new WordIU(null, bd);
 					newIU.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, "SIL")));
 					wordEdits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
 				}
@@ -222,10 +222,10 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 			if ((t.getSearchState() instanceof WordSearchState) 
 			 && (newIt.hasNext()) 
 			) {
-				segmentEndTime = newIt.next().getFrameNumber() * 0.01 + currentOffset * 0.001;
+				segmentEndTime = (newIt.next().getFrameNumber()+ currentOffset) * 0.01;
 				newIt.previous();
 			} else {
-				segmentEndTime = t.getFrameNumber() * 0.01 + currentOffset * 0.001;
+				segmentEndTime = (t.getFrameNumber() + currentOffset) * 0.01;
 			}
 			newIt.previous();
 		} else
@@ -265,11 +265,11 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	}
 	
 	public synchronized int getCurrentFrame() {
-		return currentFrame;
+		return currentFrame + currentOffset;
 	}
 	
 	public synchronized double getCurrentTime() {
-		return currentFrame * 0.01 + currentOffset * 0.001;
+		return (currentFrame + currentOffset) * 0.001;
 	}
 
 	@Override
@@ -278,15 +278,27 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		recoFinal = false;
 	}
 
+	/**
+	 *  there are two alternatives to set the offset:
+	 *  - put an OffsetAdapter into the FrontEnd (after VAD)    
+	 * 	- use signalOccurred() below; for this you have to call 
+	 *    FrontEnd.addSignalListener(deltifier) somewhere (CurrentHypothesis-setup)
+	 *    
+	 *     here, the offset is given in centiseconds (frames)
+	 */
+	public void setOffset(int currentOffset) {
+		System.err.println("SETTING OFFSET TO " + currentOffset);
+		this.currentOffset = currentOffset;
+	}
+	
 	@Override
 	public void signalOccurred(Signal signal) {
 		System.err.println(signal.toString());
 		if (signal instanceof DataStartSignal) {
 			startTime = signal.getTime();
 		} else if (signal instanceof SpeechStartSignal) {
-			currentOffset = signal.getTime() - startTime;
+			setOffset((int) (signal.getTime() - startTime) / 10);
 		}
-		
 	}
 	
 }

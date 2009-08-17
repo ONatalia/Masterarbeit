@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-package org.cocolab.inpro.incremental.filter;
+package org.cocolab.inpro.incremental.deltifier;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -23,8 +23,6 @@ import java.util.List;
 
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IUList;
-import org.cocolab.inpro.incremental.unit.SegmentIU;
-import org.cocolab.inpro.incremental.unit.SyllableIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
 import edu.cmu.sphinx.decoder.search.Token;

@@ -22,9 +22,7 @@ import java.util.List;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
-import edu.cmu.sphinx.frontend.SignalListener;
-
-public interface ASRResultKeeper extends SignalListener {
+public interface ASRResultKeeper {
 
 	public List<EditMessage<WordIU>> getWordEdits();
 

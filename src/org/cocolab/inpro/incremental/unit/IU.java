@@ -19,24 +19,26 @@ package org.cocolab.inpro.incremental.unit;
 
 import java.util.List;
 
+import org.cocolab.inpro.incremental.BaseDataKeeper;
+
 public abstract class IU {
 	
-	public static final IU FIRST_IU = new IU() {}; 
+	public static final IU FIRST_IU = new IU(null) {}; 
 	private static int IU_idCounter = 0;
 	protected final int id;
 
 	protected IU sameLevelLink;
 	
-	List<? extends IU> groundedIn;
+	protected List<? extends IU> groundedIn;
 	
-	BaseData bd;
+	protected BaseDataKeeper bd;
 	
 	/**
 	 * call this, if you want to provide a sameLevelLink and a groundedIn list
 	 * and you want groundedIn to be deeply SLLed to the sameLevelLink's groundedIn-IUs  
 	 */
-	public IU(IU sll, List<? extends IU> groundedIn, boolean deepSLL) {
-		this();
+	public IU(IU sll, List<? extends IU> groundedIn, boolean deepSLL, BaseDataKeeper bd) {
+		this(bd);
 		this.groundedIn = groundedIn;
 		if (deepSLL && (sll != null)) {
 			connectSLL(sll);
@@ -49,27 +51,32 @@ public abstract class IU {
 	/**
 	 * call this, if you want to provide both a sameLevelLink and a groundedIn list
 	 */
-	public IU(IU sll, List<? extends IU> groundedIn) {
-		this(sll, groundedIn, false);
+	public IU(IU sll, List<? extends IU> groundedIn, BaseDataKeeper bd) {
+		this(sll, groundedIn, false, bd);
 	}
 	
-	public IU(List<? extends IU> groundedIn) {
-		this((IU) null, groundedIn);
+	public IU(List<? extends IU> groundedIn, BaseDataKeeper bd) {
+		this((IU) null, groundedIn, bd);
 	}
 	
 	/**
 	 * call this, if you want to provide a sameLevelLink 
 	 */
-	public IU(IU sll) {
+	public IU(IU sll, BaseDataKeeper bd) {
 		this.id = IU.getNewID();
 		this.sameLevelLink = sll;
+		this.bd = bd;
 	}
 	
 	/**
 	 * this constructor must be called in order to acquire an IU with a valid ID. 
 	 */
+	public IU(BaseDataKeeper bd) {
+		this((IU) null, bd);
+	}
+	
 	public IU() {
-		this((IU) null);
+		this((BaseDataKeeper) null);
 	}
 	
 	/**
@@ -169,7 +176,7 @@ public abstract class IU {
 	}
 	
 	public String deepToString() {
-		StringBuffer sb = new StringBuffer("[IU of type ");
+		StringBuilder sb = new StringBuilder("[IU of type ");
 		sb.append(this.getClass());
 		sb.append(" with content ");
 		sb.append(this.toString());

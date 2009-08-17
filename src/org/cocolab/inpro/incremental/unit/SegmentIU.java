@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.cocolab.inpro.annotation.Label;
+import org.cocolab.inpro.incremental.BaseDataKeeper;
 
 public class SegmentIU extends IU {
 	
@@ -36,8 +37,8 @@ public class SegmentIU extends IU {
 	// we keep start time, end time and text of the segment in a label
 	Label l;
 	
-	public SegmentIU(String segment, SegmentIU sll) {
-		super(sll);
+	public SegmentIU(String segment, SegmentIU sll, BaseDataKeeper bd) {
+		super(sll, bd);
 		this.l = new Label(segment);
 	}
 
@@ -70,12 +71,14 @@ public class SegmentIU extends IU {
 			System.err.print("I am the now commited ");
 			System.err.print(isSilence() ? "silence " : isVowel() ? "vowel " : "consonant ");
 			System.err.println(toString());
+			double centerTime = startTime() + (endTime() - startTime()) / 2;
+			System.err.println("with center pitch " + bd.getPitchInCent(centerTime));
 		}
 	}
 	
 	@Override
 	public String toOAAString() {
-		StringBuffer sb = new StringBuffer(Integer.toString(id));
+		StringBuilder sb = new StringBuilder(Integer.toString(id));
 		sb.append(",'");
 		sb.append(l.getLabel());
 		sb.append("'");
