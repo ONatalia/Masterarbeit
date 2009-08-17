@@ -65,7 +65,7 @@ public class Label {
 	}
 	
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(start);
 		sb.append("\t");
 		sb.append(end);
@@ -75,7 +75,7 @@ public class Label {
 	}
 	
 	public String toTEDViewXML() {
-		StringBuffer sb = new StringBuffer("<event time='");
+		StringBuilder sb = new StringBuilder("<event time='");
 		sb.append(Math.round(start * 1000.0));
 		sb.append("' duration='");
 		sb.append(Math.round((end - start) * 1000.0));

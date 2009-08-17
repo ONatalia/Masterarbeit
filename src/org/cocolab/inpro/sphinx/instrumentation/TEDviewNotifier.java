@@ -25,7 +25,7 @@ public class TEDviewNotifier extends LabelWriter {
     private PrintWriter writer;
     
     private void messageZeitGeist(List<Token> list, String origin) {
-    	StringBuffer sb = new StringBuffer();
+    	StringBuilder sb = new StringBuilder();
     	if (!list.isEmpty()) {
 	    	sb.append("<event time='");
 	    	sb.append(step * 10);

@@ -232,7 +232,7 @@ public class LabelWriter implements Configurable,
      * @return 
      */
     public static String tokenListToAlignment(List<Token> list, int lastFrame) {
-		StringBuffer sb = new StringBuffer(); 
+		StringBuilder sb = new StringBuilder(); 
 		if (list.size() > 0) {
 			// iterate over the list and print the associated times
 			Token prevToken = list.get(0);

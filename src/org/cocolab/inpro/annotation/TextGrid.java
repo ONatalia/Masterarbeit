@@ -89,7 +89,7 @@ public class TextGrid {
 	}
 	
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (String tierName : getTierNames()) {
 			sb.append(tierName);
 			sb.append(":\n");

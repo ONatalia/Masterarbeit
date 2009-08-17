@@ -38,7 +38,7 @@ public class WavTEDLogger extends WavWriter {
 	protected void writeFile(String wavName) {
 		super.writeFile(wavName);
 		if (tedOutput) {
-			StringBuffer sb = new StringBuffer("<event time='");
+			StringBuilder sb = new StringBuilder("<event time='");
 // MUSING: it's probably irrelevant, when this file was stored to disk, so we don't keep that information.
 			sb.append(Long.toString(Math.round((chunkStartTime) / 16.0)));
 			sb.append("' originator='");

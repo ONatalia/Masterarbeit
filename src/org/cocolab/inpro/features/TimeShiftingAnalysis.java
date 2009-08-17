@@ -247,7 +247,7 @@ public class TimeShiftingAnalysis implements Resetable {
 	}
 	
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("TimeShiftingAnalysis with maxLag: ");
 		sb.append((maxLag != 0) ? maxLag : "none");
 		sb.append("\ndata points:\n");

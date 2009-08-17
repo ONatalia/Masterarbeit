@@ -64,7 +64,7 @@ public class SphereFileReader extends AudioFileReader {
 
     String line = lnr.readLine();
     String line2 = lnr.readLine();
-    StringBuffer sb = new StringBuffer(Integer.parseInt(line2.trim()));
+    StringBuilder sb = new StringBuilder(Integer.parseInt(line2.trim()));
     this.addToByteHeader(sb, line);
     this.addToByteHeader(sb, line2);
     int size = this.checkHeaderStartAndGetSize(line, line2);
@@ -223,10 +223,10 @@ public class SphereFileReader extends AudioFileReader {
     return length;
   }
 
-  private void addToByteHeader(StringBuffer buffer, String line) {
-	int start = buffer.length();
+  private void addToByteHeader(StringBuilder sb, String line) {
+	int start = sb.length();
 	int end = start + line.length() + 1;
-	buffer.replace(start, end, line + "\n");
+	sb.replace(start, end, line + "\n");
   }
   
   public void playFile(String filename) {

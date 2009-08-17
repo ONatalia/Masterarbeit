@@ -52,7 +52,7 @@ public class Tier extends ArrayList<Label> {
 	}
 	
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (Label l : this) {
 			sb.append(l);
 			sb.append("\n");

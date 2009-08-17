@@ -30,7 +30,7 @@ public class EditMessage<IUType extends IU> {
 	}
 	
 	public String toString() {
-		StringBuffer sb = new StringBuffer(type.toString());
+		StringBuilder sb = new StringBuilder(type.toString());
 		sb.append("(");
 		sb.append(iu.toString());
 		sb.append(")");
@@ -54,7 +54,7 @@ public class EditMessage<IUType extends IU> {
 	}
 	
 	public IclTerm toOAAGoal(String prefix) {
-		StringBuffer sb = new StringBuffer(prefix);
+		StringBuilder sb = new StringBuilder(prefix);
 		sb.append(type.oaaGoal());
 		sb.append("(");
 		sb.append(iu.toOAAString());
