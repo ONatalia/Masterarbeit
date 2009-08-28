@@ -20,6 +20,7 @@ package org.cocolab.inpro.pitch.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.cocolab.inpro.pitch.PitchCandidate;
@@ -30,9 +31,17 @@ public class PitchOptimizer extends ShortestPath<PitchCandidate> {
     private PitchCandidate start = new PitchCandidate();
     private List<PitchCandidate> lastCandidates = null;
     private int numFrames = 0;
+    int lookback; // the list of pitch candidates never grows larger than this many entries. 
+    			  // pitch is -- after all -- a local phenomenon and the decision should hardly
+                  // change if we look back more than (by default) 10 s.
 	
-    public PitchOptimizer () {
+    public PitchOptimizer (int lookback) {
     	init();
+    	this.lookback = lookback;
+    }
+    
+    public PitchOptimizer() {
+    	this(1000);
     }
     
 	public void init() {
@@ -49,8 +58,8 @@ public class PitchOptimizer extends ShortestPath<PitchCandidate> {
 			candidateList.add(candidates);
 			if (lastCandidates == null) {
 				for (PitchCandidate c : candidates) {
-					c.frame = numFrames-1;
-					double cost = c.score * 1000;
+					c.frame = numFrames - 1;
+					double cost = c.getScore() * 1000;
 					connect(start, c, cost);
 	    		}
 			} else {
@@ -59,7 +68,7 @@ public class PitchOptimizer extends ShortestPath<PitchCandidate> {
 						c2.frame = numFrames-1;
 						double framedist = (c2.frame - c1.frame);
 						double centdist = Math.abs(c2.pitchInCent() - c1.pitchInCent());
-						double cost = (centdist / framedist) + c2.score * 1000;
+						double cost = (centdist / framedist) + c2.getScore() * 1000;
 						connect(c1, c2, cost);
 	    			}
 				}
@@ -99,22 +108,28 @@ public class PitchOptimizer extends ShortestPath<PitchCandidate> {
 			path.remove(0);
 			path.remove(path.size()-1);
 
-			double[] values = new double[path.size()]; 
-			for (int i = 0; i < values.length; i++) {
-				values[i] = path.get(i).pitchInCent();
-			}
-			double [] valuesSmoothed = medianSmooth(values, 5);
-			
+			int pathsize = path.size();
+			double[] values = new double[pathsize];
 			int i = 0;
+			for (PitchCandidate pc : path) {
+				values[i] = pc.pitchInCent();
+				i++;
+			}
+			//double[] valuesSmoothed = medianSmooth(values, 5);
+			
+			Iterator<PitchCandidate> pathIt = path.iterator();
+			PitchCandidate candidate = pathIt.next(); 
+			i = 0;
 			for (int frame = 0; frame < numFrames; frame++) {
-				PitchCandidate candidate = path.get(i);
 				if (candidate.frame == frame) {
-					//System.out.println(ResultData.pitchCentToHz(valuesSmoothed[i]));
-					pitchList.add(valuesSmoothed[i]);
+					if (pathIt.hasNext()) {
+						candidate = pathIt.next();
+					}
+					//pitchList.add(valuesSmoothed[i]);
+					pitchList.add(values[i]);
 					voicingList.add(true);
-					if (i < path.size() - 1) i++;
+					if (i < pathsize - 1) i++;
 				} else {
-					//System.out.println("");
 					pitchList.add(0.0);
 					voicingList.add(false);
 				}

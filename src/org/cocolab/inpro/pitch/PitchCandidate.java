@@ -21,25 +21,29 @@ import org.cocolab.inpro.pitch.util.PitchUtils;
 
 public class PitchCandidate {
 	
-	public int lag = 0;
-	public double score = 0;
+	private int lag = 0;
+	private double score = 0;
 	public int frame = 0;
-	private int samplingFrequency = 0;
-	
-	public PitchCandidate(int lag, double score, int samplingFrequency) {
-		this.lag = lag;
-		this.score = score;
-		this.samplingFrequency = samplingFrequency;
-	}
+	private double pitchInCent = Double.NaN;
 	
 	public PitchCandidate() {}
 	
+	public PitchCandidate(int lag, double score, int samplingFrequency) {
+		this.lag = lag;
+		this.pitchInCent = PitchUtils.hzToCent(((double) samplingFrequency) / lag);
+		this.score = score;
+	}
+	
+	public double getScore() {
+		return this.score;
+	}
+	
+	public int getLag() {
+		return this.lag;
+	}
+	
 	public double pitchInCent() {
-		double d = PitchUtils.hzToCent(((double) samplingFrequency) / lag);
-		if (Math.abs(d - 110) < 0.001) {
-			System.err.println(110);
-		}
-		return d;
+		return pitchInCent;
 	}
 	
 }

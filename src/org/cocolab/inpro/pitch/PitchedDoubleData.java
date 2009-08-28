@@ -27,6 +27,7 @@ import edu.cmu.sphinx.frontend.DoubleData;
 public class PitchedDoubleData extends DoubleData {
 
 	boolean voiced;
+	double voicing;
 	double pitchHz;
 	double power;
 	List<PitchCandidate> candidates;
@@ -37,16 +38,18 @@ public class PitchedDoubleData extends DoubleData {
 	
 	public PitchedDoubleData(double[] values, int sampleRate, 
 							 long collectTime, long firstSampleNumber, 
-							 boolean voiced, double pitch, double power) {
+							 boolean voiced, double voicing, double pitch, double power) {
 		super(values, sampleRate, collectTime, firstSampleNumber);
 		this.voiced = voiced;
+		this.voicing = voicing;
 		this.pitchHz = pitch;
 		this.power = power;
 	}
 	
-	public PitchedDoubleData(DoubleData data, boolean voiced, double pitch, List<PitchCandidate> candidates, double power) {
+	public PitchedDoubleData(DoubleData data, boolean voiced, double voicing, double pitch, List<PitchCandidate> candidates, double power) {
 		super(data.getValues(), data.getSampleRate(), data.getCollectTime(), data.getFirstSampleNumber());
 		this.voiced = voiced;
+		this.voicing = voicing;
 		this.pitchHz = pitch;
 		this.power = power;
 		this.candidates = candidates;
@@ -59,6 +62,10 @@ public class PitchedDoubleData extends DoubleData {
 	
 	public boolean isVoiced() {
 		return voiced;
+	}
+	
+	public double getVoicing() {
+		return voicing;
 	}
 	
 	public double getPitchHz() {

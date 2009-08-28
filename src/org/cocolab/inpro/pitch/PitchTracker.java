@@ -179,7 +179,7 @@ public class PitchTracker extends BaseDataProcessor {
 		int lag;
 		// check if there is a candidate corresponding to the last best candidate
 		for (Iterator<PitchCandidate> iter = candidates.iterator(); iter.hasNext(); ) {
-			lag = iter.next().lag; 
+			lag = iter.next().getLag(); 
 			if (Math.abs(lag - lastBestLag) < 10) { // TODO: for higher lags (lower freqs), this must be higher than for lower freqs
 				lastBestLag = lag;
 				return lag;
@@ -193,13 +193,13 @@ public class PitchTracker extends BaseDataProcessor {
 	
 	private static int simplisticCandidateSelection(List<PitchCandidate> candidates) {
 		// select the first candidate (with the highest f0)
-		return candidates.get(0).lag;
+		return candidates.get(0).getLag();
 	}
 	
 	static PitchCandidate bestCandidateSelection(List<PitchCandidate> candidates) {
 		PitchCandidate bestCandidate = candidates.get(0);
 		for (PitchCandidate candidate : candidates) {
-			if (candidate.score < bestCandidate.score) {
+			if (candidate.getScore() < bestCandidate.getScore()) {
 				bestCandidate = candidate;
 			}
 		}
@@ -235,6 +235,7 @@ public class PitchTracker extends BaseDataProcessor {
 				System.arraycopy(newSamples, 0, signalBuffer, signalBuffer.length - newSamples.length, newSamples.length);
 				boolean voiced = false;
 				double pitchHz = -1.0f;
+				double voicing = 0f;
 				List<PitchCandidate> candidates = null;
 				if (signalPower > energyThreshold) { // TODO: better silence detection, maybe?
 					double[] lagScoreFunction = cmn(smdsf(signalBuffer));
@@ -243,12 +244,13 @@ public class PitchTracker extends BaseDataProcessor {
 					if (voiced) {
 						int lag = simplisticCandidateSelection(candidates);
 						pitchHz = ((double) samplingFrequency) / lag;
+						voicing = bestCandidateSelection(candidates).getScore();
 					} else {
 						lastBestLag = -1;
 					}
 				}
 //				System.err.print("\r\t\t\t\t\t" + pitchHz + "\r");
-				input = new PitchedDoubleData((DoubleData) input, voiced, pitchHz, candidates, signalPower);
+				input = new PitchedDoubleData((DoubleData) input, voiced, voicing, pitchHz, candidates, signalPower);
 			}
 		}
         getTimer().stop();
@@ -265,10 +267,10 @@ public class PitchTracker extends BaseDataProcessor {
 		candidateScoreThreshold = ps.getDouble(PROP_CAND_SCORE_THRESHOLD);
 		double freq = ps.getDouble(PROP_MIN_PITCH_HZ);
 		maxLag = Double.valueOf(samplingFrequency / freq).intValue();
-		System.err.println("Setting maxLag to " + maxLag);
+		//System.err.println("Setting maxLag to " + maxLag);
 		freq = ps.getDouble(PROP_MAX_PITCH_HZ);
 		minLag = Double.valueOf(samplingFrequency / freq).intValue();
-		System.err.println("Setting minLag to " + minLag);
+		//System.err.println("Setting minLag to " + minLag);
 	}
 
 	/**************************
