@@ -3,8 +3,10 @@ package org.cocolab.inpro.apps;
 import java.io.IOException;
 import java.net.URL;
 
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.sound.sampled.AudioFormat.Encoding;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -86,7 +88,16 @@ public class SimpleReco {
 				URL audioURL = clp.getAudioURL();
 				logger.info("input from " + audioURL.toString());
 				AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);
-	            sds.setInputStream(ais, audioURL.getFile());
+				// make sure that audio is in the right format 
+				AudioFormat f = ais.getFormat();
+				if (f.getChannels() != 1 ||
+					!f.getEncoding().equals(Encoding.PCM_SIGNED) ||
+					f.getSampleRate() != 16000 ||
+					f.getSampleSizeInBits() != 16) {
+					logger.fatal("Your audio is not in the right format:\nYou must use mono channel,\nPCM signed data,\nsampled at 16000 Hz,\nwith 2 bytes per samples.\nExiting...");
+					System.exit(1);
+				}
+				sds.setInputStream(ais, audioURL.getFile());
 			break;
 		}
 	}
