@@ -4,21 +4,10 @@ public class AVM {
 
 	/**
 	 * Abstract class representing an AVM with methods
-	 * for equality, unification, subsumption and
-	 * validation.
+	 * for equality and unification.
 	 */
-	public boolean subsumes(AVM a) {
-		/**
-		 * <i>A</i> subsumes <i>B</i> iff
-		 */
-		return false;
-	}
 
 	public boolean equals(AVM a) {
-		return false;
-	}
-
-	public boolean validates() {
 		return false;
 	}
 
