@@ -48,6 +48,10 @@ public abstract class IU {
 		
 	}
 	
+	public IU(IU sll, List<? extends IU> groundedIn, boolean deepSLL) {
+		this (sll, groundedIn, deepSLL, (BaseDataKeeper) null);
+	}
+	
 	/**
 	 * call this, if you want to provide both a sameLevelLink and a groundedIn list
 	 */
