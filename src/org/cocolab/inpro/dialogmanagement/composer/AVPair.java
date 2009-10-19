@@ -17,5 +17,9 @@ public class AVPair {
 	public String getValue() {
 		return this.value;
 	}
+	
+	public String toString() {
+		return getValue() + " : " + getAttribute() + "\n"; 
+	}
 
 }

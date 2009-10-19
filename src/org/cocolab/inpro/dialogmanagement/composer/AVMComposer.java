@@ -14,7 +14,7 @@ public class AVMComposer {
 		System.out.println("Starting AVM Composer.");
 		AVMComposer composer = new AVMComposer();		
 
-		// Below is a demonstration of what happens when tags come it.
+		// Below is a demonstration of what happens when tags come in.
 		AVPair avp1 = new AVPair("name", "kreuz");
 		System.out.println("Adding tag 'kreuz'.");		
 		TileAVM tile = new TileAVM(avp1);
