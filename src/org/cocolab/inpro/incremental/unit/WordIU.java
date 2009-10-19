@@ -21,18 +21,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.cocolab.inpro.annotation.Label;
+import org.cocolab.inpro.dialogmanagement.composer.AVPair;
 import org.cocolab.inpro.incremental.BaseDataKeeper;
 
 import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 
 public class WordIU extends IU {
 
+	/* TODO: implement magic to actually fill this map */
+	static Map<String, List<AVPair>> avPairs;
+	
 	final boolean isSilence;
 	final Pronunciation pron;
 	final String word;
-	
+
 	public WordIU(Pronunciation pron, WordIU sll, List<? extends IU> groundedIn, BaseDataKeeper bd) {
 		super(sll, groundedIn, true, bd);
 		this.pron = pron;
@@ -52,6 +57,10 @@ public class WordIU extends IU {
 		this.pron = Pronunciation.UNKNOWN;
 		this.word = "<sil>";
 		isSilence = true;
+	}
+	
+	public List<AVPair> getAVPairs() {
+		return avPairs.get(this.word);
 	}
 	
 	@SuppressWarnings("unchecked")
