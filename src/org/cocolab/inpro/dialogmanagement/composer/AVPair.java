@@ -10,6 +10,19 @@ public class AVPair {
 		this.value = value;
 	}
 	
+	/**
+	 * convenience constructor to create AVPair from
+	 * one string, where A and V are separated by a colon,
+	 * like "size:big"
+	 */
+	AVPair(String attval) {
+		assert (attval.contains(":"));
+		String[] tokens = attval.split("\\s*:\\s*");
+		assert (tokens.length == 2);
+		this.attribute = tokens[0];
+		this.value = tokens[1];
+	}
+	
 	public String getAttribute() {
 		return this.attribute;
 	}
@@ -19,7 +32,7 @@ public class AVPair {
 	}
 	
 	public String toString() {
-		return getValue() + " : " + getAttribute() + "\n"; 
+		return getValue() + " : " + getAttribute(); 
 	}
 
 }
