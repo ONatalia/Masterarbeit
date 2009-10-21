@@ -3,6 +3,11 @@ package org.cocolab.inpro.dialogmanagement.composer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 
+ * @author okko
+ * AVM Composer - Reads AVPairs.  Attempts composition of new AVMs and subsequent unification of existing ones.
+ */
 public class AVMComposer {
 
 	private List<AVM> avmList = new ArrayList<AVM>();
@@ -14,73 +19,40 @@ public class AVMComposer {
 		System.out.println("Starting AVM Composer.");
 		AVMComposer composer = new AVMComposer();		
 
-		// Below is a demonstration of what happens when tags come in.
-		AVPair avp1 = new AVPair("name", "kreuz");
-		System.out.println("Adding tag 'kreuz'.");		
-		TileAVM tile = new TileAVM(avp1);
-		composer.avmList.add(tile);
+		// Below is a demonstration of what should happen when tags come in.
 
-		System.out.println("AVMs:");
-		for (AVM a : composer.avmList) {
-			System.out.println(a.toString());
-		}
+		System.out.println("Adding tag 'kreuz'.");
+		AVPair nameAVPair = new AVPair("name", "kreuz");
+		TileAVM tile = new TileAVM(nameAVPair);
+		composer.avmList.add(tile);
+		composer.printAVMs();
 
 		System.out.println("Adding tag 'grün'.");
-		AVPair avp2 = new AVPair("col", "grün");
-		FieldAVM field = new FieldAVM(avp2);
+		AVPair colorAVPair = new AVPair("col", "grün");
+		FieldAVM field = new FieldAVM(colorAVPair);
 		composer.avmList.add(field);
-		tile.setColor(avp2.getValue());
-
-		System.out.println("AVMs:");
-		for (AVM a : composer.avmList) {
-			System.out.println(a.toString());
-		}
-
-		System.out.println("Adding tag 'ecke'.");
-		AVPair avp3 = new AVPair("name", "ecke");
-		LocationAVM loc = new LocationAVM(avp3);
-		composer.avmList.add(loc);
-		tile.setLocation(loc);
-		field.setLocation(loc);		
-
-		System.out.println("AVMs:");
-		for (AVM a : composer.avmList) {
-			System.out.println(a.toString());
-		}
-
-		System.out.println("Adding tag 'next_to'.");
-		AVPair avp4 = new AVPair("relation", "next_to");
-		RelativeLocationAVM rel_loc = new RelativeLocationAVM(avp4);
-		composer.avmList.add(rel_loc);
-		field.addRelativeLocation(rel_loc);
-		tile.addRelativeLocation(rel_loc);
-
-		System.out.println("AVMs:");
-		for (AVM a : composer.avmList) {
-			System.out.println(a.toString());
-		}
-
-		System.out.println("Adding tag 'right'.");
-		AVPair avp5 = new AVPair("orient", "right");
-		RowAVM row = new RowAVM(avp5);
-		composer.avmList.add(row);
-		loc.setRow(row);
-
-		System.out.println("AVMs:");
-		for (AVM a : composer.avmList) {
-			System.out.println(a.toString());
-		}
-
+		tile.setAttribute(colorAVPair);
+		composer.printAVMs();
+		
 		System.out.println("Adding tag '1'.");
-		AVPair avp6 = new AVPair("ord", "1");
-		ColumnAVM col = new ColumnAVM(avp6);
+		AVPair ordAVPair = new AVPair("ord", "1");
+		RowAVM row = new RowAVM(ordAVPair);
+		composer.avmList.add(row);
+		ColumnAVM col = new ColumnAVM(ordAVPair);
 		composer.avmList.add(col);
-		loc.setColumn(col);
-
-		System.out.println("AVMs:");
-		for (AVM a : composer.avmList) {
-			System.out.println(a.toString());
-		}
+		AVPair rowAVPair = new AVPair("row", row);
+		LocationAVM location = new LocationAVM(rowAVPair);
+		composer.avmList.add(location);
+		AVPair locationAVPair = new AVPair("loc", location);
+		tile.setAttribute(locationAVPair);
+		field.setAttribute(locationAVPair);
+		composer.printAVMs();
 	}
 
+	private void printAVMs() {
+		System.out.println("AVMs:");
+		for (AVM a : this.avmList) {
+			System.out.println(a.toString());
+		}		
+	}
 }

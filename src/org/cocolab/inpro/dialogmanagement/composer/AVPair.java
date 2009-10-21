@@ -3,7 +3,7 @@ package org.cocolab.inpro.dialogmanagement.composer;
 public class AVPair {
 
 	private String attribute;
-	private String value;
+	private Object value;
 
 	AVPair(String attribute, String value) {
 		this.attribute = attribute;
@@ -11,9 +11,12 @@ public class AVPair {
 	}
 	
 	/**
-	 * convenience constructor to create AVPair from
-	 * one string, where A and V are separated by a colon,
-	 * like "size:big"
+	 * @author okko, timo
+	 * Handles interfacing AVM construction/unification 
+	 * Convenience constructor to create AVPair from one string,
+	 * where A and V are separated by a colon, like "size:big"
+	 * or from attribute-value <String, Object> input for more
+	 * complex AVMs.
 	 */
 	AVPair(String attval) {
 		assert (attval.contains(":"));
@@ -22,12 +25,17 @@ public class AVPair {
 		this.attribute = tokens[0];
 		this.value = tokens[1];
 	}
-	
+
+	AVPair(String attribute, Object value) {
+		this.attribute = attribute;
+		this.value = value;
+	}
+
 	public String getAttribute() {
 		return this.attribute;
 	}
 	
-	public String getValue() {
+	public Object getValue() {
 		return this.value;
 	}
 	

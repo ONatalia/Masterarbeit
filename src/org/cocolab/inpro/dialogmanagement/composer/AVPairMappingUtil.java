@@ -8,7 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * @author timo
+ * Utility for AVPair construction from file/input.
+ */
 public class AVPairMappingUtil {
 
 	private static Map<String, List<AVPair>> readAVPairs(String filename) throws IOException {
