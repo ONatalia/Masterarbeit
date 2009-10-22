@@ -109,8 +109,12 @@ public class AVM {
 	public AVM unify(AVM avm) {
 		if (avm.type != null && this.attributes.get(avm.type.replaceAll("_spec", "")) != null) {
 			if (!this.setAttribute(avm.type.replaceAll("_spec", ""), avm)) {
-//				throw new IllegalArgumentException("Attribute '" + avm.type.replaceAll("_spec", "") + "' with value '" + avm.toString() + "'cannot be set on AVM " + this.toString());
-				return null;
+				ArrayList<AVM> avmList = new ArrayList<AVM>(1);
+				avmList.add(avm);
+				if (!this.setAttribute(avm.type.replaceAll("_spec", ""), avmList)) {
+//					throw new IllegalArgumentException("Attribute '" + avm.type.replaceAll("_spec", "") + "' with value '" + avm.toString() + "'cannot be set on AVM " + this.toString());
+					return null;					
+				}
 			}
 		} else {
 			for (AVPair avp : avm.getAVPairs()) {
@@ -140,6 +144,16 @@ public class AVM {
 		return this.attributes;
 	}
 
+	/**
+	 * Builds a string representation of the AVM with nested brackets
+	 * delimiting data structures as follows:<br />
+	 * <> denotes AVM boundaries<br />
+	 * [] denotes AVM list attribute boundaries<br />
+	 * {} denotes AVM attributes boundaries<br />
+	 * The first word in the AVM structure is its type.<br />
+	 * <i>Example:</i> &lt;tile {col=green, rel_loc=[], loc=<...>} &gt;
+	 * @return String representation of the AVM
+	 */
 	public String toString() {
 		return "<" + this.type + " " + this.attributes.toString() + ">";
 	}
