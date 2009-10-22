@@ -20,16 +20,18 @@ public class AVPairMappingUtil {
 		String line;
 		while ((line = lbr.readLine()) != null) {
 			if (line.startsWith("#") || line.matches("^\\s*$")) continue;
-			String[] tokens = line.split("\t");
+			String[] tokens = line.split("\\s*\t\\s*");
 			assert (tokens.length == 2) : "Error parsing " + line;
-			String word = tokens[0];
-			assert (!avPairs.containsKey(word)) : "You are (by mistake?) trying to redefine the mapping for " + word;
+			String[] words = tokens[0].split("\\s*,\\s*");
 			String[] avArray = tokens[1].split("\\s*,\\s*");
 			List<AVPair> avList = new ArrayList<AVPair>(avArray.length);
 			for (String av : avArray) {
 				avList.add(new AVPair(av));
 			}
-			avPairs.put(word, avList);
+			for (String word : words) {
+				assert (!avPairs.containsKey(word)) : "You are (by mistake?) trying to redefine the mapping for " + word;
+				avPairs.put(word, avList);
+			}
 		}
 		return avPairs;
 	}	
