@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
- * @author okko
  * AVM Composer - Reads AVPairs.  Attempts composition of new AVMs and subsequent unification of existing ones.
+ * @author okko
  */
 public class AVMComposer {
 
@@ -31,7 +30,7 @@ public class AVMComposer {
 		AVPair colorAVPair = new AVPair("col", "grün");
 		FieldAVM field = new FieldAVM(colorAVPair);
 		composer.avmList.add(field);
-		tile.setAttribute(colorAVPair);
+		tile.unify(new UntypedAVM(colorAVPair));
 		composer.printAVMs();
 		
 		System.out.println("Adding tag '1'.");
@@ -40,8 +39,9 @@ public class AVMComposer {
 		composer.avmList.add(row);
 		ColumnAVM col = new ColumnAVM(ordAVPair);
 		composer.avmList.add(col);
-		AVPair rowAVPair = new AVPair("row", row);
-		LocationAVM location = new LocationAVM(rowAVPair);
+		LocationAVM location = new LocationAVM();
+		location.unify(row);
+		location.unify(col);
 		composer.avmList.add(location);
 		AVPair locationAVPair = new AVPair("loc", location);
 		tile.setAttribute(locationAVPair);
