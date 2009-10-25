@@ -15,9 +15,22 @@ public class AVM {
 	// Implementing classes must define these in their constructors.
 	public Map<String, Object> attributes = new HashMap<String, Object>();
 	protected String type;
-	
+
 	AVM() {}
 
+	/**
+	 * Copy constructor.
+	 * @param avm - the AVM to copy.
+	 */
+	protected AVM (AVM avm) {
+		type = avm.type;
+		attributes = avm.attributes;
+	}
+
+	/**
+	 * Set attributes from AVPair.
+	 * @param avp - the AVPair to set as attribute & value.
+	 */
 	AVM(AVPair avp) {
 		try {
 			this.setAttribute(avp);			
@@ -31,8 +44,22 @@ public class AVM {
 	 * @return true if they are the same.
 	 */
 	public boolean equals(AVM a) {
-		// TODO: make real checks for equality.  First define what they are.
-		return this.equals(a);
+		if ((this.type == null && a.type == null) || (!this.type.equals(a.type))) {
+			return false;
+		} else {
+			for (String attribute : this.attributes.keySet() ) {
+				if (!a.attributes.containsKey(attribute)) {
+					return false;
+				} else {
+					if (a.attributes.get(attribute) != null && this.attributes.get(attribute) != null) {
+						if (!a.attributes.get(attribute).equals(this.attributes.get(attribute))) {
+							return false;
+						}						
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -80,14 +107,18 @@ public class AVM {
 
 	@SuppressWarnings("unchecked")
 	private boolean setAttribute(String attribute, ArrayList<AVM> values) {
-		ArrayList list = (ArrayList<AVM>) this.attributes.get(attribute);
-		for (AVM a : values) {
-			if (list.contains(a)) {
-				return false;
+		if (this.attributes.get(attribute) != null) {
+			ArrayList list = (ArrayList<AVM>) this.attributes.get(attribute);
+			for (AVM a : values) {
+				if (list.contains(a)) {
+					return false;
+				}
 			}
+			list.addAll(values);
+			return true;			
+		} else {
+			return false;
 		}
-		list.addAll(values);
-		return true;
 	}
 
 	/**
@@ -107,12 +138,13 @@ public class AVM {
 	 * null otherwise.
 	 */
 	public AVM unify(AVM avm) {
-		if (avm.type != null && this.attributes.get(avm.type.replaceAll("_spec", "")) != null) {
+		if (this.equals(avm)) {
+			return null;
+		} else if (avm.type != null && this.attributes.get(avm.type.replaceAll("_spec", "")) != null) {
 			if (!this.setAttribute(avm.type.replaceAll("_spec", ""), avm)) {
 				ArrayList<AVM> avmList = new ArrayList<AVM>(1);
 				avmList.add(avm);
-				if (!this.setAttribute(avm.type.replaceAll("_spec", ""), avmList)) {
-//					throw new IllegalArgumentException("Attribute '" + avm.type.replaceAll("_spec", "") + "' with value '" + avm.toString() + "'cannot be set on AVM " + this.toString());
+				if (!this.setAttribute(new AVPair(avm.type.replaceAll("_spec", ""), avmList))) {
 					return null;					
 				}
 			}
@@ -120,7 +152,6 @@ public class AVM {
 			for (AVPair avp : avm.getAVPairs()) {
 				if (avp.getValue() != null) {
 					if (!this.setAttribute(avp)) {
-//						throw new IllegalArgumentException("Attribute '" + avp.getAttribute() + "' with value '" + avp.getValue().toString() + "'cannot be set on AVM " + this.toString());
 						return null;
 					}
 				}

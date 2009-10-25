@@ -1,7 +1,9 @@
 package org.cocolab.inpro.dialogmanagement.composer;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * AVM Composer - Reads AVPairs.  Attempts composition of
@@ -10,9 +12,18 @@ import java.util.List;
  */
 public class AVMComposer {
 
+	private List<AVM> avmPrototypes = new ArrayList<AVM>();
 	private List<AVM> avmList = new ArrayList<AVM>();
 	
+	/**
+	 * Creates AVMComposer with a list of prototypes of
+	 * different typed AVMs.
+	 * New AVPairs will first be put into an UntypedAVM,
+	 * for which unification will be attempted on each
+	 * of these.  Non-null ones will be kept.
+	 */
 	AVMComposer() {
+		this.setPrototypeAVMs();
 	}
 	
 	public static void main(String[] args) {
@@ -21,56 +32,108 @@ public class AVMComposer {
 
 		// Below is a demonstration of what should happen when tags come in.
 
-		System.out.println("Adding tag 'name:kreuz'.");
-		AVPair nameAVPair = new AVPair("name", "kreuz");
-		TileAVM tile = new TileAVM(nameAVPair);
-		composer.avmList.add(tile);
-		composer.printAVMs();
+		ArrayList<AVPair> avps = new ArrayList<AVPair>();
+		avps.add(new AVPair("name", "kreuz"));
+		avps.add(new AVPair("color", "grün"));
+		avps.add(new AVPair("ord", "1"));
+		avps.add(new AVPair("orient", "top"));
+//		avps.add(new AVPair("rel", "next_to"));
+//		avps.add(new AVPair("rel", "above"));
 
-		System.out.println("Adding tag 'col:grün'.");
-		AVPair colorAVPair = new AVPair("col", "grün");
-		FieldAVM field = new FieldAVM(colorAVPair);
-		composer.avmList.add(field);
-		tile.unify(new UntypedAVM(colorAVPair));
-		composer.printAVMs();
-		
-		System.out.println("Adding tag 'ord:1'.");
-		AVPair ordAVPair = new AVPair("ord", "1");
-		RowAVM row = new RowAVM(ordAVPair);
-		composer.avmList.add(row);
-		ColumnAVM col = new ColumnAVM(ordAVPair);
-		composer.avmList.add(col);
-		LocationAVM location = new LocationAVM();
-		location.unify(row);
-		location.unify(col);
-		composer.avmList.add(location);
-		AVPair locationAVPair = new AVPair("loc", location);
-		tile.setAttribute(locationAVPair);
-		field.setAttribute(locationAVPair);
-		composer.printAVMs();
-
-		System.out.println("Adding tag 'rel:next_to'.");
-		AVPair relLocationAVPair1 = new AVPair("rel", "next_to");
-		RelativeLocationAVM relLoc1 = new RelativeLocationAVM(relLocationAVPair1);
-		composer.avmList.add(relLoc1);
-		tile.unify(relLoc1);
-		field.unify(relLoc1);
-		composer.printAVMs();
-
-		System.out.println("Adding tag 'rel:above'.");
-		AVPair relLocationAVPair2 = new AVPair("rel", "above");
-		RelativeLocationAVM relLoc2 = new RelativeLocationAVM(relLocationAVPair2);
-		composer.avmList.add(relLoc2);
-		tile.unify(relLoc2);
-		field.unify(relLoc2);
-		composer.printAVMs();
+		for (AVPair avp : avps) {
+			composer.unifyNewAVPair(avp);
+			composer.printAVMs();
+		}
 
 	}
 
+	/**
+	 * Method to call when a new AVPair becomes known.
+	 * Creates an UntypedAVM.  Attempt unification with known
+	 * prototypes.  For all unified AVMs re-attempts unification
+	 * with prototypes (for higher-order AVMs).  Lastly attempts
+	 * unification with existing AVMs.
+	 * @param avp
+	 */
+	private void unifyNewAVPair(AVPair avp) {
+		System.out.println("Adding tag AVPair '" + avp.toString() + "'.");
+		this.setPrototypeAVMs();
+		UntypedAVM untypedAVM = new UntypedAVM(avp);
+		ArrayList<AVM> listToAdd = new ArrayList<AVM>();
+		for (AVM protoAVM : avmPrototypes) {
+			if (protoAVM.unify(untypedAVM) != null) {
+				if (!listToAdd.contains(protoAVM)) {
+					listToAdd.add(protoAVM);
+				}
+			}
+		}
+		ArrayList<AVM> secondListToAdd = new ArrayList<AVM>();
+		for (AVM protoAVM : avmPrototypes) {
+			for (AVM newAVM : listToAdd) {
+				if (protoAVM.unify(newAVM) != null) {
+					if (!secondListToAdd.contains(protoAVM)) {
+						secondListToAdd.add(protoAVM);
+					}
+				}
+			}
+		}
+		for (AVM avm : secondListToAdd) {
+			if (!listToAdd.contains(avm)) {
+				listToAdd.add(avm);
+			}
+		}
+		ArrayList<AVM> thirdListToAdd = new ArrayList<AVM>();
+		for (AVM newAVM: listToAdd) {
+			for (AVM avm : avmList) {
+				if (avm.unify(newAVM) != null) {
+					if (!thirdListToAdd.contains(newAVM)) {
+						thirdListToAdd.add(newAVM);
+					}
+				}
+				if (newAVM.unify(avm) != null) {
+					if (!thirdListToAdd.contains(newAVM)) {
+						thirdListToAdd.add(newAVM);
+					}
+				}
+			}
+		}
+		for (AVM avm : thirdListToAdd) {
+			if (!listToAdd.contains(avm)) {
+				listToAdd.add(avm);
+			}
+		}
+		for (AVM a : listToAdd) {
+			if (!avmList.contains(a)) {
+				avmList.add(a);
+			}
+		}
+//		avmList.addAll(secondListToAdd);
+//		avmList.addAll(thirdListToAdd);
+//		Set<AVM> set = new HashSet<AVM>(avmList);
+//		avmList = new ArrayList<AVM>(set);
+	}
+
+	/**
+	 * Sets prototype AVMs to be used for matching
+	 * against UntypedAVMs (e.g. from new AVPairs).
+	 */
+	private void setPrototypeAVMs() {
+		avmPrototypes.clear();
+		avmPrototypes.add(new TileAVM());
+		avmPrototypes.add(new FieldAVM());
+		avmPrototypes.add(new LocationAVM());
+		avmPrototypes.add(new RelativeLocationAVM());
+		avmPrototypes.add(new RowAVM());
+		avmPrototypes.add(new ColumnAVM());
+	}
+
+	/**
+	 * Prints out all known AVMs.
+	 */
 	private void printAVMs() {
 		System.out.println("AVMs:");
 		for (AVM a : this.avmList) {
 			System.out.println(a.toString());
-		}		
+		}
 	}
 }
