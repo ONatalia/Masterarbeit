@@ -72,7 +72,7 @@ public class PitchTracker extends BaseDataProcessor {
 	public final static String PROP_MAX_PITCH_HZ = "maximumPitch";
 	
 	private double candidateScoreThreshold = 0.30; // default set by newProperties()
-	private double energyThreshold = 30;
+	private double energyThreshold = 5;
 	
 	private double[] signalBuffer;
 	
@@ -155,17 +155,19 @@ public class PitchTracker extends BaseDataProcessor {
 	/**
 	 * pick global minima in the lagScoreFunction that are smaller than threshold as candidates 
 	 */
-	private List<PitchCandidate> qualityThresheldCandidates(double[] lagScoreFunction) {
-		List<PitchCandidate> candidates = new ArrayList<PitchCandidate>(); 
+	private double qualityThresheldCandidates(double[] lagScoreFunction, List<PitchCandidate> candidates) {
+		candidates.clear();
+		double leastLag = Double.MAX_VALUE; // start with the maximum 
 		for (int lag = minLag + 1; lag < maxLag - 1; lag++) {
 			// all minima at or below threshold
+			leastLag = Math.min(leastLag, lagScoreFunction[lag]);
 			if ((lagScoreFunction[lag] <= candidateScoreThreshold) &&
 				(lagScoreFunction[lag - 1] > lagScoreFunction[lag]) &&
 				(lagScoreFunction[lag] < lagScoreFunction[lag + 1])) {
 					candidates.add(new PitchCandidate(lag, lagScoreFunction[lag], samplingFrequency));
 			}
 		}
-		return candidates;
+		return leastLag;
 	}
 	
 	
@@ -235,16 +237,16 @@ public class PitchTracker extends BaseDataProcessor {
 				System.arraycopy(newSamples, 0, signalBuffer, signalBuffer.length - newSamples.length, newSamples.length);
 				boolean voiced = false;
 				double pitchHz = -1.0f;
-				double voicing = 0f;
-				List<PitchCandidate> candidates = null;
+				double voicing = Double.NaN;
+				List<PitchCandidate> candidates = new ArrayList<PitchCandidate>();
 				if (signalPower > energyThreshold) { // TODO: better silence detection, maybe?
 					double[] lagScoreFunction = cmn(smdsf(signalBuffer));
-					candidates = qualityThresheldCandidates(lagScoreFunction);
+					// voicing is between 0 (unvoiced) and 1 (voiced)
+					voicing = Math.max(0f, 1.0f - qualityThresheldCandidates(lagScoreFunction, candidates));
 					voiced = !candidates.isEmpty();
 					if (voiced) {
 						int lag = simplisticCandidateSelection(candidates);
 						pitchHz = ((double) samplingFrequency) / lag;
-						voicing = bestCandidateSelection(candidates).getScore();
 					} else {
 						lastBestLag = -1;
 					}
