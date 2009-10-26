@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.dialogmanagement.composer.AVPair;
-import org.cocolab.inpro.incremental.BaseDataKeeper;
 
 import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 
@@ -38,8 +37,8 @@ public class WordIU extends IU {
 	final Pronunciation pron;
 	final String word;
 
-	public WordIU(Pronunciation pron, WordIU sll, List<? extends IU> groundedIn, BaseDataKeeper bd) {
-		super(sll, groundedIn, true, bd);
+	public WordIU(Pronunciation pron, WordIU sll, List<? extends IU> groundedIn) {
+		super(sll, groundedIn, true);
 		this.pron = pron;
 		this.word = pron.getWord().getSpelling();
 		isSilence = this.word.equals("<sil>");
@@ -49,11 +48,11 @@ public class WordIU extends IU {
 	 * create a new silent word
 	 * @param sll
 	 */
-	public WordIU(WordIU sll, BaseDataKeeper bd) {
+	public WordIU(WordIU sll) {
 		super(sll, Collections.nCopies(1, 
 					new SyllableIU(null, Collections.nCopies(1, 
-								new SegmentIU("SIL", null, bd)), bd)), 
-			true, bd);
+								new SegmentIU("SIL", null)))), 
+			true);
 		this.pron = Pronunciation.UNKNOWN;
 		this.word = "<sil>";
 		isSilence = true;

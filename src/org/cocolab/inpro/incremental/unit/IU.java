@@ -23,7 +23,7 @@ import org.cocolab.inpro.incremental.BaseDataKeeper;
 
 public abstract class IU {
 	
-	public static final IU FIRST_IU = new IU(null) {}; 
+	public static final IU FIRST_IU = new IU() {}; 
 	private static int IU_idCounter = 0;
 	protected final int id;
 
@@ -31,14 +31,14 @@ public abstract class IU {
 	
 	protected List<? extends IU> groundedIn;
 	
-	protected BaseDataKeeper bd;
+	protected static BaseDataKeeper bd;
 	
 	/**
 	 * call this, if you want to provide a sameLevelLink and a groundedIn list
 	 * and you want groundedIn to be deeply SLLed to the sameLevelLink's groundedIn-IUs  
 	 */
-	public IU(IU sll, List<? extends IU> groundedIn, boolean deepSLL, BaseDataKeeper bd) {
-		this(bd);
+	public IU(IU sll, List<? extends IU> groundedIn, boolean deepSLL) {
+		this.id = IU.getNewID();
 		this.groundedIn = groundedIn;
 		if (deepSLL && (sll != null)) {
 			connectSLL(sll);
@@ -48,39 +48,29 @@ public abstract class IU {
 		
 	}
 	
-	public IU(IU sll, List<? extends IU> groundedIn, boolean deepSLL) {
-		this (sll, groundedIn, deepSLL, (BaseDataKeeper) null);
-	}
-	
 	/**
 	 * call this, if you want to provide both a sameLevelLink and a groundedIn list
 	 */
-	public IU(IU sll, List<? extends IU> groundedIn, BaseDataKeeper bd) {
-		this(sll, groundedIn, false, bd);
+	public IU(IU sll, List<? extends IU> groundedIn) {
+		this(sll, groundedIn, false);
 	}
 	
-	public IU(List<? extends IU> groundedIn, BaseDataKeeper bd) {
-		this((IU) null, groundedIn, bd);
+	public IU(List<? extends IU> groundedIn) {
+		this((IU) null, groundedIn);
 	}
 	
 	/**
 	 * call this, if you want to provide a sameLevelLink 
 	 */
-	public IU(IU sll, BaseDataKeeper bd) {
-		this.id = IU.getNewID();
-		this.sameLevelLink = sll;
-		this.bd = bd;
+	public IU(IU sll) {
+		this(sll, null);
 	}
 	
 	/**
 	 * this constructor must be called in order to acquire an IU with a valid ID. 
 	 */
-	public IU(BaseDataKeeper bd) {
-		this((IU) null, bd);
-	}
-	
 	public IU() {
-		this((BaseDataKeeper) null);
+		this.id = IU.getNewID();
 	}
 	
 	/**
@@ -91,6 +81,11 @@ public abstract class IU {
 		return IU_idCounter++;
 	}
 	
+	public static void setBaseData(BaseDataKeeper bd) {
+		assert (bd == null) : "You're trying to re-set basedata. This may be a bug.";
+		IU.bd = bd;
+	}
+
 	public void setSameLevelLink(IU link) {
 		if (sameLevelLink != null) {
 			throw new RuntimeException("SLL may not be changed");

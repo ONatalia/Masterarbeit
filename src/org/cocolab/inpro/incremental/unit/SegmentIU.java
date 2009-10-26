@@ -24,7 +24,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.cocolab.inpro.annotation.Label;
-import org.cocolab.inpro.incremental.BaseDataKeeper;
 
 public class SegmentIU extends IU {
 	
@@ -52,8 +51,8 @@ public class SegmentIU extends IU {
 	// we keep start time, end time and text of the segment in a label
 	Label l;
 	
-	public SegmentIU(String segment, SegmentIU sll, BaseDataKeeper bd) {
-		super(sll, bd);
+	public SegmentIU(String segment, SegmentIU sll) {
+		super(sll);
 		assert (SILENCE.contains(segment) || VOWELS.contains(segment) || CONSONANTS.contains(segment)) : "segment " + segment + " is neither a vowel, consonant nor silence I could understand.";
 		this.l = new Label(segment);
 	}
@@ -83,7 +82,7 @@ public class SegmentIU extends IU {
 	
 	@Override
 	public void update(EditType edit) {
-/* this code is helpful for prosodic feature extraction
+/* this code is helpful for prosodic feature extraction *r/
 		if (edit == EditType.COMMIT) {
 			double time = startTime() + 0.01;
 			for (; time <= endTime() + 0.00001; time += 0.01) { 
@@ -97,7 +96,7 @@ public class SegmentIU extends IU {
 				                  isVowel() ? 'V' : isSilence() ? 'S' : 'C');
 			}
 		}
-*/
+/**/
 	}
 	
 	@Override
