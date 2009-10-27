@@ -1,7 +1,9 @@
 package org.cocolab.inpro.dialogmanagement.composer;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -25,8 +27,8 @@ public class AVMComposer {
 		this.setPrototypeAVMs();
 	}
 	
-	public static void main(String[] args) {
-		System.out.println("Starting AVM Composer.");
+	public static void main(String[] args) throws IOException {
+/*		System.out.println("Starting AVM Composer.");
 		AVMComposer composer = new AVMComposer();		
 
 		// Below is a demonstration of what should happen when tags come in.
@@ -44,7 +46,23 @@ public class AVMComposer {
 			composer.unifyNewAVPair(avp);
 			composer.printAVMs();
 		}
-
+*/
+		interactiveTest();
+	}
+	
+	static void interactiveTest() throws IOException {
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+		String line = stdin.readLine();
+		AVMComposer composer = new AVMComposer();
+		while (!line.equals("exit")) {
+			if (line.equals("new"))  
+				composer = new AVMComposer();
+			else {
+				composer.unifyNewAVPair(new AVPair(line));
+			}
+			composer.printAVMs();
+			line = stdin.readLine();
+		}
 	}
 
 	/**
