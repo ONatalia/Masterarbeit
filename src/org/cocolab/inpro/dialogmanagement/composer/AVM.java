@@ -44,22 +44,11 @@ public class AVM {
 	 * @return true if they are the same.
 	 */
 	public boolean equals(AVM a) {
-		if ((this.type == null && a.type == null) || (!this.type.equals(a.type))) {
-			return false;
+		if (this == a) {
+			return true;
 		} else {
-			for (String attribute : this.attributes.keySet() ) {
-				if (!a.attributes.containsKey(attribute)) {
-					return false;
-				} else {
-					if (a.attributes.get(attribute) != null && this.attributes.get(attribute) != null) {
-						if (!a.attributes.get(attribute).equals(this.attributes.get(attribute))) {
-							return false;
-						}						
-					}
-				}
-			}
+			return ((this.type == null && a.type == null) || (!this.type.equals(a.type)) && this.attributes.equals(a.attributes));
 		}
-		return true;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -77,48 +66,45 @@ public class AVM {
 	
 	private boolean setAttribute(String attribute, String value) {
 		if (this.attributes.keySet().contains(attribute)) {
-			if (this.attributes.get(attribute) == null || this.attributes.get(attribute).equals(value)) {
+			if (this.attributes.get(attribute) == null || !this.attributes.get(attribute).equals(value)) {
 				this.attributes.put(attribute, value);
 				return true;
-			} else {
-				return false;
 			}
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	private boolean setAttribute(String attribute, AVM value) {
 		if (this.attributes.keySet().contains(attribute)) {
-			if (this.attributes.get(attribute) != null && this.attributes.get(attribute).getClass().equals(value.getClass())) {
-				if (this.attributes.get(attribute) == null || this.attributes.get(attribute).equals(this.attributes.get(attribute))) {
-					this.attributes.put(attribute, value);
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				return false;
+			if (this.attributes.get(attribute) != value) {
+				if (this.attributes.get(attribute) != null && this.attributes.get(attribute).getClass().equals(value.getClass())) {
+					if (this.attributes.get(attribute) == null || this.attributes.get(attribute).equals(this.attributes.get(attribute))) {
+						this.attributes.put(attribute, value);
+						return true;
+					}
+				}				
 			}
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
 	private boolean setAttribute(String attribute, ArrayList<AVM> values) {
-		if (this.attributes.get(attribute) != null) {
-			ArrayList list = (ArrayList<AVM>) this.attributes.get(attribute);
-			for (AVM a : values) {
-				if (list.contains(a)) {
-					return false;
-				}
+		if (this.attributes.keySet().contains(attribute)) {
+			if (this.attributes.get(attribute) != values) {
+				if (this.attributes.get(attribute) != null) {
+					ArrayList list = (ArrayList<AVM>) this.attributes.get(attribute);
+					for (AVM a : values) {
+						if (list.contains(a)) {
+							return false;
+						}
+					}
+					list.addAll(values);
+					return true;
+				}				
 			}
-			list.addAll(values);
-			return true;			
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	/**
@@ -138,7 +124,7 @@ public class AVM {
 	 * null otherwise.
 	 */
 	public AVM unify(AVM avm) {
-		if (this.equals(avm)) {
+		if (this == avm) {
 			return null;
 		} else if (avm.type != null && this.attributes.get(avm.type.replaceAll("_spec", "")) != null) {
 			if (!this.setAttribute(avm.type.replaceAll("_spec", ""), avm)) {

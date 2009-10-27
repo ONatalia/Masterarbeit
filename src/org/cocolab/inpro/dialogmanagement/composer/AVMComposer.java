@@ -3,7 +3,6 @@ package org.cocolab.inpro.dialogmanagement.composer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * AVM Composer - Reads AVPairs.  Attempts composition of
@@ -37,8 +36,8 @@ public class AVMComposer {
 		avps.add(new AVPair("color", "grün"));
 		avps.add(new AVPair("ord", "1"));
 		avps.add(new AVPair("orient", "top"));
-//		avps.add(new AVPair("rel", "next_to"));
-//		avps.add(new AVPair("rel", "above"));
+		avps.add(new AVPair("rel", "next_to"));
+		avps.add(new AVPair("rel", "above"));
 
 		for (AVPair avp : avps) {
 			composer.unifyNewAVPair(avp);
@@ -58,59 +57,63 @@ public class AVMComposer {
 	private void unifyNewAVPair(AVPair avp) {
 		System.out.println("Adding tag AVPair '" + avp.toString() + "'.");
 		this.setPrototypeAVMs();
-		UntypedAVM untypedAVM = new UntypedAVM(avp);
-		ArrayList<AVM> listToAdd = new ArrayList<AVM>();
-		for (AVM protoAVM : avmPrototypes) {
-			if (protoAVM.unify(untypedAVM) != null) {
-				if (!listToAdd.contains(protoAVM)) {
-					listToAdd.add(protoAVM);
+		UntypedAVM untyped = new UntypedAVM(avp);
+		ArrayList<AVM> firstOrder= new ArrayList<AVM>();
+		for (AVM proto : avmPrototypes) {
+			AVM unified = proto.unify(untyped);
+			if (unified != null) {
+				if (!firstOrder.contains(unified)) {
+					firstOrder.add(unified);
 				}
 			}
 		}
-		ArrayList<AVM> secondListToAdd = new ArrayList<AVM>();
-		for (AVM protoAVM : avmPrototypes) {
-			for (AVM newAVM : listToAdd) {
-				if (protoAVM.unify(newAVM) != null) {
-					if (!secondListToAdd.contains(protoAVM)) {
-						secondListToAdd.add(protoAVM);
+
+		ArrayList<AVM> secondOrder = new ArrayList<AVM>();
+		for (AVM proto : avmPrototypes) {
+			for (AVM unified : firstOrder) {
+				AVM reUnified = proto.unify(unified);
+				if (reUnified != null) {
+					if (!secondOrder.contains(reUnified)) {
+						secondOrder.add(reUnified);
 					}
 				}
 			}
 		}
-		for (AVM avm : secondListToAdd) {
-			if (!listToAdd.contains(avm)) {
-				listToAdd.add(avm);
+
+		for (AVM avm : secondOrder) {
+			if (!firstOrder.contains(avm)) {
+				firstOrder.add(avm);
 			}
-		}
-		ArrayList<AVM> thirdListToAdd = new ArrayList<AVM>();
-		for (AVM newAVM: listToAdd) {
-			for (AVM avm : avmList) {
-				if (avm.unify(newAVM) != null) {
-					if (!thirdListToAdd.contains(newAVM)) {
-						thirdListToAdd.add(newAVM);
-					}
-				}
-				if (newAVM.unify(avm) != null) {
-					if (!thirdListToAdd.contains(newAVM)) {
-						thirdListToAdd.add(newAVM);
-					}
-				}
-			}
-		}
-		for (AVM avm : thirdListToAdd) {
-			if (!listToAdd.contains(avm)) {
-				listToAdd.add(avm);
-			}
-		}
-		for (AVM a : listToAdd) {
+		}		
+
+		for (AVM a : firstOrder) {
 			if (!avmList.contains(a)) {
 				avmList.add(a);
 			}
 		}
-//		avmList.addAll(secondListToAdd);
-//		avmList.addAll(thirdListToAdd);
-//		Set<AVM> set = new HashSet<AVM>(avmList);
-//		avmList = new ArrayList<AVM>(set);
+
+//		this.setPrototypeAVMs();
+//		ArrayList<AVM> thirdOrder = new ArrayList<AVM>();
+//		for (AVM proto : avmPrototypes) {
+//			ArrayList<AVM> sameTypes = new ArrayList<AVM>();
+//			for (AVM avm : avmList) {
+//				if (proto.getClass().equals(avm.getClass())) {
+//					sameTypes.add(avm);
+//				}
+//				for (AVM sameType : sameTypes) {
+//					proto.unify(sameType);
+//				}
+//				if (proto != null) {
+//					thirdOrder.add(proto);					
+//				}
+//			}
+//		}
+//		for (AVM a : thirdOrder) {
+//			if (!avmList.contains(a)) {
+//				avmList.add(a);
+//			}
+//		}
+
 	}
 
 	/**
