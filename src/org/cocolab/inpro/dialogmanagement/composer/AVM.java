@@ -92,7 +92,7 @@ public class AVM {
 	private boolean setAttribute(String attribute, ArrayList<AVM> values) {
 		if (this.attributes.keySet().contains(attribute)) {
 			if (this.attributes.get(attribute) != values) {
-				if (this.attributes.get(attribute) != null) {
+				if (this.attributes.get(attribute) != null && this.attributes.get(attribute) instanceof ArrayList) {
 					ArrayList list = (ArrayList<AVM>) this.attributes.get(attribute);
 					for (AVM a : values) {
 						if (list.contains(a)) {

@@ -32,12 +32,13 @@ public class AVMComposer {
 		// Below is a demonstration of what should happen when tags come in.
 
 		ArrayList<AVPair> avps = new ArrayList<AVPair>();
-		avps.add(new AVPair("name", "kreuz"));
+		
 		avps.add(new AVPair("color", "grün"));
-		avps.add(new AVPair("ord", "1"));
+		avps.add(new AVPair("name", "kreuz"));
+//		avps.add(new AVPair("ord", "1"));
 		avps.add(new AVPair("orient", "top"));
-		avps.add(new AVPair("rel", "next_to"));
-		avps.add(new AVPair("rel", "above"));
+//		avps.add(new AVPair("rel", "next_to"));
+//		avps.add(new AVPair("rel", "above"));
 
 		for (AVPair avp : avps) {
 			composer.unifyNewAVPair(avp);
@@ -65,7 +66,7 @@ public class AVMComposer {
 				if (!firstOrder.contains(unified)) {
 					firstOrder.add(unified);
 				}
-			}
+			}			
 		}
 
 		ArrayList<AVM> secondOrder = new ArrayList<AVM>();
@@ -92,27 +93,26 @@ public class AVMComposer {
 			}
 		}
 
-//		this.setPrototypeAVMs();
-//		ArrayList<AVM> thirdOrder = new ArrayList<AVM>();
-//		for (AVM proto : avmPrototypes) {
-//			ArrayList<AVM> sameTypes = new ArrayList<AVM>();
-//			for (AVM avm : avmList) {
-//				if (proto.getClass().equals(avm.getClass())) {
-//					sameTypes.add(avm);
-//				}
-//				for (AVM sameType : sameTypes) {
-//					proto.unify(sameType);
-//				}
-//				if (proto != null) {
-//					thirdOrder.add(proto);					
-//				}
-//			}
-//		}
-//		for (AVM a : thirdOrder) {
-//			if (!avmList.contains(a)) {
-//				avmList.add(a);
-//			}
-//		}
+		this.setPrototypeAVMs();
+		ArrayList<AVM> thirdOrder = new ArrayList<AVM>();
+		for (AVM proto : avmPrototypes) {
+			for (AVM avm1 : avmList) {
+				AVM reUnified = proto.unify(avm1);
+				if (reUnified != null) {
+					for (AVM avm2 : avmList) {
+						AVM reReUnified = reUnified.unify(avm2);
+						if (reReUnified != null) {
+							thirdOrder.add(reReUnified);
+						}
+					}						
+				}
+			}
+		}
+		for (AVM a : thirdOrder) {
+			if (!avmList.contains(a)) {
+				avmList.add(a);
+			}
+		}
 
 	}
 
