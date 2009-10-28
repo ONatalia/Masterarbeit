@@ -141,26 +141,6 @@ public class DataCollector extends JFrame {
 		}
 	}
 
-	private static String getDataPrefix(String basePath) {
-/*		JFrame f = new JFrame();
-		f.setLayout(new GridLayout(3, 2));
-		f.add(new JLabel("Verzeichnis: "));
-		JTextField path = new JTextField(basePath);
-		f.add(path);
-		f.add(new JLabel("Dateipräfix: "));
-		JTextField name = new JTextField();
-		f.add(name);
-		JButton abort = new JButton("Abbrechen");
-		f.add(abort);
-		JButton ok = new JButton("Weiter");
-		f.add(ok);
-		f.setVisible(true);
-		f.pack();
-		return null;
-*/
-		return "/tmp/timo";
-	}
-	
 	static void saveTranscript(String transcript, String filename) {
 		try {
 			PrintStream outFile = new PrintStream(filename);

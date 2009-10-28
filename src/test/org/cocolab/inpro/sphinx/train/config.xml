@@ -201,10 +201,6 @@
     <!-- The frontend configuration                               -->
     <!-- ******************************************************** -->
 
-    <component name="sessionWavWriter" type="edu.cmu.sphinx.frontend.WavWriter">
-        <property name="outFilePattern" value="/tmp/timo-A."/>
-    </component>
-
     <component name="frontend" type="edu.cmu.sphinx.frontend.FrontEnd">
         <propertylist name="pipeline">
         	<item>microphone</item>

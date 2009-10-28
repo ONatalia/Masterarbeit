@@ -1,0 +1,94 @@
+_____________________________________________________________
+  _                                         _           _   
+ (_)_ __  _ __  _ __ ___    _ __  _ __ ___ (_) ___  ___| |_ 
+ | | '_ \| '_ \| '__/ _ \  | '_ \| '__/ _ \| |/ _ \/ __| __|
+ | | | | | |_) | | | (_) | | |_) | | | (_) | |  __/ (__| |_ 
+ |_|_| |_| .__/|_|  \___/  | .__/|_|  \___// |\___|\___|\__|
+         |_|               |_|           |__/               
+_____________________________________________________________
+
+DataCollector is a program to collect spontaneous, 
+semi-automatically annotated speech data.
+
+The user interface is simplistic, but to the point:
+
+The upper line shows the ASR, while 
+the lower line is used for transcription.
+As the process alternates between recognition
+and transcription phase, only one of these
+lines is active at a time.
+
+In the textfield in the ASR line, the current hypothesis
+is shown while you speak and recognition is ongoing. It 
+may lag behind a little bit. The button on the right of
+the ASR line can be used to mute or unmute the microphone.
+As the microphone starts up muted, your first step in
+using this software will be to unmute the microphone by
+pressing on this button. Also note that it may take a 
+while before the microphone can be unmuted, as the ASR has
+to finish loading first. Only commence speaking once the 
+button's icon has changed from "pause" to "play". 
+
+The ASR will do its best to recognize what you say and
+once you have stopped speaking (and it has finished
+processing what you said), the transcription phase
+begins:
+
+The transcription line contains the recognized words
+in a textfield. There may be errors in the transcription.
+(You may actually have spotted them already while 
+processing was ongoing.) Now it's your turn: 
+(a) to correct the errors, by editing the line so that
+    it matches what you said, and 
+(b) to get a feeling about the capabilities of the ASR.
+ 
+Once you are happy with the transcription (which, if you
+said something like "ja" or "nein" might be immediately),
+accept the transcription (by clicking the button with 
+the "checkmark" icon).
+
+You will find that the ASR does not like you to talk too 
+fast or too slow, too quiet or too loud. And there are 
+certain words that it doesn't know. Don't despair! Maybe
+you've got more luck if you try a second time, and if you
+rephrase you utterance. Maybe it won't help at all. Your
+data in such cases is very valuable and will help the ASR
+learn the new word with the next training iteration.
+
+Occasionally, it may seem that the beginning of what you 
+said was not picked up. Or that a noise made recognition
+hard or impossible. Or that you mispronounced something.
+Or some other weird thing happened. Please discard such 
+utterances (by clicking the button with the "cross" icon 
+to the very right).
+
+Also, occasionally, a new (possibly empty) transcription
+might pop up, even though you were still editing the old
+transcript. This is a bug, it is not your fault. Please 
+press the discard button, to avoid adding a transcription 
+to the wrong audio.
+
+Once you have either accepted or discarded a transcription,
+the program automatically goes back to the recognition 
+step. You do not need to press the button in the ASR line.
+(Actually, doing so will mute the microphone, which is not
+what you wanted to do.)
+
+Repeat recognition and transcription as often as you want.
+You can exit the program at any time by closing the window.
+
+
+
+For every utterance, the program stores an audio file 
+(.wav), the recognition hypothesis (.hyp) and a transcript
+(.txt, unless you discarded this utterance). The files 
+will be consecutively numbered, starting from zero. 
+
+By default, your filenames will all start with "utterance"
+and will be stored in the "/tmp" directory. You can change
+this by adding the parameter 
+-DutteranceWavWriter[outFilePattern]=/your/path/and-file
+when you call java, or by changing the relevant line in the
+configuration file config.xml. There will be a GUI 
+configuration option in the future. 
+
