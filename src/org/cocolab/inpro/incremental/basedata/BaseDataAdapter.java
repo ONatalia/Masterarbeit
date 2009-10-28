@@ -28,7 +28,7 @@ public class BaseDataAdapter extends BaseDataProcessor {
 	@Override
 	public Data getData() throws DataProcessingException {
 		Data d = getPredecessor().getData();
-		if (!(d instanceof Signal) && (baseData != null))
+		if ((baseData != null) && (d != null) && !(d instanceof Signal))
 			baseData.addData(d, dataType);
 		return d;
 	}

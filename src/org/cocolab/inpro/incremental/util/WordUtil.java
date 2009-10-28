@@ -14,7 +14,7 @@ import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 
 public class WordUtil {
 
-	public static WordIU wordFromPronunciation(Pronunciation pron, WordIU wordSLL, SyllableIU syllSLL, SegmentIU segmentSLL, BaseDataKeeper bd) {
+	public static WordIU wordFromPronunciation(Pronunciation pron, WordIU wordSLL, SyllableIU syllSLL, SegmentIU segmentSLL) {
 		List<Unit[]> sylls;
 		if (pron instanceof SyllableAwarePronunciation) {
 			sylls = ((SyllableAwarePronunciation) pron).getSyllables();
@@ -26,19 +26,19 @@ public class WordUtil {
 		for (Unit[] syll : sylls) {
 			List<SegmentIU> segments = new ArrayList<SegmentIU>(syll.length);
 			for (Unit unit : syll) {
-				SegmentIU segIU = new SegmentIU(unit.getName(), segmentSLL, bd);
+				SegmentIU segIU = new SegmentIU(unit.getName(), segmentSLL);
 				segments.add(segIU);
 				segmentSLL = segIU;
 			}
-			SyllableIU syllIU = new SyllableIU(syllSLL, segments, bd); 
+			SyllableIU syllIU = new SyllableIU(syllSLL, segments); 
 			syllIUs.add(syllIU);
 			syllSLL = syllIU;
 			
 		}
-		return new WordIU(pron, wordSLL, syllIUs, bd);
+		return new WordIU(pron, wordSLL, syllIUs);
 	}
 
-	public static WordIU wordFromPronunciation(Pronunciation pron, BaseDataKeeper bd) {
-		return wordFromPronunciation(pron, null, null, null, bd);
+	public static WordIU wordFromPronunciation(Pronunciation pron) {
+		return wordFromPronunciation(pron, null, null, null);
 	}
 }

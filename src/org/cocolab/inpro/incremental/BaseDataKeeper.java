@@ -14,6 +14,12 @@ package org.cocolab.inpro.incremental;
  */
 public interface BaseDataKeeper {
 	
+	double getVoicing(double time);
+	
 	double getPitchInCent(double time);
+	
+	double getLoudness(double time);
+
+	double getSpectralTilt(double time);
 
 }

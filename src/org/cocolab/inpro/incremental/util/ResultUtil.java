@@ -110,6 +110,7 @@ public class ResultUtil {
 			hasWordTokensLast = false;
 		} else {
 			// if you see this error, then you must extend the above.
+			assert searchState != null : token;
 			assert false : searchState.getClass().toString();
 		    hasWordTokensLast = false;
 		}

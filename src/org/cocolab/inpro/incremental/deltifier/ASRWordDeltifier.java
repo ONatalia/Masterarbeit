@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.cocolab.inpro.annotation.Label;
-import org.cocolab.inpro.incremental.ASRResultKeeper;
-import org.cocolab.inpro.incremental.BaseDataKeeper;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IUList;
@@ -65,8 +63,6 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 
 	IUList<WordIU> wordIUs = new IUList<WordIU>();
 	
-	public BaseDataKeeper bd;
-
 	List<EditMessage<WordIU>> wordEdits;
 	
 //	private static final Logger logger = Logger.getLogger(ASRWordDeltifier.class);
@@ -179,7 +175,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		}
 		// check if we need to insert a silence in the end (this happens when SIL does not have its own word token) 
 		if (addSilenceWord) {
-			WordIU newIU = new WordIU(null, bd);
+			WordIU newIU = new WordIU(null);
 			newIU.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, "SIL")));
 			wordEdits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
 		}
@@ -190,7 +186,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 			/* on WordSearchStates, we build an IU and add it */
 			if (newSearchState instanceof WordSearchState) {
 				Pronunciation pron = ((WordSearchState) newSearchState).getPronunciation();
-				WordIU newIU = WordUtil.wordFromPronunciation(pron, bd);
+				WordIU newIU = WordUtil.wordFromPronunciation(pron);
 				currSegmentIt = newIU.getSegments().iterator();
 				wordEdits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
 			} else 
@@ -202,7 +198,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				if (currSegmentIt.hasNext()) {
 					currSegmentIt.next().updateLabel(new Label(segmentStartTime, segmentEndTime, name));
 				} else if (name.equals("SIL")) {
-					WordIU newIU = new WordIU(null, bd);
+					WordIU newIU = new WordIU(null);
 					newIU.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, "SIL")));
 					wordEdits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
 				}

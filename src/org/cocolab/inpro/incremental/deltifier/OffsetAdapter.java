@@ -9,6 +9,16 @@ import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Component;
 
+
+/**
+ *  there are two alternatives to set the offset:
+ *  - put an OffsetAdapter into the FrontEnd (after VAD)    
+ * 	- alternatively, use ASRWordDeltifier.signalOccurred() ; for this you have to call 
+ *    FrontEnd.addSignalListener(deltifier) somewhere (CurrentHypothesis-setup)
+ *    
+ *     here, the offset is given in centiseconds (frames)
+ */
+
 public class OffsetAdapter extends BaseDataProcessor {
 
 	@S4Component(defaultClass = ASRWordDeltifier.class, type = ASRWordDeltifier.class)

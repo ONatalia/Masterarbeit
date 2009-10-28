@@ -31,7 +31,7 @@ public abstract class IU {
 	
 	protected List<? extends IU> groundedIn;
 	
-	protected static BaseDataKeeper bd;
+	protected static BaseDataKeeper bd = null;
 	
 	/**
 	 * call this, if you want to provide a sameLevelLink and a groundedIn list
@@ -82,7 +82,7 @@ public abstract class IU {
 	}
 	
 	public static void setBaseData(BaseDataKeeper bd) {
-		assert (bd == null) : "You're trying to re-set basedata. This may be a bug.";
+		assert (IU.bd == null) : "You're trying to re-set basedata. This may be a bug.";
 		IU.bd = bd;
 	}
 

@@ -1,10 +1,19 @@
 package org.cocolab.inpro.incremental.basedata;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.BaseDataKeeper;
+import org.cocolab.inpro.pitch.PitchTracker;
 import org.cocolab.inpro.pitch.PitchedDoubleData;
+
+import ddf.minim.effects.RevisedBCurveFilter;
 
 import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DoubleData;
@@ -15,17 +24,19 @@ import edu.cmu.sphinx.util.props.PropertySheet;
 
 public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 
+	final static Logger logger = Logger.getLogger(BaseData.class);
+	
 	public static final String PITCHED_DATA = "pitchedData";
 	public static final String MEL_DATA = "melData";
 	
 	ConcurrentSkipListSet<TimedData<PitchedDoubleData>> pitchedData = new ConcurrentSkipListSet<TimedData<PitchedDoubleData>>(new TimedDataComparator());
-	ConcurrentSkipListSet<TimedData<DoubleData>> melData = new ConcurrentSkipListSet<TimedData<DoubleData>>(new TimedDataComparator());;
-	
+	ConcurrentSkipListSet<TimedData<DoubleData>> melData = new ConcurrentSkipListSet<TimedData<DoubleData>>(new TimedDataComparator());
+	private ConcurrentSkipListSet<TimedData<Double>> loudnessData = new ConcurrentSkipListSet<TimedData<Double>>(new TimedDataComparator());
+
+	private RevisedBCurveFilter rbcFilter = new RevisedBCurveFilter();
+
 	@Override
-	public void newProperties(PropertySheet ps) throws PropertyException { 
-		return;
-		
-	}
+	public void newProperties(PropertySheet ps) throws PropertyException { }
 
 	public void addData(Data d, String type) {
 		if (PITCHED_DATA.equals(type)) {
@@ -35,7 +46,7 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 				pitchedData.add(new TimedData<PitchedDoubleData>(frame, pdd));
 			}
 		} else if (MEL_DATA.equals(type)) {
-			assert (d instanceof DoubleData);
+			assert (d instanceof DoubleData) : d;
 			DoubleData dd = (DoubleData) d;
 			int frame = (int) dd.getFirstSampleNumber() / 160;
 			melData.add(new TimedData<DoubleData>(frame, dd));
@@ -48,26 +59,93 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 		int frame = (int) (time * 100);
 		TimedData<PitchedDoubleData> td = pitchedData.floor(new TimedData(frame));
 		if (td != null) {
-			PitchedDoubleData pdd = td.data;
+			PitchedDoubleData pdd = td.value;
 			if (pdd.isVoiced()) {
 				return pdd.getPitchCentTo110Hz();
 			} else {
 				return Double.NaN;
 			}
 		} else {
-			System.err.println("no data for frame " + frame);
+			logger.warn("no data for frame " + frame);
 			return Double.NaN;
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public double getVoicing(double time) {
+		int frame = (int) (time * 100);
+		TimedData<PitchedDoubleData> td = pitchedData.floor(new TimedData(frame));
+		if (td != null) {
+			PitchedDoubleData pdd = td.value;
+			return pdd.getVoicing();
+		}
+		return Double.NaN;
+	}
+
+    private double revisedBCurveCorrectedRMS(DoubleData d) {
+    	double rms = 0.0d;
+    	if (d instanceof DoubleData) {
+    		double[] samples = d.getValues();
+    		assert samples.length <= 160;
+    		double[] samplesF = Arrays.copyOf(samples, samples.length); 
+	    	rbcFilter.process(samplesF);
+	    	rms = PitchTracker.signalPower(samplesF);
+    	}
+        rms = Math.max(rms, 0);
+    	return rms;
+    }
+    
+	private static double percentileFilter(List<Double> list, int windowPosition) {
+		List<Double> sortedList = new ArrayList<Double>(list);
+		Collections.sort(sortedList);
+		return sortedList.get(windowPosition).doubleValue();
+	}
+	
+	private void makeLoudness(int smoothingWindow, int windowPosition) {
+		loudnessData.clear();
+		LinkedList<Double> rbcList = new LinkedList<Double>();
+		for (int i = 0; i < smoothingWindow; i++) {
+			rbcList.add(Double.valueOf(0.0d));
+		}
+		for (TimedData<PitchedDoubleData> data : pitchedData) {
+			double rbcEnergy = revisedBCurveCorrectedRMS(data.value);
+			rbcList.removeLast();
+			rbcList.addFirst(Double.valueOf(rbcEnergy));
+			double smoothedRbcEnergy = percentileFilter(rbcList, windowPosition);
+			double rbcEnergyInDB = 10 * Math.log10(smoothedRbcEnergy);
+			loudnessData.add(new TimedData<Double>(data.frame, new Double(rbcEnergyInDB)));
+		}
+	}
+
+	@Override
+	public double getLoudness(double time) {
+		if (loudnessData.size() == 0) {
+			makeLoudness(1, 0);
+		}
+		int frame = (int) (time * 100 + 0.01);
+		@SuppressWarnings("unchecked")
+		TimedData<Double> td = loudnessData.floor(new TimedData(frame));
+		if (td != null) {
+			return td.value.doubleValue();
+		} else {
+			return Double.NaN;
+		}
+	}
+
+	public double getSpectralTilt(double time) {
+		return 0f;
 	}
 
 	public void reset() {
 		pitchedData.clear();
 		melData.clear();
+		loudnessData.clear();
 	}
 
-	class TimedData<T> {
+	private class TimedData<T> {
 		int frame;
-		T data;
+		T value;
 		
 		TimedData(int frame) {
 			this.frame = frame;
@@ -75,7 +153,7 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 		
 		TimedData(int frame, T data) {
 			this.frame = frame;
-			this.data = data;
+			this.value = data;
 		}
 
 	}
