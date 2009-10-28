@@ -28,7 +28,7 @@ public class AVMComposer {
 	}
 	
 	public static void main(String[] args) throws IOException {
-/*		System.out.println("Starting AVM Composer.");
+		System.out.println("Starting AVM Composer.");
 		AVMComposer composer = new AVMComposer();		
 
 		// Below is a demonstration of what should happen when tags come in.
@@ -46,8 +46,8 @@ public class AVMComposer {
 			composer.unifyNewAVPair(avp);
 			composer.printAVMs();
 		}
-*/
-		interactiveTest();
+
+//		interactiveTest();
 	}
 	
 	static void interactiveTest() throws IOException {
@@ -144,8 +144,9 @@ public class AVMComposer {
 		avmPrototypes.add(new FieldAVM());
 		avmPrototypes.add(new LocationAVM());
 		avmPrototypes.add(new RelativeLocationAVM());
-		avmPrototypes.add(new RowAVM());
-		avmPrototypes.add(new ColumnAVM());
+		avmPrototypes.add(new RowColumnAVM());
+//		avmPrototypes.add(new RowAVM());
+//		avmPrototypes.add(new ColumnAVM());
 	}
 
 	/**
