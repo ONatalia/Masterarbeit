@@ -23,8 +23,8 @@ public class AVM {
 	 * @param avm - the AVM to copy.
 	 */
 	protected AVM (AVM avm) {
-		type = avm.type;
-		attributes = avm.attributes;
+		this.type = new String(avm.type);
+		this.attributes = new HashMap<String, Object>(avm.attributes);
 	}
 
 	/**
@@ -43,14 +43,21 @@ public class AVM {
 	 * @param a - an AVM to compare this AVM with.
 	 * @return true if they are the same.
 	 */
-	public boolean equals(AVM a) {
-		if (this == a) {
+	public boolean equals(AVM avm) {
+		if (this == avm) {
 			return true;
+		} else if ((this.type != avm.type) || !avm.type.equals(this.type)) {
+			return false;
 		} else {
-			return ((this.type == null && a.type == null) || (!this.type.equals(a.type)) && this.attributes.equals(a.attributes));
+			return (this.attributes.hashCode() == avm.attributes.hashCode());			
 		}
 	}
 
+	public int hashCode() { 
+		int hash = 1;
+		return hash;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public boolean setAttribute(AVPair avp) {
 		if (avp.getValue() instanceof String) {
@@ -59,8 +66,10 @@ public class AVM {
 			return setAttribute((String) avp.getAttribute(), (AVM) avp.getValue());
 		} else if (avp.getValue() instanceof ArrayList) {
 			return setAttribute((String) avp.getAttribute(), (ArrayList<AVM>) avp.getValue());
+		} else if (avp.getValue() == null) {
+			return true;
 		} else {
-			throw new IllegalArgumentException("AVP value must be one of String, AVM or ArrayList.");
+			throw new IllegalArgumentException("AVP value must be one of String, AVM or ArrayList, not " + avp.getValue().getClass().toString());
 		}
 	}
 	
@@ -124,8 +133,14 @@ public class AVM {
 	 * null otherwise.
 	 */
 	public AVM unify(AVM avm) {
-		if (this == avm) {
+		if (this.equals(avm)) {
 			return null;
+		} else if (avm.getClass().equals(this.getClass())) {
+			for (AVPair avp : avm.getAVPairs()) {
+				if (!this.setAttribute(avp)) {
+					return null;
+				}
+			}
 		} else if (avm.type != null && this.attributes.get(avm.type.replaceAll("_spec", "")) != null) {
 			if (!this.setAttribute(avm.type.replaceAll("_spec", ""), avm)) {
 				ArrayList<AVM> avmList = new ArrayList<AVM>(1);
@@ -144,6 +159,43 @@ public class AVM {
 			}
 		}
 		return this;
+	}
+
+	public boolean unifies(AVM avm) {
+		AVM that = new AVM(this);
+		if (that.unify(avm) != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	/**
+	 * Return false if any String attribute has been set,
+	 * any AVM attribute is not empty or any
+	 * element in an ArrayList<AVM> attribute is not empty.
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public boolean isEmpty() {
+		for (String attribute : this.attributes.keySet()) {
+			Object value = this.attributes.get(attribute);
+			if (value instanceof String) {
+				if (value != null) {
+					return false;
+				}
+			} else if (value instanceof AVM) {
+				if (!((AVM) value).isEmpty()) {
+					return false;
+				}
+			} else if (value instanceof ArrayList) {
+				for (AVM avm : (ArrayList<AVM>) value) {
+					if (!avm.isEmpty()) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	public ArrayList<AVPair> getAVPairs() {
@@ -171,7 +223,42 @@ public class AVM {
 	 * <i>Example:</i> &lt;tile {col=green, rel_loc=[], loc=<...>} &gt;
 	 * @return String representation of the AVM
 	 */
+	@SuppressWarnings("unchecked")
 	public String toString() {
-		return "<" + this.type + " " + this.attributes.toString() + ">";
+		String str = new String();
+		str += "[";
+		str += this.type;
+		for (String attribute : this.attributes.keySet()) {
+			Object value = this.attributes.get(attribute);
+			if (value instanceof String) {
+				if (value != null) {
+					str += " ";
+					str += attribute;
+					str += ":";
+					str += value;
+				}
+			} else if (value instanceof AVM) {
+				if (!((AVM) value).isEmpty()) {
+					str += " ";
+					str += attribute;
+					str += ":";
+					str += value.toString();
+					
+				}
+			} else if (value instanceof ArrayList) {
+				for (AVM avm : (ArrayList<AVM>) value) {
+					if (!avm.isEmpty()) {
+						str += " ";
+						str += attribute;
+						str += ":";
+						str += value.toString();
+					}
+				}
+			}
+		}
+		str += "]";
+		return str;
+//		return "<" + this.type + " " + this.attributes.toString() + ">";
 	}
+	
 }
