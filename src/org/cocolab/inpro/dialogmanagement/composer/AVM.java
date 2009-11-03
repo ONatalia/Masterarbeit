@@ -13,11 +13,6 @@ public class AVM {
 	// Implementing classes must define these in their constructors.
 	public String type;
 	public HashMap<String, Object> attributes;
-//	public ArrayList<String> attributes;
-//	public HashMap<String, String> stringAttributes;
-//	public HashMap<String, AVM> AVMAttributes;
-//	public HashMap<String, ArrayList<AVM>> listAttributes;
-//	public HashMap<String, ArrayList<AVM>> fixedListAttributes;
 
 	/**
 	 * Empty constructor.
@@ -42,7 +37,6 @@ public class AVM {
 	}
 
 	private void setEmptyAttributesFromType(String type) {
-//		System.err.println("new " + type + " avm");
 		this.attributes = new HashMap<String, Object>();
 		if (type.equals("tile")) {
 			this.attributes.put("name", null);
