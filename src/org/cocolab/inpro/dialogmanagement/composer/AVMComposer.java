@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * AVM Composer - Reads AVPairs.  Attempts composition of
@@ -13,8 +12,8 @@ import java.util.List;
  */
 public class AVMComposer {
 
-	private List<AVM> avmPrototypes = new ArrayList<AVM>();
-	private List<AVM> avmList = new ArrayList<AVM>();
+	private ArrayList<AVM> avmList = new ArrayList<AVM>();
+	private ArrayList<AVM> worldList = new ArrayList<AVM>();
 	
 	/**
 	 * Creates AVMComposer with a list of prototypes of
@@ -24,28 +23,63 @@ public class AVMComposer {
 	 * of these.  Non-null ones will be kept.
 	 */
 	AVMComposer() {
-		this.setPrototypeAVMs();
+		this.avmList = this.getObjectAVMs();
+		AVM avm1 = new AVM("tile");
+		avm1.setAttribute(new AVPair("name", "kreuz"));
+		avm1.setAttribute(new AVPair("color", "grün"));;
+		AVM avm2 = new AVM("tile");
+		avm2.setAttribute(new AVPair("name", "balken"));
+		avm2.setAttribute(new AVPair("color", "grün"));
+		AVM avm3 = new AVM("field");
+		avm3.setAttribute(new AVPair("color", "grün"));
+		AVM avm4 = new AVM("field");
+		avm4.setAttribute(new AVPair("color", "braun"));
+		this.worldList.add(avm1);
+		this.worldList.add(avm2);
+		this.worldList.add(avm3);
+		this.worldList.add(avm4);
 	}
 	
 	public static void main(String[] args) throws IOException {
 		System.out.println("Starting AVM Composer.");
-		AVMComposer composer = new AVMComposer();		
+		AVMComposer composer = new AVMComposer();
+		
+		System.out.println("World contains following objects:");
+		System.out.println(composer.worldList.toString());
 
 		// Below is a demonstration of what should happen when tags come in.
 
 		ArrayList<AVPair> avps = new ArrayList<AVPair>();
 		
+//		avps.add(new AVPair("relation", "above"));
+//		avps.add(new AVPair("ord", "1"));
 		avps.add(new AVPair("color", "grün"));
 		avps.add(new AVPair("name", "kreuz"));
-//		avps.add(new AVPair("ord", "1"));
-		avps.add(new AVPair("orient", "top"));
-//		avps.add(new AVPair("rel", "next_to"));
-//		avps.add(new AVPair("rel", "above"));
+//		avps.add(new AVPair("ord", "2"));
+//		avps.add(new AVPair("ord", "3"));
+//		avps.add(new AVPair("orient", "top"));
+//		avps.add(new AVPair("relation", "next_to"));
+//		avps.add(new AVPair("color", "gelb"));  // this should break
 
 		for (AVPair avp : avps) {
-			composer.unifyNewAVPair(avp);
-			composer.printAVMs();
+			if (composer.avmList != null) {
+				composer.unifyNewAVPair(avp);
+				composer.printAVMs();
+			}
+			if (composer.avmList != null) {
+				AVM avm = composer.resolve();
+				if (avm != null) {
+					System.out.println("Found one that resolves...");
+					System.out.println(avm.toString());
+					break;
+				}				
+			} else {
+				System.out.println("Stopping unification - last tag didn't unify..");
+				break;
+			}
 		}
+		
+		System.out.println("Done!");
 
 //		interactiveTest();
 	}
@@ -75,78 +109,50 @@ public class AVMComposer {
 	 */
 	private void unifyNewAVPair(AVPair avp) {
 		System.out.println("Adding tag AVPair '" + avp.toString() + "'.");
-		this.setPrototypeAVMs();
-		UntypedAVM untyped = new UntypedAVM(avp);
-		ArrayList<AVM> firstOrder= new ArrayList<AVM>();
-		for (AVM proto : avmPrototypes) {
-			AVM unified = proto.unify(untyped);
-			if (unified != null) {
-				if (!firstOrder.contains(unified)) {
-					firstOrder.add(unified);
-				}
-			}			
+		ArrayList<AVM> newList = new ArrayList<AVM>();
+		boolean placed = false;
+		for (AVM avm : this.avmList) {
+			if (avm.setAttribute(avp)) {
+				newList.add(avm);
+				placed = true;
+			}
 		}
+		if (placed) {
+			avmList = newList;
+		} else {
+			avmList = null;
+		}
+	}
 
-		ArrayList<AVM> secondOrder = new ArrayList<AVM>();
-		for (AVM proto : avmPrototypes) {
-			for (AVM unified : firstOrder) {
-				AVM reUnified = proto.unify(unified);
-				if (reUnified != null) {
-					if (!secondOrder.contains(reUnified)) {
-						secondOrder.add(reUnified);
+	private AVM resolve() {
+		ArrayList<AVM> resolvedList = new ArrayList<AVM>();
+		for (AVM avm1 : worldList) {
+			for (AVM avm2 : avmList) {
+				if (avm1.unifies(avm2)) {
+					avm1.unify(avm2);
+					if (!resolvedList.contains(avm1)) {
+						resolvedList.add(avm1);
 					}
 				}
 			}
 		}
-
-		for (AVM avm : secondOrder) {
-			if (!firstOrder.contains(avm)) {
-				firstOrder.add(avm);
-			}
-		}		
-
-		for (AVM a : firstOrder) {
-			if (!avmList.contains(a)) {
-				avmList.add(a);
-			}
+		if (resolvedList.size() == 1) {
+			return resolvedList.get(0);
+		} else {
+			System.out.println("found " + resolvedList.size());
+			return null;
 		}
-
-		this.setPrototypeAVMs();
-		ArrayList<AVM> thirdOrder = new ArrayList<AVM>();
-		for (AVM proto : avmPrototypes) {
-			for (AVM avm1 : avmList) {
-				AVM reUnified = proto.unify(avm1);
-				if (reUnified != null) {
-					for (AVM avm2 : avmList) {
-						AVM reReUnified = reUnified.unify(avm2);
-						if (reReUnified != null) {
-							thirdOrder.add(reReUnified);
-						}
-					}						
-				}
-			}
-		}
-		for (AVM a : thirdOrder) {
-			if (!avmList.contains(a)) {
-				avmList.add(a);
-			}
-		}
-
 	}
-
+	
 	/**
 	 * Sets prototype AVMs to be used for matching
 	 * against UntypedAVMs (e.g. from new AVPairs).
 	 */
-	private void setPrototypeAVMs() {
-		avmPrototypes.clear();
-		avmPrototypes.add(new TileAVM());
-		avmPrototypes.add(new FieldAVM());
-		avmPrototypes.add(new LocationAVM());
-		avmPrototypes.add(new RelativeLocationAVM());
-		avmPrototypes.add(new RowColumnAVM());
-//		avmPrototypes.add(new RowAVM());
-//		avmPrototypes.add(new ColumnAVM());
+	private ArrayList<AVM> getObjectAVMs() {
+		ArrayList<AVM> list = new ArrayList<AVM>();
+		list.add(new AVM("tile"));
+		list.add(new AVM("field"));
+		return list;
 	}
 
 	/**
@@ -154,8 +160,12 @@ public class AVMComposer {
 	 */
 	private void printAVMs() {
 		System.out.println("AVMs:");
-		for (AVM a : this.avmList) {
-			System.out.println(a.toString());
+		if (avmList != null) {
+			for (AVM a : this.avmList) {
+				System.out.println(a.toString());
+			}			
+		} else {
+			System.out.println("none");
 		}
 	}
 }

@@ -2,8 +2,6 @@ package org.cocolab.inpro.dialogmanagement.composer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Class representing an AVM with methods for equality, unification and setting
@@ -13,10 +11,26 @@ import java.util.Map;
 public class AVM {
 
 	// Implementing classes must define these in their constructors.
-	public Map<String, Object> attributes = new HashMap<String, Object>();
-	protected String type;
+	public String type;
+	public HashMap<String, Object> attributes;
+//	public ArrayList<String> attributes;
+//	public HashMap<String, String> stringAttributes;
+//	public HashMap<String, AVM> AVMAttributes;
+//	public HashMap<String, ArrayList<AVM>> listAttributes;
+//	public HashMap<String, ArrayList<AVM>> fixedListAttributes;
 
+	/**
+	 * Empty constructor.
+	 */
 	AVM() {}
+
+	/**
+	 * String type constructor.
+	 */
+	AVM(String type) {
+		this.type = type;
+		this.setEmptyAttributesFromType(this.type);
+	}
 
 	/**
 	 * Copy constructor.
@@ -27,15 +41,47 @@ public class AVM {
 		this.attributes = new HashMap<String, Object>(avm.attributes);
 	}
 
-	/**
-	 * Set attributes from AVPair.
-	 * @param avp - the AVPair to set as attribute & value.
-	 */
-	AVM(AVPair avp) {
-		try {
-			this.setAttribute(avp);			
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
+	private void setEmptyAttributesFromType(String type) {
+//		System.err.println("new " + type + " avm");
+		this.attributes = new HashMap<String, Object>();
+		if (type.equals("tile")) {
+			this.attributes.put("name", null);
+			this.attributes.put("color", null);
+			this.attributes.put("label", null);
+			this.attributes.put("loc", new AVM("loc_spec"));
+			ArrayList<AVM> list = new ArrayList<AVM>();
+			list.add(new AVM("rel_loc_spec"));
+			list.add(new AVM("rel_loc_spec"));
+			list.add(new AVM("rel_loc_spec"));
+			list.add(new AVM("rel_loc_spec"));
+			this.attributes.put("rel_loc", list);
+		} else if (type.equals("field")) {
+			this.attributes.put("color", null);
+			this.attributes.put("loc", new AVM("loc_spec"));
+			ArrayList<AVM> list = new ArrayList<AVM>(4);
+			list.add(new AVM("rel_loc_spec"));
+			list.add(new AVM("rel_loc_spec"));
+			list.add(new AVM("rel_loc_spec"));
+			list.add(new AVM("rel_loc_spec"));
+			this.attributes.put("rel_loc", list);
+		} else if (type.equals("loc_spec")) {
+			this.attributes.put("desc", null);
+			this.attributes.put("lr", null);
+			this.attributes.put("tb", null);
+			ArrayList<AVM> list = new ArrayList<AVM>(4);
+			list.add(new AVM("rc_spec"));
+			list.add(new AVM("rc_spec"));
+			list.add(new AVM("rc_spec"));
+			list.add(new AVM("rc_spec"));
+			this.attributes.put("rc", list);
+		} else if (type.equals("rel_loc_spec")) {
+			this.attributes.put("arg", null);
+			this.attributes.put("relation", null);
+		} else if (type.equals("rc_spec")) {
+			this.attributes.put("ord", null);
+			this.attributes.put("orient", null);
+		} else {
+			throw new IllegalArgumentException("Unknown AVM type: " + type);
 		}
 	}
 
@@ -49,115 +95,28 @@ public class AVM {
 		} else if ((this.type != avm.type) || !avm.type.equals(this.type)) {
 			return false;
 		} else {
-			return (this.attributes.hashCode() == avm.attributes.hashCode());			
+			return (this.attributes.hashCode() == avm.attributes.hashCode());
 		}
 	}
 
 	public int hashCode() { 
-		int hash = 1;
+		int hash;
+		hash = 37 * this.type.hashCode() * this.attributes.hashCode();
 		return hash;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public boolean setAttribute(AVPair avp) {
-		if (avp.getValue() instanceof String) {
-			return setAttribute((String) avp.getAttribute(), (String) avp.getValue());
-		} else if (avp.getValue() instanceof AVM) {
-			return setAttribute((String) avp.getAttribute(), (AVM) avp.getValue());
-		} else if (avp.getValue() instanceof ArrayList) {
-			return setAttribute((String) avp.getAttribute(), (ArrayList<AVM>) avp.getValue());
-		} else if (avp.getValue() == null) {
-			return true;
-		} else {
-			throw new IllegalArgumentException("AVP value must be one of String, AVM or ArrayList, not " + avp.getValue().getClass().toString());
-		}
-	}
-	
-	private boolean setAttribute(String attribute, String value) {
-		if (this.attributes.keySet().contains(attribute)) {
-			if (this.attributes.get(attribute) == null || !this.attributes.get(attribute).equals(value)) {
-				this.attributes.put(attribute, value);
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean setAttribute(String attribute, AVM value) {
-		if (this.attributes.keySet().contains(attribute)) {
-			if (this.attributes.get(attribute) != value) {
-				if (this.attributes.get(attribute) != null && this.attributes.get(attribute).getClass().equals(value.getClass())) {
-					if (this.attributes.get(attribute) == null || this.attributes.get(attribute).equals(this.attributes.get(attribute))) {
-						this.attributes.put(attribute, value);
-						return true;
-					}
-				}				
-			}
-		}
-		return false;
-	}
-
-	@SuppressWarnings("unchecked")
-	private boolean setAttribute(String attribute, ArrayList<AVM> values) {
-		if (this.attributes.keySet().contains(attribute)) {
-			if (this.attributes.get(attribute) != values) {
-				if (this.attributes.get(attribute) != null && this.attributes.get(attribute) instanceof ArrayList) {
-					ArrayList list = (ArrayList<AVM>) this.attributes.get(attribute);
-					for (AVM a : values) {
-						if (list.contains(a)) {
-							return false;
-						}
-					}
-					list.addAll(values);
-					return true;
-				}				
-			}
-		}
-		return false;
 	}
 
 	/**
 	 * Attempts unifying this AVM with the input to this method.
-	 * Unification succeeds either if both AVMs share the same attributes
-	 * and their values do not conflict (i.e. for simple values they
-	 * are either null in at least one or identical, for complex/list
-	 * values they must not be included in list value of this AVM) or
-	 * the input AVM is a possible attribute of this AVM.
-	 * <br />
-	 * Unification is achieved by checking the latter case first, or else
-	 * attempting setAttribute() for each AVPair of the input AVM.
-	 * As soon as setAttribute() is unsuccessful, null is returned.
 	 * @param a - an AVM to unify with this AVM.
-	 * @return <b>b</b> - a new AVM, which is the unification of
-	 * <b>b</b> and this AVM if unification was successful,
+	 * @return a new unified AVM if unification was successful,
 	 * null otherwise.
 	 */
 	public AVM unify(AVM avm) {
-		if (this.equals(avm)) {
-			return null;
-		} else if (avm.getClass().equals(this.getClass())) {
-			for (AVPair avp : avm.getAVPairs()) {
-				if (!this.setAttribute(avp)) {
-					return null;
-				}
+		for (AVPair avp : avm.getAVPairs()) {
+			if (!this.setAttribute(avp)) {
+				return null;
 			}
-		} else if (avm.type != null && this.attributes.get(avm.type.replaceAll("_spec", "")) != null) {
-			if (!this.setAttribute(avm.type.replaceAll("_spec", ""), avm)) {
-				ArrayList<AVM> avmList = new ArrayList<AVM>(1);
-				avmList.add(avm);
-				if (!this.setAttribute(new AVPair(avm.type.replaceAll("_spec", ""), avmList))) {
-					return null;					
-				}
-			}
-		} else {
-			for (AVPair avp : avm.getAVPairs()) {
-				if (avp.getValue() != null) {
-					if (!this.setAttribute(avp)) {
-						return null;
-					}
-				}
-			}
-		}
+		}			
 		return this;
 	}
 
@@ -169,58 +128,89 @@ public class AVM {
 			return false;
 		}
 	}
-	/**
-	 * Return false if any String attribute has been set,
-	 * any AVM attribute is not empty or any
-	 * element in an ArrayList<AVM> attribute is not empty.
-	 * @return
-	 */
+	
 	@SuppressWarnings("unchecked")
-	public boolean isEmpty() {
-		for (String attribute : this.attributes.keySet()) {
-			Object value = this.attributes.get(attribute);
+	public boolean setAttribute(AVPair avp) {
+		String attribute = avp.getAttribute();
+		Object value = avp.getValue();
+		if (this.attributes.keySet().contains(attribute)) {
 			if (value instanceof String) {
-				if (value != null) {
-					return false;
+				if (this.attributes.get(attribute) == null) {
+					this.attributes.put(attribute, (String) value);
+					return true;
+				} else if (this.attributes.get(attribute).equals((String) value)) {
+					return true;
 				}
 			} else if (value instanceof AVM) {
-				if (!((AVM) value).isEmpty()) {
-					return false;
+				if (this.attributes.get(attribute) instanceof AVM) {
+					AVM avm = (AVM) this.attributes.get(attribute); 
+					if (avm.equals((AVM) value)) {
+						return true;
+					} else if (avm.unifies((AVM) value)) {
+						avm.unify((AVM) value);
+						this.attributes.put(attribute, (AVM) value);
+						return true;
+					}
+				} else if (this.attributes.get(attribute) instanceof ArrayList) {
+					for (AVM avm : (ArrayList<AVM>) this.attributes.get(attribute)) {
+						if (avm.setAttribute(avp)) {
+							return true;
+						}
+					}
 				}
-			} else if (value instanceof ArrayList) {
-				for (AVM avm : (ArrayList<AVM>) value) {
-					if (!avm.isEmpty()) {
-						return false;
+			} else if (value instanceof ArrayList && this.attributes.get(attribute) instanceof ArrayList) {
+				for (AVM avm1 : (ArrayList<AVM>) value) {
+					boolean unified = false;
+					for (AVM avm2 : (ArrayList<AVM>) this.attributes.get(attribute)) {
+						if (avm1.unifies(avm2)) {
+							unified = true;
+							break;
+						}
+					}
+					if (unified) {
+						return true;
+					}
+				}
+			}
+		} else {
+			for (String localAttribute : this.attributes.keySet()) {
+				if (this.attributes.get(localAttribute) instanceof AVM) {
+					AVM localAVM = (AVM) this.attributes.get(localAttribute);
+					if (localAVM.setAttribute(avp)) {
+						return true;
+					}
+				} else if (this.attributes.get(localAttribute) instanceof ArrayList) {
+					for (AVM localAVM : (ArrayList<AVM>) this.attributes.get(localAttribute)) {
+						if (localAVM.setAttribute(avp)) {
+							return true;
+						}
 					}
 				}
 			}
 		}
-		return true;
+		return false;
 	}
-
+	
 	public ArrayList<AVPair> getAVPairs() {
 		ArrayList<AVPair> avps = new ArrayList<AVPair>();
-		Iterator<String> i = this.attributes.keySet().iterator();
-		while (i.hasNext()) {
-			String attribute = i.next();
-			Object value = this.attributes.get(attribute);
-			avps.add(new AVPair(attribute, value));
+		for (String attribute : this.attributes.keySet()) {
+			/* Use null? */
+//			avps.add(new AVPair(attribute, this.attributes.get(attribute)));
+			/* Maybe use non-null? */
+			if (this.attributes.get(attribute) != null) {
+				avps.add(new AVPair(attribute, this.attributes.get(attribute)));	
+			}
+			
 		}
 		return avps;
 	}
-
-	public Map<String, Object> getAttributes() {
-		return this.attributes;
+	
+	public boolean isEmpty() {
+		return false;
 	}
 
 	/**
-	 * Builds a string representation of the AVM with nested brackets
-	 * delimiting data structures as follows:<br />
-	 * <> denotes AVM boundaries<br />
-	 * [] denotes AVM list attribute boundaries<br />
-	 * {} denotes AVM attributes boundaries<br />
-	 * The first word in the AVM structure is its type.<br />
-	 * <i>Example:</i> &lt;tile {col=green, rel_loc=[], loc=<...>} &gt;
+	 * Builds a string representation of the AVM with nested brackets.
 	 * @return String representation of the AVM
 	 */
 	@SuppressWarnings("unchecked")
@@ -228,37 +218,34 @@ public class AVM {
 		String str = new String();
 		str += "[";
 		str += this.type;
+		str += " ";
 		for (String attribute : this.attributes.keySet()) {
-			Object value = this.attributes.get(attribute);
+			Object value = attributes.get(attribute);
 			if (value instanceof String) {
 				if (value != null) {
-					str += " ";
 					str += attribute;
 					str += ":";
 					str += value;
+					str += " ";
 				}
 			} else if (value instanceof AVM) {
 				if (!((AVM) value).isEmpty()) {
-					str += " ";
 					str += attribute;
 					str += ":";
 					str += value.toString();
-					
+					str += " ";
 				}
 			} else if (value instanceof ArrayList) {
+				str += attribute;
+				str += ":";
 				for (AVM avm : (ArrayList<AVM>) value) {
-					if (!avm.isEmpty()) {
-						str += " ";
-						str += attribute;
-						str += ":";
-						str += value.toString();
-					}
+					str += avm.toString();
+					str += " ";
 				}
 			}
 		}
 		str += "]";
 		return str;
-//		return "<" + this.type + " " + this.attributes.toString() + ">";
 	}
 	
 }
