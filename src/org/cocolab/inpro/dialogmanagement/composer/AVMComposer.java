@@ -12,8 +12,26 @@ import java.util.ArrayList;
  */
 public class AVMComposer {
 
+
 	private ArrayList<AVM> avmList = new ArrayList<AVM>();
-	private ArrayList<AVM> worldList = new ArrayList<AVM>();
+	static private ArrayList<AVM> worldList = new ArrayList<AVM>();
+	
+	static {
+		AVM avm1 = new AVM("tile");
+		avm1.setAttribute(new AVPair("name", "cross"));
+		avm1.setAttribute(new AVPair("color", "green"));;
+		AVM avm2 = new AVM("tile");
+		avm2.setAttribute(new AVPair("name", "gun"));
+		avm2.setAttribute(new AVPair("color", "green"));
+		AVM avm3 = new AVM("field");
+		avm3.setAttribute(new AVPair("color", "green"));
+		AVM avm4 = new AVM("field");
+		avm4.setAttribute(new AVPair("color", "brown"));
+		worldList.add(avm1);
+		worldList.add(avm2);
+		worldList.add(avm3);
+		worldList.add(avm4);
+	}
 	
 	/**
 	 * Creates AVMComposer with a list of prototypes of
@@ -22,22 +40,8 @@ public class AVMComposer {
 	 * for which unification will be attempted on each
 	 * of these.  Non-null ones will be kept.
 	 */
-	AVMComposer() {
-		this.avmList = this.getObjectAVMs();
-		AVM avm1 = new AVM("tile");
-		avm1.setAttribute(new AVPair("name", "kreuz"));
-		avm1.setAttribute(new AVPair("color", "grün"));;
-		AVM avm2 = new AVM("tile");
-		avm2.setAttribute(new AVPair("name", "balken"));
-		avm2.setAttribute(new AVPair("color", "grün"));
-		AVM avm3 = new AVM("field");
-		avm3.setAttribute(new AVPair("color", "grün"));
-		AVM avm4 = new AVM("field");
-		avm4.setAttribute(new AVPair("color", "braun"));
-		this.worldList.add(avm1);
-		this.worldList.add(avm2);
-		this.worldList.add(avm3);
-		this.worldList.add(avm4);
+	public AVMComposer() {
+		this.avmList = getObjectAVMs();
 	}
 	
 	public static void main(String[] args) throws IOException {
@@ -45,7 +49,7 @@ public class AVMComposer {
 		AVMComposer composer = new AVMComposer();
 		
 		System.out.println("World contains following objects:");
-		System.out.println(composer.worldList.toString());
+		System.out.println(worldList.toString());
 
 		// Below is a demonstration of what should happen when tags come in.
 
@@ -107,7 +111,7 @@ public class AVMComposer {
 	 * unification with existing AVMs.
 	 * @param avp
 	 */
-	private void unifyNewAVPair(AVPair avp) {
+	public void unifyNewAVPair(AVPair avp) {
 		System.out.println("Adding tag AVPair '" + avp.toString() + "'.");
 		ArrayList<AVM> newList = new ArrayList<AVM>();
 		boolean placed = false;
@@ -124,7 +128,7 @@ public class AVMComposer {
 		}
 	}
 
-	private AVM resolve() {
+	public AVM resolve() {
 		ArrayList<AVM> resolvedList = new ArrayList<AVM>();
 		for (AVM avm1 : worldList) {
 			for (AVM avm2 : avmList) {
@@ -148,7 +152,7 @@ public class AVMComposer {
 	 * Sets prototype AVMs to be used for matching
 	 * against UntypedAVMs (e.g. from new AVPairs).
 	 */
-	private ArrayList<AVM> getObjectAVMs() {
+	static public ArrayList<AVM> getObjectAVMs() {
 		ArrayList<AVM> list = new ArrayList<AVM>();
 		list.add(new AVM("tile"));
 		list.add(new AVM("field"));
@@ -168,4 +172,19 @@ public class AVMComposer {
 			System.out.println("none");
 		}
 	}
+	
+	/**
+	 * @return the avmList
+	 */
+	public ArrayList<AVM> getAvmList() {
+		return avmList;
+	}
+
+	/**
+	 * @param avmList the avmList to set
+	 */
+	public void setAvmList(ArrayList<AVM> avmList) {
+		this.avmList = avmList;
+	}
+
 }

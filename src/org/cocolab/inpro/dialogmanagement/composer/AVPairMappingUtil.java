@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class AVPairMappingUtil {
 
-	private static Map<String, List<AVPair>> readAVPairs(String filename) throws IOException {
+	public static Map<String, List<AVPair>> readAVPairs(String filename) throws IOException {
 		BufferedReader lbr = new BufferedReader(new FileReader(filename));
 		Map<String, List<AVPair>> avPairs = new HashMap<String, List<AVPair>>();
 		String line;

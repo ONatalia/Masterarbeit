@@ -247,7 +247,9 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		if (t != null)
 			deltify(result.getBestToken());
 		else {
-			System.err.println("there was no best token at frame " + currentFrame);
+			if (currentFrame > 2) { // there never is for the first two frames, so don't print a message
+				System.err.println("there was no best token at frame " + currentFrame);
+			}
 			wordEdits = new LinkedList<EditMessage<WordIU>>();
 		}
 	}

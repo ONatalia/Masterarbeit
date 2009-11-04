@@ -49,6 +49,10 @@ public class EditMessage<IUType extends IU> {
 		return iu;
 	}
 	
+	public EditType getType() {
+		return type;
+	}
+	
 	public IclTerm toOAAGoal() {
 		return toOAAGoal(null);
 	}

@@ -3,7 +3,6 @@ package org.cocolab.inpro.incremental.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cocolab.inpro.incremental.BaseDataKeeper;
 import org.cocolab.inpro.incremental.unit.SegmentIU;
 import org.cocolab.inpro.incremental.unit.SyllableIU;
 import org.cocolab.inpro.incremental.unit.WordIU;

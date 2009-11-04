@@ -94,6 +94,10 @@ public abstract class IU {
 		}
 	}
 	
+	public IU getSameLevelLink() {
+		return sameLevelLink;
+	}
+	
 	public void connectSLL(IU link) {
 		setSameLevelLink(link);
 		if (groundedIn != null) {

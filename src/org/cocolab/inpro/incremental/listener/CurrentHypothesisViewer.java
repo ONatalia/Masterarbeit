@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
@@ -21,21 +22,28 @@ public class CurrentHypothesisViewer extends HypothesisChangeListener {
     public final static String PROP_SHOW_WINDOW = "showWindow";
 	
 	JTextField textField;
+	String lastString = "";
+	boolean updateResults;
 	
 	public CurrentHypothesisViewer() {
 		textField = new JTextField("", 35);
 		textField.setEditable(false);
 		textField.setFont(new Font("Dialog", Font.BOLD, 24));
+		updateResults = true;
 	}
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		if (ps.getBoolean(PROP_SHOW_WINDOW)) {
-			JFrame f = new JFrame("current hypothesis");
-			f.add(textField);
-			f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			f.pack();
-			f.setVisible(true);
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					JFrame f = new JFrame("current hypothesis");
+					f.add(textField);
+					f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+					f.pack();
+					f.setVisible(true);
+				}
+			});
 		}
 	}
 	
@@ -46,13 +54,31 @@ public class CurrentHypothesisViewer extends HypothesisChangeListener {
 	@Override
 	public void hypChange(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
-		StringBuilder sb = new StringBuilder();
-		for (IU iu : ius) {
-			assert (iu instanceof WordIU);
-			sb.append(((WordIU) iu).getWord());
-			sb.append(" ");
+		if (updateResults) {
+			StringBuilder sb = new StringBuilder();
+			for (IU iu : ius) {
+				assert (iu instanceof WordIU);
+				sb.append(((WordIU) iu).getWord());
+				sb.append(" ");
+			}
+			final String text = sb.toString();
+			if (!text.equals(lastString)) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						textField.setText(text);
+					}
+				});
+				lastString = text;
+			}
 		}
-		textField.setText(sb.toString());
+	}
+	
+	public void updateResults(boolean ur) {
+		updateResults = ur;
+	}
+	
+	public void reset() {
+		textField.setText("");
 	}
 
 }

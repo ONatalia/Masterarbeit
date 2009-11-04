@@ -140,5 +140,12 @@ public class WordIU extends IU {
 	public boolean isSilence() {
 		return isSilence;
 	}
+	
+	public static void setAVPairs(Map<String, List<AVPair>> avPairs) {
+		assert (WordIU.avPairs == null) : "You're trying to re-set avPairs. This may be a bug.";
+		WordIU.avPairs = avPairs;
+	}
+
+
 
 }

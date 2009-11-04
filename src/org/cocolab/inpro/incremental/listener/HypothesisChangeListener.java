@@ -17,12 +17,7 @@
  */
 package org.cocolab.inpro.incremental.listener;
 
-import java.util.List;
-
 import org.cocolab.inpro.incremental.PushBuffer;
-import org.cocolab.inpro.incremental.deltifier.ASRResultKeeper;
-import org.cocolab.inpro.incremental.unit.EditMessage;
-import org.cocolab.inpro.incremental.unit.WordIU;
 
 import edu.cmu.sphinx.instrumentation.Resetable;
 import edu.cmu.sphinx.util.props.Configurable;
@@ -33,12 +28,8 @@ public abstract class HypothesisChangeListener implements Configurable, Resetabl
 
 	int currentFrame = 0;
 
-	public void hypChange(ASRResultKeeper deltifier) {
-		List<EditMessage<WordIU>> edits = deltifier.getWordEdits();
-		List<WordIU> ius = deltifier.getWordIUs();
-		currentFrame = deltifier.getCurrentFrame();
-		if (ius != null && edits != null) 
-			hypChange(ius, edits);
+	public void setCurrentFrame(int frame) {
+		currentFrame = frame;
 	}
 	
 	@Override

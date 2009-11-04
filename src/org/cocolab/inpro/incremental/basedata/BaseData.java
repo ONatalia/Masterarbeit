@@ -53,11 +53,10 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public double getPitchInCent(double time) {
-		int frame = (int) (time * 100);
-		TimedData<PitchedDoubleData> td = pitchedData.floor(new TimedData(frame));
+		@SuppressWarnings("unchecked")
+		TimedData<PitchedDoubleData> td = pitchedData.floor(new TimedData(time));
 		if (td != null) {
 			PitchedDoubleData pdd = td.value;
 			if (pdd.isVoiced()) {
@@ -66,16 +65,15 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 				return Double.NaN;
 			}
 		} else {
-			logger.warn("no data for frame " + frame);
+			logger.warn("no data at time " + time);
 			return Double.NaN;
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public double getVoicing(double time) {
-		int frame = (int) (time * 100);
-		TimedData<PitchedDoubleData> td = pitchedData.floor(new TimedData(frame));
+		@SuppressWarnings("unchecked")
+		TimedData<PitchedDoubleData> td = pitchedData.floor(new TimedData(time));
 		if (td != null) {
 			PitchedDoubleData pdd = td.value;
 			return pdd.getVoicing();
@@ -123,9 +121,8 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 		if (loudnessData.size() == 0) {
 			makeLoudness(1, 0);
 		}
-		int frame = (int) (time * 100 + 0.01);
 		@SuppressWarnings("unchecked")
-		TimedData<Double> td = loudnessData.floor(new TimedData(frame));
+		TimedData<Double> td = loudnessData.floor(new TimedData(time + 0.01));
 		if (td != null) {
 			return td.value.doubleValue();
 		} else {
@@ -134,7 +131,33 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 	}
 
 	public double getSpectralTilt(double time) {
-		return 0f;
+		@SuppressWarnings("unchecked")
+		TimedData<DoubleData> td = melData.floor(new TimedData(time));
+		// let's hope that nobody messed with melData. Then we should find the interesting range 
+		// (130-~4000) in the first 32 coefficients. to keep things simple, we just do a linear regression
+		double[] y = Arrays.copyOf(td.value.getValues(), 32);
+		double sumX = 0;
+		double sumTX = 0;
+		double sumXX = 0;
+		final int n = 32;
+		for (int i = 0; i < n; i++) {
+			sumX += y[i];
+			sumTX += n * y[i];
+			sumXX += y[i] * y[i];
+		}
+		int sumT = 496; // 0+1+2+3+...+31
+		int sumTT = 10416; // 0^2+1^2+2^2+...+31^2
+		double sumSqDevTX = (n * sumTX - sumT * sumX);
+		double sumSqDevT = (n * sumTT - sumT * sumT);
+		double slope = sumSqDevTX / sumSqDevT;
+		return slope;
+	}
+	
+	public double[] get32MFCC(double time) {
+		@SuppressWarnings("unchecked")
+		TimedData<DoubleData> td = melData.floor(new TimedData(time));
+		double[] coefficients = td.value.getValues();
+		return Arrays.copyOfRange(coefficients, 0, 32);
 	}
 
 	public void reset() {
@@ -146,6 +169,10 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 	private class TimedData<T> {
 		int frame;
 		T value;
+		
+		TimedData(double time) {
+			this((int) (time * 100));
+		}
 		
 		TimedData(int frame) {
 			this.frame = frame;
