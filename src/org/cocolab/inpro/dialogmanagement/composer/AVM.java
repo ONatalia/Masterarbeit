@@ -11,13 +11,15 @@ import java.util.HashMap;
 public class AVM {
 
 	// Implementing classes must define these in their constructors.
-	public String type;
-	public HashMap<String, Object> attributes;
+	private final String type;
+	private HashMap<String, Object> attributes;
 
 	/**
 	 * Empty constructor.
 	 */
-	AVM() {}
+	AVM() {
+		this.type = null;
+	}
 
 	/**
 	 * String type constructor.
@@ -199,8 +201,27 @@ public class AVM {
 		return avps;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public boolean isEmpty() {
-		return false;
+		for (String attribute : this.attributes.keySet()) {
+			Object value = attributes.get(attribute);
+			if (value instanceof String) {
+				if (value != null) {
+					return false;
+				}
+			} else if (value instanceof AVM) {
+				if (!((AVM) value).isEmpty()) {
+					return false;
+				}
+			} else if (value instanceof ArrayList) {
+				for (AVM avm : (ArrayList<AVM>) value) {
+					if (!avm.isEmpty()) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -230,11 +251,19 @@ public class AVM {
 					str += " ";
 				}
 			} else if (value instanceof ArrayList) {
-				str += attribute;
-				str += ":";
+				boolean printList = false;
+				String listStr = attribute;
+				listStr += ":[";
 				for (AVM avm : (ArrayList<AVM>) value) {
-					str += avm.toString();
-					str += " ";
+					if (!avm.isEmpty()) {
+						printList = true;
+						listStr += avm.toString();
+						listStr += " ";
+					}
+				}
+				if (printList) {
+					listStr += "]";
+					str += listStr;
 				}
 			}
 		}
@@ -242,4 +271,7 @@ public class AVM {
 		return str;
 	}
 	
+	public String toShortString() {
+		return "[" + this.type + "]";
+	}
 }
