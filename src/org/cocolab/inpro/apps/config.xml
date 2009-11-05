@@ -99,6 +99,12 @@
     <component name="oaaNotifier" type="org.cocolab.inpro.incremental.listener.OAANotifier"/>
     <component name="tedNotifier" type="org.cocolab.inpro.incremental.listener.TEDviewNotifier"/>
     <component name="labelWriter2" type="org.cocolab.inpro.incremental.listener.LabelWriter"/>
+	<component name="semanticResolver" type="org.cocolab.inpro.incremental.SemanticResolver">
+		<propertylist name="hypChangeListeners">
+			<item>consoleNotifier</item>
+    		<!--  <item>tedNotifier</item>-->
+		</propertylist>
+	</component>
 
 
     <component name="threadingListener" type="org.cocolab.inpro.sphinx.instrumentation.ThreadingListener">
