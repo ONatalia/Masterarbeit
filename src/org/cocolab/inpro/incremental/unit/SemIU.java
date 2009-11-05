@@ -10,30 +10,51 @@ public class SemIU extends IU {
 
 	public static final SemIU FIRST_SEM_IU = new SemIU() {}; 
 	
-	private ArrayList<AVM> avmList = new ArrayList<AVM>();
-	private final AVM resolvingAVM;
+	private ArrayList<AVM> tileList = new ArrayList<AVM>();
+	private ArrayList<AVM> fieldList = new ArrayList<AVM>();
 
 	@SuppressWarnings("unchecked") // fuck you
 	private SemIU() {
-		this(FIRST_SEM_IU, Collections.EMPTY_LIST, null, Collections.EMPTY_LIST);
+		this(FIRST_SEM_IU, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
 	}
 	
-	public SemIU(IU sll, List<? extends IU> groundedIn, AVM resolvingAVM, List<AVM> avmList) {
+	public SemIU(IU sll, List<? extends IU> groundedIn, List<AVM> avms) {
 		super(sll, groundedIn);
-		this.avmList = new ArrayList<AVM>(avmList);
-		this.resolvingAVM = resolvingAVM; 
-	}
-	
-	public ArrayList<AVM> getAvmList() {
-		return avmList;
+		for (AVM avm : avms) {
+			if (avm.getType().equals("tile")) {
+				this.tileList.add(avm);
+			} else if (avm.getType().equals("field")) {
+				this.fieldList.add(avm);
+			}
+		}
 	}
 
-	public AVM getResolvingAVM() {
-		return resolvingAVM;
+	public ArrayList<AVM> getAvmList() {
+		ArrayList<AVM> list = new ArrayList<AVM>();
+		list.addAll(this.tileList);
+		list.addAll(this.fieldList);
+		return list;
 	}
-	
+
 	public String toString() {
-		return super.toString() + ", \nresolving AVM: " + resolvingAVM + "\nAVM list: " + avmList.toString() +"\n"; 
+		return super.toString() + ", \n tiles: " + this.tileList.toString() + "\n fields: " + this.fieldList.toString() +"\n"; 
 	}
-	
+
+	public String toTEDviewXML() {
+		double startTime = startTime();
+		StringBuilder sb = new StringBuilder("<event time='");
+		sb.append(Math.round(startTime * 1000.0));
+		sb.append("' duration='");
+		sb.append(Math.round((endTime() - startTime) * 1000.0));
+		sb.append("'> ");
+		for (AVM avm : tileList) {
+			sb.append(avm.toShortString() + " ");
+		}
+		for (AVM avm : fieldList) {
+			sb.append(avm.toShortString() + " ");
+		}
+		sb.append(" </event>");
+		return sb.toString();
+	}
+
 }

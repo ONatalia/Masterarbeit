@@ -55,10 +55,11 @@ public class AVMComposer {
 
 		ArrayList<AVPair> avps = new ArrayList<AVPair>();
 		
-//		avps.add(new AVPair("relation", "above"));
+		avps.add(new AVPair("relation", "above"));
 //		avps.add(new AVPair("ord", "1"));
-		avps.add(new AVPair("color", "grün"));
-		avps.add(new AVPair("name", "kreuz"));
+		avps.add(new AVPair("color", "green"));
+		avps.add(new AVPair("name", "gun"));
+		avps.add(new AVPair("name", "cross"));
 //		avps.add(new AVPair("ord", "2"));
 //		avps.add(new AVPair("ord", "3"));
 //		avps.add(new AVPair("orient", "top"));
@@ -66,23 +67,23 @@ public class AVMComposer {
 //		avps.add(new AVPair("color", "gelb"));  // this should break
 
 		for (AVPair avp : avps) {
+			System.out.println("Adding tag AVPair '" + avp.toString() + "'.");
 			if (composer.avmList != null) {
-				composer.unifyNewAVPair(avp);
+				composer.compose(avp);
 				composer.printAVMs();
-			}
-			if (composer.avmList != null) {
-				AVM avm = composer.resolve();
-				if (avm != null) {
-					System.out.println("Found one that resolves...");
-					System.out.println(avm.toString());
-					break;
-				}				
 			} else {
 				System.out.println("Stopping unification - last tag didn't unify..");
-				break;
+			} 
+			if (composer.avmList != null) {
+				ArrayList<AVM> resolvedList = composer.resolve();
+				if (resolvedList != null) {
+					System.out.println("Found these that resolve...");
+					System.out.println(resolvedList.toString());
+				} else {
+					System.out.println("Nothing resolves...");
+				}
 			}
 		}
-		
 		System.out.println("Done!");
 
 //		interactiveTest();
@@ -112,7 +113,6 @@ public class AVMComposer {
 	 * @param avp
 	 */
 	public void unifyNewAVPair(AVPair avp) {
-		System.out.println("Adding tag AVPair '" + avp.toString() + "'.");
 		ArrayList<AVM> newList = new ArrayList<AVM>();
 		boolean placed = false;
 		for (AVM avm : this.avmList) {
@@ -127,25 +127,27 @@ public class AVMComposer {
 			avmList = null;
 		}
 	}
+	
+	public ArrayList<AVM> compose(AVPair avp) {
+		this.unifyNewAVPair(avp);
+		return avmList;
+	}
 
-	public AVM resolve() {
+	public ArrayList<AVM> resolve() {
 		ArrayList<AVM> resolvedList = new ArrayList<AVM>();
-		for (AVM avm1 : worldList) {
-			for (AVM avm2 : avmList) {
-				if (avm1.unifies(avm2)) {
-					avm1.unify(avm2);
-					if (!resolvedList.contains(avm1)) {
-						resolvedList.add(avm1);
+		if (avmList != null) {
+			for (AVM avm1 : worldList) {
+				for (AVM avm2 : avmList) {
+					if (avm1.unifies(avm2)) {
+						avm1.unify(avm2);
+						if (!resolvedList.contains(avm1)) {
+							resolvedList.add(avm1);
+						}
 					}
 				}
-			}
+			}			
 		}
-		if (resolvedList.size() == 1) {
-			return resolvedList.get(0);
-		} else {
-			System.out.println("found " + resolvedList.size());
-			return null;
-		}
+		return resolvedList;
 	}
 	
 	/**

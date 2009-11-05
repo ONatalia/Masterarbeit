@@ -190,15 +190,16 @@ public class AVM {
 	public ArrayList<AVPair> getAVPairs() {
 		ArrayList<AVPair> avps = new ArrayList<AVPair>();
 		for (String attribute : this.attributes.keySet()) {
-			/* Use null? */
-//			avps.add(new AVPair(attribute, this.attributes.get(attribute)));
-			/* Maybe use non-null? */
 			if (this.attributes.get(attribute) != null) {
 				avps.add(new AVPair(attribute, this.attributes.get(attribute)));	
 			}
 			
 		}
 		return avps;
+	}
+	
+	public String getType() {
+		return this.type;
 	}
 	
 	@SuppressWarnings("unchecked")
