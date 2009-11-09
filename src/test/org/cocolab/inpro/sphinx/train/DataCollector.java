@@ -26,13 +26,14 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 import javax.swing.BoxLayout;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import org.cocolab.inpro.incremental.listener.CurrentHypothesisViewer;
 import org.cocolab.inpro.sphinx.frontend.WavTEDLogger;
@@ -42,153 +43,160 @@ import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 
+@SuppressWarnings("serial")
 public class DataCollector extends JFrame {
 	
-	private static final long serialVersionUID = 2871403525664635161L;
-
-	JToggleButton asrButton;
-	ResultPanel resultPanel;
+	static final Object noResult = new Object();
 	
-	Recognizer recognizer;
+	// sub panels for ASR and result handling
+	ASRPanel asrPanel;
+	ResultPanel resultPanel;
+	// handles all (three) actions in the GUI
+	ActionListener myActionListener;
 
-	private boolean recognizing;
+	// Sphinx' ASR stuff 
+	ConfigurationManager cm;
 	
 	WavTEDLogger wavWriter;
+	Recognizer recognizer;
+	
+	// encapsulates (most) ASR stuff
+	RecoRunner recoRunner;
+	
+	boolean isRecognizing;
 	
 	DataCollector() {
-		ConfigurationManager cm = new ConfigurationManager(DataCollector.class.getResource("config.xml"));
-
+		super("Inpro Data Collector");
+		cm = new ConfigurationManager(DataCollector.class.getResource("config.xml"));
 		this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
 
-		JPanel asrControl = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
+		// all actions are handled in MyActionListener, see below
+		myActionListener = new MyActionListener();		
+		
+		// setup CurrentHypothesisViewer (Sphinx' ResultListener and TextField)
 		CurrentHypothesisViewer chv = (CurrentHypothesisViewer) cm.lookup("hypViewer");
-		asrControl.add(chv.getTextField());
-		
-		final Microphone mic = (Microphone) cm.lookup("microphone");
-
-		final Icon playIcon = new ImageIcon(DataCollector.class.getResource("media-playback-start.png"), "start");
-		final Icon pauseIcon = new ImageIcon(DataCollector.class.getResource("media-playback-pause.png"), "stop");
-		asrButton = new JToggleButton(playIcon);
-		asrButton.setSelectedIcon(pauseIcon);
-		asrButton.setSelected(true);
-		asrButton.setEnabled(false);
-		asrButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent ae) {
-				if (asrButton.isSelected()) {
-					System.out.println("Stopping microphone");
-					mic.stopRecording();
-				} else {
-					System.out.println("Starting microphone");
-					mic.startRecording();
-				}
-			}
-		});
-		
-		asrControl.add(asrButton);
-		this.add(asrControl);
+		// create the ASR panel using this CurrentHypothesisViewer
+		asrPanel = new ASRPanel(chv); 
+		asrPanel.setEnabled(false); // disable for now, will be enabled once ASR initialization completes
+		asrPanel.chvField.setText("\t\tInitialisierung...");
+		this.add(asrPanel);
 		
 		resultPanel = new ResultPanel();
 		resultPanel.setEnabled(false);
 		this.add(resultPanel);
 		
-		this.pack();
+		// show GUI
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.pack();
 		this.setVisible(true);
 		
-		recognizer = (Recognizer) cm.lookup("recognizer");
-		recognizer.allocate();
+		// ASR initialization, will enable asrPanel when it's finished
+		(new RecoStart()).execute();
+	}
+	
+	private class RecoStart extends SwingWorker<Void, Void> {
+		@Override
+		protected Void doInBackground() throws Exception {
+			Microphone mic = (Microphone) cm.lookup("microphone");
+			recognizer = (Recognizer) cm.lookup("recognizer");
+			recognizer.allocate();
+			wavWriter = (WavTEDLogger) cm.lookup("utteranceWavWriter");
+			mic.initialize();
+			mic.startRecording();
+			return null;
+		}
+		@Override
+		protected void done() {
+			asrPanel.setEnabled(true);
+			recoRunner = new RecoRunner();
+			recoRunner.start();
+		}
+	}
+	
+	private class RecoRunner extends Thread {
 		
-		wavWriter = (WavTEDLogger) cm.lookup("utteranceWavWriter");
-
-		mic.initialize();
-		setRecognizing(true);
-		Result result;
-		do {
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (recognizing && mic.isRecording()) {
-				System.out.println("starting reco");
-				result = recognizer.recognize();
-				System.out.println("Reco is done" + result);
-				if ((result != null) && (result.getDataFrames() != null) && (result.getDataFrames().size() > 4)) {
-					newResult(result);
+		boolean updateResults = false;
+		Result mostRecentResult = null;
+		String mostRecentWaveFile = "";
+		
+		public void setRecognizing(boolean enabled) {
+			updateResults = enabled;
+			asrPanel.chv.updateResults(enabled);
+		}
+		
+		public void run() {
+			while (true) {
+				try {
+					Thread.sleep(300);
+				} catch (InterruptedException e) { 
+					e.printStackTrace();
+				}
+				Result result = recognizer.recognize();
+				System.out.println("Reco is done: " + result);
+				if ((updateResults) && (result != null) && (result.getDataFrames() != null) && (result.getDataFrames().size() > 4)) {
+					mostRecentResult = result;
+					mostRecentWaveFile = wavWriter.getMostRecentFilename();
+					try {
+						SwingUtilities.invokeAndWait(new Runnable() {
+							@Override
+							public void run(){
+								myActionListener.actionPerformed(new ActionEvent(recoRunner, 0, "ASR_RESULT"));
+							}
+						});
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
-		} while (true);
-	}
-	
-	void setRecognizing(boolean recognizing) {
-		if (recognizing) {
-			this.recognizing = true;
-			
-			asrButton.setEnabled(true);
-		} else {
-			System.exit(1);
 		}
 	}
 	
-	public void newResult(Result result) {
-		if (result.isFinal()) {
-			asrButton.setEnabled(false);
-			System.out.println(result.getBestResultNoFiller());
-			resultPanel.setEnabled(true);
-			resultPanel.newResult(result);
+	private class ASRPanel extends JPanel {
+		CurrentHypothesisViewer chv;
+		JTextField chvField;
+		JToggleButton asrButton;
+
+		ASRPanel(CurrentHypothesisViewer chv) {
+			super(new FlowLayout(FlowLayout.LEFT));
+			this.chv = chv;
+			chvField = chv.getTextField();
+			this.add(chvField);
+			asrButton = new JToggleButton(new ImageIcon(DataCollector.class.getResource("media-playback-start.png"), "start"));
+			asrButton.setSelectedIcon(new ImageIcon(DataCollector.class.getResource("media-playback-pause.png"), "stop"));
+			asrButton.setSelected(true);
+			asrButton.setActionCommand("PAUSE");
+			asrButton.addActionListener(myActionListener);
+			chv.updateResults(false);
+			this.add(asrButton);
 		}
+		
+		public void setEnabled(boolean enabled) {
+			super.setEnabled(enabled);
+			chvField.setText("");
+			asrButton.setEnabled(enabled);
+		}
+		
 	}
 
-	static void saveTranscript(String transcript, String filename) {
-		try {
-			PrintStream outFile = new PrintStream(filename);
-			outFile.println(transcript);
-		} catch (FileNotFoundException e) {
-			System.err.println("Could not write to " + filename);
-		}
-	}
-	
 	private class ResultPanel extends JPanel {
-		
-		private static final long serialVersionUID = 1L;
 		JTextField bestResult;
 		JButton submitButton;
 		JButton skipButton;
 		
 		ResultPanel() {
 			super(new FlowLayout(FlowLayout.LEFT));
-			
 			bestResult = new JTextField("", 35);
 			bestResult.setFont(new Font("Dialog", Font.BOLD, 24));
 			bestResult.setEditable(true);
 			this.add(bestResult);
-			
 			submitButton = new JButton(new ImageIcon(DataCollector.class.getResource("dialog-ok.png")));
-			submitButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					String orthoFilename = wavWriter.getMostRecentFilename().replaceFirst("\\.wav$", ".txt");
-					saveTranscript(bestResult.getText(), orthoFilename);
-					goBackToRecording();
-				}
-			});
+			submitButton.setActionCommand("SUBMIT");
+			submitButton.addActionListener(myActionListener);
 			this.add(submitButton);
-			
 			skipButton = new JButton(new ImageIcon(DataCollector.class.getResource("dialog-cancel.png")));
+			skipButton.setActionCommand("DISCARD");
+			skipButton.addActionListener(myActionListener);
 			this.add(skipButton);
-			skipButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					System.err.println("Skipping text" + bestResult.getText());
-					goBackToRecording();
-				}
-			});
-		}
-		
-		void goBackToRecording() {
-			this.setEnabled(false);
-			asrButton.setEnabled(true);
-			setRecognizing(true);
 		}
 		
 		public void setEnabled(boolean enabled) {
@@ -197,18 +205,61 @@ public class DataCollector extends JFrame {
 			submitButton.setEnabled(enabled);
 			skipButton.setEnabled(enabled);
 		}
+	}
+
+	private class MyActionListener implements ActionListener {
 		
-		void newResult(Result result) {
-			String resultText = result.getBestFinalToken().getWordPath();
-			bestResult.setText(resultText);
-			String hypFilename = wavWriter.getMostRecentFilename().replaceFirst("\\.wav$", ".hyp");
-			saveTranscript(resultText, hypFilename);
+		private void setRecognizing(boolean enabled) {	
+			if (enabled) {
+				recoRunner.setRecognizing(true);
+				asrPanel.setEnabled(true);
+				resultPanel.bestResult.setText("");
+				resultPanel.setEnabled(false);
+			} else {
+				recoRunner.setRecognizing(false);
+				asrPanel.setEnabled(false);
+				resultPanel.setEnabled(true);
+			}
 		}
-			
+		
+		@Override
+		public void actionPerformed(ActionEvent ae) {
+			String command = ae.getActionCommand();
+			if (command.equals("PAUSE")) {
+				boolean isPaused = ((JToggleButton) ae.getSource()).isSelected(); 
+				recoRunner.setRecognizing(!isPaused);
+			} else if (command.equals("ASR_RESULT")) {
+				setRecognizing(false);
+				Result result = ((RecoRunner) ae.getSource()).mostRecentResult;
+				String resultText = result.getBestFinalToken().getWordPath();
+				resultPanel.bestResult.setText(resultText);
+				saveTranscript(resultText, ".hyp");
+			} else if (command.equals("SUBMIT")) {
+				String resultText = resultPanel.bestResult.getText();
+				saveTranscript(resultText, ".ref");
+				setRecognizing(true);
+			} else if (command.equals("DISCARD")) {
+				setRecognizing(true);
+			} 
+		}	
+	}	
+
+	void saveTranscript(String transcript, String filetype) {
+		String filename = recoRunner.mostRecentWaveFile.replaceFirst("\\.wav$", filetype);
+		try {
+			PrintStream outFile = new PrintStream(filename);
+			outFile.println(transcript);
+		} catch (FileNotFoundException e) {
+			System.err.println("Could not write to " + filename);
+		}
 	}
 
 	public static void main(String[] args) {
-		new DataCollector();	
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				new DataCollector();	
+			}
+		});
 	}
 	
 }

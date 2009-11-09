@@ -15,9 +15,9 @@
     <!-- frequently tuned properties                              -->
     <!-- ******************************************************** -->
     <property name="absoluteBeamWidth" value="5000"/>
-    <property name="relativeBeamWidth" value="1E-40"/>
+    <property name="relativeBeamWidth" value="1E-80"/>
     <property name="absoluteWordBeamWidth" value="500"/>
-    <property name="relativeWordBeamWidth" value="1E-60"/>
+    <property name="relativeWordBeamWidth" value="1E-80"/>
     <property name="wordInsertionProbability" value="0.7"/>
     <property name="languageWeight" value="11.5"/>
     <property name="silenceInsertionProbability" value=".1"/>
@@ -36,7 +36,7 @@
     <!-- The minimum amount of time in speech (in milliseconds) to be considered as utterance start -->
     <property name="startSpeech" value="100"/>
     <!-- The amount of time in silence (in milliseconds) to be considered as utterance end -->
-    <property name="endSilence" value="800"/>
+    <property name="endSilence" value="500"/>
     <!-- The amount of time (in milliseconds) before speech start to be included as speech data. -->
     <property name="speechLeader" value="100"/>
     <!-- The amount of time (in milliseconds) after speech ends to be included as speech data. -->
@@ -59,6 +59,14 @@
     <!-- ******************************************************** -->
     <!-- The incremental processing configuration                 -->
     <!-- ******************************************************** -->
+    <component name="threadingListener" type="org.cocolab.inpro.sphinx.instrumentation.ThreadingListener">
+        <property name="recognizer" value="${recognizer}"/>
+        <property name="queueSize" value="1"/>
+        <propertylist name="listeners">
+            <item>currentHypothesis</item>
+        </propertylist>
+    </component>
+
     <component name="currentHypothesis" type="org.cocolab.inpro.incremental.CurrentHypothesis">
         <property name="recognizer" value="recognizer"/>
         <property name="frontend" value="${frontend}"/>
@@ -135,7 +143,7 @@
     <component name="threadedScorer" type="edu.cmu.sphinx.decoder.scorer.ThreadedAcousticScorer">
         <property name="frontend" value="${frontend}"/>
         <property name="isCpuRelative" value="true"/>
-        <property name="numThreads" value="1"/>
+        <property name="numThreads" value="0"/>
         <property name="minScoreablesPerThread" value="100"/>
         <property name="scoreablesKeepFeature" value="true"/>
     </component>
@@ -164,7 +172,7 @@
     <component name="ngram" type="edu.cmu.sphinx.linguist.language.ngram.SimpleNGramModel">
         <property name="dictionary" value="dictionary"/>
         <property name="logMath" value="logMath"/>
-        <property name="location" value="resource:/edu.cmu.sphinx.model.acoustic.Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.Model!/edu/cmu/sphinx/model/acoustic/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/LM/inproCorpora_Dialogue.lm"/>
+        <property name="location" value="resource:/edu.cmu.sphinx.model.acoustic.Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.Model!/edu/cmu/sphinx/model/acoustic/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/LM/inproCorpora_all.lm"/>
         <property name="maxDepth" value="3"/>
         <property name="unigramWeight" value=".7"/>
     </component>
@@ -205,6 +213,7 @@
         <propertylist name="pipeline">
         	<item>microphone</item>
             <item>speechClassifier</item>
+            <item>speechStateVisualizer</item>
             <item>speechMarker</item>
             <item>nonSpeechDataFilter</item>
 			<item>utteranceWavWriter</item>
@@ -264,6 +273,12 @@
     <!-- ******************************************************* -->
     <!--  monitors                                               -->
     <!-- ******************************************************* -->
+    <component name="speedTracker" type="edu.cmu.sphinx.instrumentation.SpeedTracker">
+        <property name="recognizer" value="${recognizer}"/>
+        <property name="frontend" value="${frontend}"/>
+        <property name="showTimers" value="true"/>
+        <property name="showResponseTime" value="true"/>
+    </component>
 
     <!-- ******************************************************* -->
     <!--  Miscellaneous components                               -->
