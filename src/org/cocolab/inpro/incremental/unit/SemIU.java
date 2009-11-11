@@ -10,6 +10,7 @@ public class SemIU extends IU {
 
 	public static final SemIU FIRST_SEM_IU = new SemIU() {}; 
 	
+	private ArrayList<AVM> dialogActList = new ArrayList<AVM>();
 	private ArrayList<AVM> tileList = new ArrayList<AVM>();
 	private ArrayList<AVM> fieldList = new ArrayList<AVM>();
 
@@ -25,6 +26,8 @@ public class SemIU extends IU {
 				this.tileList.add(avm);
 			} else if (avm.getType().equals("field")) {
 				this.fieldList.add(avm);
+			} else if (avm.getType().equals("dialog_act")) {
+				this.dialogActList.add(avm);
 			}
 		}
 	}
@@ -33,11 +36,12 @@ public class SemIU extends IU {
 		ArrayList<AVM> list = new ArrayList<AVM>();
 		list.addAll(this.tileList);
 		list.addAll(this.fieldList);
+		list.addAll(this.dialogActList);
 		return list;
 	}
 
 	public String toString() {
-		return super.toString() + ", \n tiles: " + this.tileList.toString() + "\n fields: " + this.fieldList.toString() +"\n"; 
+		return super.toString() + ", \n tiles: " + this.tileList.toString() + "\n fields: " + this.fieldList.toString() + "\n dialog acts: " + this.dialogActList.toString() + "\n"; 
 	}
 
 	public String toTEDviewXML() {
@@ -47,6 +51,9 @@ public class SemIU extends IU {
 		sb.append("' duration='");
 		sb.append(Math.round((endTime() - startTime) * 1000.0));
 		sb.append("'> ");
+		for (AVM avm : dialogActList) {
+			sb.append(avm.toShortString() + " ");
+		}
 		for (AVM avm : tileList) {
 			sb.append(avm.toShortString() + " ");
 		}
