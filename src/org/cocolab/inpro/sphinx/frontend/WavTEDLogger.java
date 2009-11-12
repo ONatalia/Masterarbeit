@@ -27,15 +27,22 @@ public class WavTEDLogger extends WavWriter {
 
     private long chunkStartTime = -1;
     
+    private String mostRecentFilename;
+    
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		tedPort = ps.getInt(PROP_TED_PORT);
 		tedTrack = ps.getString(PROP_TED_TRACK);
 	}
+	
+	public String getMostRecentFilename() {
+		return mostRecentFilename;
+	}
 
 	@Override
 	protected void writeFile(String wavName) {
+		mostRecentFilename = wavName;
 		super.writeFile(wavName);
 		if (tedOutput) {
 			StringBuilder sb = new StringBuilder("<event time='");
