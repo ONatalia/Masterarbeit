@@ -102,7 +102,10 @@ public class DataCollector extends JFrame {
 			recognizer.allocate();
 			wavWriter = (WavTEDLogger) cm.lookup("utteranceWavWriter");
 			mic.initialize();
-			mic.startRecording();
+			if (!mic.startRecording()) {
+				System.err.println("Could not start microphone. Exiting...");
+				System.exit(1);
+			}
 			return null;
 		}
 		@Override
