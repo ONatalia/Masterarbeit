@@ -236,9 +236,9 @@ public class AVMComposer {
 	 */
 	static public ArrayList<AVM> getAllAVMs() {
 		ArrayList<AVM> list = new ArrayList<AVM>();
-//		list.add(new AVM("dialog_act"));
+		list.add(new AVM("dialog_act"));
 		list.add(new AVM("tile"));
-//		list.add(new AVM("field"));
+		list.add(new AVM("field"));
 		return list;
 	}
 
@@ -268,23 +268,49 @@ public class AVMComposer {
 	}
 
 	public void setAllAVMs() {
-		this.avmList = this.getAllAVMs();
+		this.avmList = getAllAVMs();
 	}
 
 	public void setObjectAVMs() {
-		this.avmList = this.getObjectAVMs();
+		this.avmList = getObjectAVMs();
 	}
 
 	public void setFieldAVMs() {
-		this.avmList = this.getFieldAVMs();
+		this.avmList = getFieldAVMs();
 	}
 
 	public void setTileAVMs() {
-		this.avmList = this.getTileAVMs();
+		this.avmList = getTileAVMs();
 	}
 
 	public void setDialogActAVMs() {
-		this.avmList = this.getDialogActAVMs();
+		this.avmList = getDialogActAVMs();
+	}
+
+	public void unsetAVMs(String type) {
+		ArrayList<AVM> removeList = new ArrayList<AVM>();
+		for (AVM avm : this.avmList) {
+			if (avm.getType().equals(type)) {
+				removeList.add(avm);
+			}
+		}
+		this.avmList.removeAll(removeList);
+		System.err.println(this.avmList.toString());
+	}
+
+	public void unsetDialogActAVMs() {
+		this.avmList.remove(new AVM("dialog_act"));
+		System.err.println(this.avmList.toString());
+	}
+
+	public void unsetTileAVMs() {
+		this.avmList.remove(new AVM("tile"));
+		System.err.println(this.avmList.toString());
+	}
+
+	public void unsetFieldAVMs() {
+		this.avmList.remove(new AVM("field"));
+		System.err.println(this.avmList.toString());
 	}
 
 	/**

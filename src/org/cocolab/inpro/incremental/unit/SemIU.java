@@ -14,7 +14,7 @@ public class SemIU extends IU {
 	private ArrayList<AVM> tileList = new ArrayList<AVM>();
 	private ArrayList<AVM> fieldList = new ArrayList<AVM>();
 
-	@SuppressWarnings("unchecked") // fuck you
+	@SuppressWarnings("unchecked")
 	private SemIU() {
 		this(FIRST_SEM_IU, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
 	}
