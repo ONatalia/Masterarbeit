@@ -18,19 +18,93 @@ public class AVMComposer {
 	
 	static {
 		AVM avm1 = new AVM("tile");
-		avm1.setAttribute(new AVPair("name", "cross"));
-		avm1.setAttribute(new AVPair("color", "green"));;
+		avm1.setAttribute(new AVPair("name", "x"));
+		avm1.setAttribute(new AVPair("label", "x1"));
+		avm1.setAttribute(new AVPair("color", "green"));
+		avm1.setAttribute(new AVPair("ord", "1"));
+		avm1.setAttribute(new AVPair("orient", "top"));
+		avm1.setAttribute(new AVPair("row_col", "row"));
+		avm1.setAttribute(new AVPair("ord", "2"));
+		avm1.setAttribute(new AVPair("orient", "bottom"));
+		avm1.setAttribute(new AVPair("row_col", "row"));
+		avm1.setAttribute(new AVPair("ord", "1"));
+		avm1.setAttribute(new AVPair("orient", "left"));
+		avm1.setAttribute(new AVPair("row_col", "col"));
+		avm1.setAttribute(new AVPair("ord", "1"));
+		avm1.setAttribute(new AVPair("orient", "right"));
+		avm1.setAttribute(new AVPair("row_col", "col"));
+		avm1.setAttribute(new AVPair("tb", "top"));
+		avm1.setAttribute(new AVPair("lr", "left"));
+		avm1.setAttribute(new AVPair("desc", "corner"));
+		avm1.setAttribute(new AVPair("relation", "next_to"));
+		avm1.setAttribute(new AVPair("relation", "above"));
+		avm1.setAttribute(new AVPair("relation", "below"));
+
 		AVM avm2 = new AVM("tile");
-		avm2.setAttribute(new AVPair("name", "gun"));
+		avm2.setAttribute(new AVPair("name", "f"));
+		avm2.setAttribute(new AVPair("label", "f1"));
 		avm2.setAttribute(new AVPair("color", "green"));
+		avm2.setAttribute(new AVPair("ord", "2"));
+		avm2.setAttribute(new AVPair("orient", "top"));
+		avm2.setAttribute(new AVPair("row_col", "row"));
+		avm2.setAttribute(new AVPair("ord", "1"));
+		avm2.setAttribute(new AVPair("orient", "bottom"));
+		avm2.setAttribute(new AVPair("row_col", "row"));
+		avm2.setAttribute(new AVPair("ord", "1"));
+		avm2.setAttribute(new AVPair("orient", "left"));
+		avm2.setAttribute(new AVPair("row_col", "col"));
+		avm2.setAttribute(new AVPair("ord", "1"));
+		avm2.setAttribute(new AVPair("orient", "right"));
+		avm2.setAttribute(new AVPair("row_col", "col"));
+		avm2.setAttribute(new AVPair("tb", "top"));
+		avm2.setAttribute(new AVPair("lr", "left"));
+		avm2.setAttribute(new AVPair("desc", "corner"));
+		avm2.setAttribute(new AVPair("relation", "next_to"));
+		avm2.setAttribute(new AVPair("relation", "above"));
+		avm2.setAttribute(new AVPair("relation", "below"));
+
 		AVM avm3 = new AVM("field");
 		avm3.setAttribute(new AVPair("color", "green"));
+		avm3.setAttribute(new AVPair("ord", "1"));
+		avm3.setAttribute(new AVPair("orient", "top"));
+		avm3.setAttribute(new AVPair("row_col", "row"));
+		avm3.setAttribute(new AVPair("ord", "2"));
+		avm3.setAttribute(new AVPair("orient", "bottom"));
+		avm3.setAttribute(new AVPair("row_col", "row"));
+		avm3.setAttribute(new AVPair("ord", "1"));
+		avm3.setAttribute(new AVPair("orient", "left"));
+		avm3.setAttribute(new AVPair("row_col", "col"));
+		avm3.setAttribute(new AVPair("ord", "1"));
+		avm3.setAttribute(new AVPair("orient", "right"));
+		avm3.setAttribute(new AVPair("row_col", "col"));
+
 		AVM avm4 = new AVM("field");
 		avm4.setAttribute(new AVPair("color", "brown"));
+		avm4.setAttribute(new AVPair("ord", "2"));
+		avm4.setAttribute(new AVPair("orient", "top"));
+		avm4.setAttribute(new AVPair("row_col", "row"));
+		avm4.setAttribute(new AVPair("ord", "1"));
+		avm4.setAttribute(new AVPair("orient", "bottom"));
+		avm4.setAttribute(new AVPair("row_col", "row"));
+		avm4.setAttribute(new AVPair("ord", "1"));
+		avm4.setAttribute(new AVPair("orient", "left"));
+		avm4.setAttribute(new AVPair("row_col", "col"));
+		avm4.setAttribute(new AVPair("ord", "1"));
+		avm4.setAttribute(new AVPair("orient", "right"));
+		avm4.setAttribute(new AVPair("row_col", "col"));
+
+		AVM avm5 = new AVM("dialog_act");
+		avm5.setAttribute(new AVPair("act", "take"));
+
+		AVM avm6 = new AVM("dialog_act");
+		avm6.setAttribute(new AVPair("act", "turn"));
+
 		worldList.add(avm1);
 		worldList.add(avm2);
 		worldList.add(avm3);
 		worldList.add(avm4);
+		worldList.add(avm5);
+		worldList.add(avm6);
 	}
 	
 	/**
@@ -41,28 +115,35 @@ public class AVMComposer {
 	 * of these.  Non-null ones will be kept.
 	 */
 	public AVMComposer() {
-		this.avmList = getObjectAVMs();
+		this.avmList = getAllAVMs();
 	}
-	
+
 	public static void main(String[] args) throws IOException {
 		System.out.println("Starting AVM Composer.");
 		AVMComposer composer = new AVMComposer();
 		
 		System.out.println("World contains following objects:");
-		System.out.println(worldList.toString());
+		for (AVM avm : worldList) {
+			System.out.println(avm.toString());
+		}
+
 
 		// Below is a demonstration of what should happen when tags come in.
 
 		ArrayList<AVPair> avps = new ArrayList<AVPair>();
 		
-		avps.add(new AVPair("relation", "above"));
-//		avps.add(new AVPair("ord", "1"));
+//		avps.add(new AVPair("act", "turn"));
 		avps.add(new AVPair("color", "green"));
-		avps.add(new AVPair("name", "gun"));
+		avps.add(new AVPair("name", "f"));
 		avps.add(new AVPair("name", "cross"));
-//		avps.add(new AVPair("ord", "2"));
+		avps.add(new AVPair("ord", "1"));
+		avps.add(new AVPair("ord", "1"));
+		avps.add(new AVPair("ord", "1"));
+		avps.add(new AVPair("ord", "2"));
 //		avps.add(new AVPair("ord", "3"));
+//		avps.add(new AVPair("ord", "4"));
 //		avps.add(new AVPair("orient", "top"));
+//		avps.add(new AVPair("orient", "bottom"));
 //		avps.add(new AVPair("relation", "next_to"));
 //		avps.add(new AVPair("color", "gelb"));  // this should break
 
@@ -71,14 +152,13 @@ public class AVMComposer {
 			if (composer.avmList != null) {
 				composer.compose(avp);
 				composer.printAVMs();
-			} else {
-				System.out.println("Stopping unification - last tag didn't unify..");
 			} 
 			if (composer.avmList != null) {
 				ArrayList<AVM> resolvedList = composer.resolve();
-				if (resolvedList != null) {
+				if (resolvedList.size() > 0) {
 					System.out.println("Found these that resolve...");
-					System.out.println(resolvedList.toString());
+					for (AVM avm : resolvedList)
+					System.out.println(avm.toString());
 				} else {
 					System.out.println("Nothing resolves...");
 				}
@@ -124,7 +204,7 @@ public class AVMComposer {
 		if (placed) {
 			avmList = newList;
 		} else {
-			avmList = null;
+			avmList.clear();
 		}
 	}
 	
@@ -154,18 +234,64 @@ public class AVMComposer {
 	 * Sets prototype AVMs to be used for matching
 	 * against UntypedAVMs (e.g. from new AVPairs).
 	 */
+	static public ArrayList<AVM> getAllAVMs() {
+		ArrayList<AVM> list = new ArrayList<AVM>();
+//		list.add(new AVM("dialog_act"));
+		list.add(new AVM("tile"));
+//		list.add(new AVM("field"));
+		return list;
+	}
+
 	static public ArrayList<AVM> getObjectAVMs() {
 		ArrayList<AVM> list = new ArrayList<AVM>();
 		list.add(new AVM("tile"));
 		list.add(new AVM("field"));
 		return list;
 	}
+	
+	static public ArrayList<AVM> getFieldAVMs() {
+		ArrayList<AVM> list = new ArrayList<AVM>();
+		list.add(new AVM("field"));
+		return list;
+	}
+
+	static public ArrayList<AVM> getTileAVMs() {
+		ArrayList<AVM> list = new ArrayList<AVM>();
+		list.add(new AVM("tile"));
+		return list;
+	}
+
+	static public ArrayList<AVM> getDialogActAVMs() {
+		ArrayList<AVM> list = new ArrayList<AVM>();
+		list.add(new AVM("dialog_act"));
+		return list;
+	}
+
+	public void setAllAVMs() {
+		this.avmList = this.getAllAVMs();
+	}
+
+	public void setObjectAVMs() {
+		this.avmList = this.getObjectAVMs();
+	}
+
+	public void setFieldAVMs() {
+		this.avmList = this.getFieldAVMs();
+	}
+
+	public void setTileAVMs() {
+		this.avmList = this.getTileAVMs();
+	}
+
+	public void setDialogActAVMs() {
+		this.avmList = this.getDialogActAVMs();
+	}
 
 	/**
 	 * Prints out all known AVMs.
 	 */
 	private void printAVMs() {
-		System.out.println("AVMs:");
+		System.out.println("Composed AVMs:");
 		if (avmList != null) {
 			for (AVM a : this.avmList) {
 				System.out.println(a.toString());

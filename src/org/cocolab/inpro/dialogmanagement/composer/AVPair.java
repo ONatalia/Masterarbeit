@@ -11,12 +11,12 @@ public class AVPair {
 	}
 	
 	/**
-	 * @author okko, timo
 	 * Handles interfacing AVM construction/unification 
 	 * Convenience constructor to create AVPair from one string,
 	 * where A and V are separated by a colon, like "size:big"
 	 * or from attribute-value <String, Object> input for more
 	 * complex AVMs.
+	 * @author okko, timo
 	 */
 	AVPair(String attval) {
 		assert (attval.contains(":"));
@@ -40,7 +40,7 @@ public class AVPair {
 	}
 	
 	public String toString() {
-		return getValue() + " : " + getAttribute(); 
+		return getAttribute() + " : " + getValue(); 
 	}
 
 }

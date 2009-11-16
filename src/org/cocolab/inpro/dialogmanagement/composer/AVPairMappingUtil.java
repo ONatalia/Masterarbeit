@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author timo
  * Utility for AVPair construction from file/input.
+ * @author timo, okko
  */
 public class AVPairMappingUtil {
 
