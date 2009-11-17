@@ -99,12 +99,16 @@ public class AVMComposer {
 		AVM avm6 = new AVM("dialog_act");
 		avm6.setAttribute(new AVPair("act", "turn"));
 
+		AVM avm7 = new AVM("dialog_act");
+		avm6.setAttribute(new AVPair("act", "place"));
+
 		worldList.add(avm1);
 		worldList.add(avm2);
 		worldList.add(avm3);
 		worldList.add(avm4);
 		worldList.add(avm5);
 		worldList.add(avm6);
+		worldList.add(avm7);
 	}
 	
 	/**
@@ -135,17 +139,18 @@ public class AVMComposer {
 //		avps.add(new AVPair("act", "turn"));
 		avps.add(new AVPair("color", "green"));
 		avps.add(new AVPair("name", "f"));
-		avps.add(new AVPair("name", "cross"));
-		avps.add(new AVPair("ord", "1"));
-		avps.add(new AVPair("ord", "1"));
-		avps.add(new AVPair("ord", "1"));
+//		avps.add(new AVPair("name", "cross"));
 		avps.add(new AVPair("ord", "2"));
+		avps.add(new AVPair("orient", "top"));
+		avps.add(new AVPair("ord", "1"));
+		avps.add(new AVPair("ord", "1"));
+		avps.add(new AVPair("ord", "1"));
 //		avps.add(new AVPair("ord", "3"));
 //		avps.add(new AVPair("ord", "4"));
-//		avps.add(new AVPair("orient", "top"));
 //		avps.add(new AVPair("orient", "bottom"));
-//		avps.add(new AVPair("relation", "next_to"));
-//		avps.add(new AVPair("color", "gelb"));  // this should break
+		avps.add(new AVPair("relation", "next_to"));
+		avps.add(new AVPair("relation", "above"));
+//		avps.add(new AVPair("color", "gelb"));
 
 		for (AVPair avp : avps) {
 			System.out.println("Adding tag AVPair '" + avp.toString() + "'.");
