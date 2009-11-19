@@ -22,4 +22,5 @@ public interface BaseDataKeeper {
 
 	double getSpectralTilt(double time);
 
+	public double getSpectralTiltQual(double time);
 }

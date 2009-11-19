@@ -115,7 +115,7 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 			loudnessData.add(new TimedData<Double>(data.frame, new Double(rbcEnergyInDB)));
 		}
 	}
-
+	
 	@Override
 	public double getLoudness(double time) {
 		if (loudnessData.size() == 0) {
@@ -129,37 +129,58 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 			return Double.NaN;
 		}
 	}
-
-	public double getSpectralTilt(double time) {
+	
+	private double specTiltTime;
+	private double specTiltSlope;
+	private double specTiltRSquared;
+	private void computeSpectralTilt(double time) {
+		if (time == specTiltTime) return;
 		@SuppressWarnings("unchecked")
 		TimedData<DoubleData> td = melData.floor(new TimedData(time));
 		// let's hope that nobody messed with melData. Then we should find the interesting range 
 		// (130-~4000) in the first 32 coefficients. to keep things simple, we just do a linear regression
-		double[] y = Arrays.copyOf(td.value.getValues(), 32);
-		double sumX = 0;
-		double sumTX = 0;
-		double sumXX = 0;
-		final int n = 32;
-		for (int i = 0; i < n; i++) {
-			sumX += y[i];
-			sumTX += n * y[i];
-			sumXX += y[i] * y[i];
+		
+		// this is actually fft now, ranging from 0-8000 Hz with 256 coefficients;
+		// range 500-4000 should then be 16-128 (112 values)
+		
+		if ((td == null) || (td.value.getValues() == null)) {
+			specTiltSlope = Double.NaN;
+			specTiltRSquared = Double.NaN;
+			return;
 		}
-		int sumT = 496; // 0+1+2+3+...+31
-		int sumTT = 10416; // 0^2+1^2+2^2+...+31^2
-		double sumSqDevTX = (n * sumTX - sumT * sumX);
-		double sumSqDevT = (n * sumTT - sumT * sumT);
-		double slope = sumSqDevTX / sumSqDevT;
-		return slope;
+		double[] y = Arrays.copyOfRange(td.value.getValues(), 16, 116);
+		double sumY = 0;
+		double sumTY = 0;
+		double sumYY = 0;
+		double sumT = 0;
+		double sumTT = 0;
+		final int n = 100;
+		for (int i = 0; i < n; i++) {
+			sumT += i;
+			sumTT += i * i;
+			sumY += y[i];
+			sumYY += y[i] * y[i];
+			sumTY += i * y[i];
+		}
+		double sumSqDevT = sumTT - sumT * sumT / (double) n;
+		double sumSqDevTY = sumTY - sumT * sumY / (double) n;
+		double sumSqDevY = sumYY - sumY * sumY / (double) n;
+		specTiltSlope = sumSqDevTY / sumSqDevT;
+		double denom = sumSqDevT * sumSqDevY;
+		specTiltRSquared = (denom != 0.0) ? (sumSqDevTY * sumSqDevTY / denom) : 1.0;
+		specTiltTime = time;
 	}
 	
-	public double[] get32MFCC(double time) {
-		@SuppressWarnings("unchecked")
-		TimedData<DoubleData> td = melData.floor(new TimedData(time));
-		double[] coefficients = td.value.getValues();
-		return Arrays.copyOfRange(coefficients, 0, 32);
+	public double getSpectralTiltQual(double time) {
+		computeSpectralTilt(time);
+		return specTiltRSquared;
 	}
-
+	
+	public double getSpectralTilt(double time) {
+		computeSpectralTilt(time);
+		return specTiltSlope;
+	}
+	
 	public void reset() {
 		pitchedData.clear();
 		melData.clear();

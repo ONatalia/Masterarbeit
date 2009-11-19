@@ -82,17 +82,18 @@ public class SegmentIU extends IU {
 	
 	@Override
 	public void update(EditType edit) {
-/* this code is helpful for prosodic feature extraction */
+/* this code is helpful for prosodic feature extraction * /
 		if (edit == EditType.COMMIT) {
 			double time = startTime() + 0.01;
 			for (; time <= endTime() + 0.00001; time += 0.01) { 
 				System.err.printf(Locale.US, 
-				                  "%.2f\t%f\t%f\t%f\t%f\t\"%s\"\t%s\n", 
+				                  "%.2f\t%f\t%f\t%f\t%f\t%f\t\"%s\"\t%s\n", 
 				                  time, 
 				                  bd.getLoudness(time),
 				                  bd.getPitchInCent(time),
 				                  bd.getVoicing(time),
 				                  bd.getSpectralTilt(time),
+				                  bd.getSpectralTiltQual(time),
 				                  l.getLabel(),
 				                  isVowel() ? 'V' : isSilence() ? 'S' : 'C');
 			}
