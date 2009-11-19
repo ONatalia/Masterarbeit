@@ -10,24 +10,24 @@ import java.util.HashMap;
  */
 public class AVM {
 
-	// Implementing classes must define these in their constructors.
 	private final String type;
 	private HashMap<String, Object> attributes;
-	private boolean monotonic = false;					//Defaults to false.  This is really "is part of a monotonic collection of AVMs".
+	private boolean monotonic;
 
 	/**
-	 * Empty constructor.
+	 * String type, HashMap avmStructures constructor.
 	 */
-	AVM() {
-		this.type = null;
+	AVM(String type, HashMap<String, HashMap<String, String>> avmStructures) {
+		this(type, false, avmStructures);
 	}
 
 	/**
-	 * String type constructor.
+	 * String type, boolean monotonic, HashMap avmStructures constructor.
 	 */
-	AVM(String type) {
+	AVM(String type, boolean monotonic, HashMap<String, HashMap<String, String>> avmStructures) {
 		this.type = type;
-		this.initFromType(this.type);
+		this.attributes = this.unpackStructures(avmStructures, type);
+		this.monotonic = monotonic;
 	}
 
 	/**
@@ -36,57 +36,40 @@ public class AVM {
 	 */
 	protected AVM (AVM avm) {
 		this.type = new String(avm.type);
-		this.attributes = new HashMap<String, Object>(avm.attributes);
+		this.attributes = new HashMap<String, Object>(avm.attributes);	// this may need reworking as it does a shallow copy only.
 		this.monotonic = avm.monotonic;
 	}
 
-	private void initFromType(String type) {
-		this.attributes = new HashMap<String, Object>();
-		if (type.equals("tile")) {
-			this.attributes.put("name", null);
-			this.attributes.put("color", null);
-			this.attributes.put("label", null);
-			ArrayList<AVM> list0 = new ArrayList<AVM>();
-			list0.add(new AVM("loc_spec"));
-			this.attributes.put("loc", list0);
-			ArrayList<AVM> list = new ArrayList<AVM>();
-			list.add(new AVM("rel_loc_spec"));
-			list.add(new AVM("rel_loc_spec"));
-			list.add(new AVM("rel_loc_spec"));
-			this.attributes.put("rel_loc", list);
-		} else if (type.equals("field")) {
-			this.attributes.put("color", null);
-			ArrayList<AVM> list0 = new ArrayList<AVM>();
-			list0.add(new AVM("loc_spec"));
-			this.attributes.put("loc", list0);
-			ArrayList<AVM> list = new ArrayList<AVM>(4);
-			list.add(new AVM("rel_loc_spec"));
-			list.add(new AVM("rel_loc_spec"));
-			list.add(new AVM("rel_loc_spec"));
-			this.attributes.put("rel_loc", list);
-		} else if (type.equals("loc_spec")) {
-			this.attributes.put("desc", null);
-			this.attributes.put("lr", null);
-			this.attributes.put("tb", null);
-			ArrayList<AVM> list = new ArrayList<AVM>(4);
-			list.add(new AVM("rc_spec"));
-			list.add(new AVM("rc_spec"));
-			list.add(new AVM("rc_spec"));
-			list.add(new AVM("rc_spec"));
-			this.attributes.put("rc", list);
-		} else if (type.equals("rel_loc_spec")) {
-			this.attributes.put("arg", null);
-			this.attributes.put("relation", null);
-		} else if (type.equals("rc_spec")) {
-			this.attributes.put("ord", null);
-			this.attributes.put("orient", null);
-			this.attributes.put("row_col", null);
-			this.monotonic = true;
-		} else if (type.equals("dialog_act")) {
-			this.attributes.put("act", null);
-		} else {
-			throw new IllegalArgumentException("Unknown AVM type: " + type);
+	/**
+	 * Builds attribute map from flat string map (read from file by AVMStructureUtil).
+	 * @param structure - HashMap 
+	 * @param type of the AVM
+	 */
+	private HashMap<String, Object> unpackStructures(HashMap<String, HashMap<String, String>> avmStructures, String type) {
+		HashMap<String, Object> attributes = new HashMap<String, Object>();
+		HashMap<String, String> avmStructure = avmStructures.get(type);
+		for (String attribute : avmStructure.keySet()) {
+			if (avmStructure.get(attribute).equals("String")) {						// String attribute
+				attributes.put(attribute, null);
+			} else if (((String) avmStructure.get(attribute)).startsWith("(")) {	// AVM List attribute
+				String[] tokens = ((String) avmStructure.get(attribute)).replaceAll("[\\(\\)]", "").split(",");
+				String childType = tokens[0];
+				int num = Integer.parseInt(tokens[1]);
+				boolean monotonic = false;
+				if (tokens[2].equals("true"))
+					monotonic = true;
+				ArrayList<AVM> list = new ArrayList<AVM>(1);
+				for (int i=0; i<num; i++) {
+					list.add(new AVM(childType, monotonic, avmStructures));
+				}
+				attributes.put(attribute, list);
+			} else {																// AVM attribute
+				ArrayList<AVM> list = new ArrayList<AVM>(1);
+				list.add(new AVM((String) avmStructure.get(attribute), avmStructures));
+				attributes.put(attribute, list);
+			}
 		}
+		return attributes;
 	}
 
 	/**
@@ -121,7 +104,6 @@ public class AVM {
 	 */
 	@SuppressWarnings("unchecked")
 	public AVM unify(AVM avm) {
-		//METHOD 2
 		for (AVPair avp : avm.getAVPairs()) {
 			if (avp.getValue() instanceof String) {
 				if (!this.setAttribute(avp)) {
@@ -153,14 +135,15 @@ public class AVM {
 	}
 
 	/**
-	 * @param avm - an AVM to check subsumption against.
-	 * @return true if <b>avm</b> is subsumed.
+	 * Checks if unification is possible for two AVMs.
+	 * @param avm - an AVM to check against whether unification would be successful.
+	 * @return true if so, false otherwise
 	 */
 	@SuppressWarnings("unchecked")
-	public boolean subsumes(AVM avm) {
+	public boolean unifies(AVM avm) {
 		if (this == avm) {
 			return true;
-		} else if ((this.type != avm.type) || !avm.type.equals(this.type)) {
+		} else if (!avm.type.equals(this.type)) {
 			return false;
 		} else {
 			for (AVPair avp : avm.getAVPairs()) {
@@ -175,14 +158,15 @@ public class AVM {
 								return false;
 							}
 						} else if (value instanceof ArrayList) {
-							boolean subsumes = false;
+							// FIXME: REWORK THIS!
 							for (AVM avm1 : (ArrayList<AVM>) value) {
+								boolean subsumed = false;
 								for (AVM avm2 : (ArrayList<AVM>) this.attributes.get(attribute)) {
-									if (avm2.subsumes(avm1)) {
-										subsumes = true;
+									if (avm2.unifies(avm1)) {
+										subsumed = true;
 									}
 								}
-								if (!subsumes) {
+								if (!subsumed) {
 									return false;
 								}
 							}
@@ -192,15 +176,6 @@ public class AVM {
 			}
 		}
 		return true;
-	}
-
-	/**
-	 * Checks if unification is possible for two AVMs.
-	 * @param avm - an AVM to check against whether unification would be successful.
-	 * @return true if so, false otherwise
-	 */
-	public boolean unifies(AVM avm) {
-		return (this.subsumes(avm));
 	}
 
 	/**
@@ -225,23 +200,23 @@ public class AVM {
 						return true;					
 					}
 				}
-			} else if (value instanceof AVM) {
-				if (this.attributes.get(attribute) instanceof AVM) {
-					AVM avm = (AVM) this.attributes.get(attribute); 
-					if (avm.equals((AVM) value)) {
-						return true;
-					} else if (avm.unifies((AVM) value)) {
-						avm.unify((AVM) value);
-						this.attributes.put(attribute, (AVM) value);
-						return true;
-					}
-				} else if (this.attributes.get(attribute) instanceof ArrayList) {
-					for (AVM avm : (ArrayList<AVM>) this.attributes.get(attribute)) {
-						if (avm.setAttribute(avp)) {
-							return true;
-						}
-					}
-				}
+//			} else if (value instanceof AVM) {
+//				if (this.attributes.get(attribute) instanceof AVM) {
+//					AVM avm = (AVM) this.attributes.get(attribute); 
+//					if (avm.equals((AVM) value)) {
+//						return true;
+//					} else if (avm.unifies((AVM) value)) {
+//						avm.unify((AVM) value);
+//						this.attributes.put(attribute, (AVM) value);
+//						return true;
+//					}
+//				} else if (this.attributes.get(attribute) instanceof ArrayList) {
+//					for (AVM avm : (ArrayList<AVM>) this.attributes.get(attribute)) {
+//						if (avm.setAttribute(avp)) {
+//							return true;
+//						}
+//					}
+//				}
 			} else if (value instanceof ArrayList && this.attributes.get(attribute) instanceof ArrayList) {
 				for (AVM avm1 : (ArrayList<AVM>) value) {
 					boolean unified = false;
@@ -378,6 +353,7 @@ public class AVM {
 		}
 		str += "]";
 		return str;
+//		return this.toLongString();
 	}
 
 	/**
@@ -397,6 +373,8 @@ public class AVM {
 		String str = new String();
 		str += "[";
 		str += this.type;
+		if (this.monotonic)
+			str +=  "(m)";
 		str += " ";
 		for (String attribute : this.attributes.keySet()) {
 			Object value = attributes.get(attribute);

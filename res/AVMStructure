@@ -1,0 +1,21 @@
+# This file is a template for describing domain-specific AVM structures.
+# Hashes start commented lines.
+#
+# The format of each (non-comment) line is as follows:
+# [type:AVM_TYPE attribute:String attribute:AVM_TYPE attribute:(AVM_TYPE,NUM,ORD)]
+#
+# Where:
+#  AVM_TYPE is the type of AVM
+#  'String' attributes are initiated as "null" Strings
+#  AVM_TYPE attributes are initiated as empty AVMs of the given type.
+#  [AVM_TYPE] attributes are initiated as lists of AVMs of the given type.
+#  NUM is the number of AVMs in the list.
+#  ORD is one of 'true' or 'false' and denotes whether the list is ordered (roughly: monotonic)
+#
+# Examples:
+[type:tile name:String color:String label:String rel_loc:(rel_loc_spec,3,false) loc:loc_spec]
+[type:field color:String rel_loc:(rel_loc_spec,3,false) loc:loc_spec]
+[type:rel_loc_spec arg:String relation:String]
+[type:loc_spec tb:String lr:String desc:String rc:(rc_spec,4,true)]
+[type:rc_spec row_col:String orient:String ord:String]
+[type:dialog_act act:String]

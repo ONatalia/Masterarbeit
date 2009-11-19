@@ -4,20 +4,31 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * AVM Composer - Reads AVPairs.  Attempts composition of
- * new AVMs and subsequent unification of existing ones.
+ * new AVMs and unification of existing ones.
  * @author okko
  */
 public class AVMComposer {
 
 
+	private HashMap<String, HashMap<String, String>> avmStructures;
 	private ArrayList<AVM> avmList = new ArrayList<AVM>();
 	static private ArrayList<AVM> worldList = new ArrayList<AVM>();
-	
-	static {
-		AVM avm1 = new AVM("tile");
+
+	/**
+	 * Creates AVMComposer with a list of prototypes (avmStructures) of
+	 * different typed AVMs and a local list of composed AVMs (avmList).
+	 */
+	public AVMComposer() {
+
+		AVMStructureUtil su = new AVMStructureUtil();
+		this.avmStructures = su.getAVMStructures();
+		this.avmList = getAllAVMs();
+
+		AVM avm1 = new AVM("tile", this.avmStructures);
 		avm1.setAttribute(new AVPair("name", "x"));
 		avm1.setAttribute(new AVPair("label", "x1"));
 		avm1.setAttribute(new AVPair("color", "green"));
@@ -40,7 +51,7 @@ public class AVMComposer {
 		avm1.setAttribute(new AVPair("relation", "above"));
 		avm1.setAttribute(new AVPair("relation", "below"));
 
-		AVM avm2 = new AVM("tile");
+		AVM avm2 = new AVM("tile", this.avmStructures);
 		avm2.setAttribute(new AVPair("name", "f"));
 		avm2.setAttribute(new AVPair("label", "f1"));
 		avm2.setAttribute(new AVPair("color", "green"));
@@ -63,7 +74,7 @@ public class AVMComposer {
 		avm2.setAttribute(new AVPair("relation", "above"));
 		avm2.setAttribute(new AVPair("relation", "below"));
 
-		AVM avm3 = new AVM("field");
+		AVM avm3 = new AVM("field", this.avmStructures);
 		avm3.setAttribute(new AVPair("color", "green"));
 		avm3.setAttribute(new AVPair("ord", "1"));
 		avm3.setAttribute(new AVPair("orient", "top"));
@@ -78,11 +89,11 @@ public class AVMComposer {
 		avm3.setAttribute(new AVPair("orient", "right"));
 		avm3.setAttribute(new AVPair("row_col", "col"));
 
-		AVM avm4 = new AVM("field");
+		AVM avm4 = new AVM("field", this.avmStructures);
 		avm4.setAttribute(new AVPair("color", "brown"));
 		avm4.setAttribute(new AVPair("ord", "2"));
-		avm4.setAttribute(new AVPair("orient", "top"));
 		avm4.setAttribute(new AVPair("row_col", "row"));
+		avm4.setAttribute(new AVPair("orient", "top"));
 		avm4.setAttribute(new AVPair("ord", "1"));
 		avm4.setAttribute(new AVPair("orient", "bottom"));
 		avm4.setAttribute(new AVPair("row_col", "row"));
@@ -93,14 +104,14 @@ public class AVMComposer {
 		avm4.setAttribute(new AVPair("orient", "right"));
 		avm4.setAttribute(new AVPair("row_col", "col"));
 
-		AVM avm5 = new AVM("dialog_act");
+		AVM avm5 = new AVM("dialog_act", this.avmStructures);
 		avm5.setAttribute(new AVPair("act", "take"));
 
-		AVM avm6 = new AVM("dialog_act");
+		AVM avm6 = new AVM("dialog_act", this.avmStructures);
 		avm6.setAttribute(new AVPair("act", "turn"));
 
-		AVM avm7 = new AVM("dialog_act");
-		avm6.setAttribute(new AVPair("act", "place"));
+		AVM avm7 = new AVM("dialog_act", this.avmStructures);
+		avm7.setAttribute(new AVPair("act", "place"));
 
 		worldList.add(avm1);
 		worldList.add(avm2);
@@ -109,47 +120,43 @@ public class AVMComposer {
 		worldList.add(avm5);
 		worldList.add(avm6);
 		worldList.add(avm7);
-	}
-	
-	/**
-	 * Creates AVMComposer with a list of prototypes of
-	 * different typed AVMs.
-	 * New AVPairs will first be put into an UntypedAVM,
-	 * for which unification will be attempted on each
-	 * of these.  Non-null ones will be kept.
-	 */
-	public AVMComposer() {
-		this.avmList = getAllAVMs();
+
 	}
 
 	public static void main(String[] args) throws IOException {
 		System.out.println("Starting AVM Composer.");
 		AVMComposer composer = new AVMComposer();
-		
+
 		System.out.println("World contains following objects:");
 		for (AVM avm : worldList) {
 			System.out.println(avm.toString());
 		}
 
-
 		// Below is a demonstration of what should happen when tags come in.
 
 		ArrayList<AVPair> avps = new ArrayList<AVPair>();
-		
-//		avps.add(new AVPair("act", "turn"));
+
+		// These should compose and resolve
 		avps.add(new AVPair("color", "green"));
 		avps.add(new AVPair("name", "f"));
-//		avps.add(new AVPair("name", "cross"));
 		avps.add(new AVPair("ord", "2"));
 		avps.add(new AVPair("orient", "top"));
 		avps.add(new AVPair("ord", "1"));
+		avps.add(new AVPair("orient", "bottom"));
 		avps.add(new AVPair("ord", "1"));
-		avps.add(new AVPair("ord", "1"));
-//		avps.add(new AVPair("ord", "3"));
-//		avps.add(new AVPair("ord", "4"));
-//		avps.add(new AVPair("orient", "bottom"));
 		avps.add(new AVPair("relation", "next_to"));
 		avps.add(new AVPair("relation", "above"));
+		avps.add(new AVPair("relation", "below"));
+		
+		// These should compose but not resolve 
+//		avps.add(new AVPair("ord", "4"));
+//		avps.add(new AVPair("ord", "1"));
+//		avps.add(new AVPair("relation", "below"));
+		
+		// These should compose and resolve nothing
+//		avps.add(new AVPair("name", "cross"));
+//		avps.add(new AVPair("ord", "1"));
+//		avps.add(new AVPair("ord", "4"));
 //		avps.add(new AVPair("color", "gelb"));
 
 		for (AVPair avp : avps) {
@@ -169,9 +176,10 @@ public class AVMComposer {
 				}
 			}
 		}
-		System.out.println("Done!");
-
-//		interactiveTest();
+		System.out.println();
+		System.out.println("Done! Continue composing by entering any AVPair (e.g. ord:1). Enter 'exit' to stop or 'new' to restart'");
+		composer = new AVMComposer();
+		interactiveTest();
 	}
 	
 	static void interactiveTest() throws IOException {
@@ -187,17 +195,15 @@ public class AVMComposer {
 			composer.printAVMs();
 			line = stdin.readLine();
 		}
+		System.exit(0);
 	}
 
 	/**
 	 * Method to call when a new AVPair becomes known.
-	 * Creates an UntypedAVM.  Attempt unification with known
-	 * prototypes.  For all unified AVMs re-attempts unification
-	 * with prototypes (for higher-order AVMs).  Lastly attempts
-	 * unification with existing AVMs.
+	 * Attempt unification with known prototypes (avmStructures).
 	 * @param avp
 	 */
-	public void unifyNewAVPair(AVPair avp) {
+	private void unifyNewAVPair(AVPair avp) {
 		ArrayList<AVM> newList = new ArrayList<AVM>();
 		boolean placed = false;
 		for (AVM avm : this.avmList) {
@@ -237,38 +243,38 @@ public class AVMComposer {
 	
 	/**
 	 * Sets prototype AVMs to be used for matching
-	 * against UntypedAVMs (e.g. from new AVPairs).
+	 * against (e.g. from new AVPairs).
 	 */
-	static public ArrayList<AVM> getAllAVMs() {
+	public ArrayList<AVM> getAllAVMs() {
 		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.add(new AVM("dialog_act"));
-		list.add(new AVM("tile"));
-		list.add(new AVM("field"));
+		list.add(new AVM("dialog_act", this.avmStructures));
+		list.add(new AVM("tile", this.avmStructures));
+		list.add(new AVM("field", this.avmStructures));
 		return list;
 	}
 
-	static public ArrayList<AVM> getObjectAVMs() {
+	public ArrayList<AVM> getObjectAVMs() {
 		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.add(new AVM("tile"));
-		list.add(new AVM("field"));
+		list.add(new AVM("tile", this.avmStructures));
+		list.add(new AVM("field", this.avmStructures));
 		return list;
 	}
 	
-	static public ArrayList<AVM> getFieldAVMs() {
+	public ArrayList<AVM> getFieldAVMs() {
 		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.add(new AVM("field"));
+		list.add(new AVM("field", this.avmStructures));
 		return list;
 	}
 
-	static public ArrayList<AVM> getTileAVMs() {
+	public ArrayList<AVM> getTileAVMs() {
 		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.add(new AVM("tile"));
+		list.add(new AVM("tile", this.avmStructures));
 		return list;
 	}
 
-	static public ArrayList<AVM> getDialogActAVMs() {
+	public ArrayList<AVM> getDialogActAVMs() {
 		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.add(new AVM("dialog_act"));
+		list.add(new AVM("dialog_act", this.avmStructures));
 		return list;
 	}
 
@@ -304,17 +310,17 @@ public class AVMComposer {
 	}
 
 	public void unsetDialogActAVMs() {
-		this.avmList.remove(new AVM("dialog_act"));
+		this.avmList.remove(new AVM("dialog_act", this.avmStructures));
 		System.err.println(this.avmList.toString());
 	}
 
 	public void unsetTileAVMs() {
-		this.avmList.remove(new AVM("tile"));
+		this.avmList.remove(new AVM("tile", this.avmStructures));
 		System.err.println(this.avmList.toString());
 	}
 
 	public void unsetFieldAVMs() {
-		this.avmList.remove(new AVM("field"));
+		this.avmList.remove(new AVM("field", this.avmStructures));
 		System.err.println(this.avmList.toString());
 	}
 
