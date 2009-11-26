@@ -67,7 +67,7 @@ public class TEDviewNotifier extends HypothesisChangeListener {
 
 	@Override
 	public void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
-		if (tedOutput && (edits.size() > 0)) {
+		if (tedOutput && (edits.size() > 0) && (ius.size() > 0)) {
 	    	StringBuilder sbIUs = new StringBuilder();
 	    	sbIUs.append("<event time='");
 	    	sbIUs.append(currentFrame * 10);
