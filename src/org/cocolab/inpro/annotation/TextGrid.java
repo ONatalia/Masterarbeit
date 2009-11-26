@@ -2,16 +2,17 @@ package org.cocolab.inpro.annotation;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.regex.Pattern;
 
 public class TextGrid {
@@ -33,7 +34,7 @@ public class TextGrid {
 	}
 	
 	public static TextGrid newFromTextGridFile(File file) throws IOException {
-		BufferedReader in = new BufferedReader(new FileReader(file));
+		BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "ISO-8859-1"));
 		List<String> lines = new LinkedList<String>();
 		String line;
 		while ((line = in.readLine()) != null)
@@ -48,11 +49,12 @@ public class TextGrid {
 		int size = Integer.parseInt(params.get(6));
 		List<Tier> tiers = new ArrayList<Tier>(size);
 		List<String> tierLines = new ArrayList<String>();
-		Iterator<String> lineIt = lines.listIterator(8);
+		ListIterator<String> lineIt = lines.listIterator(8);
+		String line;
 		try {
 			while (lineIt.hasNext()) {
-				String line = lineIt.next();
-				if (Pattern.matches("^\\s*item \\[\\d\\]:\\s*$", line)) {
+				line = lineIt.next();
+				if ((Pattern.matches("^\\s*item \\[\\d+\\]:\\s*$", line)) && (tierLines.size() > 0)) {
 					tiers.add(Tier.newFromTextGridLines(tierLines));
 					tierLines = new ArrayList<String>();
 				} else {
@@ -125,11 +127,11 @@ public class TextGrid {
 				"        xmin = 0.820000", 
 				"        xmax = 0.910000", 
 				"        text = \"\"",
-				"    item [1]:",
+				"    item [2]:",
 				"    class = \"IntervalTier\"", 
 				"    name = \"MAU:\"", 
 				"    xmin = 0", 
-				"    xmax = 6.450000", 
+				"    xmax = 0.910000", 
 				"    intervals: size = 5", 
 				"    intervals [1]:", 
 				"        xmin = 0.000000", 
@@ -151,8 +153,10 @@ public class TextGrid {
 				"        xmin = 0.820000", 
 				"        xmax = 0.910000", 
 				"        text = \"<p:>\""));
-		System.out.println(tg.toString());
+		//System.out.println(tg.toString());
 		tg = newFromTextGridFile("/home/timo/inpro/Scripts/mausI/test1.TextGrid");
+		//System.out.println(tg.toString());
+		tg = newFromTextGridFile("/home/timo/inpro/experimente/020_SoT/data/PDC-FTT/tg/FTT_2006-02-13_pair1.TextGrid");
 		System.out.println(tg.toString());
 	}
 

@@ -19,11 +19,19 @@ package org.cocolab.inpro.annotation;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
+
+import org.cocolab.inpro.incremental.unit.SegmentIU;
 
 public class Label {
 	
+	public static final Set<String> SILENCE = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+			"<sil>", "SIL", "<p:>", "<s>", "</s>", "")));
+
 	private final double start; // in seconds
 	private final double end; // in seconds
 	private final String label;
@@ -92,6 +100,10 @@ public class Label {
 				"        xmax = 1.970000", 
 				"        text = \"Quader\""));
 		System.out.println(l.toString());
+	}
+
+	public boolean isSilence() {
+		return SILENCE.contains(getLabel()); 
 	}
 
 }

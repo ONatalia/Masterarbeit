@@ -14,15 +14,18 @@ public class Tier extends ArrayList<Label> {
 	
 	private static List<Pattern> tgPatterns = Arrays.asList( 
 		Pattern.compile("^\\s*class = \"IntervalTier\"\\s*$"), 
-		Pattern.compile("^\\s*name = \"(.+)\"\\s*$"), 
+		Pattern.compile("^\\s*name = \"(.*)\"\\s*$"), 
 		Pattern.compile("^\\s*xmin = (\\d*(\\.\\d+)?)\\s*$"), 
 		Pattern.compile("^\\s*xmax = (\\d*(\\.\\d+)?)\\s*$"), 
 		Pattern.compile("^\\s*intervals: size = (\\d+)\\s*$") 
 	);
 	
 	static Tier newFromTextGridLines(List<String> lines) throws IOException {
-		assert lines.size() >= 5;
-		assert (lines.size() - 5) % 4 == 0 : lines;
+		assert lines.size() >= 5 : lines;
+		if (lines.get(0).equals("    item [1]:")) {
+			lines.remove(0);
+		}
+		//assert (lines.size() - 5) % 4 == 0 : lines;
 		List<String> params = AnnotationUtil.interpret(lines, tgPatterns);
 		String name = params.get(1);
 		int size = Integer.parseInt(params.get(4));
@@ -49,6 +52,29 @@ public class Tier extends ArrayList<Label> {
 	private Tier(String name, List<Label> labels) {
 		super(labels);
 		this.name = name;
+	}
+	
+	public Tier getSpan(double start, double end) {
+		assert (start <= end);
+		int startIndex = 0;
+		int endIndex = 0;
+		for (int i = 0; i < this.size(); i++) {
+			Label l = this.get(i);
+			if (l.getStart() - 0.0001 <= start) {
+				startIndex = i;
+			}
+			if (l.getEnd() - 0.0001 <= end) {
+				endIndex = i + 1;
+			} else {
+				break;
+			}
+		}
+		assert (startIndex < endIndex) : start + " " + end;
+		return new Tier(this.name, subList(startIndex, endIndex));
+	}
+	
+	public Tier getSpan(Label l) {
+		return getSpan(l.getStart(), l.getEnd());
 	}
 	
 	public String toString() {
@@ -80,6 +106,7 @@ public class Tier extends ArrayList<Label> {
 				"        xmax = 0.910000", 
 				"        text = \"\""));
 		System.out.println(t.toString());
+		System.out.println(t.getSpan(0.55, 0.82).toString());
 	}
 
 }
