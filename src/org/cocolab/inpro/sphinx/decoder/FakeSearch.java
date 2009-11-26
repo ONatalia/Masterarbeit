@@ -7,8 +7,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.annotation.TextGrid;
+import org.cocolab.inpro.annotation.Tier;
 
 import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.frontend.Data;
@@ -18,6 +20,7 @@ import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.Signal;
 import edu.cmu.sphinx.linguist.SearchState;
 import edu.cmu.sphinx.linguist.acoustic.Unit;
+import edu.cmu.sphinx.linguist.acoustic.UnitManager;
 import edu.cmu.sphinx.linguist.dictionary.Dictionary;
 import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 import edu.cmu.sphinx.linguist.dictionary.Word;
@@ -43,16 +46,21 @@ import edu.cmu.sphinx.util.props.S4String;
 
 public class FakeSearch extends NoSearch {
 
+	private static final Logger logger = Logger.getLogger(FakeSearch.class);
+
 	@S4Component(type = Dictionary.class)
 	public static final String PROP_DICTIONARY = "dictionary";
+	
+	@S4Component(type = UnitManager.class)
+	public static final String PROP_UNIT_MANAGER = "unitManager";
 	
 	@S4String(defaultValue = "")
 	public static final String PROP_TRANSCRIPT_FILE = "textGrid";
 
-	@S4String(defaultValue = "ORT:")
+	@S4String(defaultValue = "MAUS-words")
 	public static final String PROP_WORD_TIER = "asrWords";
 
-	@S4String(defaultValue = "MAU:")
+	@S4String(defaultValue = "MAUS-phones")
 	public static final String PROP_UNIT_TIER = "asrUnits";
 	
 	private Dictionary dictionary;
@@ -63,6 +71,8 @@ public class FakeSearch extends NoSearch {
 	
 	private TokenList sortedTokenList;
 	private int frameNumber = 0;
+	
+	private UnitManager unitManager;
 
     public void allocate() {
     	frameNumber = 0;
@@ -99,6 +109,9 @@ public class FakeSearch extends NoSearch {
 						finalResult = true;
 				}
 				frameNumber++;
+				if (frameNumber % 1000 == 0) {
+					logger.info(frameNumber);
+				}
 			} catch (DataProcessingException e) {
 				e.printStackTrace();
 			}
@@ -121,20 +134,32 @@ public class FakeSearch extends NoSearch {
 	 * @param tg given TextGrid
 	 */
 	public void loadTranscript(TextGrid tg) {
-		Iterator<Label> wordIt = tg.getTierByName(wordTierName).iterator();
-		ListIterator<Label> unitIt = tg.getTierByName(unitTierName).listIterator();
+		logger.info("Words come from " + wordTierName);
+		Tier wordTier = tg.getTierByName(wordTierName);
+		assert (wordTier != null) : "Could not find " + wordTierName;
+		Iterator<Label> wordIt = wordTier.iterator();
+		logger.info("Units come from " + unitTierName);
+		Tier unitTier = tg.getTierByName(unitTierName);
+		assert (unitTier != null) : "Could not find " + unitTierName;
 		sortedTokenList = new TokenList();
 		Token t = null;
 		int frameNumber = 0;
 		while (wordIt.hasNext()) {
 			Label wordLabel = wordIt.next();
 			String spelling = wordLabel.getLabel();
-			Word word = (spelling.equals("")) ? dictionary.getSilenceWord() : dictionary.getWord(spelling);
-			if (word == null) {
-				throw new RuntimeException("don't know pronunciation for " + wordLabel.getLabel());
+			Tier unitSpan = unitTier.getSpan(wordLabel);
+			assert (unitSpan.size() > 0) : unitTier.toString();
+			// FIXME/TODO: this does not yet handle syllables :-(
+			Unit[] units = new Unit[unitSpan.size()];
+			int i = 0;
+			for (Label l : unitSpan) {
+				units[i++] = unitManager.getUnit(l.getLabel());
 			}
-			Pronunciation pron = word.getMostLikelyPronunciation();
-			SearchState searchState = new PronunciationState(wordLabel.getLabel(), pron, 0);
+			Pronunciation[] prons = new Pronunciation[1];
+			prons[0] = new Pronunciation(units, null, null, 1.0f);
+			Word word = (spelling.equals("")) ? dictionary.getSilenceWord() : new Word(spelling, prons, false);
+			prons[0].setWord(word);
+			SearchState searchState = new PronunciationState(spelling, prons[0], 0);
 			frameNumber = (int) Math.round(wordLabel.getStart() * 100);
 			if (t == null) {
 				t = new Token(searchState, frameNumber);
@@ -142,21 +167,15 @@ public class FakeSearch extends NoSearch {
 				t = t.child(searchState, 0.0f, 0.0f, 0.0f, frameNumber);
 			}
 			sortedTokenList.add(t);
-			Unit[] units = pron.getUnits();
-			for (Unit unit : units) {
-				Label unitLabel = unitIt.next();
-				assert unit.getName().equals(unitLabel.getLabel()) 
-					: "Problem with pronunciation of word " + wordLabel.toString() + "\n"
-					+ "dictionary says " + pron + " and TextGrid has " + unitLabel + "\n";
+			i = 0;
+			for (Label unitLabel : unitSpan) {
+				Unit unit = units[i++];
 				searchState = new UnitState(unit, null);
 				frameNumber = (int) Math.round(unitLabel.getStart() * 100);
 				t = t.child(searchState, 0.0f, 0.0f, 0.0f, frameNumber);
-				sortedTokenList.add(t);
+				sortedTokenList.add(t);				
 			}
 		}
-		unitIt.previous();
-		frameNumber = (int) Math.round(unitIt.next().getEnd() * 100);
-		sortedTokenList.add(t.child(null, 0.0f, 0.0f, 0.0f, frameNumber));
 	}
 	
 	public void loadTranscript(String filename) {
@@ -175,6 +194,7 @@ public class FakeSearch extends NoSearch {
 	public void newProperties(PropertySheet ps) throws PropertyException {
         fe = (FrontEnd) ps.getComponent(PROP_FRONTEND);
         dictionary = (Dictionary) ps.getComponent(PROP_DICTIONARY);
+        unitManager = (UnitManager) ps.getComponent(PROP_UNIT_MANAGER);
         wordTierName = ps.getString(PROP_WORD_TIER);
         unitTierName = ps.getString(PROP_UNIT_TIER);
         transcriptName = ps.getString(PROP_TRANSCRIPT_FILE);

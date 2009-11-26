@@ -21,7 +21,10 @@ public class SyllableAwarePronunciation extends Pronunciation {
 			WordClassification wordClassification, float probability) {
 		super(units, tag, wordClassification, probability);
 		this.syllableBoundaryIndices = syllableBoundaries;
-		// TODO Auto-generated constructor stub
+	}
+	
+	SyllableAwarePronunciation(Unit[] units, List<Integer> syllableBoundaries) {
+		this(units, syllableBoundaries, null, null, 1.0f);
 	}
 	
 	public List<Unit[]> getSyllables() {

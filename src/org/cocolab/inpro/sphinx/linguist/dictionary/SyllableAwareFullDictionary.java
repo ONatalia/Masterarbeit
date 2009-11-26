@@ -22,16 +22,24 @@ import java.util.List;
 import java.util.Map;
 
 import edu.cmu.sphinx.linguist.acoustic.Unit;
-import edu.cmu.sphinx.linguist.acoustic.UnitManager;
 import edu.cmu.sphinx.linguist.dictionary.FullDictionary;
 import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 import edu.cmu.sphinx.util.ExtendedStreamTokenizer;
 
 public class SyllableAwareFullDictionary extends FullDictionary {
 
-    /** Spelling of the sentence start word. */
     public static final String SYLLABLE_BOUNDARY_SYMBOL = "-";
 
+/*    public void clearDictionary() {
+    	wordDictionary.clear();
+    }
+    
+    public void addPronunciation(String text, Pronunciation pron) {
+    	allowMissingWords = true;
+    	Word word = getWord(text);
+    	word.getPronunciations();
+    }
+*/
     /**
      * Loads the given sphinx3 style simple dictionary from the given InputStream. The InputStream is assumed to contain
      * ASCII data.
@@ -67,18 +75,9 @@ public class SyllableAwareFullDictionary extends FullDictionary {
             if (pronunciations == null) {
                 pronunciations = new LinkedList<Pronunciation>();
             }
-            Pronunciation pronunciation = new SyllableAwarePronunciation(unitsArray, syllBoundaries, null,
-                    null, 1.0f);
+            Pronunciation pronunciation = new SyllableAwarePronunciation(unitsArray, syllBoundaries);
             pronunciations.add(pronunciation);
-            // if we are adding a SIL ending duplicate
-            if (!isFillerDict && addSilEndingPronunciation) {
-                units.add(UnitManager.SILENCE);
-                Unit[] unitsArray2 = units.toArray(new Unit[units
-                        .size()]);
-                Pronunciation pronunciation2 = new SyllableAwarePronunciation(unitsArray2, syllBoundaries,
-                        null, null, 1.0f);
-                pronunciations.add(pronunciation2);
-            }
+            // we never add a SIL ending duplicate
             dictionary.put(word, pronunciations);
         }
         inputStream.close();
@@ -86,5 +85,5 @@ public class SyllableAwareFullDictionary extends FullDictionary {
         createWords(dictionary, isFillerDict);
         return dictionary;
     }
-
+    
 }
