@@ -26,6 +26,8 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.SegmentIU;
+import org.cocolab.inpro.incremental.unit.SemIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -66,24 +68,22 @@ public class TEDviewNotifier extends HypothesisChangeListener {
 	@Override
 	public void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
 		if (tedOutput && (edits.size() > 0)) {
-	    	StringBuilder sbWords = new StringBuilder();
-	    	sbWords.append("<event time='");
-	    	sbWords.append(currentFrame * 10);
-	    	StringBuilder sbSegms = new StringBuilder(sbWords);
-	    	sbWords.append("' originator='asr_words'>");
-	    	sbSegms.append("' originator='asr_phones'>");
-	    	for (IU iu : ius) {
-	    		if (iu instanceof WordIU) {
-		    		sbWords.append(iu.toTEDviewXML());
-		    		for (IU iu2 : ((WordIU) iu).getSegments()) {
-		    			sbSegms.append(iu2.toTEDviewXML());
-		    		}
-	    		}
+	    	StringBuilder sbIUs = new StringBuilder();
+	    	sbIUs.append("<event time='");
+	    	sbIUs.append(currentFrame * 10);
+	    	IU iuType = ius.iterator().next();
+	    	if (iuType instanceof WordIU) {
+	    		sbIUs.append("' originator='asr_words'>");
+	    	} else if (iuType instanceof SegmentIU) {
+	    		sbIUs.append("' originator='asr_phones'>");
+	    	} else if (iuType instanceof SemIU) {
+	    		sbIUs.append("' originator='semantics'>");
 	    	}
-	    	sbWords.append("</event>\n\n");
-	    	sbSegms.append("</event>\n\n");
-			writer.print(sbWords.toString());
-			writer.print(sbSegms.toString());
+	    	for (IU iu : ius) {
+	    		sbIUs.append(iu.toTEDviewXML());
+	    	}
+	    	sbIUs.append("</event>\n\n");
+			writer.print(sbIUs.toString());
 			writer.flush();
 		}
 	}
