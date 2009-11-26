@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
@@ -64,6 +65,8 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	IUList<WordIU> wordIUs = new IUList<WordIU>();
 	
 	List<EditMessage<WordIU>> wordEdits;
+	
+	Logger logger = Logger.getLogger(ASRWordDeltifier.class);
 	
 //	private static final Logger logger = Logger.getLogger(ASRWordDeltifier.class);
 	
@@ -248,7 +251,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 			deltify(result.getBestToken());
 		else {
 			if (currentFrame > 2) { // there never is for the first two frames, so don't print a message
-				System.err.println("there was no best token at frame " + currentFrame);
+				logger.debug("there was no best token at frame " + currentFrame);
 			}
 			wordEdits = new LinkedList<EditMessage<WordIU>>();
 		}
@@ -285,7 +288,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	 *     here, the offset is given in centiseconds (frames)
 	 */
 	public void setOffset(int currentOffset) {
-		System.err.println("SETTING OFFSET TO " + currentOffset);
+		logger.debug("SETTING OFFSET TO " + currentOffset);
 		this.currentOffset = currentOffset;
 	}
 	
