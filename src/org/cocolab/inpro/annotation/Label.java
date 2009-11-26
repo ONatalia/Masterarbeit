@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.cocolab.inpro.incremental.unit.SegmentIU;
-
 public class Label {
 	
 	public static final Set<String> SILENCE = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(

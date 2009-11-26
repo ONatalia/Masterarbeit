@@ -27,8 +27,6 @@ import org.cocolab.inpro.annotation.Label;
 
 public class SegmentIU extends IU {
 	
-	public static final Set<String> SILENCE = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			"<sil>", "SIL", "<p:>", "<s>", "</s>", "")));
 	public static final Set<String> VOWELS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			"2:", "9", "@", "@U", "6", "a", "a:", "aa:", "A:", "aa", "A", "ai", "aI", "au", "aU", "e", "e:", "ee", "E", "ee:", "E:", "ei", "eI", "i:", "i", "ii", "I", "o", "o:", "oo", "O", "oy", "OY", "u:", "u", "ui", "uI", "ui:", "uu", "U", "y:", "y", "yy", "Y")));
 // for swedish:
@@ -53,7 +51,7 @@ public class SegmentIU extends IU {
 	
 	public SegmentIU(String segment, SegmentIU sll) {
 		super(sll);
-		assert (SILENCE.contains(segment) || VOWELS.contains(segment) || CONSONANTS.contains(segment)) : "segment " + segment + " is neither a vowel, consonant nor silence I could understand.";
+		assert (Label.SILENCE.contains(segment) || VOWELS.contains(segment) || CONSONANTS.contains(segment)) : "segment " + segment + " is neither a vowel, consonant nor silence I could understand.";
 		this.l = new Label(segment);
 	}
 
@@ -73,7 +71,7 @@ public class SegmentIU extends IU {
 	}
 
 	public boolean isSilence() {
-		return SILENCE.contains(l.getLabel());
+		return l.isSilence();
 	}
 	
 	public boolean isVowel() {
