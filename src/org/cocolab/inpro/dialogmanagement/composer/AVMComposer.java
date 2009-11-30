@@ -190,7 +190,7 @@ public class AVMComposer {
 			if (line.equals("new"))  
 				composer = new AVMComposer();
 			else {
-				composer.unifyNewAVPair(new AVPair(line));
+				composer.compose(new AVPair(line));
 			}
 			composer.printAVMs();
 			line = stdin.readLine();
@@ -203,7 +203,7 @@ public class AVMComposer {
 	 * Attempt unification with known prototypes (avmStructures).
 	 * @param avp
 	 */
-	private void unifyNewAVPair(AVPair avp) {
+	public ArrayList<AVM> compose(AVPair avp) {
 		ArrayList<AVM> newList = new ArrayList<AVM>();
 		boolean placed = false;
 		for (AVM avm : this.avmList) {
@@ -217,13 +217,14 @@ public class AVMComposer {
 		} else {
 			avmList.clear();
 		}
-	}
-	
-	public ArrayList<AVM> compose(AVPair avp) {
-		this.unifyNewAVPair(avp);
 		return avmList;
 	}
 
+	/**
+	 * Method to call to resolve world AVMs with composed ones.
+	 * Returns list of AVMs from world list that unify at least one 
+	 * AVM on the composed list. 
+	 */
 	public ArrayList<AVM> resolve() {
 		ArrayList<AVM> resolvedList = new ArrayList<AVM>();
 		if (avmList != null) {
