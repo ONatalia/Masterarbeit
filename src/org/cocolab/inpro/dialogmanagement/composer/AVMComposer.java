@@ -241,64 +241,40 @@ public class AVMComposer {
 		}
 		return resolvedList;
 	}
-	
+
 	/**
-	 * Sets prototype AVMs to be used for matching
-	 * against (e.g. from new AVPairs).
+	 * Returns list of AVMs known from AVM structures.
 	 */
 	public ArrayList<AVM> getAllAVMs() {
 		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.add(new AVM("dialog_act", this.avmStructures));
-		list.add(new AVM("tile", this.avmStructures));
-		list.add(new AVM("field", this.avmStructures));
+		for (String type : this.avmStructures.keySet()) {
+			list.add(new AVM(type, this.avmStructures));
+		}
 		return list;
 	}
 
-	public ArrayList<AVM> getObjectAVMs() {
-		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.add(new AVM("tile", this.avmStructures));
-		list.add(new AVM("field", this.avmStructures));
-		return list;
-	}
-	
-	public ArrayList<AVM> getFieldAVMs() {
-		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.add(new AVM("field", this.avmStructures));
-		return list;
-	}
-
-	public ArrayList<AVM> getTileAVMs() {
-		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.add(new AVM("tile", this.avmStructures));
-		return list;
-	}
-
-	public ArrayList<AVM> getDialogActAVMs() {
-		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.add(new AVM("dialog_act", this.avmStructures));
-		return list;
-	}
-
+	/**
+	 * Sets prototype AVMs to be used for matching
+	 * against (e.g. from new AVPairs).
+	 * getAllAVMs() sets these from known structures.
+	 */
 	public void setAllAVMs() {
 		this.avmList = getAllAVMs();
 	}
 
-	public void setObjectAVMs() {
-		this.avmList = getObjectAVMs();
+	/**
+	 * Sets only one type of AVM by creating a compose list of only that type.
+	 * @param type
+	 */
+	public void setAVMs(String type) {
+		this.avmList = new ArrayList<AVM>();
+		this.avmList.add(new AVM(type, this.avmStructures));
 	}
 
-	public void setFieldAVMs() {
-		this.avmList = getFieldAVMs();
-	}
-
-	public void setTileAVMs() {
-		this.avmList = getTileAVMs();
-	}
-
-	public void setDialogActAVMs() {
-		this.avmList = getDialogActAVMs();
-	}
-
+	/**
+	 * Unsets AVM of a given type by removing them from the composed list..
+	 * @param type
+	 */
 	public void unsetAVMs(String type) {
 		ArrayList<AVM> removeList = new ArrayList<AVM>();
 		for (AVM avm : this.avmList) {
@@ -307,21 +283,6 @@ public class AVMComposer {
 			}
 		}
 		this.avmList.removeAll(removeList);
-		System.err.println(this.avmList.toString());
-	}
-
-	public void unsetDialogActAVMs() {
-		this.avmList.remove(new AVM("dialog_act", this.avmStructures));
-		System.err.println(this.avmList.toString());
-	}
-
-	public void unsetTileAVMs() {
-		this.avmList.remove(new AVM("tile", this.avmStructures));
-		System.err.println(this.avmList.toString());
-	}
-
-	public void unsetFieldAVMs() {
-		this.avmList.remove(new AVM("field", this.avmStructures));
 		System.err.println(this.avmList.toString());
 	}
 
