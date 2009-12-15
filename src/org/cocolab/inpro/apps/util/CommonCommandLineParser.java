@@ -11,17 +11,13 @@ public abstract class CommonCommandLineParser {
 	public static final int RTP_INPUT = 3;
 	public static final int OAA_DISPATCHER_INPUT = 4;
 	
-	public static final int REGULAR_RECO = 0;
-	public static final int FORCED_ALIGNER_RECO = 1;
-	public static final int FAKE_RECO = 2;
-	
 	public static final int NO_OUTPUT = 0;
 	public static final int OAA_OUTPUT = 1;
 	public static final int TED_OUTPUT = 2;
 	public static final int LABEL_OUTPUT = 4;
 	public static final int SPEAKER_OUTPUT = 8;
 	public static final int FILE_OUTPUT = 16;
-	public static final int INCFEATS_OUTPUT = 32;
+	public static final int CURRHYP_OUTPUT = 32;
 	
 	URL configURL;
 	boolean verbose;

@@ -5,7 +5,14 @@ import java.net.URL;
 
 public class RecoCommandLineParser extends CommonCommandLineParser {
 
-
+	public static final int REGULAR_RECO = 0;
+	public static final int FORCED_ALIGNER_RECO = 1;
+	public static final int FAKE_RECO = 2;
+	
+	public static final int INCREMENTAL = 0;
+	public static final int NON_INCREMENTAL = 1;
+	public static final int SMOOTHED_INCREMENTAL = 2;
+	public static final int FIXEDLAG_INCREMENTAL = 3;
 	
 	public RecoCommandLineParser(String[] args) {
 		super(args);
@@ -15,6 +22,8 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	
 	public int rtpPort;
 	int outputMode;
+	int incrementalMode = INCREMENTAL;
+	int incrementalModifier = 0;
 	String referenceText;
 	String referenceFile;
 	
@@ -30,14 +39,20 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -R <port>      read data from RTP");
 		System.err.println("    -F <fileURL>   read data from sound file with given URL");
 		System.err.println("output selection:");
-		System.err.println("    -A             send messages via OAA");
+		System.err.println("    -A             send add/revokeWord messages via OAA");
 		System.err.println("    -T             send incremental hypotheses to TEDview");
 		System.err.println("    -L             incremental output using LabelWriter");
+		System.err.println("    -C             show current incremental ASR hypothesis");
+		System.err.println("incrementality options:");
+		System.err.println("                   by default, incremental results are generated at every frame");
+		System.err.println("    -In            no incremental output");
+		System.err.println("    -Is <n>        apply smoothing factor");
+		System.err.println("    -If <n>        apply fixed lag");
 		System.err.println("special modes:");
 		System.err.println("    -fa <text>     do forced alignment with the given reference text");
 		System.err.println("    -tg <file>     do fake recognition from the given reference textgrid");
 	}
-	
+
 	/*
 	 * check whether the configuration is valid
 	 */
@@ -102,8 +117,18 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 			else if (args[i].equals("-L")) {
 				outputMode |= LABEL_OUTPUT;
 			}
-			else if (args[i].equals("-I")) {
-				outputMode |= INCFEATS_OUTPUT;
+			else if (args [i].equals("-In")) {
+				incrementalMode = NON_INCREMENTAL;
+			}
+			else if (args [i].equals("-Is")) {
+				incrementalMode = SMOOTHED_INCREMENTAL;
+				i++;
+				incrementalModifier = Integer.parseInt(args[i]);
+			}
+			else if (args [i].equals("-If")) {
+				incrementalMode = FIXEDLAG_INCREMENTAL;
+				i++;
+				incrementalModifier = Integer.parseInt(args[i]);
 			}
 			else {
 				printUsage();

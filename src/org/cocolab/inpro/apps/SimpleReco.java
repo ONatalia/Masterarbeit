@@ -29,7 +29,7 @@ public class SimpleReco {
 	
 	private static final Logger logger = Logger.getLogger(SimpleReco.class);
 	
-	protected static void setupMicrophone(final Microphone mic) {
+	public static void setupMicrophone(final Microphone mic) {
 		Runnable micInitializer = new Runnable() {
 			public void run() {
 				mic.initialize();
@@ -101,32 +101,8 @@ public class SimpleReco {
 			break;
 		}
 	}
-
-	private static void setupMonitors(ConfigurationManager cm, RecoCommandLineParser clp) throws InstantiationException, PropertyException {
-		if (clp.matchesOutputMode(RecoCommandLineParser.OAA_OUTPUT)) {
-			cm.lookup("newWordNotifierAgent");
-		}
-		if (clp.matchesOutputMode(RecoCommandLineParser.TED_OUTPUT)) {
-			cm.lookup("TEDviewNotifier");
-		}
-		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
-			cm.lookup("labelWriter");
-		}
-		if (clp.matchesOutputMode(RecoCommandLineParser.INCFEATS_OUTPUT)) {
-			cm.lookup("incASRConfidenceFeatureWriter");
-		}
-		if (clp.verbose()) {
-			cm.lookup("memoryTracker");
-			cm.lookup("speedTracker");
-		}
-	}
-
-	public static void main(String[] args) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException {
-		BasicConfigurator.configure();
-		//PropertyConfigurator.configure("log4j.properties");
-    	RecoCommandLineParser clp = new RecoCommandLineParser(args);
-    	if (!clp.parsedSuccessfully()) { System.exit(1); }
-    	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
+	
+	private static void setupReco(ConfigurationManager cm, RecoCommandLineParser clp) throws IOException {
     	if (clp.isRecoMode(RecoCommandLineParser.FORCED_ALIGNER_RECO)) {
     		logger.info("Running in forced alignment mode.");
     		logger.info("Will try to recognize: " + clp.getReference());
@@ -145,6 +121,34 @@ public class SimpleReco {
     	} else {
     		logger.info("Loading recognizer...");
     	}
+	}
+
+	private static void setupMonitors(ConfigurationManager cm, RecoCommandLineParser clp) throws InstantiationException, PropertyException {
+		if (clp.matchesOutputMode(RecoCommandLineParser.OAA_OUTPUT)) {
+			cm.lookup("newWordNotifierAgent");
+		}
+		if (clp.matchesOutputMode(RecoCommandLineParser.TED_OUTPUT)) {
+			cm.lookup("TEDviewNotifier");
+		}
+		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
+			cm.lookup("labelWriter");
+		}
+		if (clp.matchesOutputMode(RecoCommandLineParser.CURRHYP_OUTPUT)) {
+			// FIXME: implement me
+		}
+		if (clp.verbose()) {
+			cm.lookup("memoryTracker");
+			cm.lookup("speedTracker");
+		}
+	}
+
+	public static void main(String[] args) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException {
+		BasicConfigurator.configure();
+		//PropertyConfigurator.configure("log4j.properties");
+    	RecoCommandLineParser clp = new RecoCommandLineParser(args);
+    	if (!clp.parsedSuccessfully()) { System.exit(1); }
+    	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
+    	setupReco(cm, clp);
     	Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
     	recognizer.allocate();
     	logger.info("Setting up source...");
