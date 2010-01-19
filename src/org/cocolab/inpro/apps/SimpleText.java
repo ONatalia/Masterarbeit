@@ -16,6 +16,8 @@ import javax.swing.text.PlainDocument;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.cocolab.inpro.apps.util.TextCommandLineParser;
+import org.cocolab.inpro.incremental.CurrentHypothesis;
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.listener.HypothesisChangeListener;
 import org.cocolab.inpro.incremental.unit.AtomicWordIU;
@@ -23,21 +25,31 @@ import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IUList;
 
+import edu.cmu.sphinx.util.props.ConfigurationManager;
+import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.S4Component;
 import edu.cmu.sphinx.util.props.S4ComponentList;
 
 
 @SuppressWarnings("serial")
-public class SimpleType extends JPanel {
+public class SimpleText extends JPanel {
 
-	private static final Logger logger = Logger.getLogger(SimpleType.class);
+	private static final Logger logger = Logger.getLogger(SimpleText.class);
 
+	@S4Component(type = CurrentHypothesis.class)
+	public final static String PROP_CURRENT_HYPOTHESIS = "currentHypothesis";
+	
 	@S4ComponentList(type = HypothesisChangeListener.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
 
-	SimpleType() {
+	IUDocument iuDocument;
+	
+	SimpleText() {
+		iuDocument = new IUDocument();
+		iuDocument.listeners = new ArrayList<PushBuffer>();
 		final JTextField textField = new JTextField(60);
 		textField.setFont(new Font("Dialog", Font.BOLD, 24));
-		textField.setDocument(new IUDocument());
+		textField.setDocument(iuDocument);
 		JButton commitButton = new JButton("Commit");
 		commitButton.addActionListener(new ActionListener() {
 			@Override
@@ -54,11 +66,11 @@ public class SimpleType extends JPanel {
 		// add(new JLabel("you can only edit at the right"));
 	}
 	
-	public static void createAndShowGUI() {
-		BasicConfigurator.configure();
+	public static void createAndShowGUI(List<PushBuffer> listeners) {
 		JFrame frame = new JFrame("SimpleType");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        SimpleType contentPane = new SimpleType();
+        SimpleText contentPane = new SimpleText();
+        contentPane.iuDocument.setListeners(listeners);
         contentPane.setOpaque(true);
         frame.setContentPane(contentPane);
         //Display the window.
@@ -68,10 +80,16 @@ public class SimpleType extends JPanel {
 	}
 	
 	public static void main(String[] args) {
-		new SimpleType();
+		BasicConfigurator.configure();
+        TextCommandLineParser clp = new TextCommandLineParser(args);
+    	if (!clp.parsedSuccessfully()) { System.exit(1); }
+    	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
+    	PropertySheet ps = cm.getPropertySheet(PROP_CURRENT_HYPOTHESIS);
+    	@SuppressWarnings("unchecked")
+    	final List<PushBuffer> listeners = (List<PushBuffer>) ps.getComponentList(PROP_HYP_CHANGE_LISTENERS);
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                 createAndShowGUI();
+                 createAndShowGUI(listeners);
             }
         });
 	}
@@ -91,7 +109,28 @@ public class SimpleType extends JPanel {
 		IUList<AtomicWordIU> wordIUs = new IUList<AtomicWordIU>();
 		List<EditMessage<AtomicWordIU>> edits = new ArrayList<EditMessage<AtomicWordIU>>();
 		String currentWord = "";
-		boolean hasWhitespace = true;
+		
+		int currentFrame = 0;
+		
+		public void setListeners(List<PushBuffer> listeners) {
+			this.listeners = listeners;
+		}
+		
+		public void notifyListeners() {
+			if (edits.size() > 0) {
+				currentFrame += 100;
+				for (PushBuffer listener : listeners) {
+					if (listener instanceof HypothesisChangeListener) {
+						((HypothesisChangeListener) listener).setCurrentFrame(currentFrame);
+					}
+					// notify
+					if (wordIUs != null && edits != null)
+						listener.hypChange(wordIUs, edits);
+					
+				}
+				edits = new ArrayList<EditMessage<AtomicWordIU>>();
+			}
+		}
 		
 		/* 
 		 * only allow removal at the right end
@@ -113,7 +152,7 @@ public class SimpleType extends JPanel {
 				}
 				currentWord = currentWord.substring(0, currentWord.length() - len);
 				logger.debug("now it's " + currentWord);
-
+				notifyListeners();
 			}
 		}
 
@@ -157,6 +196,7 @@ public class SimpleType extends JPanel {
 				}
 				super.insertString(offs, outStr, a);
 			}
+			notifyListeners();
 		}
 
 
