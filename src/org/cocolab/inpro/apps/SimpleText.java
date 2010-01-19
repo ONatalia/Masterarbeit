@@ -32,7 +32,7 @@ import edu.cmu.sphinx.util.props.S4ComponentList;
 
 
 @SuppressWarnings("serial")
-public class SimpleText extends JPanel {
+public class SimpleText extends JPanel implements ActionListener {
 
 	private static final Logger logger = Logger.getLogger(SimpleText.class);
 
@@ -50,20 +50,16 @@ public class SimpleText extends JPanel {
 		final JTextField textField = new JTextField(60);
 		textField.setFont(new Font("Dialog", Font.BOLD, 24));
 		textField.setDocument(iuDocument);
+		textField.addActionListener(this);
 		JButton commitButton = new JButton("Commit");
-		commitButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				if ("Commit".equals(arg0.getActionCommand())) {
-					// TODO: commit logic
-					textField.setText("");
-					textField.requestFocusInWindow();
-				}
-			}
-		});
+		commitButton.addActionListener(this);
 		add(textField);
 		add(commitButton);
 		// add(new JLabel("you can only edit at the right"));
+	}
+	
+	public void actionPerformed(ActionEvent arg0) {
+		iuDocument.commit();
 	}
 	
 	public static void createAndShowGUI(List<PushBuffer> listeners) {
@@ -118,6 +114,7 @@ public class SimpleText extends JPanel {
 		
 		public void notifyListeners() {
 			if (edits.size() > 0) {
+				logger.debug("notifying about" + edits);
 				currentFrame += 100;
 				for (PushBuffer listener : listeners) {
 					if (listener instanceof HypothesisChangeListener) {
@@ -130,6 +127,28 @@ public class SimpleText extends JPanel {
 				}
 				edits = new ArrayList<EditMessage<AtomicWordIU>>();
 			}
+		}
+		
+		public void commit() {
+			// handle last word (if there is one)
+			if (!"".equals(currentWord)) {
+				addCurrentWord();
+			}
+			// add commit messages
+			for (AtomicWordIU iu : wordIUs) {
+				edits.add(new EditMessage<AtomicWordIU>(EditType.COMMIT, iu));
+				iu.update(EditType.COMMIT);
+			}
+			// notify
+			notifyListeners();
+			// reset
+			try {
+				super.remove(0,getLength());
+			} catch (BadLocationException e) {
+				e.printStackTrace();
+			}
+			wordIUs = new IUList<AtomicWordIU>();
+			edits = new ArrayList<EditMessage<AtomicWordIU>>();			
 		}
 		
 		/* 
@@ -174,14 +193,7 @@ public class SimpleText extends JPanel {
 				for (char ch : chars) {
 					if (Character.isWhitespace(ch)) {
 						if (currentWord.length() > 0) {
-							logger.debug("adding " + currentWord);
-							AtomicWordIU sll = (wordIUs.size() > 0) ? wordIUs.get(wordIUs.size() - 1) : AtomicWordIU.FIRST_ATOMIC_WORD_IU;
-							AtomicWordIU iu = new AtomicWordIU(currentWord, sll);
-							EditMessage<AtomicWordIU> edit = new EditMessage<AtomicWordIU>(EditType.ADD, iu);
-							edits.add(edit);
-							wordIUs.add(iu);
-							logger.debug(edit.toString());
-							currentWord = "";
+							addCurrentWord();
 							outStr += " "; // add a space, no matter what whitespace was added
 						} else {
 							logger.debug("ignoring additional whitespace");
@@ -197,6 +209,17 @@ public class SimpleText extends JPanel {
 				super.insertString(offs, outStr, a);
 			}
 			notifyListeners();
+		}
+		
+		private void addCurrentWord() {
+			logger.debug("adding " + currentWord);
+			AtomicWordIU sll = (wordIUs.size() > 0) ? wordIUs.get(wordIUs.size() - 1) : AtomicWordIU.FIRST_ATOMIC_WORD_IU;
+			AtomicWordIU iu = new AtomicWordIU(currentWord, sll);
+			EditMessage<AtomicWordIU> edit = new EditMessage<AtomicWordIU>(EditType.ADD, iu);
+			edits.add(edit);
+			wordIUs.add(iu);
+			logger.debug(edit.toString());
+			currentWord = "";
 		}
 
 
