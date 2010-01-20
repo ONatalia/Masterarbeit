@@ -16,7 +16,7 @@ public class AVMComposer {
 
 	private HashMap<String, HashMap<String, String>> avmStructures;
 	private ArrayList<AVM> avmList = new ArrayList<AVM>();
-	static private ArrayList<AVM> worldList = new ArrayList<AVM>();
+	private ArrayList<AVM> worldList = new ArrayList<AVM>();
 
 	/**
 	 * Creates AVMComposer with a list of prototypes (avmStructures) of
@@ -27,99 +27,101 @@ public class AVMComposer {
 		AVMStructureUtil su = new AVMStructureUtil();
 		this.avmStructures = su.getAVMStructures();
 		this.avmList = getAllAVMs();
+		AVMWorldUtil wu = new AVMWorldUtil(this.avmStructures);
+		this.worldList = wu.getWorldList();
 
-		AVM avm1 = new AVM("tile", this.avmStructures);
-		avm1.setAttribute(new AVPair("name", "x"));
-		avm1.setAttribute(new AVPair("label", "x1"));
-		avm1.setAttribute(new AVPair("color", "green"));
-		avm1.setAttribute(new AVPair("ord", "1"));
-		avm1.setAttribute(new AVPair("orient", "top"));
-		avm1.setAttribute(new AVPair("row_col", "row"));
-		avm1.setAttribute(new AVPair("ord", "2"));
-		avm1.setAttribute(new AVPair("orient", "bottom"));
-		avm1.setAttribute(new AVPair("row_col", "row"));
-		avm1.setAttribute(new AVPair("ord", "1"));
-		avm1.setAttribute(new AVPair("orient", "left"));
-		avm1.setAttribute(new AVPair("row_col", "col"));
-		avm1.setAttribute(new AVPair("ord", "1"));
-		avm1.setAttribute(new AVPair("orient", "right"));
-		avm1.setAttribute(new AVPair("row_col", "col"));
-		avm1.setAttribute(new AVPair("tb", "top"));
-		avm1.setAttribute(new AVPair("lr", "left"));
-		avm1.setAttribute(new AVPair("desc", "corner"));
-		avm1.setAttribute(new AVPair("relation", "next_to"));
-		avm1.setAttribute(new AVPair("relation", "above"));
-		avm1.setAttribute(new AVPair("relation", "below"));
-
-		AVM avm2 = new AVM("tile", this.avmStructures);
-		avm2.setAttribute(new AVPair("name", "f"));
-		avm2.setAttribute(new AVPair("label", "f1"));
-		avm2.setAttribute(new AVPair("color", "green"));
-		avm2.setAttribute(new AVPair("ord", "2"));
-		avm2.setAttribute(new AVPair("orient", "top"));
-		avm2.setAttribute(new AVPair("row_col", "row"));
-		avm2.setAttribute(new AVPair("ord", "1"));
-		avm2.setAttribute(new AVPair("orient", "bottom"));
-		avm2.setAttribute(new AVPair("row_col", "row"));
-		avm2.setAttribute(new AVPair("ord", "1"));
-		avm2.setAttribute(new AVPair("orient", "left"));
-		avm2.setAttribute(new AVPair("row_col", "col"));
-		avm2.setAttribute(new AVPair("ord", "1"));
-		avm2.setAttribute(new AVPair("orient", "right"));
-		avm2.setAttribute(new AVPair("row_col", "col"));
-		avm2.setAttribute(new AVPair("tb", "top"));
-		avm2.setAttribute(new AVPair("lr", "left"));
-		avm2.setAttribute(new AVPair("desc", "corner"));
-		avm2.setAttribute(new AVPair("relation", "next_to"));
-		avm2.setAttribute(new AVPair("relation", "above"));
-		avm2.setAttribute(new AVPair("relation", "below"));
-
-		AVM avm3 = new AVM("field", this.avmStructures);
-		avm3.setAttribute(new AVPair("color", "green"));
-		avm3.setAttribute(new AVPair("ord", "1"));
-		avm3.setAttribute(new AVPair("orient", "top"));
-		avm3.setAttribute(new AVPair("row_col", "row"));
-		avm3.setAttribute(new AVPair("ord", "2"));
-		avm3.setAttribute(new AVPair("orient", "bottom"));
-		avm3.setAttribute(new AVPair("row_col", "row"));
-		avm3.setAttribute(new AVPair("ord", "1"));
-		avm3.setAttribute(new AVPair("orient", "left"));
-		avm3.setAttribute(new AVPair("row_col", "col"));
-		avm3.setAttribute(new AVPair("ord", "1"));
-		avm3.setAttribute(new AVPair("orient", "right"));
-		avm3.setAttribute(new AVPair("row_col", "col"));
-
-		AVM avm4 = new AVM("field", this.avmStructures);
-		avm4.setAttribute(new AVPair("color", "brown"));
-		avm4.setAttribute(new AVPair("ord", "2"));
-		avm4.setAttribute(new AVPair("row_col", "row"));
-		avm4.setAttribute(new AVPair("orient", "top"));
-		avm4.setAttribute(new AVPair("ord", "1"));
-		avm4.setAttribute(new AVPair("orient", "bottom"));
-		avm4.setAttribute(new AVPair("row_col", "row"));
-		avm4.setAttribute(new AVPair("ord", "1"));
-		avm4.setAttribute(new AVPair("orient", "left"));
-		avm4.setAttribute(new AVPair("row_col", "col"));
-		avm4.setAttribute(new AVPair("ord", "1"));
-		avm4.setAttribute(new AVPair("orient", "right"));
-		avm4.setAttribute(new AVPair("row_col", "col"));
-
-		AVM avm5 = new AVM("dialog_act", this.avmStructures);
-		avm5.setAttribute(new AVPair("act", "take"));
-
-		AVM avm6 = new AVM("dialog_act", this.avmStructures);
-		avm6.setAttribute(new AVPair("act", "turn"));
-
-		AVM avm7 = new AVM("dialog_act", this.avmStructures);
-		avm7.setAttribute(new AVPair("act", "place"));
-
-		worldList.add(avm1);
-		worldList.add(avm2);
-		worldList.add(avm3);
-		worldList.add(avm4);
-		worldList.add(avm5);
-		worldList.add(avm6);
-		worldList.add(avm7);
+//		AVM avm1 = new AVM("tile", this.avmStructures);
+//		avm1.setAttribute(new AVPair("name", "x"));
+//		avm1.setAttribute(new AVPair("label", "x1"));
+//		avm1.setAttribute(new AVPair("color", "green"));
+//		avm1.setAttribute(new AVPair("ord", "1"));
+//		avm1.setAttribute(new AVPair("orient", "top"));
+//		avm1.setAttribute(new AVPair("row_col", "row"));
+//		avm1.setAttribute(new AVPair("ord", "2"));
+//		avm1.setAttribute(new AVPair("orient", "bottom"));
+//		avm1.setAttribute(new AVPair("row_col", "row"));
+//		avm1.setAttribute(new AVPair("ord", "1"));
+//		avm1.setAttribute(new AVPair("orient", "left"));
+//		avm1.setAttribute(new AVPair("row_col", "col"));
+//		avm1.setAttribute(new AVPair("ord", "1"));
+//		avm1.setAttribute(new AVPair("orient", "right"));
+//		avm1.setAttribute(new AVPair("row_col", "col"));
+//		avm1.setAttribute(new AVPair("tb", "top"));
+//		avm1.setAttribute(new AVPair("lr", "left"));
+//		avm1.setAttribute(new AVPair("desc", "corner"));
+//		avm1.setAttribute(new AVPair("relation", "next_to"));
+//		avm1.setAttribute(new AVPair("relation", "above"));
+//		avm1.setAttribute(new AVPair("relation", "below"));
+//
+//		AVM avm2 = new AVM("tile", this.avmStructures);
+//		avm2.setAttribute(new AVPair("name", "f"));
+//		avm2.setAttribute(new AVPair("label", "f1"));
+//		avm2.setAttribute(new AVPair("color", "green"));
+//		avm2.setAttribute(new AVPair("ord", "2"));
+//		avm2.setAttribute(new AVPair("orient", "top"));
+//		avm2.setAttribute(new AVPair("row_col", "row"));
+//		avm2.setAttribute(new AVPair("ord", "1"));
+//		avm2.setAttribute(new AVPair("orient", "bottom"));
+//		avm2.setAttribute(new AVPair("row_col", "row"));
+//		avm2.setAttribute(new AVPair("ord", "1"));
+//		avm2.setAttribute(new AVPair("orient", "left"));
+//		avm2.setAttribute(new AVPair("row_col", "col"));
+//		avm2.setAttribute(new AVPair("ord", "1"));
+//		avm2.setAttribute(new AVPair("orient", "right"));
+//		avm2.setAttribute(new AVPair("row_col", "col"));
+//		avm2.setAttribute(new AVPair("tb", "top"));
+//		avm2.setAttribute(new AVPair("lr", "left"));
+//		avm2.setAttribute(new AVPair("desc", "corner"));
+//		avm2.setAttribute(new AVPair("relation", "next_to"));
+//		avm2.setAttribute(new AVPair("relation", "above"));
+//		avm2.setAttribute(new AVPair("relation", "below"));
+//
+//		AVM avm3 = new AVM("field", this.avmStructures);
+//		avm3.setAttribute(new AVPair("color", "green"));
+//		avm3.setAttribute(new AVPair("ord", "1"));
+//		avm3.setAttribute(new AVPair("orient", "top"));
+//		avm3.setAttribute(new AVPair("row_col", "row"));
+//		avm3.setAttribute(new AVPair("ord", "2"));
+//		avm3.setAttribute(new AVPair("orient", "bottom"));
+//		avm3.setAttribute(new AVPair("row_col", "row"));
+//		avm3.setAttribute(new AVPair("ord", "1"));
+//		avm3.setAttribute(new AVPair("orient", "left"));
+//		avm3.setAttribute(new AVPair("row_col", "col"));
+//		avm3.setAttribute(new AVPair("ord", "1"));
+//		avm3.setAttribute(new AVPair("orient", "right"));
+//		avm3.setAttribute(new AVPair("row_col", "col"));
+//
+//		AVM avm4 = new AVM("field", this.avmStructures);
+//		avm4.setAttribute(new AVPair("color", "brown"));
+//		avm4.setAttribute(new AVPair("ord", "2"));
+//		avm4.setAttribute(new AVPair("row_col", "row"));
+//		avm4.setAttribute(new AVPair("orient", "top"));
+//		avm4.setAttribute(new AVPair("ord", "1"));
+//		avm4.setAttribute(new AVPair("orient", "bottom"));
+//		avm4.setAttribute(new AVPair("row_col", "row"));
+//		avm4.setAttribute(new AVPair("ord", "1"));
+//		avm4.setAttribute(new AVPair("orient", "left"));
+//		avm4.setAttribute(new AVPair("row_col", "col"));
+//		avm4.setAttribute(new AVPair("ord", "1"));
+//		avm4.setAttribute(new AVPair("orient", "right"));
+//		avm4.setAttribute(new AVPair("row_col", "col"));
+//
+//		AVM avm5 = new AVM("dialog_act", this.avmStructures);
+//		avm5.setAttribute(new AVPair("act", "take"));
+//
+//		AVM avm6 = new AVM("dialog_act", this.avmStructures);
+//		avm6.setAttribute(new AVPair("act", "turn"));
+//
+//		AVM avm7 = new AVM("dialog_act", this.avmStructures);
+//		avm7.setAttribute(new AVPair("act", "place"));
+//
+//		worldList.add(avm1);
+//		worldList.add(avm2);
+//		worldList.add(avm3);
+//		worldList.add(avm4);
+//		worldList.add(avm5);
+//		worldList.add(avm6);
+//		worldList.add(avm7);
 
 	}
 
@@ -128,7 +130,7 @@ public class AVMComposer {
 		AVMComposer composer = new AVMComposer();
 
 		System.out.println("World contains following objects:");
-		for (AVM avm : worldList) {
+		for (AVM avm : composer.worldList) {
 			System.out.println(avm.toString());
 		}
 
