@@ -43,11 +43,12 @@ public class SimpleText extends JPanel implements ActionListener {
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
 
 	IUDocument iuDocument;
+	JTextField textField;
 	
 	SimpleText() {
 		iuDocument = new IUDocument();
 		iuDocument.listeners = new ArrayList<PushBuffer>();
-		final JTextField textField = new JTextField(60);
+		textField = new JTextField(60);
 		textField.setFont(new Font("Dialog", Font.BOLD, 24));
 		textField.setDocument(iuDocument);
 		textField.addActionListener(this);
@@ -60,6 +61,7 @@ public class SimpleText extends JPanel implements ActionListener {
 	
 	public void actionPerformed(ActionEvent arg0) {
 		iuDocument.commit();
+		textField.requestFocusInWindow();
 	}
 	
 	public static void createAndShowGUI(List<PushBuffer> listeners) {

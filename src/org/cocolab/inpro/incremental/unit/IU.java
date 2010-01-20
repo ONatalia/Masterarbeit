@@ -17,6 +17,7 @@
  */
 package org.cocolab.inpro.incremental.unit;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.cocolab.inpro.incremental.BaseDataKeeper;
@@ -141,8 +142,9 @@ public abstract class IU {
 		}
 	}
 		
+	@SuppressWarnings("unchecked")
 	public List<? extends IU> groundedIn() {
-		return groundedIn;
+		return groundedIn != null ? groundedIn : Collections.EMPTY_LIST;
 	}
 
 	public boolean equals(IU iu) {

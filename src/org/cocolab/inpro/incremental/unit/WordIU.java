@@ -38,10 +38,14 @@ public class WordIU extends IU {
 	final String word;
 
 	public WordIU(Pronunciation pron, WordIU sll, List<? extends IU> groundedIn) {
+		this(pron.getWord().getSpelling(), pron, sll, groundedIn);
+	}
+	
+	protected WordIU(String word, Pronunciation pron, WordIU sll, List<? extends IU> groundedIn) {
 		super(sll, groundedIn, true);
 		this.pron = pron;
-		this.word = pron.getWord().getSpelling();
-		isSilence = this.word.equals("<sil>");
+		this.word = word;
+		isSilence = this.word.equals(("<sil>"));
 	}
 	
 	/**
@@ -145,7 +149,5 @@ public class WordIU extends IU {
 		assert (WordIU.avPairs == null) : "You're trying to re-set avPairs. This may be a bug.";
 		WordIU.avPairs = avPairs;
 	}
-
-
 
 }
