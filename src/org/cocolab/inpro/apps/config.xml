@@ -83,12 +83,12 @@
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
     		<item>hypViewer</item>
-    		<item>tedNotifier</item>
-            <item>semanticResolver</item>
+          <item>wordCatcher</item>
 <!--
-            <item>consoleNotifier</item>
-            <item>consoleNotifier</item>
-            <item>labelWriter2</item>
+    		<item>tedNotifier</item>
+          <item>semanticResolver</item>
+          <item>consoleNotifier</item>
+          <item>labelWriter2</item>
     		<item>oaaNotifier</item>
 -->
         </propertylist>
@@ -96,8 +96,15 @@
     
     <component name="semanticResolver" type="org.cocolab.inpro.incremental.SemanticResolver">
         <propertylist name="hypChangeListeners">
-            <item>consoleNotifier</item>
+          <item>consoleNotifier</item>
     		<item>tedNotifier</item>
+        </propertylist>
+    </component>
+
+    <component name="wordCatcher" type="org.cocolab.inpro.incremental.WordCatcher">
+	   <property name="word" value="kreuz" />
+        <propertylist name="hypChangeListeners">
+          <item>consoleNotifier</item>
         </propertylist>
     </component>
 

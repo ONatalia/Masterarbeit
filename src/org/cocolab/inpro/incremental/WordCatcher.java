@@ -3,8 +3,6 @@
  */
 package org.cocolab.inpro.incremental;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +17,7 @@ import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4ComponentList;
+import edu.cmu.sphinx.util.props.S4String;
 
 /**
  * @author das
@@ -30,7 +29,10 @@ public class WordCatcher implements Configurable, PushBuffer {
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
 	List<PushBuffer> listeners;
 	
-	
+	@S4String()
+	public final static String PROP_WORD_TO_CATCH = "word";
+	private String wordToCatch;
+	private boolean wordCaught = false;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -41,11 +43,17 @@ public class WordCatcher implements Configurable, PushBuffer {
 			EditMessage<? extends IU> edit = editIt.next();
 			if (edit.getType() == EditType.ADD) {
 				String current_word = ((WordIU) edit.getIU()).getWord();
-				//System.out.println(current_word);
 				if (current_word.equals("kreuz")) {
-					System.out.println("Jeder nur ein Kreuz, bitte!");
+					if (!wordCaught) {
+						wordCaught = true;
+						java.awt.Toolkit.getDefaultToolkit().beep();
+						System.out.println("Jeder nur ein " + wordToCatch + ", bitte!");
+					}
 				}
+			} else if (edit.getType() == EditType.COMMIT) {
+				wordCaught = false;
 			}
+
 		}
 	}
 	
@@ -60,6 +68,7 @@ public class WordCatcher implements Configurable, PushBuffer {
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		listeners = (List<PushBuffer>) ps.getComponentList(PROP_HYP_CHANGE_LISTENERS);
+		wordToCatch = (String) ps.getString(PROP_WORD_TO_CATCH);
 	}
 
 }
