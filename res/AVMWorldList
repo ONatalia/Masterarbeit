@@ -8,11 +8,20 @@
 #    TYPE is the attribute type (for which a corresponding structure must
 #         be specified in the domain's AVMStructure file
 #
-# Minimal examples:
-{type:tile name:x label:x1 color:green ord:1 orient:top row_col:row ord:2 orient:bottom row_col:row ord:1 orient:left row_col:col ord:1 orient:right row_col:col tb:top lr:left desc:corner relation:next_to relation:above relation:below}
-{type:tile name:f label:f1 color:green ord:2 orient:top row_col:row ord:1 orient:bottom row_col:row ord:1 orient:left row_col:col ord:1 orient:right row_col:col tb:bottom lr:left desc:corner relation:next_to relation:above relation:below}
-{type:field color:green ord:1 orient:top row_col:row ord:2 orient:bottom row_col:row ord:1 orient:left row_col:col ord:1 orient:right row_col:col tb:top lr:left desc:corner relation:next_to relation:above relation:below}
-{type:field color:brown ord:2 orient:top row_col:row ord:1 orient:bottom row_col:row ord:1 orient:left row_col:col ord:1 orient:right row_col:col tb:bottom lr:left desc:corner relation:next_to relation:above relation:below}
+# Minimal example:
+#{type:tile name:x label:x1 color:green ord:1 orient:top row_col:row ord:1 orient:bottom row_col:row ord:1 orient:left row_col:col ord:1 orient:right row_col:col tb:top lr:left desc:corner relation:next_to relation:above relation:below}
+
+#Tiles:
+{type:tile name:x label:x1 color:blue ord:1 orient:top row_col:row ord:2 orient:bottom row_col:row ord:1 orient:left row_col:col ord:2 orient:right row_col:col tb:top lr:left desc:corner relation:next_to relation:above relation:below}
+{type:tile name:y label:f1 color:blue ord:2 orient:top row_col:row ord:1 orient:bottom row_col:row ord:1 orient:left row_col:col ord:2 orient:right row_col:col tb:bottom lr:left desc:corner relation:next_to relation:above relation:below}
+{type:tile name:x label:x2 color:green ord:1 orient:top row_col:row ord:2 orient:bottom row_col:row ord:2 orient:left row_col:col ord:1 orient:right row_col:col tb:top lr:left desc:corner relation:next_to relation:above relation:below}
+{type:tile name:y label:f2 color:green ord:2 orient:top row_col:row ord:1 orient:bottom row_col:row ord:2 orient:left row_col:col ord:1 orient:right row_col:col tb:bottom lr:left desc:corner relation:next_to relation:above relation:below}
+#Fields:
+{type:field color:white ord:1 orient:top row_col:row ord:2 orient:bottom row_col:row ord:1 orient:left row_col:col ord:1 orient:right row_col:col tb:top lr:left desc:corner relation:next_to relation:above relation:below}
+{type:field color:blue ord:2 orient:top row_col:row ord:1 orient:bottom row_col:row ord:1 orient:left row_col:col ord:1 orient:right row_col:col tb:bottom lr:left desc:corner relation:next_to relation:above relation:below}
+{type:field color:white ord:1 orient:top row_col:row ord:2 orient:bottom row_col:row ord:2 orient:left row_col:col ord:1 orient:right row_col:col tb:top lr:left desc:corner relation:next_to relation:above relation:below}
+{type:field color:green ord:2 orient:top row_col:row ord:1 orient:bottom row_col:row ord:2 orient:left row_col:col ord:1 orient:right row_col:col tb:bottom lr:left desc:corner relation:next_to relation:above relation:below}
+#Dialog acts:
 {type:dialog_act act:place}
 {type:dialog_act act:take}
 {type:dialog_act act:turn}
