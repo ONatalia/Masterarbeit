@@ -10,7 +10,7 @@ import edu.cmu.sphinx.instrumentation.Resetable;
 
 public interface PushBuffer extends Resetable {
 
-	/*
+	/**
 	 * this should receive a list of current IUs and 
 	 * a list of edit messages since the last call to hypChange
 	 */

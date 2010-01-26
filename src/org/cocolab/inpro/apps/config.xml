@@ -59,7 +59,7 @@
     <component name="recognizer" type="edu.cmu.sphinx.recognizer.Recognizer">
         <property name="decoder" value="decoder"/>
         <propertylist name="monitors">
-        	<item>currentHypothesis</item>
+        	<item>currentASRHypothesis</item>
 <!--
             <item>labelWriter </item>
         	<item>threadingListener</item>
@@ -76,14 +76,14 @@
     <!-- ******************************************************** -->
     <!-- The incremental processing configuration                 -->
     <!-- ******************************************************** -->
-    <component name="currentHypothesis" type="org.cocolab.inpro.incremental.CurrentHypothesis">
+    <component name="currentASRHypothesis" type="org.cocolab.inpro.incremental.CurrentASRHypothesis">
         <property name="recognizer" value="recognizer"/>
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
     		<item>hypViewer</item>
-          <item>wordCatcher</item>
+          	<item>wordCatcher</item>
 <!--
     		<item>tedNotifier</item>
           <item>semanticResolver</item>

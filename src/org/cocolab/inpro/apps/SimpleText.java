@@ -17,7 +17,7 @@ import javax.swing.text.PlainDocument;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.apps.util.TextCommandLineParser;
-import org.cocolab.inpro.incremental.CurrentHypothesis;
+import org.cocolab.inpro.incremental.CurrentASRHypothesis;
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.listener.HypothesisChangeListener;
 import org.cocolab.inpro.incremental.unit.AtomicWordIU;
@@ -36,7 +36,7 @@ public class SimpleText extends JPanel implements ActionListener {
 
 	private static final Logger logger = Logger.getLogger(SimpleText.class);
 
-	@S4Component(type = CurrentHypothesis.class)
+	@S4Component(type = CurrentASRHypothesis.class)
 	public final static String PROP_CURRENT_HYPOTHESIS = "currentHypothesis";
 	
 	@S4ComponentList(type = HypothesisChangeListener.class)
