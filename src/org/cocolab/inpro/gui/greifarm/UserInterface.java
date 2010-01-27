@@ -69,6 +69,9 @@ public class UserInterface extends AgentImpl {
 			greifarm.emptyHand.setPos(greifarm.cursorPosition);
 			greifarm.emptyHand.setVisible(true);
 			greifarm.cursorMoveSlowlyTo(greifarm.cursorPosition.x, (GreifArm.RELATIVE_HEIGHT - 1) * GreifArm.SCALE);
+		} else if (str.equals("stop")) {
+			logger.info("stopping at " + GreifArm.translateBlockToPixel(greifarmPosition));
+			greifarm.cursorMoveTo(greifarm.cursorPosition.x, greifarm.cursorPosition.y);
 		}
 		return result;
 	}
