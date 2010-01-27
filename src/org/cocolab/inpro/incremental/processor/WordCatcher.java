@@ -33,7 +33,7 @@ public class WordCatcher implements Configurable, PushBuffer {
 	@S4String()
 	public final static String PROP_WORD_TO_CATCH = "word";
 	private String wordToCatch;
-	private boolean wordCaught = false;
+	//private boolean wordCaught = false;
 	
 	@Override
 	public void hypChange(Collection<? extends IU> ius,
@@ -51,9 +51,9 @@ public class WordCatcher implements Configurable, PushBuffer {
 					System.out.println("Jeder nur ein " + wordToCatch + ", bitte!");
 					//}
 				}
-			} else if (edit.getType() == EditType.COMMIT) {
+			}/* else if (edit.getType() == EditType.COMMIT) {
 				wordCaught = false;
-			}
+			}*/
 
 		}
 	}
