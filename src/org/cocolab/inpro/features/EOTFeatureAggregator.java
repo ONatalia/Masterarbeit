@@ -337,4 +337,10 @@ public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeat
 		setCurrentPitch(pitch);
 	}
 
+	@Override
+	public void newSignalFeatures(double logEnergy, double rBCEnergy,
+			boolean voicing, double pitch) {
+		newSignalFeatures(logEnergy, voicing, pitch);
+	}
+
 }

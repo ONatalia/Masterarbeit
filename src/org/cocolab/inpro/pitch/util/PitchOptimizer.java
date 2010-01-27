@@ -137,6 +137,7 @@ public class PitchOptimizer extends ShortestPath<PitchCandidate> {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private double[] medianSmooth(double[] values, int windowsize) {
 		assert (windowsize >= 3);
 		assert (windowsize % 2 == 1);

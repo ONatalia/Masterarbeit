@@ -214,7 +214,8 @@ public class LabelWriter implements Configurable,
      * @param result the result to analyse
      * @return List of all tokens on the best path
      */
-    private static List<Token> getAllBestTokens(Result result) {
+    @SuppressWarnings("unused")
+	private static List<Token> getAllBestTokens(Result result) {
 		List<Token> list = new ArrayList<Token>();
     	Token token = result.getBestToken();
 		// recover the path of visited word- and silence-tokens in the best token
