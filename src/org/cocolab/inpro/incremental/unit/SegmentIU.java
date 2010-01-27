@@ -20,7 +20,6 @@ package org.cocolab.inpro.incremental.unit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 import org.cocolab.inpro.annotation.Label;
