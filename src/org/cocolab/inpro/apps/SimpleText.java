@@ -57,7 +57,7 @@ public class SimpleText extends JPanel implements ActionListener {
 	SimpleText() {
 		iuDocument = new IUDocument();
 		iuDocument.listeners = new ArrayList<PushBuffer>();
-		textField = new JTextField(60);
+		textField = new JTextField(40);
 		textField.setFont(new Font("Dialog", Font.BOLD, 24));
 		textField.setDocument(iuDocument);
 		textField.addActionListener(this);
@@ -74,7 +74,7 @@ public class SimpleText extends JPanel implements ActionListener {
 	}
 	
 	public static void createAndShowGUI(List<PushBuffer> listeners) {
-		JFrame frame = new JFrame("SimpleType");
+		JFrame frame = new JFrame("SimpleText");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         SimpleText contentPane = new SimpleText();
         contentPane.iuDocument.setListeners(listeners);
