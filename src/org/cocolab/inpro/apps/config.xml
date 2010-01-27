@@ -14,10 +14,10 @@
     <!-- ******************************************************** -->
     <!-- frequently tuned properties                              -->
     <!-- ******************************************************** -->
-    <property name="absoluteBeamWidth" value="5000"/>
+    <property name="absoluteBeamWidth" value="1500"/>
     <property name="relativeBeamWidth" value="1E-80"/>
     <property name="absoluteWordBeamWidth" value="500"/>
-    <property name="relativeWordBeamWidth" value="1E-80"/>
+    <property name="relativeWordBeamWidth" value="1E-60"/>
     <property name="wordInsertionProbability" value="0.7"/>
     <property name="languageWeight" value="11.5"/>
     <property name="silenceInsertionProbability" value=".1"/>
@@ -46,7 +46,7 @@
     <!-- The amount of time in silence (in milliseconds) to be considered as utterance end -->
     <property name="endSilence" value="500"/>
     <!-- The amount of time (in milliseconds) before speech start to be included as speech data. -->
-    <property name="speechLeader" value="100"/>
+    <property name="speechLeader" value="30"/>
     <!-- The amount of time (in milliseconds) after speech ends to be included as speech data. -->
     <property name="speechTrailer" value="100"/>
     <!-- The speech classifier threshold. -->

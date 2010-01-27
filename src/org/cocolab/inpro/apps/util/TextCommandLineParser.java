@@ -1,10 +1,15 @@
 package org.cocolab.inpro.apps.util;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class TextCommandLineParser extends CommonCommandLineParser {
 
+	private Reader textReader;
+	
 	public TextCommandLineParser(String[] args) {
 		super(args);
 	}
@@ -13,6 +18,15 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 	boolean checkConfiguration() {
 		return true;
 	}
+	
+	public boolean hasTextFromReader() {
+		return textReader != null;
+	}
+	
+	public Reader getReader() {
+		return textReader;
+	}
+	
 
 	@Override
 	void parse(String[] args) throws MalformedURLException {
@@ -29,17 +43,33 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 			else if (args[i].equals("-v")) {
 				verbose = true;
 			}
+			else if (args[i].equals("-T")) {
+				StringBuilder sb = new StringBuilder();
+				i++;
+				while (i < args.length) {
+					sb.append(args[i]);
+					sb.append(" ");
+					i++;
+				}
+				textReader = new StringReader(sb.toString());
+			}
+			else if (args[i].equals("-STDIN")) {
+				textReader = new InputStreamReader(System.in);
+			}
 		}
 	}
-
+	
 	@Override
 	void printUsage() {
-		System.err.println("simple ASR simulator for the inpro project");
+		System.err.println("simple interactive ASR simulator for the inpro project");
 		System.err.println("usage: java org.cocolab.inpro.apps.SimpleType");
 		System.err.println("options:");
 		System.err.println("    -h	           this screen");
 		System.err.println("    -c <URL>       sphinx configuration file to use (reasonable default)");
-		System.err.println("    -v             more verbose output (speed and memory tracker)");
+//		System.err.println("    -v             more verbose output (speed and memory tracker)");
+		System.err.println("input selection:");
+		System.err.println("    -T \"<text>\"    simulate input of the given text.");
+		System.err.println("    -STDIN         read input from standard in");
 	}
 
 }

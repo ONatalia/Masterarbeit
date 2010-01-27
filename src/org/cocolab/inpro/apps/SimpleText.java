@@ -3,6 +3,9 @@ package org.cocolab.inpro.apps;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
@@ -17,9 +21,9 @@ import javax.swing.text.PlainDocument;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.apps.util.TextCommandLineParser;
-import org.cocolab.inpro.incremental.CurrentASRHypothesis;
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.listener.HypothesisChangeListener;
+import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
 import org.cocolab.inpro.incremental.unit.AtomicWordIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
@@ -30,7 +34,12 @@ import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Component;
 import edu.cmu.sphinx.util.props.S4ComponentList;
 
-
+/**
+ * simple interactive (and non-interactive) ASR simulator for the inpro project
+ * 
+ * @author timo
+ *
+ */
 @SuppressWarnings("serial")
 public class SimpleText extends JPanel implements ActionListener {
 
@@ -74,31 +83,63 @@ public class SimpleText extends JPanel implements ActionListener {
         //Display the window.
         frame.pack();
         frame.setVisible(true);
-
 	}
 	
-	public static void main(String[] args) {
+	public static void runFromReader(Reader reader, List<PushBuffer> listeners) throws IOException {
+		IUDocument iuDocument = new IUDocument();
+		iuDocument.setListeners(listeners);
+		BufferedReader bReader = new BufferedReader(reader);
+		String line;
+		while ((line = bReader.readLine()) != null) {
+			logger.debug(line);
+			try {
+				iuDocument.insertString(0, line, null);
+			} catch (BadLocationException e) {
+				logger.error("wow, this should really not happen (I thought I could always add a string at position 0)");
+				e.printStackTrace();
+			}
+			iuDocument.commit();
+		}
+	}
+	
+	public static void main(String[] args) throws IOException {
 		BasicConfigurator.configure();
         TextCommandLineParser clp = new TextCommandLineParser(args);
-    	if (!clp.parsedSuccessfully()) { System.exit(1); }
+    	if (!clp.parsedSuccessfully()) { System.exit(1); } // abort on error
     	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
     	PropertySheet ps = cm.getPropertySheet(PROP_CURRENT_HYPOTHESIS);
     	@SuppressWarnings("unchecked")
     	final List<PushBuffer> listeners = (List<PushBuffer>) ps.getComponentList(PROP_HYP_CHANGE_LISTENERS);
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                 createAndShowGUI(listeners);
-            }
-        });
+    	if (clp.hasTextFromReader()) { // if we already know the text:
+    		logger.info("running in non-interactive mode");
+    		// run non-interactively
+    		runFromReader(clp.getReader(), listeners);
+    		System.exit(0); //
+    	} else {
+    		// run interactively
+    		logger.info("running in interactive mode");
+    		SwingUtilities.invokeLater(new Runnable() {
+	            public void run() {
+	                createAndShowGUI(listeners);
+	            }
+	        });
+    	}
 	}
 
 	/**
 	 * An IUDocument stores a list of current IUs, 
+	 * edits since the last update and
 	 * the string for the (partial) next IU
 	 * 
-	 * also, it handles HypothesisChangeListeners
-	 * which are notified, whenever the IUList changes
+	 * It handles HypothesisChangeListeners 
+	 * which are notified, when the IUList changes (or is committed)
+	 * (and can be set via setListeners())
 	 * 
+	 * IUs are committed and the list is reset after an explicit call to commit()
+	 * (when used as the document of a JTextField, this can be done by 
+	 *  calling commit() from a JTextField's ActionListener)
+	 *  
+	 * @see javax.swing.text.Document Document
 	 * @author timo
 	 */
 	static class IUDocument extends PlainDocument {
@@ -131,6 +172,17 @@ public class SimpleText extends JPanel implements ActionListener {
 			}
 		}
 		
+		private void addCurrentWord() {
+			logger.debug("adding " + currentWord);
+			AtomicWordIU sll = (wordIUs.size() > 0) ? wordIUs.get(wordIUs.size() - 1) : AtomicWordIU.FIRST_ATOMIC_WORD_IU;
+			AtomicWordIU iu = new AtomicWordIU(currentWord, sll);
+			EditMessage<AtomicWordIU> edit = new EditMessage<AtomicWordIU>(EditType.ADD, iu);
+			edits.add(edit);
+			wordIUs.add(iu);
+			logger.debug(edit.toString());
+			currentWord = "";
+		}
+		
 		public void commit() {
 			// handle last word (if there is one)
 			if (!"".equals(currentWord)) {
@@ -153,7 +205,9 @@ public class SimpleText extends JPanel implements ActionListener {
 			edits = new ArrayList<EditMessage<AtomicWordIU>>();			
 		}
 		
-		/* 
+		/* Overrides over PlainDocument: */
+		
+		/** 
 		 * only allow removal at the right end
 		 * and correctly handle removals beyond the current word
 		 */
@@ -177,7 +231,7 @@ public class SimpleText extends JPanel implements ActionListener {
 			}
 		}
 
-		/* 
+		/** 
 		 * only allow insertion at the right end
 		 */
 		@Override
@@ -213,18 +267,6 @@ public class SimpleText extends JPanel implements ActionListener {
 			notifyListeners();
 		}
 		
-		private void addCurrentWord() {
-			logger.debug("adding " + currentWord);
-			AtomicWordIU sll = (wordIUs.size() > 0) ? wordIUs.get(wordIUs.size() - 1) : AtomicWordIU.FIRST_ATOMIC_WORD_IU;
-			AtomicWordIU iu = new AtomicWordIU(currentWord, sll);
-			EditMessage<AtomicWordIU> edit = new EditMessage<AtomicWordIU>(EditType.ADD, iu);
-			edits.add(edit);
-			wordIUs.add(iu);
-			logger.debug(edit.toString());
-			currentWord = "";
-		}
-
-
 	}
 	
 }
