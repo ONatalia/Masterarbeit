@@ -91,11 +91,11 @@ public class SimpleText extends JPanel implements ActionListener {
 		BufferedReader bReader = new BufferedReader(reader);
 		String line;
 		while ((line = bReader.readLine()) != null) {
-			logger.debug(line);
+			//logger.debug(line);
 			try {
 				iuDocument.insertString(0, line, null);
 			} catch (BadLocationException e) {
-				logger.error("wow, this should really not happen (I thought I could always add a string at position 0)");
+				//logger.error("wow, this should really not happen (I thought I could always add a string at position 0)");
 				e.printStackTrace();
 			}
 			iuDocument.commit();
@@ -111,13 +111,13 @@ public class SimpleText extends JPanel implements ActionListener {
     	@SuppressWarnings("unchecked")
     	final List<PushBuffer> listeners = (List<PushBuffer>) ps.getComponentList(PROP_HYP_CHANGE_LISTENERS);
     	if (clp.hasTextFromReader()) { // if we already know the text:
-    		logger.info("running in non-interactive mode");
+    		//logger.info("running in non-interactive mode");
     		// run non-interactively
     		runFromReader(clp.getReader(), listeners);
     		System.exit(0); //
     	} else {
     		// run interactively
-    		logger.info("running in interactive mode");
+    		//logger.info("running in interactive mode");
     		SwingUtilities.invokeLater(new Runnable() {
 	            public void run() {
 	                createAndShowGUI(listeners);
@@ -157,7 +157,7 @@ public class SimpleText extends JPanel implements ActionListener {
 		
 		public void notifyListeners() {
 			if (edits.size() > 0) {
-				logger.debug("notifying about" + edits);
+				//logger.debug("notifying about" + edits);
 				currentFrame += 100;
 				for (PushBuffer listener : listeners) {
 					if (listener instanceof HypothesisChangeListener) {
@@ -173,13 +173,13 @@ public class SimpleText extends JPanel implements ActionListener {
 		}
 		
 		private void addCurrentWord() {
-			logger.debug("adding " + currentWord);
+			//logger.debug("adding " + currentWord);
 			AtomicWordIU sll = (wordIUs.size() > 0) ? wordIUs.get(wordIUs.size() - 1) : AtomicWordIU.FIRST_ATOMIC_WORD_IU;
 			AtomicWordIU iu = new AtomicWordIU(currentWord, sll);
 			EditMessage<AtomicWordIU> edit = new EditMessage<AtomicWordIU>(EditType.ADD, iu);
 			edits.add(edit);
 			wordIUs.add(iu);
-			logger.debug(edit.toString());
+			//logger.debug(edit.toString());
 			currentWord = "";
 		}
 		
@@ -222,11 +222,11 @@ public class SimpleText extends JPanel implements ActionListener {
 					AtomicWordIU iu = wordIUs.remove(wordIUs.size() - 1);
 					EditMessage<AtomicWordIU> edit = new EditMessage<AtomicWordIU>(EditType.REVOKE, iu);
 					edits.add(edit);
-					logger.debug(edit.toString());
+					//logger.debug(edit.toString());
 					currentWord = iu.getWord();
 				}
 				currentWord = currentWord.substring(0, currentWord.length() - len);
-				logger.debug("now it's " + currentWord);
+				//logger.debug("now it's " + currentWord);
 				notifyListeners();
 			}
 		}
@@ -252,12 +252,12 @@ public class SimpleText extends JPanel implements ActionListener {
 							addCurrentWord();
 							outStr += " "; // add a space, no matter what whitespace was added
 						} else {
-							logger.debug("ignoring additional whitespace");
+							//logger.debug("ignoring additional whitespace");
 						}
 					} else {
-						logger.debug("appending to currentWord");
+						//logger.debug("appending to currentWord");
 						currentWord += ch;
-						logger.debug("now it's " + currentWord);
+						//logger.debug("now it's " + currentWord);
 						outStr += ch;
 					}
 					
