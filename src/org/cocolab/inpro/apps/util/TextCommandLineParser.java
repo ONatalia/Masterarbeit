@@ -1,5 +1,7 @@
 package org.cocolab.inpro.apps.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
@@ -53,6 +55,16 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 				}
 				textReader = new StringReader(sb.toString());
 			}
+			else if (args[i].equals("-F")) {
+				i++;
+				try {
+					textReader = new InputStreamReader(new URL(args[i]).openStream());
+				} catch (IOException e) {
+					System.err.println("Could not open URL " + args[i]);
+					e.printStackTrace();
+					System.exit(1);
+				}
+			}
 			else if (args[i].equals("-STDIN")) {
 				textReader = new InputStreamReader(System.in);
 			}
@@ -68,7 +80,8 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -c <URL>       sphinx configuration file to use (reasonable default)");
 //		System.err.println("    -v             more verbose output (speed and memory tracker)");
 		System.err.println("input selection:");
-		System.err.println("    -T \"<text>\"    simulate input of the given text.");
+		System.err.println("    -T \"<text>\"    simulate input of the given text");
+		System.err.println("    -F <URL>       read input from file (one line will be committed at a time)");
 		System.err.println("    -STDIN         read input from standard in");
 	}
 

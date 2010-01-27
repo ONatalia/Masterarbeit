@@ -76,7 +76,7 @@
     <!-- ******************************************************** -->
     <!-- The incremental processing configuration                 -->
     <!-- ******************************************************** -->
-    <component name="currentASRHypothesis" type="org.cocolab.inpro.incremental.CurrentASRHypothesis">
+    <component name="currentASRHypothesis" type="org.cocolab.inpro.incremental.processor.CurrentASRHypothesis">
         <property name="recognizer" value="recognizer"/>
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
@@ -94,14 +94,14 @@
         </propertylist>
     </component>
     
-    <component name="semanticResolver" type="org.cocolab.inpro.incremental.SemanticResolver">
+    <component name="semanticResolver" type="org.cocolab.inpro.incremental.processor.SemanticResolver">
         <propertylist name="hypChangeListeners">
           <item>consoleNotifier</item>
     		<item>tedNotifier</item>
         </propertylist>
     </component>
 
-    <component name="wordCatcher" type="org.cocolab.inpro.incremental.WordCatcher">
+    <component name="wordCatcher" type="org.cocolab.inpro.incremental.processor.WordCatcher">
 	   <property name="word" value="kreuz" />
         <propertylist name="hypChangeListeners">
           <item>consoleNotifier</item>
