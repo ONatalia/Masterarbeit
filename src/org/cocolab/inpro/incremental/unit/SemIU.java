@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.cocolab.inpro.dialogmanagement.composer.AVM;
+import org.cocolab.inpro.nlu.AVM;
 
 public class SemIU extends IU {
 

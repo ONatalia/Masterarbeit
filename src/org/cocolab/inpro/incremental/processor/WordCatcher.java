@@ -1,12 +1,13 @@
 /**
  * 
  */
-package org.cocolab.inpro.incremental;
+package org.cocolab.inpro.incremental.processor;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.listener.HypothesisChangeListener;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
@@ -34,7 +35,6 @@ public class WordCatcher implements Configurable, PushBuffer {
 	private String wordToCatch;
 	private boolean wordCaught = false;
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void hypChange(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {

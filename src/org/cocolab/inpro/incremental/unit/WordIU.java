@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.cocolab.inpro.annotation.Label;
-import org.cocolab.inpro.dialogmanagement.composer.AVPair;
+import org.cocolab.inpro.nlu.AVPair;
 
 import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 

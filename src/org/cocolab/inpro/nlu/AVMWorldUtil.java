@@ -1,4 +1,4 @@
-package org.cocolab.inpro.dialogmanagement.composer;
+package org.cocolab.inpro.nlu;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
