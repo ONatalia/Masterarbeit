@@ -44,11 +44,12 @@ public class WordCatcher implements Configurable, PushBuffer {
 			if (edit.getType() == EditType.ADD) {
 				String current_word = ((WordIU) edit.getIU()).getWord();
 				if (current_word.equals("kreuz")) {
-					if (!wordCaught) {
-						wordCaught = true;
-						java.awt.Toolkit.getDefaultToolkit().beep();
-						System.out.println("Jeder nur ein " + wordToCatch + ", bitte!");
-					}
+					// das: why catch only once?? Commented this out again.
+					//if (!wordCaught) {
+					//	wordCaught = true;
+					java.awt.Toolkit.getDefaultToolkit().beep();
+					System.out.println("Jeder nur ein " + wordToCatch + ", bitte!");
+					//}
 				}
 			} else if (edit.getType() == EditType.COMMIT) {
 				wordCaught = false;

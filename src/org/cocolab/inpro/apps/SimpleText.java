@@ -37,7 +37,7 @@ public class SimpleText extends JPanel implements ActionListener {
 	private static final Logger logger = Logger.getLogger(SimpleText.class);
 
 	@S4Component(type = CurrentASRHypothesis.class)
-	public final static String PROP_CURRENT_HYPOTHESIS = "currentHypothesis";
+	public final static String PROP_CURRENT_HYPOTHESIS = "currentASRHypothesis";
 	
 	@S4ComponentList(type = HypothesisChangeListener.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";

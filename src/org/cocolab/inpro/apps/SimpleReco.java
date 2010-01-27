@@ -133,9 +133,9 @@ public class SimpleReco {
 		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
 			cm.lookup("labelWriter");
 		}
-		if (clp.matchesOutputMode(RecoCommandLineParser.CURRHYP_OUTPUT)) {
+/*		if (clp.matchesOutputMode(RecoCommandLineParser.CURRHYP_OUTPUT)) {
 			// FIXME: implement me
-		}
+		} */
 		if (clp.verbose()) {
 			cm.lookup("memoryTracker");
 			cm.lookup("speedTracker");

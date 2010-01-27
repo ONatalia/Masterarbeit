@@ -14,7 +14,7 @@
     <!-- ******************************************************** -->
     <!-- frequently tuned properties                              -->
     <!-- ******************************************************** -->
-    <property name="absoluteBeamWidth" value="5000"/>
+    <property name="absoluteBeamWidth" value="2000"/>
     <property name="relativeBeamWidth" value="1E-80"/>
     <property name="absoluteWordBeamWidth" value="500"/>
     <property name="relativeWordBeamWidth" value="1E-80"/>
@@ -29,7 +29,8 @@
     <property name="recognizer" value="recognizer"/>
     <property name="linguist" value="lexTreeLinguist"/>
     <property name="searchManager" value="searchManager"/>
-    <property name="deltifier" value="smoothing"/>
+    <property name="deltifier" value="none"/>
+    <!-- <property name="deltifier" value="smoothing"/> -->
     
     <property name="frontend" value="frontend"/>
     <property name="baseData" value="baseData"/>
@@ -51,7 +52,7 @@
     <component name="recognizer" type="edu.cmu.sphinx.recognizer.Recognizer">
         <property name="decoder" value="decoder"/>
         <propertylist name="monitors">
-        	<item>currentHypothesis</item>
+        	<item>threadingListener</item>
         </propertylist>
     </component>
 
@@ -82,6 +83,9 @@
     <component name="smoothing" type="org.cocolab.inpro.incremental.deltifier.SmoothingDeltifier">
         <property name="smoothing" value="5"/>
     </component>
+
+	<component name="none" type="org.cocolab.inpro.incremental.deltifier.ASRWordDeltifier">
+	</component>
 
     <component name="hypViewer" type="org.cocolab.inpro.incremental.listener.CurrentHypothesisViewer">
     	<property name="showWindow" value="false"/>
@@ -268,7 +272,7 @@
     <component name="batchCMN" type="edu.cmu.sphinx.frontend.feature.BatchCMN"/>
     <component name="liveCMN" type="edu.cmu.sphinx.frontend.feature.LiveCMN"/>
     <component name="mfccExtraction" type="edu.cmu.sphinx.frontend.feature.DeltasFeatureExtractor"/>
-
+    <component name="frontendThread" type="org.cocolab.inpro.sphinx.frontend.ThreadingFrontendBuffer"/>
 
     <!-- ******************************************************* -->
     <!--  monitors                                               -->
