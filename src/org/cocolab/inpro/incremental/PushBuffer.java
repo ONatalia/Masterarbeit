@@ -7,8 +7,9 @@ import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 
 import edu.cmu.sphinx.instrumentation.Resetable;
+import edu.cmu.sphinx.util.props.Configurable;
 
-public interface PushBuffer extends Resetable {
+public interface PushBuffer extends Resetable, Configurable {
 
 	/**
 	 * this should receive a list of current IUs and 

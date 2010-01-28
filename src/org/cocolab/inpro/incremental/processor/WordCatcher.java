@@ -14,7 +14,6 @@ import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
-import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4ComponentList;
@@ -24,7 +23,7 @@ import edu.cmu.sphinx.util.props.S4String;
  * @author das
  *
  */
-public class WordCatcher implements Configurable, PushBuffer {
+public class WordCatcher implements PushBuffer {
 	// Pushbuffer stuff
 	@S4ComponentList(type = HypothesisChangeListener.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
