@@ -1,0 +1,71 @@
+
+    <property name="deltifier" value="none"/>
+    <property name="deltifierParam" value="7"/>
+    <property name="baseData" value="baseData"/>
+    <property name="actionManager" value="dialogueManager"/>
+
+    <!-- ******************************************************** -->
+    <!-- The incremental processing configuration                 -->
+    <!-- ******************************************************** -->
+    <component name="currentASRHypothesis" type="org.cocolab.inpro.incremental.processor.CurrentASRHypothesis">
+        <property name="recognizer" value="recognizer"/>
+        <property name="frontend" value="${frontend}"/>
+        <property name="asrFilter" value="${deltifier}"/>
+        <property name="baseData" value="${baseData}"/>
+        <property name="tngm" value="temporalngram"/>
+        <propertylist name="hypChangeListeners">
+    		<item>hypViewer</item>
+          	<item>wordCatcher</item>
+          	<item>floorManager</item>
+<!--
+    		<item>tedNotifier</item>
+          <item>semanticResolver</item>
+          <item>consoleNotifier</item>
+          <item>labelWriter2</item>
+    		<item>oaaNotifier</item>
+-->
+        </propertylist>
+    </component>
+    
+    <component name="semanticResolver" type="org.cocolab.inpro.incremental.processor.SemanticResolver">
+        <propertylist name="hypChangeListeners">
+          <item>consoleNotifier</item>
+    		<item>tedNotifier</item>
+        </propertylist>
+    </component>
+
+    <component name="wordCatcher" type="org.cocolab.inpro.incremental.processor.WordCatcher">
+	   <property name="word" value="kreuz" />
+        <propertylist name="hypChangeListeners">
+          <item>consoleNotifier</item>
+        </propertylist>
+    </component>
+
+	<component name="floorManager" type="org.cocolab.inpro.incremental.processor.FloorManager">
+		<propertylist name="listener">
+			<item>${actionManager}</item>
+			<item></item>
+		</propertylist>
+	</component>
+
+	<component name="dialogueManager" type="org.cocolab.inpro.incremental.processor.DialogueManager">
+		<property name="nlu" value="semanticResolver"/>
+	</component>
+
+    <component name="baseData" type="org.cocolab.inpro.incremental.basedata.BaseData"/>
+
+	<component name="none" type="org.cocolab.inpro.incremental.deltifier.ASRWordDeltifier"/>
+
+    <component name="fixedLag" type="org.cocolab.inpro.incremental.deltifier.FixedLagDeltifier">
+        <property name="fixedLag" value="${deltifierParam}"/>
+    </component>
+
+    <component name="smoothing" type="org.cocolab.inpro.incremental.deltifier.SmoothingDeltifier">
+        <property name="smoothing" value="${deltifierParam}"/>
+    </component>
+
+    <component name="consoleNotifier" type="org.cocolab.inpro.incremental.listener.ConsoleNotifier"/>
+    <component name="oaaNotifier" type="org.cocolab.inpro.incremental.listener.OAANotifier"/>
+    <component name="tedNotifier" type="org.cocolab.inpro.incremental.listener.TEDviewNotifier"/>
+    <component name="labelWriter2" type="org.cocolab.inpro.incremental.listener.LabelWriter"/>
+    <component name="hypViewer" type="org.cocolab.inpro.incremental.listener.CurrentHypothesisViewer"/>
