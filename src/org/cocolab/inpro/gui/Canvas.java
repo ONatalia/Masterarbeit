@@ -15,6 +15,10 @@ import javax.swing.JPanel;
 
 import edu.cmu.sphinx.instrumentation.Resetable;
 
+/**
+ * a canvas that contains @see{Tile}s which can be selected, moved around, placed, etc.
+ */
+
 @SuppressWarnings("serial")
 public abstract class Canvas extends JPanel implements ActionListener, Resetable {
 
@@ -75,6 +79,10 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	protected void shuffleTiles(Random rnd, List<Point> positions) {
 		Collections.shuffle(positions, rnd);
 		setPositions(positions);
+	}
+	
+	public Tile[] getTiles() {
+		return tiles;
 	}
 	
 	protected void setPositions(List<Point> positions) {

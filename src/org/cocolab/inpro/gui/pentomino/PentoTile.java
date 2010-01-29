@@ -42,6 +42,10 @@ public class PentoTile extends Tile {
 	};
 	
 	PentoTile(int s, Color c, int x0, int y0, char name) {
+		this(s, c, x0, y0, name, Character.valueOf(name).toString());
+	}
+	
+	PentoTile(int s, Color c, int x0, int y0, char name, String label) {
 		if (!isValidTile(name)) 
 			throw new RuntimeException("Error in PentoTile: " + Character.toString(name) + " is not a valid type for a tile");
 		this.defVectors = getDefVectors(name);
@@ -49,7 +53,7 @@ public class PentoTile extends Tile {
 		this.refPoint = new Point(x0, y0);
 		this.scale = s;
 		this.name = Character.valueOf(name).toString();
-		this.label = this.name;
+		this.label = label;
 
 		this.placed = false;
 		this.defaultRefPoint = this.refPoint;

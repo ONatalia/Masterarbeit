@@ -5,7 +5,16 @@ import java.awt.Graphics;
 
 import edu.cmu.sphinx.instrumentation.Resetable;
 
-
+/**
+ * an abstract pentomino tile / puzzle piece / whatever
+ * it can be drawn (this is to be implemented by derived classes),
+ * moved around, be in a placed or unplaced state, and a few more things
+ * 
+ * implementing classes (for now) are ImageTile (used in Greifarm),
+ * and PentoTile (used in all things pentomino) 
+ * 
+ * @see Canvas
+ */
 public abstract class Tile implements Resetable {
 	protected String name;
 	public String label;
