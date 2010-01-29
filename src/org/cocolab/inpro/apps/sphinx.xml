@@ -152,7 +152,7 @@
     <component name="lexTreeLinguist" type="edu.cmu.sphinx.linguist.lextree.LexTreeLinguist">
         <property name="logMath" value="logMath"/>
         <property name="acousticModel" value="acousticModel"/>
-        <property name="languageModel" value="temporalngram"/>
+        <property name="languageModel" value="ngram"/>
         <property name="dictionary" value="dictionary"/>
         <property name="generateUnitStates" value="true"/>
         <property name="wantUnigramSmear" value="true"/>
@@ -195,16 +195,6 @@
         <property name="languageModel" value="ngram"/>
     </component>
     
-    <component name="temporalngram" type="org.cocolab.inpro.sphinx.linguist.language.ngram.TemporalNGramModel">
-    
-		<!-- the properties from ngram: -->
-        <property name="dictionary" value="dictionary"/>
-        <property name="logMath" value="logMath"/>
-        <property name="location" value="resource:/edu.cmu.sphinx.model.acoustic.Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.Model!/edu/cmu/sphinx/model/acoustic/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/LM/inproCorpora_all.lm"/>
-        <property name="maxDepth" value="3"/>
-        <property name="unigramWeight" value=".7"/>
-    </component>
-
     <component name="ngram" type="edu.cmu.sphinx.linguist.language.ngram.SimpleNGramModel">
         <property name="dictionary" value="dictionary"/>
         <property name="logMath" value="logMath"/>

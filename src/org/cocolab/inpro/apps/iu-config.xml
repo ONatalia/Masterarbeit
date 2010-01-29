@@ -12,7 +12,6 @@
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
-        <property name="tngm" value="temporalngram"/>
         <propertylist name="hypChangeListeners">
     		<item>hypViewer</item>
           	<item>wordCatcher</item>

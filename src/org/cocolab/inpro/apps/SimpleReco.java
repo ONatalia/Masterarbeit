@@ -172,6 +172,7 @@ public class SimpleReco {
 	        }
     	} while ((result != null) && (result.getDataFrames() != null) && (result.getDataFrames().size() > 4));
     	recognizer.deallocate();
+    	System.exit(0);
     }
 
 }
