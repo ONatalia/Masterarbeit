@@ -17,7 +17,7 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 
 	public SpeechStateVisualizer() {
 		ImageIcon silentIcon = new ImageIcon(SpeechStateVisualizer.class.getResource("happyhal-inactive.png"));
-		ImageIcon talkingIcon = new ImageIcon(SpeechStateVisualizer.class.getResource("happyhal-active.png"));
+		ImageIcon talkingIcon = new ImageIcon(SpeechStateVisualizer.class.getResource("happyhal-inactive-vad.png"));
 		speechIndicator = new JLabel(talkingIcon);
 		speechIndicator.setDisabledIcon(silentIcon);
 		speechIndicator.setEnabled(false);
