@@ -29,6 +29,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
@@ -111,6 +112,7 @@ public class DataCollector extends JFrame {
 		@Override
 		protected void done() {
 			asrPanel.setEnabled(true);
+			asrPanel.configButton.setEnabled(true);
 			recoRunner = new RecoRunner();
 			recoRunner.start();
 		}
@@ -158,6 +160,7 @@ public class DataCollector extends JFrame {
 		CurrentHypothesisViewer chv;
 		JTextField chvField;
 		JToggleButton asrButton;
+		JButton configButton;
 
 		ASRPanel(CurrentHypothesisViewer chv) {
 			super(new FlowLayout(FlowLayout.LEFT));
@@ -171,6 +174,11 @@ public class DataCollector extends JFrame {
 			asrButton.addActionListener(myActionListener);
 			chv.updateResults(false);
 			this.add(asrButton);
+			configButton = new JButton(new ImageIcon(DataCollector.class.getResource("config.png")));
+			configButton.setEnabled(false);
+			configButton.setActionCommand("CONFIG");
+			configButton.addActionListener(myActionListener);
+			this.add(configButton);
 		}
 		
 		public void setEnabled(boolean enabled) {
@@ -192,14 +200,16 @@ public class DataCollector extends JFrame {
 			bestResult.setFont(new Font("Dialog", Font.BOLD, 24));
 			bestResult.setEditable(true);
 			this.add(bestResult);
-			submitButton = new JButton(new ImageIcon(DataCollector.class.getResource("dialog-ok.png")));
-			submitButton.setActionCommand("SUBMIT");
-			submitButton.addActionListener(myActionListener);
-			this.add(submitButton);
-			skipButton = new JButton(new ImageIcon(DataCollector.class.getResource("dialog-cancel.png")));
-			skipButton.setActionCommand("DISCARD");
-			skipButton.addActionListener(myActionListener);
-			this.add(skipButton);
+			submitButton = createAndAddButton("dialog-ok.png", "SUBMIT", myActionListener);
+			skipButton = createAndAddButton("dialog-cancel.png", "DISCARD", myActionListener);
+		}
+		
+		private JButton createAndAddButton(String icon, String command, ActionListener al) {
+			JButton button = new JButton(new ImageIcon(DataCollector.class.getResource(icon)));
+			button.setActionCommand(command);
+			button.addActionListener(al);
+			this.add(button);
+			return button;
 		}
 		
 		public void setEnabled(boolean enabled) {
@@ -231,6 +241,7 @@ public class DataCollector extends JFrame {
 			if (command.equals("PAUSE")) {
 				boolean isPaused = ((JToggleButton) ae.getSource()).isSelected(); 
 				recoRunner.setRecognizing(!isPaused);
+				asrPanel.configButton.setEnabled(isPaused);
 			} else if (command.equals("ASR_RESULT")) {
 				setRecognizing(false);
 				Result result = ((RecoRunner) ae.getSource()).mostRecentResult;
@@ -243,9 +254,20 @@ public class DataCollector extends JFrame {
 				setRecognizing(true);
 			} else if (command.equals("DISCARD")) {
 				setRecognizing(true);
-			} 
+			} else if (command.equals("CONFIG")) {
+				configurePath();
+			}
 		}	
-	}	
+	}
+	
+	void configurePath() {
+		String oldPath = wavWriter.getDumpFilePath();
+		String newPath = (String) JOptionPane.showInputDialog(null, 
+				"Path and prefix for collected files", 
+				"Configuration", 
+				JOptionPane.PLAIN_MESSAGE, null, null, oldPath);
+		wavWriter.setDumpFilePath(newPath);
+	}
 
 	void saveTranscript(String transcript, String filetype) {
 		String filename = recoRunner.mostRecentWaveFile.replaceFirst("\\.wav$", filetype);

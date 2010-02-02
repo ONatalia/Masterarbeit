@@ -15,7 +15,7 @@ The user interface is simplistic, but to the point:
 The upper line shows the ASR, while 
 the lower line is used for transcription.
 As the process alternates between recognition
-and transcription phase, only one of these
+and transcription phases, only one of these
 lines is active at a time.
 
 In the textfield in the ASR line, the current hypothesis
@@ -77,18 +77,18 @@ what you wanted to do.)
 Repeat recognition and transcription as often as you want.
 You can exit the program at any time by closing the window.
 
-
-
 For every utterance, the program stores an audio file 
 (.wav), the recognition hypothesis (.hyp) and a transcript
-(.txt, unless you discarded this utterance). The files 
+(.ref, unless you discarded this utterance). The files 
 will be consecutively numbered, starting from zero. 
 
-By default, your filenames will all start with "utterance"
+By default, your filenames will all start with "utterance."
 and will be stored in the "/tmp" directory. You can change
-this by adding the parameter 
+this by clicking the configuration icon in the top right
+and entering a different path and file prefix (recognition
+has to be paused in order to change the path) or by adding  
 -DutteranceWavWriter[outFilePattern]=/your/path/and-file
-when you call java, or by changing the relevant line in the
-configuration file config.xml. There will be a GUI 
-configuration option in the future. 
+as the **first** parameter when you call java, or by 
+changing the relevant line in the configuration file 
+config.xml. 
 
