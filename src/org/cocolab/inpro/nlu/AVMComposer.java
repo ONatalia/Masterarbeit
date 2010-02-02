@@ -285,7 +285,6 @@ public class AVMComposer {
 			}
 		}
 		this.avmList.removeAll(removeList);
-		System.err.println(this.avmList.toString());
 	}
 
 	/**

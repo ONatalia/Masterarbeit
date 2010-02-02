@@ -21,7 +21,7 @@ public class AVMWorldUtil {
 
 	AVMWorldUtil(String filename, HashMap<String, HashMap<String, String>> structs) {
 		this.avmStructures = structs;
-		System.err.println(this.avmStructures.toString());
+//		System.err.println(this.avmStructures.toString());
 		this.worldList = this.setAVMsFromFile(filename);
 	}
 	private ArrayList<AVM> setAVMsFromFile(String filename) {
