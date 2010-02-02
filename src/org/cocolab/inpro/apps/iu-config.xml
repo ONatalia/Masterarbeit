@@ -14,13 +14,13 @@
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
     		<item>hypViewer</item>
-          	<item>wordCatcher</item>
-          	<item>floorManager</item>
+        	<item>consoleNotifier</item>
+    		<item>semanticResolver</item>
+	       	<item>floorManager</item>
 <!--
+          	<item>wordCatcher</item>
     		<item>tedNotifier</item>
-          <item>semanticResolver</item>
-          <item>consoleNotifier</item>
-          <item>labelWriter2</item>
+          	<item>labelWriter2</item>
     		<item>oaaNotifier</item>
 -->
         </propertylist>
@@ -30,6 +30,7 @@
         <propertylist name="hypChangeListeners">
           <item>consoleNotifier</item>
     		<item>tedNotifier</item>
+    		<item>dialogueManager</item>
         </propertylist>
     </component>
 
@@ -43,7 +44,6 @@
 	<component name="floorManager" type="org.cocolab.inpro.incremental.processor.FloorManager">
 		<propertylist name="listener">
 			<item>${actionManager}</item>
-			<item></item>
 		</propertylist>
 	</component>
 

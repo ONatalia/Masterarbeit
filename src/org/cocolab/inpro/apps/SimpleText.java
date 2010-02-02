@@ -24,6 +24,7 @@ import org.cocolab.inpro.apps.util.TextCommandLineParser;
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.listener.HypothesisChangeListener;
 import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
+import org.cocolab.inpro.incremental.processor.FloorManager;
 import org.cocolab.inpro.incremental.unit.AtomicWordIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
@@ -37,6 +38,21 @@ import edu.cmu.sphinx.util.props.S4ComponentList;
 /**
  * simple interactive (and non-interactive) ASR simulator for the inpro project
  * 
+ * Words are added to the IU list (and sent off to CurrentASRHypothesis'
+ * HypothesisChangeListeners) as you type, revoked when you delete them
+ * and committed when you press enter (or click on the "commit" button).
+ * 
+ * Floor management (EoT-detection) is simulated by pressing enter twice 
+ * in a row (effectively: pressing enter when the textfield is empty) or
+ * by clicking the "EoT" button.
+ * 
+ * Notice: double-pressing enter and clicking on "EoT" is actually different,
+ * because in the former case, all words will have been committed, while
+ * in the latter case some words may be left uncommitted. Our system should
+ * be able to cope with both cases (at least with EoT slightly preceding 
+ * ASR-commit), and this is a way for us to test this.
+ * 
+ * 
  * @author timo
  *
  */
@@ -49,12 +65,19 @@ public class SimpleText extends JPanel implements ActionListener {
 	public final static String PROP_CURRENT_HYPOTHESIS = "currentASRHypothesis";
 	
 	@S4ComponentList(type = HypothesisChangeListener.class)
-	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
+	public final static String PROP_HYP_CHANGE_LISTENERS = CurrentASRHypothesis.PROP_HYP_CHANGE_LISTENERS;
+
+	@S4Component(type = FloorManager.class)
+	public final static String PROP_FLOOR_MANAGER = "floorManager";
+
+	@S4Component(type = FloorManager.Listener.class)
+	public final static String PROP_FLOOR_MANAGER_LISTENERS = FloorManager.PROP_STATE_LISTENERS;
 
 	IUDocument iuDocument;
+	List<FloorManager.Listener> floorListeners;
 	JTextField textField;
 	
-	SimpleText() {
+	SimpleText(List<FloorManager.Listener> floorListeners) {
 		iuDocument = new IUDocument();
 		iuDocument.listeners = new ArrayList<PushBuffer>();
 		textField = new JTextField(40);
@@ -65,19 +88,31 @@ public class SimpleText extends JPanel implements ActionListener {
 		commitButton.addActionListener(this);
 		add(textField);
 		add(commitButton);
+		this.floorListeners = floorListeners;
+		// clicking this button is actually not identical to 
+		// double pressing enter in the text field
+		JButton floorButton = new JButton("EoT");
+		floorButton.addActionListener(this);
+		add(floorButton);
 		// add(new JLabel("you can only edit at the right"));
 	}
 	
 	public void actionPerformed(ActionEvent arg0) {
 		iuDocument.commit();
+		// hitting enter on empty lines results in an EoT-marker
+		if (iuDocument.getLength() == 0) {
+			for (FloorManager.Listener l : floorListeners) {
+				l.floor(FloorManager.State.AVAILABLE, FloorManager.State.UNAVAILABLE, null);
+			}
+		}
 		textField.requestFocusInWindow();
 	}
 	
-	public static void createAndShowGUI(List<PushBuffer> listeners) {
+	public static void createAndShowGUI(List<PushBuffer> hypListeners, List<FloorManager.Listener> floorListeners) {
 		JFrame frame = new JFrame("SimpleText");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        SimpleText contentPane = new SimpleText();
-        contentPane.iuDocument.setListeners(listeners);
+        SimpleText contentPane = new SimpleText(floorListeners);
+        contentPane.iuDocument.setListeners(hypListeners);
         contentPane.setOpaque(true);
         frame.setContentPane(contentPane);
         //Display the window.
@@ -85,20 +120,25 @@ public class SimpleText extends JPanel implements ActionListener {
         frame.setVisible(true);
 	}
 	
-	public static void runFromReader(Reader reader, List<PushBuffer> listeners) throws IOException {
+	public static void runFromReader(Reader reader, List<PushBuffer> hypListeners, List<FloorManager.Listener> floorListeners) throws IOException {
 		IUDocument iuDocument = new IUDocument();
-		iuDocument.setListeners(listeners);
+		iuDocument.setListeners(hypListeners);
 		BufferedReader bReader = new BufferedReader(reader);
 		String line;
 		while ((line = bReader.readLine()) != null) {
-			//logger.debug(line);
 			try {
 				iuDocument.insertString(0, line, null);
 			} catch (BadLocationException e) {
-				//logger.error("wow, this should really not happen (I thought I could always add a string at position 0)");
+				logger.error("wow, this should really not happen (I thought I could always add a string at position 0)");
 				e.printStackTrace();
 			}
 			iuDocument.commit();
+			// empty lines results in an EoT-marker
+			if ("".equals(line)) {
+				for (FloorManager.Listener l : floorListeners) {
+					l.floor(FloorManager.State.AVAILABLE, FloorManager.State.UNAVAILABLE, null);
+				}
+			}
 		}
 	}
 	
@@ -109,18 +149,21 @@ public class SimpleText extends JPanel implements ActionListener {
     	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
     	PropertySheet ps = cm.getPropertySheet(PROP_CURRENT_HYPOTHESIS);
     	@SuppressWarnings("unchecked")
-    	final List<PushBuffer> listeners = (List<PushBuffer>) ps.getComponentList(PROP_HYP_CHANGE_LISTENERS);
+    	final List<PushBuffer> hypListeners = (List<PushBuffer>) ps.getComponentList(PROP_HYP_CHANGE_LISTENERS);
+    	ps = cm.getPropertySheet(PROP_FLOOR_MANAGER);
+    	@SuppressWarnings("unchecked")
+    	final List<FloorManager.Listener> floorListeners = (List<FloorManager.Listener>) ps.getComponentList(PROP_FLOOR_MANAGER_LISTENERS);
     	if (clp.hasTextFromReader()) { // if we already know the text:
-    		//logger.info("running in non-interactive mode");
+    		logger.info("running in non-interactive mode");
     		// run non-interactively
-    		runFromReader(clp.getReader(), listeners);
+    		runFromReader(clp.getReader(), hypListeners, floorListeners);
     		System.exit(0); //
     	} else {
     		// run interactively
-    		//logger.info("running in interactive mode");
+    		logger.info("running in interactive mode");
     		SwingUtilities.invokeLater(new Runnable() {
 	            public void run() {
-	                createAndShowGUI(listeners);
+	                createAndShowGUI(hypListeners, floorListeners);
 	            }
 	        });
     	}
