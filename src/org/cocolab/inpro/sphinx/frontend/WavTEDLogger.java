@@ -39,6 +39,14 @@ public class WavTEDLogger extends WavWriter {
 	public String getMostRecentFilename() {
 		return mostRecentFilename;
 	}
+	
+	public String getDumpFilePath() {
+		return dumpFilePath;
+	}
+	
+	public void setDumpFilePath(String s) {
+		dumpFilePath = s;
+	}
 
 	@Override
 	protected void writeFile(String wavName) {
