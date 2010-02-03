@@ -10,18 +10,10 @@ import java.util.HashMap;
  * @author timo, okko
  */
 public class AVMStructureUtil {
-
-	private HashMap<String, HashMap<String, String>> avmStructures;
-
-	AVMStructureUtil() {
-		this("res/AVMStructure");
-	}
-
-	AVMStructureUtil(String filename) {
-		this.avmStructures = this.parseStructureFile(filename);
-	}
-
-	private HashMap<String, HashMap<String, String>> parseStructureFile(String filename) {
+	
+	// TODO: might make sense to keep previous structures around (in yet another hash map...)
+	// to speed up parseStructureFile
+	public static HashMap<String, HashMap<String, String>> parseStructureFile(String filename) {
 		HashMap<String, HashMap<String, String>> avmStructures = new HashMap<String, HashMap<String, String>>();
 		try {
 			BufferedReader lbr;
@@ -48,17 +40,12 @@ public class AVMStructureUtil {
 		return avmStructures;
 	}
 	
-	public HashMap<String, HashMap<String, String>> getAVMStructures()  {
-		return this.avmStructures;
-	}	
-	
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		AVMStructureUtil su = new AVMStructureUtil();
-		System.out.println(su.avmStructures.toString());
+		System.out.println(parseStructureFile("res/AVMStructure"));
 	}
 
 }

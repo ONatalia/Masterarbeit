@@ -63,5 +63,9 @@ public class SemIU extends IU {
 		sb.append(" </event>");
 		return sb.toString();
 	}
+	
+	public boolean samePayload(SemIU siu) {
+		return false; //FIXME: IMPLEMENT
+	}
 
 }

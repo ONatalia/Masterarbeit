@@ -14,6 +14,12 @@ public interface PushBuffer extends Resetable, Configurable {
 	/**
 	 * this should receive a list of current IUs and 
 	 * a list of edit messages since the last call to hypChange
+	 * 
+	 * @param ius while this is a (plain) collection, the collection's iterator()
+	 *        method must ensure a sensible ordering of the returned elements.
+	 *        For now we have only used Lists (which are ordered), 
+	 *        but a Tree of IUs should also be possible and this should gracefully
+	 *        work together with processors that expect lists 
 	 */
 	public abstract void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits);
 

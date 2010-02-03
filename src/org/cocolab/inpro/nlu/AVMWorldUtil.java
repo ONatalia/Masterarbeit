@@ -12,19 +12,7 @@ import java.util.HashMap;
  */
 public class AVMWorldUtil {
 	
-	private ArrayList<AVM> worldList;
-	private HashMap<String, HashMap<String, String>> avmStructures;
-
-	AVMWorldUtil(HashMap<String, HashMap<String, String>> structs) {
-		this("res/AVMWorldList", structs);
-	}
-
-	AVMWorldUtil(String filename, HashMap<String, HashMap<String, String>> structs) {
-		this.avmStructures = structs;
-//		System.err.println(this.avmStructures.toString());
-		this.worldList = this.setAVMsFromFile(filename);
-	}
-	private ArrayList<AVM> setAVMsFromFile(String filename) {
+	public static ArrayList<AVM> setAVMsFromFile(String filename, HashMap<String, HashMap<String, String>> avmStructures) {
 		ArrayList<AVM> list = new ArrayList<AVM>();
 		try {
 			BufferedReader lbr;
@@ -44,7 +32,7 @@ public class AVMWorldUtil {
 						avps.add(new AVPair(pair[0], pair[1]));
 					}
 				}
-				AVM avm = new AVM(type, this.avmStructures);
+				AVM avm = new AVM(type, avmStructures);
 				for (AVPair avp : avps) {
 					avm.setAttribute(avp);
 				}
@@ -56,22 +44,17 @@ public class AVMWorldUtil {
 		return list;
 	}
 	
-	public void setStructures(HashMap<String, HashMap<String, String>> structures) {
-		this.avmStructures = structures;
-	}
-	
-	public ArrayList<AVM> getWorldList() {
-		return this.worldList;
-	}	
-	
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		AVMStructureUtil su = new AVMStructureUtil();
-		AVMWorldUtil wu = new AVMWorldUtil(su.getAVMStructures());
-		System.out.println(wu.worldList.toString());
+		String worldFile = "res/AVMWorldList";
+		String structureFile = "res/AVMStructure";
+		System.out.println(
+				AVMWorldUtil.setAVMsFromFile(worldFile, 
+											 AVMStructureUtil.parseStructureFile(structureFile))
+				);
 	}
 
 }

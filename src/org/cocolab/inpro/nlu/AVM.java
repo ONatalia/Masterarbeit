@@ -2,6 +2,7 @@ package org.cocolab.inpro.nlu;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Class representing an AVM with methods for equality, unification and setting
@@ -35,9 +36,17 @@ public class AVM {
 	 * @param avm - the AVM to copy.
 	 */
 	protected AVM (AVM avm) {
-		this.type = new String(avm.type);
-		this.attributes = new HashMap<String, Object>(avm.attributes);	// this may need reworking as it does a shallow copy only.
-		this.monotonic = avm.monotonic;
+		type = avm.type;
+		monotonic = avm.monotonic;
+		// do a deep copy of attributes
+		attributes = new HashMap<String, Object>();
+		for (String attribute : avm.attributes.keySet()) {
+			Object value = avm.attributes.get(attribute);
+			if (value instanceof AVM) {
+				value = new AVM((AVM) value);
+			}
+			attributes.put(attribute, value);
+		}
 	}
 
 	/**
@@ -314,46 +323,46 @@ public class AVM {
 	 */
 	@SuppressWarnings("unchecked")
 	public String toString() {
-		String str = new String();
-		str += "[";
-		str += this.type;
-		str += " ";
+		// FIXME: much more efficient to use StringBuilder instead of += for Strings
+		StringBuilder sb = new StringBuilder("[");
+		sb.append(this.type);
+		sb.append(" ");
 		for (String attribute : this.attributes.keySet()) {
 			Object value = attributes.get(attribute);
 			if (value instanceof String) {
 				if (value != null) {
-					str += attribute;
-					str += ":";
-					str += value;
-					str += " ";
+					sb.append(attribute);
+					sb.append(":");
+					sb.append(value);
+					sb.append(" ");
 				}
 			} else if (value instanceof AVM) {
 				if (!((AVM) value).isEmpty()) {
-					str += attribute;
-					str += ":";
-					str += value.toString();
-					str += " ";
+					sb.append(attribute);
+					sb.append(":");
+					sb.append(value);
+					sb.append(" ");
 				}
 			} else if (value instanceof ArrayList) {
 				boolean printList = false;
-				String listStr = attribute;
-				listStr += ":[";
+				StringBuilder sb2 = new StringBuilder(attribute);
+				sb.append(":[");
 				for (AVM avm : (ArrayList<AVM>) value) {
 					if (!avm.isEmpty()) {
 						printList = true;
-						listStr += avm.toString();
-						listStr += " ";
+						sb2.append(avm);
+						sb2.append(" ");
 					}
 				}
 				if (printList) {
-					listStr += "]";
-					str += listStr;
+					sb2.append("]");
+					sb.append(sb2);
 				}
 			}
 		}
-		str += "]";
-		return str;
-//		return this.toLongString();
+		sb.append("]");
+		return sb.toString();
+//		return this.toLongString(); 
 	}
 
 	/**
