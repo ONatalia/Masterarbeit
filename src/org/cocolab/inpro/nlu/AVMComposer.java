@@ -15,14 +15,12 @@ import java.util.List;
 public class AVMComposer {
 
 	private static HashMap<String, HashMap<String, String>> avmStructures;
-	private ArrayList<AVM> avmList = new ArrayList<AVM>();
+	
 	// TODO: think about whether this can remain static in the future or not
 	private static ArrayList<AVM> worldList = new ArrayList<AVM>();
-	/**
-	 * this caches the last resolve operation. on compose we invalidate (set to null)
-	 * and on resolve we check if it's still there
-	 */
-	private ArrayList<AVM> resolvedList = null;
+	private ArrayList<AVM> avmList;
+	private ArrayList<AVM> resolvedList;
+	private ArrayList<AVM> keepList;
 
 	/**
 	 * Creates AVMComposer with a list of prototypes (avmStructures) of
@@ -30,9 +28,11 @@ public class AVMComposer {
 	 * TODO: should take filename of AVM structure file and AVM world list
 	 */
 	public AVMComposer() {
-		AVMComposer.avmStructures = AVMStructureUtil.parseStructureFile("res/AVMStructures");
+		AVMComposer.avmStructures = AVMStructureUtil.parseStructureFile("res/AVMStructure");
 		worldList = AVMWorldUtil.setAVMsFromFile("res/AVMWorldList", avmStructures);
 		avmList = getAllAVMs();
+		resolvedList = new ArrayList<AVM>();
+		keepList = new ArrayList<AVM>();
 	}
 	
 	public AVMComposer(AVMComposer c) {
@@ -40,65 +40,115 @@ public class AVMComposer {
 		for (AVM avm : c.avmList) {
 			avmList.add(new AVM(avm));
 		}
-		resolvedList = c.resolvedList;
+		resolvedList = new ArrayList<AVM>();
+		for (AVM avm : c.resolvedList) {
+			resolvedList.add(new AVM(avm));
+		}
+		keepList = new ArrayList<AVM>();
+		for (AVM avm : c.keepList) {
+			keepList.add(new AVM(avm));
+		}
+//		System.err.println("Copied AVMComposer:");
+//		System.err.println("avmList: " + avmList.toString());
+//		System.err.println("resolvedList: " + resolvedList.toString());
+//		System.err.println("keepList: " + keepList.toString());
 	}
 
 	/**
 	 * Method to call when a new AVPair becomes known.
-	 * Attempt unification with known prototypes (avmStructures).
+	 * Attempt unification with known AVM prototypes (from avmStructures).
 	 * @param avp
 	 */
 	public ArrayList<AVM> compose(AVPair avp) {
-		resolvedList = null;
+		// Initialize a new list
 		ArrayList<AVM> newList = new ArrayList<AVM>();
+		// Assume new AVPair can't be set as attribute.
 		boolean placed = false;
+		// Try setting new AVPair on all known AVMs
 		for (AVM avm : this.avmList) {
 			if (avm.setAttribute(avp)) {
+				// Keep successful ones.
 				newList.add(avm);
 				placed = true;
 			}
 		}
 		if (placed) {
+			// If successful, set new avmList and return
 			avmList = newList;
 		} else {
+			// Else clear avmList and return
 			avmList.clear();
 		}
 		return avmList;
 	}
 
 	/**
-	 * call compose for the list of AVPairs
+	 * Calls compose for the list of AVPairs
 	 * @param avPairs list of AVPairs to be composed
 	 */
 	public void composeAll(List<AVPair> avPairs) {
-		for (AVPair pair : avPairs) {
-			compose(pair);
-		}
+		if (avPairs != null) {
+			for (AVPair pair : avPairs) {
+				compose(pair);
+			}	
+		}		
 	}
 
 	/**
-	 * Method to call to resolve world AVMs with composed ones.
-	 * Returns list of AVMs from world list that unify at least one 
-	 * AVM on the composed list. 
-	 * this uses resolvedList as a cache
+	 * Method to resolve composed AVMs in avmList with
+	 * known AVMs in worldList. Loops through both and attempts
+	 * unification.
+	 * 
+	 * @return resolveList the new list of resolved AVMs
 	 */
 	public ArrayList<AVM> resolve() {
-		if (resolvedList == null) {
-			resolvedList = new ArrayList<AVM>();
-			if (avmList != null) {
-				for (AVM avm1 : worldList) {
-					for (AVM avm2 : avmList) {
-						if (avm1.unifies(avm2)) {
-							avm1.unify(avm2);
-							if (!resolvedList.contains(avm1)) {
-								resolvedList.add(avm1);
-							}
-						}
+		ArrayList<AVM> newlyResolved = new ArrayList<AVM>();
+		// Loop through known and world AVMs, attempt unification
+//		System.err.println("composed: "+ this.avmList.toString());
+		for (AVM avm1 : worldList) {
+			for (AVM avm2 : this.avmList) {
+				if (avm1.unifies(avm2)) {
+					avm1.unify(avm2);
+					if (!newlyResolved.contains(avm1)) {
+						newlyResolved.add(avm1);
 					}
-				}			
+				}
 			}
 		}
-		return resolvedList;
+//		System.err.println("resolved: "+ newlyResolved.toString());
+		// If we resolved to a single, hitherto unknown AVM, remember it
+		if (newlyResolved.size() == 1) {
+			for (AVM avm : newlyResolved) {
+				if (!this.keepList.contains(avm)) {
+					this.keepList.add(avm);
+				}
+			}
+//			System.err.println("keeping: "+ this.keepList.toString());
+			// Reset avmList and remove those already found
+			this.setAllAVMs();
+			for (AVM avm : this.keepList) {
+				this.unsetAVMs(avm.getType());
+			}
+//			System.err.println("reset: "+ this.avmList.toString());
+		// If nothing was resolved input was out-of-domain and nothing returns
+		} else if (newlyResolved.size() == 0) {
+			this.resolvedList.clear();
+			this.keepList.clear();
+		}
+		// Return unique list of kept and resolved AVMs
+		this.resolvedList = new ArrayList<AVM>(newlyResolved);
+//		System.err.println("kept: "+ this.keepList.toString());
+		for (AVM avm : keepList) {
+			if (!this.resolvedList.contains(avm)) {
+				this.resolvedList.add(avm);
+			}
+		}
+//		System.err.println("returned: "+ this.resolvedList.toString());
+		return this.resolvedList;
+	}
+	
+	public ArrayList<AVM> getResolvedList() {
+		return this.resolvedList;
 	}
 	
 	/**
@@ -131,7 +181,7 @@ public class AVMComposer {
 	}
 
 	/**
-	 * Unsets AVM of a given type by removing them from the composed list..
+	 * Unsets AVM of a given type by removing them from avmList list.
 	 * @param type
 	 */
 	public void unsetAVMs(String type) {
@@ -200,18 +250,21 @@ public class AVMComposer {
 		// Below is a demonstration of what should happen when tags come in.
 
 		ArrayList<AVPair> avps = new ArrayList<AVPair>();
+		
+		avps.add(new AVPair("act", "take"));
+
 
 		// These should compose and resolve
-		avps.add(new AVPair("color", "green"));
-		avps.add(new AVPair("name", "f"));
-		avps.add(new AVPair("ord", "2"));
-		avps.add(new AVPair("orient", "top"));
-		avps.add(new AVPair("ord", "1"));
-		avps.add(new AVPair("orient", "bottom"));
-		avps.add(new AVPair("ord", "1"));
-		avps.add(new AVPair("relation", "next_to"));
-		avps.add(new AVPair("relation", "above"));
-		avps.add(new AVPair("relation", "below"));
+//		avps.add(new AVPair("color", "green"));
+//		avps.add(new AVPair("name", "f"));
+//		avps.add(new AVPair("ord", "2"));
+//		avps.add(new AVPair("orient", "top"));
+//		avps.add(new AVPair("ord", "1"));
+//		avps.add(new AVPair("orient", "bottom"));
+//		avps.add(new AVPair("ord", "1"));
+//		avps.add(new AVPair("relation", "next_to"));
+//		avps.add(new AVPair("relation", "above"));
+//		avps.add(new AVPair("relation", "below"));
 		
 		// These should compose but not resolve 
 //		avps.add(new AVPair("ord", "4"));

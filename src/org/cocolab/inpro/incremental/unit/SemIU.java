@@ -41,7 +41,20 @@ public class SemIU extends IU {
 	}
 
 	public String toString() {
-		return super.toString() + ", \n tiles: " + this.tileList.toString() + "\n fields: " + this.fieldList.toString() + "\n dialog acts: " + this.dialogActList.toString() + "\n"; 
+		StringBuilder sb = new StringBuilder("< ");
+		for (AVM avm : dialogActList) {
+			sb.append(avm.toShortString() + " ");
+		}
+		for (AVM avm : tileList) {
+			sb.append(avm.toShortString() + " ");
+		}
+		for (AVM avm : fieldList) {
+			sb.append(avm.toShortString() + " ");
+		}
+		sb.append(" >");
+		return super.toString() + " " + sb.toString();
+//
+//		return super.toString() + ", \n tiles: " + this.tileList.toString() + "\n fields: " + this.fieldList.toString() + "\n dialog acts: " + this.dialogActList.toString() + "\n"; 
 	}
 
 	public String toTEDviewXML() {
@@ -65,7 +78,9 @@ public class SemIU extends IU {
 	}
 	
 	public boolean samePayload(SemIU siu) {
-		return false; //FIXME: IMPLEMENT
+		return (this.dialogActList.equals(siu.dialogActList) &&
+				this.fieldList.equals(siu.fieldList) &&
+				this.tileList.equals(siu.tileList));
 	}
 
 }

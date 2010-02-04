@@ -2,7 +2,6 @@ package org.cocolab.inpro.nlu;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Class representing an AVM with methods for equality, unification and setting
@@ -362,7 +361,6 @@ public class AVM {
 		}
 		sb.append("]");
 		return sb.toString();
-//		return this.toLongString(); 
 	}
 
 	/**
