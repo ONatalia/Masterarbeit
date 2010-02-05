@@ -31,10 +31,10 @@ public class AVMComposer {
 		AVMComposer.avmStructures = AVMStructureUtil.parseStructureFile("res/AVMStructure");
 		worldList = AVMWorldUtil.setAVMsFromFile("res/AVMWorldList", avmStructures);
 		avmList = getAllAVMs();
-		resolvedList = new ArrayList<AVM>();
+		resolvedList = new ArrayList<AVM>(worldList);
 		keepList = new ArrayList<AVM>();
 	}
-	
+
 	public AVMComposer(AVMComposer c) {
 		avmList = new ArrayList<AVM>();
 		for (AVM avm : c.avmList) {
@@ -48,15 +48,12 @@ public class AVMComposer {
 		for (AVM avm : c.keepList) {
 			keepList.add(new AVM(avm));
 		}
-//		System.err.println("Copied AVMComposer:");
-//		System.err.println("avmList: " + avmList.toString());
-//		System.err.println("resolvedList: " + resolvedList.toString());
-//		System.err.println("keepList: " + keepList.toString());
 	}
 
 	/**
 	 * Method to call when a new AVPair becomes known.
-	 * Attempt unification with known AVM prototypes (from avmStructures).
+	 * Attempt unification with known AVM prototypes (from avmStructures)
+	 * which incrementally grow with more input.
 	 * @param avp
 	 */
 	public ArrayList<AVM> compose(AVPair avp) {
@@ -129,6 +126,7 @@ public class AVMComposer {
 			for (AVM avm : this.keepList) {
 				this.unsetAVMs(avm.getType());
 			}
+
 //			System.err.println("reset: "+ this.avmList.toString());
 		// If nothing was resolved input was out-of-domain and nothing returns
 		} else if (newlyResolved.size() == 0) {
