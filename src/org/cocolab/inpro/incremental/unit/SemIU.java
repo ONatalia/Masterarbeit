@@ -53,8 +53,6 @@ public class SemIU extends IU {
 		}
 		sb.append(" >");
 		return super.toString() + " " + sb.toString();
-//
-//		return super.toString() + ", \n tiles: " + this.tileList.toString() + "\n fields: " + this.fieldList.toString() + "\n dialog acts: " + this.dialogActList.toString() + "\n"; 
 	}
 
 	public String toTEDviewXML() {
@@ -77,10 +75,16 @@ public class SemIU extends IU {
 		return sb.toString();
 	}
 	
+	/**
+	 * Compares payload of two SemIUs.
+	 * Note: I'm comparing string representations of lists, because .equals() of contents of lists seems to differ.
+	 * @param siu the SemIU to compare against
+	 * @return true if each SemIUs string representations of their payload (three array lists) are the same.
+	 */
 	public boolean samePayload(SemIU siu) {
-		return (this.dialogActList.equals(siu.dialogActList) &&
-				this.fieldList.equals(siu.fieldList) &&
-				this.tileList.equals(siu.tileList));
+		return (this.dialogActList.toString().equals(siu.dialogActList.toString()) &&
+				this.fieldList.toString().equals(siu.fieldList.toString()) &&
+				this.tileList.toString().equals(siu.tileList.toString()));
 	}
 
 }
