@@ -40,6 +40,24 @@ public class SemIU extends IU {
 		return list;
 	}
 
+	public ArrayList<AVM> getFieldList() {
+		ArrayList<AVM> list = new ArrayList<AVM>();
+		list.addAll(this.fieldList);
+		return list;
+	}
+
+	public ArrayList<AVM> getTileList() {
+		ArrayList<AVM> list = new ArrayList<AVM>();
+		list.addAll(this.tileList);
+		return list;
+	}
+
+	public ArrayList<AVM> getDialogActList() {
+		ArrayList<AVM> list = new ArrayList<AVM>();
+		list.addAll(this.dialogActList);
+		return list;
+	}
+
 	public String toString() {
 		StringBuilder sb = new StringBuilder("< ");
 		for (AVM avm : dialogActList) {
