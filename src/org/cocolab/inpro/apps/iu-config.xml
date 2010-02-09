@@ -42,7 +42,7 @@
     </component>
 
 	<component name="floorManager" type="org.cocolab.inpro.incremental.processor.FloorManager">
-		<propertylist name="listener">
+		<propertylist name="listeners">
 			<item>${actionManager}</item>
 		</propertylist>
 	</component>

@@ -109,7 +109,7 @@ public class SimpleText extends JPanel implements ActionListener {
 	}
 	
 	public void actionPerformed(ActionEvent ae) {
-		if (ae.getActionCommand().equals("Commit")) {
+		if (ae.getActionCommand().equals("EoT")) {
 			notifyFloorAvailable();
 		} else {
 			iuDocument.commit();
