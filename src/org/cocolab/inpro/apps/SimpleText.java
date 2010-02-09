@@ -53,6 +53,11 @@ import edu.cmu.sphinx.util.props.S4ComponentList;
  * ASR-commit), and this is a way for us to test this.
  * 
  * 
+ * TODO: implement revocation of words when running non-interactively.
+ * specification more or less follows Verbmobil: an exclamation mark
+ * is followed by the number of words to be revoked. !2 would revoke the 
+ * two words preceding the exclamation mark.
+ * 
  * @author timo
  *
  */
@@ -97,12 +102,20 @@ public class SimpleText extends JPanel implements ActionListener {
 		// add(new JLabel("you can only edit at the right"));
 	}
 	
-	public void actionPerformed(ActionEvent arg0) {
-		iuDocument.commit();
-		// hitting enter on empty lines results in an EoT-marker
-		if (iuDocument.getLength() == 0) {
-			for (FloorManager.Listener l : floorListeners) {
-				l.floor(FloorManager.State.AVAILABLE, FloorManager.State.UNAVAILABLE, null);
+	public void notifyFloorAvailable() {
+		for (FloorManager.Listener l : floorListeners) {
+			l.floor(FloorManager.State.AVAILABLE, FloorManager.State.UNAVAILABLE, null);
+		}		
+	}
+	
+	public void actionPerformed(ActionEvent ae) {
+		if (ae.getActionCommand().equals("Commit")) {
+			notifyFloorAvailable();
+		} else {
+			iuDocument.commit();
+			// hitting enter on empty lines results in an EoT-marker
+			if (iuDocument.getLength() == 0) {
+				notifyFloorAvailable();
 			}
 		}
 		textField.requestFocusInWindow();
