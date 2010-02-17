@@ -242,8 +242,8 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	
 	/**
 	 * translate coordinates given in blocks into coordinates given in pixels
-	 * @param t
-	 * @return
+	 * @param t coordinate in block-domain
+	 * @return coordinate in pixel-domain
 	 */
 	public static int translateBlockToPixel(double t) {
 		return (int) (t * SCALE);

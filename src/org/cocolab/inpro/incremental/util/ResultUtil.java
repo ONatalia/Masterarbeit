@@ -149,7 +149,7 @@ public class ResultUtil {
 	 * shortcut for calling getWordLabelSequence and then using labelsToWords(); could probably be removed?
 	 * @param token
 	 * @param wantFiller
-	 * @return
+	 * @return the list of words (as strings) that lead to token
 	 */
 	public static List<String> getWordSequence(Token token, boolean wantFiller) {
 		List<String> returnList = new LinkedList<String>();

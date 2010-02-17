@@ -13,7 +13,7 @@ public class LabelFile {
 	/**
      * Returns a List of the lines in a label file.
      *
-     * @param batchFile the batch file to read
+     * @param labelFile the label file (wavesurfer format) to read
      * @param skip the number of lines to skip between items
      *
      * @return a List of the lines in a label file

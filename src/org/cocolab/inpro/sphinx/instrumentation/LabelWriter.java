@@ -166,7 +166,7 @@ public class LabelWriter implements Configurable,
     /**
      * get the word-tokens on the best path
      *
-     * @param result the result to analyse
+     * @param token the result to analyse
      * @return List of word tokens on the best path
      */
     protected List<Token> getBestWordTokens(Token token) {
@@ -188,7 +188,7 @@ public class LabelWriter implements Configurable,
     /**
      * get the phone-tokens on the best path
      *
-     * @param result the result to analyse
+     * @param token the result to analyse
      * @return List of phone tokens on the best path
      */
     protected static List<Token> getBestPhoneTokens(Token token) {
@@ -230,7 +230,6 @@ public class LabelWriter implements Configurable,
      * convert a token list to an alignment string 
      * 
      * @param list list of tokens
-     * @return 
      */
     public static String tokenListToAlignment(List<Token> list, int lastFrame) {
 		StringBuilder sb = new StringBuilder(); 
@@ -258,12 +257,10 @@ public class LabelWriter implements Configurable,
 
     /**
      * write labels of aligned segments or words  
-     * to stream if it differs from lastAlignment
+     * to stream &lt;!--if it differs from lastAlignment--&gt;
      * @param list
      * @param stream
-     * @param lastAlignment
      * @param timestamp
-     * @return
      */
     private String writeAlignment(List<Token> list, PrintStream stream, boolean timestamp) {
     	String alignment = tokenListToAlignment(list, step - fixedLag);

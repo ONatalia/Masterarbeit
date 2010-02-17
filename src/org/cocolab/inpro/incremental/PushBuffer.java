@@ -20,6 +20,7 @@ public interface PushBuffer extends Resetable, Configurable {
 	 *        For now we have only used Lists (which are ordered), 
 	 *        but a Tree of IUs should also be possible and this should gracefully
 	 *        work together with processors that expect lists 
+	 * @param edits a list of edits since the last call to hypChange
 	 */
 	public abstract void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits);
 

@@ -1,5 +1,5 @@
 
-    <property name="deltifier" value="none"/>
+    <property name="deltifier" value="smoothing"/>
     <property name="deltifierParam" value="7"/>
     <property name="baseData" value="baseData"/>
     <property name="actionManager" value="dialogueManager"/>
@@ -14,11 +14,10 @@
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
     		<item>hypViewer</item>
-        	<item>consoleNotifier</item>
+<!--        	<item>consoleNotifier</item> -->
     		<item>semanticResolver</item>
 	       	<item>floorManager</item>
 <!--
-          	<item>wordCatcher</item>
     		<item>tedNotifier</item>
           	<item>labelWriter2</item>
     		<item>oaaNotifier</item>
@@ -28,16 +27,9 @@
     
     <component name="semanticResolver" type="org.cocolab.inpro.incremental.processor.SemanticResolver">
         <propertylist name="hypChangeListeners">
-          <item>consoleNotifier</item>
-    		<item>tedNotifier</item>
+<!--          <item>consoleNotifier</item>
+    		<item>tedNotifier</item> -->
     		<item>dialogueManager</item>
-        </propertylist>
-    </component>
-
-    <component name="wordCatcher" type="org.cocolab.inpro.incremental.processor.WordCatcher">
-	   <property name="word" value="kreuz" />
-        <propertylist name="hypChangeListeners">
-          <item>consoleNotifier</item>
         </propertylist>
     </component>
 

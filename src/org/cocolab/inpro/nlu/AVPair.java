@@ -1,5 +1,9 @@
 package org.cocolab.inpro.nlu;
 
+/**
+ * A simple attribute-value pair.
+ * @author okko
+ */
 public class AVPair {
 
 	private String attribute;
@@ -16,7 +20,6 @@ public class AVPair {
 	 * where A and V are separated by a colon, like "size:big"
 	 * or from attribute-value <String, Object> input for more
 	 * complex AVMs.
-	 * @author okko, timo
 	 */
 	AVPair(String attval) {
 		assert (attval.contains(":"));

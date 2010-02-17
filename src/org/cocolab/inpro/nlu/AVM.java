@@ -50,7 +50,7 @@ public class AVM {
 
 	/**
 	 * Builds attribute map from flat string map (read from file by AVMStructureUtil).
-	 * @param structure - HashMap 
+	 * @param avmStructures HashMap 
 	 * @param type of the AVM
 	 */
 	private HashMap<String, Object> unpackStructures(HashMap<String, HashMap<String, String>> avmStructures, String type) {

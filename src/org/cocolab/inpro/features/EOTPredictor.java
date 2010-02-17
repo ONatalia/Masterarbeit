@@ -21,7 +21,6 @@ public class EOTPredictor extends EOTFeatureAggregator {
 	/**
 	 * load classifier from file
 	 * @param filename name of the file the serialized classifier is stored in
-	 * @return classifier from file
 	 */
 	public void loadClassifier(String filename) {
 		try {
