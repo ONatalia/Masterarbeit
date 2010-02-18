@@ -18,4 +18,4 @@
  * <li>Check if words are in dictionary? what happens if not?
  * </ul>
  */
-package test.org.cocolab.inpro.sphinx.train;
+package org.cocolab.inpro.training;

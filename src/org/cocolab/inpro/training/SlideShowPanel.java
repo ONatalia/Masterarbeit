@@ -1,4 +1,4 @@
-package test.org.cocolab.inpro.sphinx.train;
+package org.cocolab.inpro.training;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;

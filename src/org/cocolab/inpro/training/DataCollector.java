@@ -1,4 +1,4 @@
-package test.org.cocolab.inpro.sphinx.train;
+package org.cocolab.inpro.training;
 
 /* 
  * Copyright 2009, 2010, Timo Baumann and the Inpro project
