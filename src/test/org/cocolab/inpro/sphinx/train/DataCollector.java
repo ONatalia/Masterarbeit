@@ -1,7 +1,7 @@
 package test.org.cocolab.inpro.sphinx.train;
 
 /* 
- * Copyright 2009, Timo Baumann and the Inpro project
+ * Copyright 2009, 2010, Timo Baumann and the Inpro project
  * 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,24 +18,22 @@ package test.org.cocolab.inpro.sphinx.train;
 
  */
 
-import java.awt.FlowLayout;
-import java.awt.Font;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import org.cocolab.inpro.gui.util.SpeechStateVisualizer;
 import org.cocolab.inpro.incremental.listener.CurrentHypothesisViewer;
 import org.cocolab.inpro.sphinx.frontend.WavTEDLogger;
 
@@ -44,89 +42,139 @@ import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 
+/**
+ * Software to collect user-annotated semi-spontaneous speech.
+ * 
+ * DataCollector combines ASR and recording tool in order
+ * to improve understanding between users and ASR. The user
+ * gets a feeling for what the ASR may be able to understand
+ * while the annotated output from the user can be used
+ * to further improve ASR. 
+ * <p>
+ * DataCollector can be distributed as a Java WebStart application
+ * which enables data collections from a broad (and cheap) user base.
+ * <p>
+ * Visual cues to what should or could be recorded can be
+ * given in a slide show panel, which also enables the collector
+ * to prime specific words or contexts in which an utterance
+ * is produced.
+ * <p>
+ * This approach allows to balance the degree of freedom
+ * the collected data will expose: Very generic slide shows
+ * lead to almost spontaneous utterances, while very specific
+ * slides (e.g. spelling out the sentence to read) result in
+ * non-spontaneous, read data.
+ * 
+ * @author timo
+ */
 @SuppressWarnings("serial")
-public class DataCollector extends JFrame {
+public class DataCollector extends JPanel implements ActionListener {
 	
 	static final Object noResult = new Object();
 	
 	// sub panels for ASR and result handling
-	ASRPanel asrPanel;
-	ResultPanel resultPanel;
-	// handles all (three) actions in the GUI
-	ActionListener myActionListener;
+	private ASRPanel asrPanel;
+	private ResultPanel resultPanel;
+	/** panel to show an inspirational slide show */
+	private SlideShowPanel slidePanel;
 
-	// Sphinx' ASR stuff 
-	ConfigurationManager cm;
+	private CurrentHypothesisViewer chv;
+
+	private WavTEDLogger wavWriter;
 	
-	WavTEDLogger wavWriter;
-	Recognizer recognizer;
-	
-	// encapsulates (most) ASR stuff
-	RecoRunner recoRunner;
+	/** encapsulates (most) ASR stuff */
+	private RecoRunner recoRunner;
 	
 	boolean isRecognizing;
 	
 	DataCollector() {
-		super("Inpro Data Collector");
-		cm = new ConfigurationManager(DataCollector.class.getResource("config.xml"));
-		this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
+		super(new BorderLayout());
+		ConfigurationManager cm = new ConfigurationManager(DataCollector.class.getResource("config.xml"));
 
-		// all actions are handled in MyActionListener, see below
-		myActionListener = new MyActionListener();		
-		
 		// setup CurrentHypothesisViewer (Sphinx' ResultListener and TextField)
-		CurrentHypothesisViewer chv = (CurrentHypothesisViewer) cm.lookup("hypViewer");
+		chv = (CurrentHypothesisViewer) cm.lookup("hypViewer");
+		wavWriter = (WavTEDLogger) cm.lookup("utteranceWavWriter");
+
+		SpeechStateVisualizer ssv = (SpeechStateVisualizer) cm.lookup("speechStateVisualizer");
+		
+		JPanel p = new JPanel();
+		p.add(ssv.getSpeechIndicator());
+		// all actions are handled in MyActionListener, see below
+		
+		JPanel p2 = new JPanel();
+		p2.setLayout(new BoxLayout(p2, BoxLayout.Y_AXIS));
+		
 		// create the ASR panel using this CurrentHypothesisViewer
-		asrPanel = new ASRPanel(chv); 
+		asrPanel = new ASRPanel(chv, this); 
 		asrPanel.setEnabled(false); // disable for now, will be enabled once ASR initialization completes
-		asrPanel.chvField.setText("\t\tInitialisierung...");
-		this.add(asrPanel);
+		p2.add(asrPanel);
 		
-		resultPanel = new ResultPanel();
+		resultPanel = new ResultPanel(this);
 		resultPanel.setEnabled(false);
-		this.add(resultPanel);
+		p2.add(resultPanel);
 		
-		// show GUI
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.pack();
-		this.setVisible(true);
-		
+		p.add(p2);
+		this.add(p, BorderLayout.NORTH);
+		slidePanel = new SlideShowPanel(SwingConstants.TOP);
+		this.add(slidePanel, BorderLayout.CENTER);
+		recoRunner = new RecoRunner(this);
 		// ASR initialization, will enable asrPanel when it's finished
-		(new RecoStart()).execute();
+		(new RecoStart(recoRunner, cm)).execute();
 	}
 	
 	private class RecoStart extends SwingWorker<Void, Void> {
+		
+		RecoRunner recoRunner;
+		ConfigurationManager cm;
+		
+		RecoStart(RecoRunner recoRunner, ConfigurationManager cm) {
+			this.recoRunner = recoRunner;
+			this.cm = cm;
+		}
+		
 		@Override
 		protected Void doInBackground() throws Exception {
 			Microphone mic = (Microphone) cm.lookup("microphone");
-			recognizer = (Recognizer) cm.lookup("recognizer");
+			Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
 			recognizer.allocate();
-			wavWriter = (WavTEDLogger) cm.lookup("utteranceWavWriter");
+			
 			mic.initialize();
 			if (!mic.startRecording()) {
 				System.err.println("Could not start microphone. Exiting...");
 				System.exit(1);
 			}
+			this.recoRunner.setRecognizer(recognizer);
 			return null;
 		}
+		
 		@Override
 		protected void done() {
 			asrPanel.setEnabled(true);
-			asrPanel.configButton.setEnabled(true);
-			recoRunner = new RecoRunner();
-			recoRunner.start();
+			this.recoRunner.start();
 		}
 	}
 	
 	private class RecoRunner extends Thread {
 		
+		ActionListener myActionListener;
+		
 		boolean updateResults = false;
 		Result mostRecentResult = null;
 		String mostRecentWaveFile = "";
 		
+		Recognizer recognizer;
+
+		RecoRunner(ActionListener myActionListener) {
+			this.myActionListener = myActionListener;
+		}
+		
+		public void setRecognizer(Recognizer recognizer) {
+			this.recognizer = recognizer;
+		}
+		
 		public void setRecognizing(boolean enabled) {
 			updateResults = enabled;
-			asrPanel.chv.updateResults(enabled);
+			chv.updateResults(enabled);
 		}
 		
 		public void run() {
@@ -156,111 +204,56 @@ public class DataCollector extends JFrame {
 		}
 	}
 	
-	private class ASRPanel extends JPanel {
-		CurrentHypothesisViewer chv;
-		JTextField chvField;
-		JToggleButton asrButton;
-		JButton configButton;
-
-		ASRPanel(CurrentHypothesisViewer chv) {
-			super(new FlowLayout(FlowLayout.LEFT));
-			this.chv = chv;
-			chvField = chv.getTextField();
-			this.add(chvField);
-			asrButton = new JToggleButton(new ImageIcon(DataCollector.class.getResource("media-playback-start.png"), "start"));
-			asrButton.setSelectedIcon(new ImageIcon(DataCollector.class.getResource("media-playback-pause.png"), "stop"));
-			asrButton.setSelected(true);
-			asrButton.setActionCommand("PAUSE");
-			asrButton.addActionListener(myActionListener);
-			chv.updateResults(false);
-			this.add(asrButton);
-			configButton = new JButton(new ImageIcon(DataCollector.class.getResource("config.png")));
-			configButton.setEnabled(false);
-			configButton.setActionCommand("CONFIG");
-			configButton.addActionListener(myActionListener);
-			this.add(configButton);
+	private void setRecognizing(boolean enabled) {	
+		if (enabled) {
+			recoRunner.setRecognizing(true);
+			asrPanel.setEnabled(true);
+			resultPanel.reset();
+			resultPanel.setEnabled(false);
+		} else {
+			recoRunner.setRecognizing(false);
+			asrPanel.setEnabled(false);
+			resultPanel.setEnabled(true);
 		}
-		
-		public void setEnabled(boolean enabled) {
-			super.setEnabled(enabled);
-			chvField.setText("");
-			asrButton.setEnabled(enabled);
-		}
-		
-	}
-
-	private class ResultPanel extends JPanel {
-		JTextField bestResult;
-		JButton submitButton;
-		JButton skipButton;
-		
-		ResultPanel() {
-			super(new FlowLayout(FlowLayout.LEFT));
-			bestResult = new JTextField("", 35);
-			bestResult.setFont(new Font("Dialog", Font.BOLD, 24));
-			bestResult.setEditable(true);
-			this.add(bestResult);
-			submitButton = createAndAddButton("dialog-ok.png", "SUBMIT", myActionListener);
-			skipButton = createAndAddButton("dialog-cancel.png", "DISCARD", myActionListener);
-		}
-		
-		private JButton createAndAddButton(String icon, String command, ActionListener al) {
-			JButton button = new JButton(new ImageIcon(DataCollector.class.getResource(icon)));
-			button.setActionCommand(command);
-			button.addActionListener(al);
-			this.add(button);
-			return button;
-		}
-		
-		public void setEnabled(boolean enabled) {
-			super.setEnabled(enabled);
-			bestResult.setEnabled(enabled);
-			submitButton.setEnabled(enabled);
-			skipButton.setEnabled(enabled);
-		}
-	}
-
-	private class MyActionListener implements ActionListener {
-		
-		private void setRecognizing(boolean enabled) {	
-			if (enabled) {
-				recoRunner.setRecognizing(true);
-				asrPanel.setEnabled(true);
-				resultPanel.bestResult.setText("");
-				resultPanel.setEnabled(false);
-			} else {
-				recoRunner.setRecognizing(false);
-				asrPanel.setEnabled(false);
-				resultPanel.setEnabled(true);
-			}
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent ae) {
-			String command = ae.getActionCommand();
-			if (command.equals("PAUSE")) {
-				boolean isPaused = ((JToggleButton) ae.getSource()).isSelected(); 
-				recoRunner.setRecognizing(!isPaused);
-				asrPanel.configButton.setEnabled(isPaused);
-			} else if (command.equals("ASR_RESULT")) {
-				setRecognizing(false);
-				Result result = ((RecoRunner) ae.getSource()).mostRecentResult;
-				String resultText = result.getBestFinalToken().getWordPath();
-				resultPanel.bestResult.setText(resultText);
-				saveTranscript(resultText, ".hyp");
-			} else if (command.equals("SUBMIT")) {
-				String resultText = resultPanel.bestResult.getText();
-				saveTranscript(resultText, ".ref");
-				setRecognizing(true);
-			} else if (command.equals("DISCARD")) {
-				setRecognizing(true);
-			} else if (command.equals("CONFIG")) {
-				configurePath();
-			}
-		}	
 	}
 	
-	void configurePath() {
+	/**
+	 * Action handler for all actions in the application.
+	 * handles all (four) actions in the GUI
+	 * plus the one action from ASR.
+	 */
+	@Override
+	public void actionPerformed(ActionEvent ae) {
+		String command = ae.getActionCommand();
+		if (command.equals("PAUSE")) {
+			boolean isPaused = ((JToggleButton) ae.getSource()).isSelected(); 
+			recoRunner.setRecognizing(!isPaused);
+			asrPanel.setConfigurable(isPaused);
+		} else if (command.equals("ASR_RESULT")) {
+			/* when a new result comes in:
+			 * - stop to recognize (we now come to the editing phase
+			 * - save current scene information,
+			 * - save the ASR hypothesis,
+			 * - show the ASR hypothesis
+			 * */
+			setRecognizing(false);
+			saveTranscript(slidePanel.getCurrentSlideInfo(), ".scene");
+			Result result = ((RecoRunner) ae.getSource()).mostRecentResult;
+			String resultText = result.getBestFinalToken().getWordPath();
+			saveTranscript(resultText, ".hyp");
+			resultPanel.setResult(resultText);
+		} else if (command.equals("ACCEPT")) {
+			String resultText = resultPanel.getResult();
+			saveTranscript(resultText, ".ref");
+			setRecognizing(true);
+		} else if (command.equals("DISCARD")) {
+			setRecognizing(true);
+		} else if (command.equals("CONFIG")) {
+			configurePath();
+		}
+	}	
+	
+	private void configurePath() {
 		String oldPath = wavWriter.getDumpFilePath();
 		String newPath = (String) JOptionPane.showInputDialog(null, 
 				"Path and prefix for collected files", 
@@ -269,7 +262,7 @@ public class DataCollector extends JFrame {
 		wavWriter.setDumpFilePath(newPath);
 	}
 
-	void saveTranscript(String transcript, String filetype) {
+	private void saveTranscript(String transcript, String filetype) {
 		String filename = recoRunner.mostRecentWaveFile.replaceFirst("\\.wav$", filetype);
 		try {
 			PrintStream outFile = new PrintStream(filename);
@@ -279,10 +272,30 @@ public class DataCollector extends JFrame {
 		}
 	}
 
+	/**
+	 * used to construct the GUI on the Swing thread.
+	 */
+	public static void createAndShowGUI() {
+		JFrame frame = new JFrame("Inpro Data Collector");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		// add our object
+		DataCollector contentPane = new DataCollector();
+		contentPane.setOpaque(true);
+		contentPane.slidePanel.setXML(DataCollector.class.getResourceAsStream("slides.xml"));
+		frame.setContentPane(contentPane);
+		//Display the window.
+        frame.pack();
+		frame.setVisible(true);
+	}
+	
+	/**
+	 * main method for the application
+	 * @param args arguments are ignored
+	 */
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				new DataCollector();	
+				createAndShowGUI();	
 			}
 		});
 	}

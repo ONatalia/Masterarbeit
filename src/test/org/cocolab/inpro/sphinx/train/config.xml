@@ -249,7 +249,9 @@
         <property name="debug" value="false"/> <!-- this is *very* verbose if set to true-->
     </component>
 
-    <component name="speechStateVisualizer" type="org.cocolab.inpro.gui.util.SpeechStateVisualizer"/>
+    <component name="speechStateVisualizer" type="org.cocolab.inpro.gui.util.SpeechStateVisualizer">
+       	<property name="showWindow" value="false"/>
+    </component>
 
     <component name="speechMarker" type="edu.cmu.sphinx.frontend.endpoint.SpeechMarker">
         <property name="startSpeech" value="${startSpeech}"/>

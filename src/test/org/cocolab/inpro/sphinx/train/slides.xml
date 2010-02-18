@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<slideshow description="boring slideshow" root="http://www.ling.uni-potsdam.de/~timo/projekte/dc/slides1/">
+	<slide url="scene1.png" description="Szene 1"/>
+	<slide url="scene2.png" description="Szene 2"/>
+	<slide url="scene3.png" description="Szene 3"/>
+	<slide url="scene4.png" description="Szene 4"/>
+	<slide url="scene5.png" description="Szene 5"/>
+	<slide url="scene6.png" description="Szene 6"/>
+	<slide url="scene7.png" description="Szene 7"/>
+	<slide url="scene8.png" description="Szene 8"/>
+	<slide url="scene9.png" description="Szene 9"/>
+</slideshow>
