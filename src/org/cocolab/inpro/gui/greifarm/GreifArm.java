@@ -2,6 +2,8 @@ package org.cocolab.inpro.gui.greifarm;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 
@@ -31,14 +33,13 @@ public class GreifArm extends CursorCanvas {
 	}
 	
 	@Override
-	protected Tile[] createTiles() {
-		Tile[] tiles;
-		tiles = new Tile[3];
-		tiles[0] = new ImageTile(GreifArm.class.getResource("ball.png"));
-		tiles[1] = new ImageTile(GreifArm.class.getResource("bowl.png"));
+	protected List<Tile> createTiles() {
+		ArrayList<Tile> tiles = new ArrayList<Tile>(3);
+		tiles.add(new ImageTile(GreifArm.class.getResource("ball.png")));
+		tiles.add(new ImageTile(GreifArm.class.getResource("bowl.png")));
 		emptyHand = new ImageTile(CursorCanvas.class.getResource("draggable.png"));
 		emptyHand.setVisible(false);
-		tiles[2] = emptyHand;
+		tiles.add(emptyHand);
 		return tiles;
 	}
 	
@@ -56,14 +57,14 @@ public class GreifArm extends CursorCanvas {
 		super.reset();
 		// reset to a new position
 		double ballX = Math.random() * (RELATIVE_WIDTH - 2) + 1;
-		tiles[0].setPos(new Point((int) (ballX * SCALE), 1 * SCALE));
+		tiles.get(0).setPos(new Point((int) (ballX * SCALE), 1 * SCALE));
 		cursorPosition = new Point((int) (ballX * SCALE), 1 * SCALE);
 		grabbing = true;
 		cursorVisible = true;
 		cursorPressAt((int) (ballX * SCALE), 1 * SCALE);
 		logger.info("greifarm position is now " + cursorPosition.x);
 		double bowlX = Math.random() * (RELATIVE_WIDTH - 2) + 1;
-		tiles[1].setPos(new Point((int) (bowlX * SCALE), (int) ((RELATIVE_HEIGHT - 1.5) * SCALE)));
+		tiles.get(1).setPos(new Point((int) (bowlX * SCALE), (int) ((RELATIVE_HEIGHT - 1.5) * SCALE)));
 		logger.info("bowl position is now " + (int) (bowlX * SCALE));
 	}
 	

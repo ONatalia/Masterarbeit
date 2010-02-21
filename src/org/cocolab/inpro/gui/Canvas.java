@@ -4,11 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import javax.swing.JPanel;
 
@@ -17,29 +14,25 @@ import edu.cmu.sphinx.instrumentation.Resetable;
 
 /**
  * a canvas that contains @see{Tile}s which can be selected, moved around, placed, etc.
+ * 
+ * tiles within the canvas live in a logical coordinate system, which is mapped
+ * to screen pixels using the final SCALE variable.
+ * the canvas has a size of RELATIVE_WIDTH * RELATIVE_HEIGHT
+ * 
  */
 
 @SuppressWarnings("serial")
 public abstract class Canvas extends JPanel implements ActionListener, Resetable {
 
+	/** width of the canvas */
 	protected static final int RELATIVE_WIDTH = 30; // measured in boxes
+	/** height of the canvas */
 	protected static final int RELATIVE_HEIGHT = 24;
 
+	/** scales the logical coordinate system of the canvas to pixel coordinates */
 	public static final int SCALE = 20;
 
-	protected static final Point[] defPoss = {
-		new Point(2 * SCALE, 7 * SCALE), new Point(6 * SCALE, 7 * SCALE), 
-		new Point(10 * SCALE, 7 * SCALE), new Point(14 * SCALE, 7 * SCALE), 
-		new Point(19 * SCALE, 6 * SCALE), new Point(25 * SCALE, 6 * SCALE),  
-		new Point(2 * SCALE, 13 * SCALE), new Point(6 * SCALE, 14 * SCALE), 
-		new Point(10 * SCALE, 13 * SCALE), new Point(14 * SCALE, 13 * SCALE), 
-		new Point(19 * SCALE, 13 * SCALE), new Point(25 * SCALE, 12 * SCALE),  
-		new Point(2 * SCALE, 18 * SCALE), new Point(6 * SCALE, 18 * SCALE), 
-		new Point(10 * SCALE, 18 * SCALE), new Point(14 * SCALE, 18 * SCALE), 
-		new Point(19 * SCALE, 18 * SCALE), new Point(25 * SCALE, 18 * SCALE),  
-	};
-	
-	protected Tile[] tiles;
+	protected List<Tile> tiles;
 	protected Tile draggingTile;
 	protected Tile activeTile;
 	Point clickOffset = new Point(0, 0);
@@ -54,39 +47,24 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 		showTiles = true;
 	}
 	
-	protected abstract Tile[] createTiles();
+	protected abstract List<Tile> createTiles();
 	
 	public void showTiles(boolean show) {
 		showTiles = show;
 		repaint();
 	}
-	
-	public void shuffleTiles() {
-		Random rnd = new Random();
-		shuffleTiles(rnd);
-	}
-	
-	public void shuffleTiles(Long seed) {
-		shuffleTiles(new Random(seed));
-	}
-	
-	public void shuffleTiles(Random rnd) {
-		Point[] poss = Arrays.copyOf(defPoss, defPoss.length);
-		List<Point> positions = Arrays.asList(poss);
-		shuffleTiles(rnd, positions);
-	}
-
+/*	
 	protected void shuffleTiles(Random rnd, List<Point> positions) {
 		Collections.shuffle(positions, rnd);
 		setPositions(positions);
 	}
-	
-	public Tile[] getTiles() {
+*/	
+	public List<Tile> getTiles() {
 		return tiles;
 	}
 	
 	protected void setPositions(List<Point> positions) {
-		if (tiles.length > positions.size()) {
+		if (tiles.size() > positions.size()) {
 			throw new ArrayIndexOutOfBoundsException("I can only shuffle arrays with at most " + positions.size() + "tiles");
 		}
 		Iterator<Point> posIt = positions.iterator();
@@ -104,7 +82,7 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	}
 
 	public void setLabels(List<String> labels) {
-		assert (tiles.length == labels.size());
+		assert (tiles.size() == labels.size());
 		Iterator<String> li = labels.iterator();
 		for (Tile t : tiles) {
 			t.setLabel(li.next());

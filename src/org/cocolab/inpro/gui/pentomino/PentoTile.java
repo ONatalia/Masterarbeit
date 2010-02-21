@@ -7,6 +7,11 @@ import java.lang.String;
 import org.cocolab.inpro.gui.Point;
 import org.cocolab.inpro.gui.Tile;
 
+/**
+ * implements pentomino tiles.
+ * 
+ * a tile is represented by 5 @see{Box}es.
+ */
 public class PentoTile extends Tile {
 
 	public static final String CCW_ROTATE_COMMAND = "ccwRotate";
@@ -14,7 +19,7 @@ public class PentoTile extends Tile {
 	public static final String HORIZONTAL_FLIP_COMMAND = "hFlip";
 	public static final String VERTICAL_FLIP_COMMAND = "vFlip";
 
-	int     scale;
+	final int     scale;
 
 	Point  clipOffset;                  // (refPoint - clipCorner)
 	Point  clipCorner;
@@ -26,6 +31,12 @@ public class PentoTile extends Tile {
 	
 	private Grid myGrid;
 	
+	/**
+	 * the outermost array contains for each kind of pentomino tile (12)
+	 * an array with two entries (X and Y) each of these containing 
+	 * five positions. 
+	 * FIXME: ordering is obviously wrong: it should be 12 -> 5 -> 2 instead.
+	 */
 	protected static int[][][] TILE_BITMAPS = {
 		{{0, 0, -1, 0, 1}, {0, -1, 0, 1, -1}}, // F
 		{{0, 1, 0, 0, 1}, {0, -1, -1, 1, 1}}, // U
@@ -73,6 +84,7 @@ public class PentoTile extends Tile {
 	
 	int[][] getDefVectors(char name) {
 		int[][] vector;
+		assert(isValidTile(name));
 		switch (name) {
 			case 'F': vector = TILE_BITMAPS[0]; break; 
 			case 'U': vector = TILE_BITMAPS[1]; break; 

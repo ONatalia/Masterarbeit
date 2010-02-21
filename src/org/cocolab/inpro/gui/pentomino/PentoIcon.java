@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 
 import org.cocolab.inpro.gui.Point;
 
-/*
+/**
  * encapsulate PentoTile so that it can be used as the icon on a button
  */
 

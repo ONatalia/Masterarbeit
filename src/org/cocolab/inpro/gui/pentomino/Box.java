@@ -6,9 +6,15 @@ import java.lang.Cloneable;
 
 import org.cocolab.inpro.gui.Point;
 
+/**
+ * five of these make a pentomino tile, four for tetris.
+ * @author whoever implemented the original pentomino code
+ * @author timo: some adaptations/deprovements over the years
+ */
 public class Box implements Cloneable {
 
-   Point dim;
+   /** a box's dimensions never change, hence final */
+   final Point dim;
    Point corner;
    private Color color;
 
@@ -55,10 +61,6 @@ public class Box implements Cloneable {
 		   g.drawLine(corner.x + 1, corner.y + dim.y, corner.x + dim.x - 1, corner.y + dim.y);
    }
    
-   public boolean selected(Point p) {
-	   return matchesPosition(p);
-   }
-
    public boolean matchesPosition(Point p) {
       if (p.x >= this.corner.x && p.x <= this.corner.x + this.dim.x - 1 &&
           p.y >= this.corner.y && p.y <= this.corner.y + this.dim.y - 1)

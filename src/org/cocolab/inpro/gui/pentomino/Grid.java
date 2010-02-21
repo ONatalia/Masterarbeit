@@ -9,26 +9,35 @@ import java.net.URL;
 
 import org.cocolab.inpro.gui.Point;
 
+/**
+ * Defines the goal pattern of a pentomino game.
+ * TODO: should probably be renamed to GoalPattern 
+ * instead of Grid, cause that's what it is and we could
+ * use the name Grid somewhere else (cmp. o.c.i.gui.Matrix)
+ * 
+ * @author whoever implemented the original pentomino code
+ * @author timo: some adaptations/deprovements over the years
+ */
 public class Grid {
 	
 	static final Object OUTSIDE = "-";
 	static final Object INSIDE = "x";
 
 	private Point pos; // position of the grid in the graphic context
-	private int scale; // size of each field in the tray
+	private final int scale; // size of each field in the tray
 
 	public Point dim; // dimension of the tray, *NOT pixels*
 	public Object[][] tray;
 	
-	void init(int x0, int y0, int scale, int nx, int ny) {
+	void init(int x0, int y0, int nx, int ny) {
 		this.pos = new Point(x0, y0);
-		this.scale = scale;
 		this.dim = new Point(nx, ny); /* treat like (x,y) -- (width, height) */
 		this.tray = new Object[nx][ny];
 	}
 	
 	public Grid(int x0, int y0, int scale, String patternFile) {
 		URL patternURL = Grid.class.getResource(patternFile);
+		this.scale = scale;
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(patternURL.openStream()));
 			// the first line (hopefully) contains the dimensions of the tray
@@ -37,7 +46,7 @@ public class Grid {
 			int nx = new Integer(lineTokens[0]).intValue();
 			int ny = new Integer(lineTokens[1]).intValue();
 			// initialize the tray
-			init(x0, y0, scale, nx, ny);
+			init(x0, y0, nx, ny);
 			for (int y = 0; y < ny; y++) {
 				String line = reader.readLine();
 				for (int x = 0; x < nx; x++) {
@@ -59,7 +68,8 @@ public class Grid {
 	Grid(int x0, int y0, int scale) {
 		int nx = 11;
 		int ny = 9;
-		init(x0, y0, scale, nx, ny);
+		this.scale = scale;
+		init(x0, y0, nx, ny);
 		
 		// added by das:
 		for (int i = 0; i < ny; i++)
