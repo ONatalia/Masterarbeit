@@ -11,14 +11,11 @@ import org.cocolab.inpro.gui.Point;
 
 /**
  * Defines the goal pattern of a pentomino game.
- * TODO: should probably be renamed to GoalPattern 
- * instead of Grid, cause that's what it is and we could
- * use the name Grid somewhere else (cmp. o.c.i.gui.Matrix)
  * 
  * @author whoever implemented the original pentomino code
  * @author timo: some adaptations/deprovements over the years
  */
-public class Grid {
+public class TargetPattern {
 	
 	static final Object OUTSIDE = "-";
 	static final Object INSIDE = "x";
@@ -35,8 +32,8 @@ public class Grid {
 		this.tray = new Object[nx][ny];
 	}
 	
-	public Grid(int x0, int y0, int scale, String patternFile) {
-		URL patternURL = Grid.class.getResource(patternFile);
+	public TargetPattern(int x0, int y0, int scale, String patternFile) {
+		URL patternURL = TargetPattern.class.getResource(patternFile);
 		this.scale = scale;
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(patternURL.openStream()));
@@ -65,7 +62,7 @@ public class Grid {
 	}
 
 	// draw an elephant if no pattern file is given
-	Grid(int x0, int y0, int scale) {
+	TargetPattern(int x0, int y0, int scale) {
 		int nx = 11;
 		int ny = 9;
 		this.scale = scale;

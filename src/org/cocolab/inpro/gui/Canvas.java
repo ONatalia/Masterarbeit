@@ -1,6 +1,5 @@
 package org.cocolab.inpro.gui;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JPanel;
-
 
 import edu.cmu.sphinx.instrumentation.Resetable;
 
@@ -19,6 +17,9 @@ import edu.cmu.sphinx.instrumentation.Resetable;
  * to screen pixels using the final SCALE variable.
  * the canvas has a size of RELATIVE_WIDTH * RELATIVE_HEIGHT
  * 
+ * a tile in a canvas can be selected and this tile can then be moved around  
+ * 
+ * @see Tile
  */
 
 @SuppressWarnings("serial")
@@ -36,8 +37,6 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	protected Tile draggingTile;
 	protected Tile activeTile;
 	Point clickOffset = new Point(0, 0);
-	Color selectedColor = Color.green;
-	Color normalColor = Color.gray;
 	
 	private boolean showTiles;
 	public boolean labelsVisible;
@@ -145,16 +144,18 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 		// Placed pieces appear to be underneath non-placed ones, 
 		// so non-placed pieces get the first chance at being selected.
 		for (Tile tile : tiles) {
-			if (!tile.placed && tile.matchesPosition(p)) {
+			if (!tile.isPlaced() && tile.matchesPosition(p)) {
 				draggingTile = tile;
+				draggingTile.select();
 				break;
 			}
 		}
 		// if no unplaced tile has been selected, try to select a placed tile 
 		if (draggingTile == null) {
 			for (Tile tile : tiles) {
-				if (tile.placed && tile.matchesPosition(p)) {
+				if (tile.isPlaced() && tile.matchesPosition(p)) {
 					draggingTile = tile;
+					draggingTile.select();
 					break;
 				}
 			}
@@ -163,18 +164,20 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 		if (activeTile != null) {
 			System.out.println("Unselected: " + activeTile.defaultRefPoint
 					+ " " + activeTile.name);
-			if (!activeTile.placed) {
-				activeTile.setColor(normalColor);
+			if (!activeTile.isPlaced()) {
+				//activeTile.setColor(normalColor);
+				activeTile.unselect();
 			}
 			activeTile = null;
 		}
 		if (draggingTile != null) {
 			System.out.println("Selected: " + draggingTile.defaultRefPoint + " "
 					+ draggingTile.name);
-			if (draggingTile.placed) {
+			if (draggingTile.isPlaced()) {
 				draggingTile.unplace();
 			}
-			draggingTile.setColor(selectedColor);
+			draggingTile.select();
+//			draggingTile.setColor(selectedColor);
 			clickOffset.copy(p);
 			clickOffset.sub(draggingTile.refPoint);
 			selectionSuccessful = true;
@@ -193,7 +196,8 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 		if (draggingTile != null) {
 			activeTile = draggingTile;
 			/* next line: don't allow selection for flips or rotates while a piece is in the Grid */
-			if (activeTile.placed) {
+			if (activeTile.isPlaced()) {
+				activeTile.unselect();
 				activeTile = null;
 			}
 			draggingTile = null; // nothing to drag anymore

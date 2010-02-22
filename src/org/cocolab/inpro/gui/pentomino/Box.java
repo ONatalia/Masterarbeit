@@ -29,6 +29,11 @@ public class Box implements Cloneable {
       dim = new Point(dx, dy);
       color = c;
    }
+    
+	public void drawSelection(Graphics g) {
+		g.setColor(Color.decode("#FF7F00"));
+		g.drawRect(corner.x - 1, corner.y - 1, dim.x + 2, dim.y + 2);
+	}
 
    public void draw(Graphics g) {
       g.setColor(color.brighter());
@@ -87,4 +92,5 @@ public class Box implements Cloneable {
       this.corner.x = x;
       this.corner.y = y;
    }
+
 }

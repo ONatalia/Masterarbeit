@@ -1,6 +1,5 @@
 package org.cocolab.inpro.gui;
 
-import java.awt.Color;
 import java.awt.Graphics;
 
 import edu.cmu.sphinx.instrumentation.Resetable;
@@ -8,7 +7,9 @@ import edu.cmu.sphinx.instrumentation.Resetable;
 /**
  * an abstract pentomino tile / puzzle piece / whatever
  * it can be drawn (this is to be implemented by derived classes),
- * moved around, be in a placed or unplaced state, and a few more things
+ * selected, then moved around, 
+ * and be in a placed or unplaced state, 
+ * and a few more things
  * 
  * implementing classes (for now) are ImageTile (used in Greifarm),
  * and PentoTile (used in all things pentomino) 
@@ -20,9 +21,8 @@ public abstract class Tile implements Resetable {
 	public String label;
 	public Point refPoint = new Point(0, 0);
 	protected Point defaultRefPoint = new Point(0, 0);   // defaultRefPoint can be used for resetting
-	protected Color color;         // defaultColor    can be used for resetting
-	protected Color defaultColor;
-	public boolean placed;
+	protected boolean isPlaced;
+	private boolean isSelected;
 
 	// draw the tile, if l is true, the label should be drawn
 	public abstract void draw(Graphics g, boolean l);
@@ -33,10 +33,6 @@ public abstract class Tile implements Resetable {
 
 	abstract public boolean matchesPosition(Point p);
 
-	public void setColor(Color c) {
-		this.color = c;
-	}
-	
 	public void setLabel(String l) {
 		this.label = l;
 	}
@@ -47,14 +43,34 @@ public abstract class Tile implements Resetable {
 	
 	public void reset() {
 		setPos(defaultRefPoint);
-		setColor(defaultColor);
 		unplace();
+		unselect();
 	}
 	
 	public void doCommand(String command) {
 		throw new RuntimeException("Illegal command for tile manipulation");
 	}
 	
+	public void place() {
+		this.isPlaced = true;
+	}
+	
 	abstract public void unplace();
+
+	public boolean isPlaced() {
+		return isPlaced;
+	}
+
+	public void select() {
+		this.isSelected = true;
+	}
+	
+	public void unselect() {
+		this.isSelected = false;
+	}
+
+	public boolean isSelected() {
+		return isSelected;
+	}
 
 }

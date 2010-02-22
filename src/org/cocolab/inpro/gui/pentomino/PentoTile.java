@@ -19,17 +19,23 @@ public class PentoTile extends Tile {
 	public static final String HORIZONTAL_FLIP_COMMAND = "hFlip";
 	public static final String VERTICAL_FLIP_COMMAND = "vFlip";
 
-	final int     scale;
+	final int scale;
 
 	Point  clipOffset;                  // (refPoint - clipCorner)
 	Point  clipCorner;
 	Point  clipDim;
 
+	protected Color color;         // defaultColor    can be used for resetting
+	protected Color defaultColor;
+
+	final static Color selectedColor = Color.green;
+	final static Color normalColor = Color.gray;
+	
 	private static final int BOX_COUNT = 5; // number of boxes making up the piece
 	private Box[]   boxes = new Box[BOX_COUNT];
 	private int[][] defVectors = new int[2][BOX_COUNT];
 	
-	private Grid myGrid;
+	private TargetPattern myGrid;
 	
 	/**
 	 * the outermost array contains for each kind of pentomino tile (12)
@@ -56,17 +62,16 @@ public class PentoTile extends Tile {
 		this(s, c, x0, y0, name, Character.valueOf(name).toString());
 	}
 	
-	PentoTile(int s, Color c, int x0, int y0, char name, String label) {
+	public PentoTile(int s, Color c, int x0, int y0, char name, String label) {
 		if (!isValidTile(name)) 
 			throw new RuntimeException("Error in PentoTile: " + Character.toString(name) + " is not a valid type for a tile");
 		this.defVectors = getDefVectors(name);
 		this.color = c;
 		this.refPoint = new Point(x0, y0);
-		this.scale = s;
 		this.name = Character.valueOf(name).toString();
 		this.label = label;
+		this.scale = s;
 
-		this.placed = false;
 		this.defaultRefPoint = this.refPoint;
 		this.defaultColor = this.color;
 		this.clipCorner = new Point(this.refPoint);
@@ -113,16 +118,16 @@ public class PentoTile extends Tile {
 		Point p = new Point(0, 0);
 		Point clipLRCorner =
 			new Point(this.refPoint);
-		clipLRCorner.add(this.scale);
+		clipLRCorner.add(scale);
 
 		this.clipCorner.copy(this.refPoint);
 		for (int i=0; i<BOX_COUNT; i++) {
 			p.copy(this.refPoint);
-			p.add(new Point(defVectors[0][i] *this.scale,
-					defVectors[1][i] *this.scale));
-			boxes[i] = new Box(p, this.scale, color); //generates GARBAGE
+			p.add(new Point(defVectors[0][i] *scale,
+					defVectors[1][i] *scale));
+			boxes[i] = new Box(p, scale, color); //generates GARBAGE
 			this.clipCorner.min(p);
-			p.add(this.scale);
+			p.add(scale);
 			clipLRCorner.max(p);
 		}
 		this.clipDim = (Point) clipLRCorner.clone();
@@ -139,6 +144,7 @@ public class PentoTile extends Tile {
 		super.reset();
 		defVectors = getDefVectors(name.charAt(0));
 		generate();
+		setColor(defaultColor);
 	}
 
 	public boolean matchesPosition(Point p) {
@@ -163,7 +169,6 @@ public class PentoTile extends Tile {
 	}
 
 	public void setColor(Color c) {
-		super.setColor(c);
 		for (int i=0; i<BOX_COUNT; i++) {
 			(boxes[i]).setColor(c);
 		}
@@ -175,6 +180,11 @@ public class PentoTile extends Tile {
 	public void draw(Graphics g, boolean l) {
 		int tx = boxes[0].corner.x;
 		int ty = boxes[0].corner.y;
+		if (isSelected()) {
+			for (int i = 0; i < BOX_COUNT; i++) {
+				boxes[i].drawSelection(g);
+			}
+		}
 		for (int i = 0; i < BOX_COUNT; i++) {
 			Box current = boxes[i];
 			Point left = new Point(current.corner.x - current.dim.x, current.corner.y);
@@ -270,7 +280,7 @@ public class PentoTile extends Tile {
 			mj = index0.y +defVectors[1][i];
 			// das:
 				if (mi < 0 || mi >= dim.x || mj < 0 || mj >= dim.y ||
-						(tray[mi][mj] != Grid.INSIDE && tray[mi][mj] != null))
+						(tray[mi][mj] != TargetPattern.INSIDE && tray[mi][mj] != null))
 					fit = false;
 		}
 		return fit;
@@ -303,8 +313,8 @@ public class PentoTile extends Tile {
 							tray[mi+k][mj+L] != this && tray[mi+k][mj+L] != null) {    // don't count spaces occupied by _this_ or not occupied at all
 						for (int z = 0; z<c.length; z++) {
 							// das:
-							if (tray[mi+k][mj+L] == Grid.INSIDE 
-									&& tray[mi+k][mj+L] == Grid.OUTSIDE
+							if (tray[mi+k][mj+L] == TargetPattern.INSIDE 
+									&& tray[mi+k][mj+L] == TargetPattern.OUTSIDE
 									&& ((PentoTile) tray[mi+k][mj+L]).color == c[z])
 							{
 								cOK[z] = false;
@@ -321,7 +331,7 @@ public class PentoTile extends Tile {
 				break;
 			}
 		}
-		placed = true;
+		isPlaced = true;
 	}
 
 	public void unplace() {
@@ -340,15 +350,25 @@ public class PentoTile extends Tile {
 			mj = index0.y +defVectors[1][i];
 			tray[mi][mj] = null;
 		}
-		placed = false;
+		isPlaced = false;
 	}
 
 	public String toString() {
 		return "tile: " + this.name + "\n";
 	}
 
-	public void setMyGrid(Grid myGrid) {
+	public void setMyGrid(TargetPattern myGrid) {
 		this.myGrid = myGrid;
 	}
 
+	public void select() {
+		super.select();
+		setColor(selectedColor);
+	}
+	
+	public void unselect() {
+		super.unselect();
+		setColor(normalColor);
+	}
+	
 }
