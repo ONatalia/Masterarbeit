@@ -363,12 +363,12 @@ public class PentoTile extends Tile {
 
 	public void select() {
 		super.select();
-		setColor(selectedColor);
+//		setColor(selectedColor);
 	}
 	
 	public void unselect() {
 		super.unselect();
-		setColor(normalColor);
+//		setColor(normalColor);
 	}
 	
 }

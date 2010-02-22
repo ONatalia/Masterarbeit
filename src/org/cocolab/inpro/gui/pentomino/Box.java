@@ -32,7 +32,9 @@ public class Box implements Cloneable {
     
 	public void drawSelection(Graphics g) {
 		g.setColor(Color.decode("#FF7F00"));
-		g.drawRect(corner.x - 1, corner.y - 1, dim.x + 2, dim.y + 2);
+		g.fillRect(corner.x - 2, corner.y - 2, dim.x + 5, dim.y + 5);
+//		g.setColor(Color.yellow);
+//		g.drawRect(corner.x - 1, corner.y - 1, dim.x + 2, dim.y + 2);
 	}
 
    public void draw(Graphics g) {
