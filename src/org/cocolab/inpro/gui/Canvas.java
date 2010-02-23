@@ -184,6 +184,13 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 		}
 		return selectionSuccessful;
 	}
+	
+	public void tileUnselect() {
+		if (activeTile != null) {
+			activeTile.unselect();
+			activeTile = null;
+		}
+	}
 			
 	public void tileReleaseRel(double x, double y) {
 		tileRelease(translateBlockToPixel(x), translateBlockToPixel(y));

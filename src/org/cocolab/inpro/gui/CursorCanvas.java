@@ -179,6 +179,10 @@ abstract public class CursorCanvas extends Canvas {
 	public void cursorMoveSlowlyToRel(double x, double y) {
 		cursorMoveSlowlyTo(translateBlockToPixel(x), translateBlockToPixel(y));
 	}
+
+	public void cursorMoveSlowlyTo(Point p) {
+		cursorMoveSlowlyTo(p.x, p.y);
+	}
 	
 	public void cursorMoveSlowlyTo(int x, int y) {
 		int distX = x - cursorPosition.x;
