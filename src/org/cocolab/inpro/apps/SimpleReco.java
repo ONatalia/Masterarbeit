@@ -12,6 +12,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.apps.util.RecoCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
+import org.cocolab.inpro.gui.util.MuteButton;
 import org.cocolab.inpro.sphinx.decoder.FakeSearch;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 
@@ -44,7 +45,8 @@ public class SimpleReco {
 		if (!mic.startRecording()) {
 			logger.fatal("Could not open microphone. Exiting...");
 			System.exit(1);
-		}	
+		}
+		MuteButton.showMuteButton(mic);
 		Runnable shutdownHook = new Runnable() {
 			public void run() {
 				logger.info("Shutting down microphone.");
@@ -159,18 +161,30 @@ public class SimpleReco {
     		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
     	}
     	Result result = null;
-    	do {
-	    	result = recognizer.recognize();
-	        if (result != null) {
-	        	// Normal Output
-	        	logger.info("RESULT: " + result.toString() + "\n");
-	        } else {
-	        	logger.info("Result: null\n");
-	        }
-	        if (clp.getInputMode() == RecoCommandLineParser.FILE_INPUT) {
-	        	break;
-	        }
-    	} while ((result != null) && (result.getDataFrames() != null) && (result.getDataFrames().size() > 4));
+    	while (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
+	    	do {
+		    	result = recognizer.recognize();
+		        if (result != null) {
+		        	// Normal Output
+		        	logger.info("RESULT: " + result.toString() + "\n");
+		        } else {
+		        	logger.info("Result: null\n");
+		        }
+		        if (clp.getInputMode() == RecoCommandLineParser.FILE_INPUT) {
+		        	break;
+		        }
+	    	} while ((result != null) && (result.getDataFrames() != null) && (result.getDataFrames().size() > 4));
+	    	Microphone mic = (Microphone) cm.lookup("microphone");
+	    	synchronized(mic) {
+	    	try {
+				mic.wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    	}
+    		recognizer.resetMonitors();
+    	}
     	recognizer.deallocate();
     	System.exit(0);
     }
