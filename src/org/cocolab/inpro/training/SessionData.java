@@ -18,19 +18,21 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * Container for all the files in the current session.
+ * Container for all data in the current session.
+ * SessionData contains files in the file system,
+ * and smaller information chunks (in SmallFile objects). 
+ * 
  * An archive (in the form of a ZIP file) may be 
  * stored on disk or sent to a server via the network.
  * 
  * @author timo
  */
-public class SessionData { // FIXME: improve naming
+public class SessionData {
 
 	/** the files contained in this archive */
-	List<File> files = new ArrayList<File>(); 
-	
-	/** meta data for this archive */
-	MetaData metaData; // FIXME: should this rather live somewhere else (somewhere more guiy?)
+	final List<File> files = new ArrayList<File>(); 
+	/** additional list of small information chunks to be stored in the archive */
+	final List<SmallFile> smallFiles = new ArrayList<SmallFile>();
 
 	/** 
 	 * the boundary between multipart message parts. As it is highly unlikely  
@@ -40,7 +42,7 @@ public class SessionData { // FIXME: improve naming
 	final static String BOUNDARY = "---------------------------01234567890";
 	/** size of the buffer when piping from input buffer to output buffer */
 	static final int BUFFER_SIZE = 4096;
-
+	
 	/**
 	 * add a file to the archive
 	 * @param file the file to add
@@ -57,20 +59,20 @@ public class SessionData { // FIXME: improve naming
 	}
 	
 	/**
-	 * add an input stream that will be added to the archive with the given name.
-	 * TODO: this could be implemented by holding a separate list, similar to the list of files
-	 * @param stream the data to be added
+	 * add a short bit of information that will be added to the archive under the given name.
 	 * @param filename the filename in the zipfile
+	 * @param content the data to be added
 	 */
-	void addStream(InputStream stream, String filename) {
-		/* TODO: implement */
+	void addSmallFile(String filename, CharSequence content) {
+		smallFiles.add(new SmallFile(filename, content));
 	}
 	
 	/**
 	 * clear the archive of previous entries
 	 */
 	void clear() {
-		files = new ArrayList<File>();
+		files.clear();
+		smallFiles.clear();
 	}
 
 	/**
@@ -94,20 +96,29 @@ public class SessionData { // FIXME: improve naming
 	 * @throws IOException when errors occur on reading the files contained in the archive
 	 */
 	void toOutputStream(OutputStream outStream) throws IOException {
-		ZipOutputStream zipStream = new ZipOutputStream(outStream);
-		for (File f : files) {
-			FileInputStream fi = new FileInputStream(f);
-			ZipEntry ze = new ZipEntry(f.getName());
-			zipStream.putNextEntry(ze);
-			pipe(fi, zipStream);
-			fi.close();
-			zipStream.closeEntry();
+		if (!files.isEmpty() || !smallFiles.isEmpty()) { 
+			ZipOutputStream zipStream = new ZipOutputStream(outStream);
+			for (SmallFile sf : smallFiles) {
+				String fileWOPath = new File(sf.filename).getName();
+				ZipEntry ze = new ZipEntry(fileWOPath);
+				zipStream.putNextEntry(ze);
+				zipStream.write(sf.content.toString().getBytes());
+				zipStream.closeEntry();
+			}
+			for (File f : files) {
+				FileInputStream fi = new FileInputStream(f);
+				ZipEntry ze = new ZipEntry(f.getName());
+				zipStream.putNextEntry(ze);
+				pipe(fi, zipStream);
+				fi.close();
+				zipStream.closeEntry();
+			}
+			zipStream.close();
 		}
-		zipStream.close();
 	}
 	
 	/**
-	 * post the archive's content (encoded as a zip file) to a server.
+	 * post the archive's content (packed as a zip file) to a server.
 	 * 
 	 * in Swing, this should be called from a SwingWorker thread
 	 * and some progress status should be displayed, as posting
@@ -117,7 +128,6 @@ public class SessionData { // FIXME: improve naming
 	 * @throws IOException 
 	 */
 	InputStream postToServer(URL url) throws IOException {
-		// TODO:IMPLEMENT
 		URLConnection connection = url.openConnection();
 		connection.setDoOutput(true); // use this connection for output
 		connection.setRequestProperty("Content-Type",
@@ -179,22 +189,36 @@ public class SessionData { // FIXME: improve naming
 	}
 	
 	/**
+	 * keeps data bits that are not worth to write into files.
+	 * a pair of filename (in archive) and bit of data
+	 * to be put into the archive under this filename.
+	 */
+	public class SmallFile {
+		private final String filename;
+		private final CharSequence content;
+		
+		public SmallFile(String filename, CharSequence content) {
+			this.filename = filename;
+			this.content = content;
+		}
+	}
+	
+	/**
 	 * for testing only.
 	 * @param args arguments are ignored
 	 * @throws IOException when something goes wrong 
 	 */
 	public static void main(String[] args) throws IOException {
-		SessionData a = new SessionData();
-		a.addFile("/home/timo/IMG_1881.JPG");
-		a.addFile("/home/timo/IMG_2459.JPG");
-		a.saveToFile("/tmp/testfile.zip");
+		final SessionData a = new SessionData();
+		a.addSmallFile("hallo", "lalalalalaa");
+		a.addSmallFile("halla", "lololololoo");
+//		a.saveToFile("/tmp/testfile.zip");
 		InputStream is = a.postToServer("http://www.sfb632.uni-potsdam.de/cgi-timo/upload.pl");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 		String line;
 		while ((line = reader.readLine()) != null) {
 			System.err.println(line);
 		}
-
 	}
 
 }

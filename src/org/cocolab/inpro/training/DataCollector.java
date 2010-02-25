@@ -21,12 +21,13 @@ package org.cocolab.inpro.training;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
+import java.io.File;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
@@ -70,23 +71,23 @@ import edu.cmu.sphinx.util.props.ConfigurationManager;
 @SuppressWarnings("serial")
 public class DataCollector extends JPanel implements ActionListener {
 	
-	static final Object noResult = new Object();
-	
 	// sub panels for ASR and result handling
-	private ASRPanel asrPanel;
-	private ResultPanel resultPanel;
+	private final ASRPanel asrPanel;
+	private final ResultPanel resultPanel;
 	/** panel to show an inspirational slide show */
-	private SlideShowPanel slidePanel;
+	private final SlideShowPanel slidePanel;
 
-	private CurrentHypothesisViewer chv;
-
-	private WavTEDLogger wavWriter;
+	private final CurrentHypothesisViewer chv;
+	private final WavTEDLogger wavWriter;
 	
 	/** encapsulates (most) ASR stuff */
-	private RecoRunner recoRunner;
+	private final RecoRunner recoRunner;
 	
-	boolean isRecognizing;
-	
+	/** stores references to the various files, so that they can be sent to the server later on */
+	private final SessionData sessionData = new SessionData();
+	/** meta data for this recording session */
+	MetaData metaData = new MetaData(null);
+
 	DataCollector() {
 		super(new BorderLayout());
 		ConfigurationManager cm = new ConfigurationManager(DataCollector.class.getResource("config.xml"));
@@ -94,6 +95,7 @@ public class DataCollector extends JPanel implements ActionListener {
 		// setup CurrentHypothesisViewer (Sphinx' ResultListener and TextField)
 		chv = (CurrentHypothesisViewer) cm.lookup("hypViewer");
 		wavWriter = (WavTEDLogger) cm.lookup("utteranceWavWriter");
+		wavWriter.setDumpFilePath(System.getProperty("java.io.tmpdir") + "/dc.");
 
 		SpeechStateVisualizer ssv = (SpeechStateVisualizer) cm.lookup("speechStateVisualizer");
 		
@@ -156,11 +158,11 @@ public class DataCollector extends JPanel implements ActionListener {
 	
 	private class RecoRunner extends Thread {
 		
-		ActionListener myActionListener;
+		private ActionListener myActionListener;
 		
-		boolean updateResults = false;
-		Result mostRecentResult = null;
-		String mostRecentWaveFile = "";
+		private boolean updateResults = false;
+		private Result mostRecentResult = null;
+		private String mostRecentWaveFile = "";
 		
 		Recognizer recognizer;
 
@@ -177,6 +179,10 @@ public class DataCollector extends JPanel implements ActionListener {
 			chv.updateResults(enabled);
 		}
 		
+		public String getMostRecentFilename() {
+			return mostRecentWaveFile;
+		}
+		
 		public void run() {
 			while (true) {
 				try {
@@ -185,10 +191,16 @@ public class DataCollector extends JPanel implements ActionListener {
 					e.printStackTrace();
 				}
 				Result result = recognizer.recognize();
-				System.out.println("Reco is done: " + result);
-				if ((updateResults) && (result != null) && (result.getDataFrames() != null) && (result.getDataFrames().size() > 4)) {
+				//System.out.println("Reco is done: " + result);
+				if ((updateResults) 
+					&& (result != null) 
+					&& (result.getDataFrames() != null)
+					&& (result.getDataFrames().size() > 4)) {
 					mostRecentResult = result;
 					mostRecentWaveFile = wavWriter.getMostRecentFilename();
+					sessionData.addFile(mostRecentWaveFile);
+					// make sure we don't eternally fill up temp space
+					(new File(mostRecentWaveFile)).deleteOnExit();
 					try {
 						SwingUtilities.invokeAndWait(new Runnable() {
 							@Override
@@ -231,7 +243,7 @@ public class DataCollector extends JPanel implements ActionListener {
 			asrPanel.setConfigurable(isPaused);
 		} else if (command.equals("ASR_RESULT")) {
 			/* when a new result comes in:
-			 * - stop to recognize (we now come to the editing phase
+			 * - stop to recognize (we now come to the editing phase)
 			 * - save current scene information,
 			 * - save the ASR hypothesis,
 			 * - show the ASR hypothesis
@@ -248,28 +260,39 @@ public class DataCollector extends JPanel implements ActionListener {
 			setRecognizing(true);
 		} else if (command.equals("DISCARD")) {
 			setRecognizing(true);
-		} else if (command.equals("CONFIG")) {
-			configurePath();
+		} else if (command.equals("UPLOAD")) {
+			// get meta data
+			String metaDataString = metaData.getData();
+			// store it in session data
+			sessionData.addSmallFile("META-DATA.txt", metaDataString);
+			// prepare a dialogue to be displayed during upload
+			final JDialog waitDialog = new JDialog((JFrame) null, "Bitte warten", true);
+			waitDialog.add(new JLabel("Dateien werden zum Server hochgeladen", 
+					new ImageIcon(SessionData.class.getResource("spinning_wheel_throbber.gif")), 0));
+			waitDialog.pack();
+			// start a new worker thread that submits session data
+			// and destroys the waitDialog when the upload is done 
+			(new SwingWorker<Void, Void>() {
+				@Override
+				protected Void doInBackground() throws Exception {
+					sessionData.postToServer("http://www.sfb632.uni-potsdam.de/cgi-timo/upload.pl");
+					return null;
+				}
+				@Override 
+				protected void done() {
+					sessionData.clear();
+					waitDialog.dispose();					
+				}
+			}).execute();
+			// show the wait dialog (which blocks execution until dispose is
+			// called once upload has finished
+			waitDialog.setVisible(true);
 		}
 	}	
 	
-	private void configurePath() {
-		String oldPath = wavWriter.getDumpFilePath();
-		String newPath = (String) JOptionPane.showInputDialog(null, 
-				"Path and prefix for collected files", 
-				"Configuration", 
-				JOptionPane.PLAIN_MESSAGE, null, null, oldPath);
-		wavWriter.setDumpFilePath(newPath);
-	}
-
 	private void saveTranscript(String transcript, String filetype) {
-		String filename = recoRunner.mostRecentWaveFile.replaceFirst("\\.wav$", filetype);
-		try {
-			PrintStream outFile = new PrintStream(filename);
-			outFile.println(transcript);
-		} catch (FileNotFoundException e) {
-			System.err.println("Could not write to " + filename);
-		}
+		String filename = recoRunner.getMostRecentFilename().replaceFirst("\\.wav$", filetype);
+		sessionData.addSmallFile(filename, transcript);
 	}
 
 	/**

@@ -13,6 +13,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 /**
@@ -64,10 +65,16 @@ public class MetaData extends JDialog implements ActionListener {
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbs = new GridBagConstraints();
 		gbs.gridx = 1;
-		gbs.gridy = 1;
+		gbs.gridy = 0;
 		gbs.fill = GridBagConstraints.HORIZONTAL;
 		gbs.insets = new Insets(5, 5, 0, 5); // a little slack around the components
+		gbs.gridwidth = 2;
+		JLabel l = new JLabel("Bitte Meta-Daten angeben:");
+		l.setHorizontalAlignment(SwingConstants.CENTER);
+		add(l, gbs);
 		// add the pseudonym text field:
+		gbs.gridy = 1;
+		gbs.gridwidth = 1;
 		add(new JLabel("Pseudonym:", JLabel.TRAILING), gbs);
 		pseudonym = new JTextField(10);
 		gbs.gridx = 2;

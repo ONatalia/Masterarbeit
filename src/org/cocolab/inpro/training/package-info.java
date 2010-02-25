@@ -4,10 +4,8 @@
  * 
  * <h2>TODO before release:</h2> 
  * <ul>
- * <li>incorporate meta data dialog
- * <li>write audio (and other stuff) to tempfiles (via File.createTemporaryFile)
- * <li>put all the files (and other stuff) into one ZIP and send online
- * <li>write server-side CGI
+ * <li>review client-UI (which buttons should be where?)
+ * <li>make a few more things configurable
  * </ul>
  *
  * <h2>TODO later:</h2> 
