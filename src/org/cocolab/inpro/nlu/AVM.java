@@ -17,14 +17,14 @@ public class AVM {
 	/**
 	 * String type, HashMap avmStructures constructor.
 	 */
-	AVM(String type, HashMap<String, HashMap<String, String>> avmStructures) {
+	public AVM(String type, HashMap<String, HashMap<String, String>> avmStructures) {
 		this(type, false, avmStructures);
 	}
 
 	/**
 	 * String type, boolean monotonic, HashMap avmStructures constructor.
 	 */
-	AVM(String type, boolean monotonic, HashMap<String, HashMap<String, String>> avmStructures) {
+	public AVM(String type, boolean monotonic, HashMap<String, HashMap<String, String>> avmStructures) {
 		this.type = type;
 		this.attributes = this.unpackStructures(avmStructures, type);
 		this.monotonic = monotonic;

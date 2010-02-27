@@ -21,7 +21,7 @@ public class AVPair {
 	 * or from attribute-value <String, Object> input for more
 	 * complex AVMs.
 	 */
-	AVPair(String attval) {
+	public AVPair(String attval) {
 		assert (attval.contains(":"));
 		String[] tokens = attval.split("\\s*:\\s*");
 		assert (tokens.length == 2);
