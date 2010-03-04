@@ -175,6 +175,11 @@ abstract public class CursorCanvas extends Canvas {
 		cursorPosition = new Point(x, y);
 		cursorMoved();
 	}
+	
+	public void cursorMoveTo(Point cursorPosition) {
+		this.cursorPosition = cursorPosition;
+		cursorMoved();
+	}
 
 	public void cursorMoveSlowlyToRel(double x, double y) {
 		cursorMoveSlowlyTo(translateBlockToPixel(x), translateBlockToPixel(y));
@@ -199,10 +204,7 @@ abstract public class CursorCanvas extends Canvas {
 			cursorMoveTo((int) currentX, (int) currentY);
 			try {
 				Thread.sleep(5);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} catch (InterruptedException e) {  } // ignore interruptions
 		}
 		cursorMoveTo(x, y);
 	}
