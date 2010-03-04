@@ -75,7 +75,7 @@ public class MetaData extends JDialog implements ActionListener {
 		// add the pseudonym text field:
 		gbs.gridy = 1;
 		gbs.gridwidth = 1;
-		add(new JLabel("Pseudonym:", JLabel.TRAILING), gbs);
+		add(new JLabel("Name/Pseudonym:", JLabel.TRAILING), gbs);
 		pseudonym = new JTextField(10);
 		gbs.gridx = 2;
 		add(pseudonym, gbs);

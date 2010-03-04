@@ -2,7 +2,6 @@ package org.cocolab.inpro.training;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import java.util.zip.ZipOutputStream;
 public class SessionData {
 
 	/** the files contained in this archive */
-	final List<File> files = new ArrayList<File>(); 
+	final List<URL> urls = new ArrayList<URL>(); 
 	/** additional list of small information chunks to be stored in the archive */
 	final List<SmallFile> smallFiles = new ArrayList<SmallFile>();
 
@@ -48,7 +48,12 @@ public class SessionData {
 	 * @param file the file to add
 	 */
 	void addFile(File file) {
-		files.add(file);
+		try {
+			addFromURL(file.toURI().toURL());
+		} catch (MalformedURLException e) {
+			// this is higly unlikely to happen, as the file must come from somewhere
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -66,12 +71,19 @@ public class SessionData {
 	void addSmallFile(String filename, CharSequence content) {
 		smallFiles.add(new SmallFile(filename, content));
 	}
-	
+
+	/**
+	 * add data that comes from a URL
+	 */
+	public void addFromURL(URL url) {
+		urls.add(url);
+	}
+
 	/**
 	 * clear the archive of previous entries
 	 */
 	void clear() {
-		files.clear();
+		urls.clear();
 		smallFiles.clear();
 	}
 
@@ -96,8 +108,9 @@ public class SessionData {
 	 * @throws IOException when errors occur on reading the files contained in the archive
 	 */
 	void toOutputStream(OutputStream outStream) throws IOException {
-		if (!files.isEmpty() || !smallFiles.isEmpty()) { 
+		if (!urls.isEmpty() || !smallFiles.isEmpty()) { 
 			ZipOutputStream zipStream = new ZipOutputStream(outStream);
+			// handle small files
 			for (SmallFile sf : smallFiles) {
 				String fileWOPath = new File(sf.filename).getName();
 				ZipEntry ze = new ZipEntry(fileWOPath);
@@ -105,12 +118,13 @@ public class SessionData {
 				zipStream.write(sf.content.toString().getBytes());
 				zipStream.closeEntry();
 			}
-			for (File f : files) {
-				FileInputStream fi = new FileInputStream(f);
-				ZipEntry ze = new ZipEntry(f.getName());
+			// handle stuff that comes from URLs
+			for (URL url : urls) {
+				InputStream is = url.openConnection().getInputStream();
+				ZipEntry ze = new ZipEntry(url.getFile());
 				zipStream.putNextEntry(ze);
-				pipe(fi, zipStream);
-				fi.close();
+				pipe(is, zipStream);
+				is.close();
 				zipStream.closeEntry();
 			}
 			zipStream.close();

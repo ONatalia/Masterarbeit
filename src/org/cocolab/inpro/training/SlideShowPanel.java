@@ -5,10 +5,12 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -25,8 +27,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * A slide show panel to be used as part of DataCollector.
@@ -55,7 +55,6 @@ public class SlideShowPanel extends JPanel implements ActionListener {
 	private String description;
 	
 	/** list of currently available slides; initialized with one empty slide */
-	@SuppressWarnings("unchecked")
 	private List<SlideIcon> images = Collections.singletonList(new SlideIcon());
 	/** index to the currently displayed slide */ 
 	private int current;
@@ -117,6 +116,21 @@ public class SlideShowPanel extends JPanel implements ActionListener {
 	public SlideShowPanel(InputStream is) {
 		this(SwingConstants.TOP);
 		setXML(is);
+	}
+	
+	/**
+	 * set the slide show images from a given URL.
+	 * 
+	 * try for example
+	 * <code><pre>
+	 * slideshow.setXML(new URL("http://www.ling.uni-potsdam.de/~timo/projekte/dc/slides1.xml"));
+	 * </pre></code>
+	 * 
+	 * @param url URL to the XML
+	 * @throws IOException when the URL cannot be accessed
+	 */
+	public void setXML(URL url) throws IOException {
+		setXML(url.openStream());
 	}
 	
 	/**

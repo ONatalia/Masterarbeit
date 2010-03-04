@@ -18,12 +18,15 @@ package org.cocolab.inpro.training;
 
  */
 
-import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -63,7 +66,7 @@ import edu.cmu.sphinx.util.props.ConfigurationManager;
  * This approach allows to balance the degree of freedom
  * the collected data will expose: Very generic slide shows
  * lead to almost spontaneous utterances, while very specific
- * slides (e.g. spelling out the sentence to read) result in
+ * slides (i.e. spelling out the sentence to read) result in
  * non-spontaneous, read data.
  * 
  * @author timo
@@ -88,9 +91,9 @@ public class DataCollector extends JPanel implements ActionListener {
 	/** meta data for this recording session */
 	MetaData metaData = new MetaData(null);
 
-	DataCollector() {
-		super(new BorderLayout());
-		ConfigurationManager cm = new ConfigurationManager(DataCollector.class.getResource("config.xml"));
+	DataCollector(URL configXML) {
+		super(new GridBagLayout());
+		ConfigurationManager cm = new ConfigurationManager(configXML);
 
 		// setup CurrentHypothesisViewer (Sphinx' ResultListener and TextField)
 		chv = (CurrentHypothesisViewer) cm.lookup("hypViewer");
@@ -98,27 +101,58 @@ public class DataCollector extends JPanel implements ActionListener {
 		wavWriter.setDumpFilePath(System.getProperty("java.io.tmpdir") + "/dc.");
 
 		SpeechStateVisualizer ssv = (SpeechStateVisualizer) cm.lookup("speechStateVisualizer");
-		
-		JPanel p = new JPanel();
-		p.add(ssv.getSpeechIndicator());
-		// all actions are handled in MyActionListener, see below
-		
-		JPanel p2 = new JPanel();
-		p2.setLayout(new BoxLayout(p2, BoxLayout.Y_AXIS));
-		
+
 		// create the ASR panel using this CurrentHypothesisViewer
 		asrPanel = new ASRPanel(chv, this); 
 		asrPanel.setEnabled(false); // disable for now, will be enabled once ASR initialization completes
-		p2.add(asrPanel);
 		
 		resultPanel = new ResultPanel(this);
 		resultPanel.setEnabled(false);
-		p2.add(resultPanel);
-		
-		p.add(p2);
-		this.add(p, BorderLayout.NORTH);
+
 		slidePanel = new SlideShowPanel(SwingConstants.TOP);
-		this.add(slidePanel, BorderLayout.CENTER);
+		
+		// add all necessary components to the GridBag
+		GridBagConstraints gbs = new GridBagConstraints();
+		gbs.gridx = 1;
+		gbs.gridy = 1;
+		gbs.fill = GridBagConstraints.HORIZONTAL;
+		gbs.gridheight = 2;
+		gbs.insets = new Insets(5, 5, 0, 5); // a little slack around the components
+		add(ssv.getSpeechIndicator(), gbs);		
+		
+		gbs.gridheight = 1;
+		gbs.gridx = 2;
+		gbs.weightx = 1.0;
+		add(asrPanel.getHypothesisField(), gbs);
+		gbs.gridy = 2;
+		gbs.gridwidth = 2;
+		add(resultPanel.getResultField(), gbs);
+		gbs.gridwidth = 2;
+		gbs.weightx = 0.0;
+		gbs.gridx = 3;
+		gbs.gridy = 1;
+		add(asrPanel.getASRButton(), gbs);
+		//add(new MuteButton((Microphone) cm.lookup("microphone")), gbs);
+		gbs.gridwidth = 1;
+		gbs.gridx = 4;
+		gbs.gridy = 2;
+		add(resultPanel.getAcceptButton(), gbs);
+		gbs.gridx = 5;
+		gbs.gridy = 1;
+		gbs.gridwidth = 1;
+		add(asrPanel.getUploadButton(), gbs);
+		gbs.gridy = 2;
+		add(resultPanel.getDiscardButton(), gbs);
+		
+		gbs.gridx = 1;
+		gbs.gridy = 3;
+		gbs.gridwidth = 5;
+		gbs.weightx = 1.0;
+		gbs.weighty = 1.0;
+		gbs.fill = GridBagConstraints.BOTH;
+		gbs.insets = new Insets(0, 1, 0, 0); // a little slack around the components
+		add(slidePanel, gbs);
+
 		recoRunner = new RecoRunner(this);
 		// ASR initialization, will enable asrPanel when it's finished
 		(new RecoStart(recoRunner, cm)).execute();
@@ -186,7 +220,7 @@ public class DataCollector extends JPanel implements ActionListener {
 		public void run() {
 			while (true) {
 				try {
-					Thread.sleep(300);
+					Thread.sleep(100);
 				} catch (InterruptedException e) { 
 					e.printStackTrace();
 				}
@@ -297,15 +331,20 @@ public class DataCollector extends JPanel implements ActionListener {
 
 	/**
 	 * used to construct the GUI on the Swing thread.
+	 * @param commandLineOptions 
 	 */
-	public static void createAndShowGUI() {
+	public static void createAndShowGUI(CommandLineOptions options) {
 		JFrame frame = new JFrame("Inpro Data Collector");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// add our object
-		DataCollector contentPane = new DataCollector();
-		contentPane.setOpaque(true);
-		contentPane.slidePanel.setXML(DataCollector.class.getResourceAsStream("slides.xml"));
-		frame.setContentPane(contentPane);
+		DataCollector mainPanel = new DataCollector(options.configURL);
+		mainPanel.sessionData.addFromURL(options.configURL);
+		mainPanel.sessionData.addFromURL(options.slideURL);
+		mainPanel.setOpaque(true);
+		try {
+			mainPanel.slidePanel.setXML(options.slideURL);
+		} catch (IOException e) { } // just ignore broken slide show URL 
+		frame.setContentPane(mainPanel);
 		//Display the window.
         frame.pack();
 		frame.setVisible(true);
@@ -313,12 +352,12 @@ public class DataCollector extends JPanel implements ActionListener {
 	
 	/**
 	 * main method for the application
-	 * @param args arguments are ignored
+	 * @param args for argument parsing see CommandLineOptions
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				createAndShowGUI();	
+				createAndShowGUI(new CommandLineOptions(args));
 			}
 		});
 	}
