@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.lang.String;
 
+import org.cocolab.inpro.domain.Posture;
 import org.cocolab.inpro.gui.Point;
 import org.cocolab.inpro.gui.Tile;
 
@@ -58,7 +59,7 @@ public class PentoTile extends Tile {
 		{{0, 0, 0, 0, 1}, {0, 1, 2, -1, -1}} // L
 	};
 	
-	PentoTile(int s, Color c, int x0, int y0, char name) {
+	public PentoTile(int s, Color c, int x0, int y0, char name) {
 		this(s, c, x0, y0, name, Character.valueOf(name).toString());
 	}
 	
@@ -214,6 +215,17 @@ public class PentoTile extends Tile {
 			g.setColor(Color.BLACK);
 			g.drawString(this.label, tx + 5, ty + 15);
 		}
+	}
+	
+	public void setPosture(Posture posture) {
+		this.defVectors = getDefVectors(this.name.charAt(0));
+		if (posture.isMirrored()) {
+			hFlip();
+		}
+		for (int i = 0; i < posture.quarterRotations(); i++) {
+			cwRotate();
+		}
+		this.generate();
 	}
 
 	public void doCommand(String command) {
