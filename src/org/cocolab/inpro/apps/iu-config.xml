@@ -1,6 +1,6 @@
 
-    <property name="deltifier" value="smoothing"/>
-    <property name="deltifierParam" value="7"/>
+    <property name="deltifier" value="none"/>
+    <property name="deltifierParam" value="0"/>
     <property name="baseData" value="baseData"/>
     <property name="actionManager" value="dialogueManager"/>
 
@@ -13,7 +13,6 @@
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
-    		<item>hypViewer</item>
 <!--        	<item>consoleNotifier</item> -->
     		<item>semanticResolver</item>
 	       	<item>floorManager</item>

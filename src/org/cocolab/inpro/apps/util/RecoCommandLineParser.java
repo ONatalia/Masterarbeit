@@ -22,8 +22,8 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	
 	public int rtpPort;
 	int outputMode;
-	int incrementalMode = INCREMENTAL;
-	int incrementalModifier = 0;
+	int incrementalMode;
+	int incrementalModifier;
 	String referenceText;
 	String referenceFile;
 	
@@ -45,9 +45,10 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -C             show current incremental ASR hypothesis");
 		System.err.println("incrementality options:");
 		System.err.println("                   by default, incremental results are generated at every frame");
-		System.err.println("    -In            no incremental output");
+		System.err.println("    -N             no incremental output");
 		System.err.println("    -Is <n>        apply smoothing factor");
 		System.err.println("    -If <n>        apply fixed lag");
+		System.err.println("    -In            no result smoothing/lagging");
 		System.err.println("special modes:");
 		System.err.println("    -fa <text>     do forced alignment with the given reference text");
 		System.err.println("    -tg <file>     do fake recognition from the given reference textgrid");
@@ -117,15 +118,21 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 			else if (args[i].equals("-L")) {
 				outputMode |= LABEL_OUTPUT;
 			}
-			else if (args [i].equals("-In")) {
+			else if (args[i].equals("-C")) {
+				outputMode |= CURRHYP_OUTPUT;
+			}
+			else if (args[i].equals("-N")) {
 				incrementalMode = NON_INCREMENTAL;
 			}
-			else if (args [i].equals("-Is")) {
+			else if (args[i].equals("-In")) {
+				incrementalMode = INCREMENTAL;
+			}
+			else if (args[i].equals("-Is")) {
 				incrementalMode = SMOOTHED_INCREMENTAL;
 				i++;
 				incrementalModifier = Integer.parseInt(args[i]);
 			}
-			else if (args [i].equals("-If")) {
+			else if (args[i].equals("-If")) {
 				incrementalMode = FIXEDLAG_INCREMENTAL;
 				i++;
 				incrementalModifier = Integer.parseInt(args[i]);
@@ -149,5 +156,17 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	public boolean isRecoMode(int mode) {
 		return recoMode == mode;
 	}
+	
+	public boolean isIncremental() {
+		return !(incrementalMode == NON_INCREMENTAL);
+	}
+	
+	public int getIncrementalMode() {
+		return incrementalMode;
+	}
 
+	public int getIncrementalModifier() {
+		return incrementalModifier;
+	}
+	
 }

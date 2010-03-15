@@ -13,6 +13,8 @@ import org.apache.log4j.Logger;
 import org.cocolab.inpro.apps.util.RecoCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.gui.util.MuteButton;
+import org.cocolab.inpro.incremental.PushBuffer;
+import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
 import org.cocolab.inpro.sphinx.decoder.FakeSearch;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 
@@ -30,6 +32,26 @@ public class SimpleReco {
 	
 	private static final Logger logger = Logger.getLogger(SimpleReco.class);
 	
+	private static void setupDeltifier(ConfigurationManager cm, RecoCommandLineParser clp) {
+		if (clp.isIncremental()) {
+			String ASRfilter;
+			switch (clp.getIncrementalMode()) {
+				case RecoCommandLineParser.FIXEDLAG_INCREMENTAL : ASRfilter = "fixedLag"; break;
+				case RecoCommandLineParser.INCREMENTAL : ASRfilter = "none"; break;
+				case RecoCommandLineParser.SMOOTHED_INCREMENTAL : ASRfilter = "smoothing"; break;
+				default : throw new RuntimeException("something's wrong");
+			}
+			logger.info("Setting ASR filter to " + ASRfilter);
+			cm.setGlobalProperty("deltifier", ASRfilter);
+			if (!ASRfilter.equals("none")) {
+				logger.info("Setting filter parameter to " + clp.getIncrementalModifier());
+				cm.setGlobalProperty("deltifierParam", Integer.toString(clp.getIncrementalModifier()));
+			}
+		} else {
+			logger.info("Running in NON-INCREMENTAL (pure sphinx) mode");
+		}
+	}
+
 	public static void setupMicrophone(final Microphone mic) {
 		Runnable micInitializer = new Runnable() {
 			public void run() {
@@ -96,7 +118,7 @@ public class SimpleReco {
 					!f.getEncoding().equals(Encoding.PCM_SIGNED) ||
 					f.getSampleRate() != 16000 ||
 					f.getSampleSizeInBits() != 16) {
-					logger.fatal("Your audio is not in the right format:\nYou must use mono channel,\nPCM signed data,\nsampled at 16000 Hz,\nwith 2 bytes per samples.\nExiting...");
+					logger.fatal("Your audio is not in the right format:\nYou must use mono channel,\nPCM signed data,\nsampled at 16000 Hz,\nwith 2 bytes per sample.\nExiting...");
 					System.exit(1);
 				}
 				sds.setInputStream(ais, audioURL.getFile());
@@ -135,21 +157,40 @@ public class SimpleReco {
 		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
 			cm.lookup("labelWriter");
 		}
-/*		if (clp.matchesOutputMode(RecoCommandLineParser.CURRHYP_OUTPUT)) {
-			// FIXME: implement me
-		} */
+		if (clp.isIncremental()) {
+			CurrentASRHypothesis cah = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
+			if (clp.matchesOutputMode(RecoCommandLineParser.CURRHYP_OUTPUT)) {
+				logger.info("Adding current hypothesis viewer");
+				cah.addListener((PushBuffer) cm.lookup("hypViewer"));
+			} 
+		}
 		if (clp.verbose()) {
 			cm.lookup("memoryTracker");
 			cm.lookup("speedTracker");
 		}
 	}
-
+	
+	private static void recognizeOnce(Recognizer recognizer) {
+		Result result = null;
+    	do {
+	    	result = recognizer.recognize();
+	        if (result != null) {
+	        	// Normal Output
+	        	logger.info("RESULT: " + result.toString() + "\n");
+	        } else {
+	        	logger.info("Result: null\n");
+	        }
+    	} while ((result != null) && (result.getDataFrames() != null) && (result.getDataFrames().size() > 4));
+	}
+	
 	public static void main(String[] args) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException {
 		BasicConfigurator.configure();
 		//PropertyConfigurator.configure("log4j.properties");
     	RecoCommandLineParser clp = new RecoCommandLineParser(args);
     	if (!clp.parsedSuccessfully()) { System.exit(1); }
     	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
+    	setupDeltifier(cm, clp);
+
     	setupReco(cm, clp);
     	Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
     	recognizer.allocate();
@@ -159,31 +200,18 @@ public class SimpleReco {
     	setupMonitors(cm, clp);
     	if (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
     		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
-    	}
-    	Result result = null;
-    	while (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
-	    	do {
-		    	result = recognizer.recognize();
-		        if (result != null) {
-		        	// Normal Output
-		        	logger.info("RESULT: " + result.toString() + "\n");
-		        } else {
-		        	logger.info("Result: null\n");
-		        }
-		        if (clp.getInputMode() == RecoCommandLineParser.FILE_INPUT) {
-		        	break;
-		        }
-	    	} while ((result != null) && (result.getDataFrames() != null) && (result.getDataFrames().size() > 4));
+    		recognizeOnce(recognizer);
 	    	Microphone mic = (Microphone) cm.lookup("microphone");
 	    	synchronized(mic) {
-	    	try {
-				mic.wait();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		    	try {
+					mic.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 	    	}
     		recognizer.resetMonitors();
+    	} else {
+    		recognizeOnce(recognizer);
     	}
     	recognizer.deallocate();
     	System.exit(0);
