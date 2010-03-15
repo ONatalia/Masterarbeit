@@ -19,7 +19,7 @@ public class SemIU extends IU {
 		this(FIRST_SEM_IU, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
 	}
 	
-	public SemIU(IU sll, List<? extends IU> groundedIn, List<AVM> avms) {
+	public SemIU(IU sll, List<IU> groundedIn, List<AVM> avms) {
 		super(sll, groundedIn);
 		for (AVM avm : avms) {
 			if (avm.getType().equals("tile")) {

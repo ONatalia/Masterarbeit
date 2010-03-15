@@ -17,6 +17,7 @@
  */
 package org.cocolab.inpro.incremental.unit;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +31,8 @@ public abstract class IU {
 
 	protected IU sameLevelLink;
 	
-	protected List<? extends IU> groundedIn;
+	protected List<IU> groundedIn;
+	protected List<IU> grounds; 
 	
 	protected static BaseDataKeeper bd = null;
 	
@@ -38,7 +40,7 @@ public abstract class IU {
 	 * call this, if you want to provide a sameLevelLink and a groundedIn list
 	 * and you want groundedIn to be deeply SLLed to the sameLevelLink's groundedIn-IUs  
 	 */
-	public IU(IU sll, List<? extends IU> groundedIn, boolean deepSLL) {
+	public IU(IU sll, List<IU> groundedIn, boolean deepSLL) {
 		this.id = IU.getNewID();
 		this.groundedIn = groundedIn;
 		if (deepSLL && (sll != null)) {
@@ -52,11 +54,11 @@ public abstract class IU {
 	/**
 	 * call this, if you want to provide both a sameLevelLink and a groundedIn list
 	 */
-	public IU(IU sll, List<? extends IU> groundedIn) {
+	public IU(IU sll, List<IU> groundedIn) {
 		this(sll, groundedIn, false);
 	}
 	
-	public IU(List<? extends IU> groundedIn) {
+	public IU(List<IU> groundedIn) {
 		this((IU) null, groundedIn);
 	}
 	
@@ -169,11 +171,29 @@ public abstract class IU {
 	 * @param edit
 	 */
 	public void update(EditType edit) {
-		if (edit == EditType.COMMIT) {
-			for (IU iu : groundedIn()) {
-				iu.update(edit);
-			}
+		switch (edit) {
+			case COMMIT: // commit what you're grounding
+				for (IU iu : groundedIn()) {
+					iu.update(edit);
+				}
+				break;
+			case REVOKE: // revoke what is grounded in you
+				for (IU iu : grounds) {
+					iu.update(edit);
+				}
+				break;
+			case ADD: // nothing to do, whoever adds us should set us up correctly
 		}
+	}
+	
+	public void ground(IU iu) {
+		if (grounds == null) {
+			// we typically ground just 1 IU, so there's no need for an initial capacity of 10
+			grounds = new ArrayList<IU>(1);
+		}
+		grounds.add((IU) iu);
+		if (!iu.groundedIn.contains(this))
+			iu.groundedIn.add(this);
 	}
 	
 	public String toString() {

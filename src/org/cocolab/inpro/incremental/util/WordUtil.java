@@ -3,6 +3,7 @@ package org.cocolab.inpro.incremental.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.SegmentIU;
 import org.cocolab.inpro.incremental.unit.SyllableIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
@@ -21,9 +22,9 @@ public class WordUtil {
 			sylls = new ArrayList<Unit[]>(1);
 			sylls.add(pron.getUnits());
 		}
-		List<SyllableIU> syllIUs = new ArrayList<SyllableIU>(sylls.size());
+		List<IU> syllIUs = new ArrayList<IU>(sylls.size());
 		for (Unit[] syll : sylls) {
-			List<SegmentIU> segments = new ArrayList<SegmentIU>(syll.length);
+			List<IU> segments = new ArrayList<IU>(syll.length);
 			for (Unit unit : syll) {
 				SegmentIU segIU = new SegmentIU(unit.getName(), segmentSLL);
 				segments.add(segIU);

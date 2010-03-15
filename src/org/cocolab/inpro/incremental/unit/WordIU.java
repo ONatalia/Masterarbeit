@@ -37,11 +37,11 @@ public class WordIU extends IU {
 	final Pronunciation pron;
 	final String word;
 
-	public WordIU(Pronunciation pron, WordIU sll, List<? extends IU> groundedIn) {
+	public WordIU(Pronunciation pron, WordIU sll, List<IU> groundedIn) {
 		this(pron.getWord().getSpelling(), pron, sll, groundedIn);
 	}
 	
-	protected WordIU(String word, Pronunciation pron, WordIU sll, List<? extends IU> groundedIn) {
+	protected WordIU(String word, Pronunciation pron, WordIU sll, List<IU> groundedIn) {
 		super(sll, groundedIn, true);
 		this.pron = pron;
 		this.word = word;
@@ -54,8 +54,8 @@ public class WordIU extends IU {
 	 */
 	public WordIU(WordIU sll) {
 		super(sll, Collections.nCopies(1, 
-					new SyllableIU(null, Collections.nCopies(1, 
-								new SegmentIU("SIL", null)))), 
+					(IU) new SyllableIU(null, Collections.nCopies(1, 
+								(IU) new SegmentIU("SIL", null)))), 
 			true);
 		this.pron = Pronunciation.UNKNOWN;
 		this.word = "<sil>";
@@ -66,21 +66,22 @@ public class WordIU extends IU {
 		return avPairs.get(this.word);
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked") // the untyped list in the call to Collections.checkedList
 	public List<SegmentIU> getSegments() {
-		if ((groundedIn == null) || groundedIn.size() == 0) { 
-			return null;
+		List<IU> returnList;
+		if ((groundedIn == null) || groundedIn.size() == 0) {
+			returnList = Collections.emptyList();
 		} else if (groundedIn.get(0) instanceof SegmentIU) {
-			return (List<SegmentIU>) groundedIn;
+			returnList = groundedIn;
 		} else if (groundedIn.get(0) instanceof SyllableIU) {
-			List<SegmentIU> returnList = new ArrayList<SegmentIU>();
+			returnList = new ArrayList<IU>();
 			for (IU gIn : groundedIn) {
-				returnList.addAll((List<SegmentIU>) gIn.groundedIn);
+				returnList.addAll(gIn.groundedIn);
 			}
-			return returnList;
 		} else {
 			throw new RuntimeException("I don't know how to get segments from my groundedIn list");
 		}
+		return Collections.checkedList((List) returnList, SegmentIU.class);
 	}
 	
 	public void updateSegments(List<Label> newLabels) {

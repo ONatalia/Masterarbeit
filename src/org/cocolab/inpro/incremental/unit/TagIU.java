@@ -23,7 +23,7 @@ public class TagIU extends IU {
 
 	final String tag;
 
-	public TagIU(String tag, TagIU sll, List<? extends IU> groundedIn) {
+	public TagIU(String tag, TagIU sll, List<IU> groundedIn) {
 		super(sll, groundedIn, true);
 		this.tag = tag;
 	}
