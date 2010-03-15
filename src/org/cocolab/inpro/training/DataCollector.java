@@ -25,18 +25,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import org.cocolab.inpro.gui.util.MuteButton;
 import org.cocolab.inpro.gui.util.SpeechStateVisualizer;
 import org.cocolab.inpro.incremental.listener.CurrentHypothesisViewer;
 import org.cocolab.inpro.sphinx.frontend.WavTEDLogger;
@@ -44,7 +46,6 @@ import org.cocolab.inpro.sphinx.frontend.WavTEDLogger;
 import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
-import edu.cmu.sphinx.util.props.ConfigurationManager;
 
 /**
  * Software to collect user-annotated semi-spontaneous speech.
@@ -74,13 +75,20 @@ import edu.cmu.sphinx.util.props.ConfigurationManager;
 @SuppressWarnings("serial")
 public class DataCollector extends JPanel implements ActionListener {
 	
-	// sub panels for ASR and result handling
-	private final ASRPanel asrPanel;
-	private final ResultPanel resultPanel;
-	/** panel to show an inspirational slide show */
+	// GUI buttons (we need these later to selectively disable them
+	// when their related actions are not applicable)
+	private final JToggleButton muteButton;
+	private final JButton uploadButton;
+	private final JButton acceptButton;
+	private final JButton discardButton;	
+	private final JTextField resultField;
+	/** panel to show and control an inspirational slide show */
 	private final SlideShowPanel slidePanel;
 
+	/** Sphinx ResultListener with a JTextField showing the current hypothesis */
 	private final CurrentHypothesisViewer chv;
+	/** Sphinx FrontEnd processor which writes VAD speech chunks to disk */
+	// we need to know the file names of stored speech chunks
 	private final WavTEDLogger wavWriter;
 	
 	/** encapsulates (most) ASR stuff */
@@ -91,24 +99,39 @@ public class DataCollector extends JPanel implements ActionListener {
 	/** meta data for this recording session */
 	MetaData metaData = new MetaData(null);
 
-	DataCollector(URL configXML) {
+	private final CommandLineOptions configuration; 
+
+	DataCollector(CommandLineOptions configuration) {
 		super(new GridBagLayout());
-		ConfigurationManager cm = new ConfigurationManager(configXML);
+		this.configuration = configuration;
 
 		// setup CurrentHypothesisViewer (Sphinx' ResultListener and TextField)
-		chv = (CurrentHypothesisViewer) cm.lookup("hypViewer");
-		wavWriter = (WavTEDLogger) cm.lookup("utteranceWavWriter");
+		chv = (CurrentHypothesisViewer) configuration.lookup("hypViewer");
+		chv.updateResults(false); // do not update for now
+		chv.getTextField().setText("\t\tInitialisierung...");
+		wavWriter = (WavTEDLogger) configuration.lookup("utteranceWavWriter");
 		wavWriter.setDumpFilePath(System.getProperty("java.io.tmpdir") + "/dc.");
 
-		SpeechStateVisualizer ssv = (SpeechStateVisualizer) cm.lookup("speechStateVisualizer");
+		SpeechStateVisualizer ssv = (SpeechStateVisualizer) configuration.lookup("speechStateVisualizer");
 
-		// create the ASR panel using this CurrentHypothesisViewer
-		asrPanel = new ASRPanel(chv, this); 
-		asrPanel.setEnabled(false); // disable for now, will be enabled once ASR initialization completes
+		muteButton = new JToggleButton(new ImageIcon(MuteButton.class.getResource("media-playback-start.png"), "start"));
+		muteButton.setSelectedIcon(new ImageIcon(MuteButton.class.getResource("media-playback-pause.png"), "stop"));
+		muteButton.setToolTipText("Pause/Unpause ASR");
+		muteButton.setSelected(true); // start muted
+		muteButton.addActionListener(this);
+		muteButton.setActionCommand("PAUSE");
+		muteButton.setEnabled(false); // disable for now, will be enabled once ASR initialization completes
 		
-		resultPanel = new ResultPanel(this);
-		resultPanel.setEnabled(false);
+		uploadButton = createButton("pack-and-upload.png", "Upload to Server", this, "UPLOAD");
+		acceptButton = DataCollector.createButton("dialog-ok.png", "This is what I said.", this, "ACCEPT");
+		discardButton = DataCollector.createButton("dialog-cancel.png", "Cancel this Recording.", this, "DISCARD");
+		
 
+		resultField = new JTextField();
+		resultField.setFont(CurrentHypothesisViewer.DEFAULT_FONT);
+		resultField.setEditable(true);
+		resultField.setEnabled(false);
+		
 		slidePanel = new SlideShowPanel(SwingConstants.TOP);
 		
 		// add all necessary components to the GridBag
@@ -123,26 +146,26 @@ public class DataCollector extends JPanel implements ActionListener {
 		gbs.gridheight = 1;
 		gbs.gridx = 2;
 		gbs.weightx = 1.0;
-		add(asrPanel.getHypothesisField(), gbs);
+		add(chv.getTextField(), gbs);
 		gbs.gridy = 2;
 		gbs.gridwidth = 2;
-		add(resultPanel.getResultField(), gbs);
+		add(resultField, gbs);
 		gbs.gridwidth = 2;
 		gbs.weightx = 0.0;
 		gbs.gridx = 3;
 		gbs.gridy = 1;
-		add(asrPanel.getASRButton(), gbs);
+		add(muteButton, gbs);
 		//add(new MuteButton((Microphone) cm.lookup("microphone")), gbs);
 		gbs.gridwidth = 1;
 		gbs.gridx = 4;
 		gbs.gridy = 2;
-		add(resultPanel.getAcceptButton(), gbs);
+		add(acceptButton, gbs);
 		gbs.gridx = 5;
 		gbs.gridy = 1;
 		gbs.gridwidth = 1;
-		add(asrPanel.getUploadButton(), gbs);
+		add(uploadButton, gbs);
 		gbs.gridy = 2;
-		add(resultPanel.getDiscardButton(), gbs);
+		add(discardButton, gbs);
 		
 		gbs.gridx = 1;
 		gbs.gridy = 3;
@@ -153,25 +176,53 @@ public class DataCollector extends JPanel implements ActionListener {
 		gbs.insets = new Insets(0, 1, 0, 0); // a little slack around the components
 		add(slidePanel, gbs);
 
-		recoRunner = new RecoRunner(this);
+		setOptions();
+		
+		recoRunner = new RecoRunner();
 		// ASR initialization, will enable asrPanel when it's finished
-		(new RecoStart(recoRunner, cm)).execute();
+		(new RecoStart()).execute();
 	}
 	
+	/** 
+	 * used in GUI creation
+	 * @param icon name of the icon resource (relative to this class)
+	 * @param tooltip tooltip for this button
+	 * @param al action listener for this button
+	 * @param command executed on action listener
+	 * @return
+	 */
+	static JButton createButton(String icon, String tooltip, ActionListener al, String command) {
+		JButton button = new JButton(new ImageIcon(DataCollector.class.getResource(icon)));
+		button.setToolTipText(tooltip);
+		button.setEnabled(false); // all buttons start disabled
+		button.addActionListener(al);
+		button.setActionCommand(command);
+		return button;
+	}
+	
+	/**
+	 * add config files to sessionData. 
+	 */
+	private void setOptions() {
+		sessionData.addFromURL(configuration.configURL);
+		try {
+			slidePanel.setXML(configuration.slideURL);
+			sessionData.addFromURL(configuration.slideURL);
+		} catch (IOException e) { } // simply ignore broken slide show URLs
+	}
+	
+	/**
+	 * RecoStart is used to start up recognition (AM loading, ...) in a SwingWorker thread.
+	 * once finished, it calls recoRunner, the thread that continuously
+	 * runs recognition in the background and pushes ASR_RESULT events 
+	 * onto the Swing event queue.
+	 */
 	private class RecoStart extends SwingWorker<Void, Void> {
-		
-		RecoRunner recoRunner;
-		ConfigurationManager cm;
-		
-		RecoStart(RecoRunner recoRunner, ConfigurationManager cm) {
-			this.recoRunner = recoRunner;
-			this.cm = cm;
-		}
 		
 		@Override
 		protected Void doInBackground() throws Exception {
-			Microphone mic = (Microphone) cm.lookup("microphone");
-			Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
+			Microphone mic = (Microphone) configuration.lookup("microphone");
+			Recognizer recognizer = (Recognizer) configuration.lookup("recognizer");
 			recognizer.allocate();
 			
 			mic.initialize();
@@ -179,31 +230,27 @@ public class DataCollector extends JPanel implements ActionListener {
 				System.err.println("Could not start microphone. Exiting...");
 				System.exit(1);
 			}
-			this.recoRunner.setRecognizer(recognizer);
+			recoRunner.setRecognizer(recognizer);
 			return null;
 		}
 		
 		@Override
 		protected void done() {
-			asrPanel.setEnabled(true);
-			this.recoRunner.start();
+			// enable controls, remove initialization message
+			muteButton.setEnabled(true);
+			chv.getTextField().setText("");
+			recoRunner.start();
 		}
 	}
 	
 	private class RecoRunner extends Thread {
 		
-		private ActionListener myActionListener;
-		
 		private boolean updateResults = false;
-		private Result mostRecentResult = null;
-		private String mostRecentWaveFile = "";
+		private String mostRecentRecoResult = null;
+		private String mostRecentFileName = "";
 		
 		Recognizer recognizer;
 
-		RecoRunner(ActionListener myActionListener) {
-			this.myActionListener = myActionListener;
-		}
-		
 		public void setRecognizer(Recognizer recognizer) {
 			this.recognizer = recognizer;
 		}
@@ -213,8 +260,12 @@ public class DataCollector extends JPanel implements ActionListener {
 			chv.updateResults(enabled);
 		}
 		
+		public String getMostRecentRecoResult() {
+			return mostRecentRecoResult;
+		}
+		
 		public String getMostRecentFilename() {
-			return mostRecentWaveFile;
+			return mostRecentFileName;
 		}
 		
 		public void run() {
@@ -230,16 +281,16 @@ public class DataCollector extends JPanel implements ActionListener {
 					&& (result != null) 
 					&& (result.getDataFrames() != null)
 					&& (result.getDataFrames().size() > 4)) {
-					mostRecentResult = result;
-					mostRecentWaveFile = wavWriter.getMostRecentFilename();
-					sessionData.addFile(mostRecentWaveFile);
+					mostRecentRecoResult = result.getBestFinalToken().getWordPath();
+					mostRecentFileName = wavWriter.getMostRecentFilename();
+					sessionData.addFile(mostRecentFileName);
 					// make sure we don't eternally fill up temp space
-					(new File(mostRecentWaveFile)).deleteOnExit();
+					(new File(mostRecentFileName)).deleteOnExit();
 					try {
 						SwingUtilities.invokeAndWait(new Runnable() {
 							@Override
 							public void run(){
-								myActionListener.actionPerformed(new ActionEvent(recoRunner, 0, "ASR_RESULT"));
+								actionPerformed(new ActionEvent(recoRunner, 0, "ASR_RESULT"));
 							}
 						});
 					} catch (Exception e) {
@@ -250,16 +301,15 @@ public class DataCollector extends JPanel implements ActionListener {
 		}
 	}
 	
-	private void setRecognizing(boolean enabled) {	
-		if (enabled) {
-			recoRunner.setRecognizing(true);
-			asrPanel.setEnabled(true);
-			resultPanel.reset();
-			resultPanel.setEnabled(false);
-		} else {
-			recoRunner.setRecognizing(false);
-			asrPanel.setEnabled(false);
-			resultPanel.setEnabled(true);
+	private void setRecognizing(boolean recognizing) {
+		chv.getTextField().setText("");
+		muteButton.setEnabled(recognizing);
+		acceptButton.setEnabled(!recognizing);
+		discardButton.setEnabled(!recognizing);
+		resultField.setEnabled(!recognizing);
+		recoRunner.setRecognizing(recognizing);
+		if (recognizing) {
+			resultField.setText("");
 		}
 	}
 	
@@ -274,7 +324,7 @@ public class DataCollector extends JPanel implements ActionListener {
 		if (command.equals("PAUSE")) {
 			boolean isPaused = ((JToggleButton) ae.getSource()).isSelected(); 
 			recoRunner.setRecognizing(!isPaused);
-			asrPanel.setConfigurable(isPaused);
+			uploadButton.setEnabled(isPaused);
 		} else if (command.equals("ASR_RESULT")) {
 			/* when a new result comes in:
 			 * - stop to recognize (we now come to the editing phase)
@@ -284,12 +334,11 @@ public class DataCollector extends JPanel implements ActionListener {
 			 * */
 			setRecognizing(false);
 			saveTranscript(slidePanel.getCurrentSlideInfo(), ".scene");
-			Result result = ((RecoRunner) ae.getSource()).mostRecentResult;
-			String resultText = result.getBestFinalToken().getWordPath();
+			String resultText = recoRunner.getMostRecentRecoResult();
 			saveTranscript(resultText, ".hyp");
-			resultPanel.setResult(resultText);
+			resultField.setText(resultText);
 		} else if (command.equals("ACCEPT")) {
-			String resultText = resultPanel.getResult();
+			String resultText = resultField.getText();
 			saveTranscript(resultText, ".ref");
 			setRecognizing(true);
 		} else if (command.equals("DISCARD")) {
@@ -309,12 +358,13 @@ public class DataCollector extends JPanel implements ActionListener {
 			(new SwingWorker<Void, Void>() {
 				@Override
 				protected Void doInBackground() throws Exception {
-					sessionData.postToServer("http://www.sfb632.uni-potsdam.de/cgi-timo/upload.pl");
+					sessionData.postToServer(configuration.uploadURL);
 					return null;
 				}
 				@Override 
 				protected void done() {
 					sessionData.clear();
+					setOptions();
 					waitDialog.dispose();					
 				}
 			}).execute();
@@ -333,19 +383,15 @@ public class DataCollector extends JPanel implements ActionListener {
 	 * used to construct the GUI on the Swing thread.
 	 * @param commandLineOptions 
 	 */
-	public static void createAndShowGUI(CommandLineOptions options) {
+	public static void createAndShowGUI(CommandLineOptions configuration) {
 		JFrame frame = new JFrame("Inpro Data Collector");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// add our object
-		DataCollector mainPanel = new DataCollector(options.configURL);
-		mainPanel.sessionData.addFromURL(options.configURL);
-		mainPanel.sessionData.addFromURL(options.slideURL);
+		DataCollector mainPanel = new DataCollector(configuration);
+		// add config to session data
 		mainPanel.setOpaque(true);
-		try {
-			mainPanel.slidePanel.setXML(options.slideURL);
-		} catch (IOException e) { } // just ignore broken slide show URL 
 		frame.setContentPane(mainPanel);
-		//Display the window.
+		// Display the window.
         frame.pack();
 		frame.setVisible(true);
 	}
@@ -355,9 +401,10 @@ public class DataCollector extends JPanel implements ActionListener {
 	 * @param args for argument parsing see CommandLineOptions
 	 */
 	public static void main(final String[] args) {
+		final CommandLineOptions clo = new CommandLineOptions(args); 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				createAndShowGUI(new CommandLineOptions(args));
+				createAndShowGUI(clo);
 			}
 		});
 	}

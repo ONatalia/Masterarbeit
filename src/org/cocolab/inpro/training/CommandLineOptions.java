@@ -3,10 +3,15 @@ package org.cocolab.inpro.training;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import edu.cmu.sphinx.util.props.Configurable;
+import edu.cmu.sphinx.util.props.ConfigurationManager;
+
 class CommandLineOptions {
 
+	private ConfigurationManager cm;
 	URL configURL = DataCollector.class.getResource("config.xml");
 	URL slideURL = SlideShowPanel.class.getResource("slides.xml");
+	URL uploadURL;
 	boolean verbose = false;
 	
 	CommandLineOptions(String[] args) {
@@ -38,10 +43,31 @@ class CommandLineOptions {
 					printUsage("Cannot interpret URL " + args[i]);
 				}
 			}
+			else if (args[i].equals("-u")) {
+				i++;
+				if (i >= args.length) {
+					printUsage("-u switch needs a URL parameter!");
+				}
+				try {
+					uploadURL = new URL(args[i]);
+				} catch (MalformedURLException e) {
+					printUsage("Cannot interpret URL " + args[i]);
+				}
+			}
 			else if (args[i].equals("-v")) {
 				verbose = true;
 			}
+			else {
+				printUsage();
+				System.err.println("Illegal argument: " + args[i]);
+				System.exit(1);
+			}
 		}
+		cm = new ConfigurationManager(configURL);
+	}
+	
+	Configurable lookup(String instanceName) {
+		return cm.lookup(instanceName);
 	}
 	
 	void printUsage() {
