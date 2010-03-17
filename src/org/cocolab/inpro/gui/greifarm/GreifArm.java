@@ -66,6 +66,7 @@ public class GreifArm extends CursorCanvas {
 		double bowlX = Math.random() * (RELATIVE_WIDTH - 2) + 1;
 		tiles.get(1).setPos(new Point((int) (bowlX * SCALE), (int) ((RELATIVE_HEIGHT - 1.5) * SCALE)));
 		logger.info("bowl position is now " + (int) (bowlX * SCALE));
+		repaint();
 	}
 	
 	public static void main(String[] args) {

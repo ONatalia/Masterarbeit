@@ -189,24 +189,45 @@ abstract public class CursorCanvas extends Canvas {
 		cursorMoveSlowlyTo(p.x, p.y);
 	}
 	
-	public void cursorMoveSlowlyTo(int x, int y) {
-		int distX = x - cursorPosition.x;
-		int distY = y - cursorPosition.y;
-		double dist = Math.sqrt(distX * distX + distY * distY);
-		double deltaX = distX / dist;
-		double deltaY = distY / dist;
-		double currentX = cursorPosition.x;
-		double currentY = cursorPosition.y;
-		int speed = 1;
-		for (int i = 0; i <= dist; i += speed) {
-			currentX += deltaX * speed;
-			currentY += deltaY * speed;
-			cursorMoveTo((int) currentX, (int) currentY);
-			try {
-				Thread.sleep(5);
-			} catch (InterruptedException e) {  } // ignore interruptions
+	private MoveThread moveThread;
+	
+	public synchronized void cursorMoveSlowlyTo(int x, int y) {
+		Point goalPosition = new Point(x, y);
+		if (moveThread == null || !moveThread.setNewPosition(goalPosition)) {
+			moveThread = new MoveThread(goalPosition);
+			moveThread.start();
+		} 
+	}
+	
+	private class MoveThread extends Thread {
+		private Point goalPosition;
+		double speed = 1.0;
+
+		MoveThread(Point goalPosition) {
+			this.goalPosition = goalPosition;
 		}
-		cursorMoveTo(x, y);
+		
+		boolean setNewPosition(Point goalPosition) {
+			this.goalPosition = goalPosition; 
+			return isAlive();
+		}
+		
+		@Override 
+		public void run() {
+			double distance;
+			do {
+				// relax a little 
+				try {
+					Thread.sleep(5);
+				} catch (InterruptedException e) {  } // ignore interruptions
+				distance = cursorPosition.distance(goalPosition);
+				double stepX = speed * (goalPosition.x - cursorPosition.x) / distance;
+				double stepY = speed * (goalPosition.y - cursorPosition.y) / distance;
+				cursorMoveTo(cursorPosition.x + (int) stepX, cursorPosition.y + (int) stepY);
+			} while(distance > 1);
+			cursorMoveTo(goalPosition); // finally, make sure that we reach the destination
+		}
+		
 	}
 	
 	public boolean tileSelect(int x, int y) {
