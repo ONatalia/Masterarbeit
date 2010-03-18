@@ -35,7 +35,7 @@ public class ImageTile extends Tile {
 	}
 
 	@Override
-	public boolean matchesPosition(Point p) {
+	public boolean matchesPosition(java.awt.Point p) {
 		boolean s;
 		s = ((refPoint.x - size.x / 2 < p.x) && (p.x < (refPoint.x + size.x / 2))
 		&& (refPoint.y - size.y / 2 < p.y) && (p.y < (refPoint.y + size.y + size.y / 2)));

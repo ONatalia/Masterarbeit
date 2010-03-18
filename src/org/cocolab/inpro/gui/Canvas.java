@@ -3,6 +3,7 @@ package org.cocolab.inpro.gui;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -127,6 +128,22 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 		if (activeTile != null) {
 			activeTile.doCommand(command);
 		}
+	}
+	
+	/**
+	 * unlike tileSelect, this returns the tiles at a point 
+	 * regardless of their selection/dragging/placement state
+	 * @param p
+	 * @return
+	 */
+	public List<Tile> getTilesAt(java.awt.Point p) {
+		List<Tile> returnList = new ArrayList<Tile>(1); // there will usually be just one tile to return
+		for (Tile t : tiles) {
+			if (t.matchesPosition(p)) {
+				returnList.add(t);
+			}
+		}
+		return returnList;
 	}
 
 	public boolean tileSelectRel(double x, double y) {

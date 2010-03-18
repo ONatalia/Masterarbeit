@@ -31,7 +31,7 @@ public abstract class Tile implements Resetable {
 		draw(g, true); // do not print labels if no parameter was given
 	}
 
-	abstract public boolean matchesPosition(Point p);
+	abstract public boolean matchesPosition(java.awt.Point p);
 
 	public void setLabel(String l) {
 		this.label = l;

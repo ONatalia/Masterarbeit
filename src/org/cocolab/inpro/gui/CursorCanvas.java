@@ -31,8 +31,8 @@ import javax.swing.JButton;
 @SuppressWarnings("serial")
 abstract public class CursorCanvas extends Canvas {
 
-	Image cursorGrab;
-	Image cursorFree;
+	protected Image cursorGrab;
+	protected Image cursorFree;
 	public boolean grabbing;
 	
 	public Point cursorPosition = new Point(0, 0);
@@ -185,7 +185,7 @@ abstract public class CursorCanvas extends Canvas {
 		cursorMoveSlowlyTo(translateBlockToPixel(x), translateBlockToPixel(y));
 	}
 
-	public void cursorMoveSlowlyTo(Point p) {
+	public void cursorMoveSlowlyTo(java.awt.Point p) {
 		cursorMoveSlowlyTo(p.x, p.y);
 	}
 	
@@ -197,6 +197,15 @@ abstract public class CursorCanvas extends Canvas {
 			moveThread = new MoveThread(goalPosition);
 			moveThread.start();
 		} 
+	}
+	
+	public synchronized void cursorMoveSlowlyToAndWait(int x, int y) {
+		cursorMoveSlowlyTo(x, y);
+		try {
+			moveThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private class MoveThread extends Thread {
@@ -215,15 +224,19 @@ abstract public class CursorCanvas extends Canvas {
 		@Override 
 		public void run() {
 			double distance;
+			double stepX = 0.0;
+			double stepY = 0.0;
 			do {
 				// relax a little 
 				try {
 					Thread.sleep(5);
 				} catch (InterruptedException e) {  } // ignore interruptions
 				distance = cursorPosition.distance(goalPosition);
-				double stepX = speed * (goalPosition.x - cursorPosition.x) / distance;
-				double stepY = speed * (goalPosition.y - cursorPosition.y) / distance;
+				stepX += speed * (goalPosition.x - cursorPosition.x) / distance;
+				stepY += speed * (goalPosition.y - cursorPosition.y) / distance;
 				cursorMoveTo(cursorPosition.x + (int) stepX, cursorPosition.y + (int) stepY);
+				stepX -= (int) stepX;
+				stepY -= (int) stepY;
 			} while(distance > 1);
 			cursorMoveTo(goalPosition); // finally, make sure that we reach the destination
 		}

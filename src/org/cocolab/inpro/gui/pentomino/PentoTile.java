@@ -148,7 +148,7 @@ public class PentoTile extends Tile {
 		setColor(defaultColor);
 	}
 
-	public boolean matchesPosition(Point p) {
+	public boolean matchesPosition(java.awt.Point p) {
 		boolean s;
 		s = (boxes[0]).matchesPosition(p) || 
 		(boxes[1]).matchesPosition(p) ||
