@@ -18,7 +18,7 @@ import edu.cmu.sphinx.instrumentation.Resetable;
  */
 public abstract class Tile implements Resetable {
 	protected String name;
-	public String label;
+	protected String label;
 	public Point refPoint = new Point(0, 0);
 	protected Point defaultRefPoint = new Point(0, 0);   // defaultRefPoint can be used for resetting
 	protected boolean isPlaced;
@@ -33,6 +33,14 @@ public abstract class Tile implements Resetable {
 
 	abstract public boolean matchesPosition(java.awt.Point p);
 
+	public String getName() {
+		return this.name;
+	}
+	
+	public String getLabel() {
+		return this.label;
+	}
+	
 	public void setLabel(String l) {
 		this.label = l;
 	}

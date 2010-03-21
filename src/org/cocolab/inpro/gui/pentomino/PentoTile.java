@@ -38,6 +38,9 @@ public class PentoTile extends Tile {
 	
 	private TargetPattern myGrid;
 	
+	/** the kind of pentomino tile this object represents */
+	private char type;
+	
 	/**
 	 * the outermost array contains for each kind of pentomino tile (12)
 	 * an array with two entries (X and Y) each of these containing 
@@ -59,17 +62,18 @@ public class PentoTile extends Tile {
 		{{0, 0, 0, 0, 1}, {0, 1, 2, -1, -1}} // L
 	};
 	
-	public PentoTile(int s, Color c, int x0, int y0, char name) {
-		this(s, c, x0, y0, name, Character.valueOf(name).toString());
+	public PentoTile(int s, Color c, int x0, int y0, char type) {
+		this(s, c, x0, y0, type, "", "");
 	}
 	
-	public PentoTile(int s, Color c, int x0, int y0, char name, String label) {
-		if (!isValidTile(name)) 
-			throw new RuntimeException("Error in PentoTile: " + Character.toString(name) + " is not a valid type for a tile");
-		this.defVectors = getDefVectors(name);
+	public PentoTile(int s, Color c, int x0, int y0, char type, String name, String label) {
+		if (!isValidTile(type)) 
+			throw new RuntimeException("Error in PentoTile: " + Character.toString(type) + " is not a valid type for a tile");
+		this.defVectors = getDefVectors(type);
 		this.color = c;
 		this.refPoint = new Point(x0, y0);
-		this.name = Character.valueOf(name).toString();
+		this.type = type;
+		this.name = name;
 		this.label = label;
 		this.scale = s;
 
@@ -218,7 +222,7 @@ public class PentoTile extends Tile {
 	}
 	
 	public void setPosture(Posture posture) {
-		this.defVectors = getDefVectors(this.name.charAt(0));
+		this.defVectors = getDefVectors(type);
 		if (posture.isMirrored()) {
 			hFlip();
 		}
