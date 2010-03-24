@@ -210,7 +210,7 @@ abstract public class CursorCanvas extends Canvas {
 	
 	private class MoveThread extends Thread {
 		private Point goalPosition;
-		double speed = 1.0;
+		double speed = 10.0;
 
 		MoveThread(Point goalPosition) {
 			this.goalPosition = goalPosition;
@@ -229,18 +229,19 @@ abstract public class CursorCanvas extends Canvas {
 			do {
 				// relax a little 
 				try {
-					Thread.sleep(5);
+					Thread.sleep(40);
 				} catch (InterruptedException e) {  } // ignore interruptions
 				distance = cursorPosition.distance(goalPosition);
 				stepX += speed * (goalPosition.x - cursorPosition.x) / distance;
+				if (Math.abs(stepX) > Math.abs(distance)) stepX = goalPosition.x - cursorPosition.x;
 				stepY += speed * (goalPosition.y - cursorPosition.y) / distance;
+				if (Math.abs(stepY) > Math.abs(distance)) stepY = goalPosition.y - cursorPosition.y;
 				cursorMoveTo(cursorPosition.x + (int) stepX, cursorPosition.y + (int) stepY);
 				stepX -= (int) stepX;
 				stepY -= (int) stepY;
 			} while(distance > 1);
 			cursorMoveTo(goalPosition); // finally, make sure that we reach the destination
 		}
-		
 	}
 	
 	public boolean tileSelect(int x, int y) {
