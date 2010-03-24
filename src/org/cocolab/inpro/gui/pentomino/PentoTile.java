@@ -1,7 +1,9 @@
 package org.cocolab.inpro.gui.pentomino;
 
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.lang.String;
 
 import org.cocolab.inpro.domain.Posture;
@@ -216,8 +218,15 @@ public class PentoTile extends Tile {
 			}
 		}
 		if (l) {
+			Rectangle box = getBoundingBox(); 
 			g.setColor(Color.BLACK);
-			g.drawString(this.label, tx + 5, ty + 15);
+			g.setFont(new Font(Font.DIALOG, Font.BOLD, 15));
+			int textWidth = g.getFontMetrics().stringWidth(this.label);
+			int textHeight = g.getFontMetrics().getHeight();
+			
+			g.drawString(this.label, box.x - (textWidth - box.width) / 2 , 
+					box.y + box.height + textHeight);
+			
 		}
 	}
 	
@@ -386,5 +395,14 @@ public class PentoTile extends Tile {
 		super.unselect();
 //		setColor(normalColor);
 	}
+	
+	public Rectangle getBoundingBox() {
+		Rectangle r = boxes[0].getBoundingBox();
+		for (int i = 1; i < BOX_COUNT; i++) {
+			r = r.union(boxes[i].getBoundingBox());
+		}
+		return r;
+	}
+	
 	
 }

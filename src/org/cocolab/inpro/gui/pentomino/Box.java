@@ -1,7 +1,9 @@
 package org.cocolab.inpro.gui.pentomino;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.lang.Cloneable;
 
 import org.cocolab.inpro.gui.Point;
@@ -94,6 +96,10 @@ public class Box implements Cloneable {
    public void setPos(int x, int y) {
       this.corner.x = x;
       this.corner.y = y;
+   }
+   
+   public Rectangle getBoundingBox() {
+	   return new Rectangle(corner, new Dimension(dim.x, dim.y));
    }
 
 }
