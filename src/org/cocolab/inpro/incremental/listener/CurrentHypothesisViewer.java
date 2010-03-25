@@ -21,6 +21,8 @@ public class CurrentHypothesisViewer extends HypothesisChangeListener {
 	@S4Boolean(defaultValue = true)
     public final static String PROP_SHOW_WINDOW = "showWindow";
 	
+	public final static Font DEFAULT_FONT = new Font("Dialog", Font.BOLD, 24); 
+	
 	JTextField textField;
 	String lastString = "";
 	boolean updateResults;
@@ -28,7 +30,7 @@ public class CurrentHypothesisViewer extends HypothesisChangeListener {
 	public CurrentHypothesisViewer() {
 		textField = new JTextField("", 35);
 		textField.setEditable(false);
-		textField.setFont(new Font("Dialog", Font.BOLD, 24));
+		textField.setFont(DEFAULT_FONT);
 		updateResults = true;
 	}
 	
