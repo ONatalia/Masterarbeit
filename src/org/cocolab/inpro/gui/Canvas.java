@@ -32,7 +32,7 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	protected static final int RELATIVE_HEIGHT = 24;
 
 	/** scales the logical coordinate system of the canvas to pixel coordinates */
-	public static final int SCALE = 20;
+	public static final int SCALE = 19;
 
 	protected List<Tile> tiles;
 	protected Tile draggingTile;
