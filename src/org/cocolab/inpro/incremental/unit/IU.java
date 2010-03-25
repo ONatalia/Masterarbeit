@@ -191,7 +191,8 @@ public abstract class IU {
 			// we typically ground just 1 IU, so there's no need for an initial capacity of 10
 			grounds = new ArrayList<IU>(1);
 		}
-		grounds.add((IU) iu);
+		if (!grounds.contains(iu)) 
+			grounds.add((IU) iu);
 		if (!iu.groundedIn.contains(this))
 			iu.groundedIn.add(this);
 	}
