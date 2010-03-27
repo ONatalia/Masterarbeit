@@ -112,7 +112,6 @@ public class SimpleMonitor implements RtpListener {
 		final OAADispatchStream ods = (OAADispatchStream) 
 		cm.lookup("oaaDispatchStream");
 		ods.initialize();
-		ods.sendSilence(false);
 		Runnable streamDrainer = new Runnable() {
 			@Override
 			public void run() {
@@ -129,7 +128,7 @@ public class SimpleMonitor implements RtpListener {
 						newData(b, 0, bytesRead);
 					else // if there is no data, then we wait a little for data to become available (instead of looping like crazy)
 						try {
-							Thread.sleep(5);
+							Thread.sleep(40);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
