@@ -115,10 +115,14 @@ public class SimpleReco {
 				// make sure that audio is in the right format 
 				AudioFormat f = ais.getFormat();
 				if (f.getChannels() != 1 ||
-					!f.getEncoding().equals(Encoding.PCM_SIGNED) ||
+					!(f.getEncoding().equals(Encoding.PCM_SIGNED) || f.getEncoding().toString().equals("FLAC")) || 
 					f.getSampleRate() != 16000 ||
 					f.getSampleSizeInBits() != 16) {
 					logger.fatal("Your audio is not in the right format:\nYou must use mono channel,\nPCM signed data,\nsampled at 16000 Hz,\nwith 2 bytes per sample.\nExiting...");
+					logger.info("channels: " + f.getChannels());
+					logger.info("encoding: " + f.getEncoding());
+					logger.info("sample rate: " + f.getSampleRate());
+					logger.info("sample size: " + f.getSampleSizeInBits());
 					System.exit(1);
 				}
 				sds.setInputStream(ais, audioURL.getFile());
