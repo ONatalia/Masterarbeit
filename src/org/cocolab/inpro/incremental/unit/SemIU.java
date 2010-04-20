@@ -15,10 +15,10 @@ public class SemIU extends IU {
 	private ArrayList<AVM> fieldList = new ArrayList<AVM>();
 
 	@SuppressWarnings("unchecked")
-	private SemIU() {
+	public SemIU() {
 		this(FIRST_SEM_IU, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
 	}
-	
+
 	public SemIU(IU sll, List<IU> groundedIn, List<AVM> avms) {
 		super(sll, groundedIn);
 		for (AVM avm : avms) {
