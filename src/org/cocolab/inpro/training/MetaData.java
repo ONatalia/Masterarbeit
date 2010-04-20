@@ -61,6 +61,7 @@ public class MetaData extends JDialog implements ActionListener {
 	 */
 	public MetaData(JFrame owner) {
 		super(owner, "Meta Data", true);
+		setLocationRelativeTo(null);
 		setResizable(false); // the dialog looks stupid when resized
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbs = new GridBagConstraints();

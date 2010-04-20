@@ -268,6 +268,7 @@ public class DataCollector extends JPanel implements ActionListener {
 			return mostRecentFileName;
 		}
 		
+		@Override
 		public void run() {
 			while (true) {
 				try {
@@ -352,6 +353,7 @@ public class DataCollector extends JPanel implements ActionListener {
 			final JDialog waitDialog = new JDialog((JFrame) null, "Bitte warten", true);
 			waitDialog.add(new JLabel("Dateien werden zum Server hochgeladen", 
 					new ImageIcon(SessionData.class.getResource("spinning_wheel_throbber.gif")), 0));
+			waitDialog.setLocationRelativeTo(null);
 			waitDialog.pack();
 			// start a new worker thread that submits session data
 			// and destroys the waitDialog when the upload is done 

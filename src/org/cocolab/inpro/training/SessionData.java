@@ -135,7 +135,7 @@ public class SessionData {
 	 * post the archive's content (packed as a zip file) to a server.
 	 * 
 	 * in Swing, this should be called from a SwingWorker thread
-	 * and some progress status should be displayed, as posting
+	 * and some progress state should be displayed, as posting
 	 * large archives can take quite a while. 
 	 * 
 	 * @param url the server's URL

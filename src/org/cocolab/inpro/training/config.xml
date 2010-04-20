@@ -44,9 +44,9 @@
     <!-- The amount of time (in milliseconds) before speech start to be included as speech data. -->
     <property name="speechLeader" value="100"/>
     <!-- The amount of time (in milliseconds) after speech ends to be included as speech data. -->
-    <property name="speechTrailer" value="100"/>
+    <property name="speechTrailer" value="200"/>
     <!-- The speech classifier threshold. -->
-    <property name="threshold" value="20"/>
+    <property name="threshold" value="15"/>
 
 
     <!-- ******************************************************** -->
@@ -85,7 +85,7 @@
     
     <component name="none" type="org.cocolab.inpro.incremental.deltifier.ASRWordDeltifier"/>
     <component name="smoothing" type="org.cocolab.inpro.incremental.deltifier.SmoothingDeltifier">
-        <property name="smoothing" value="5"/>
+        <property name="smoothing" value="2"/>
     </component>
 
     <component name="hypViewer" type="org.cocolab.inpro.incremental.listener.CurrentHypothesisViewer">
