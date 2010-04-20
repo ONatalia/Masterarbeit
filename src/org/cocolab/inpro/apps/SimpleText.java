@@ -25,7 +25,7 @@ import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.listener.HypothesisChangeListener;
 import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
 import org.cocolab.inpro.incremental.processor.FloorManager;
-import org.cocolab.inpro.incremental.unit.AtomicWordIU;
+import org.cocolab.inpro.incremental.unit.TextualWordIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IUList;
@@ -61,6 +61,7 @@ import edu.cmu.sphinx.util.props.S4ComponentList;
  * @author timo
  *
  */
+
 @SuppressWarnings("serial")
 public class SimpleText extends JPanel implements ActionListener {
 
@@ -79,10 +80,9 @@ public class SimpleText extends JPanel implements ActionListener {
 	public final static String PROP_FLOOR_MANAGER_LISTENERS = FloorManager.PROP_STATE_LISTENERS;
 
 	IUDocument iuDocument;
-	List<FloorManager.Listener> floorListeners;
 	JTextField textField;
 	
-	SimpleText(List<FloorManager.Listener> floorListeners) {
+	SimpleText(FloorManager floorManager) {
 		iuDocument = new IUDocument();
 		iuDocument.listeners = new ArrayList<PushBuffer>();
 		textField = new JTextField(40);
@@ -93,38 +93,23 @@ public class SimpleText extends JPanel implements ActionListener {
 		commitButton.addActionListener(this);
 		add(textField);
 		add(commitButton);
-		this.floorListeners = floorListeners;
-		// clicking this button is actually not identical to 
-		// double pressing enter in the text field
-		JButton floorButton = new JButton("EoT");
-		floorButton.addActionListener(this);
-		add(floorButton);
-		// add(new JLabel("you can only edit at the right"));
-	}
-	
-	public void notifyFloorAvailable() {
-		for (FloorManager.Listener l : floorListeners) {
-			l.floor(FloorManager.State.AVAILABLE, FloorManager.State.UNAVAILABLE, null);
-		}		
+		add(floorManager.signalPanel);
+		
 	}
 	
 	public void actionPerformed(ActionEvent ae) {
-		if (ae.getActionCommand().equals("EoT")) {
-			notifyFloorAvailable();
-		} else {
-			iuDocument.commit();
-			// hitting enter on empty lines results in an EoT-marker
-			if (iuDocument.getLength() == 0) {
-				notifyFloorAvailable();
-			}
+		iuDocument.commit();
+		// hitting enter on empty lines results in an EoT-marker
+		if (iuDocument.getLength() == 0) {
+//			notifyFloorAvailable();
 		}
 		textField.requestFocusInWindow();
 	}
 	
-	public static void createAndShowGUI(List<PushBuffer> hypListeners, List<FloorManager.Listener> floorListeners) {
+	public static void createAndShowGUI(List<PushBuffer> hypListeners, FloorManager floorManager) {
 		JFrame frame = new JFrame("SimpleText");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        SimpleText contentPane = new SimpleText(floorListeners);
+        SimpleText contentPane = new SimpleText(floorManager);
         contentPane.iuDocument.setListeners(hypListeners);
         contentPane.setOpaque(true);
         frame.setContentPane(contentPane);
@@ -133,7 +118,7 @@ public class SimpleText extends JPanel implements ActionListener {
         frame.setVisible(true);
 	}
 	
-	public static void runFromReader(Reader reader, List<PushBuffer> hypListeners, List<FloorManager.Listener> floorListeners) throws IOException {
+	public static void runFromReader(Reader reader, List<PushBuffer> hypListeners, FloorManager floorManager) throws IOException {
 		IUDocument iuDocument = new IUDocument();
 		iuDocument.setListeners(hypListeners);
 		BufferedReader bReader = new BufferedReader(reader);
@@ -148,9 +133,7 @@ public class SimpleText extends JPanel implements ActionListener {
 			iuDocument.commit();
 			// empty lines results in an EoT-marker
 			if ("".equals(line)) {
-				for (FloorManager.Listener l : floorListeners) {
-					l.floor(FloorManager.State.AVAILABLE, FloorManager.State.UNAVAILABLE, null);
-				}
+				floorManager.setEOT();
 			}
 		}
 	}
@@ -159,24 +142,22 @@ public class SimpleText extends JPanel implements ActionListener {
 		BasicConfigurator.configure();
         TextCommandLineParser clp = new TextCommandLineParser(args);
     	if (!clp.parsedSuccessfully()) { System.exit(1); } // abort on error
-    	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
+    	final ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
     	PropertySheet ps = cm.getPropertySheet(PROP_CURRENT_HYPOTHESIS);
+    	final FloorManager floorManager = (FloorManager) cm.lookup(PROP_FLOOR_MANAGER);
     	@SuppressWarnings("unchecked")
     	final List<PushBuffer> hypListeners = (List<PushBuffer>) ps.getComponentList(PROP_HYP_CHANGE_LISTENERS);
-    	ps = cm.getPropertySheet(PROP_FLOOR_MANAGER);
-    	@SuppressWarnings("unchecked")
-    	final List<FloorManager.Listener> floorListeners = (List<FloorManager.Listener>) ps.getComponentList(PROP_FLOOR_MANAGER_LISTENERS);
     	if (clp.hasTextFromReader()) { // if we already know the text:
     		logger.info("running in non-interactive mode");
     		// run non-interactively
-    		runFromReader(clp.getReader(), hypListeners, floorListeners);
+    		runFromReader(clp.getReader(), hypListeners, floorManager);
     		System.exit(0); //
     	} else {
     		// run interactively
     		logger.info("running in interactive mode");
     		SwingUtilities.invokeLater(new Runnable() {
 	            public void run() {
-	                createAndShowGUI(hypListeners, floorListeners);
+	                createAndShowGUI(hypListeners, floorManager);
 	            }
 	        });
     	}
@@ -201,8 +182,8 @@ public class SimpleText extends JPanel implements ActionListener {
 	static class IUDocument extends PlainDocument {
 
 		List<PushBuffer> listeners;
-		IUList<AtomicWordIU> wordIUs = new IUList<AtomicWordIU>();
-		List<EditMessage<AtomicWordIU>> edits = new ArrayList<EditMessage<AtomicWordIU>>();
+		IUList<TextualWordIU> wordIUs = new IUList<TextualWordIU>();
+		List<EditMessage<TextualWordIU>> edits = new ArrayList<EditMessage<TextualWordIU>>();
 		String currentWord = "";
 		
 		int currentFrame = 0;
@@ -224,15 +205,15 @@ public class SimpleText extends JPanel implements ActionListener {
 						listener.hypChange(wordIUs, edits);
 					
 				}
-				edits = new ArrayList<EditMessage<AtomicWordIU>>();
+				edits = new ArrayList<EditMessage<TextualWordIU>>();
 			}
 		}
 		
 		private void addCurrentWord() {
 			//logger.debug("adding " + currentWord);
-			AtomicWordIU sll = (wordIUs.size() > 0) ? wordIUs.get(wordIUs.size() - 1) : AtomicWordIU.FIRST_ATOMIC_WORD_IU;
-			AtomicWordIU iu = new AtomicWordIU(currentWord, sll);
-			EditMessage<AtomicWordIU> edit = new EditMessage<AtomicWordIU>(EditType.ADD, iu);
+			TextualWordIU sll = (wordIUs.size() > 0) ? wordIUs.get(wordIUs.size() - 1) : TextualWordIU.FIRST_ATOMIC_WORD_IU;
+			TextualWordIU iu = new TextualWordIU(currentWord, sll);
+			EditMessage<TextualWordIU> edit = new EditMessage<TextualWordIU>(EditType.ADD, iu);
 			edits.add(edit);
 			wordIUs.add(iu);
 			//logger.debug(edit.toString());
@@ -245,8 +226,8 @@ public class SimpleText extends JPanel implements ActionListener {
 				addCurrentWord();
 			}
 			// add commit messages
-			for (AtomicWordIU iu : wordIUs) {
-				edits.add(new EditMessage<AtomicWordIU>(EditType.COMMIT, iu));
+			for (TextualWordIU iu : wordIUs) {
+				edits.add(new EditMessage<TextualWordIU>(EditType.COMMIT, iu));
 				iu.update(EditType.COMMIT);
 			}
 			// notify
@@ -257,8 +238,8 @@ public class SimpleText extends JPanel implements ActionListener {
 			} catch (BadLocationException e) {
 				e.printStackTrace();
 			}
-			wordIUs = new IUList<AtomicWordIU>();
-			edits = new ArrayList<EditMessage<AtomicWordIU>>();			
+			wordIUs = new IUList<TextualWordIU>();
+			edits = new ArrayList<EditMessage<TextualWordIU>>();			
 		}
 		
 		/* Overrides over PlainDocument: */
@@ -275,8 +256,8 @@ public class SimpleText extends JPanel implements ActionListener {
 				while (len > currentWord.length()) { // +1 because the whitespace has to be accounted for
 					len -= currentWord.length();
 					len--; // to account for whitespace
-					AtomicWordIU iu = wordIUs.remove(wordIUs.size() - 1);
-					EditMessage<AtomicWordIU> edit = new EditMessage<AtomicWordIU>(EditType.REVOKE, iu);
+					TextualWordIU iu = wordIUs.remove(wordIUs.size() - 1);
+					EditMessage<TextualWordIU> edit = new EditMessage<TextualWordIU>(EditType.REVOKE, iu);
 					edits.add(edit);
 					//logger.debug(edit.toString());
 					currentWord = iu.getWord();

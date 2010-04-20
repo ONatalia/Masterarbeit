@@ -197,8 +197,12 @@ public abstract class IU {
 			iu.groundedIn.add(this);
 	}
 	
+	public String toLabelLine() {
+		return "\n"; // the prototypical IU is empty
+	}
+	
 	public String toString() {
-		return Integer.toString(id);
+		return id + "," + toLabelLine(); // + "\n";
 	}
 	
 	public String deepToString() {

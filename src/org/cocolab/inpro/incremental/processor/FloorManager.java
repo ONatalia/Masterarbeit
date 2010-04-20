@@ -1,12 +1,17 @@
 package org.cocolab.inpro.incremental.processor;
 
+import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.List;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.unit.EditMessage;
-import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.IUList;
 
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -25,8 +30,30 @@ public class FloorManager implements PushBuffer {
 
 	@S4ComponentList(type = Listener.class)
 	public final static String PROP_STATE_LISTENERS = "listeners";
-	List<Listener> listeners;
+	public List<Listener> listeners;
 
+	/**
+	 * other modules are notified about floor state if they implement FloorManager.Listener
+	 * and are registered to listen in the configuration file 
+	 */
+	public enum Signal { NO_INPUT, START, EOT_FALLING, EOT_RISING, EOT_ANY }
+
+	private enum InternalState { NOT_AWAITING_INPUT, AWAITING_INPUT, IN_INPUT } // not implementing POST_INPUT, because it doesn't mean anything for text 
+	
+	InternalState internalState;
+	
+	public SignalPanel signalPanel;
+
+	/** this is used to infer prosody as needed */
+	@SuppressWarnings("unchecked")
+	IUList mostRecentIUs;
+	
+	public FloorManager() {
+		internalState = InternalState.NOT_AWAITING_INPUT;
+		signalPanel = new SignalPanel();
+		signalPanel.updateButtons();
+	}
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	public void newProperties(PropertySheet ps) throws PropertyException {
@@ -47,32 +74,58 @@ public class FloorManager implements PushBuffer {
 	 * wanders off to another processor), the second runs the risk of creating
 	 * incredible amounts of threads, which is no better 
 	 */
-	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void hypChange(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		// TODO: check type of IUs (right now, we only expect WordIUs)
 		// TODO: not only react to WordIUs, but to more interesting stuff
-		if ((edits != null) && (edits.size() > 0) && (edits.get(0).getType().equals(EditType.COMMIT))) {
-			for (Listener l : listeners) {
-				l.floor(State.AVAILABLE, State.UNAVAILABLE, this);
-			}
-		}
+		mostRecentIUs = (IUList) ius;
+		if (isNotInInput() && ius.size() > 0) {
+			setSoT();
+		}	
 	}
 
 	@Override
-	public void reset() {
-		// TODO Auto-generated method stub, there's nothing to reset yet
+	public void reset() { // ignore
 	}
 
-	/**
-	 * externally visible floor states
-	 * other modules are notified about floor state if they implement FloorManager.Listener
-	 * and are registered to listen in the configuration file 
-	 * @author timo
-	 */
-	public enum State {
-		AVAILABLE, UNAVAILABLE, CONTESTED, GONE;
+	private boolean isNotInInput() {
+		return internalState.equals(InternalState.AWAITING_INPUT) || internalState.equals(InternalState.NOT_AWAITING_INPUT);
+	}
+	
+	
+	public void setExpect() {
+		if (internalState.equals(InternalState.NOT_AWAITING_INPUT)) {
+			internalState = InternalState.AWAITING_INPUT;
+			signalPanel.updateButtons();
+		}
+	}
+	
+	public void setSoT() {
+		assert isNotInInput();
+		signal(InternalState.IN_INPUT, Signal.START);
+	}
+	
+	/** call this to (externally) assert that speech is over */
+	public void setEOT() {
+		assert internalState.equals(InternalState.IN_INPUT);
+		Signal signal = Signal.EOT_ANY;
+		// TODO: find out what type of signal to send
+		signal(InternalState.NOT_AWAITING_INPUT, signal);
+	}
+	
+	public void setNoInput() {
+		assert internalState.equals(InternalState.AWAITING_INPUT);
+		signal(InternalState.NOT_AWAITING_INPUT, Signal.NO_INPUT);
+	}
+	
+	public void signal(InternalState state, Signal signal) {
+		internalState = state;
+		for (Listener l : listeners) {
+			l.floor(signal, this);
+		}
+		signalPanel.updateButtons();		
 	}
 
 	/**
@@ -86,7 +139,33 @@ public class FloorManager implements PushBuffer {
 		 * @param previousState	the previous state of the floor
 		 * @param floorManager	the floor manager itself. in this way a consumer can request e.g. to change timeouts 
 		 */
-		public void floor(State floorState, State previousState, FloorManager floorManager);
+		public void floor(Signal signal, FloorManager floorManager);
+	}
+	
+	@SuppressWarnings("serial")
+	private class SignalPanel extends JPanel {
+		JButton noInputButton = new JButton(new AbstractAction("noInput") {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				setNoInput();
+			}
+		});
+		JButton eotButton = new JButton(new AbstractAction("EoT") {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				setEOT();
+			}
+		});
+		
+		SignalPanel() {
+			add(noInputButton);
+			add(eotButton);
+		}
+		
+		void updateButtons() {
+			noInputButton.setEnabled(internalState.equals(InternalState.AWAITING_INPUT));
+			eotButton.setEnabled(!isNotInInput());
+		}
 	}
 
 }

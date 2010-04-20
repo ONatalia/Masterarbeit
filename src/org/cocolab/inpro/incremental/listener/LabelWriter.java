@@ -31,7 +31,7 @@ public class LabelWriter extends HypothesisChangeListener {
 			System.out.print("Time: ");
 			System.out.println(currentFrame * 0.01);
 			for (IU iu : ius) {
-				System.out.println(iu.toString());
+				System.out.println(iu.toLabelLine());
 			}
 			System.out.println();
 		}

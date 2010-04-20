@@ -63,7 +63,7 @@ public class WordIU extends IU {
 	}
 	
 	public List<AVPair> getAVPairs() {
-		return avPairs.get(this.word);
+		return avPairs.get(this.getWord());
 	}
 	
 	@SuppressWarnings("unchecked") // the untyped list in the call to Collections.checkedList
@@ -125,10 +125,6 @@ public class WordIU extends IU {
 		return startTime() + "\t" + endTime() + "\t" + word;
 	}
 
-	public String toString() {
-		return id + "," + toLabelLine(); // + "\n";
-	}
-	
 	public String toOAAString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(id);
@@ -144,6 +140,18 @@ public class WordIU extends IU {
 	
 	public boolean isSilence() {
 		return isSilence;
+	}
+	
+	public boolean hasProsody() {
+		return false;
+	}
+
+	/**
+	 * @precondition: only call this if hasProsody()
+	 */
+	public boolean pitchIsRising() {
+		assert hasProsody();
+		return false;
 	}
 	
 	public static void setAVPairs(Map<String, List<AVPair>> avPairs) {
