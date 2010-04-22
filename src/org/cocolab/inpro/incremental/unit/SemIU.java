@@ -13,6 +13,7 @@ public class SemIU extends IU {
 	private ArrayList<AVM> dialogActList = new ArrayList<AVM>();
 	private ArrayList<AVM> tileList = new ArrayList<AVM>();
 	private ArrayList<AVM> fieldList = new ArrayList<AVM>();
+	private ArrayList<AVM> booleanList = new ArrayList<AVM>();
 
 	@SuppressWarnings("unchecked")
 	public SemIU() {
@@ -28,6 +29,8 @@ public class SemIU extends IU {
 				this.fieldList.add(avm);
 			} else if (avm.getType().equals("dialog_act")) {
 				this.dialogActList.add(avm);
+			} else if (avm.getType().equals("boolean")) {
+				this.booleanList.add(avm);
 			}
 		}
 	}
@@ -58,15 +61,24 @@ public class SemIU extends IU {
 		return list;
 	}
 
+	public ArrayList<AVM> getBooleanList() {
+		ArrayList<AVM> list = new ArrayList<AVM>();
+		list.addAll(this.booleanList);
+		return list;
+	}
+
 	public String toString() {
 		StringBuilder sb = new StringBuilder("< ");
-		for (AVM avm : dialogActList) {
+		for (AVM avm : this.dialogActList) {
 			sb.append(avm.toShortString() + " ");
 		}
-		for (AVM avm : tileList) {
+		for (AVM avm : this.tileList) {
 			sb.append(avm.toShortString() + " ");
 		}
-		for (AVM avm : fieldList) {
+		for (AVM avm : this.fieldList) {
+			sb.append(avm.toShortString() + " ");
+		}
+		for (AVM avm : this.booleanList) {
 			sb.append(avm.toShortString() + " ");
 		}
 		sb.append(" >");
@@ -80,13 +92,16 @@ public class SemIU extends IU {
 		sb.append("' duration='");
 		sb.append(Math.round((endTime() - startTime) * 1000.0));
 		sb.append("'> ");
-		for (AVM avm : dialogActList) {
+		for (AVM avm : this.dialogActList) {
 			sb.append(avm.toShortString() + " ");
 		}
-		for (AVM avm : tileList) {
+		for (AVM avm : this.tileList) {
 			sb.append(avm.toShortString() + " ");
 		}
-		for (AVM avm : fieldList) {
+		for (AVM avm : this.fieldList) {
+			sb.append(avm.toShortString() + " ");
+		}
+		for (AVM avm : this.booleanList) {
 			sb.append(avm.toShortString() + " ");
 		}
 		sb.append(" </event>");
@@ -102,7 +117,8 @@ public class SemIU extends IU {
 	public boolean samePayload(SemIU siu) {
 		return (this.dialogActList.toString().equals(siu.dialogActList.toString()) &&
 				this.fieldList.toString().equals(siu.fieldList.toString()) &&
-				this.tileList.toString().equals(siu.tileList.toString()));
+				this.tileList.toString().equals(siu.tileList.toString())) &&
+				this.booleanList.toString().equals(siu.booleanList.toString());
 	}
 
 }

@@ -250,8 +250,9 @@ public class AVMComposer {
 		ArrayList<AVPair> avps = new ArrayList<AVPair>();
 		
 		avps.add(new AVPair("act", "take"));
-
-
+		avps.add(new AVPair("yesno", "yes"));
+		avps.add(new AVPair("yesno", "no"));
+		
 		// These should compose and resolve
 //		avps.add(new AVPair("color", "green"));
 //		avps.add(new AVPair("name", "f"));
