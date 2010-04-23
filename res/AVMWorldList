@@ -10,7 +10,6 @@
 #
 # Minimal example:
 #{type:tile name:x label:x1 color:green ord:1 orient:top row_col:row ord:1 orient:bottom row_col:row ord:1 orient:left row_col:col ord:1 orient:right row_col:col tb:top lr:left desc:corner relation:next_to relation:above relation:below}
-
 #Tiles:
 {type:tile id:x1 name:x label:x1 color:blue ord:1 orient:top row_col:row ord:2 orient:bottom row_col:row ord:1 orient:left row_col:col ord:2 orient:right row_col:col tb:top lr:left desc:corner relation:next_to relation:above relation:below}
 {type:tile id:y1 name:y label:f1 color:blue ord:2 orient:top row_col:row ord:1 orient:bottom row_col:row ord:2 orient:left row_col:col ord:1 orient:right row_col:col tb:bottom lr:right desc:corner relation:next_to relation:above relation:below}
@@ -25,3 +24,7 @@
 {type:dialog_act act:place}
 {type:dialog_act act:take}
 {type:dialog_act act:turn}
+{type:dialog_act act:delete}
+#Booleans
+{type:boolean yesno:yes}
+{type:boolean yesno:no}
