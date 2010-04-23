@@ -40,6 +40,7 @@ public class SemIU extends IU {
 		list.addAll(this.tileList);
 		list.addAll(this.fieldList);
 		list.addAll(this.dialogActList);
+		list.addAll(this.booleanList);
 		return list;
 	}
 
