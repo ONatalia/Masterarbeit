@@ -81,8 +81,8 @@ public class SegmentIU extends IU {
 	public void update(EditType edit) {
 /* this code is helpful for prosodic feature extraction * /
 		if (edit == EditType.COMMIT) {
-			double time = startTime() + 0.01;
-			for (; time <= endTime() + 0.00001; time += 0.01) { 
+			double time = startTime() + 1 * ResultUtil.FRAME_TO_SECOND_FACTOR;
+			for (; time <= endTime() + 0.00001; time += 1 * ResultUtil.FRAME_TO_SECOND_FACTOR) { 
 				System.err.printf(Locale.US, 
 				                  "%.2f\t%f\t%f\t%f\t%f\t%f\t\"%s\"\t%s\n", 
 				                  time, 

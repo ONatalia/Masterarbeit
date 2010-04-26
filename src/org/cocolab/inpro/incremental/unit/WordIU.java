@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.cocolab.inpro.annotation.Label;
+import org.cocolab.inpro.incremental.util.ResultUtil;
 import org.cocolab.inpro.nlu.AVPair;
 
 import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
@@ -112,9 +113,9 @@ public class WordIU extends IU {
 	public String toTEDviewXML() {
 		double startTime = startTime();
 		StringBuilder sb = new StringBuilder("<event time='");
-		sb.append(Math.round(startTime * 1000.0));
+		sb.append(Math.round(startTime * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
 		sb.append("' duration='");
-		sb.append(Math.round((endTime() - startTime) * 1000.0));
+		sb.append(Math.round((endTime() - startTime) * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
 		sb.append("'> ");
 		sb.append(word.replace("<", "&lt;").replace(">", "&gt;"));
 		sb.append(" </event>");

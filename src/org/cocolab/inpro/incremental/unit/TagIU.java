@@ -19,6 +19,8 @@ package org.cocolab.inpro.incremental.unit;
 
 import java.util.List;
 
+import org.cocolab.inpro.incremental.util.ResultUtil;
+
 public class TagIU extends IU {
 
 	final String tag;
@@ -35,9 +37,9 @@ public class TagIU extends IU {
 	public String toTEDviewXML() {
 		double startTime = startTime();
 		return "<event time='"
-				+ Math.round(startTime * 1000.0) 
+				+ Math.round(startTime * ResultUtil.SECOND_TO_MILLISECOND_FACTOR) 
 				+ "' duration='"
-				+ Math.round((endTime() - startTime) * 1000.0)
+				+ Math.round((endTime() - startTime) * ResultUtil.SECOND_TO_MILLISECOND_FACTOR)
 				+ "'> "
 				+ tag
 				+ " </event>";

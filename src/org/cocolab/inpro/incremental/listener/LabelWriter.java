@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.util.ResultUtil;
 
 public class LabelWriter extends HypothesisChangeListener {
 
@@ -29,7 +30,7 @@ public class LabelWriter extends HypothesisChangeListener {
 	public void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
 		if (ius.size() > 0) {
 			System.out.print("Time: ");
-			System.out.println(currentFrame * 0.01);
+			System.out.println(currentFrame * ResultUtil.FRAME_TO_SECOND_FACTOR);
 			for (IU iu : ius) {
 				System.out.println(iu.toLabelLine());
 			}

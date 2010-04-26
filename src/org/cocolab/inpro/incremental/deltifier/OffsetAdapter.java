@@ -38,10 +38,13 @@ public class OffsetAdapter extends BaseDataProcessor {
 		Data data = getPredecessor().getData();
 		if ((!inAudio) && (data instanceof DoubleData)) {
 			long chunkStartSample = ((DoubleData) data).getFirstSampleNumber();
+			long collectTime = ((DoubleData) data).getCollectTime();
 			asrDeltifier.setOffset((int) chunkStartSample / 160); // divide by 16000, multiply by 100 -> frames
+			asrDeltifier.setCollectTime(collectTime);
 			inAudio = true;
 		}
 		if ((data instanceof Signal)) {
+			asrDeltifier.signalOccurred((Signal) data);
 			inAudio = false;
 		}
 		return data;

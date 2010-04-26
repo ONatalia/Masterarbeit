@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.cocolab.inpro.incremental.util.ResultUtil;
 import org.cocolab.inpro.nlu.AVM;
 
 public class SemIU extends IU {
@@ -89,9 +90,9 @@ public class SemIU extends IU {
 	public String toTEDviewXML() {
 		double startTime = startTime();
 		StringBuilder sb = new StringBuilder("<event time='");
-		sb.append(Math.round(startTime * 1000.0));
+		sb.append(Math.round(startTime * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
 		sb.append("' duration='");
-		sb.append(Math.round((endTime() - startTime) * 1000.0));
+		sb.append(Math.round((endTime() - startTime) * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
 		sb.append("'> ");
 		for (AVM avm : this.dialogActList) {
 			sb.append(avm.toShortString() + " ");

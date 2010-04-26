@@ -122,7 +122,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		// step over wordIUs and newWords to see which are equal in both
 		ListIterator<Token> newIt = newTokens.listIterator();
 		ListIterator<WordIU> currWordIt = currWordIUs.listIterator();
-		double segmentStartTime = currentOffset * 0.01;
+		double segmentStartTime = currentOffset * ResultUtil.FRAME_TO_SECOND_FACTOR;
 		double segmentEndTime = 0.0;
 		List<SegmentIU> emptyList = Collections.emptyList(); // needed to initialize prevSegmentIt with an empty non-null iterator
 		Iterator<SegmentIU> currSegmentIt = emptyList.iterator();
@@ -221,10 +221,10 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 			if ((t.getSearchState() instanceof WordSearchState) 
 			 && (newIt.hasNext()) 
 			) {
-				segmentEndTime = (newIt.next().getFrameNumber()+ currentOffset) * 0.01;
+				segmentEndTime = (newIt.next().getFrameNumber()+ currentOffset) * ResultUtil.FRAME_TO_SECOND_FACTOR;
 				newIt.previous();
 			} else {
-				segmentEndTime = (t.getFrameNumber() + currentOffset) * 0.01;
+				segmentEndTime = (t.getFrameNumber() + currentOffset) * ResultUtil.FRAME_TO_SECOND_FACTOR;
 			}
 			newIt.previous();
 		} else
@@ -270,7 +270,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	}
 	
 	public synchronized double getCurrentTime() {
-		return (currentFrame + currentOffset) * 0.001;
+		return (currentFrame + currentOffset) * ResultUtil.FRAME_TO_SECOND_FACTOR;
 	}
 
 	@Override
@@ -288,18 +288,22 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	 *     here, the offset is given in centiseconds (frames)
 	 */
 	public void setOffset(int currentOffset) {
-		logger.debug("SETTING OFFSET TO " + currentOffset);
+		logger.debug("SETTING OFFSET (frames) TO " + currentOffset);
 		this.currentOffset = currentOffset;
 	}
 	
 	@Override
 	public void signalOccurred(Signal signal) {
-		System.err.println(signal.toString());
 		if (signal instanceof DataStartSignal) {
 			startTime = signal.getTime();
+			logger.debug("Audio start time is " + startTime);
 		} else if (signal instanceof SpeechStartSignal) {
-			setOffset((int) (signal.getTime() - startTime) / 10);
+		//	setOffset((int) (signal.getTime() - startTime) / 10);
 		}
+	}
+
+	public void setCollectTime(long collectTime) {
+		logger.debug("SETTING COLLECT TIME (ms) TO " + ((collectTime - startTime) / 10));
 	}
 	
 }

@@ -36,6 +36,9 @@ import edu.cmu.sphinx.linguist.lextree.LexTreeLinguist;
 
 public class ResultUtil {
 	
+	public static double FRAME_TO_SECOND_FACTOR = 0.01;
+	public static double SECOND_TO_MILLISECOND_FACTOR = 1000.0;
+	
 	/**
 	 * return a list of word and/or unit tokens extracted from a linked token list
 	 * 
@@ -130,7 +133,7 @@ public class ResultUtil {
 		double start = 0.0;
 		while (it.hasNext()) {
 			Token t = it.next();
-			double end = t.getFrameNumber() / 100.0;
+			double end = t.getFrameNumber() * FRAME_TO_SECOND_FACTOR;
 			if (!((WordSearchState) t.getSearchState()).getPronunciation().getWord().isFiller() || wantFiller) {
 				Label l = new Label(start, end, stringForSearchState(t.getSearchState()));
 				returnList.add(l);

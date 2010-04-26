@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.util.ResultUtil;
 
 public class ConsoleNotifier extends HypothesisChangeListener {
 
@@ -29,7 +30,7 @@ public class ConsoleNotifier extends HypothesisChangeListener {
 	public void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
 		if (edits.size() > 0) {
 			System.out.print("\nThe Hypothesis has changed at time: ");
-			System.out.println(currentFrame * 0.01);
+			System.out.println(currentFrame * ResultUtil.FRAME_TO_SECOND_FACTOR);
 			System.out.println("Edits since last hypothesis:");
 			for (EditMessage<? extends IU> edit : edits) {
 				System.out.println(edit.toString());
@@ -39,7 +40,7 @@ public class ConsoleNotifier extends HypothesisChangeListener {
 				System.out.println(iu.deepToString());
 			} 
 		} else {
-			System.out.print(".");
+/*			System.out.print("."); */
 		}
 	}
 
