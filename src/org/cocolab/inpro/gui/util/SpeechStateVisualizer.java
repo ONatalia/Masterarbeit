@@ -1,10 +1,16 @@
 /* (c) 2009 Timo Baumann. released as-is to the public domain. */
 package org.cocolab.inpro.gui.util;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
@@ -22,6 +28,9 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 	
 	JLabel speechIndicator;
 	JFrame f;
+	JToggleButton recordButton;
+	
+	boolean isRecording = true;
 
 	public SpeechStateVisualizer() {
 		ImageIcon silentIcon = new ImageIcon(SpeechStateVisualizer.class.getResource("happyhal-inactive.png"));
@@ -29,6 +38,16 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 		speechIndicator = new JLabel(talkingIcon);
 		speechIndicator.setDisabledIcon(silentIcon);
 		speechIndicator.setEnabled(false);
+		recordButton = new JToggleButton(new ImageIcon(SpeechStateVisualizer.class.getResource("media-playback-pause.png"), "PAUSE"));
+		recordButton.setActionCommand("PAUSE");
+		recordButton.setSelectedIcon(new ImageIcon(SpeechStateVisualizer.class.getResource("media-record.png"), "PAUSE"));
+		recordButton.setSelected(true);
+		recordButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				setRecording(((JToggleButton) ae.getSource()).isSelected());
+			}
+		});
 	}
 	
 	@Override
@@ -37,7 +56,10 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					f = new JFrame("speech estimation");
-					f.add(speechIndicator);
+					JPanel p = new JPanel(new BorderLayout());
+					p.add(speechIndicator, BorderLayout.CENTER);
+					p.add(recordButton, BorderLayout.SOUTH);
+					f.add(p);
 					f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 					f.pack();
 				}
@@ -45,8 +67,17 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 		}
 	}
 	
+	public void setRecording(boolean recording) {
+		isRecording = recording;
+		recordButton.setSelected(recording);
+	}
+	
 	public JComponent getSpeechIndicator() {
 		return speechIndicator;
+	}
+	
+	public JToggleButton getMuteButton() {
+		return recordButton;
 	}
 
 	@Override
@@ -54,12 +85,25 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 		if (f != null && !f.isVisible()) {
 			f.setVisible(true);
 		}
-		Data d = getPredecessor().getData();
+		Data d;
+		do { // at least once and until recording
+			d = getPredecessor().getData();
+		} while (!isRecording);
 		if (d instanceof SpeechClassifiedData) {
 			SpeechClassifiedData scd = (SpeechClassifiedData) d;
 			speechIndicator.setEnabled(scd.isSpeech());
 		}
 		return d;
+	}
+	
+	/**
+	 * for testing purposes; this should initialize the microphone, add 
+	 * a speech state visualizer and a mutebutton preceeding it.
+	 * when muted, nothing should pass the speech state visualizer
+	 * when not muted, speech state should be visualized
+	 */
+	public static void main(String args[]) {
+		
 	}
 
 }

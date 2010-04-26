@@ -12,7 +12,6 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.apps.util.RecoCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
-import org.cocolab.inpro.gui.util.MuteButton;
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
 import org.cocolab.inpro.sphinx.decoder.FakeSearch;
@@ -68,7 +67,6 @@ public class SimpleReco {
 			logger.fatal("Could not open microphone. Exiting...");
 			System.exit(1);
 		}
-		MuteButton.showMuteButton(mic);
 		Runnable shutdownHook = new Runnable() {
 			public void run() {
 				logger.info("Shutting down microphone.");
@@ -204,16 +202,11 @@ public class SimpleReco {
     	setupMonitors(cm, clp);
     	if (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
     		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
-    		recognizeOnce(recognizer);
-	    	Microphone mic = (Microphone) cm.lookup("microphone");
-	    	synchronized(mic) {
-		    	try {
-					mic.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-	    	}
-    		recognizer.resetMonitors();
+    		while(true) {
+    			logger.debug("in while loop");
+	    		recognizeOnce(recognizer);
+	    		recognizer.resetMonitors();
+    		}
     	} else {
     		recognizeOnce(recognizer);
     	}
