@@ -38,13 +38,13 @@
     <property name="frontend" value="frontend"/>
     <property name="baseData" value="baseData"/>
     <!-- The minimum amount of time in speech (in milliseconds) to be considered as utterance start -->
-    <property name="startSpeech" value="100"/>
+    <property name="startSpeech" value="200"/>
     <!-- The amount of time in silence (in milliseconds) to be considered as utterance end -->
     <property name="endSilence" value="500"/>
     <!-- The amount of time (in milliseconds) before speech start to be included as speech data. -->
-    <property name="speechLeader" value="100"/>
+    <property name="speechLeader" value="50"/>
     <!-- The amount of time (in milliseconds) after speech ends to be included as speech data. -->
-    <property name="speechTrailer" value="200"/>
+    <property name="speechTrailer" value="250"/>
     <!-- The speech classifier threshold. -->
     <property name="threshold" value="15"/>
 

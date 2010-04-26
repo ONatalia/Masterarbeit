@@ -24,7 +24,7 @@ may lag behind a little bit. The button on the right of
 the ASR line can be used to mute or unmute the microphone.
 As the microphone starts up muted, your first step in
 using this software will be to unmute the microphone by
-pressing on this button. Also note that it may take a 
+pressing this button. Also note that it may take a 
 while before the microphone can be unmuted, as the ASR has
 to finish loading first. Only commence speaking once the 
 button's icon has changed from "pause" to "play". 
@@ -53,7 +53,14 @@ certain words that it doesn't know. Don't despair! Maybe
 you've got more luck if you try a second time, and if you
 rephrase you utterance. Maybe it won't help at all. Your
 data in such cases is very valuable and will help the ASR
-learn the new word with the next training iteration.
+learn the new word with the next training iteration. 
+
+So, if you find a word consistently being mis-understood, 
+you may even choose to still use it, in order to "teach" 
+the system the new word in several contexts. 
+(Unfortunately, teaching means correcting mistakes and 
+the system will only have learned the word in the next 
+training iteration -- most likely not before the next day.)  
 
 Occasionally, it may seem that the beginning of what you 
 said was not picked up. Or that a noise made recognition

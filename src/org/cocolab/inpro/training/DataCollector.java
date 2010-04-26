@@ -18,14 +18,19 @@ package org.cocolab.inpro.training;
 
  */
 
+import sun.audio.AudioPlayer;
+import sun.audio.AudioStream;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -38,7 +43,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
-import org.cocolab.inpro.gui.util.MuteButton;
 import org.cocolab.inpro.gui.util.SpeechStateVisualizer;
 import org.cocolab.inpro.incremental.listener.CurrentHypothesisViewer;
 import org.cocolab.inpro.sphinx.frontend.WavTEDLogger;
@@ -75,12 +79,14 @@ import edu.cmu.sphinx.result.Result;
 @SuppressWarnings("serial")
 public class DataCollector extends JPanel implements ActionListener {
 	
+	private final SpeechStateVisualizer ssv;
+	
 	// GUI buttons (we need these later to selectively disable them
 	// when their related actions are not applicable)
-	private final JToggleButton muteButton;
 	private final JButton uploadButton;
 	private final JButton acceptButton;
-	private final JButton discardButton;	
+	private final JButton discardButton;
+	private final JButton playbackButton;
 	private final JTextField resultField;
 	/** panel to show and control an inspirational slide show */
 	private final SlideShowPanel slidePanel;
@@ -112,20 +118,23 @@ public class DataCollector extends JPanel implements ActionListener {
 		wavWriter = (WavTEDLogger) configuration.lookup("utteranceWavWriter");
 		wavWriter.setDumpFilePath(System.getProperty("java.io.tmpdir") + "/dc.");
 
-		SpeechStateVisualizer ssv = (SpeechStateVisualizer) configuration.lookup("speechStateVisualizer");
+		ssv = (SpeechStateVisualizer) configuration.lookup("speechStateVisualizer");
 
-		muteButton = new JToggleButton(new ImageIcon(MuteButton.class.getResource("media-playback-start.png"), "start"));
-		muteButton.setSelectedIcon(new ImageIcon(MuteButton.class.getResource("media-playback-pause.png"), "stop"));
-		muteButton.setToolTipText("Pause/Unpause ASR");
-		muteButton.setSelected(true); // start muted
-		muteButton.addActionListener(this);
-		muteButton.setActionCommand("PAUSE");
-		muteButton.setEnabled(false); // disable for now, will be enabled once ASR initialization completes
-		
+		ssv.getMuteButton().setEnabled(false);
+		ssv.getMuteButton().addActionListener(this);
+
 		uploadButton = createButton("pack-and-upload.png", "Upload to Server", this, "UPLOAD");
 		acceptButton = DataCollector.createButton("dialog-ok.png", "This is what I said.", this, "ACCEPT");
 		discardButton = DataCollector.createButton("dialog-cancel.png", "Cancel this Recording.", this, "DISCARD");
-		
+
+		playbackButton = new JButton(new AbstractAction("", new ImageIcon(SpeechStateVisualizer.class.getResource("media-playback-start.png"))) {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				playFile(recoRunner.getMostRecentFilename());
+			}
+		});
+		playbackButton.setToolTipText("Play back the recording.");
+		playbackButton.setEnabled(false);
 
 		resultField = new JTextField();
 		resultField.setFont(CurrentHypothesisViewer.DEFAULT_FONT);
@@ -154,8 +163,10 @@ public class DataCollector extends JPanel implements ActionListener {
 		gbs.weightx = 0.0;
 		gbs.gridx = 3;
 		gbs.gridy = 1;
-		add(muteButton, gbs);
-		//add(new MuteButton((Microphone) cm.lookup("microphone")), gbs);
+		add(ssv.getMuteButton(), gbs);
+		gbs.gridwidth=1;
+		gbs.gridx = 6;
+		
 		gbs.gridwidth = 1;
 		gbs.gridx = 4;
 		gbs.gridy = 2;
@@ -166,6 +177,9 @@ public class DataCollector extends JPanel implements ActionListener {
 		add(uploadButton, gbs);
 		gbs.gridy = 2;
 		add(discardButton, gbs);
+		gbs.gridx = 6;
+		gbs.gridy = 2;
+		add(playbackButton, gbs);
 		
 		gbs.gridx = 1;
 		gbs.gridy = 3;
@@ -237,14 +251,17 @@ public class DataCollector extends JPanel implements ActionListener {
 		@Override
 		protected void done() {
 			// enable controls, remove initialization message
-			muteButton.setEnabled(true);
+			ssv.getMuteButton().setEnabled(true);
+
 			chv.getTextField().setText("");
 			recoRunner.start();
+			// and start recognition mode
+			recoRunner.setRecognizing(true);
 		}
 	}
 	
 	private class RecoRunner extends Thread {
-		
+		/** determines whether new results should be thrown away or passed onto swing UI */ 
 		private boolean updateResults = false;
 		private String mostRecentRecoResult = null;
 		private String mostRecentFileName = "";
@@ -283,6 +300,8 @@ public class DataCollector extends JPanel implements ActionListener {
 					&& (result.getDataFrames() != null)
 					&& (result.getDataFrames().size() > 4)) {
 					mostRecentRecoResult = result.getBestFinalToken().getWordPath();
+					mostRecentRecoResult = mostRecentRecoResult.replaceAll("<\\/?s>", ""); // remove <s> and </s>
+					mostRecentRecoResult = mostRecentRecoResult.replaceFirst("^\\s*<sil> ", ""); // remove leading "<sil> "
 					mostRecentFileName = wavWriter.getMostRecentFilename();
 					sessionData.addFile(mostRecentFileName);
 					// make sure we don't eternally fill up temp space
@@ -304,9 +323,12 @@ public class DataCollector extends JPanel implements ActionListener {
 	
 	private void setRecognizing(boolean recognizing) {
 		chv.getTextField().setText("");
-		muteButton.setEnabled(recognizing);
+		ssv.getMuteButton().setEnabled(recognizing);
+		ssv.setRecording(recognizing);
+		
 		acceptButton.setEnabled(!recognizing);
 		discardButton.setEnabled(!recognizing);
+		playbackButton.setEnabled(!recognizing);
 		resultField.setEnabled(!recognizing);
 		recoRunner.setRecognizing(recognizing);
 		if (recognizing) {
@@ -323,7 +345,7 @@ public class DataCollector extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent ae) {
 		String command = ae.getActionCommand();
 		if (command.equals("PAUSE")) {
-			boolean isPaused = ((JToggleButton) ae.getSource()).isSelected(); 
+			boolean isPaused = !((JToggleButton) ae.getSource()).isSelected(); 
 			recoRunner.setRecognizing(!isPaused);
 			uploadButton.setEnabled(isPaused);
 		} else if (command.equals("ASR_RESULT")) {
@@ -376,9 +398,22 @@ public class DataCollector extends JPanel implements ActionListener {
 		}
 	}	
 	
+	/** save a transcript to sessiondata */
 	private void saveTranscript(String transcript, String filetype) {
 		String filename = recoRunner.getMostRecentFilename().replaceFirst("\\.wav$", filetype);
 		sessionData.addSmallFile(filename, transcript);
+	}
+	
+	
+	/** playback the given audio file to the speakers */
+	public void playFile(String fileName) {
+		AudioStream as;
+		try {
+			as = new AudioStream(new FileInputStream(fileName));
+			AudioPlayer.player.start(as);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}        
 	}
 
 	/**
