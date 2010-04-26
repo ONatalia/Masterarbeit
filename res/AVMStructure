@@ -14,7 +14,7 @@
 #
 # Examples:
 [type:tile id:String name:String color:String label:String rel_loc:(rel_loc_spec,3,false) loc:loc_spec]
-[type:field color:String rel_loc:(rel_loc_spec,3,false) loc:loc_spec]
+#[type:field color:String rel_loc:(rel_loc_spec,3,false) loc:loc_spec]
 [type:rel_loc_spec arg:String relation:String]
 [type:loc_spec tb:String lr:String desc:String rc:(rc_spec,4,true)]
 [type:rc_spec row_col:String orient:String ord:String]
