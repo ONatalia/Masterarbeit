@@ -41,6 +41,8 @@ abstract public class CursorCanvas extends Canvas {
 	
 	public int buttonClickDelay = 400; // in milliseconds
 
+	protected double MOVE_SPEED = 10;
+	
 	public CursorCanvas() {
 		this(false);
 	}
@@ -210,7 +212,7 @@ abstract public class CursorCanvas extends Canvas {
 	
 	private class MoveThread extends Thread {
 		private Point goalPosition;
-		double speed = 10.0;
+		double speed = MOVE_SPEED;
 
 		MoveThread(Point goalPosition) {
 			this.goalPosition = goalPosition;

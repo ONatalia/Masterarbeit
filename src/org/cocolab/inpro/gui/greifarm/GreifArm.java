@@ -18,13 +18,14 @@ public class GreifArm extends CursorCanvas {
 
 	private static final Logger logger = Logger.getLogger(GreifArm.class);
 	
-	public static final int RELATIVE_WIDTH = 40;
+	public static final int RELATIVE_WIDTH = 70;
 	public static final int RELATIVE_HEIGHT = 10;
 	
-	ImageTile emptyHand;
+	public ImageTile emptyHand;
 	
 	public GreifArm() {
 		super();
+		MOVE_SPEED = 5;
 		reset();
 		cursorVisible = true;
 		buttonClickDelay = 100;
@@ -41,6 +42,10 @@ public class GreifArm extends CursorCanvas {
 		emptyHand.setVisible(false);
 		tiles.add(emptyHand);
 		return tiles;
+	}
+	
+	public int getBowlPosition() {
+		return tiles.get(1).refPoint.x;
 	}
 	
 	@Override
