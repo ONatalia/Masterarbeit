@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -31,15 +33,31 @@ import gov.nist.jrtp.RtpSession;
 import gov.nist.jrtp.RtpStatusEvent;
 import gov.nist.jrtp.RtpTimeoutEvent;
 
+/**
+ * SimpleMonitor is kind of a "mixer" application with several 
+ * input ports (microphone, OAA-goals, RTP) and several 
+ * output ports (speakers or file).  
+ * 
+ * More or less, the software works as follows (and should probably be 
+ * refactored to be self-explanatory)
+ * 
+ * createMicrophoneSource()
+ * createDispatcherSource()
+ * 
+ * 
+ * @author timo
+ */
+
 public class SimpleMonitor implements RtpListener {
 
 	private static final Logger logger = Logger.getLogger(SimpleMonitor.class);
 	
+	/* make these variables global, so that they are accessible from sub functions */
 	MonitorCommandLineParser clp;
     SourceDataLine line;
     FileOutputStream fileStream;
-	
-	SimpleMonitor(MonitorCommandLineParser clp) throws RtpException, IOException, PropertyException, InstantiationException {
+
+    SimpleMonitor(MonitorCommandLineParser clp) throws RtpException, IOException, PropertyException, InstantiationException {
 		this.clp = clp;
 		logger.info("Setting up output stream...\n");
 		if (clp.matchesOutputMode(CommonCommandLineParser.FILE_OUTPUT)) {
@@ -48,13 +66,11 @@ public class SimpleMonitor implements RtpListener {
 		}
 		if (clp.matchesOutputMode(CommonCommandLineParser.SPEAKER_OUTPUT)) {
 			logger.info("setting up speaker output");
-			setupSpeaker();
+			setupSpeakers();
 		}
 		switch (clp.getInputMode()) {
 			case CommonCommandLineParser.RTP_INPUT :
-				RtpSession rs = new RtpSession(InetAddress.getLocalHost(), clp.getLocalPort());
-				rs.addRtpListener(this);
-				rs.receiveRTPPackets();
+				createRTPSource();
 			break;
 			case CommonCommandLineParser.OAA_DISPATCHER_INPUT : 
 				Runnable streamDrainer = createDispatcherSource();
@@ -67,7 +83,61 @@ public class SimpleMonitor implements RtpListener {
 			default: throw new RuntimeException("oups in SimpleMonitor"); 
 		}
 	}
-
+    
+    /* setup of output streams */
+    
+	/** setup output to file */
+	void setupFileStream() {
+		fileStream = null;
+		try {
+			fileStream = new FileOutputStream(clp.getAudioURL().getFile());
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/** setup output to speakers */
+	void setupSpeakers() {
+		SourceDataLine line;
+		AudioFormat format = getFormat();
+		// define the required attributes for our line, 
+        // and make sure a compatible line is supported.
+        DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
+        if (!AudioSystem.isLineSupported(info)) {
+            throw new RuntimeException("Line matching " + info + " not supported.");
+        }
+        // get and open the source data line for playback.
+        try {
+            line = (SourceDataLine) AudioSystem.getLine(info);
+		    logger.info("opening speaker with buffer size " + clp.getBufSize());
+		    line.open(format, clp.getBufSize());
+		    logger.info("speaker actually has buffer size " + line.getBufferSize());
+        } catch (LineUnavailableException ex) { 
+            throw new RuntimeException("Unable to open the line: " + ex);
+        }
+        // start the source data line
+        line.start();
+	}
+	
+	/** defines the supported audio format */
+    AudioFormat getFormat() {
+        AudioFormat.Encoding encoding = AudioFormat.Encoding.PCM_SIGNED;
+		float rate = 16000.f;
+		int sampleSize = 16;
+		int channels = 1;
+		boolean bigEndian = clp.isInputMode(MonitorCommandLineParser.RTP_INPUT);
+		return new AudioFormat(encoding, rate, sampleSize, channels, (sampleSize/8)*channels, rate, bigEndian);
+    }
+    
+    /* setup of input streams */
+    
+	/** 
+	 * returns a runnable that will continuously read data from the microphone
+	 * and append the data read to the output stream(s) using newData() (see below) 
+	 * @return a Runnable that continuously drains the microphone and pipes
+	 *         its data to newData()
+	 */
 	Runnable createMicrophoneSource() {
 		AudioFormat format = getFormat();
 		DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
@@ -107,10 +177,15 @@ public class SimpleMonitor implements RtpListener {
 		return streamDrainer;
 	}
 
+	/**
+	 * returns a runnable that will read data from an OAADispatchStream (which
+	 * in turn either returns silence, sine waves, or data from audio files, 
+	 * depending on how it is instructed via OAA
+	 * @return a Runnable that pipes its data to newData()
+	 */
 	Runnable createDispatcherSource() throws IOException, PropertyException, InstantiationException {
     	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
-		final OAADispatchStream ods = (OAADispatchStream) 
-		cm.lookup("oaaDispatchStream");
+		final OAADispatchStream ods = (OAADispatchStream) cm.lookup("oaaDispatchStream");
 		ods.initialize();
 		Runnable streamDrainer = new Runnable() {
 			@Override
@@ -138,74 +213,15 @@ public class SimpleMonitor implements RtpListener {
 		return streamDrainer;
 	}
 
-	void setupFileStream() {
-		try {
-			fileStream = new FileOutputStream(clp.getAudioURL().getFile());
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    /** creates an RTP session that piepes incoming audio to newData() */
+	void createRTPSource() throws SocketException, UnknownHostException, RtpException {
+		RtpSession rs = new RtpSession(InetAddress.getLocalHost(), clp.getLocalPort());
+		rs.addRtpListener(this);
+		rs.receiveRTPPackets();
 	}
 	
-	void setupSpeaker() {
-		AudioFormat format = getFormat();
-		// define the required attributes for our line, 
-        // and make sure a compatible line is supported.
-        DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
-        if (!AudioSystem.isLineSupported(info)) {
-            throw new RuntimeException("Line matching " + info + " not supported.");
-        }
-        // get and open the source data line for playback.
-        try {
-            line = (SourceDataLine) AudioSystem.getLine(info);
-		    logger.info("opening speaker with buffer size " + clp.getBufSize());
-		    line.open(format, clp.getBufSize());
-		    logger.info("speaker actually has buffer size " + line.getBufferSize());
-        } catch (LineUnavailableException ex) { 
-            throw new RuntimeException("Unable to open the line: " + ex);
-        }
-        // start the source data line
-        line.start();
-	}
-	
-    AudioFormat getFormat() {
-        AudioFormat.Encoding encoding = AudioFormat.Encoding.PCM_SIGNED;
-		float rate = 16000.f;
-		int sampleSize = 16;
-		int channels = 1;
-		boolean bigEndian;
-		if (clp.getInputMode() == MonitorCommandLineParser.RTP_INPUT) {
-			bigEndian = true;
-		} else {
-			bigEndian = false;
-		}
-		return new AudioFormat(encoding, rate, sampleSize, channels, (sampleSize/8)*channels, rate, bigEndian);
-    }
-    
-    /*
-     * handle incoming data
-     */
-    void newData(byte[] bytes, int offset, int length) {
-    	assert length >= 0;
-    	assert offset >= 0;
-    	assert offset + length <= bytes.length;
-    	if (clp.verbose()) {
-    		System.err.print(".");
-    	}
-    	if (clp.matchesOutputMode(CommonCommandLineParser.SPEAKER_OUTPUT)) {
-    		line.write(bytes, offset, length);
-    	}
-    	if (clp.matchesOutputMode(CommonCommandLineParser.FILE_OUTPUT)) {
-    		try {
-				fileStream.write(bytes, offset, length);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-    	}
-    }
-
     /************************
-     * RtpListener interface
+     * RtpListener interface (this is used in RTP input mode)
      ************************/
     
 	public void handleRtpPacketEvent(RtpPacketEvent arg0) {
@@ -227,6 +243,30 @@ public class SimpleMonitor implements RtpListener {
 		if (clp.verbose()) System.err.println(arg0);
 	}
 	
+
+	
+    /**
+     * handle incoming data: copy to lineout and/or filebuffer
+     */
+    void newData(byte[] bytes, int offset, int length) {
+    	assert length >= 0;
+    	assert offset >= 0;
+    	assert offset + length <= bytes.length;
+    	if (clp.verbose()) {
+    		System.err.print(".");
+    	}
+    	if (clp.matchesOutputMode(CommonCommandLineParser.SPEAKER_OUTPUT)) {
+    		line.write(bytes, offset, length);
+    	}
+    	if (clp.matchesOutputMode(CommonCommandLineParser.FILE_OUTPUT)) {
+    		try {
+				fileStream.write(bytes, offset, length);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    	}
+    }
+
 	/*******************
 	 * main
 	 *******************/
