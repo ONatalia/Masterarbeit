@@ -24,6 +24,7 @@ public abstract class CommonCommandLineParser {
 	boolean success;
 	URL audioURL;
 	int inputMode;
+	int outputMode;
 	
 	public CommonCommandLineParser(String[] args) {
 		success = false;
@@ -69,5 +70,10 @@ public abstract class CommonCommandLineParser {
 	public boolean isInputMode(int inputMode) {
 		return this.inputMode == inputMode;
 	}
+
+	public boolean matchesOutputMode(int mode) {
+		return (outputMode & mode) == mode;
+	}
+
 	
 }

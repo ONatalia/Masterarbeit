@@ -17,7 +17,11 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 
 	@Override
 	boolean checkConfiguration() {
-		return true;
+		if (matchesOutputMode(CURRHYP_OUTPUT) && hasTextFromReader()) {
+			success = false;
+			System.err.println("Can only use -C in interactive mode.");
+		}
+		return success;
 	}
 	
 	public boolean hasTextFromReader() {
@@ -31,11 +35,11 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 
 	@Override
 	void parse(String[] args) throws MalformedURLException {
+		success = true;
 		for (int i = 0; i < args.length; i++) {
-			if (args[i].equals("-h")) {
+			if (args[i].equals("-h") || args[i].equals("--help")) {
 				printUsage();
-				System.exit(0);
-				return;
+				success = false;
 			}
 			else if (args[i].equals("-c")) {
 				i++;
@@ -66,6 +70,13 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-STDIN")) {
 				textReader = new InputStreamReader(System.in);
+			} 
+			else if (args[i].equals("-C")) {
+				outputMode |= CURRHYP_OUTPUT;
+			}
+			else {
+				printUsage();
+				success = false;
 			}
 		}
 	}
@@ -82,6 +93,8 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -T \"<text>\"    simulate input of the given text");
 		System.err.println("    -F <URL>       read input from file (one line will be committed at a time)");
 		System.err.println("    -STDIN         read input from standard in");
+		System.err.println("output selection:");
+		System.err.println("    -C             show current incremental ASR hypothesis");
 	}
 
 }

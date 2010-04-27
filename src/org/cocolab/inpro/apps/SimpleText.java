@@ -106,6 +106,7 @@ public class SimpleText extends JPanel implements ActionListener {
         contentPane.setOpaque(true);
         frame.setContentPane(contentPane);
         //Display the window.
+        frame.setLocationRelativeTo(null);
         frame.pack();
         frame.setVisible(true);
 	}
@@ -144,8 +145,11 @@ public class SimpleText extends JPanel implements ActionListener {
     		// run non-interactively
     		runFromReader(clp.getReader(), hypListeners, floorManager);
     		System.exit(0); //
-    	} else {
-    		// run interactively
+    	} else { // run interactively
+    		// add hypothesis viewer 
+    		if (clp.matchesOutputMode(TextCommandLineParser.CURRHYP_OUTPUT)) {
+    			hypListeners.add((PushBuffer) cm.lookup("hypViewer"));
+    		}
     		logger.info("running in interactive mode");
     		SwingUtilities.invokeLater(new Runnable() {
 	            public void run() {

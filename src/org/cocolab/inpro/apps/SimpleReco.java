@@ -64,7 +64,6 @@ public class SimpleReco {
 		micInitializer.start();
 		try {
 			micInitializer.join(3000); // allow the microphone 3 seconds to initialize
-			Thread.sleep(3000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -75,10 +74,17 @@ public class SimpleReco {
 		Runnable shutdownHook = new Runnable() {
 			public void run() {
 				logger.info("Shutting down microphone.");
-				mic.stopRecording();
+				Thread micStopper = new Thread() {
+					@Override
+					public void run() {
+						mic.stopRecording();
+					}
+				};
+				micStopper.start();
 				try {
-					Thread.sleep(1000);
+					micStopper.join(3000);
 				} catch (InterruptedException ie) {
+					ie.printStackTrace();
 				}
 			}
 		};
@@ -164,13 +170,10 @@ public class SimpleReco {
 		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
 			cm.lookup("labelWriter");
 		}
-		CurrentASRHypothesis cah = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
-		cah.addListener((PushBuffer) cm.lookup("hypViewer"));
-//		if (clp.isIncremental()) {
-//			if (clp.matchesOutputMode(RecoCommandLineParser.CURRHYP_OUTPUT)) {
-//				logger.info("Adding current hypothesis viewer");
-//			} 
-//		}
+		if (clp.matchesOutputMode(RecoCommandLineParser.CURRHYP_OUTPUT)) {
+			CurrentASRHypothesis cah = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
+			cah.addListener((PushBuffer) cm.lookup("hypViewer"));
+		}
 		if (clp.verbose()) {
 			cm.lookup("memoryTracker");
 			cm.lookup("speedTracker");
@@ -183,9 +186,9 @@ public class SimpleReco {
 	    	result = recognizer.recognize();
 	        if (result != null) {
 	        	// Normal Output
-	        	logger.info("RESULT: " + result.toString() + "\n");
+	        	logger.info("RESULT: " + result.toString());
 	        } else {
-	        	logger.info("Result: null\n");
+	        	logger.info("Result: null");
 	        }
     	} while ((result != null) && (result.getDataFrames() != null) && (result.getDataFrames().size() > 4));
 	}
@@ -208,8 +211,7 @@ public class SimpleReco {
     	if (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
     		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
     		while(true) {
-    			logger.debug("in while loop");
-	    		recognizeOnce(recognizer);
+    			recognizeOnce(recognizer);
 	    		recognizer.resetMonitors();
     		}
     	} else {

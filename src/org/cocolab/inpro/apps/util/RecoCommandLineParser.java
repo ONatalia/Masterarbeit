@@ -21,7 +21,6 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	int recoMode;
 	
 	public int rtpPort;
-	int outputMode;
 	int incrementalMode;
 	int incrementalModifier;
 	String referenceText;
@@ -48,7 +47,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -N             no incremental output");
 		System.err.println("    -Is <n>        apply smoothing factor");
 		System.err.println("    -If <n>        apply fixed lag");
-		System.err.println("    -In            no result smoothing/lagging");
+		System.err.println("    -In            no result smoothing/lagging, DEFAULT");
 		System.err.println("special modes:");
 		System.err.println("    -fa <text>     do forced alignment with the given reference text");
 		System.err.println("    -tg <file>     do fake recognition from the given reference textgrid");
@@ -145,10 +144,6 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		}
 	}
 	
-	public boolean matchesOutputMode(int mode) {
-		return (outputMode & mode) == mode;
-	}
-
 	public String getReference() {
 		return referenceText;
 	}
