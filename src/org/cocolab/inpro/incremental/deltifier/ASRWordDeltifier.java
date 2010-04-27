@@ -124,7 +124,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		ListIterator<WordIU> currWordIt = currWordIUs.listIterator();
 		double segmentStartTime = currentOffset * ResultUtil.FRAME_TO_SECOND_FACTOR;
 		double segmentEndTime = 0.0;
-		List<SegmentIU> emptyList = Collections.emptyList(); // needed to initialize prevSegmentIt with an empty non-null iterator
+		List<SegmentIU> emptyList = Collections.<SegmentIU>emptyList(); // needed to initialize prevSegmentIt with an empty non-null iterator
 		Iterator<SegmentIU> currSegmentIt = emptyList.iterator();
 		boolean addSilenceWord = false;
 		while (newIt.hasNext()) {

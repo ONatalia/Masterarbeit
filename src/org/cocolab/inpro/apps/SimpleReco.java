@@ -32,11 +32,12 @@ public class SimpleReco {
 	private static final Logger logger = Logger.getLogger(SimpleReco.class);
 	
 	private static void setupDeltifier(ConfigurationManager cm, RecoCommandLineParser clp) {
-		if (clp.isIncremental()) {
+//		if (clp.isIncremental()) {
 			String ASRfilter;
 			switch (clp.getIncrementalMode()) {
 				case RecoCommandLineParser.FIXEDLAG_INCREMENTAL : ASRfilter = "fixedLag"; break;
 				case RecoCommandLineParser.INCREMENTAL : ASRfilter = "none"; break;
+				case RecoCommandLineParser.NON_INCREMENTAL : ASRfilter = "nonIncr"; break;
 				case RecoCommandLineParser.SMOOTHED_INCREMENTAL : ASRfilter = "smoothing"; break;
 				default : throw new RuntimeException("something's wrong");
 			}
@@ -46,9 +47,9 @@ public class SimpleReco {
 				logger.info("Setting filter parameter to " + clp.getIncrementalModifier());
 				cm.setGlobalProperty("deltifierParam", Integer.toString(clp.getIncrementalModifier()));
 			}
-		} else {
-			logger.info("Running in NON-INCREMENTAL (pure sphinx) mode");
-		}
+//		} else {
+//			logger.info("Running in NON-INCREMENTAL (pure sphinx) mode");
+//		}
 	}
 
 	public static void setupMicrophone(final Microphone mic) {
@@ -163,13 +164,13 @@ public class SimpleReco {
 		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
 			cm.lookup("labelWriter");
 		}
-		if (clp.isIncremental()) {
-			CurrentASRHypothesis cah = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
-			if (clp.matchesOutputMode(RecoCommandLineParser.CURRHYP_OUTPUT)) {
-				logger.info("Adding current hypothesis viewer");
-				cah.addListener((PushBuffer) cm.lookup("hypViewer"));
-			} 
-		}
+		CurrentASRHypothesis cah = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
+		cah.addListener((PushBuffer) cm.lookup("hypViewer"));
+//		if (clp.isIncremental()) {
+//			if (clp.matchesOutputMode(RecoCommandLineParser.CURRHYP_OUTPUT)) {
+//				logger.info("Adding current hypothesis viewer");
+//			} 
+//		}
 		if (clp.verbose()) {
 			cm.lookup("memoryTracker");
 			cm.lookup("speedTracker");
