@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -72,7 +71,7 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 		recordButton.setSelected(recording);
 	}
 	
-	public JComponent getSpeechIndicator() {
+	public JLabel getSpeechIndicator() {
 		return speechIndicator;
 	}
 	

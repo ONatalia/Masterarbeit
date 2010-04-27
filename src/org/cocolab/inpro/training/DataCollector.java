@@ -21,6 +21,7 @@ package org.cocolab.inpro.training;
 import sun.audio.AudioPlayer;
 import sun.audio.AudioStream;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -31,6 +32,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -151,16 +153,20 @@ public class DataCollector extends JPanel implements ActionListener {
 		gbs.gridy = 1;
 		gbs.fill = GridBagConstraints.HORIZONTAL;
 		gbs.gridheight = 2;
-		gbs.insets = new Insets(5, 5, 0, 5); // a little slack around the components
-		add(ssv.getSpeechIndicator(), gbs);		
+		gbs.insets = new Insets(5, 0, 0, 0); // a little slack around the components
+		ssv.getSpeechIndicator().setIcon(new ImageIcon(DataCollector.class.getResource("happyhal-inactive-vad.png")));
+		add(ssv.getSpeechIndicator(), gbs);
 		
+		gbs.insets = new Insets(5, 0, 0, 5); // a little slack around the components
 		gbs.gridheight = 1;
 		gbs.gridx = 2;
 		gbs.weightx = 1.0;
+		chv.getTextField().setBorder(BorderFactory.createEtchedBorder(Color.WHITE, Color.LIGHT_GRAY));
 		add(chv.getTextField(), gbs);
 		gbs.gridy = 2;
 		gbs.gridwidth = 2;
 		add(resultField, gbs);
+		gbs.insets = new Insets(5, 5, 0, 5); // a little slack around the components
 		gbs.gridwidth = 2;
 		gbs.weightx = 0.0;
 		gbs.gridx = 3;
@@ -185,7 +191,7 @@ public class DataCollector extends JPanel implements ActionListener {
 		
 		gbs.gridx = 1;
 		gbs.gridy = 3;
-		gbs.gridwidth = 5;
+		gbs.gridwidth = 7;
 		gbs.weightx = 1.0;
 		gbs.weighty = 1.0;
 		gbs.fill = GridBagConstraints.BOTH;
