@@ -36,7 +36,7 @@ public class TextualWordIU extends WordIU {
 	 */
 	@Override
 	public boolean hasProsody() {
-		return super.getWord().matches("[\\+\\-]$");
+		return super.getWord().matches(".*[\\-\\+]$");
 	}
 	
 	/**
@@ -45,7 +45,7 @@ public class TextualWordIU extends WordIU {
 	@Override
 	public boolean pitchIsRising() {
 		assert hasProsody();
-		return super.getWord().matches("\\+$");
+		return super.getWord().matches(".*\\+$");
 	}
 	
 	@Override
