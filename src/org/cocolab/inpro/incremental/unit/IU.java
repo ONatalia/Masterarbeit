@@ -198,7 +198,7 @@ public abstract class IU {
 	}
 	
 	public String toLabelLine() {
-		return "\n"; // the prototypical IU is empty
+		return startTime() + "\t" + endTime() + "\t"; // the prototypical IU is empty
 	}
 	
 	public String toString() {

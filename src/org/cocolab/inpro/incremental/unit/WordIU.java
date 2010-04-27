@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.cocolab.inpro.annotation.Label;
@@ -122,8 +123,9 @@ public class WordIU extends IU {
 		return sb.toString();
 	}
 	
+	@Override
 	public String toLabelLine() {
-		return startTime() + "\t" + endTime() + "\t" + word;
+		return String.format(Locale.US,	"%.2f\t%.2f\t%s", startTime(), endTime(), word);
 	}
 
 	public String toOAAString() {
