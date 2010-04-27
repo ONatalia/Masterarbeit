@@ -14,16 +14,16 @@ import org.cocolab.inpro.gui.Point;
 import org.cocolab.inpro.gui.Tile;
 
 @SuppressWarnings("serial")
-public class GreifArm extends CursorCanvas {
+public class GreifArmGUI extends CursorCanvas {
 
-	private static final Logger logger = Logger.getLogger(GreifArm.class);
+	private static final Logger logger = Logger.getLogger(GreifArmGUI.class);
 	
 	public static final int RELATIVE_WIDTH = 70;
 	public static final int RELATIVE_HEIGHT = 10;
 	
 	public ImageTile emptyHand;
 	
-	public GreifArm() {
+	public GreifArmGUI() {
 		super();
 		MOVE_SPEED = 5;
 		reset();
@@ -36,8 +36,8 @@ public class GreifArm extends CursorCanvas {
 	@Override
 	protected List<Tile> createTiles() {
 		ArrayList<Tile> tiles = new ArrayList<Tile>(3);
-		tiles.add(new ImageTile(GreifArm.class.getResource("ball.png")));
-		tiles.add(new ImageTile(GreifArm.class.getResource("bowl.png")));
+		tiles.add(new ImageTile(GreifArmGUI.class.getResource("ball.png")));
+		tiles.add(new ImageTile(GreifArmGUI.class.getResource("bowl.png")));
 		emptyHand = new ImageTile(CursorCanvas.class.getResource("draggable.png"));
 		emptyHand.setVisible(false);
 		tiles.add(emptyHand);
@@ -76,7 +76,7 @@ public class GreifArm extends CursorCanvas {
 	
 	public static void main(String[] args) {
 		JFrame f = new JFrame("Greifarm");
-		GreifArm greifarm = new GreifArm();
+		GreifArmGUI greifarm = new GreifArmGUI();
 		f.add(greifarm);
 		f.pack();
 		f.setResizable(true);
