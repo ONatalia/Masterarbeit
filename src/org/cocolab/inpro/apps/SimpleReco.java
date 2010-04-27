@@ -52,20 +52,24 @@ public class SimpleReco {
 	}
 
 	public static void setupMicrophone(final Microphone mic) {
-		Runnable micInitializer = new Runnable() {
+		// create a Thread to start up the microphone (this avoid a problem 
+		// with microphone initialization hanging and taking forever)
+		Thread micInitializer = new Thread() {
+			@Override
 			public void run() {
 				mic.initialize();
 			}
 		};
-		new Thread(micInitializer).start();
+		micInitializer.start();
 		try {
+			micInitializer.join(3000); // allow the microphone 3 seconds to initialize
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		} // allow the microphone 3 seconds to initialize
+		}
 		if (!mic.startRecording()) {
 			logger.fatal("Could not open microphone. Exiting...");
-			System.exit(1);
+			throw new RuntimeException("Could not open microphone. Exiting...");
 		}
 		Runnable shutdownHook = new Runnable() {
 			public void run() {
