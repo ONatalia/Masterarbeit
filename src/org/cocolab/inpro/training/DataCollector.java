@@ -36,6 +36,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
@@ -43,6 +44,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import org.cocolab.inpro.apps.SimpleReco;
 import org.cocolab.inpro.gui.util.SpeechStateVisualizer;
 import org.cocolab.inpro.incremental.listener.CurrentHypothesisViewer;
 import org.cocolab.inpro.sphinx.frontend.WavTEDLogger;
@@ -235,16 +237,17 @@ public class DataCollector extends JPanel implements ActionListener {
 		
 		@Override
 		protected Void doInBackground() throws Exception {
-			Microphone mic = (Microphone) configuration.lookup("microphone");
-			Recognizer recognizer = (Recognizer) configuration.lookup("recognizer");
-			recognizer.allocate();
-			
-			mic.initialize();
-			if (!mic.startRecording()) {
-				System.err.println("Could not start microphone. Exiting...");
+			try {
+				Recognizer recognizer = (Recognizer) configuration.lookup("recognizer");
+				recognizer.allocate();
+				recoRunner.setRecognizer(recognizer);
+				final Microphone mic = (Microphone) configuration.lookup("microphone");
+				SimpleReco.setupMicrophone(mic);
+			} catch (Exception e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "ASR Error: " + e.toString());
 				System.exit(1);
 			}
-			recoRunner.setRecognizer(recognizer);
 			return null;
 		}
 		
@@ -268,7 +271,7 @@ public class DataCollector extends JPanel implements ActionListener {
 		
 		Recognizer recognizer;
 
-		public void setRecognizer(Recognizer recognizer) {
+		public synchronized void setRecognizer(Recognizer recognizer) {
 			this.recognizer = recognizer;
 		}
 		
