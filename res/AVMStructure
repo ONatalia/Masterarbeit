@@ -19,4 +19,4 @@
 [type:loc_spec tb:String lr:String desc:String rc:(rc_spec,4,true)]
 [type:rc_spec row_col:String orient:String ord:String]
 [type:dialog_act act:String]
-[type:boolean yesno:String]
+[type:boolean correct:String]

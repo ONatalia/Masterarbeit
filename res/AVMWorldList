@@ -26,5 +26,5 @@
 {type:dialog_act act:turn}
 {type:dialog_act act:delete}
 #Booleans
-{type:boolean yesno:yes}
-{type:boolean yesno:no}
+{type:boolean correct:yes}
+{type:boolean correct:no}
