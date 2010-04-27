@@ -12,6 +12,7 @@ import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
+import org.cocolab.inpro.incremental.unit.WordIU;
 
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -110,7 +111,13 @@ public class FloorManager implements PushBuffer {
 	/** call this to (externally) assert that speech is over */
 	public void setEOT() {
 		assert internalState.equals(InternalState.IN_INPUT);
-		Signal signal = Signal.EOT_ANY;
+		WordIU lastWord = (WordIU) mostRecentIUs.get(mostRecentIUs.size() - 1); 
+		Signal signal;
+		if (lastWord.hasProsody()) {
+			signal = lastWord.pitchIsRising() ? Signal.EOT_RISING : Signal.EOT_FALLING;
+		} else {
+			signal = Signal.EOT_ANY;
+		}
 		// TODO: find out what type of signal to send
 		signal(InternalState.NOT_AWAITING_INPUT, signal);
 	}
