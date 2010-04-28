@@ -232,7 +232,7 @@
         </propertylist>
     </component>
  
-    <component name="microphone" type="edu.cmu.sphinx.frontend.util.Microphone">
+    <component name="microphone" type="org.cocolab.inpro.sphinx.frontend.Microphone">
         <property name="closeBetweenUtterances" value="false"/>
     </component>
  

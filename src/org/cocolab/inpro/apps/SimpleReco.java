@@ -15,10 +15,10 @@ import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
 import org.cocolab.inpro.sphinx.decoder.FakeSearch;
+import org.cocolab.inpro.sphinx.frontend.Microphone;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 
 import edu.cmu.sphinx.frontend.FrontEnd;
-import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
 import edu.cmu.sphinx.linguist.Linguist;
 import edu.cmu.sphinx.linguist.language.grammar.ForcedAlignerGrammar;

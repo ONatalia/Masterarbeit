@@ -33,9 +33,9 @@
     <!-- The amount of time (in milliseconds) before speech start to be included as speech data. -->
     <property name="speechLeader" value="30"/>
     <!-- The amount of time (in milliseconds) after speech ends to be included as speech data. -->
-    <property name="speechTrailer" value="100"/>
+    <property name="speechTrailer" value="250"/>
     <!-- The speech classifier threshold. -->
-    <property name="threshold" value="20"/>
+    <property name="threshold" value="15"/>
 
 
     <!-- ******************************************************** -->
@@ -272,7 +272,7 @@
         </propertylist>
     </component>
  
-    <component name="microphone" type="edu.cmu.sphinx.frontend.util.Microphone">
+    <component name="microphone" type="org.cocolab.inpro.sphinx.frontend.Microphone">
         <property name="closeBetweenUtterances" value="false"/>
     </component>
  
