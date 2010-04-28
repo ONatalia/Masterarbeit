@@ -143,6 +143,13 @@ public abstract class IU {
 			return Double.NaN;
 		}
 	}
+	
+	/**
+	 * @return the duration of the IU, that is, endTime() - startTime()
+	 */
+	public double duration() {
+		return endTime() - startTime();
+	}
 		
 	@SuppressWarnings("unchecked")
 	public List<? extends IU> groundedIn() {
@@ -178,9 +185,10 @@ public abstract class IU {
 				}
 				break;
 			case REVOKE: // revoke what is grounded in you
-				for (IU iu : grounds) {
-					iu.update(edit);
-				}
+				if (grounds != null)
+					for (IU iu : grounds) {
+						iu.update(edit);
+					}
 				break;
 			case ADD: // nothing to do, whoever adds us should set us up correctly
 		}

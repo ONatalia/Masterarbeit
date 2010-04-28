@@ -18,14 +18,18 @@ public class GreifArmGUI extends CursorCanvas {
 
 	private static final Logger logger = Logger.getLogger(GreifArmGUI.class);
 	
-	public static final int RELATIVE_WIDTH = 70;
+	public static final int RELATIVE_WIDTH = 50;
 	public static final int RELATIVE_HEIGHT = 10;
 	
 	public ImageTile emptyHand;
 	
 	public GreifArmGUI() {
+		this(5);
+	}
+	
+	public GreifArmGUI(double moveSpeed) {
 		super();
-		MOVE_SPEED = 5;
+		MOVE_SPEED = moveSpeed;
 		reset();
 		cursorVisible = true;
 		buttonClickDelay = 100;

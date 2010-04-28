@@ -41,7 +41,6 @@ public class CurrentHypothesisViewer extends HypothesisChangeListener {
 				public void run() {
 					JFrame f = new JFrame("current hypothesis");
 					f.add(textField);
-					f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 					f.pack();
 					f.setVisible(true);
 				}
