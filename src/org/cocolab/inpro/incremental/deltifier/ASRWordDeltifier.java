@@ -102,16 +102,24 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	
 	/**
 	 * update the stored ASR-representation with information from the ASR result's given Token  
-	 * 
+	 * <p>
 	 * the actual deltification algorithm works as follows:
-	 * - we first extract all the word- and phoneme tokens from the token sequence
-	 *   - each word-token is followed by the corresponding phoneme tokens
-	 * - we then compare the previous and the current hypothesis:
-	 *   - the beginning of the previous and this word hypothesis should be equal,
-	 *     we only need to update phoneme timings
-	 *   - eventually, the two hypotheses will differ:
-	 *     - we construct remove-edits for the remaining old words
-	 *     - we then construct the new words and add-edits for them 
+	 * <ul><li>
+	 * we first extract all the word- and phoneme tokens from the token sequence
+	 * </li><ul><li>
+	 * 		each word-token is followed by the corresponding phoneme tokens
+	 * </li></ul><li>
+	 * we then compare the previous and the current hypothesis:
+	 * </li><ul><li>
+	 * 		the beginning of the previous and this word hypothesis should be equal,
+	 * 		we only need to update phoneme timings
+	 * </li><li>    
+	 * 		eventually, the two hypotheses will differ:
+	 * </li><ul><li>
+	 * 				we construct remove-edits for the remaining old words
+	 * </li><li>
+	 * 				we then construct the new words and add edits for them
+	 * </li></ul></ul></ul>
 	 * 
 	 * @param token the token from which the deltification starts
 	 */
@@ -234,12 +242,12 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 
 	/**
 	 * update the stored ASR-representation with the new Result from ASR
-	 * 
-	 * - the current representation can afterwards be queried through getWordIUs()
-	 * - the difference from the previous state can be queried through getWordEdits()
-	 * 
-	 * the actual deltification algorithm is described in deltify(Token)
-	 * 
+	 * <ul>
+	 * <li>the current representation can afterwards be queried through getWordIUs()</li>
+	 * <li>the difference from the previous state can be queried through getWordEdits()</li>
+	 * </ul>
+	 * the actual deltification algorithm is described in {@link ASRWordDeltifier#deltify(Token)}
+	 * @see ASRWordDeltifier#deltify(Token)
 	 * @param result current ASR hypothesis
 	 */
 	public synchronized void deltify(Result result) {
