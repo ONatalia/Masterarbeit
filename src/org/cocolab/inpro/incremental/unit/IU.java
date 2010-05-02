@@ -25,6 +25,8 @@ import org.cocolab.inpro.incremental.BaseDataKeeper;
 
 public abstract class IU {
 	
+	public static final long startupTime = System.currentTimeMillis();
+	
 	public static final IU FIRST_IU = new IU() {}; 
 	private static int IU_idCounter = 0;
 	protected final int id;
@@ -36,11 +38,14 @@ public abstract class IU {
 	
 	protected static BaseDataKeeper bd = null;
 	
+	protected long creationTime;
+	
 	/**
 	 * call this, if you want to provide a sameLevelLink and a groundedIn list
 	 * and you want groundedIn to be deeply SLLed to the sameLevelLink's groundedIn-IUs  
 	 */
 	public IU(IU sll, List<IU> groundedIn, boolean deepSLL) {
+		this.creationTime = System.currentTimeMillis();
 		this.id = IU.getNewID();
 		this.groundedIn = groundedIn;
 		if (deepSLL && (sll != null)) {
@@ -48,7 +53,6 @@ public abstract class IU {
 		} else {
 			this.sameLevelLink = sll;
 		}
-		
 	}
 	
 	/**
@@ -243,6 +247,10 @@ public abstract class IU {
 
 	public String toTEDviewXML() {
 		return null;
+	}
+	
+	public long getCreationTime() {
+		return creationTime;
 	}
 	
 }

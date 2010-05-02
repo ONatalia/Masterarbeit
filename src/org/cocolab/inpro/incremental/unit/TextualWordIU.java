@@ -39,6 +39,10 @@ public class TextualWordIU extends WordIU {
 		return super.getWord().matches(".*[\\-\\+]$");
 	}
 	
+	public boolean wordEquals(WordIU iu) {
+		return (word.equals(iu.word));
+	}
+	
 	/**
 	 * @precondition: only call this if hasProsody()
 	 */
