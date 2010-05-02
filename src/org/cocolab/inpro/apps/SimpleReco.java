@@ -91,16 +91,22 @@ public class SimpleReco {
 		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
 	}
 	
+	public static void setupMicrophoneWithEndpointing(ConfigurationManager cm) {
+    	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
+		final Microphone mic = (Microphone) cm.lookup("microphone");
+		FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
+		endpoint.setPredecessor(mic);
+		endpoint.initialize();
+		setupMicrophone(mic);
+		fe.setPredecessor(endpoint);
+		
+	}
+	
 	protected static void setupSource(ConfigurationManager cm, RecoCommandLineParser clp) throws InstantiationException, PropertyException, UnsupportedAudioFileException, IOException {
     	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
 		switch (clp.getInputMode()) {
 			case RecoCommandLineParser.MICROPHONE_INPUT:
-				final Microphone mic = (Microphone) cm.lookup("microphone");
-				FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
-				endpoint.setPredecessor(mic);
-				endpoint.initialize();
-				setupMicrophone(mic);
-				fe.setPredecessor(endpoint);
+				setupMicrophoneWithEndpointing(cm);
 			break;
 			case RecoCommandLineParser.RTP_INPUT:
 				RtpRecvProcessor rtp = (RtpRecvProcessor) cm.lookup("RTPDataSource");
@@ -109,7 +115,7 @@ public class SimpleReco {
 				// to the property clp.rtpPort (which is a string)
 				cm.getPropertySheet("RTPDataSource").setString("recvPort", "" + clp.rtpPort);
 				rtp.initialize();
-				endpoint = (FrontEnd) cm.lookup("endpointing");
+				FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
 				endpoint.setPredecessor(rtp);
 				endpoint.initialize();
 				fe.setPredecessor(endpoint);
