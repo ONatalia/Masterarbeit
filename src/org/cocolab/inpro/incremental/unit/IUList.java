@@ -20,9 +20,13 @@ package org.cocolab.inpro.incremental.unit;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 @SuppressWarnings("serial")
 public class IUList<IUType extends IU> extends ArrayList<IUType> {
 
+	private static final Logger logger = Logger.getLogger(IUList.class);
+	
 	public IUList() {
 		super();
 	}
@@ -52,9 +56,15 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  	}
  	
  	public void apply(List<EditMessage<IUType>> edits) {
-		for (EditMessage<IUType> edit : edits) {
-			apply(edit);
-		}
+ 		try {
+			for (EditMessage<IUType> edit : edits) {
+				apply(edit);
+			}
+	 	} catch (AssertionError ae) {
+ 			logger.fatal("list of edits given was " + edits);
+ 			logger.fatal(ae);
+ 			throw ae;
+ 		}
 	}
  	
  	public void add(IUType e, boolean deepSLL) {
