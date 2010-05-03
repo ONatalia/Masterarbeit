@@ -28,7 +28,7 @@ public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 	 */
 	@Override
 	protected int getSmoothingFactor(EditMessage<WordIU> edit) {
-		if (staySafeWord(edit))
+		if (isStaySafeWord(edit))
 			return 20; // 200ms
 		else if (isUrgentWord(edit))
 			return 0; // immediately
@@ -36,16 +36,23 @@ public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 			return smoothing;
 	}
 	
-	// words with action:drop should get a high smoothing factor,
-	protected boolean staySafeWord(EditMessage<WordIU> edit) {
+	/**
+	 * determines the edits that should get a high safety-threshold
+	 * words with action:drop should get a high smoothing factor,
+	 */
+	protected boolean isStaySafeWord(EditMessage<WordIU> edit) {
 		return (edit.getIU().getAVPairs() != null && 
 				edit.getIU().getAVPairs().size() > 0 &&
 				edit.getIU().getAVPairs().get(0).getValue().equals("drop"));
 	}
 	
-	// words with action:stop should get a very low smoothing factor,
+	/**
+	 * determines the words that should be handled with priority 
+	 * words with action:stop should get a very low smoothing factor for the ADD message 
+	 */
 	protected boolean isUrgentWord(EditMessage<WordIU> edit) {
-		return (edit.getIU().getAVPairs() != null && 
+		return (edit.getType() == EditType.ADD &&
+				edit.getIU().getAVPairs() != null && 
 				edit.getIU().getAVPairs().size() > 0 &&
 				edit.getIU().getAVPairs().get(0).getValue().equals("stop"));
 	}
