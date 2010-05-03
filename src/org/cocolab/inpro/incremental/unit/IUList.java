@@ -37,7 +37,7 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  				this.add(edit.getIU()); 
  				break;
  			case REVOKE: 
- 				assert (get(size() - 1)).equals(edit.getIU());
+ 				assert (get(size() - 1)).equals(edit.getIU()) : "Can't apply this edit to the list: " + this + edit;
  				this.remove(size() - 1);
  				break;
  			case COMMIT:
