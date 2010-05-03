@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Random;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.cocolab.inpro.apps.SimpleReco;
+import org.cocolab.inpro.gui.util.SpeechStateVisualizer;
 import org.cocolab.inpro.incremental.deltifier.ASRWordDeltifier;
 import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
 
@@ -19,7 +21,7 @@ public class GreifarmExperiment implements DropListener {
 
 	private static final Logger logger = Logger.getLogger(GreifarmExperiment.class);
 
-	private static final int MAX_GAMES = 5;
+	private static final int MAX_GAMES = 3;
 	
 	Random random;
 	CurrentASRHypothesis casrh;
@@ -27,6 +29,8 @@ public class GreifarmExperiment implements DropListener {
 	RecoRunner rr;
 	GreifarmActor ga;
 	GreifarmController gc;
+	GameScore gameScore;
+	SpeechStateVisualizer ssv;
 	
 	int gameCount = 0;
 	
@@ -34,8 +38,10 @@ public class GreifarmExperiment implements DropListener {
     	Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
     	recognizer.allocate();
 		SimpleReco.setupMicrophoneWithEndpointing(cm);
+		ssv = (SpeechStateVisualizer) cm.lookup("speechStateVisualizer");
 		ga = (GreifarmActor) cm.lookup("greifarmActor");
 		ga.greifarmController.dropListener = this;
+		gameScore = ga.gameScore;
 		casrh = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
 		deltifiers = new ArrayList<ASRWordDeltifier>(3);
 		deltifiers.add((ASRWordDeltifier) cm.lookup("none"));
@@ -44,8 +50,7 @@ public class GreifarmExperiment implements DropListener {
 		random = new Random();
 		rr = new RecoRunner(recognizer);
 		(new Thread(rr)).start();
-		rr.setInRecoMode(true);
-		JOptionPane.showMessageDialog(null, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                      Neues Spiel, neues Glück.                                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+		showDialog();
 	}
 	
 	private class RecoRunner implements Runnable {
@@ -85,25 +90,68 @@ public class GreifarmExperiment implements DropListener {
 	}
 	
 	private void setRandomSmoothingStyle() {
-		rr.setInRecoMode(false);
 		int randomIndex = random.nextInt(deltifiers.size());
-		
 		ASRWordDeltifier newDeltifier = deltifiers.get(randomIndex);
 		logger.info("setting deltifier " + newDeltifier);
 		casrh.setDeltifier(newDeltifier);
-		rr.setInRecoMode(true);		
+	}
+	
+	/** only call this on the Swing Thread! */
+	void showDialog() {
+		ssv.setRecording(false);
+		rr.setInRecoMode(false);
+		String lineBreaks = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+		String whiteSpace = "                                                     ";
+		whiteSpace = whiteSpace + whiteSpace + whiteSpace;
+		JOptionPane.showMessageDialog(null,
+				lineBreaks + whiteSpace + 
+				"Neues Spiel, neues Glück." +
+				whiteSpace + lineBreaks);
+		nextRound();
+		rr.setInRecoMode(true);
+		ssv.setRecording(true);
+	}
+	
+	void nextRound() {
+		setRandomSmoothingStyle();
+		gameScore.reset();
+		ga.greifarmController.reset();
+		ga.processorReset();		
 	}
 	
 	@Override
-	public void notifyDrop(GameScore gameScore) {
+	public void notifyDrop(final GameScore gameScore) {
 		gameCount++;
-		if (gameCount > MAX_GAMES) {
+		logger.debug("gameCount is now " + gameCount);
+		if (gameCount >= MAX_GAMES) {
 			gameCount = 0;
-			setRandomSmoothingStyle();
-			JOptionPane.showMessageDialog(null, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n                                                      Neues Spiel, neues Glück.                                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-			gameScore.reset();
-			ga.greifarmController.reset();
-			ga.processorReset();
+			try {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(300);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						showDialog();
+					}
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(300);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					nextRound();
+				}				
+			}).start();
 		}
 	}
 

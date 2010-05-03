@@ -94,7 +94,7 @@
     </component>
     
 <!--	<component name="greifarmActor" type="org.cocolab.inpro.incremental.processor.GreifarmActor" />-->
-	<component name="greifarmActor" type="org.cocolab.inpro.greifarm.refactoredbutnotworking.GreifarmActor" />
+	<component name="greifarmActor" type="org.cocolab.inpro.greifarm.GreifarmActor" />
 
     <component name="baseData" type="org.cocolab.inpro.incremental.basedata.BaseData"/>
 

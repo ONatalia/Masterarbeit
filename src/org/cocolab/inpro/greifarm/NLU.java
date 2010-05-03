@@ -22,7 +22,7 @@ public class NLU {
 	 * the *last* modifierWord's Modifier
 	 */
 	public void incrementallyUnderstandUnusedWords() {
-		logger.debug(unusedWords);
+		//logger.debug(unusedWords);
 		Modifier strengthModifier = Modifier.NORMAL;
 		for (ListIterator<WordIU> it = unusedWords.listIterator(); it.hasNext();) {
 			WordIU word = it.next();
