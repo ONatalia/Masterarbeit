@@ -38,6 +38,7 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  				this.add(edit.getIU()); 
  				break;
  			case REVOKE: 
+ 				assert size() > 0 : "Can't revoke from an empty list: " + edit;
  				assert (get(size() - 1)).equals(edit.getIU()) : "Can't apply this edit to the list: " + this + edit;
  				this.remove(size() - 1);
  				break;
