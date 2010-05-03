@@ -34,7 +34,8 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  	public void apply(EditMessage<IUType> edit) {
  		switch (edit.type) {
  			case ADD: 
- 				assert get(size() - 1).endTime() <= edit.getIU().endTime() : "better sort your IUs: " + this + edit;
+ 				assert isEmpty() || get(size() - 1).endTime() <= edit.getIU().endTime() 
+ 							: "better sort your IUs: " + this + edit;
  				this.add(edit.getIU()); 
  				break;
  			case REVOKE: 
