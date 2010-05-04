@@ -44,7 +44,7 @@ public class TextualWordIU extends WordIU {
 	}
 	
 	/**
-	 * @precondition: only call this if hasProsody()
+	 * <strong>precondition</strong>: only call this if hasProsody()
 	 */
 	@Override
 	public boolean pitchIsRising() {

@@ -48,7 +48,10 @@ public class ResultUtil {
 	 * @param token the start token (that is, the last in time)
 	 * @param words whether word tokens should be returned
 	 * @param units whether unit tokens hsould be returned
-	 * @return a list of tokens of word and/or unit tokens
+	 * @return a list of tokens of word and/or unit tokens NOTICE: that no provisions
+	 * are taken to ensure that there are the "right" segment tokens for every word,
+	 * especially, no provisions are taken to assert that each silence segment is 
+	 * accompanied by a silence word
 	 */
 	public static LinkedList<Token> getTokenList(Token token, boolean words, boolean units) {
 		LinkedList<Token> tokenList = new LinkedList<Token>();

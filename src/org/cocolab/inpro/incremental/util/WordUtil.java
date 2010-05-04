@@ -12,8 +12,19 @@ import org.cocolab.inpro.sphinx.linguist.dictionary.SyllableAwarePronunciation;
 import edu.cmu.sphinx.linguist.acoustic.Unit;
 import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 
+/**
+ * utility functions to build IU sub-networks for Sphinx' words
+ */
 public class WordUtil {
 
+	/**
+	 * creates a new word/syllable/segment network from the parameters
+	 * @param pron the pronunciation to get sub-word information from
+	 * @param wordSLL the SLL the WordIU will be connected to
+	 * @param syllSLL the SLL the SyllIU will be connected to
+	 * @param segmentSLL the SLL the SegmentIU will be connected to
+	 * @return a new WordIU network for the given pronunciation
+	 */
 	public static WordIU wordFromPronunciation(Pronunciation pron, WordIU wordSLL, SyllableIU syllSLL, SegmentIU segmentSLL) {
 		List<Unit[]> sylls;
 		if (pron instanceof SyllableAwarePronunciation) {
@@ -38,6 +49,10 @@ public class WordUtil {
 		return new WordIU(pron, wordSLL, syllIUs);
 	}
 
+	/**
+	 * creates a new word/syllable/segment network from the parameters
+	 * @return a WordIU-network that is not connected to previous IUs via SLLs
+	 */
 	public static WordIU wordFromPronunciation(Pronunciation pron) {
 		return wordFromPronunciation(pron, null, null, null);
 	}

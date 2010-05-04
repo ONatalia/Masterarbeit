@@ -12,6 +12,7 @@
  *
  * <h2>TODO later:</h2> 
  * <ul>
+ * <li>calculate and display WER on commit (using sphinx.util.NISTAlign) 
  * <li>persistently store meta data on client-side?
  * <li>implement lazy image loading in SlideShowPanel.SlideIcon
  * <li>Check if words are in dictionary? what happens if not?

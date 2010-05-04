@@ -134,7 +134,7 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	 * unlike tileSelect, this returns the tiles at a point 
 	 * regardless of their selection/dragging/placement state
 	 * @param p
-	 * @return
+	 * @return a list of tiles (possibly empty but never null) at point t
 	 */
 	public List<Tile> getTilesAt(java.awt.Point p) {
 		List<Tile> returnList = new ArrayList<Tile>(1); // there will usually be just one tile to return

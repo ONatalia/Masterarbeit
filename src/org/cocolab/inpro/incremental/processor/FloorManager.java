@@ -142,8 +142,7 @@ public class FloorManager implements PushBuffer {
 	public interface Listener extends Configurable {
 		/**
 		 * will be called when the floor state changes
-		 * @param floorState	the new state of the floor
-		 * @param previousState	the previous state of the floor
+		 * @param signal the signal describing the change in the floor
 		 * @param floorManager	the floor manager itself. in this way a consumer can request e.g. to change timeouts 
 		 */
 		public void floor(Signal signal, FloorManager floorManager);

@@ -211,7 +211,7 @@ public class DataCollector extends JPanel implements ActionListener {
 	 * @param tooltip tooltip for this button
 	 * @param al action listener for this button
 	 * @param command executed on action listener
-	 * @return
+	 * @return a new button with all the information from above
 	 */
 	static JButton createButton(String icon, String tooltip, ActionListener al, String command) {
 		JButton button = new JButton(new ImageIcon(DataCollector.class.getResource(icon)));
@@ -427,7 +427,7 @@ public class DataCollector extends JPanel implements ActionListener {
 
 	/**
 	 * used to construct the GUI on the Swing thread.
-	 * @param commandLineOptions 
+	 * @param configuration the configuration derived from the command line options 
 	 */
 	public static void createAndShowGUI(CommandLineOptions configuration) {
 		JFrame frame = new JFrame("Inpro Data Collector");

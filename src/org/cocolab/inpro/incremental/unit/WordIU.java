@@ -150,7 +150,7 @@ public class WordIU extends IU {
 	}
 
 	/**
-	 * @precondition: only call this if hasProsody()
+	 * <strong>precondition</strong>: only call this if hasProsody()
 	 */
 	public boolean pitchIsRising() {
 		assert hasProsody();
