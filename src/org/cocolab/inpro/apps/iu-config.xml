@@ -13,10 +13,12 @@
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
-<!--        	<item>consoleNotifier</item> -->
-    		<item>semanticResolver</item>
-	       	<item>floorManager</item>
 <!--
+	       	<item>outputForSimpleText</item>
+    		<item>hypViewer</item>
+	       	<item>floorManager</item>
+    		<item>semanticResolver</item>
+        	<item>consoleNotifier</item>
     		<item>tedNotifier</item>
           	<item>labelWriter2</item>
     		<item>oaaNotifier</item>
@@ -28,7 +30,7 @@
         <propertylist name="hypChangeListeners">
 <!--          <item>consoleNotifier</item>
     		<item>tedNotifier</item> -->
-    		<item>dialogueManager</item>
+    		<item>${actionManager}</item>
         </propertylist>
     </component>
 
@@ -45,6 +47,7 @@
     <component name="baseData" type="org.cocolab.inpro.incremental.basedata.BaseData"/>
 
 	<component name="none" type="org.cocolab.inpro.incremental.deltifier.ASRWordDeltifier"/>
+    <component name="nonIncr" type="org.cocolab.inpro.incremental.deltifier.NonIncrementalDeltifier"/>
 
     <component name="fixedLag" type="org.cocolab.inpro.incremental.deltifier.FixedLagDeltifier">
         <property name="fixedLag" value="${deltifierParam}"/>
@@ -54,6 +57,7 @@
         <property name="smoothing" value="${deltifierParam}"/>
     </component>
 
+	<component name="outputForSimpleText" type="org.cocolab.inpro.incremental.listener.OutputForSimpleText"/>
     <component name="consoleNotifier" type="org.cocolab.inpro.incremental.listener.ConsoleNotifier"/>
     <component name="oaaNotifier" type="org.cocolab.inpro.incremental.listener.OAANotifier"/>
     <component name="tedNotifier" type="org.cocolab.inpro.incremental.listener.TEDviewNotifier"/>
