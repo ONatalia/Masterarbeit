@@ -186,10 +186,19 @@ public class SimpleReco {
 		}
 	}
 	
-	private static void recognizeOnce(Recognizer recognizer) {
+	private static void recognizeOnce(Recognizer recognizer, RecoCommandLineParser clp) {
 		Result result = null;
     	do {
-	    	result = recognizer.recognize();
+    		if (clp.ignoreErrors()) {
+				try {
+			    	result = recognizer.recognize();
+				} catch (Throwable e) { // also includes AssertionError
+					e.printStackTrace();
+					logger.warn("Something's wrong further down, trying to continue anyway" , e);
+				}
+    		} else {
+    			result = recognizer.recognize();
+    		}
 	        if (result != null) {
 	        	// Normal Output
 	        	logger.info("RESULT: " + result.toString());
@@ -202,6 +211,7 @@ public class SimpleReco {
 	public static void main(String[] args) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException {
 		BasicConfigurator.configure();
 		//PropertyConfigurator.configure("log4j.properties");
+		
     	RecoCommandLineParser clp = new RecoCommandLineParser(args);
     	if (!clp.parsedSuccessfully()) { System.exit(1); }
     	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
@@ -217,11 +227,11 @@ public class SimpleReco {
     	if (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
     		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
     		while(true) {
-    			recognizeOnce(recognizer);
+    			recognizeOnce(recognizer, clp);
 	    		recognizer.resetMonitors();
     		}
     	} else {
-    		recognizeOnce(recognizer);
+    		recognizeOnce(recognizer, clp);
     	}
     	recognizer.deallocate();
     	System.exit(0);

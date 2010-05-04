@@ -26,6 +26,8 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	String referenceText;
 	String referenceFile;
 	
+	protected boolean ignoreErrors;
+	
 	void printUsage() {
 		System.err.println("simple sphinx recognizer for the inpro project");
 		System.err.println("usage: java org.cocolab.inpro.apps.SimpleReco");
@@ -33,6 +35,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -h	           this screen");
 		System.err.println("    -c <URL>       sphinx configuration file to use (reasonable default)");
 		System.err.println("    -v             more verbose output (speed and memory tracker)");
+		System.err.println("    -f             force operation, i.e. try to ignore all errors");
 		System.err.println("input selection:");
 		System.err.println("    -M             read data from microphone");
 		System.err.println("    -R <port>      read data from RTP");
@@ -84,6 +87,9 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-v")) {
 				verbose = true;
+			}
+			else if (args[i].equals("-f")) {
+				ignoreErrors = true;
 			}
 			else if (args[i].equals("-fa")) {
 				i++; 
@@ -154,6 +160,10 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	
 	public boolean isIncremental() {
 		return !(incrementalMode == NON_INCREMENTAL);
+	}
+	
+	public boolean ignoreErrors() {
+		return ignoreErrors;
 	}
 	
 	public int getIncrementalMode() {
