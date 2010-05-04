@@ -68,6 +68,10 @@ public class SemIU extends IU {
 		list.addAll(this.booleanList);
 		return list;
 	}
+	
+	public boolean isEmpty() {
+		return (this.booleanList.size() == 0 && this.dialogActList.size() == 0 && this.fieldList.size() == 0 && this.tileList.size() == 0);
+	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder("< ");
