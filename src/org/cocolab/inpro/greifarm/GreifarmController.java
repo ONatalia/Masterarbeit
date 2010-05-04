@@ -37,33 +37,35 @@ public class GreifarmController {
 	}
 	
 	public void drop() {
-		hasControl = false;
-		logger.info("dropping at " + GreifArmGUI.translateBlockToPixel(greifarmPosition));
-		greifarmGUI.cursorVisible = false;
-	//	greifarmGUI.repaint();
-		greifarmGUI.emptyHand.setPos(greifarmGUI.cursorPosition);
-		greifarmGUI.emptyHand.setVisible(true);
-		greifarmGUI.cursorMoveSlowlyToAndWait(greifarmGUI.cursorPosition.x, (GreifArmGUI.RELATIVE_HEIGHT - 1) * GreifArmGUI.SCALE);
-		// calculate score: if the ball lands within the bowl, score should be increased, otherwise decreased by a fixed amount
-		int distance = Math.abs(greifarmGUI.getBowlPosition() - greifarmGUI.cursorPosition.x);
-		int score;
-		if (distance < 3) 
-			score = 100;
-		else if (distance > 25) 
-			score = -100;
-		else 
-			score = 100 - (4 * distance);
-		gamescore.increaseScore(score);
-		if (dropListener != null) {
-			dropListener.notifyDrop(gamescore);
+		if (hasControl) { // no need to act if we're already dropping
+			hasControl = false;
+			logger.info("dropping at " + GreifArmGUI.translateBlockToPixel(greifarmPosition));
+			greifarmGUI.cursorVisible = false;
+		//	greifarmGUI.repaint();
+			greifarmGUI.emptyHand.setPos(greifarmGUI.cursorPosition);
+			greifarmGUI.emptyHand.setVisible(true);
+			greifarmGUI.cursorMoveSlowlyToAndWait(greifarmGUI.cursorPosition.x, (GreifArmGUI.RELATIVE_HEIGHT - 1) * GreifArmGUI.SCALE);
+			// calculate score: if the ball lands within the bowl, score should be increased, otherwise decreased by a fixed amount
+			int distance = Math.abs(greifarmGUI.getBowlPosition() - greifarmGUI.cursorPosition.x);
+			int score;
+			if (distance < 3) 
+				score = 100;
+			else if (distance > 25) 
+				score = -100;
+			else 
+				score = 100 - (4 * distance);
+			gamescore.increaseScore(score);
+			if (dropListener != null) {
+				dropListener.notifyDrop(gamescore);
+			}
 		}
-		
 	}
 
 	public void stop() {
 		greifarmGUI.cursorMoveSlowlyTo(greifarmGUI.cursorPosition.x, greifarmGUI.cursorPosition.y);
 		greifarmPosition = GreifArmGUI.translatePixelToBlock(greifarmGUI.cursorPosition.x);
 		logger.info("stopping at " + GreifArmGUI.translateBlockToPixel(greifarmPosition));
+		logger.warn("distance between arm and bowl is: " + (GreifArmGUI.translateBlockToPixel(greifarmPosition) - greifarmGUI.getBowlPosition()));
 	}
 	
 	public double getCurrentPosition() {

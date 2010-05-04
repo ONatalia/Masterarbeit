@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.JFrame;
 
@@ -22,6 +23,8 @@ public class GreifArmGUI extends CursorCanvas {
 	public static final int RELATIVE_HEIGHT = 10;
 	
 	public ImageTile emptyHand;
+	
+	Random randomSource = new Random();
 	
 	public GreifArmGUI() {
 		this(5);
@@ -60,22 +63,51 @@ public class GreifArmGUI extends CursorCanvas {
 		paintCursor(g);
 	}
 	
+	public void regeneratePositions() {
+		// reset to a new position
+		double ballX = randomSource.nextDouble() * (RELATIVE_WIDTH - 2) + 1;
+		setBall(ballX);
+		double bowlX = randomSource.nextDouble() * (RELATIVE_WIDTH - 2) + 1;
+		setBowl(bowlX);
+		repaint();		
+	}
+	
+	public void regenerateWithGreatDistance() {
+		boolean bowlLeft = randomSource.nextBoolean();
+		double minDistance = 20;
+		double distLeftAndRight = (RELATIVE_WIDTH - minDistance) / 2;
+		double bowlPos = randomSource.nextDouble() * distLeftAndRight + 4;
+		double ballPos = RELATIVE_WIDTH - randomSource.nextDouble() * distLeftAndRight - 4;
+		if (!bowlLeft) {
+			double swap;
+			swap = bowlPos;
+			bowlPos = ballPos;
+			ballPos = swap;
+		}
+		setBowl(bowlPos);
+		setBall(ballPos);
+	}
+	
+	private void setBowl(double pos) {
+		tiles.get(1).setPos(new Point((int) (pos * SCALE), (int) ((RELATIVE_HEIGHT - 1.5) * SCALE)));
+		logger.info("bowl position is now " + (int) (pos * SCALE));		
+	}
+	
+	private void setBall(double pos) {
+		tiles.get(0).setPos(new Point((int) (pos * SCALE), 1 * SCALE));
+		cursorPosition = new Point((int) (pos * SCALE), 1 * SCALE);
+		grabbing = true;
+		cursorVisible = true;
+		cursorPressAt((int) (pos * SCALE), 1 * SCALE);
+		logger.info("greifarm position is now " + cursorPosition.x);		
+	}
+
 	@Override
 	public void reset() {
 		logger.info("being reset");
 		super.reset();
-		// reset to a new position
-		double ballX = Math.random() * (RELATIVE_WIDTH - 2) + 1;
-		tiles.get(0).setPos(new Point((int) (ballX * SCALE), 1 * SCALE));
-		cursorPosition = new Point((int) (ballX * SCALE), 1 * SCALE);
-		grabbing = true;
-		cursorVisible = true;
-		cursorPressAt((int) (ballX * SCALE), 1 * SCALE);
-		logger.info("greifarm position is now " + cursorPosition.x);
-		double bowlX = Math.random() * (RELATIVE_WIDTH - 2) + 1;
-		tiles.get(1).setPos(new Point((int) (bowlX * SCALE), (int) ((RELATIVE_HEIGHT - 1.5) * SCALE)));
-		logger.info("bowl position is now " + (int) (bowlX * SCALE));
-		repaint();
+		//regeneratePositions();
+		regenerateWithGreatDistance();
 	}
 	
 	public static void main(String[] args) {

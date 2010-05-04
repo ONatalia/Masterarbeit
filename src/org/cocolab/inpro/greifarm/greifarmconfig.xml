@@ -48,7 +48,7 @@
     <!-- The amount of time (in milliseconds) before speech start to be included as speech data. -->
     <property name="speechLeader" value="10"/>
     <!-- The amount of time (in milliseconds) after speech ends to be included as speech data. -->
-    <property name="speechTrailer" value="100"/>
+    <property name="speechTrailer" value="200"/>
     <!-- The speech classifier threshold. -->
     <property name="threshold" value="15"/>
 
@@ -84,6 +84,7 @@
     		<item>greifarmActor</item>
     		<item>hypViewer</item>
 <!--
+    		<item>tedNotifier</item>
             <item>consoleNotifier</item>
             <item>semanticResolver</item>
             <item>consoleNotifier</item>
@@ -103,10 +104,10 @@
         <property name="fixedLag" value="${deltifierParam}"/>
     </component>
     <component name="smoothing" type="org.cocolab.inpro.incremental.deltifier.SmoothingDeltifier">
-        <property name="smoothing" value="10"/>
+        <property name="smoothing" value="5"/>
     </component>
     <component name="adaptivesmoothing" type="org.cocolab.inpro.incremental.deltifier.WordAdaptiveSmoothingDeltifier">
-        <property name="smoothing" value="7"/>
+        <property name="smoothing" value="5"/>
     </component>
     <component name="nonIncr" type="org.cocolab.inpro.incremental.deltifier.NonIncrementalDeltifier"/>
 
@@ -301,14 +302,16 @@
 
     <component name="endpointing" type="edu.cmu.sphinx.frontend.FrontEnd">
         <propertylist name="pipeline">
-<!--            <item>sessionWavWriter</item> -->
+            <item>sessionWavWriter</item> 
+<!--
+-->
             <item>speechClassifier</item>
             <item>speechStateVisualizer</item>
             <item>speechMarker</item>
             <item>nonSpeechDataFilter</item>
-<!--
             <item>utteranceWavWriter</item>
             <item>timePasser</item>
+<!--
 -->
         </propertylist>
     </component>
@@ -386,7 +389,7 @@
     </component>
 
 	<component name="timePasser" type="org.cocolab.inpro.incremental.deltifier.OffsetAdapter">
-		<property name="deltifier" value="${deltifier}"/>
+		<property name="casrh" value="currentASRHypothesis"/>
 	</component>
 
     <component name="pitchTracker" 

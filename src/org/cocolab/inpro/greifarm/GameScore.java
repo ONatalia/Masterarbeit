@@ -14,9 +14,12 @@ public class GameScore implements Runnable {
 	JLabel scoreLabel = new JLabel("Punktestand: ");
 	
 	private synchronized void redrawLabel() {
-		int displayedScore = score - time + feelGoodAddition;
-		scoreLabel.setText("Punktestand: " + displayedScore);
+		scoreLabel.setText("Punktestand: " + getCombinedScore());
 		scoreLabel.repaint();
+	}
+	
+	public int getCombinedScore() {
+		return score - time + feelGoodAddition;
 	}
 	
 	public JLabel getScoreLabel() {

@@ -7,6 +7,7 @@ package org.cocolab.inpro.nlu;
 public class AVPair {
 
 	private String attribute;
+	/* what kind of Objects can be values? */
 	private Object value;
 
 	AVPair(String attribute, String value) {

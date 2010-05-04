@@ -48,7 +48,7 @@ import edu.cmu.sphinx.util.props.PropertySheet;
  * executed and put into the list of performed actions by the NLU. 
  * <p>
  * Greifarm: handles concurrency stuff related to the greifarm GUI (which itself
- * lives in {@link org.cocolab.inpro.gui.greifarm.GreifarmGUI} 
+ * lives in {@link org.cocolab.inpro.gui.greifarm.GreifArmGUI} 
  * <p>
  * 
  * 
@@ -88,8 +88,15 @@ public class GreifarmActor implements PushBuffer {
 				//	logger.debug("I have to revert an action");
 					if (performedActions.size() > 0) {
 						ActionIU previousAction = performedActions.pollLast();
-						previousAction.update(EditType.REVOKE);
-						unusedWords.addAll((List<WordIU>) previousAction.groundedIn());
+						if (previousAction instanceof ActionIU.StartActionIU) {
+							logger.warn("something's wrong: " + performedActions + previousAction + unusedWords);
+							performedActions.addLast(previousAction);
+						} else {
+							previousAction.update(EditType.REVOKE);
+							unusedWords.addAll((List<WordIU>) previousAction.groundedIn());
+						}
+					} else {
+						assert false : "Must not revoke when no word has been input.";
 					}
 				}
 				unusedWords.pollLast();
@@ -176,7 +183,7 @@ public class GreifarmActor implements PushBuffer {
 				public void run() {
 					constructGUI();
 				}});
-			WordIU.setAVPairs(AVPairMappingUtil.readAVPairs("res/GreifarmAVMapping"));
+			WordIU.setAVPairs(AVPairMappingUtil.readAVPairs(GreifarmActor.class.getResourceAsStream("GreifarmAVMapping")));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

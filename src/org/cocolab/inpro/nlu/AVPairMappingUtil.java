@@ -1,8 +1,10 @@
 package org.cocolab.inpro.nlu;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +16,8 @@ import java.util.Map;
  */
 public class AVPairMappingUtil {
 
-	public static Map<String, List<AVPair>> readAVPairs(String filename) throws IOException {
-		BufferedReader lbr = new BufferedReader(new FileReader(filename));
+	public static Map<String, List<AVPair>> readAVPairs(InputStream is) throws IOException {
+		BufferedReader lbr = new BufferedReader(new InputStreamReader(is));
 		Map<String, List<AVPair>> avPairs = new HashMap<String, List<AVPair>>();
 		String line;
 		while ((line = lbr.readLine()) != null) {
@@ -34,8 +36,12 @@ public class AVPairMappingUtil {
 			}
 		}
 		return avPairs;
-	}	
-	
+	}
+		
+	public static Map<String, List<AVPair>> readAVPairs(String filename) throws IOException {
+		return readAVPairs(new FileInputStream(filename));
+	}
+
 	/**
 	 * @param args
 	 * @throws IOException 
