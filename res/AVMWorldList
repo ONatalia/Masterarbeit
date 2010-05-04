@@ -12,9 +12,9 @@
 #{type:tile name:x label:x1 color:green ord:1 orient:top row_col:row ord:1 orient:bottom row_col:row ord:1 orient:left row_col:col ord:1 orient:right row_col:col tb:top lr:left desc:corner relation:next_to relation:above relation:below}
 #Tiles:
 {type:tile id:tile-1 name:x label:tile-1 color:green ord:1 orient:top row_col:row ord:2 orient:bottom row_col:row ord:1 orient:left row_col:col ord:2 orient:right row_col:col tb:top lr:left desc:corner relation:next_to relation:above relation:below}
-{type:tile id:tile-2 name:x label:tile-2 color:blue ord:2 orient:top row_col:row ord:1 orient:bottom row_col:row ord:2 orient:left row_col:col ord:1 orient:right row_col:col tb:bottom lr:right desc:corner relation:next_to relation:above relation:below}
+{type:tile id:tile-2 name:x label:tile-2 color:blue ord:2 orient:top row_col:row ord:1 orient:bottom row_col:row ord:2 orient:left row_col:col ord:1 orient:right row_col:col tb:bottom lr:left desc:corner relation:next_to relation:above relation:below}
 {type:tile id:tile-3 name:y label:tile-3 color:green ord:1 orient:top row_col:row ord:2 orient:bottom row_col:row ord:2 orient:left row_col:col ord:1 orient:right row_col:col tb:top lr:right desc:corner relation:next_to relation:above relation:below}
-{type:tile id:tile-4 name:y label:tile-4 color:blue ord:2 orient:top row_col:row ord:1 orient:bottom row_col:row ord:1 orient:left row_col:col ord:2 orient:right row_col:col tb:bottom lr:left desc:corner relation:next_to relation:above relation:below}
+{type:tile id:tile-4 name:y label:tile-4 color:blue ord:2 orient:top row_col:row ord:1 orient:bottom row_col:row ord:1 orient:left row_col:col ord:2 orient:right row_col:col tb:bottom lr:right desc:corner relation:next_to relation:above relation:below}
 #Fields:
 #{type:field color:white ord:1 orient:top row_col:row ord:2 orient:bottom row_col:row ord:1 orient:left row_col:col ord:2 orient:right row_col:col tb:top lr:left desc:corner relation:next_to relation:above relation:below}
 #{type:field color:blue ord:2 orient:top row_col:row ord:1 orient:bottom row_col:row ord:2 orient:left row_col:col ord:1 orient:right row_col:col tb:bottom lr:left desc:corner relation:next_to relation:above relation:below}
@@ -25,6 +25,7 @@
 {type:dialog_act act:take}
 {type:dialog_act act:turn}
 {type:dialog_act act:delete}
+{type:dialog_act act:reset}
 #Booleans
 {type:boolean correct:yes}
 {type:boolean correct:no}

@@ -25,11 +25,23 @@ public class AVMComposer {
 	/**
 	 * Creates AVMComposer with a list of prototypes (avmStructures) of
 	 * different typed AVMs and a local list of composed AVMs (avmList).
-	 * TODO: should take filename of AVM structure file and AVM world list
 	 */
 	public AVMComposer() {
 		AVMComposer.avmStructures = AVMStructureUtil.parseStructureFile("res/AVMStructure");
 		worldList = AVMWorldUtil.setAVMsFromFile("res/AVMWorldList", avmStructures);
+		avmList = getAllAVMs();
+		resolvedList = new ArrayList<AVM>(worldList);
+		keepList = new ArrayList<AVM>();
+	}
+
+	/**
+	 * Creates AVMComposer with a list of prototypes (avmStructures) of
+	 * different typed AVMs and a local list of composed AVMs (avmList).
+	 * @param file with list of AVMs in the world. 
+	 */
+	public AVMComposer(String worldFile) {
+		AVMComposer.avmStructures = AVMStructureUtil.parseStructureFile("res/AVMStructure");
+		worldList = AVMWorldUtil.setAVMsFromFile(worldFile, avmStructures);
 		avmList = getAllAVMs();
 		resolvedList = new ArrayList<AVM>(worldList);
 		keepList = new ArrayList<AVM>();
