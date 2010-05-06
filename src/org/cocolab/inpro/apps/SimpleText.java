@@ -21,7 +21,7 @@ import org.cocolab.inpro.apps.util.TextCommandLineParser;
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.listener.HypothesisChangeListener;
 import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
-import org.cocolab.inpro.incremental.processor.FloorManager;
+import org.cocolab.inpro.incremental.processor.TextBasedFloorTracker;
 import org.cocolab.inpro.incremental.util.IUDocument;
 
 import edu.cmu.sphinx.util.props.ConfigurationManager;
@@ -67,16 +67,16 @@ public class SimpleText extends JPanel implements ActionListener {
 	@S4ComponentList(type = HypothesisChangeListener.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = CurrentASRHypothesis.PROP_HYP_CHANGE_LISTENERS;
 
-	@S4Component(type = FloorManager.class)
+	@S4Component(type = TextBasedFloorTracker.class)
 	public final static String PROP_FLOOR_MANAGER = "floorManager";
 
-	@S4Component(type = FloorManager.Listener.class)
-	public final static String PROP_FLOOR_MANAGER_LISTENERS = FloorManager.PROP_STATE_LISTENERS;
+	@S4Component(type = TextBasedFloorTracker.Listener.class)
+	public final static String PROP_FLOOR_MANAGER_LISTENERS = TextBasedFloorTracker.PROP_STATE_LISTENERS;
 
 	IUDocument iuDocument;
 	JTextField textField;
 	
-	SimpleText(FloorManager floorManager) {
+	SimpleText(TextBasedFloorTracker textBasedFloorTracker) {
 		iuDocument = new IUDocument();
 		textField = new JTextField(40);
 		textField.setFont(new Font("Dialog", Font.BOLD, 24));
@@ -86,7 +86,7 @@ public class SimpleText extends JPanel implements ActionListener {
 		commitButton.addActionListener(this);
 		add(textField);
 		add(commitButton);
-		add(floorManager.signalPanel);
+		add(textBasedFloorTracker.signalPanel);
 	}
 	
 	public void actionPerformed(ActionEvent ae) {
@@ -98,10 +98,10 @@ public class SimpleText extends JPanel implements ActionListener {
 		textField.requestFocusInWindow();
 	}
 	
-	public static void createAndShowGUI(List<PushBuffer> hypListeners, FloorManager floorManager) {
+	public static void createAndShowGUI(List<PushBuffer> hypListeners, TextBasedFloorTracker textBasedFloorTracker) {
 		JFrame frame = new JFrame("SimpleText");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        SimpleText contentPane = new SimpleText(floorManager);
+        SimpleText contentPane = new SimpleText(textBasedFloorTracker);
         contentPane.iuDocument.setListeners(hypListeners);
         contentPane.setOpaque(true);
         frame.setContentPane(contentPane);
@@ -111,7 +111,7 @@ public class SimpleText extends JPanel implements ActionListener {
         frame.setVisible(true);
 	}
 	
-	public static void runFromReader(Reader reader, List<PushBuffer> hypListeners, FloorManager floorManager) throws IOException {
+	public static void runFromReader(Reader reader, List<PushBuffer> hypListeners, TextBasedFloorTracker textBasedFloorTracker) throws IOException {
 		IUDocument iuDocument = new IUDocument();
 		iuDocument.setListeners(hypListeners);
 		BufferedReader bReader = new BufferedReader(reader);
@@ -126,7 +126,7 @@ public class SimpleText extends JPanel implements ActionListener {
 			iuDocument.commit();
 			// empty lines results in an EoT-marker
 			if ("".equals(line)) {
-				floorManager.setEOT();
+				textBasedFloorTracker.setEOT();
 			}
 		}
 	}
@@ -137,13 +137,13 @@ public class SimpleText extends JPanel implements ActionListener {
     	if (!clp.parsedSuccessfully()) { System.exit(1); } // abort on error
     	final ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
     	PropertySheet ps = cm.getPropertySheet(PROP_CURRENT_HYPOTHESIS);
-    	final FloorManager floorManager = (FloorManager) cm.lookup(PROP_FLOOR_MANAGER);
+    	final TextBasedFloorTracker textBasedFloorTracker = (TextBasedFloorTracker) cm.lookup(PROP_FLOOR_MANAGER);
     	@SuppressWarnings("unchecked")
     	final List<PushBuffer> hypListeners = (List<PushBuffer>) ps.getComponentList(PROP_HYP_CHANGE_LISTENERS);
     	if (clp.hasTextFromReader()) { // if we already know the text:
     		logger.info("running in non-interactive mode");
     		// run non-interactively
-    		runFromReader(clp.getReader(), hypListeners, floorManager);
+    		runFromReader(clp.getReader(), hypListeners, textBasedFloorTracker);
     		System.exit(0); //
     	} else { // run interactively
     		// add hypothesis viewer 
@@ -153,7 +153,7 @@ public class SimpleText extends JPanel implements ActionListener {
     		logger.info("running in interactive mode");
     		SwingUtilities.invokeLater(new Runnable() {
 	            public void run() {
-	                createAndShowGUI(hypListeners, floorManager);
+	                createAndShowGUI(hypListeners, textBasedFloorTracker);
 	            }
 	        });
     	}

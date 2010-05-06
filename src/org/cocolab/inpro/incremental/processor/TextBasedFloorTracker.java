@@ -8,59 +8,25 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
-import edu.cmu.sphinx.util.props.Configurable;
-import edu.cmu.sphinx.util.props.PropertyException;
-import edu.cmu.sphinx.util.props.PropertySheet;
-import edu.cmu.sphinx.util.props.S4ComponentList;
-
 /**
- * The floor manager tracks which dialogue participant has the floor
- * (i.e. the user or the system) and takes decisions when the floor 
- * should be taken or released 
  * 
  * @author timo
- *
  */
-public class FloorManager implements PushBuffer {
+public class TextBasedFloorTracker extends AbstractFloorTracker {
 
-	@S4ComponentList(type = Listener.class)
-	public final static String PROP_STATE_LISTENERS = "listeners";
-	public List<Listener> listeners;
-
-	/**
-	 * other modules are notified about floor state if they implement FloorManager.Listener
-	 * and are registered to listen in the configuration file 
-	 */
-	public enum Signal { NO_INPUT, START, EOT_FALLING, EOT_RISING, EOT_ANY }
-
-	private enum InternalState { NOT_AWAITING_INPUT, AWAITING_INPUT, IN_INPUT } // not implementing POST_INPUT, because it doesn't mean anything for text 
-	
-	InternalState internalState;
-	
 	public SignalPanel signalPanel;
 
-	/** this is used to infer prosody as needed */
-	@SuppressWarnings("unchecked")
-	IUList mostRecentIUs;
-	
-	public FloorManager() {
+	public TextBasedFloorTracker() {
 		internalState = InternalState.NOT_AWAITING_INPUT;
 		signalPanel = new SignalPanel();
 		signalPanel.updateButtons();
 	}
 	
-	@Override
-	@SuppressWarnings("unchecked")
-	public void newProperties(PropertySheet ps) throws PropertyException {
-		listeners = (List<Listener>) ps.getComponentList(PROP_STATE_LISTENERS); 
-	}
-
 	/*
 	 * the floor manager will have to become a living thing sooner or later.
 	 * 
@@ -108,6 +74,13 @@ public class FloorManager implements PushBuffer {
 		signal(InternalState.IN_INPUT, Signal.START);
 	}
 	
+
+	
+	private void signal(InternalState inInput, Signal start) {
+		signalListeners(inInput, start);
+		signalPanel.updateButtons();
+	}
+
 	/** call this to (externally) assert that speech is over */
 	public void setEOT() {
 		assert internalState.equals(InternalState.IN_INPUT);
@@ -125,27 +98,6 @@ public class FloorManager implements PushBuffer {
 	public void setNoInput() {
 		assert internalState.equals(InternalState.AWAITING_INPUT);
 		signal(InternalState.NOT_AWAITING_INPUT, Signal.NO_INPUT);
-	}
-	
-	public void signal(InternalState state, Signal signal) {
-		internalState = state;
-		for (Listener l : listeners) {
-			l.floor(signal, this);
-		}
-		signalPanel.updateButtons();		
-	}
-
-	/**
-	 * the interface that the floor manager's listeners must implement
-	 * @author timo
-	 */
-	public interface Listener extends Configurable {
-		/**
-		 * will be called when the floor state changes
-		 * @param signal the signal describing the change in the floor
-		 * @param floorManager	the floor manager itself. in this way a consumer can request e.g. to change timeouts 
-		 */
-		public void floor(Signal signal, FloorManager floorManager);
 	}
 	
 	@SuppressWarnings("serial")
