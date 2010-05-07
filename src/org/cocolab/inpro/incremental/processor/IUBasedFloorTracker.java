@@ -61,6 +61,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 				assert timeOutThread == null : "There shall be no timeout threads during speech";
 				@SuppressWarnings("unchecked")
 				List<WordIU> words = (List<WordIU>) ius;
+				assert words != null : "hey, if there's a commit, then there must be words!";
 				assert words.size() > 0 : edits + "" + words;
 				WordIU endingWord = words.get(words.size() - 1);
 				if (endingWord != null && endingWord.isSilence()) {
@@ -81,7 +82,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 
 		/** if set, this timeout thread will not do anything when its timer runs out */
 		boolean killbit = false;
-		
+		/** the word that we'll inspect for rising pitch */
 		WordIU endingWord;
 		
 		public TimeOutThread(WordIU endingWord) {
@@ -89,7 +90,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		}
 
 		private void sleepSafely(long timeout) {
-			if (timeout < 0)
+			if (timeout < 5) // ignore microsleeps
 				return;
 			logger.debug("going to sleep for " + timeout + " milliseconds");
 			try {
