@@ -99,7 +99,6 @@ public class SimpleMonitor implements RtpListener {
 	
 	/** setup output to speakers */
 	void setupSpeakers() {
-		SourceDataLine line;
 		AudioFormat format = getFormat();
 		// define the required attributes for our line, 
         // and make sure a compatible line is supported.
