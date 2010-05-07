@@ -9,11 +9,38 @@ import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
+import edu.cmu.sphinx.util.props.PropertyException;
+import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.S4Boolean;
+import edu.cmu.sphinx.util.props.S4Integer;
+
 public class IUBasedFloorTracker extends AbstractFloorTracker {
+	
+	@S4Integer(defaultValue = 0)
+	public final static String PROP_RISING_TIMEOUT = "risingTimeout";
+	private int risingTimeout;
+	
+	@S4Integer(defaultValue = 700)
+	public final static String PROP_ANY_TIMEOUT = "anyProsodyTimeout";
+	private int anyProsodyTimeout;
+	
+	@S4Boolean(defaultValue = true)
+	public final static String PROP_USE_PROSODY = "useProsody";
+	private boolean useProsody;
 	
 	private static Logger logger = Logger.getLogger(IUBasedFloorTracker.class);
 	
 	TimeOutThread timeOutThread;
+
+	/* @see org.cocolab.inpro.incremental.processor.AbstractFloorTracker#newProperties(edu.cmu.sphinx.util.props.PropertySheet) */
+	@Override
+	public void newProperties(PropertySheet ps) throws PropertyException {
+		super.newProperties(ps);
+		risingTimeout = ps.getInt(PROP_RISING_TIMEOUT);
+		anyProsodyTimeout = ps.getInt(PROP_ANY_TIMEOUT);
+		useProsody = ps.getBoolean(PROP_USE_PROSODY);
+	}
+
 
 	/* (non-Javadoc)
 	 * @see org.cocolab.inpro.incremental.processor.AbstractFloorTracker#hypChange(java.util.Collection, java.util.List)
@@ -31,12 +58,17 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 			}
 			if (edits.get(edits.size() - 1).getType() == EditType.COMMIT) {
 				logger.debug("found a commit!");
-				assert timeOutThread == null;
+				assert timeOutThread == null : "There shall be no timeout threads during speech";
 				@SuppressWarnings("unchecked")
 				List<WordIU> words = (List<WordIU>) ius;
-				final WordIU endingWord = words.get(words.size() - 1);
-				timeOutThread = new TimeOutThread(endingWord);
-				timeOutThread.start();
+				WordIU endingWord = words.get(words.size() - 1);
+				while (endingWord.isSilence()) {
+					endingWord = (WordIU) endingWord.getSameLevelLink();
+				}
+				if (endingWord != null) {
+					timeOutThread = new TimeOutThread(endingWord);
+					timeOutThread.start();
+				}
 			}
 		}
 	}
@@ -44,10 +76,6 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 	
 	private class TimeOutThread extends Thread {
 
-		private static final int FIRST_TIME_OUT = 200;
-		private static final int SECOND_TIME_OUT = 200;
-		private static final int THIRD_TIME_OUT = 300;
-		
 		/** if set, this timeout thread will not do anything when its timer runs out */
 		boolean killbit = false;
 		
@@ -58,9 +86,11 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		}
 
 		private void sleepSafely(long timeout) {
+			if (timeout < 0)
+				return;
 			logger.debug("going to sleep for " + timeout + " milliseconds");
 			try {
-				Thread.sleep(FIRST_TIME_OUT);
+				Thread.sleep(risingTimeout);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -87,26 +117,20 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		
 		@Override
 		public void run() {
-			sleepSafely(FIRST_TIME_OUT);
+			sleepSafely(risingTimeout);
+			if (shouldDie())
+				return;
+			if (useProsody) {
+				Signal s = findBoundaryTone();
+				if (s == Signal.EOT_RISING) {
+					signalListeners(InternalState.NOT_AWAITING_INPUT, s);
+					return;
+				}
+			}
+			sleepSafely(anyProsodyTimeout);
 			if (shouldDie())
 				return;
 			Signal s = findBoundaryTone();
-			if (s == Signal.EOT_RISING) {
-				signalListeners(InternalState.NOT_AWAITING_INPUT, s);
-				return;
-			}
-			sleepSafely(SECOND_TIME_OUT);
-			if (shouldDie())
-				return;
-			s = findBoundaryTone();
-			if (s == Signal.EOT_RISING || s == Signal.EOT_FALLING) {
-				signalListeners(InternalState.NOT_AWAITING_INPUT, s);
-				return;
-			}
-			sleepSafely(THIRD_TIME_OUT);
-			if (shouldDie())
-				return;
-			s = findBoundaryTone();
 			signalListeners(InternalState.NOT_AWAITING_INPUT, s);
 		}
 		
