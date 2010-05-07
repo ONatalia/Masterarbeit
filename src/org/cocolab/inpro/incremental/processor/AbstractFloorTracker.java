@@ -76,5 +76,4 @@ public abstract class AbstractFloorTracker implements PushBuffer {
 		public void floor(Signal signal, AbstractFloorTracker floorManager);
 	}
 	
-
 }

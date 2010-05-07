@@ -1,5 +1,7 @@
 package org.cocolab.inpro.incremental.deltifier;
 
+import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
+
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DataProcessingException;
@@ -21,26 +23,28 @@ import edu.cmu.sphinx.util.props.S4Component;
 
 public class OffsetAdapter extends BaseDataProcessor {
 
-	@S4Component(defaultClass = ASRWordDeltifier.class, type = ASRWordDeltifier.class)
-	public static final String PROP_DELTIFIER = "deltifier";
+	@S4Component(defaultClass = CurrentASRHypothesis.class, type = CurrentASRHypothesis.class)
+	public static final String PROP_CASRH = "casrh";
 	
-	ASRWordDeltifier asrDeltifier;
+	CurrentASRHypothesis casrh;
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
-		asrDeltifier = (ASRWordDeltifier) ps.getComponent(PROP_DELTIFIER);
+		casrh = (CurrentASRHypothesis) ps.getComponent(PROP_CASRH);
 	}
 
     private boolean inAudio = false; 
     @Override
 	public Data getData() throws DataProcessingException {
 		Data data = getPredecessor().getData();
+		ASRWordDeltifier asrDeltifier = casrh.getDeltifier();
 		if ((!inAudio) && (data instanceof DoubleData)) {
 			long chunkStartSample = ((DoubleData) data).getFirstSampleNumber();
 			long collectTime = ((DoubleData) data).getCollectTime();
 			asrDeltifier.setOffset((int) chunkStartSample / 160); // divide by 16000, multiply by 100 -> frames
 			asrDeltifier.setCollectTime(collectTime);
+			
 			inAudio = true;
 		}
 		if ((data instanceof Signal)) {

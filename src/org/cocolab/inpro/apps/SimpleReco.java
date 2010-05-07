@@ -32,24 +32,20 @@ public class SimpleReco {
 	private static final Logger logger = Logger.getLogger(SimpleReco.class);
 	
 	private static void setupDeltifier(ConfigurationManager cm, RecoCommandLineParser clp) {
-//		if (clp.isIncremental()) {
-			String ASRfilter;
-			switch (clp.getIncrementalMode()) {
-				case RecoCommandLineParser.FIXEDLAG_INCREMENTAL : ASRfilter = "fixedLag"; break;
-				case RecoCommandLineParser.INCREMENTAL : ASRfilter = "none"; break;
-				case RecoCommandLineParser.NON_INCREMENTAL : ASRfilter = "nonIncr"; break;
-				case RecoCommandLineParser.SMOOTHED_INCREMENTAL : ASRfilter = "smoothing"; break;
-				default : throw new RuntimeException("something's wrong");
-			}
-			logger.info("Setting ASR filter to " + ASRfilter);
-			cm.setGlobalProperty("deltifier", ASRfilter);
-			if (!ASRfilter.equals("none")) {
-				logger.info("Setting filter parameter to " + clp.getIncrementalModifier());
-				cm.setGlobalProperty("deltifierParam", Integer.toString(clp.getIncrementalModifier()));
-			}
-//		} else {
-//			logger.info("Running in NON-INCREMENTAL (pure sphinx) mode");
-//		}
+		String ASRfilter;
+		switch (clp.getIncrementalMode()) {
+			case RecoCommandLineParser.FIXEDLAG_INCREMENTAL : ASRfilter = "fixedLag"; break;
+			case RecoCommandLineParser.INCREMENTAL : ASRfilter = "none"; break;
+			case RecoCommandLineParser.NON_INCREMENTAL : ASRfilter = "nonIncr"; break;
+			case RecoCommandLineParser.SMOOTHED_INCREMENTAL : ASRfilter = "smoothing"; break;
+			default : throw new RuntimeException("something's wrong");
+		}
+		logger.info("Setting ASR filter to " + ASRfilter);
+		cm.setGlobalProperty("deltifier", ASRfilter);
+		if (!ASRfilter.equals("none")) {
+			logger.info("Setting filter parameter to " + clp.getIncrementalModifier());
+			cm.setGlobalProperty("deltifierParam", Integer.toString(clp.getIncrementalModifier()));
+		}
 	}
 
 	public static void setupMicrophone(final Microphone mic) {
