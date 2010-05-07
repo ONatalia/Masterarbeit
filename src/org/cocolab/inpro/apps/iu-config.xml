@@ -13,13 +13,13 @@
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
-<!--
-	       	<item>outputForSimpleText</item>
     		<item>hypViewer</item>
-	       	<item>floorManager</item>
-    		<item>semanticResolver</item>
-        	<item>consoleNotifier</item>
     		<item>tedNotifier</item>
+	       	<item>vadBasedFloorTracker</item>
+<!--
+    		<item>semanticResolver</item>
+	       	<item>outputForSimpleText</item>
+        	<item>consoleNotifier</item>
           	<item>labelWriter2</item>
     		<item>oaaNotifier</item>
 -->
@@ -34,7 +34,7 @@
         </propertylist>
     </component>
 
-	<component name="floorManager" type="org.cocolab.inpro.incremental.processor.FloorManager">
+	<component name="vadBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.VADBasedFloorTracker">
 		<propertylist name="listeners">
 			<item>${actionManager}</item>
 		</propertylist>

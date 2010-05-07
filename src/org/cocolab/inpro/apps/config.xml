@@ -2,6 +2,7 @@
 <!DOCTYPE config[
   <!ENTITY iuconfig SYSTEM "org/cocolab/inpro/apps/iu-config.xml">
   <!ENTITY sphinx SYSTEM "org/cocolab/inpro/apps/sphinx.xml">
+  <!ENTITY frontend SYSTEM "org/cocolab/inpro/apps/frontend.xml">
 ]>
 <!--
    Sphinx-4 Configuration file
@@ -14,6 +15,7 @@
 <config>
 
 	&sphinx;
+	&frontend;
     &iuconfig;
 
 
