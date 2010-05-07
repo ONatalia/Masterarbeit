@@ -69,7 +69,7 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 			return Double.NaN;
 		}
 	}
-
+	
 	@Override
 	public double getVoicing(double time) {
 		@SuppressWarnings("unchecked")

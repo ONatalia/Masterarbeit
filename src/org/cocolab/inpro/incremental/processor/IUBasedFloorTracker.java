@@ -61,10 +61,13 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 				assert timeOutThread == null : "There shall be no timeout threads during speech";
 				@SuppressWarnings("unchecked")
 				List<WordIU> words = (List<WordIU>) ius;
+				assert words.size() > 0 : edits + "" + words;
 				WordIU endingWord = words.get(words.size() - 1);
-				while (endingWord.isSilence()) {
-					endingWord = (WordIU) endingWord.getSameLevelLink();
+				if (endingWord != null && endingWord.isSilence()) {
+					logger.debug("ending word is silence, trying predecessor: " + endingWord);
+					endingWord = words.get(words.size() - 2);
 				}
+				logger.debug("will work with: " + endingWord);
 				if (endingWord != null) {
 					timeOutThread = new TimeOutThread(endingWord);
 					timeOutThread.start();
@@ -110,7 +113,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 			// do something with the following: 
 			logger.debug("turnFinalWord is " + endingWord);
 			if (endingWord.hasProsody()) {
-				return endingWord.pitchIsRising() ?  Signal.EOT_RISING : Signal.EOT_FALLING;
+				return endingWord.pitchIsRising() ?  Signal.EOT_RISING : Signal.EOT_ANY;
 			}
 			return Signal.EOT_ANY;
 		}

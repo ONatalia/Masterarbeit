@@ -50,6 +50,7 @@ public class TimeShiftingAnalysis implements Resetable {
 	}
 	
 	public void add(int t, double x) {
+		assert !Double.isNaN(x);
 		// add data point and remove data points, that are more than maxLag ago
 		dataPoints.addFirst(new DataPoint(t, x));
 		shiftTime(t);

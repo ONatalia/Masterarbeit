@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.cocolab.inpro.annotation.Label;
+import org.cocolab.inpro.features.TimeShiftingAnalysis;
 import org.cocolab.inpro.incremental.util.ResultUtil;
 import org.cocolab.inpro.nlu.AVPair;
 
@@ -145,8 +146,13 @@ public class WordIU extends IU {
 		return isSilence;
 	}
 	
+	public static void setAVPairs(Map<String, List<AVPair>> avPairs) {
+		assert (WordIU.avPairs == null) : "You're trying to re-set avPairs. This may be a bug.";
+		WordIU.avPairs = avPairs;
+	}
+
 	public boolean hasProsody() {
-		return false;
+		return (bd != null && startTime() != Double.NaN && endTime() != Double.NaN && !isSilence());
 	}
 
 	/**
@@ -154,12 +160,31 @@ public class WordIU extends IU {
 	 */
 	public boolean pitchIsRising() {
 		assert hasProsody();
-		return false;
+		if (prosodicFeatures == null)
+			prosodicFeatures = new ProsodicFeatures();
+		return prosodicFeatures.pitchIsRising();
 	}
 	
-	public static void setAVPairs(Map<String, List<AVPair>> avPairs) {
-		assert (WordIU.avPairs == null) : "You're trying to re-set avPairs. This may be a bug.";
-		WordIU.avPairs = avPairs;
-	}
+	private ProsodicFeatures prosodicFeatures;
+	
+	private class ProsodicFeatures {
+		
+		TimeShiftingAnalysis tsa;
 
+		ProsodicFeatures() {
+			tsa = new TimeShiftingAnalysis();
+			for (double time = startTime(); time < endTime(); time += 0.01) {
+				int frame = (int) Math.floor(time * ResultUtil.SECOND_TO_MILLISECOND_FACTOR + 0.5);
+				double pitch = bd.getPitchInCent(time);
+				if (!Double.isNaN(pitch))
+					tsa.add(frame, pitch);
+			}
+		}
+		
+		public boolean pitchIsRising() {
+			return tsa.getSlope() > 2.5;
+		} 
+		
+	}
+	
 }
