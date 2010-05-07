@@ -6,7 +6,6 @@
         <propertylist name="pipeline">
 <!--            <item>sessionWavWriter</item> -->
             <item>speechClassifier</item>
-            <item>floorTrackerFrontendSplitter</item>
             <item>speechStateVisualizer</item>
             <item>speechMarker</item>
             <item>nonSpeechDataFilter</item>
@@ -70,12 +69,6 @@
         <property name="debug" value="false"/> <!-- this is *very* verbose if set to true-->
     </component>
 
-	<component name="floorTrackerFrontendSplitter" type="edu.cmu.sphinx.frontend.databranch.FrontEndSplitter">
-		<propertylist name="dataListeners">
-			<item>vadBasedFloorTracker</item>
-		</propertylist>
-	</component>
-	
     <component name="speechStateVisualizer" type="org.cocolab.inpro.gui.util.SpeechStateVisualizer"/>
 
     <component name="speechMarker" type="edu.cmu.sphinx.frontend.endpoint.SpeechMarker">

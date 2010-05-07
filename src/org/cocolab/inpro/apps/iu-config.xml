@@ -15,9 +15,9 @@
         <propertylist name="hypChangeListeners">
     		<item>hypViewer</item>
     		<item>tedNotifier</item>
-	       	<item>vadBasedFloorTracker</item>
-<!--
+	       	<item>iuBasedFloorTracker</item>
     		<item>semanticResolver</item>
+<!--
 	       	<item>outputForSimpleText</item>
         	<item>consoleNotifier</item>
           	<item>labelWriter2</item>
@@ -34,7 +34,7 @@
         </propertylist>
     </component>
 
-	<component name="vadBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.VADBasedFloorTracker">
+	<component name="iuBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.IUBasedFloorTracker">
 		<propertylist name="listeners">
 			<item>${actionManager}</item>
 		</propertylist>
