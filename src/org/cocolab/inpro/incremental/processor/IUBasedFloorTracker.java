@@ -66,7 +66,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 				WordIU endingWord = words.get(words.size() - 1);
 				if (endingWord != null && endingWord.isSilence()) {
 					logger.debug("ending word is silence, trying predecessor: " + endingWord);
-					endingWord = words.get(words.size() - 2);
+					endingWord = (words.size() > 1) ? words.get(words.size() - 2) : null;
 				}
 				logger.debug("will work with: " + endingWord);
 				if (endingWord != null) {

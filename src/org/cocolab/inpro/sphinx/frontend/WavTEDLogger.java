@@ -52,6 +52,7 @@ public class WavTEDLogger extends WavWriter {
 	protected void writeFile(String wavName) {
 		mostRecentFilename = wavName;
 		super.writeFile(wavName);
+		logger.info("saving audio as: " + wavName);
 		if (tedOutput) {
 			StringBuilder sb = new StringBuilder("<event time='");
 // MUSING: it's probably irrelevant, when this file was stored to disk, so we don't keep that information.

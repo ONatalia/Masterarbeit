@@ -38,6 +38,7 @@ public class AVMWorldUtil {
 				}
 				list.add(avm);
 			}
+			lbr.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -34,6 +34,7 @@ public class AVMStructureUtil {
 				}
 				avmStructures.put(type, attributes);
 			}
+			lbr.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
