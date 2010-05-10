@@ -75,13 +75,17 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 		// keep a copy of the original wordIUs
 		saveOutputLists();
 		// calculate would-be edits the standard way
-		super.deltify(token); 
+		super.deltify(token);
 		if (!recoFinal) {
 			handleIncomingWordIUs(); 
 			applySmoothingQueueToOutputWords();
 		}
 	}
 
+	/**
+	 * update smoothing counters for words of still-valid words in the smoothing
+	 * queue, remove invalid ones, add new ones for new words
+	 */
 	protected void handleIncomingWordIUs() {
 		Iterator<EditMessage<WordIU>> editsIter = wordEdits.iterator();
 		Iterator<SmoothingCounter> smoothIter = smoothingQueue.iterator();
@@ -91,7 +95,7 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 	}
 
 	/** 
-	 * apply edits from smoothingQueue if their counter has run out, 
+	 * apply edits from smoothingQueue if their counters have run out, 
 	 * add them to edit list and update wordIUs
 	 * NOTE: this implementation only handles smoothing factors that
 	 * are constant for all words:
@@ -147,6 +151,7 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 			SmoothingCounter sc = smoothIter.next();
 			edit = editsIter.next();
 			if (sc.matches(edit)) {
+				sc.updateWordTimings(edit.getIU());
 				sc.count--;
 			} else {
 				smoothIter.remove();
@@ -202,6 +207,11 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 			this(edit, getSmoothingFactor(edit));
 		}
 		
+		public void updateWordTimings(WordIU otherWord) {
+			this.edit.getIU().updateTimings(otherWord);
+			new RuntimeException("not implemented yet");
+		}
+
 		protected SmoothingCounter(EditMessage<WordIU> edit, int count) {
 			this.edit = edit;
 			this.countStart = count;

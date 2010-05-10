@@ -57,4 +57,11 @@ public class TextualWordIU extends WordIU {
 		return super.getWord().replaceAll("[\\+\\-]$", "");
 	}
 	
+	/** update the end time of this word */
+	@Override
+	public void updateTimings(WordIU otherWord) {
+		assert otherWord instanceof TextualWordIU;
+		this.counter = ((TextualWordIU) otherWord).counter;
+	}
+	
 }

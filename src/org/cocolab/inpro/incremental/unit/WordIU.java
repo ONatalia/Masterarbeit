@@ -1,20 +1,3 @@
-/* 
- * Copyright 2009, Timo Baumann and the Inpro project
- * 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
- */
 package org.cocolab.inpro.incremental.unit;
 
 import java.util.ArrayList;
@@ -100,6 +83,20 @@ public class WordIU extends IU {
 		for (Label label : newLabels) {
 			segIt.next().updateLabel(label);
 		}
+	}
+	
+	/**
+	 * this operation updates the timings of the grounding segments to
+	 * match those of another IU for the same word (in terms of spelling)
+	 * @param otherWord the word to base the new timings on
+	 */
+	public void updateTimings(WordIU otherWord) {
+		assert this.wordEquals(otherWord) : "Can't update segment timings based on a different word's segments";
+		List<Label> newLabels = new ArrayList<Label>();
+		for (SegmentIU segment : otherWord.getSegments()) {
+			newLabels.add(segment.l);
+		}
+		updateSegments(newLabels);
 	}
 	
 	public boolean wordEquals(Pronunciation pron) {
