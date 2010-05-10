@@ -1,25 +1,8 @@
-/* 
- * Copyright 2008, 2009, Timo Baumann and the Inpro project
- * 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
- */
 package org.cocolab.inpro.incremental.deltifier;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -62,24 +45,30 @@ import edu.cmu.sphinx.util.props.PropertySheet;
  */
 public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeeper, SignalListener {
 
-	IUList<WordIU> wordIUs = new IUList<WordIU>();
+	final IUList<WordIU> wordIUs = new IUList<WordIU>();
 	
-	List<EditMessage<WordIU>> wordEdits;
+	final List<EditMessage<WordIU>> wordEdits = new ArrayList<EditMessage<WordIU>>();;
 	
-	Logger logger = Logger.getLogger(ASRWordDeltifier.class);
-	
-//	private static final Logger logger = Logger.getLogger(ASRWordDeltifier.class);
+	private static final Logger logger = Logger.getLogger(ASRWordDeltifier.class);
 	
 	int currentFrame = 0;
 	int currentOffset = 0; // measured in centiseconds / frames
 	long startTime = 0;
 	
-	protected boolean recoFinal; // flag to avoid smoothing or fixed lags on final result
+	/** flag to avoid smoothing or fixed lags on final result */
+	protected boolean recoFinal;
 	
+	/** this base implementation does not accept any parameters */
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 	}
 	
+	/**
+	 * adds a bunch of assertions to the output of {@link ResultUtil#getTokenList(Token,boolean,boolean)}
+	 * @param token the token to start the backwards trace from
+	 * @return a list of tokens, word tokens precede their corresponding segment tokens
+	 * TODO?!! currently, no provisions are taken for SILs to be preceded by a <sil> word!
+	 */
 	protected synchronized List<Token> getTokens(Token token) {
 		List<Token> tokens = ResultUtil.getTokenList(token, true, true);
 		assert (tokens != null);
@@ -105,9 +94,12 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	 * <p>
 	 * the actual deltification algorithm works as follows:
 	 * <ul><li>
-	 * we first extract all the word- and phoneme tokens from the token sequence
+	 * we first extract all the word- and phoneme tokens from the token sequence,
 	 * </li><ul><li>
 	 * 		each word-token is followed by the corresponding phoneme tokens
+	 * </li><li>
+	 * 		let's assert that every word-token is followed by the corresponding 
+	 * 		phoneme tokens and that every SIL phoneme is preceded by a silence-word token
 	 * </li></ul><li>
 	 * we then compare the previous and the current hypothesis:
 	 * </li><ul><li>
@@ -125,11 +117,10 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	 */
 	protected synchronized void deltify(Token token) {
 		List<Token> newTokens = getTokens(token);
-		@SuppressWarnings("unchecked")
-		List<WordIU> currWordIUs = (List<WordIU>) wordIUs.clone();
 		// step over wordIUs and newWords to see which are equal in both
 		ListIterator<Token> newIt = newTokens.listIterator();
-		ListIterator<WordIU> currWordIt = currWordIUs.listIterator();
+		ListIterator<WordIU> currWordIt = wordIUs.listIterator();
+		// TODO: what are these for?
 		double segmentStartTime = currentOffset * ResultUtil.FRAME_TO_SECOND_FACTOR;
 		double segmentEndTime = 0.0;
 		List<SegmentIU> emptyList = Collections.<SegmentIU>emptyList(); // needed to initialize prevSegmentIt with an empty non-null iterator
@@ -173,13 +164,15 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 					// assert false; // hmm, I don't know why, but it works without this assertion. and it doesn't hurt
 				}
 				segmentStartTime = segmentEndTime;
+			} else {
+				throw new RuntimeException("weird searchState type in deltify: " + newSearchState);
 			}
 		}
 		// ok, now:
 		// if there are words left in the prev word list, send purge notifications
 		// purge notifications have to be sent in reversed order, starting with the very last word
 		// therefore we put them in reverse order into a new list
-		wordEdits = new LinkedList<EditMessage<WordIU>>();
+		wordEdits.clear();
 		while (currWordIt.hasNext()) {
 			WordIU prevIU = currWordIt.next();
 			wordEdits.add(0, new EditMessage<WordIU>(EditType.REVOKE, prevIU));
@@ -219,7 +212,8 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		wordIUs.apply(wordEdits);
 	}
 	
-	/* tries to get segmentEndTime from a list iterator; 
+	/**
+	 * tries to get segmentEndTime from a list iterator; 
 	 * the iterator will be at the same position afterwards as it was before
 	 */
 	private double getTimeFromNewIt(ListIterator<Token> newIt) {
@@ -261,7 +255,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 			if (currentFrame > 2) { // there never is for the first two frames, so don't print a message
 				logger.debug("there was no best token at frame " + currentFrame);
 			}
-			wordEdits = new LinkedList<EditMessage<WordIU>>();
+			wordEdits.clear();
 		}
 	}
 
@@ -283,7 +277,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 
 	@Override
 	public void reset() {
-		wordIUs = new IUList<WordIU>();
+		wordIUs.clear();
 		recoFinal = false;
 	}
 

@@ -1,20 +1,3 @@
-/* 
- * Copyright 2008, 2009, Timo Baumann and the Inpro project
- * 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
- */
 package org.cocolab.inpro.incremental.deltifier;
 
 import java.util.ArrayList;
@@ -140,7 +123,8 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 	/** initiate output lists */
 	protected void restoreOutputLists() {
 		wordEdits.clear();
-		wordIUs = prevWordIUs;
+		wordIUs.clear();
+		wordIUs.addAll(prevWordIUs);
 	}
 
 
@@ -182,6 +166,11 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 		}
 	}
 
+	/**
+	 * @param edit a (possibly null) edit to add first 
+	 * @param editsIter more edits to add
+	 * @param smoothingQueue the queue to add to
+	 */
 	private void addNewWordsToSmoothingQueue(EditMessage<WordIU> edit,
 			Iterator<EditMessage<WordIU>> editsIter,
 			List<SmoothingCounter> smoothingQueue) {

@@ -135,7 +135,8 @@ public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 		TextualWordIU alreadyThereWord = new TextualWordIU("null", null);
 		IUList<WordIU> prevWordIUs = new IUList<WordIU>();
 		prevWordIUs.add(alreadyThereWord);
-		wasd.wordIUs = prevWordIUs;
+		wasd.wordIUs.clear();
+		wasd.wordIUs.addAll(prevWordIUs);
 		wasd.saveOutputLists();
 		TextualWordIU firstWord = new TextualWordIU("eins", null);
 		TextualWordIU secondWord = new TextualWordIU("zwei", null);
@@ -151,8 +152,9 @@ public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 		inputWords.add(firstWord);
 		inputWords.add(secondWord);
 		inputWords.add(stopWord);
-		wasd.wordIUs = inputWords;
-		wasd.wordEdits = new ArrayList<EditMessage<WordIU>>();
+		wasd.wordIUs.clear();
+		wasd.wordIUs.addAll(inputWords);
+		wasd.wordEdits.clear();
 		wasd.wordEdits.add(new EditMessage<WordIU>(EditType.ADD, firstWord));
 		wasd.wordEdits.add(new EditMessage<WordIU>(EditType.ADD, secondWord));
 		wasd.wordEdits.add(new EditMessage<WordIU>(EditType.ADD, stopWord));

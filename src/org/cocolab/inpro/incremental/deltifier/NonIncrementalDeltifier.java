@@ -1,10 +1,8 @@
 package org.cocolab.inpro.incremental.deltifier;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.cocolab.inpro.incremental.unit.EditMessage;
-import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
 public class NonIncrementalDeltifier extends ASRWordDeltifier {
@@ -21,7 +19,7 @@ public class NonIncrementalDeltifier extends ASRWordDeltifier {
 		if (recoFinal) {
 			return super.getWordEdits();
 		} else {
-			wordEdits = Collections.<EditMessage<WordIU>>emptyList();
+			wordEdits.clear();
 			return wordEdits;
 		}
 	}
@@ -36,7 +34,7 @@ public class NonIncrementalDeltifier extends ASRWordDeltifier {
 		if (recoFinal) {
 			return super.getWordIUs();
 		} else {
-			wordIUs = new IUList<WordIU>();
+			wordIUs.clear();
 			return wordIUs;
 		}
 	}

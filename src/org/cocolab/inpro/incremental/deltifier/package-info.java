@@ -50,7 +50,8 @@ a word that will be back in the next frame, alternating between readings etc.
 </dd>
 <dt>{@link org.cocolab.inpro.incremental.deltifier.FixedLagDeltifier}</dt>
 <dd>
-instead of interpreting the current {@link Result} up to the current time,
+instead of interpreting the current {@link edu.cmu.sphinx.result.Result} 
+up to the current time,
 it leaves some <em>fixed lag</em> (measured in frames) at the end of the result. 
 As most intermittent recognition errors happen at the right end of the 
 hypothesis, the fixed lag is a simple and effective method to avoid these.
