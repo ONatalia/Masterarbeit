@@ -68,7 +68,7 @@ public class SimpleText extends JPanel implements ActionListener {
 	public final static String PROP_HYP_CHANGE_LISTENERS = CurrentASRHypothesis.PROP_HYP_CHANGE_LISTENERS;
 
 	@S4Component(type = TextBasedFloorTracker.class)
-	public final static String PROP_FLOOR_MANAGER = "floorManager";
+	public final static String PROP_FLOOR_MANAGER = "textBasedFloorTracker";
 
 	@S4Component(type = TextBasedFloorTracker.Listener.class)
 	public final static String PROP_FLOOR_MANAGER_LISTENERS = TextBasedFloorTracker.PROP_STATE_LISTENERS;
@@ -86,6 +86,8 @@ public class SimpleText extends JPanel implements ActionListener {
 		commitButton.addActionListener(this);
 		add(textField);
 		add(commitButton);
+		assert textBasedFloorTracker != null;
+		assert textBasedFloorTracker.signalPanel != null;
 		add(textBasedFloorTracker.signalPanel);
 	}
 	

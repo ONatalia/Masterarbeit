@@ -21,19 +21,20 @@ public class AVMWorldUtil {
 			while ((line = lbr.readLine()) != null) {
 				if (line.startsWith("#") || line.matches("^\\s*$")) continue;
 				// {type:X name:kreuz color:green }
-				String[] tokens = line.replaceAll("[\\{\\}]", "").split("\\s");
-				ArrayList<AVPair> avps = new ArrayList<AVPair>();
+				String[] tokens = line.replaceAll("[\\{\\}]", "").split("\\s+");
+				ArrayList<AVPair> avpairs = new ArrayList<AVPair>();
 				String type = "";
 				for (String token : tokens) {
 					String[] pair = token.split(":");
+					assert pair.length == 2 : "Cannot parse file " + filename + ". Failing line is: " + line;
 					if (pair[0].equals("type")) {
 						type = pair[1];
 					} else {
-						avps.add(new AVPair(pair[0], pair[1]));
+						avpairs.add(new AVPair(pair[0], pair[1]));
 					}
 				}
 				AVM avm = new AVM(type, avmStructures);
-				for (AVPair avp : avps) {
+				for (AVPair avp : avpairs) {
 					avm.setAttribute(avp);
 				}
 				list.add(avm);

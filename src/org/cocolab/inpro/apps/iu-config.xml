@@ -15,9 +15,9 @@
         <propertylist name="hypChangeListeners">
     		<item>hypViewer</item>
     		<item>tedNotifier</item>
-	       	<item>iuBasedFloorTracker</item>
     		<item>semanticResolver</item>
 <!--
+	       	<item>iuBasedFloorTracker</item>
 	       	<item>outputForSimpleText</item>
         	<item>consoleNotifier</item>
           	<item>labelWriter2</item>
@@ -29,12 +29,18 @@
     <component name="semanticResolver" type="org.cocolab.inpro.incremental.processor.SemanticResolver">
         <propertylist name="hypChangeListeners">
 <!--          <item>consoleNotifier</item>
-    		<item>tedNotifier</item> -->
-    		<item>${actionManager}</item>
+    		<item>tedNotifier</item> 
+    		<item>${actionManager}</item> -->
         </propertylist>
     </component>
 
 	<component name="iuBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.IUBasedFloorTracker">
+		<propertylist name="listeners">
+			<item>${actionManager}</item>
+		</propertylist>
+	</component>
+
+	<component name="textBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.TextBasedFloorTracker">
 		<propertylist name="listeners">
 			<item>${actionManager}</item>
 		</propertylist>
