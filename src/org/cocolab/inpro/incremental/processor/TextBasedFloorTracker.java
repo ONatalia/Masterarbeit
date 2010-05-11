@@ -121,8 +121,8 @@ public class TextBasedFloorTracker extends AbstractFloorTracker {
 		}
 		
 		void updateButtons() {
-			noInputButton.setEnabled(internalState.equals(InternalState.AWAITING_INPUT));
-			eotButton.setEnabled(!isNotInInput());
+			noInputButton.setEnabled(true); //internalState.equals(InternalState.AWAITING_INPUT));
+			eotButton.setEnabled(true); //!isNotInInput());
 		}
 	}
 
