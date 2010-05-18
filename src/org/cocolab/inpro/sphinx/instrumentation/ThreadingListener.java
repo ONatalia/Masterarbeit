@@ -111,6 +111,7 @@ public class ThreadingListener implements ResultListener, ResultProducer, StateL
 		boolean run = true;
 		
 		DispatchThread(ResultListener listener, BlockingQueue<Result> resultQueue) {
+			super("result dispatch thread for " + listener);
 			this.listener = listener;
 			this.resultQueue = resultQueue;
 		}

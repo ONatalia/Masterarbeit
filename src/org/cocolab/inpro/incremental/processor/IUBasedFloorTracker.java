@@ -86,6 +86,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		WordIU endingWord;
 		
 		public TimeOutThread(WordIU endingWord) {
+			super("timeout thread for " + endingWord.getWord());
 			this.endingWord = endingWord;
 		}
 

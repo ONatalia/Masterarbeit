@@ -39,7 +39,7 @@ public class SimpleRTP {
 						mic.initialize();
 					}
 				};
-				new Thread(micInitializer).start();
+				new Thread(micInitializer, "microphone initializer").start();
 				try {
 					Thread.sleep(3000);
 				} catch (InterruptedException e) {

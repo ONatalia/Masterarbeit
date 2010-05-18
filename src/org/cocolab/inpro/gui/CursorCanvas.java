@@ -215,6 +215,7 @@ abstract public class CursorCanvas extends Canvas {
 		double speed = MOVE_SPEED;
 
 		MoveThread(Point goalPosition) {
+			super("move thread");
 			this.goalPosition = goalPosition;
 		}
 		

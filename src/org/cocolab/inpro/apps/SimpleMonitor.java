@@ -74,11 +74,11 @@ public class SimpleMonitor implements RtpListener {
 			break;
 			case CommonCommandLineParser.OAA_DISPATCHER_INPUT : 
 				Runnable streamDrainer = createDispatcherSource();
-				new Thread(streamDrainer).run();
+				new Thread(streamDrainer, "oaa dispatcher source").run();
 			break;
 			case CommonCommandLineParser.MICROPHONE_INPUT:
 				streamDrainer = createMicrophoneSource();
-				new Thread(streamDrainer).run();
+				new Thread(streamDrainer, "microphone thread").run();
 			break;
 			default: throw new RuntimeException("oups in SimpleMonitor"); 
 		}

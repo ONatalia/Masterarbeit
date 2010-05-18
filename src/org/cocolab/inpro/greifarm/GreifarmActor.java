@@ -187,7 +187,7 @@ public class GreifarmActor implements PushBuffer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		new Thread(gameScore).start();
+		new Thread(gameScore, "game score thread").start();
 	}
 
 }

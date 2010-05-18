@@ -276,6 +276,10 @@ public class DataCollector extends JPanel implements ActionListener {
 		private String mostRecentFileName = "";
 		
 		Recognizer recognizer;
+		
+		RecoRunner() {
+			super("recognition runner");
+		}
 
 		public synchronized void setRecognizer(Recognizer recognizer) {
 			this.recognizer = recognizer;

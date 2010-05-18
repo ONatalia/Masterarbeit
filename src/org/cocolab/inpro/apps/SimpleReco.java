@@ -51,7 +51,7 @@ public class SimpleReco {
 	public static void setupMicrophone(final Microphone mic) {
 		// create a Thread to start up the microphone (this avoid a problem 
 		// with microphone initialization hanging and taking forever)
-		Thread micInitializer = new Thread() {
+		Thread micInitializer = new Thread("microphone initializer") {
 			@Override
 			public void run() {
 				mic.initialize();
@@ -70,7 +70,7 @@ public class SimpleReco {
 		Runnable shutdownHook = new Runnable() {
 			public void run() {
 				logger.info("Shutting down microphone.");
-				Thread micStopper = new Thread() {
+				Thread micStopper = new Thread("shutdown microphone") {
 					@Override
 					public void run() {
 						mic.stopRecording();

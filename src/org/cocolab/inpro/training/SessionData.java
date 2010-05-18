@@ -174,7 +174,7 @@ public class SessionData {
 					throw new RuntimeException(e);
 				}
 			}
-		}).start();
+		}, "upload to server").start();
 		pipe(pin, os);
 		sb = new StringBuilder("\r\n");
 		sb.append("--");

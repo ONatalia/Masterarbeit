@@ -57,7 +57,7 @@ public class GreifarmExperiment implements DropListener {
 		}
 		random = new Random();
 		rr = new RecoRunner(recognizer);
-		(new Thread(rr)).start();
+		(new Thread(rr, "recognizer thread")).start();
 		showDialog();
 		
 		Runnable shutdownHook = new Runnable() {
@@ -65,7 +65,7 @@ public class GreifarmExperiment implements DropListener {
 				showTestResult();
 			}
 		};
-		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
+		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook, "shutdown thread"));
 
 		
 	}
@@ -179,7 +179,7 @@ public class GreifarmExperiment implements DropListener {
 					}
 					nextRound();
 				}				
-			}).start();
+			}, "advance to next round with delay").start();
 		}
 	}
 
