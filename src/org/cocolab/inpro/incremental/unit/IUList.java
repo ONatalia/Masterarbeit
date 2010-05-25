@@ -45,7 +45,11 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  			case REVOKE: 
  				assert size() > 0 : "Can't revoke from an empty list: " + edit;
  				assert (get(size() - 1)).equals(edit.getIU()) : "Can't apply this edit to the list: " + this + edit;
- 				this.remove(size() - 1);
+ 				if (size() > 0) {
+ 					this.remove(size() - 1);
+ 				} else {
+ 					logger.warn("you are revoking from an empty list!");
+ 				}
  				break;
  			case COMMIT:
  				// don't do anything on commit
