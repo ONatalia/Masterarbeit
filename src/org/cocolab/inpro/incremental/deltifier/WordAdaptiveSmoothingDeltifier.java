@@ -13,6 +13,10 @@ import org.cocolab.inpro.incremental.unit.TextualWordIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.nlu.AVPairMappingUtil;
 
+import edu.cmu.sphinx.util.props.PropertyException;
+import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.S4String;
+
 /**
  * TODO/possible extensions:
  * - make incremental smoothing depend on currently salient actions
@@ -21,6 +25,20 @@ import org.cocolab.inpro.nlu.AVPairMappingUtil;
 
 public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 	
+	@S4String(defaultValue="drop")
+	public final static String PROP_SAFE_WORD = "safeWord";
+	public String safeWord;
+
+	@S4String(defaultValue="drop")
+	public final static String PROP_URGENT_WORD = "urgentWord";
+	public String urgentWord;
+
+	@Override
+	public void newProperties(PropertySheet ps) throws PropertyException {
+		safeWord = (String) ps.getString(PROP_SAFE_WORD);
+		urgentWord = (String) ps.getString(PROP_URGENT_WORD);
+	}
+
 	/**
 	 * more interesting assignment of smoothing factors
 	 * depending on whether something is an "urgent word",
@@ -43,7 +61,7 @@ public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 	protected boolean isStaySafeWord(EditMessage<WordIU> edit) {
 		return (edit.getIU().getAVPairs() != null && 
 				edit.getIU().getAVPairs().size() > 0 &&
-				edit.getIU().getAVPairs().get(0).getValue().equals("drop"));
+				edit.getIU().getAVPairs().get(0).getValue().equals(this.safeWord));
 	}
 	
 	/**
@@ -54,7 +72,7 @@ public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 		return (edit.getType() == EditType.ADD &&
 				edit.getIU().getAVPairs() != null && 
 				edit.getIU().getAVPairs().size() > 0 &&
-				edit.getIU().getAVPairs().get(0).getValue().equals("stop"));
+				edit.getIU().getAVPairs().get(0).getValue().equals(this.urgentWord));
 	}
 	
 	/** 

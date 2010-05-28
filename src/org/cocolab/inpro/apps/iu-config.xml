@@ -35,6 +35,8 @@
     </component>
 
 	<component name="iuBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.IUBasedFloorTracker">
+		<property name="useProsody" value="false" />
+		<property name="anyProsodyTimeout" value="3000" />
 		<propertylist name="listeners">
 			<item>${actionManager}</item>
 		</propertylist>
@@ -52,8 +54,12 @@
 
     <component name="baseData" type="org.cocolab.inpro.incremental.basedata.BaseData"/>
 
-	<component name="none" type="org.cocolab.inpro.incremental.deltifier.ASRWordDeltifier"/>
+    <component name="none" type="org.cocolab.inpro.incremental.deltifier.ASRWordDeltifier"/>
     <component name="nonIncr" type="org.cocolab.inpro.incremental.deltifier.NonIncrementalDeltifier"/>
+    <component name="wasd" type="org.cocolab.inpro.incremental.deltifier.WordAdaptiveSmoothingDeltifier">
+        <property name="safeWord" value="drop" />
+        <property name="urgentWord" value="stop" />
+    </component>
 
     <component name="fixedLag" type="org.cocolab.inpro.incremental.deltifier.FixedLagDeltifier">
         <property name="fixedLag" value="${deltifierParam}"/>
