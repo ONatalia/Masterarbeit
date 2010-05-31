@@ -11,6 +11,7 @@ import org.cocolab.inpro.incremental.unit.WordIU;
 public class OutputForSimpleText extends HypothesisChangeListener {
 	
 	PrintStream outputStream = System.out;
+	String outputString = "";
 	
 	@Override
 	public void hypChange(Collection<? extends IU> ius,
@@ -20,10 +21,12 @@ public class OutputForSimpleText extends HypothesisChangeListener {
 			for (EditMessage<?> e : edits) {
 				switch (e.getType()) {
 				case REVOKE: 
-					outputStream.print("!1 "); 
+					outputString += "!1 ";
+//					outputStream.print("!1 "); 
 					break; 
 				case ADD: 
-					outputStream.print(((WordIU) e.getIU()).getWord() + " ");
+					outputString += ((WordIU) e.getIU()).getWord() + " ";
+//					outputStream.print(((WordIU) e.getIU()).getWord() + " ");
 					break;
 				case COMMIT: 
 					commitFlag = true;
@@ -33,8 +36,9 @@ public class OutputForSimpleText extends HypothesisChangeListener {
 				}		
 			}
 			if (commitFlag) {
+				outputStream.print("For SimpleText: " + outputString);
 				outputStream.println();
-				outputStream.println();
+				outputString = "";
 			}
 		}
 	}
