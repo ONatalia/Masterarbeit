@@ -1,92 +1,47 @@
 package org.cocolab.inpro.incremental.unit;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.cocolab.inpro.incremental.util.ResultUtil;
-import org.cocolab.inpro.nlu.AVM;
+import org.cocolab.inpro.nlu.AVPair;
 
 public class SemIU extends IU {
 
 	public static final SemIU FIRST_SEM_IU = new SemIU() {}; 
 	
-	private ArrayList<AVM> dialogActList = new ArrayList<AVM>();
-	private ArrayList<AVM> tileList = new ArrayList<AVM>();
-	private ArrayList<AVM> fieldList = new ArrayList<AVM>();
-	private ArrayList<AVM> booleanList = new ArrayList<AVM>();
+	private AVPair avp;
 
 	@SuppressWarnings("unchecked")
 	public SemIU() {
-		this(FIRST_SEM_IU, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+		this(FIRST_SEM_IU, Collections.EMPTY_LIST, null);
 	}
 
-	public SemIU(IU sll, List<IU> groundedIn, List<AVM> avms) {
+	public SemIU(IU sll, List<IU> groundedIn, AVPair avp) {
 		super(sll, groundedIn);
-		for (AVM avm : avms) {
-			if (avm.getType().equals("tile")) {
-				this.tileList.add(avm);
-			} else if (avm.getType().equals("field")) {
-				this.fieldList.add(avm);
-			} else if (avm.getType().equals("dialog_act")) {
-				this.dialogActList.add(avm);
-			} else if (avm.getType().equals("boolean")) {
-				this.booleanList.add(avm);
-			}
-		}
+		this.avp = avp;
 	}
 
-	public ArrayList<AVM> getAvmList() {
-		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.addAll(this.tileList);
-		list.addAll(this.fieldList);
-		list.addAll(this.dialogActList);
-		list.addAll(this.booleanList);
-		return list;
+	public SemIU(IU sll, IU groundedIn, AVPair avp) {
+		super(sll, Collections.singletonList(groundedIn));
+		this.avp = avp;
 	}
 
-	public ArrayList<AVM> getFieldList() {
-		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.addAll(this.fieldList);
-		return list;
+	public AVPair getAVPair() {
+		return this.avp;
 	}
 
-	public ArrayList<AVM> getTileList() {
-		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.addAll(this.tileList);
-		return list;
-	}
-
-	public ArrayList<AVM> getDialogActList() {
-		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.addAll(this.dialogActList);
-		return list;
-	}
-
-	public ArrayList<AVM> getBooleanList() {
-		ArrayList<AVM> list = new ArrayList<AVM>();
-		list.addAll(this.booleanList);
-		return list;
-	}
-	
 	public boolean isEmpty() {
-		return (this.booleanList.size() == 0 && this.dialogActList.size() == 0 && this.fieldList.size() == 0 && this.tileList.size() == 0);
+		if (this.avp != null) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder("< ");
-		for (AVM avm : this.dialogActList) {
-			sb.append(avm.toShortString() + " ");
-		}
-		for (AVM avm : this.tileList) {
-			sb.append(avm.toShortString() + " ");
-		}
-		for (AVM avm : this.fieldList) {
-			sb.append(avm.toShortString() + " ");
-		}
-		for (AVM avm : this.booleanList) {
-			sb.append(avm.toShortString() + " ");
-		}
+		sb.append(this.avp.toString());
 		sb.append(" >");
 		return super.toString() + " " + sb.toString();
 	}
@@ -98,18 +53,7 @@ public class SemIU extends IU {
 		sb.append("' duration='");
 		sb.append(Math.round((endTime() - startTime) * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
 		sb.append("'> ");
-		for (AVM avm : this.dialogActList) {
-			sb.append(avm.toShortString() + " ");
-		}
-		for (AVM avm : this.tileList) {
-			sb.append(avm.toShortString() + " ");
-		}
-		for (AVM avm : this.fieldList) {
-			sb.append(avm.toShortString() + " ");
-		}
-		for (AVM avm : this.booleanList) {
-			sb.append(avm.toShortString() + " ");
-		}
+		sb.append(this.avp.toString());
 		sb.append(" </event>");
 		return sb.toString();
 	}
@@ -121,10 +65,7 @@ public class SemIU extends IU {
 	 * @return true if each SemIUs string representations of their payload (three array lists) are the same.
 	 */
 	public boolean samePayload(SemIU siu) {
-		return (this.dialogActList.toString().equals(siu.dialogActList.toString()) &&
-				this.fieldList.toString().equals(siu.fieldList.toString()) &&
-				this.tileList.toString().equals(siu.tileList.toString())) &&
-				this.booleanList.toString().equals(siu.booleanList.toString());
+		return (this.avp.equals(siu.avp));
 	}
 
 }

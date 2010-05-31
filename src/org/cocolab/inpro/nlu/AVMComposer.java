@@ -113,7 +113,6 @@ public class AVMComposer {
 	public ArrayList<AVM> resolve() {
 		ArrayList<AVM> newlyResolved = new ArrayList<AVM>();
 		// Loop through known and world AVMs, attempt unification
-//		System.err.println("composed: "+ this.avmList.toString());
 		for (AVM avm1 : worldList) {
 			for (AVM avm2 : this.avmList) {
 				if (avm1.unifies(avm2)) {
@@ -124,7 +123,6 @@ public class AVMComposer {
 				}
 			}
 		}
-//		System.err.println("resolved: "+ newlyResolved.toString());
 		// If we resolved to a single, hitherto unknown AVM, remember it
 		if (newlyResolved.size() == 1) {
 			for (AVM avm : newlyResolved) {
@@ -132,14 +130,11 @@ public class AVMComposer {
 					this.keepList.add(avm);
 				}
 			}
-//			System.err.println("keeping: "+ this.keepList.toString());
 			// Reset avmList and remove those already found
 			this.setAllAVMs();
 			for (AVM avm : this.keepList) {
 				this.unsetAVMs(avm.getType());
 			}
-
-//			System.err.println("reset: "+ this.avmList.toString());
 		// If nothing was resolved input was out-of-domain and nothing returns
 		} else if (newlyResolved.size() == 0) {
 			this.resolvedList.clear();
@@ -147,16 +142,28 @@ public class AVMComposer {
 		}
 		// Return unique list of kept and resolved AVMs
 		this.resolvedList = new ArrayList<AVM>(newlyResolved);
-//		System.err.println("kept: "+ this.keepList.toString());
 		for (AVM avm : keepList) {
 			if (!this.resolvedList.contains(avm)) {
 				this.resolvedList.add(avm);
 			}
 		}
-//		System.err.println("returned: "+ this.resolvedList.toString());
 		return this.resolvedList;
 	}
 	
+	/** 
+	 * Resolves AVMs, returns only a single AVPair of one AVM if one was resolved (else null).
+	 * @return AVPair of AVM that resolved
+	 */
+	public AVPair uniquelyResolve() {
+		this.resolve();
+		if (this.resolvedList.size() == 1) {
+			System.err.println("Found one - now looking for " + this.avmList.toString());
+			return this.resolvedList.get(0).getAVPairs().get(0);
+		} else {
+			return null;
+		}
+	}
+
 	public ArrayList<AVM> getResolvedList() {
 		return this.resolvedList;
 	}
