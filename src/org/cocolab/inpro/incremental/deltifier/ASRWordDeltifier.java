@@ -47,12 +47,12 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 
 	final IUList<WordIU> wordIUs = new IUList<WordIU>();
 	
-	final List<EditMessage<WordIU>> wordEdits = new ArrayList<EditMessage<WordIU>>();;
+	final List<EditMessage<WordIU>> wordEdits = new ArrayList<EditMessage<WordIU>>();
 	
 	private static final Logger logger = Logger.getLogger(ASRWordDeltifier.class);
 	
 	int currentFrame = 0;
-	int currentOffset = 0; // measured in centiseconds / frames
+	int currentOffset = 0; // measured in centiseconds / frames (since when ?)
 	long startTime = 0;
 	
 	/** flag to avoid smoothing or fixed lags on final result */
@@ -65,30 +65,70 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	
 	/**
 	 * adds a bunch of assertions to the output of {@link ResultUtil#getTokenList(Token,boolean,boolean)}
-	 * @param token the token to start the backwards trace from
+	 * @param finalToken the token to start the backwards trace from
 	 * @return a list of tokens, word tokens precede their corresponding segment tokens
 	 * TODO?!! currently, no provisions are taken for SILs to be preceded by a <sil> word!
+	 * -> it would be really annoying to insert such words in the token list, 
+	 *    we hence handle silence-insertion at a later step in the process
+	 * -> should we do the opposite and strip silence words, 
+	 *    so that we don't have to support them if they ever occur in the token list?  
 	 */
-	protected synchronized List<Token> getTokens(Token token) {
-		List<Token> tokens = ResultUtil.getTokenList(token, true, true);
+	protected synchronized List<Token> getTokens(Token finalToken) {
+		List<Token> tokens = ResultUtil.getTokenList(finalToken, true, true);
 		assert (tokens != null);
-		// the following asserts that each word token is followed by at least one phoneme token
-		// and that the sequence starts with a word token
-		boolean phoneSeen = true;
-		for (Token t : tokens) {
-			SearchState s = t.getSearchState();
-			if (s instanceof WordSearchState) {
-				assert (phoneSeen) : tokens.toString();
-				phoneSeen = false;
-			} else if (s instanceof UnitSearchState) {
-				phoneSeen = true;
+		// pure debug code to 
+		// test that each sequence of SIL segments is preceded by a SIL word
+		// --> turns out that this is often NOT the case with LexTree
+		Token precedingToken = null;
+		for (Token token : tokens) {
+			if (isSilenceSegment(token)) {
+				assert precedingToken != null : "null oops: " + tokens;
+				if (!isSilenceWord(precedingToken)) {
+				//	System.err.println("no silence word: " + tokens);
+				}
 			} else {
-				assert false;
+				precedingToken = token;
 			}
 		}
 		return tokens;
 	}
 	
+	private static boolean isSilenceWord(Token t) {
+		SearchState s = t.getSearchState();
+		return (s instanceof WordSearchState &&
+				((WordSearchState) s).getPronunciation().getWord().isFiller());
+	}
+	
+	private static boolean isSilenceSegment(Token t) {
+		SearchState s = t.getSearchState();
+		return (s instanceof UnitSearchState &&
+				((UnitSearchState) s).getUnit().getName().equals("SIL"));
+	}
+	
+	/**
+	 * 
+	 * @param finalToken the token in the result to start deltification from
+	 */
+/*	protected synchronized void newDeltify(Token finalToken) {
+		List<Token> allTokens = getTokens(finalToken);
+		// let's take a very easy (but maybe slightly inefficient) approach:
+		// first, we create a shiny new IU network from the current tokens
+		List<WordIU> newWordIUs = createIUNetworkFromWordAndPhonemeTokens(allTokens);
+		// secondly, update the timings of previously output IUs 
+		List<EditMessage<WordIU>> newEdits = compareAndUpdateOldNetwork(newWordIUs);
+		// finally, update wordEdits to be output:
+		wordEdits.clear();
+		wordEdits.addAll(newEdits);
+	}
+	
+	private List<WordIU> createIUNetworkFromWordAndPhonemeTokens(List<Token> allTokens) {
+		throw new RuntimeException("not implemented");
+	}
+
+	private List<EditMessage<WordIU>> compareAndUpdateOldNetwork(List<WordIU> newWordIUs) {
+		throw new RuntimeException("not implemented");
+	}
+*/
 	/**
 	 * update the stored ASR-representation with information from the ASR result's given Token  
 	 * <p>
@@ -117,28 +157,32 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	 */
 	protected synchronized void deltify(Token token) {
 		List<Token> newTokens = getTokens(token);
+		logger.debug("started to deltify; word tokens are: " + newTokens);
 		// step over wordIUs and newWords to see which are equal in both
 		ListIterator<Token> newIt = newTokens.listIterator();
-		ListIterator<WordIU> currWordIt = wordIUs.listIterator();
+		ListIterator<WordIU> wordIt = wordIUs.listIterator();
 		// TODO: what are these for?
 		double segmentStartTime = currentOffset * ResultUtil.FRAME_TO_SECOND_FACTOR;
 		double segmentEndTime = 0.0;
 		List<SegmentIU> emptyList = Collections.<SegmentIU>emptyList(); // needed to initialize prevSegmentIt with an empty non-null iterator
 		Iterator<SegmentIU> currSegmentIt = emptyList.iterator();
+		// TODO: what exactly is the meaning of this variable?
 		boolean addSilenceWord = false;
+		// TODO: implement this loop in new method compareNewTokensToPreviousOuput();
 		while (newIt.hasNext()) {
 			Token newToken = newIt.next();
 			SearchState newSearchState = newToken.getSearchState();
 			if (newSearchState instanceof WordSearchState) {
-				if (!currWordIt.hasNext()) {
+				// ?
+				if (!wordIt.hasNext()) {
 					newIt.previous();
 					break;
 				}
 				Pronunciation pron = ((WordSearchState) newToken.getSearchState()).getPronunciation();
-				WordIU prevIU = currWordIt.next();
-				// check if the words match and break once we reach the point where they don't match anymore
+				WordIU prevIU = wordIt.next();
+				// check if the words matches and break once we reach the point where they don't match anymore
 				if (!prevIU.wordEquals(pron)) {
-					currWordIt.previous(); // go back the one word that didn't match anymore
+					wordIt.previous(); // go back the one word that didn't match anymore
 					newIt.previous();
 					break;
 				}
@@ -151,11 +195,18 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				if (currSegmentIt.hasNext()) {
 					currSegmentIt.next().updateLabel(new Label(segmentStartTime, segmentEndTime, name));
 				} else if (name.equals("SIL")) {
-					if (currWordIt.hasNext() && currWordIt.next().isSilence()) {
-						currWordIt.previous();
-						WordIU currWord = currWordIt.next(); 
-						currWord.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, name)));
-						currSegmentIt = currWord.getSegments().iterator();
+					if (wordIt.hasNext()) {
+						if (wordIt.next().isSilence()) {
+							wordIt.previous();
+							WordIU currWord = wordIt.next(); 
+							currWord.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, name)));
+							currSegmentIt = currWord.getSegments().iterator();
+							addSilenceWord = false; // maybe this was missing? -> nope, doesn't help, but still, it seems sane to be here
+						} else {
+							wordIt.previous();
+							addSilenceWord = true;
+							break;
+						}
 					} else {
 						addSilenceWord = true;
 						break;
@@ -168,21 +219,24 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				throw new RuntimeException("weird searchState type in deltify: " + newSearchState);
 			}
 		}
+		// TODO: implement this loop in new method makeRevokes()
 		// ok, now:
 		// if there are words left in the prev word list, send purge notifications
 		// purge notifications have to be sent in reversed order, starting with the very last word
 		// therefore we put them in reverse order into a new list
 		wordEdits.clear();
-		while (currWordIt.hasNext()) {
-			WordIU prevIU = currWordIt.next();
+		while (wordIt.hasNext()) {
+			WordIU prevIU = wordIt.next();
 			wordEdits.add(0, new EditMessage<WordIU>(EditType.REVOKE, prevIU));
 		}
+		// TODO: likely culprit for what's going wrong
 		// check if we need to insert a silence in the end (this happens when SIL does not have its own word token) 
 		if (addSilenceWord) {
 			WordIU newIU = new WordIU(null);
 			newIU.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, "SIL")));
 			wordEdits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
 		}
+		// TODO: implement this loop in new method makeAdds() ?
 		// for the remaining words in the new list, add them to the old list and send add notifications
 		while (newIt.hasNext()) {
 			Token newToken = newIt.next();
@@ -209,7 +263,16 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				segmentStartTime = segmentEndTime;
 			}
 		}
-		wordIUs.apply(wordEdits);
+		logger.debug("I believe the following edits should be applied: " + wordEdits);
+		logger.debug("to the previous IUs: " + wordIUs);
+		try {
+			wordIUs.apply(wordEdits);
+		} catch (AssertionError ae) {
+			logger.fatal("new tokens: " + newTokens);
+			logger.fatal(addSilenceWord);
+			throw ae;
+		}
+		logger.debug("ok, ouput IUs are now: " + wordIUs);
 	}
 	
 	/**
