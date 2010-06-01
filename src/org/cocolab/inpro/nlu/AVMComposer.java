@@ -30,7 +30,7 @@ public class AVMComposer {
 		AVMComposer.avmStructures = AVMStructureUtil.parseStructureFile("res/AVMStructure");
 		worldList = AVMWorldUtil.setAVMsFromFile("res/AVMWorldList", avmStructures);
 		avmList = getAllAVMs();
-		resolvedList = new ArrayList<AVM>(worldList);
+		resolvedList = new ArrayList<AVM>(worldList.size());
 		keepList = new ArrayList<AVM>();
 	}
 
@@ -43,7 +43,7 @@ public class AVMComposer {
 		AVMComposer.avmStructures = AVMStructureUtil.parseStructureFile("res/AVMStructure");
 		worldList = AVMWorldUtil.setAVMsFromFile(worldFile, avmStructures);
 		avmList = getAllAVMs();
-		resolvedList = new ArrayList<AVM>(worldList);
+		resolvedList = new ArrayList<AVM>(worldList.size());
 		keepList = new ArrayList<AVM>();
 	}
 
@@ -92,7 +92,7 @@ public class AVMComposer {
 	}
 
 	/**
-	 * Calls compose for the list of AVPairs
+	 * Calls compose() for the list of AVPairs
 	 * @param avPairs list of AVPairs to be composed
 	 */
 	public void composeAll(List<AVPair> avPairs) {
@@ -119,32 +119,9 @@ public class AVMComposer {
 					avm1.unify(avm2);
 					if (!newlyResolved.contains(avm1)) {
 						newlyResolved.add(avm1);
+						this.resolvedList.add(avm1);
 					}
 				}
-			}
-		}
-		// If we resolved to a single, hitherto unknown AVM, remember it
-		if (newlyResolved.size() == 1) {
-			for (AVM avm : newlyResolved) {
-				if (!this.keepList.contains(avm)) {
-					this.keepList.add(avm);
-				}
-			}
-			// Reset avmList and remove those already found
-			this.setAllAVMs();
-			for (AVM avm : this.keepList) {
-				this.unsetAVMs(avm.getType());
-			}
-		// If nothing was resolved input was out-of-domain and nothing returns
-		} else if (newlyResolved.size() == 0) {
-			this.resolvedList.clear();
-			this.keepList.clear();
-		}
-		// Return unique list of kept and resolved AVMs
-		this.resolvedList = new ArrayList<AVM>(newlyResolved);
-		for (AVM avm : keepList) {
-			if (!this.resolvedList.contains(avm)) {
-				this.resolvedList.add(avm);
 			}
 		}
 		return this.resolvedList;
@@ -157,7 +134,7 @@ public class AVMComposer {
 	public AVPair uniquelyResolve() {
 		this.resolve();
 		if (this.resolvedList.size() == 1) {
-			System.err.println("Found one - now looking for " + this.avmList.toString());
+			this.setAllAVMs();
 			return this.resolvedList.get(0).getAVPairs().get(0);
 		} else {
 			return null;
@@ -255,7 +232,13 @@ public class AVMComposer {
 		System.exit(0);
 	}
 
+	/**
+	 * Main method mostly for local testing.
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws IOException {
+		//For debug only...
 		System.out.println("Starting AVM Composer.");
 		AVMComposer composer = new AVMComposer();
 
@@ -271,29 +254,6 @@ public class AVMComposer {
 		avps.add(new AVPair("act", "take"));
 		avps.add(new AVPair("yesno", "yes"));
 		avps.add(new AVPair("yesno", "no"));
-		
-		// These should compose and resolve
-//		avps.add(new AVPair("color", "green"));
-//		avps.add(new AVPair("name", "f"));
-//		avps.add(new AVPair("ord", "2"));
-//		avps.add(new AVPair("orient", "top"));
-//		avps.add(new AVPair("ord", "1"));
-//		avps.add(new AVPair("orient", "bottom"));
-//		avps.add(new AVPair("ord", "1"));
-//		avps.add(new AVPair("relation", "next_to"));
-//		avps.add(new AVPair("relation", "above"));
-//		avps.add(new AVPair("relation", "below"));
-		
-		// These should compose but not resolve 
-//		avps.add(new AVPair("ord", "4"));
-//		avps.add(new AVPair("ord", "1"));
-//		avps.add(new AVPair("relation", "below"));
-		
-		// These should compose and resolve nothing
-//		avps.add(new AVPair("name", "cross"));
-//		avps.add(new AVPair("ord", "1"));
-//		avps.add(new AVPair("ord", "4"));
-//		avps.add(new AVPair("color", "gelb"));
 
 		for (AVPair avp : avps) {
 			System.out.println("Adding tag AVPair '" + avp.toString() + "'.");

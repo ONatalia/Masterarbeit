@@ -128,7 +128,7 @@ public class ActionIU extends IU {
 	}
 	
 	@Override
-	public String toLabelLine() {
+	public String toPayLoad() {
 		return "Action " + type + " with strength " + modifier;
 	}
 	
@@ -170,5 +170,6 @@ public class ActionIU extends IU {
 			return ActionType.STOP;
 		}
 	}
+
 }
 
