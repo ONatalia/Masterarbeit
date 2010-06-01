@@ -223,7 +223,9 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 		}
 		
 		boolean matches(EditMessage<WordIU> edit) {
-			return this.edit.getIU().wordEquals(edit.getIU());
+			return 
+			    this.edit.getType().equals(edit.getType()) 
+			 && this.edit.getIU().wordEquals(edit.getIU());
 		}
 	}
 	
