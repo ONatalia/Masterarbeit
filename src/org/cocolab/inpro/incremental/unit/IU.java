@@ -3,6 +3,7 @@ package org.cocolab.inpro.incremental.unit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.cocolab.inpro.incremental.BaseDataKeeper;
 
@@ -10,7 +11,12 @@ public abstract class IU {
 	
 	public static final long startupTime = System.currentTimeMillis();
 	
-	public static final IU FIRST_IU = new IU() {}; 
+	public static final IU FIRST_IU = new IU() {
+		@Override
+		public String toPayLoad() {
+			return "The very first IU";
+		}
+	}; 
 	private static int IU_idCounter = 0;
 	protected final int id;
 
@@ -192,8 +198,10 @@ public abstract class IU {
 			iu.groundedIn.add(this);
 	}
 	
+	public abstract String toPayLoad();
+	
 	public String toLabelLine() {
-		return startTime() + "\t" + endTime() + "\t"; // the prototypical IU is empty
+		return String.format(Locale.US,	"%.2f\t%.2f\t%s", startTime(), endTime(), toPayLoad());
 	}
 	
 	public String toString() {

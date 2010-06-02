@@ -12,6 +12,11 @@ public class SyllableIU extends IU {
 		}
 	}
 
+	@Override
+	public String toPayLoad() {
+		return null;
+	}
+
 	// nothing to see here (yet), move on
 	
 }

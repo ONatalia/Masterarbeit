@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.cocolab.inpro.annotation.Label;
@@ -121,11 +120,6 @@ public class WordIU extends IU {
 		return sb.toString();
 	}
 	
-	@Override
-	public String toLabelLine() {
-		return String.format(Locale.US,	"%.2f\t%.2f\t%s", startTime(), endTime(), word);
-	}
-
 	public String toOAAString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(id);
@@ -182,6 +176,11 @@ public class WordIU extends IU {
 			return tsa.getSlope() > 2.5;
 		} 
 		
+	}
+
+	@Override
+	public String toPayLoad() {
+		return word;
 	}
 	
 }

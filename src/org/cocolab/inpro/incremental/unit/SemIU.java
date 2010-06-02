@@ -8,7 +8,7 @@ import org.cocolab.inpro.nlu.AVPair;
 
 public class SemIU extends IU {
 
-	public static final SemIU FIRST_SEM_IU = new SemIU() {}; 
+	public static final SemIU FIRST_SEM_IU = new SemIU(); 
 	
 	private AVPair avp;
 
@@ -32,28 +32,22 @@ public class SemIU extends IU {
 	}
 
 	public boolean isEmpty() {
-		if (this.avp != null) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public String toString() {
-		StringBuilder sb = new StringBuilder("< ");
-		sb.append(this.avp.toString());
-		sb.append(" >");
-		return super.toString() + " " + sb.toString();
+		return (this.avp == null);
 	}
 
 	public String toTEDviewXML() {
-		double startTime = startTime();
 		StringBuilder sb = new StringBuilder("<event time='");
+		double startTime = startTime();
+		if (Double.isNaN(startTime))
+			startTime = 0.0;
 		sb.append(Math.round(startTime * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
 		sb.append("' duration='");
-		sb.append(Math.round((endTime() - startTime) * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
+		double duration = duration();
+		if (Double.isNaN(duration))
+			duration = 0.0;
+		sb.append(Math.round(duration * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
 		sb.append("'> ");
-		sb.append(this.avp.toString());
+		sb.append(toPayLoad().replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
 		sb.append(" </event>");
 		return sb.toString();
 	}
@@ -66,6 +60,19 @@ public class SemIU extends IU {
 	 */
 	public boolean samePayload(SemIU siu) {
 		return (this.avp.equals(siu.avp));
+	}
+
+	@Override
+	public String toPayLoad() {
+		String payLoad;
+		if (this == FIRST_SEM_IU) 
+			payLoad = "the very first SemIU";
+		else if (isEmpty())
+			payLoad = "empty";
+		else
+			payLoad = avp.toString();
+			
+		return "<" + payLoad + ">";
 	}
 
 }

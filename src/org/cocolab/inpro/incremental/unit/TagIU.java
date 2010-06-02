@@ -45,10 +45,6 @@ public class TagIU extends IU {
 				+ " </event>";
 	}
 
-	public String toString() {
-		return id + "," + tag;
-	}
-
 	public String toOAAString() {
 		StringBuffer sb = new StringBuffer(Integer.toString(id));
 		sb.append(",'");
@@ -66,6 +62,11 @@ public class TagIU extends IU {
 	
 	public int getID() {
 		return this.id;
+	}
+
+	@Override
+	public String toPayLoad() {
+		return tag;
 	}
 
 }

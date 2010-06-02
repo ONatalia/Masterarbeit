@@ -18,6 +18,7 @@
 package org.cocolab.inpro.incremental.unit;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -27,15 +28,24 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
 
 	private static final Logger logger = Logger.getLogger(IUList.class);
 	
+	IUType firstIU;
+	
 	public IUList() {
 		super();
 	}
 	
 	public IUList(List<IUType> base) {
 		super(base);
+		if (!base.isEmpty())
+			firstIU = base.get(0);
 	}
 	
- 	public void apply(EditMessage<IUType> edit) {
+ 	public IUList(IUType firstIU) {
+ 		super(Collections.<IUType>singletonList(firstIU));
+ 		this.firstIU = firstIU;
+ 	}
+
+	public void apply(EditMessage<IUType> edit) {
  		switch (edit.type) {
  			case ADD: 
  				assert isEmpty() || get(size() - 1).endTime() <= edit.getIU().startTime() + 0.001 // account for floating point error 
@@ -45,11 +55,7 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  			case REVOKE: 
  				assert size() > 0 : "Can't revoke from an empty list: " + edit;
  				assert (get(size() - 1)).equals(edit.getIU()) : "Can't apply this edit to the list: " + this + edit;
- 				if (size() > 0) {
- 					this.remove(size() - 1);
- 				} else {
- 					logger.warn("you are revoking from an empty list!");
- 				}
+ 				this.remove(size() - 1);
  				break;
  			case COMMIT:
  				// don't do anything on commit
@@ -80,4 +86,11 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  		add(e);
  	}
 	
+ 	@Override
+ 	public void clear() {
+ 		super.clear();
+ 		if (firstIU != null)
+ 			add(firstIU);
+ 	}
+ 	
 }

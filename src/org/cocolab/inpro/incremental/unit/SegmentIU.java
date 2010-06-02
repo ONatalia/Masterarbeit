@@ -99,5 +99,10 @@ public class SegmentIU extends IU {
 	public String toLabelLine() {
 		return l.toString();
 	}
+
+	@Override
+	public String toPayLoad() {
+		return l.getLabel();
+	}
 	
 }
