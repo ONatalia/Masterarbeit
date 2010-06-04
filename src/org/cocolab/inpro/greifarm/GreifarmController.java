@@ -17,9 +17,9 @@ public class GreifarmController {
 	private Random rand = new Random();
 	private double greifarmPosition;
 	/** this is set to false by drop() and set to true by the reset command */
-	boolean hasControl;
+	private boolean hasControl;
 	
-	GameScore gamescore;
+	private GameScore gamescore;
 	
 	GreifarmController(GameScore gamescore) {
 		this.gamescore = gamescore;
@@ -72,7 +72,7 @@ public class GreifarmController {
 		return greifarmPosition; // this is the same as calling getGoalPosition(0), but nevertheless
 	}
 
-	public double getGoalPosition(double amount) {
+	public double getGoalPositionFor(double amount) {
 		if (hasControl) {
 			double newPosition = greifarmPosition + (rand.nextGaussian() *.1 + 1) * amount;
 			newPosition = Math.min(Math.max(newPosition, 0.5), GreifArmGUI.RELATIVE_WIDTH - 0.5);

@@ -3,8 +3,9 @@ package org.cocolab.inpro.greifarm;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Deque;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -67,11 +68,11 @@ public class GreifarmActor implements PushBuffer {
 	
 	/* incrementality/add/revoke related stuff here: */
 	/** most recent words that are not yet part of an interpretation */
-	private final LinkedList<WordIU> unusedWords = new LinkedList<WordIU>();
+	private final Deque<WordIU> unusedWords = new ArrayDeque<WordIU>(); 
 	/** actions already performed since the last call to processorReset() */
-	private final LinkedList<ActionIU> performedActions = new LinkedList<ActionIU>();
+	private final Deque<ActionIU> performedActions = new ArrayDeque<ActionIU>();
 	
-	private final NLU nlu = new NLU();
+	private final NLU nlu = new NLU(unusedWords, performedActions);
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -86,14 +87,14 @@ public class GreifarmActor implements PushBuffer {
 				// unusedWords, or that unusedWords is empty and
 				if (unusedWords.isEmpty()) {
 				//	logger.debug("I have to revert an action");
-					if (performedActions.size() > 0) {
-						ActionIU previousAction = performedActions.pollLast();
-						if (previousAction instanceof ActionIU.StartActionIU) {
-							logger.warn("something's wrong: " + performedActions + previousAction + unusedWords);
-							performedActions.addLast(previousAction);
-						} else {
+					if (!performedActions.isEmpty()) {
+						ActionIU previousAction = performedActions.peekLast();
+						if (!(previousAction instanceof ActionIU.StartActionIU)) {
+							performedActions.pollLast();
 							previousAction.update(EditType.REVOKE);
 							unusedWords.addAll((List<WordIU>) previousAction.groundedIn());
+						} else {
+							logger.warn("something's wrong: " + performedActions + previousAction + unusedWords);
 						}
 					} else {
 						assert false : "Must not revoke when no word has been input.";
@@ -108,7 +109,7 @@ public class GreifarmActor implements PushBuffer {
 				// on add, add this word to unusedWords;
 				WordIU addedWord = (WordIU) em.getIU();
 				if (addedWord.isSilence() && addedWord.duration() > 0.1) {
-					if (performedActions.size() > 0)
+					if (!performedActions.isEmpty())
 						performedActions.getLast().precedesPause(true);
 				} else {
 					unusedWords.addLast(addedWord);
@@ -122,7 +123,7 @@ public class GreifarmActor implements PushBuffer {
 		if (commitFlag) {
 			nlu.understandUnusedWordsOnCommit();
 			// on commit, we want to notify the corresponding performedAction
-			if (performedActions.size() > 0)
+			if (!performedActions.isEmpty())
 				performedActions.getLast().precedesPause(true);
 		}
 	}
@@ -144,7 +145,6 @@ public class GreifarmActor implements PushBuffer {
 		unusedWords.clear();
 		performedActions.clear();
 		performedActions.add(new ActionIU.StartActionIU(greifarmController));
-		nlu.setLists(unusedWords, performedActions);
 	}
 	
 	public void gameReset() {

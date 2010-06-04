@@ -1,7 +1,9 @@
 package org.cocolab.inpro.greifarm;
 
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.unit.WordIU;
@@ -11,29 +13,31 @@ import org.cocolab.inpro.nlu.AVPair;
 public class NLU {
 
 	private final Logger logger = Logger.getLogger(NLU.class);
-	private LinkedList<WordIU> unusedWords;
-	private LinkedList<ActionIU> performedActions;
+	private final Deque<WordIU> unusedWords;
+	private final Deque<ActionIU> performedActions;
 
+	public NLU(Deque<WordIU> unusedWords, Deque<ActionIU> performedActions) {
+		this.unusedWords = unusedWords;
+		this.performedActions = performedActions;
+	}
+	
 	/**
 	 * after each hypothesis, we try to find one (or more) "commands",
 	 * which we define as "(contentlessWord | modifierWord)* actionWord",
 	 * i.e. a sequence of words leading up to and including an actionWord.
 	 * the action depends on the actionWord's ActionType, and
-	 * the *last* modifierWord's Modifier
+	 * the *last* modifierWord's ActionStrength
 	 */
 	public void incrementallyUnderstandUnusedWords() {
 		//logger.debug(unusedWords);
-		Modifier strengthModifier = Modifier.NORMAL;
-		for (ListIterator<WordIU> it = unusedWords.listIterator(); it.hasNext();) {
+		ActionStrength strengthModifier = ActionStrength.NORMAL;
+		List<WordIU> groundingWords = new ArrayList<WordIU>();
+		for (Iterator<WordIU> it = unusedWords.iterator(); it.hasNext();) {
 			WordIU word = it.next();
+			// get all the words leading up to the current words
+			groundingWords.add(word);
 			if (isActionWord(word)) {
 				logger.debug("found action word " + word.getWord());
-				// get all the words leading up to the current words
-				LinkedList<WordIU> groundingWords = new LinkedList<WordIU>();
-				while (it.hasPrevious()) {
-					groundingWords.addFirst(it.previous());
-					it.remove();
-				}
 				logger.debug("all words contained in this action: " + groundingWords);
 				logger.debug("action type is " + actionType(word));
 				// get SLL (which is also relevant to determine the ActionIU's behaviour
@@ -41,8 +45,9 @@ public class NLU {
 				// create new Action IU depending on actionType(iu), previous actions
 				// and directionModifier.
 				ActionIU action = new ActionIU(sll, groundingWords, actionType(word), strengthModifier);
+				groundingWords = new ArrayList<WordIU>();
 				performedActions.addLast(action);
-				strengthModifier = Modifier.NORMAL; // reset to NORMAL for a possibly following action
+				strengthModifier = ActionStrength.NORMAL; // reset to NORMAL for a possibly following action
 			} else if (isModifierWord(word)) {
 				strengthModifier = getModifierValue(word, strengthModifier);
 				logger.debug("set strength to " + strengthModifier + " due to " + word.getWord());
@@ -50,12 +55,6 @@ public class NLU {
 				// ignore all other words
 			}
 		}
-	}
-
-	public void setLists(LinkedList<WordIU> unusedWords,
-			LinkedList<ActionIU> performedActions) {
-		this.unusedWords = unusedWords;
-		this.performedActions = performedActions;
 	}
 
 	/** 
@@ -66,9 +65,9 @@ public class NLU {
 	 * at least three consecutive NORMAL or STRONG actions
 	 */
 	public void understandUnusedWordsOnCommit() {
-		Modifier strengthModifier = Modifier.NONE;
+		ActionStrength strengthModifier = ActionStrength.NONE;
 		if (unusedWords.size() > 0) {
-			for (ListIterator<WordIU> it = unusedWords.listIterator(); it.hasNext();) {
+			for (Iterator<WordIU> it = unusedWords.iterator(); it.hasNext();) {
 				WordIU iu = it.next();
 				if (isModifierWord(iu)) {
 					strengthModifier = getModifierValue(iu, strengthModifier);
@@ -77,7 +76,7 @@ public class NLU {
 			}
 			if (strengthModifier.isNormalDistance()) {
 				ActionIU sll = performedActions.peekLast();
-				ActionIU action = new ActionIU(sll, new LinkedList<WordIU>(unusedWords), ActionType.CONTINUE, strengthModifier);
+				ActionIU action = new ActionIU(sll, new ArrayList<WordIU>(unusedWords), ActionType.CONTINUE, strengthModifier);
 				performedActions.addLast(action);
 				unusedWords.clear();
 			}
@@ -128,7 +127,7 @@ public class NLU {
 		}
 		if (counter >= 3) {
 			logger.debug("adding max action");
-			ActionIU action = new ActionIU(ultimateAction, null, ActionType.CONTINUE, Modifier.MAX);
+			ActionIU action = new ActionIU(ultimateAction, null, ActionType.CONTINUE, ActionStrength.MAX);
 			performedActions.addLast(action);	
 		}
 	}
@@ -137,20 +136,20 @@ public class NLU {
 	 * we only interpret the very last modifier word; that is, things like
 	 * "sehr weit" are handled just like "weit"
 	 * 
-	 * TODO: "ganz weit nach" should really be interpreted like "ganz nach", not like "weit nach"
+	 * "ganz weit nach" should really be interpreted like "ganz nach", not like "weit nach"
 	 * at the same time, "ganz bisschen" *should* be interpreted like "bisschen"
 	 * in other words: max followed by strong should remain strong.
 	 * @param word the word to be interpreted
 	 * @param strengthModifier the previous modifier value
 	 */
-	private Modifier getModifierValue(WordIU word, Modifier strengthModifier) {
+	private ActionStrength getModifierValue(WordIU word, ActionStrength strengthModifier) {
 		assert isModifierWord(word);
 		AVPair sem = word.getAVPairs().get(0);
-		if (sem.getValue().equals("weak")) return Modifier.WEAK;
-		if (sem.getValue().equals("regular")) return Modifier.NORMAL;
+		if (sem.getValue().equals("weak")) return ActionStrength.WEAK;
+		if (sem.getValue().equals("regular")) return ActionStrength.NORMAL;
 		if (sem.getValue().equals("strong"))
-			return (strengthModifier == Modifier.MAX) ? Modifier.MAX : Modifier.STRONG; 
-		if (sem.getValue().equals("max")) return Modifier.MAX; 
+			return (strengthModifier == ActionStrength.MAX) ? ActionStrength.MAX : ActionStrength.STRONG; 
+		if (sem.getValue().equals("max")) return ActionStrength.MAX; 
 		throw new RuntimeException("panic: " + sem.getValue());
 	}
 

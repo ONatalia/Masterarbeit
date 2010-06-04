@@ -26,13 +26,12 @@ public class GreifarmExperiment implements DropListener {
 	private static final int MAX_GAMES = 1;
 	
 	Random random;
-	CurrentASRHypothesis casrh;
-	List<ASRWordDeltifier> deltifiers;
-	RecoRunner rr;
-	GreifarmActor ga;
-	GreifarmController gc;
-	GameScore gameScore;
-	SpeechStateVisualizer ssv;
+	private CurrentASRHypothesis casrh;
+	private List<ASRWordDeltifier> deltifiers;
+	private RecoRunner rr;
+	private GreifarmActor ga;
+	private GameScore gameScore;
+	private SpeechStateVisualizer ssv;
 	
 	HashMap<ASRWordDeltifier, List<Score>> testResult = new HashMap<ASRWordDeltifier, List<Score>>();
 	
@@ -145,6 +144,14 @@ public class GreifarmExperiment implements DropListener {
 		ga.processorReset();		
 	}
 	
+	void sleep(int time) {
+		try {
+			Thread.sleep(time);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}		
+	}
+	
 	@Override
 	public void notifyDrop(final GameScore gameScore) {
 		gameCount++;
@@ -157,11 +164,7 @@ public class GreifarmExperiment implements DropListener {
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						try {
-							Thread.sleep(600);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+						sleep(600);
 						showDialog();
 					}
 				});
@@ -172,11 +175,7 @@ public class GreifarmExperiment implements DropListener {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					try {
-						Thread.sleep(600);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+					sleep(600);
 					nextRound();
 				}				
 			}, "advance to next round with delay").start();

@@ -1,6 +1,6 @@
 package org.cocolab.inpro.greifarm;
 
-public enum Modifier {
+public enum ActionStrength {
 	NONE, WEAK, NORMAL, STRONG, MAX;
 	
 	double getDistance() {
@@ -16,6 +16,6 @@ public enum Modifier {
 	
 	/** a distance that is neither 0 nor infinity */
 	boolean isNormalDistance() {
-		return this != Modifier.NONE && this != Modifier.MAX;
+		return this != ActionStrength.NONE && this != ActionStrength.MAX;
 	}
 }

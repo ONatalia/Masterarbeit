@@ -13,7 +13,7 @@ public class ActionIU extends IU {
 	private ActionType type = ActionType.STOP;
 	private boolean precedesPause = false;
 	// store the extent of this action
-	private Modifier modifier = Modifier.NORMAL;
+	private ActionStrength actionStrength = ActionStrength.NORMAL;
 	/** store the start position to be able to go back later */
 	/** store the planned goal position */
 	protected double goalPosition;
@@ -25,7 +25,7 @@ public class ActionIU extends IU {
 	}
 	
 	@SuppressWarnings("unchecked")
-	ActionIU(ActionIU sll, List<? extends IU> groundingWords, ActionType type, Modifier strengthModifier) {
+	ActionIU(ActionIU sll, List<? extends IU> groundingWords, ActionType type, ActionStrength strengthModifier) {
 		super(sll, (List<IU>) groundingWords);
 		// we'll get this from the predecessor, it's only required for StartActionIU
 		this.type = type;
@@ -40,17 +40,17 @@ public class ActionIU extends IU {
 			// if that is the case, we have to revert the action associated with "weiter" and 
 			if (sll.realizedDirection() != type) {  
 				sll.update(EditType.REVOKE);
-				this.modifier = strengthModifier;
+				this.actionStrength = strengthModifier;
 			} else {
-				this.modifier = Modifier.NONE;
+				this.actionStrength = ActionStrength.NONE;
 			}
 		} else {
-			this.modifier = strengthModifier;
+			this.actionStrength = strengthModifier;
 		}
 		// setup goalPosition
 		switch (realizedDirection()) { 
-		case LEFT: goalPosition = greifarm.getGoalPosition(-modifier.getDistance()); break;
-		case RIGHT: goalPosition = greifarm.getGoalPosition(modifier.getDistance()); break;
+		case LEFT: goalPosition = greifarm.getGoalPositionFor(-actionStrength.getDistance()); break;
+		case RIGHT: goalPosition = greifarm.getGoalPositionFor(actionStrength.getDistance()); break;
 		case DROP: // will be handled in execute() break;
 		case STOP: // will be handled in execute() break;
 		default: // ignore CONTINUE and REVERSE if they can't be resolved
@@ -119,7 +119,7 @@ public class ActionIU extends IU {
 	}
 	
 	public boolean isWeak() {
-		return modifier == Modifier.WEAK || modifier == Modifier.NONE;
+		return actionStrength == ActionStrength.WEAK || actionStrength == ActionStrength.NONE;
 	}
 	
 	public void precedesPause(boolean precedesPause) {
@@ -129,13 +129,12 @@ public class ActionIU extends IU {
 	
 	@Override
 	public String toPayLoad() {
-		return "Action " + type + " with strength " + modifier;
+		return "Action " + type + " with strength " + actionStrength;
 	}
 	
 	@Override
 	public void update(EditType edit) {
 		if (edit == EditType.REVOKE) {
-			// TODO: revert the action
 			logger.debug("reverted: " + toString());
 			switch (type) {
 			case DROP: 
