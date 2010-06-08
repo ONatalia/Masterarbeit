@@ -371,4 +371,10 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		logger.debug("SETTING COLLECT TIME (ms) TO " + ((collectTime - startTime) / 10));
 	}
 	
+	@Override
+	public String toString() {
+		return "basic ASRWordDeltifier";
+	}
+	
+	
 }

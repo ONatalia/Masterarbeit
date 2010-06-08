@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 public class Label {
 	
 	public static final Set<String> SILENCE = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			"<sil>", "SIL", "<p:>", "<s>", "</s>", "")));
+			"<sil>", "SIL", "<p:>", "<s>", "</s>", "", "_")));
 
 	private final double start; // in seconds
 	private final double end; // in seconds

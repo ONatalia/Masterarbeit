@@ -62,12 +62,10 @@ public class WordCatcher implements PushBuffer {
 	public void reset() {
 		
 	}
-
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
-		listeners = (List<PushBuffer>) ps.getComponentList(PROP_HYP_CHANGE_LISTENERS);
+		listeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
 		wordToCatch = (String) ps.getString(PROP_WORD_TO_CATCH);
 	}
 

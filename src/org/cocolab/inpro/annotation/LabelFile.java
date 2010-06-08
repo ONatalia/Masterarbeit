@@ -1,10 +1,13 @@
 package org.cocolab.inpro.annotation;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,13 +23,20 @@ public class LabelFile {
 	 * @throws IOException 
      */
     public static List<String> getLines(String labelFile, int skip) throws IOException {
+        try {
+        	return getLines(new FileInputStream(labelFile), skip);
+        } catch (FileNotFoundException ioe) {
+        	System.err.println("File not found: " + labelFile);
+//        	ioe.printStackTrace();
+        }
+        return Collections.<String>emptyList();
+    }
+    
+    public static List<String> getLines(InputStream is, int skip) throws IOException {
         int curCount = skip;
         List<String> list = new ArrayList<String>();
-        try {
-	        BufferedReader reader = new BufferedReader(new FileReader(labelFile));
-	        
+	        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 	        String line = null;
-	        
 	        while ((line = reader.readLine()) != null) {
 	            if (line.length() > 0) {
 	                if (++curCount >= skip) {
@@ -36,10 +46,6 @@ public class LabelFile {
 	            }
 			}
 			reader.close();
-        } catch (FileNotFoundException ioe) {
-        	System.err.println("File not found: " + labelFile);
-//        	ioe.printStackTrace();
-        }
         return list;
     }
     

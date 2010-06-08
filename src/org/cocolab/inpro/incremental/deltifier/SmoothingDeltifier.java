@@ -228,5 +228,10 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 			 && this.edit.getIU().wordEquals(edit.getIU());
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "SmoothingDeltifier with factor " + smoothing;
+	}
 	
 }

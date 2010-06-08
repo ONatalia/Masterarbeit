@@ -50,4 +50,9 @@ public class FixedLagDeltifier extends ASRWordDeltifier {
 		return newTokens;
 	}
 	
+	@Override
+	public String toString() {
+		return "FixedLagDeltifier with lag " + fixedLag;
+	}
+	
 }

@@ -6,14 +6,14 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 import edu.cmu.sphinx.decoder.ResultListener;
 import edu.cmu.sphinx.decoder.ResultProducer;
+import edu.cmu.sphinx.instrumentation.Monitor;
 import edu.cmu.sphinx.recognizer.Recognizer;
-import edu.cmu.sphinx.recognizer.RecognizerState;
 import edu.cmu.sphinx.recognizer.StateListener;
+import edu.cmu.sphinx.recognizer.Recognizer.State;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -25,7 +25,10 @@ import edu.cmu.sphinx.util.props.S4Integer;
  * read listeners from configuration, listen in on Recognizer, 
  * then dispatch resultListeners on separate threads on newResult 
  */
-public class ThreadingListener implements ResultListener, ResultProducer, StateListener {
+public class ThreadingListener implements ResultListener, 
+                                          ResultProducer,
+                                          StateListener,
+                                          Monitor {
 
 	@S4Component(type = ResultProducer.class)
 	public final static String PROP_RECOGNIZER = "recognizer";
@@ -63,19 +66,17 @@ public class ThreadingListener implements ResultListener, ResultProducer, StateL
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		logger = Logger.getLogger(ThreadingListener.class);
-		BasicConfigurator.configure();
-        recognizer = (ResultProducer) ps.getComponent(PROP_RECOGNIZER);
+		recognizer = (ResultProducer) ps.getComponent(PROP_RECOGNIZER);
         recognizer.addResultListener(this);
         if (recognizer instanceof Recognizer) {
         	((Recognizer) recognizer).addStateListener(this);
         }
         queueSize = ps.getInt(PROP_QUEUE_SIZE);
         @SuppressWarnings("unused")
-		List<ResultListener> resultListeners = (List<ResultListener>) ps.getComponentList(PROP_LISTENERS);
+		List<ResultListener> resultListeners = ps.getComponentList(PROP_LISTENERS, ResultListener.class);
 	}
 	
 	@Override
@@ -96,8 +97,8 @@ public class ThreadingListener implements ResultListener, ResultProducer, StateL
 	}
 	
 	@Override
-	public void statusChanged(RecognizerState status) {
-		if (status == RecognizerState.DEALLOCATING) {
+	public void statusChanged(State status) {
+		if (status == State.DEALLOCATING) {
 			for (ResultListener listener : listenerThreads.keySet()) {
 				removeResultListener(listener);
 			}

@@ -189,4 +189,9 @@ public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 		System.out.println("I got the following IUs: " + wasd.getWordIUs());
 		
 	}
+	
+	@Override
+	public String toString() {
+		return "WordAdaptiveSmoothingDeltifier, see your config for details."; 
+	}
 }

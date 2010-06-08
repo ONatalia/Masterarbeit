@@ -37,7 +37,8 @@ public class ResultUtil {
 	 * @return a list of tokens of word and/or unit tokens NOTICE: that no provisions
 	 * are taken to ensure that there are the "right" segment tokens for every word,
 	 * especially, no provisions are taken to assert that each silence segment is 
-	 * accompanied by a silence word
+	 * accompanied by a silence word &rarr; it turns out that (at least for LexTree),
+	 * SIL tokens are usually not preceded by &lt;sil&gt; words. 
 	 */
 	public static List<Token> getTokenList(Token inputToken, boolean words, boolean units) {
 		ArrayList<Token> outputTokens = new ArrayList<Token>();

@@ -36,7 +36,7 @@ import edu.cmu.sphinx.util.props.S4String;
  * recognizing is so time consuming 
  * 
  * why not have a recognizer that doesn't recognize at all,
- * fakes results from a given transcription,
+ * but fakes results from a given transcription,
  * just consumes frames from the frontend 
  * and calls event listeners and monitors as needed
  * 
@@ -164,7 +164,7 @@ public class FakeSearch extends NoSearch {
 			if (t == null) {
 				t = new Token(searchState, frameNumber);
 			} else {
-				t = t.child(searchState, 0.0f, 0.0f, 0.0f, frameNumber);
+				t = new Token(t, searchState, 0.0f, 0.0f, 0.0f, frameNumber);
 			}
 			sortedTokenList.add(t);
 			i = 0;
@@ -172,7 +172,7 @@ public class FakeSearch extends NoSearch {
 				Unit unit = units[i++];
 				searchState = new UnitState(unit, null);
 				frameNumber = (int) Math.round(unitLabel.getStart() * 100);
-				t = t.child(searchState, 0.0f, 0.0f, 0.0f, frameNumber);
+				t = new Token(t, searchState, 0.0f, 0.0f, 0.0f, frameNumber);
 				sortedTokenList.add(t);				
 			}
 		}

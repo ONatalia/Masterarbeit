@@ -54,9 +54,8 @@ public abstract class AbstractFloorTracker implements PushBuffer {
 	public void reset() {  }
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void newProperties(PropertySheet ps) throws PropertyException {
-		listeners = (List<Listener>) ps.getComponentList(PROP_STATE_LISTENERS); 
+		listeners = ps.getComponentList(PROP_STATE_LISTENERS, Listener.class); 
 	}
 
 	protected void signalListeners(InternalState state, Signal signal) {

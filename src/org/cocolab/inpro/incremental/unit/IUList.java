@@ -52,11 +52,11 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  							: "better sort your IUs: " + this + edit;
  				this.add(edit.getIU()); 
  				break;
- 			case REVOKE: 
- 				assert size() > 0 : "Can't revoke from an empty list: " + edit;
- 				assert (get(size() - 1)).equals(edit.getIU()) : "Can't apply this edit to the list: " + this + edit;
+ 			case REVOKE: // assertion errors on REVOKE seem to only happen as a consequence of earlier errors on ADD
+ 				assert !isEmpty() : "Can't revoke from an empty list: " + edit;
+ 				assert getLast().equals(edit.getIU()) : "Can't apply this edit to the list: " + this + edit;
  				this.remove(size() - 1);
- 				break;
+				break;
  			case COMMIT:
  				// don't do anything on commit
  				break;
@@ -79,12 +79,19 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  	
  	public void add(IUType e, boolean deepSLL) {
  		if (deepSLL) {
- 			e.connectSLL(get(size()));
+ 			e.connectSLL(getLast());
  		} else {
- 			e.setSameLevelLink(get(size()));
+ 			e.setSameLevelLink(getLast());
  		}
  		add(e);
  	}
+
+	public IUType getLast() {
+		if (isEmpty()) 
+			return null;
+		else
+			return get(size() - 1);
+	}
 	
  	@Override
  	public void clear() {

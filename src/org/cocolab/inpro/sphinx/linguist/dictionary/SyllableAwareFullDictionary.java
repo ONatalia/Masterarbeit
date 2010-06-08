@@ -24,6 +24,7 @@ import java.util.Map;
 import edu.cmu.sphinx.linguist.acoustic.Unit;
 import edu.cmu.sphinx.linguist.dictionary.FullDictionary;
 import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
+import edu.cmu.sphinx.linguist.dictionary.Word;
 import edu.cmu.sphinx.util.ExtendedStreamTokenizer;
 
 public class SyllableAwareFullDictionary extends FullDictionary {
@@ -48,10 +49,9 @@ public class SyllableAwareFullDictionary extends FullDictionary {
      * @param isFillerDict true if this is a filler dictionary, false otherwise
      * @throws java.io.IOException if there is an error reading the dictionary
      */
-    @SuppressWarnings({"unchecked"})
-    protected Map<String, Object> loadDictionary(InputStream inputStream, boolean isFillerDict)
+    protected Map<String, Word> loadDictionary(InputStream inputStream, boolean isFillerDict)
             throws IOException {
-        Map<String, Object> dictionary = new HashMap<String, Object>();
+        Map<String, List<Pronunciation>> dictionary = new HashMap<String, List<Pronunciation>>();
         ExtendedStreamTokenizer est = new ExtendedStreamTokenizer(inputStream,
                 true);
         String word;
@@ -82,8 +82,8 @@ public class SyllableAwareFullDictionary extends FullDictionary {
         }
         inputStream.close();
         est.close();
-        createWords(dictionary, isFillerDict);
-        return dictionary;
+        HashMap<String, Word> wordDictionary = createWords(dictionary, isFillerDict);
+        return wordDictionary;
     }
     
 }

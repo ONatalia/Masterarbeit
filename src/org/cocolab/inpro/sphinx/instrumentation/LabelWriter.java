@@ -24,12 +24,13 @@ import edu.cmu.sphinx.linguist.UnitSearchState;
 import edu.cmu.sphinx.linguist.WordSearchState;
 import edu.cmu.sphinx.linguist.lextree.LexTreeLinguist;
 import edu.cmu.sphinx.recognizer.Recognizer;
-import edu.cmu.sphinx.recognizer.RecognizerState;
 import edu.cmu.sphinx.recognizer.StateListener;
+import edu.cmu.sphinx.recognizer.Recognizer.State;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.decoder.ResultListener;
 import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.util.props.Configurable;
+import edu.cmu.sphinx.instrumentation.Monitor;
 import edu.cmu.sphinx.instrumentation.Resetable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -44,7 +45,8 @@ import edu.cmu.sphinx.util.props.S4String;
 public class LabelWriter implements Configurable,
 						            ResultListener,
 						            Resetable,
-						            StateListener {
+						            StateListener,
+									Monitor  {
     /**
      * A Sphinx property that defines which recognizer to monitor
      */
@@ -310,10 +312,11 @@ public class LabelWriter implements Configurable,
     	step += stepWidth;
     }
 
-    public void statusChanged(RecognizerState status) {
-		if (status == RecognizerState.RECOGNIZING) {
+	@Override
+	public void statusChanged(State status) {
+		if (status == State.RECOGNIZING) {
 			step = 0;
 		}
-    }
+	}
     
 }

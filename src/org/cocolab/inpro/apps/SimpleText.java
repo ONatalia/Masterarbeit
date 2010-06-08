@@ -140,8 +140,7 @@ public class SimpleText extends JPanel implements ActionListener {
     	final ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
     	PropertySheet ps = cm.getPropertySheet(PROP_CURRENT_HYPOTHESIS);
     	final TextBasedFloorTracker textBasedFloorTracker = (TextBasedFloorTracker) cm.lookup(PROP_FLOOR_MANAGER);
-    	@SuppressWarnings("unchecked")
-    	final List<PushBuffer> hypListeners = (List<PushBuffer>) ps.getComponentList(PROP_HYP_CHANGE_LISTENERS);
+    	final List<PushBuffer> hypListeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
     	if (clp.hasTextFromReader()) { // if we already know the text:
     		logger.info("running in non-interactive mode");
     		// run non-interactively
