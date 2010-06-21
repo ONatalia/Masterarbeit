@@ -17,6 +17,10 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	public RecoCommandLineParser(String[] args) {
 		super(args);
 	}
+	
+	public RecoCommandLineParser() {
+		this(new String[0]);
+	}
 
 	int recoMode;
 	

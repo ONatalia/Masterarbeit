@@ -29,6 +29,10 @@ public class WavTEDLogger extends WavWriter {
     
     private String mostRecentFilename;
     
+    public WavTEDLogger() {
+    	dumpFilePath = "";
+    }
+    
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);

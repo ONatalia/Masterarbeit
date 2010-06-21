@@ -8,8 +8,8 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.AudioFormat.Encoding;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.cocolab.inpro.apps.util.RecoCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.incremental.PushBuffer;
@@ -31,7 +31,49 @@ public class SimpleReco {
 	
 	private static final Logger logger = Logger.getLogger(SimpleReco.class);
 	
-	private static void setupDeltifier(ConfigurationManager cm, RecoCommandLineParser clp) {
+	private final RecoCommandLineParser clp;
+	private final ConfigurationManager cm;
+	private final Recognizer recognizer;
+	
+	public SimpleReco() throws PropertyException, IOException, InstantiationException, UnsupportedAudioFileException {
+		this(new RecoCommandLineParser());
+	}
+	
+	public SimpleReco(ConfigurationManager cm) throws PropertyException, IOException, InstantiationException, UnsupportedAudioFileException {
+		this(cm, new RecoCommandLineParser());
+	}
+	
+	public SimpleReco(RecoCommandLineParser clp) throws PropertyException, IOException, InstantiationException, UnsupportedAudioFileException {
+		this(new ConfigurationManager(clp.getConfigURL()), clp);
+	}
+	
+	public SimpleReco(ConfigurationManager cm, RecoCommandLineParser clp) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException {
+		this.clp = clp;
+		this.cm = cm;
+    	setupDeltifier();
+    	this.recognizer = (Recognizer) cm.lookup("recognizer");
+    	assert recognizer != null;
+
+    	setupReco();
+    	allocateRecognizer();
+    	logger.info("Setting up source...");
+    	setupSource();
+    	logger.info("Setting up monitors...");
+    	setupMonitors();
+    	if (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
+    		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
+    		while(true) {
+    			recognizeOnce();
+	    		recognizer.resetMonitors();
+    		}
+    	} else {
+    		recognizeOnce();
+    	}
+    	recognizer.deallocate();
+    	System.exit(0);
+	}
+	
+	private void setupDeltifier() {
 		String ASRfilter;
 		switch (clp.getIncrementalMode()) {
 			case RecoCommandLineParser.FIXEDLAG_INCREMENTAL : ASRfilter = "fixedLag"; break;
@@ -87,7 +129,8 @@ public class SimpleReco {
 		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
 	}
 	
-	public static void setupMicrophoneWithEndpointing(ConfigurationManager cm) {
+	public void setupMicrophoneWithEndpointing() {
+		allocateRecognizer();
     	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
 		final Microphone mic = (Microphone) cm.lookup("microphone");
 		FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
@@ -95,14 +138,20 @@ public class SimpleReco {
 		endpoint.initialize();
 		setupMicrophone(mic);
 		fe.setPredecessor(endpoint);
-		
 	}
 	
-	protected static void setupSource(ConfigurationManager cm, RecoCommandLineParser clp) throws InstantiationException, PropertyException, UnsupportedAudioFileException, IOException {
+	public void allocateRecognizer() {
+		if (recognizer.getState() == Recognizer.State.DEALLOCATED) {
+	    	logger.info("Allocating recognizer...");
+			recognizer.allocate();
+		}
+	}
+	
+	protected void setupSource() throws InstantiationException, PropertyException, UnsupportedAudioFileException, IOException {
     	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
 		switch (clp.getInputMode()) {
 			case RecoCommandLineParser.MICROPHONE_INPUT:
-				setupMicrophoneWithEndpointing(cm);
+				setupMicrophoneWithEndpointing();
 			break;
 			case RecoCommandLineParser.RTP_INPUT:
 				RtpRecvProcessor rtp = (RtpRecvProcessor) cm.lookup("RTPDataSource");
@@ -127,7 +176,7 @@ public class SimpleReco {
 				AudioFormat f = ais.getFormat();
 				if (f.getChannels() != 1 ||
 					!(f.getEncoding().equals(Encoding.PCM_SIGNED) || f.getEncoding().toString().equals("FLAC")) || 
-					f.getSampleRate() != 16000 ||
+					Math.abs(f.getSampleRate() - 16000f) > 1f ||
 					f.getSampleSizeInBits() != 16) {
 					logger.fatal("Your audio is not in the right format:\nYou must use mono channel,\nPCM signed data,\nsampled at 16000 Hz,\nwith 2 bytes per sample.\nExiting...");
 					logger.info("channels: " + f.getChannels());
@@ -141,7 +190,7 @@ public class SimpleReco {
 		}
 	}
 	
-	private static void setupReco(ConfigurationManager cm, RecoCommandLineParser clp) throws IOException {
+	private void setupReco() throws IOException {
     	if (clp.isRecoMode(RecoCommandLineParser.FORCED_ALIGNER_RECO)) {
     		logger.info("Running in forced alignment mode.");
     		logger.info("Will try to recognize: " + clp.getReference());
@@ -162,7 +211,7 @@ public class SimpleReco {
     	}
 	}
 
-	private static void setupMonitors(ConfigurationManager cm, RecoCommandLineParser clp) throws InstantiationException, PropertyException {
+	private void setupMonitors() throws InstantiationException, PropertyException {
 		if (clp.matchesOutputMode(RecoCommandLineParser.OAA_OUTPUT)) {
 			cm.lookup("newWordNotifierAgent");
 		}
@@ -182,7 +231,7 @@ public class SimpleReco {
 		}
 	}
 	
-	private static void recognizeOnce(Recognizer recognizer, RecoCommandLineParser clp) {
+	private void recognizeOnce() {
 		Result result = null;
     	do {
     		if (clp.ignoreErrors()) {
@@ -205,32 +254,13 @@ public class SimpleReco {
 	}
 	
 	public static void main(String[] args) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException {
-		BasicConfigurator.configure();
-		//PropertyConfigurator.configure("log4j.properties");
-		
+		PropertyConfigurator.configure("log4j.properties");
     	RecoCommandLineParser clp = new RecoCommandLineParser(args);
     	if (!clp.parsedSuccessfully()) { System.exit(1); }
-    	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
-    	setupDeltifier(cm, clp);
+    	new SimpleReco(clp);
+	}
 
-    	setupReco(cm, clp);
-    	Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
-    	recognizer.allocate();
-    	logger.info("Setting up source...");
-    	setupSource(cm, clp);
-    	logger.info("Setting up monitors...");
-    	setupMonitors(cm, clp);
-    	if (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
-    		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
-    		while(true) {
-    			recognizeOnce(recognizer, clp);
-	    		recognizer.resetMonitors();
-    		}
-    	} else {
-    		recognizeOnce(recognizer, clp);
-    	}
-    	recognizer.deallocate();
-    	System.exit(0);
-    }
-
+	public Recognizer getRecognizer() {
+		return recognizer;
+	}
 }

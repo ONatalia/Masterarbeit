@@ -38,9 +38,14 @@ public class GreifarmExperiment implements DropListener {
 	int gameCount = 0;
 	
 	public GreifarmExperiment(ConfigurationManager cm) {
-    	Recognizer recognizer = (Recognizer) cm.lookup("recognizer");
-    	recognizer.allocate();
-		SimpleReco.setupMicrophoneWithEndpointing(cm);
+    	SimpleReco simpleReco;
+		try {
+			simpleReco = new SimpleReco(cm);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		simpleReco.setupMicrophoneWithEndpointing();
 		ssv = (SpeechStateVisualizer) cm.lookup("speechStateVisualizer");
 		ga = (GreifarmActor) cm.lookup("greifarmActor");
 		ga.greifarmController.dropListener = this;
@@ -55,7 +60,7 @@ public class GreifarmExperiment implements DropListener {
 			testResult.put(deltifier, new ArrayList<Score>());
 		}
 		random = new Random();
-		rr = new RecoRunner(recognizer);
+		rr = new RecoRunner(simpleReco.getRecognizer());
 		(new Thread(rr, "recognizer thread")).start();
 		showDialog();
 		
@@ -65,8 +70,6 @@ public class GreifarmExperiment implements DropListener {
 			}
 		};
 		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook, "shutdown thread"));
-
-		
 	}
 	
 	private class RecoRunner implements Runnable {
