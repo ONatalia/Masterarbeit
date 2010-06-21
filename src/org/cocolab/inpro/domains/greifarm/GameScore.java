@@ -1,4 +1,4 @@
-package org.cocolab.inpro.greifarm;
+package org.cocolab.inpro.domains.greifarm;
 
 import javax.swing.JLabel;
 

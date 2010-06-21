@@ -1,4 +1,4 @@
-package org.cocolab.inpro.greifarm;
+package org.cocolab.inpro.domains.greifarm;
 
 public enum ActionStrength {
 	NONE, WEAK, NORMAL, STRONG, MAX;

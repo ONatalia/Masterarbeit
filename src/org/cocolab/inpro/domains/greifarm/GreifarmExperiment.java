@@ -1,4 +1,4 @@
-package org.cocolab.inpro.greifarm;
+package org.cocolab.inpro.domains.greifarm;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -47,8 +47,8 @@ public class GreifarmExperiment implements DropListener {
 		gameScore = ga.gameScore;
 		casrh = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
 		deltifiers = new ArrayList<ASRWordDeltifier>(3);
-		deltifiers.add((ASRWordDeltifier) cm.lookup("none"));
-		deltifiers.add((ASRWordDeltifier) cm.lookup("smoothing"));
+//		deltifiers.add((ASRWordDeltifier) cm.lookup("none"));
+//		deltifiers.add((ASRWordDeltifier) cm.lookup("smoothing"));
 		deltifiers.add((ASRWordDeltifier) cm.lookup("adaptivesmoothing"));
 		logger.debug("i've got the following deltifiers to chose from: " + deltifiers);
 		for (ASRWordDeltifier deltifier : deltifiers) {

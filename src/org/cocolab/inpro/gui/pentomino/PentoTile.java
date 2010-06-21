@@ -6,7 +6,7 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.lang.String;
 
-import org.cocolab.inpro.domain.Posture;
+import org.cocolab.inpro.domains.pentomino.Posture;
 import org.cocolab.inpro.gui.Point;
 import org.cocolab.inpro.gui.Tile;
 
