@@ -10,6 +10,7 @@ import javax.sound.sampled.AudioFormat.Encoding;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.cocolab.inpro.apps.util.MonitorCommandLineParser;
 import org.cocolab.inpro.apps.util.RecoCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.incremental.PushBuffer;
@@ -60,17 +61,6 @@ public class SimpleReco {
     	setupSource();
     	logger.info("Setting up monitors...");
     	setupMonitors();
-    	if (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
-    		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
-    		while(true) {
-    			recognizeOnce();
-	    		recognizer.resetMonitors();
-    		}
-    	} else {
-    		recognizeOnce();
-    	}
-    	recognizer.deallocate();
-    	System.exit(0);
 	}
 	
 	private void setupDeltifier() {
@@ -229,9 +219,23 @@ public class SimpleReco {
 			cm.lookup("memoryTracker");
 			cm.lookup("speedTracker");
 		}
+		// this is a little hacky, but so be it
+		if (clp.matchesOutputMode(RecoCommandLineParser.DISPATCHER_OBJECT_OUTPUT)) {
+			MonitorCommandLineParser clp = new MonitorCommandLineParser(new String[] {
+					"-S", "-M"
+				});
+			clp.setInputMode(MonitorCommandLineParser.DISPATCHER_OBJECT_INPUT);
+			try {
+				new SimpleMonitor(clp, cm);
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+		}
 	}
 	
-	private void recognizeOnce() {
+	/** call this if you want a single recognition */
+	public void recognizeOnce() {
 		Result result = null;
     	do {
     		if (clp.ignoreErrors()) {
@@ -253,14 +257,32 @@ public class SimpleReco {
     	} while ((result != null) && (result.getDataFrames() != null) && (result.getDataFrames().size() > 4));
 	}
 	
+	/** call this if you want recognition to loop forever */
+	public void recognizeInfinitely() {
+		while(true) {
+			recognizeOnce();
+    		recognizer.resetMonitors();
+		}		
+	}
+	
+	/** call this if you want to implement recognition looping yourself */ 
+	public Recognizer getRecognizer() {
+		return recognizer;
+	}
+	
 	public static void main(String[] args) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException {
 		PropertyConfigurator.configure("log4j.properties");
     	RecoCommandLineParser clp = new RecoCommandLineParser(args);
     	if (!clp.parsedSuccessfully()) { System.exit(1); }
-    	new SimpleReco(clp);
+    	SimpleReco simpleReco = new SimpleReco(clp);
+    	if (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
+    		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
+    		simpleReco.recognizeInfinitely();
+    	} else {
+    		simpleReco.recognizeOnce();
+    	}
+    	simpleReco.getRecognizer().deallocate();
+    	System.exit(0);
 	}
 
-	public Recognizer getRecognizer() {
-		return recognizer;
-	}
 }

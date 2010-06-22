@@ -35,7 +35,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	void printUsage() {
 		System.err.println("simple sphinx recognizer for the inpro project");
 		System.err.println("usage: java org.cocolab.inpro.apps.SimpleReco");
-		System.err.println("options:");
+		System.err.println("general options:");
 		System.err.println("    -h	           this screen");
 		System.err.println("    -c <URL>       sphinx configuration file to use (reasonable default)");
 		System.err.println("    -v             more verbose output (speed and memory tracker)");
@@ -44,20 +44,25 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -M             read data from microphone");
 		System.err.println("    -R <port>      read data from RTP");
 		System.err.println("    -F <fileURL>   read data from sound file with given URL");
+//		System.err.println("dialogue system options:");
+//		System.err.println("    -D configname  use the named dialogue manager (see documentation)");
 		System.err.println("output selection:");
+		System.err.println("    -O             output dialogue system responses");
 		System.err.println("    -A             send add/revokeWord messages via OAA");
 		System.err.println("    -T             send incremental hypotheses to TEDview");
 		System.err.println("    -L             incremental output using LabelWriter");
-		System.err.println("    -C             show current incremental ASR hypothesis");
 		System.err.println("incrementality options:");
 		System.err.println("                   by default, incremental results are generated at every frame");
 		System.err.println("    -N             no incremental output");
 		System.err.println("    -Is <n>        apply smoothing factor");
 		System.err.println("    -If <n>        apply fixed lag");
 		System.err.println("    -In            no result smoothing/lagging, DEFAULT");
-		System.err.println("special modes:");
+		System.err.println("    -C             show current incremental ASR hypothesis");
+		System.err.println("special recognition modes:");
 		System.err.println("    -fa <text>     do forced alignment with the given reference text");
 		System.err.println("    -tg <file>     do fake recognition from the given reference textgrid");
+//		System.err.println("    -gr <URL>      recognize using the given JSGF grammar");
+//		System.err.println("    -lm <URL>      recognize using the given language model");
 	}
 
 	/*
@@ -129,6 +134,9 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-C")) {
 				outputMode |= CURRHYP_OUTPUT;
+			} 
+			else if (args[i].equals("-O")) {
+				outputMode |= DISPATCHER_OBJECT_OUTPUT;
 			}
 			else if (args[i].equals("-N")) {
 				incrementalMode = NON_INCREMENTAL;

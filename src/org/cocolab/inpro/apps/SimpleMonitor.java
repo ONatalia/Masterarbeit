@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.cocolab.inpro.apps.util.CommonCommandLineParser;
 import org.cocolab.inpro.apps.util.MonitorCommandLineParser;
-import org.cocolab.inpro.audio.OAADispatchStream;
+import org.cocolab.inpro.audio.DispatchStream;
 import org.cocolab.inpro.sphinx.frontend.ConversionUtil;
 
 import edu.cmu.sphinx.util.props.ConfigurationManager;
@@ -35,7 +35,7 @@ import gov.nist.jrtp.RtpTimeoutEvent;
 
 /**
  * SimpleMonitor is kind of a "mixer" application with several 
- * input ports (microphone, OAA-goals, RTP) and several 
+ * input ports (microphone, OAA-goals, RTP, programmatically) and several 
  * output ports (speakers or file).  
  * 
  * More or less, the software works as follows (and should probably be 
@@ -53,12 +53,18 @@ public class SimpleMonitor implements RtpListener {
 	private static final Logger logger = Logger.getLogger(SimpleMonitor.class);
 	
 	/* make these variables global, so that they are accessible from sub functions */
-	MonitorCommandLineParser clp;
+	final MonitorCommandLineParser clp;
+	final ConfigurationManager cm;
     SourceDataLine line;
     FileOutputStream fileStream;
 
     SimpleMonitor(MonitorCommandLineParser clp) throws RtpException, IOException, PropertyException, InstantiationException {
+    	this(clp, new ConfigurationManager(clp.getConfigURL()));
+    }
+
+    SimpleMonitor(MonitorCommandLineParser clp, ConfigurationManager cm) throws RtpException, IOException, PropertyException, InstantiationException {
 		this.clp = clp;
+		this.cm = cm;
 		logger.info("Setting up output stream...\n");
 		if (clp.matchesOutputMode(CommonCommandLineParser.FILE_OUTPUT)) {
 			logger.info("setting up file output to file " + clp.getAudioURL().toString());
@@ -73,12 +79,16 @@ public class SimpleMonitor implements RtpListener {
 				createRTPSource();
 			break;
 			case CommonCommandLineParser.OAA_DISPATCHER_INPUT : 
-				Runnable streamDrainer = createDispatcherSource();
-				new Thread(streamDrainer, "oaa dispatcher source").run();
+				Runnable streamDrainer = createDispatcherSource("oaaDispatchStream");
+				new Thread(streamDrainer, "oaa dispatcher source").start();
+			break;
+			case CommonCommandLineParser.DISPATCHER_OBJECT_INPUT:
+				streamDrainer = createDispatcherSource("dispatchStream");
+				new Thread(streamDrainer, "dispatcher object source").start();
 			break;
 			case CommonCommandLineParser.MICROPHONE_INPUT:
 				streamDrainer = createMicrophoneSource();
-				new Thread(streamDrainer, "microphone thread").run();
+				new Thread(streamDrainer, "microphone thread").start();
 			break;
 			default: throw new RuntimeException("oups in SimpleMonitor"); 
 		}
@@ -117,6 +127,7 @@ public class SimpleMonitor implements RtpListener {
         }
         // start the source data line
         line.start();
+        logger.info("output to speakers has started");
 	}
 	
 	/** defines the supported audio format */
@@ -182,9 +193,8 @@ public class SimpleMonitor implements RtpListener {
 	 * depending on how it is instructed via OAA
 	 * @return a Runnable that pipes its data to newData()
 	 */
-	Runnable createDispatcherSource() throws IOException, PropertyException, InstantiationException {
-    	ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
-		final OAADispatchStream ods = (OAADispatchStream) cm.lookup("oaaDispatchStream");
+	Runnable createDispatcherSource(String name) throws IOException, PropertyException, InstantiationException {
+		final DispatchStream ods = (DispatchStream) cm.lookup(name);
 		ods.initialize();
 		Runnable streamDrainer = new Runnable() {
 			@Override

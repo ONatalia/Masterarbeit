@@ -53,12 +53,6 @@
  
     <component name="RTPDataSource" type="org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor"/>
 
-    <component name="oaaDispatchStream" type="org.cocolab.inpro.audio.OAADispatchStream">
-        <property name="agentName" value="dispatchStream"/>
-        <property name="goalPrefix" value="x"/>
-        <property name="sendSilence" value="false"/>
-    </component>
-
     <component name="sessionWavWriter" type="org.cocolab.inpro.sphinx.frontend.WavTEDLogger">
         <property name="tedTrack" value="audio"/>
         <property name="outFilePattern" value="/tmp/session."/>

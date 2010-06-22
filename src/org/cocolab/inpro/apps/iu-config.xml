@@ -13,10 +13,11 @@
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
-    		<item>hypViewer</item>
-    		<item>tedNotifier</item>
-    		<item>semanticResolver</item>
 <!--
+    		<item>semanticResolver</item>
+          	<item>labelWriter2</item>
+    		<item>tedNotifier</item>
+    		<item>hypViewer</item>
 	       	<item>iuBasedFloorTracker</item>
 	       	<item>outputForSimpleText</item>
         	<item>consoleNotifier</item>
@@ -75,3 +76,15 @@
     <component name="tedNotifier" type="org.cocolab.inpro.incremental.listener.TEDviewNotifier"/>
     <component name="labelWriter2" type="org.cocolab.inpro.incremental.listener.LabelWriter"/>
     <component name="hypViewer" type="org.cocolab.inpro.incremental.listener.CurrentHypothesisViewer"/>
+
+    <component name="oaaDispatchStream" type="org.cocolab.inpro.audio.OAADispatchStream">
+        <property name="agentName" value="dispatchStream"/>
+        <property name="goalPrefix" value="x"/>
+        <property name="sendSilence" value="false"/>
+    </component>
+
+    <component name="dispatchStream" type="org.cocolab.inpro.audio.DispatchStream">
+        <property name="sendSilence" value="true"/>
+    </component>
+
+    

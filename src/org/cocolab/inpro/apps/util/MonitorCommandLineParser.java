@@ -132,4 +132,12 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 		return (outputMode & mode) == mode;
 	}
 	
+	public void setInputMode(int mode) {
+		inputMode = mode;
+	}
+	
+	public void setOutputMode(int mode) {
+		outputMode = mode;
+	}
+	
 }
