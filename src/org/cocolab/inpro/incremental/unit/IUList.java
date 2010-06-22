@@ -48,14 +48,16 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
 	public void apply(EditMessage<IUType> edit) {
  		switch (edit.type) {
  			case ADD: 
- 				assert isEmpty() || get(size() - 1).endTime() <= edit.getIU().startTime() + 0.001 // account for floating point error 
- 							: "better sort your IUs: " + this + edit;
+ 				assert isEmpty() || 
+ 				       Double.isNaN(getLast().endTime()) || // allow addition if previous ends at NaN
+ 				       getLast().endTime() <= edit.getIU().startTime() + 0.001 // account for floating point error 
+ 						: "better sort your IUs: " + this + edit;
  				this.add(edit.getIU()); 
  				break;
  			case REVOKE: // assertion errors on REVOKE seem to only happen as a consequence of earlier errors on ADD
  				assert !isEmpty() : "Can't revoke from an empty list: " + edit;
  				assert getLast().equals(edit.getIU()) : "Can't apply this edit to the list: " + this + edit;
- 				this.remove(size() - 1);
+				this.remove(size() - 1);
 				break;
  			case COMMIT:
  				// don't do anything on commit

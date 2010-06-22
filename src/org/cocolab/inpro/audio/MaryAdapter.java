@@ -21,14 +21,14 @@ import javax.sound.sampled.AudioSystem;
  * "de.timobaumann.tts.voice". The default voice is "male"
  * (i.e. we let mary decide what male voice to use)
  */
-class MaryAdapter {
+public class MaryAdapter {
 	de.dfki.lt.mary.client.MaryClient mc36;
 	marytts.client.MaryClient mc40;
 	
 	enum CompatibilityMode { mary36, mary40 };
 	CompatibilityMode compatibilityMode = CompatibilityMode.mary36;
 	
-	MaryAdapter() {
+	public MaryAdapter() {
         String serverHost = System.getProperty("server.host", "localhost");
         int serverPort = Integer.getInteger("server.port", 59125).intValue();
         try {
@@ -50,7 +50,7 @@ class MaryAdapter {
 		}
 	}
 	
-	ByteArrayOutputStream process(String text, String inputType, String outputType, String audioType, String defaultVoiceName) throws UnknownHostException, IOException {
+	public ByteArrayOutputStream process(String text, String inputType, String outputType, String audioType, String defaultVoiceName) throws UnknownHostException, IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		switch (compatibilityMode) {
 		case mary36:
@@ -69,11 +69,11 @@ class MaryAdapter {
 		}
 	}
 	
-	InputStream text2audio(String text) {
+	public InputStream text2audio(String text) {
 	    String inputType = "TEXT";
         String outputType = "AUDIO";
         String audioType = "WAVE";
-        String defaultVoiceName = System.getProperty("de.timobaumann.tts.voice", "male");
+        String defaultVoiceName = System.getProperty("inpro.tts.voice", "de2");
         ByteArrayInputStream bais = null;
 		try {
 			ByteArrayOutputStream baos = process(text, inputType, outputType, 
@@ -86,11 +86,11 @@ class MaryAdapter {
 		return bais;
 	}
 	
-	InputStream text2mbrola(String text) {
+	public InputStream text2mbrola(String text) {
         String inputType = "TEXT";
         String outputType = "MBROLA";
         String audioType = "";
-        String defaultVoiceName = System.getProperty("de.timobaumann.tts.voice", "male");
+        String defaultVoiceName = System.getProperty("inpro.tts.voice", "de2");
         ByteArrayInputStream bais = null;
 		try {
 	        ByteArrayOutputStream baos = process(text, inputType, outputType, audioType,
@@ -103,17 +103,17 @@ class MaryAdapter {
 		return bais;
 	}
 	
-	ByteArrayOutputStream marySynthese(String mbrola) throws UnknownHostException, IOException {
+	public ByteArrayOutputStream marySynthese(String mbrola) throws UnknownHostException, IOException {
         String inputType = "MBROLA";
         String outputType = "AUDIO";
         String audioType = "WAVE";
-        String defaultVoiceName = System.getProperty("de.timobaumann.tts.voice", "male");
+        String defaultVoiceName = System.getProperty("de.timobaumann.tts.voice", "de2");
         ByteArrayOutputStream baos = process(mbrola, inputType, outputType, audioType,
 			    defaultVoiceName);
 		return baos;
 	}
 	
-	AudioInputStream mbrola2audio(String mbrola) {
+	public AudioInputStream mbrola2audio(String mbrola) {
         AudioInputStream ais = null;
         try {
 	        ByteArrayOutputStream baos = marySynthese(mbrola);
@@ -125,7 +125,7 @@ class MaryAdapter {
 		return ais;
 	}
 	
-	void mbrola2file(String mbrola, File file) throws UnknownHostException, IOException {
+	public void mbrola2file(String mbrola, File file) throws UnknownHostException, IOException {
         ByteArrayOutputStream baos = marySynthese(mbrola);
 		FileOutputStream fos = new FileOutputStream(file);
 		fos.write(baos.toByteArray());

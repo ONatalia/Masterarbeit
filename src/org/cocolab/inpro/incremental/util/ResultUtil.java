@@ -31,7 +31,7 @@ public class ResultUtil {
 	 * the final output, the opposite is the case while the list is being 
 	 * constructed.
 	 * 
-	 * @param currentToken the start token (that is, the last in time)
+	 * @param inputToken the start token (that is, the last in time)
 	 * @param words whether word tokens should be returned
 	 * @param units whether unit tokens hsould be returned
 	 * @return a list of tokens of word and/or unit tokens NOTICE: that no provisions

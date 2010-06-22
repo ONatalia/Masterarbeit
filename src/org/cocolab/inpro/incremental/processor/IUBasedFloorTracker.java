@@ -32,7 +32,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 	
 	TimeOutThread timeOutThread;
 
-	/* @see org.cocolab.inpro.incremental.processor.AbstractFloorTracker#newProperties(edu.cmu.sphinx.util.props.PropertySheet) */
+	/** @see org.cocolab.inpro.incremental.processor.AbstractFloorTracker#newProperties(edu.cmu.sphinx.util.props.PropertySheet) */
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
@@ -42,8 +42,11 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 	}
 
 
-	/* (non-Javadoc)
-	 * @see org.cocolab.inpro.incremental.processor.AbstractFloorTracker#hypChange(java.util.Collection, java.util.List)
+	/** 
+	 * handles creation (and destruction) of time-out threads. 
+	 * Threads are created on commit (i.e. when VAD thinks that the
+	 * user is silent) and (potentially) destroyed on add 
+	 * (i.e. when VAD notices that the user speaks)
 	 */
 	@Override
 	public void hypChange(Collection<? extends IU> ius,
@@ -62,7 +65,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 				@SuppressWarnings("unchecked")
 				List<WordIU> words = (List<WordIU>) ius;
 				assert words != null : "hey, if there's a commit, then there must be words!";
-				assert words.size() > 0 : edits + "" + words;
+				assert !words.isEmpty() : edits + "" + words;
 				WordIU endingWord = words.get(words.size() - 1);
 				if (endingWord != null && endingWord.isSilence()) {
 					logger.debug("ending word is silence, trying predecessor: " + endingWord);
@@ -77,7 +80,14 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		}
 	}
 
-	
+	/**
+	 * handles timing out (and handling) an utterance-final word.
+	 * this waits for a while (@see risingTimeout) before checking
+	 * whether the word's pitch was rising. If it is, we send off
+	 * a signal. Otherwise we wait a little longer and only then
+	 * send a signal.
+	 * @author timo
+	 */
 	private class TimeOutThread extends Thread {
 
 		/** if set, this timeout thread will not do anything when its timer runs out */

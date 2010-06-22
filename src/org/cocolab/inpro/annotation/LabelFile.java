@@ -35,17 +35,17 @@ public class LabelFile {
     public static List<String> getLines(InputStream is, int skip) throws IOException {
         int curCount = skip;
         List<String> list = new ArrayList<String>();
-	        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-	        String line = null;
-	        while ((line = reader.readLine()) != null) {
-	            if (line.length() > 0) {
-	                if (++curCount >= skip) {
-	                    list.add(line);
-	                    curCount = 0;
-	                }
-	            }
-			}
-			reader.close();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            if (line.length() > 0) {
+                if (++curCount >= skip) {
+                    list.add(line);
+                    curCount = 0;
+                }
+            }
+		}
+		reader.close();
         return list;
     }
     

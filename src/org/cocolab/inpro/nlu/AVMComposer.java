@@ -37,7 +37,7 @@ public class AVMComposer {
 	/**
 	 * Creates AVMComposer with a list of prototypes (avmStructures) of
 	 * different typed AVMs and a local list of composed AVMs (avmList).
-	 * @param file with list of AVMs in the world. 
+	 * @param worldFile with list of AVMs in the world. 
 	 */
 	public AVMComposer(String worldFile) {
 		AVMComposer.avmStructures = AVMStructureUtil.parseStructureFile("res/AVMStructure");
