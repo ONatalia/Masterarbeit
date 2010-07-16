@@ -5,7 +5,7 @@
 # 2. a tab character '\t', and  
 # 3. a list of (comma-separated) AVPairs.
 # AVPairs marked by their attribute, followed by a colon ':', followed by the value
- 
+# Greifarm Example:
 hoch	size:big,location:top
 groß,grosz, gross	size: big
 lang	size : big
