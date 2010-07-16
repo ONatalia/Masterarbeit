@@ -91,7 +91,14 @@ public class AVM {
 		} else if ((this.type != avm.type) || !avm.type.equals(this.type)) {
 			return false;
 		} else {
-			return (this.attributes.hashCode() == avm.attributes.hashCode());
+			for (String attribute : this.attributes.keySet()) {
+				if (!avm.attributes.keySet().contains(attribute)) {
+					return false;
+				} else if (this.attributes.get(attribute) != avm.attributes.get(attribute)) {
+					return false;
+				}
+			}
+			return (this.attributes.hashCode() == avm.attributes.hashCode());	
 		}
 	}
 
@@ -166,15 +173,14 @@ public class AVM {
 								return false;
 							}
 						} else if (value instanceof ArrayList) {
-							// FIXME: REWORK THIS!
 							for (AVM avm1 : (ArrayList<AVM>) value) {
-								boolean subsumed = false;
+								boolean unified = false;
 								for (AVM avm2 : (ArrayList<AVM>) this.attributes.get(attribute)) {
 									if (avm2.unifies(avm1)) {
-										subsumed = true;
+										unified = true;
 									}
 								}
-								if (!subsumed) {
+								if (!unified) {
 									return false;
 								}
 							}
@@ -208,23 +214,6 @@ public class AVM {
 						return true;					
 					}
 				}
-//			} else if (value instanceof AVM) {
-//				if (this.attributes.get(attribute) instanceof AVM) {
-//					AVM avm = (AVM) this.attributes.get(attribute); 
-//					if (avm.equals((AVM) value)) {
-//						return true;
-//					} else if (avm.unifies((AVM) value)) {
-//						avm.unify((AVM) value);
-//						this.attributes.put(attribute, (AVM) value);
-//						return true;
-//					}
-//				} else if (this.attributes.get(attribute) instanceof ArrayList) {
-//					for (AVM avm : (ArrayList<AVM>) this.attributes.get(attribute)) {
-//						if (avm.setAttribute(avp)) {
-//							return true;
-//						}
-//					}
-//				}
 			} else if (value instanceof ArrayList && this.attributes.get(attribute) instanceof ArrayList) {
 				for (AVM avm1 : (ArrayList<AVM>) value) {
 					boolean unified = false;

@@ -33,11 +33,29 @@
     <component name="semanticResolver" type="org.cocolab.inpro.incremental.processor.SemanticResolver">
         <propertylist name="hypChangeListeners">
 <!--          <item>consoleNotifier</item> -->
-    		<item>tedNotifier</item>
+	    		<item>tedNotifier</item>
           	<item>labelWriter2</item>
-    		<item>${actionManager}</item>
+    			<item>${actionManager}</item>
         </propertylist>
+        <!-- Domain: DIGITS -->
+        <!--
         <property name="chunkMarkers" value="in die,field;in der,tile" />
+        <property name="semanticsFile" value="res/PentoAVMWordlList" />
+        <property name="semanticsMapping" value="res/PentoAVMapping" />
+        <property name="structureFile" value="res/PentoAVMStructure" />
+        -->
+        <!-- Domain: PENTO -->
+        <!--
+        <property name="chunkMarkers" value="in die,field;in der,tile" />
+        <property name="semanticsFile" value="res/PentoAVMWordlList" />
+        <property name="semanticsMapping" value="res/PentoAVMapping" />
+        <property name="structureFile" value="res/PentoAVMStructure" />
+         -->
+        <!-- Domain: TRAVEL -->
+        <property name="chunkMarkers" value="von,origin;nach,destination" />
+        <property name="semanticsFile" value="res/TravelAVMWordlList" />
+        <property name="semanticsMapping" value="res/TravelAVMapping" />
+        <property name="structureFile" value="res/TravelAVMStructure" />
      </component>
 
 	<component name="iuBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.IUBasedFloorTracker">
