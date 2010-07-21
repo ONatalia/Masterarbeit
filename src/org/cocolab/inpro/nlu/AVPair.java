@@ -59,5 +59,10 @@ public class AVPair {
 	public String toString() {
 		return getAttribute() + " : " + getValue(); 
 	}
+	
+	public boolean equals(AVPair avp) {
+		return (this.attribute.equals(avp.attribute) &&
+				this.value.equals(avp.value));
+	}
 
 }
