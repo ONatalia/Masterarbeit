@@ -31,6 +31,8 @@ public class NLU {
 	public void incrementallyUnderstandUnusedWords() {
 		//logger.debug(unusedWords);
 		ActionStrength strengthModifier = ActionStrength.NORMAL;
+		// the following list keeps the words that have been consumed during iteration in order to remove them from the list of unusedWords after iteration
+		List<WordIU> consumedWords = new ArrayList<WordIU>();
 		List<WordIU> groundingWords = new ArrayList<WordIU>();
 		for (Iterator<WordIU> it = unusedWords.iterator(); it.hasNext();) {
 			WordIU word = it.next();
@@ -45,6 +47,7 @@ public class NLU {
 				// create new Action IU depending on actionType(iu), previous actions
 				// and directionModifier.
 				ActionIU action = new ActionIU(sll, groundingWords, actionType(word), strengthModifier);
+				consumedWords.addAll(groundingWords);
 				groundingWords = new ArrayList<WordIU>();
 				performedActions.addLast(action);
 				strengthModifier = ActionStrength.NORMAL; // reset to NORMAL for a possibly following action
@@ -54,6 +57,10 @@ public class NLU {
 			} else {
 				// ignore all other words
 			}
+		}
+		// now remove consumed words from unusedWords
+		for (WordIU word : consumedWords) {
+			assert word == unusedWords.removeFirst();
 		}
 	}
 

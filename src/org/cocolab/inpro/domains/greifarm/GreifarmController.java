@@ -65,7 +65,11 @@ public class GreifarmController {
 		greifarmGUI.cursorMoveSlowlyTo(greifarmGUI.cursorPosition.x, greifarmGUI.cursorPosition.y);
 		greifarmPosition = GreifArmGUI.translatePixelToBlock(greifarmGUI.cursorPosition.x);
 		logger.info("stopping at " + GreifArmGUI.translateBlockToPixel(greifarmPosition));
-		logger.warn("distance between arm and bowl is: " + (GreifArmGUI.translateBlockToPixel(greifarmPosition) - greifarmGUI.getBowlPosition()));
+		logger.warn("distance between arm and bowl is: " + getDistanceToGoal());
+	}
+	
+	protected int getDistanceToGoal() {
+		return greifarmGUI.cursorPosition.x - greifarmGUI.getBowlPosition();	
 	}
 	
 	public double getCurrentPosition() {

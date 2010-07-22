@@ -83,8 +83,8 @@
         <propertylist name="hypChangeListeners">
     		<item>greifarmActor</item>
     		<item>hypViewer</item>
-<!--
     		<item>tedNotifier</item>
+<!--
             <item>consoleNotifier</item>
             <item>semanticResolver</item>
             <item>consoleNotifier</item>
@@ -272,8 +272,8 @@
     <!-- The Dictionary configuration                            -->
     <!-- ******************************************************** -->
     <component name="dictionary" type="org.cocolab.inpro.sphinx.linguist.dictionary.SyllableAwareFullDictionary">
-        <property name="dictionaryPath" value="resource:/edu.cmu.sphinx.model.acoustic.Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.Model!/edu/cmu/sphinx/model/acoustic/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab_DE.lex"/>
-        <property name="fillerPath" value="resource:/edu.cmu.sphinx.model.acoustic.Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.Model!/edu/cmu/sphinx/model/acoustic/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab_DE.filler"/>
+        <property name="dictionaryPath" value="file:///home/timo/inpro/experimente/014_greifarm/confs/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab.lex"/>
+        <property name="fillerPath" value="file:///home/timo/inpro/experimente/014_greifarm/confs/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab.filler"/>
         <property name="addSilEndingPronunciation" value="false"/>
         <property name="unitManager" value="unitManager"/>
     </component>
@@ -282,14 +282,17 @@
     <!-- ******************************************************** -->
     <!-- The acoustic model and unit manager configuration        -->
     <!-- ******************************************************** -->
-    <component name="acousticModel" type="edu.cmu.sphinx.model.acoustic.Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.Model">
+    <component name="acousticModel" type="edu.cmu.sphinx.linguist.acoustic.tiedstate.TiedStateAcousticModel">
         <property name="loader" value="sphinx3Loader"/>
         <property name="unitManager" value="unitManager"/>
     </component>
 
-    <component name="sphinx3Loader" type="edu.cmu.sphinx.model.acoustic.Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.ModelLoader">
+    <component name="sphinx3Loader" type="edu.cmu.sphinx.linguist.acoustic.tiedstate.Sphinx3Loader">
         <property name="logMath" value="logMath"/>
         <property name="unitManager" value="unitManager"/>
+        <property name="location" value="file:///home/timo/inpro/experimente/014_greifarm/confs/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz"/>
+		<property name="modelDefinition" value="etc/Cocolab_noGreifarm.2000.mdef"/>
+		<property name="dataLocation" value="cd_cont_2000_8/"/>
     </component>
 
     <component name="unitManager" type="edu.cmu.sphinx.linguist.acoustic.UnitManager"/>
@@ -317,28 +320,13 @@
 
     <component name="frontend" type="edu.cmu.sphinx.frontend.FrontEnd">
         <propertylist name="pipeline">
-<!-- 
-            <item>pitchTracker</item>
-            <item>baseDataAdapter1</item>
-            <item>signalFeatureExtractor</item>
---> 
             <item>preemphasizer</item>
             <item>windower</item>
             <item>fft</item>
             <item>melFilterBank</item>
-<!--
-            <item>baseDataAdapter2</item>
--->
             <item>dct</item>
             <item>liveCMN</item>
-<!--
-			<item>batchCMN</item>
--->
             <item>mfccExtraction</item>
-<!--
-            <item>dataDumper</item>
-            <item>frontendThread</item>
--->
         </propertylist>
     </component>
  

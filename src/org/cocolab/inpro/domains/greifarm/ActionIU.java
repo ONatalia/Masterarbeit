@@ -17,6 +17,7 @@ public class ActionIU extends IU {
 	/** store the start position to be able to go back later */
 	/** store the planned goal position */
 	protected double goalPosition;
+	private int distanceToGoal = Integer.MAX_VALUE; // only meant to output statistics 
 	
 	protected static GreifarmController greifarm;
 	
@@ -72,6 +73,8 @@ public class ActionIU extends IU {
 			break;
 		case STOP: 
 			greifarm.stop(); 
+			this.distanceToGoal = greifarm.getDistanceToGoal();
+			logger.info("stopping with distance to goal: " + distanceToGoal);
 			this.goalPosition = greifarm.getCurrentPosition();
 			break;
 		default: greifarm.moveTo(goalPosition);
@@ -87,6 +90,7 @@ public class ActionIU extends IU {
 			logger.info("I'm not sure you wanted me to repeat the dropping, but that's what drop is all about.");
 			break;
 		case STOP: // on re-execution, stopping means to go back to where we originally stopped 
+			logger.info("re-executing stop with distance to goal: " + distanceToGoal);
 		default: greifarm.moveTo(goalPosition);
 		}
 		
@@ -134,7 +138,8 @@ public class ActionIU extends IU {
 	
 	@Override
 	public void update(EditType edit) {
-		if (edit == EditType.REVOKE) {
+		switch (edit) {
+		case REVOKE:
 			logger.debug("reverted: " + toString());
 			switch (type) {
 			case DROP: 
@@ -145,14 +150,21 @@ public class ActionIU extends IU {
 			case CONTINUE:
 			case REVERSE:
 			case STOP: // reverting a stop action means going back to what we previously wanted
+				logger.info("reverting stop with distance to goal: " + distanceToGoal);
 				if (predecessor() != null) // && !predecessor().precedesPause)
 					predecessor().reexecute(); 
 				break;
 			default: 
 				// TODO/FIXME: revocation of other actions are ignored for now
 			}
-		} else {
-			logger.debug("ignoring edit " + edit);
+			break;
+		case COMMIT:
+			if (type.equals(ActionType.STOP) && distanceToGoal != Integer.MAX_VALUE) {
+				logger.info("committing a stop with distance " + distanceToGoal);
+			}
+			break;
+		default:
+			logger.debug("ignoring edit " + edit);				
 		}
 	}
 

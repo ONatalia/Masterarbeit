@@ -143,6 +143,9 @@ public class GreifarmActor implements PushBuffer {
 	 */
 	public void processorReset() {
 		unusedWords.clear();
+		for (ActionIU aiu : performedActions) {
+			aiu.update(EditType.COMMIT);
+		}
 		performedActions.clear();
 		performedActions.add(new ActionIU.StartActionIU(greifarmController));
 	}
