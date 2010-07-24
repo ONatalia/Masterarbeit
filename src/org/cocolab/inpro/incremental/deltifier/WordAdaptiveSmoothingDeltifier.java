@@ -29,7 +29,7 @@ public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 	public final static String PROP_SAFE_WORD = "safeWord";
 	public String safeWord;
 
-	@S4String(defaultValue="drop")
+	@S4String(defaultValue="stop")
 	public final static String PROP_URGENT_WORD = "urgentWord";
 	public String urgentWord;
 

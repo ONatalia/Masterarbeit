@@ -38,6 +38,8 @@ public class WavTEDLogger extends WavWriter {
 		super.newProperties(ps);
 		tedPort = ps.getInt(PROP_TED_PORT);
 		tedTrack = ps.getString(PROP_TED_TRACK);
+		captureUtts = ps.getBoolean(PROP_CAPTURE_UTTERANCES);
+		dumpFilePath = ps.getString(PROP_OUT_FILE_NAME_PATTERN);
 	}
 	
 	public String getMostRecentFilename() {

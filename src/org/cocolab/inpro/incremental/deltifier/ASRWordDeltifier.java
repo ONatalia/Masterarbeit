@@ -212,6 +212,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 						break;
 					}
 				} else {
+					assert false : newSearchState.getClass().toString() + newSearchState.toString();
 					// assert false; // hmm, I don't know why, but it works without this assertion. and it doesn't hurt
 				}
 				segmentStartTime = segmentEndTime;
@@ -270,6 +271,8 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		} catch (AssertionError ae) {
 			logger.fatal("new tokens: " + newTokens);
 			logger.fatal(addSilenceWord);
+			logger.fatal("value of addSilenceWord was " + (addSilenceWord ? "true" : "false"));
+			logger.fatal("");
 			throw ae;
 		}
 		logger.debug("ok, ouput IUs are now: " + wordIUs);
