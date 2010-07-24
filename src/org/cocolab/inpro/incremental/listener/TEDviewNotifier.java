@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.cocolab.inpro.domains.greifarm.ActionIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.SegmentIU;
@@ -18,11 +19,13 @@ import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Integer;
 import edu.cmu.sphinx.util.props.S4String;
 
-public class TEDviewNotifier extends HypothesisChangeListener {
+public class TEDviewNotifier extends FrameAwarePushBuffer {
 
     @S4Integer(defaultValue = 2000)
     public final static String PROP_TEDVIEW_PORT = "tedPort";
 
+    Logger logger = Logger.getLogger(TEDviewNotifier.class);
+    
     private int tedPort;
 
     @S4String(defaultValue = "localhost")
@@ -43,7 +46,7 @@ public class TEDviewNotifier extends HypothesisChangeListener {
 			sock = new Socket(tedAddress, tedPort);
 			writer = new PrintWriter(sock.getOutputStream());
 		} catch (IOException e) {
-			Logger.getLogger(this.getClass()).warn("Cannot connect to TEDview. I will not retry.");
+			logger.warn("Cannot connect to TEDview. I will not retry.");
 			tedOutput = false;
 		}
 	}
@@ -61,6 +64,10 @@ public class TEDviewNotifier extends HypothesisChangeListener {
 	    		sbIUs.append("' originator='asr_phones'>");
 	    	} else if (iuType instanceof SemIU) {
 	    		sbIUs.append("' originator='semantics'>");
+	    	} else  if (iuType instanceof ActionIU) {
+	    		sbIUs.append("' originator='action'>");
+	    	} else {
+	    		logger.warn("Dunno in what track to log IUs of type " + iuType.getClass().toString());
 	    	}
 	    	for (IU iu : ius) {
 	    		sbIUs.append(iu.toTEDviewXML());

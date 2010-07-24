@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.WordIU;
@@ -16,7 +17,7 @@ import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Boolean;
 
-public class CurrentHypothesisViewer extends HypothesisChangeListener {
+public class CurrentHypothesisViewer extends PushBuffer {
 
 	@S4Boolean(defaultValue = true)
     public final static String PROP_SHOW_WINDOW = "showWindow";

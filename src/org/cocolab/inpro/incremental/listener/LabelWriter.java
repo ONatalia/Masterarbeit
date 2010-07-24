@@ -8,7 +8,7 @@ import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.util.ResultUtil;
 
-public class LabelWriter extends HypothesisChangeListener {
+public class LabelWriter extends FrameAwarePushBuffer {
 
 	@Override
 	public void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {

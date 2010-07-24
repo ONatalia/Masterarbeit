@@ -4,11 +4,12 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
 
+import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
-public class OutputForSimpleText extends HypothesisChangeListener {
+public class OutputForSimpleText extends PushBuffer {
 	
 	PrintStream outputStream = System.out;
 	String outputString = "";

@@ -19,12 +19,7 @@ package org.cocolab.inpro.incremental.listener;
 
 import org.cocolab.inpro.incremental.PushBuffer;
 
-import edu.cmu.sphinx.instrumentation.Resetable;
-import edu.cmu.sphinx.util.props.Configurable;
-import edu.cmu.sphinx.util.props.PropertyException;
-import edu.cmu.sphinx.util.props.PropertySheet;
-
-public abstract class HypothesisChangeListener implements Configurable, Resetable, PushBuffer {
+public abstract class FrameAwarePushBuffer extends PushBuffer {
 
 	int currentFrame = 0;
 
@@ -32,14 +27,4 @@ public abstract class HypothesisChangeListener implements Configurable, Resetabl
 		currentFrame = frame;
 	}
 	
-	@Override
-	public void newProperties(PropertySheet ps) throws PropertyException {
-		// ignore by default
-	}
-
-	@Override
-	public void reset() {
-		// ignore by default
-	}
-
 }

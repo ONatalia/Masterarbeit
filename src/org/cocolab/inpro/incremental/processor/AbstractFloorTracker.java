@@ -22,7 +22,7 @@ import edu.cmu.sphinx.util.props.S4ComponentList;
  * @author timo
  *
  */
-public abstract class AbstractFloorTracker implements PushBuffer {
+public abstract class AbstractFloorTracker extends PushBuffer {
 
 	private static Logger logger = Logger.getLogger(AbstractFloorTracker.class);
 	
@@ -49,9 +49,6 @@ public abstract class AbstractFloorTracker implements PushBuffer {
 			List<? extends EditMessage<? extends IU>> edits) {
 		mostRecentIUs = (List<WordIU>) ius;
 	}
-
-	@Override
-	public void reset() {  }
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {

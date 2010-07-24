@@ -19,7 +19,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.apps.util.TextCommandLineParser;
 import org.cocolab.inpro.incremental.PushBuffer;
-import org.cocolab.inpro.incremental.listener.HypothesisChangeListener;
+import org.cocolab.inpro.incremental.listener.FrameAwarePushBuffer;
 import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
 import org.cocolab.inpro.incremental.processor.TextBasedFloorTracker;
 import org.cocolab.inpro.incremental.util.IUDocument;
@@ -64,7 +64,7 @@ public class SimpleText extends JPanel implements ActionListener {
 	@S4Component(type = CurrentASRHypothesis.class)
 	public final static String PROP_CURRENT_HYPOTHESIS = "currentASRHypothesis";
 	
-	@S4ComponentList(type = HypothesisChangeListener.class)
+	@S4ComponentList(type = FrameAwarePushBuffer.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = CurrentASRHypothesis.PROP_HYP_CHANGE_LISTENERS;
 
 	@S4Component(type = TextBasedFloorTracker.class)
