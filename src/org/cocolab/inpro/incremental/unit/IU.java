@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.cocolab.inpro.incremental.BaseDataKeeper;
+import org.cocolab.inpro.incremental.util.ResultUtil;
 
 public abstract class IU {
 	
@@ -232,12 +233,21 @@ public abstract class IU {
 		return sb.toString();
  	}
 	
-	public String toOAAString() {
-		return null;
-	}
-
 	public String toTEDviewXML() {
-		return null;
+		double startTime = startTime();
+		if (Double.isNaN(startTime))
+			startTime = 0.0;
+		StringBuilder sb = new StringBuilder("<event time='");
+		sb.append(Math.round(startTime * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
+		double duration = duration();
+		if (Double.isNaN(duration))
+			duration = 0.0;
+		sb.append("' duration='");
+		sb.append(duration * ResultUtil.SECOND_TO_MILLISECOND_FACTOR);
+		sb.append("'> ");
+		sb.append(toPayLoad().replace("<", "&lt;").replace(">", "&gt;"));
+		sb.append(" </event>");
+		return sb.toString();
 	}
 	
 	public long getCreationTime() {

@@ -108,18 +108,6 @@ public class WordIU extends IU {
 		return ((isSilence && iu.isSilence) || pron.equals(iu.pron));
 	}
 	
-	public String toTEDviewXML() {
-		double startTime = startTime();
-		StringBuilder sb = new StringBuilder("<event time='");
-		sb.append(Math.round(startTime * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
-		sb.append("' duration='");
-		sb.append(Math.round((endTime() - startTime) * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
-		sb.append("'> ");
-		sb.append(word.replace("<", "&lt;").replace(">", "&gt;"));
-		sb.append(" </event>");
-		return sb.toString();
-	}
-	
 	public String toOAAString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(id);

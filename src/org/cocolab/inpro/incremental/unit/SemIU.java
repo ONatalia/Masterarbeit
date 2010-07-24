@@ -3,7 +3,6 @@ package org.cocolab.inpro.incremental.unit;
 import java.util.Collections;
 import java.util.List;
 
-import org.cocolab.inpro.incremental.util.ResultUtil;
 import org.cocolab.inpro.nlu.AVPair;
 
 public class SemIU extends IU {
@@ -33,23 +32,6 @@ public class SemIU extends IU {
 
 	public boolean isEmpty() {
 		return (this.avp == null);
-	}
-
-	public String toTEDviewXML() {
-		StringBuilder sb = new StringBuilder("<event time='");
-		double startTime = startTime();
-		if (Double.isNaN(startTime))
-			startTime = 0.0;
-		sb.append(Math.round(startTime * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
-		sb.append("' duration='");
-		double duration = duration();
-		if (Double.isNaN(duration))
-			duration = 0.0;
-		sb.append(Math.round(duration * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
-		sb.append("'> ");
-		sb.append(toPayLoad().replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
-		sb.append(" </event>");
-		return sb.toString();
 	}
 	
 	/**

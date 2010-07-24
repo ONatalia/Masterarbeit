@@ -19,8 +19,6 @@ package org.cocolab.inpro.incremental.unit;
 
 import java.util.List;
 
-import org.cocolab.inpro.incremental.util.ResultUtil;
-
 public class TagIU extends IU {
 
 	final String tag;
@@ -34,25 +32,6 @@ public class TagIU extends IU {
 		this.tag = tag;
 	}
 
-	public String toTEDviewXML() {
-		double startTime = startTime();
-		return "<event time='"
-				+ Math.round(startTime * ResultUtil.SECOND_TO_MILLISECOND_FACTOR) 
-				+ "' duration='"
-				+ Math.round((endTime() - startTime) * ResultUtil.SECOND_TO_MILLISECOND_FACTOR)
-				+ "'> "
-				+ tag
-				+ " </event>";
-	}
-
-	public String toOAAString() {
-		StringBuffer sb = new StringBuffer(Integer.toString(id));
-		sb.append(",'");
-		sb.append(tag);
-		sb.append("'");
-		return sb.toString();
-	}
-	
 	public boolean equals(TagIU iu) {
 		/**
 		 * IUs are same if their tags are the same

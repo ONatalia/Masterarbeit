@@ -17,6 +17,8 @@ public class SyllableIU extends IU {
 		return null;
 	}
 
-	// nothing to see here (yet), move on
+	public List<SegmentIU> getNucleus() {
+		throw new RuntimeException("not yet implemented");
+	}
 	
 }

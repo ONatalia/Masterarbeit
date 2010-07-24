@@ -80,15 +80,6 @@ public class SegmentIU extends IU {
 		}
 /**/
 	}
-	
-	@Override
-	public String toOAAString() {
-		StringBuilder sb = new StringBuilder(Integer.toString(id));
-		sb.append(",'");
-		sb.append(l.getLabel());
-		sb.append("'");
-		return sb.toString();
-	}
 
 	@Override
 	public String toTEDviewXML() {
