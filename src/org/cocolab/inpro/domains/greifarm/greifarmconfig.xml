@@ -94,7 +94,11 @@
         </propertylist>
     </component>
     
-	<component name="greifarmActor" type="org.cocolab.inpro.domains.greifarm.GreifarmActor" />
+	<component name="greifarmActor" type="org.cocolab.inpro.domains.greifarm.GreifarmActor">
+        <propertylist name="hypChangeListeners">
+    		<item>tedNotifier</item>
+    	</propertylist>
+	</component>
 
     <component name="baseData" type="org.cocolab.inpro.incremental.basedata.BaseData"/>
 

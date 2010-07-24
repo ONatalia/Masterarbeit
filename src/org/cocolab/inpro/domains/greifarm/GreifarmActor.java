@@ -17,7 +17,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 
 import org.apache.log4j.Logger;
-import org.cocolab.inpro.incremental.PushBuffer;
+import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
@@ -56,7 +56,7 @@ import edu.cmu.sphinx.util.props.PropertySheet;
  * @author timo
  *
  */
-public class GreifarmActor implements PushBuffer {
+public class GreifarmActor extends IUModule {
 	
 	private static final Logger logger = Logger.getLogger(GreifarmActor.class);
 
@@ -76,7 +76,7 @@ public class GreifarmActor implements PushBuffer {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public void hypChange(Collection<? extends IU> ius,
+	public void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		boolean commitFlag = false; // set to true if there are commit messages
 		for (EditMessage<? extends IU> em : edits) {
@@ -126,6 +126,7 @@ public class GreifarmActor implements PushBuffer {
 			if (!performedActions.isEmpty())
 				performedActions.getLast().precedesPause(true);
 		}
+		rightBuffer.setBuffer(performedActions);
 	}
 	
 	@Override
@@ -181,6 +182,7 @@ public class GreifarmActor implements PushBuffer {
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
+		super.newProperties(ps);
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {@Override
 				public void run() {

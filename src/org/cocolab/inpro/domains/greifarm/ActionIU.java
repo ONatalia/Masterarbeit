@@ -180,7 +180,12 @@ public class ActionIU extends IU {
 		public ActionType getType() {
 			return ActionType.STOP;
 		}
-	}
+		
+		@Override
+		public String toPayLoad() {
+			return "Initial " + super.toPayLoad();
+		}
+}
 
 }
 
