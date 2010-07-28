@@ -48,7 +48,7 @@ public class SemIU extends IU {
 	public String toPayLoad() {
 		String payLoad;
 		if (this == FIRST_SEM_IU) 
-			payLoad = "the very first SemIU";
+			payLoad = "Root SemIU";
 		else if (isEmpty())
 			payLoad = "empty";
 		else
