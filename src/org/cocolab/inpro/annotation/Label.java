@@ -80,18 +80,6 @@ public class Label {
 		return sb.toString();
 	}
 	
-	public String toTEDViewXML() {
-		StringBuilder sb = new StringBuilder("<event time='");
-		sb.append(Math.round(start * 1000.0));
-		sb.append("' duration='");
-		sb.append(Math.round((end - start) * 1000.0));
-		sb.append("'> ");
-		sb.append(label.replace("<", "&lt;").replace(">", "&gt;"));
-		sb.append(" </event>");
-		return sb.toString();
-	}
-	
-
 	public static void main(String[] args) throws IOException {
 		Label l = newFromTextGridLines(Arrays.asList(
 				"        xmin = 0.910000", 

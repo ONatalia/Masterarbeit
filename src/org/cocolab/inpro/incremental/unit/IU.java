@@ -238,35 +238,34 @@ public abstract class IU {
 		double startTime = startTime();
 		if (Double.isNaN(startTime))
 			startTime = 0.0;
-		StringBuilder sb = new StringBuilder("<event time='");
+		StringBuilder sb = new StringBuilder("<iu iu_id='");
+		sb.append(this.id);
+		sb.append("' time='");
 		sb.append(Math.round(startTime * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
 		double duration = duration();
 		if (Double.isNaN(duration))
 			duration = 0.0;
 		sb.append("' duration='");
-		sb.append(duration * ResultUtil.SECOND_TO_MILLISECOND_FACTOR);
-		sb.append("'>");
-		sb.append("<iu iu_id=\"" + this.id + "\"");
+		sb.append(Math.round(duration * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
+		sb.append("'");
 		if (this.getSameLevelLink() == null) {
-			sb.append(" sll=\"top\"");
+			sb.append(" sll='top'");
 		} else {
-			sb.append(" sll=\"" + this.getSameLevelLink().id + "\"");
+			sb.append(" sll='" + this.getSameLevelLink().id + "'");
 		}
-		if (this.groundedIn != null && !groundedIn.isEmpty()) {
-			Iterator<IU> grIt = groundedIn.iterator();
-			sb.append(" gil=\"");
-			while (grIt.hasNext()) {
-				sb.append(grIt.next().id);
-				if (grIt.hasNext())
-					sb.append(",");
-			}
-			sb.append("\"");
+		if (groundedIn != null && !groundedIn.isEmpty()) {
+	        Iterator<IU> grIt = groundedIn.iterator();
+			sb.append(" gil='");
+	        while (grIt.hasNext()) {
+	                sb.append(grIt.next().id);
+	                if (grIt.hasNext())
+	                        sb.append(",");
+	        }
+			sb.append("'");
 		}
 		sb.append(">");
 		sb.append(toPayLoad().replace("<", "&lt;").replace(">", "&gt;"));
 		sb.append("</iu>");
-		sb.append("</event>");
-//		System.err.println(sb.toString());
 		return sb.toString();
 	}
 	
