@@ -2,6 +2,7 @@ package org.cocolab.inpro.incremental.unit;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -245,30 +246,27 @@ public abstract class IU {
 		sb.append("' duration='");
 		sb.append(duration * ResultUtil.SECOND_TO_MILLISECOND_FACTOR);
 		sb.append("'>");
-//		<iu iu_id="5" sll="3">piep from A</iu>
 		sb.append("<iu iu_id=\"" + this.id + "\"");
 		if (this.getSameLevelLink() == null) {
 			sb.append(" sll=\"top\"");
 		} else {
 			sb.append(" sll=\"" + this.getSameLevelLink().id + "\"");
 		}
-		if (this.groundedIn != null) {
-			if (this.groundedIn.size() > 1) {
-				sb.append(" gil=\"");
-				for (int i=0; i<=this.groundedIn.size();i++) {
-					sb.append(this.groundedIn.get(i));
-					if (i<this.groundedIn.size()) {
-						sb.append(",");
-					}
-				}
-				sb.append("\"");
+		if (this.groundedIn != null && !groundedIn.isEmpty()) {
+			Iterator<IU> grIt = groundedIn.iterator();
+			sb.append(" gil=\"");
+			while (grIt.hasNext()) {
+				sb.append(grIt.next().id);
+				if (grIt.hasNext())
+					sb.append(",");
 			}
+			sb.append("\"");
 		}
 		sb.append(">");
 		sb.append(toPayLoad().replace("<", "&lt;").replace(">", "&gt;"));
 		sb.append("</iu>");
 		sb.append("</event>");
-		System.err.println(sb.toString());
+//		System.err.println(sb.toString());
 		return sb.toString();
 	}
 	
