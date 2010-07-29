@@ -32,12 +32,15 @@ public class AVMStructureUtil {
 						attributes.put(pair[0], pair[1]);
 					}
 				}
+				assert (type != null) : "Found AVM structure without type (" + attributes.toString() + ")!";
+				assert (!attributes.isEmpty()) : "No structures found for type " + type  + "!";
 				avmStructures.put(type, attributes);
 			}
 			lbr.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		assert (avmStructures != null) : "Could not parse AVM structures in " + filename + ".";
 		return avmStructures;
 	}
 	

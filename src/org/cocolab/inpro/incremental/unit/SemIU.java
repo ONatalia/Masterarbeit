@@ -36,9 +36,8 @@ public class SemIU extends IU {
 	
 	/**
 	 * Compares payload of two SemIUs.
-	 * Note: I'm comparing string representations of lists, because .equals() of contents of lists seems to differ.
 	 * @param siu the SemIU to compare against
-	 * @return true if each SemIUs string representations of their payload (three array lists) are the same.
+	 * @return true if each SemIUs string representations of their payload (AVPairs)
 	 */
 	public boolean samePayload(SemIU siu) {
 		return (this.avp.equals(siu.avp));

@@ -33,6 +33,7 @@ public class AVMWorldUtil {
 						avpairs.add(new AVPair(pair[0], pair[1]));
 					}
 				}
+				assert (!type.equals("")) : "No type def found for AVM structure " + avpairs.toString();
 				AVM avm = new AVM(type, avmStructures);
 				for (AVPair avp : avpairs) {
 					avm.setAttribute(avp);

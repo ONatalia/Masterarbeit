@@ -54,6 +54,8 @@ public class AVM {
 	 * @param type of the AVM
 	 */
 	private HashMap<String, Object> unpackStructures(HashMap<String, HashMap<String, String>> avmStructures, String type) {
+		assert (type != null && !type.equals("")) : "Must specify AVM type! (config error?)";
+		assert (avmStructures.containsKey(type)) : "No AVM structure known for type " + type + "! (config error?)";
 		HashMap<String, Object> attributes = new HashMap<String, Object>();
 		HashMap<String, String> avmStructure = avmStructures.get(type);
 		for (String attribute : avmStructure.keySet()) {

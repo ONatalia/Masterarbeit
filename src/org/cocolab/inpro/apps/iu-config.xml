@@ -2,7 +2,30 @@
     <property name="deltifier" value="wasd"/>
     <property name="deltifierParam" value="0"/>
     <property name="baseData" value="baseData"/>
-    <property name="actionManager" value="dialogueManager"/>
+    <property name="dialogueManager" value="dialogueManager"/>
+    <!-- Domain defs: -->
+    <!-- DIGITS -->
+    <!-- 
+        <property name="chunkMarkers" value="in die,field;in der,tile" />
+        <property name="semanticsFile" value="res/PentoAVMWordlList" />
+        <property name="semanticsMapping" value="res/PentoAVMapping" />
+        <property name="structureFile" value="res/PentoAVMStructure" />
+     -->
+    <!-- PENTO -->
+    <!--
+        <property name="chunkMarkers" value="in die,field;in der,tile" />
+        <property name="semanticsFile" value="res/PentoAVMWordlList" />
+        <property name="semanticsMapping" value="res/PentoAVMapping" />
+        <property name="structureFile" value="res/PentoAVMStructure" />
+     -->
+    <!-- Domain: TRAVEL -->
+        <!-- 
+        <property name="chunkMarkers" value="von,origin;nach,destination" />
+        <property name="semanticsFile" value="res/TravelAVMWordlList" />
+        <property name="semanticsMapping" value="res/TravelAVMapping" />
+        <property name="structureFile" value="res/TravelAVMStructure" />
+    -->
+
 
     <!-- ******************************************************** -->
     <!-- The incremental processing configuration                 -->
@@ -13,9 +36,11 @@
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
-    		<item>semanticResolver</item>
+    		<item>semanticComposer</item>
+    		<item>consoleNotifier</item>
     		<item>hypViewer</item>
 	     <item>iuBasedFloorTracker</item>
+	     <item>tedNotifier</item>
 <!--
     		<item>semanticResolver</item>
           <item>labelWriter2</item>
@@ -29,33 +54,32 @@
 -->
         </propertylist>
     </component>
+
+    <component name="semanticComposer" type="org.cocolab.inpro.incremental.processor.SemanticComposer">
+        <property name="semanticsMapping" value="${semanticsMapping}" />
+        <property name="structureFile" value="${structureFile}" />
+        <property name="chunkMarkers" value="${chunkMarkers}" />
+        <propertylist name="hypChangeListeners">
+<!--          <item>consoleNotifier</item> 
+	    		<item>tedNotifier</item>
+          	<item>labelWriter2</item>-->
+          	<item>semanticResolver</item>
+          	<item>tedNotifier</item>
+    			<item>consoleNotifier</item>
+        </propertylist>
+     </component>
     
     <component name="semanticResolver" type="org.cocolab.inpro.incremental.processor.SemanticResolver">
+        <property name="semanticsFile" value="${semanticsFile}" />
+        <property name="structureFile" value="${structureFile}" />
+        <property name="composer" value="semanticComposer"/>
         <propertylist name="hypChangeListeners">
-<!--          <item>consoleNotifier</item> -->
+<!--          <item>consoleNotifier</item> 
 	    		<item>tedNotifier</item>
-          	<item>labelWriter2</item>
-    			<item>${actionManager}</item>
+          	<item>labelWriter2</item>-->
+          	<item>tedNotifier</item>
+    			<item>${dialogueManager}</item>
         </propertylist>
-        <!-- Domain: DIGITS -->
-        <!--
-        <property name="chunkMarkers" value="in die,field;in der,tile" />
-        <property name="semanticsFile" value="res/PentoAVMWordlList" />
-        <property name="semanticsMapping" value="res/PentoAVMapping" />
-        <property name="structureFile" value="res/PentoAVMStructure" />
-        -->
-        <!-- Domain: PENTO -->
-        <!--
-        <property name="chunkMarkers" value="in die,field;in der,tile" />
-        <property name="semanticsFile" value="res/PentoAVMWordlList" />
-        <property name="semanticsMapping" value="res/PentoAVMapping" />
-        <property name="structureFile" value="res/PentoAVMStructure" />
-         -->
-        <!-- Domain: TRAVEL -->
-        <property name="chunkMarkers" value="von,origin;nach,destination" />
-        <property name="semanticsFile" value="res/TravelAVMWordlList" />
-        <property name="semanticsMapping" value="res/TravelAVMapping" />
-        <property name="structureFile" value="res/TravelAVMStructure" />
      </component>
 
 	<component name="iuBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.IUBasedFloorTracker">
@@ -63,12 +87,12 @@
 		<property name="risingProsodyTimeout" value="${risingProsodyTimeout}" />
 		<property name="anyProsodyTimeout" value="${anyProsodyTimeout}" />
 		<propertylist name="listeners">
-			<item>${actionManager}</item>
+			<item>${dialogueManager}</item>
 		</propertylist>
 	</component>
 	<component name="textBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.TextBasedFloorTracker">
 		<propertylist name="listeners">
-			<item>${actionManager}</item>
+			<item>${dialogueManager}</item>
 		</propertylist>
 	</component>
 
@@ -82,7 +106,7 @@
 	<component name="none" type="org.cocolab.inpro.incremental.deltifier.ASRWordDeltifier"/>
     <component name="nonIncr" type="org.cocolab.inpro.incremental.deltifier.NonIncrementalDeltifier"/>
     <component name="wasd" type="org.cocolab.inpro.incremental.deltifier.WordAdaptiveSmoothingDeltifier">
-        <property name="safeWord" value="yes" />
+        <property name="safeWord" value="no" />
         <property name="urgentWord" value="take" />
     </component>
 
