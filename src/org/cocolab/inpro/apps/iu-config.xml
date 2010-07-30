@@ -3,6 +3,8 @@
     <property name="deltifierParam" value="0"/>
     <property name="baseData" value="baseData"/>
     <property name="dialogueManager" value="dialogueManager"/>
+    <property name="semanticComposer" value="semanticComposer"/>
+    <property name="semanticResolver" value="semanticResolver"/>
     <!-- Domain defs: -->
     <!-- DIGITS -->
     <!-- 
@@ -36,7 +38,7 @@
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
-    		<item>semanticComposer</item>
+    		<item>${semanticComposer}</item>
     		<item>consoleNotifier</item>
     		<item>hypViewer</item>
 	     <item>iuBasedFloorTracker</item>
@@ -60,24 +62,22 @@
         <property name="structureFile" value="${structureFile}" />
         <property name="chunkMarkers" value="${chunkMarkers}" />
         <propertylist name="hypChangeListeners">
-<!--          <item>consoleNotifier</item> 
+<!--           <item>consoleNotifier</item> 
 	    		<item>tedNotifier</item>
-          	<item>labelWriter2</item>-->
-          	<item>semanticResolver</item>
-          	<item>tedNotifier</item>
+          	<item>labelWriter2</item> -->
+          	<item>${semanticResolver}</item>
     			<item>consoleNotifier</item>
         </propertylist>
      </component>
-    
+
     <component name="semanticResolver" type="org.cocolab.inpro.incremental.processor.SemanticResolver">
         <property name="semanticsFile" value="${semanticsFile}" />
         <property name="structureFile" value="${structureFile}" />
-        <property name="composer" value="semanticComposer"/>
+        <property name="composer" value="${semanticComposer}"/>
         <propertylist name="hypChangeListeners">
-<!--          <item>consoleNotifier</item> 
+<!--           <item>consoleNotifier</item> 
 	    		<item>tedNotifier</item>
-          	<item>labelWriter2</item>-->
-          	<item>tedNotifier</item>
+          	<item>labelWriter2</item> -->
     			<item>${dialogueManager}</item>
         </propertylist>
      </component>
@@ -97,7 +97,7 @@
 	</component>
 
 	<component name="dialogueManager" type="org.cocolab.inpro.incremental.processor.DialogueManager">
-		<property name="nlu" value="semanticResolver"/>
+		<property name="nlu" value="${semanticResolver}"/>
 		<property name="dispatchStream" value="dispatchStream"/>
 	</component>
 
