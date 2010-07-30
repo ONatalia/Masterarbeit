@@ -58,17 +58,7 @@ public class TEDviewNotifier extends FrameAwarePushBuffer {
 	    	sbIUs.append("<event time='");
 	    	sbIUs.append(currentFrame * 10);
 	    	IU iuType = ius.iterator().next();
-	    	if (iuType instanceof WordIU) {
-	    		sbIUs.append("' originator='asr_words'>");
-	    	} else if (iuType instanceof SegmentIU) {
-	    		sbIUs.append("' originator='asr_phones'>");
-	    	} else if (iuType instanceof SemIU) {
-	    		sbIUs.append("' originator='semantics'>");
-	    	} else  if (iuType instanceof ActionIU) {
-	    		sbIUs.append("' originator='action'>");
-	    	} else {
-	    		logger.warn("Dunno in what track to log IUs of type " + iuType.getClass().toString());
-	    	}
+	    	sbIUs.append("' originator='" + iuType.getClass().getSimpleName() + "'>");
 	    	for (IU iu : ius) {
 	    		sbIUs.append(iu.toTEDviewXML());
 	    	}
