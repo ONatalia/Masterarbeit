@@ -7,12 +7,8 @@ import java.util.List;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.cocolab.inpro.domains.greifarm.ActionIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
-import org.cocolab.inpro.incremental.unit.SegmentIU;
-import org.cocolab.inpro.incremental.unit.SemIU;
-import org.cocolab.inpro.incremental.unit.WordIU;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
