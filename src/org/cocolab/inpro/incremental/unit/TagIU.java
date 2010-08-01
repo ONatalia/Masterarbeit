@@ -39,10 +39,6 @@ public class TagIU extends IU {
 		return this.tag == iu.tag;
 	}
 	
-	public int getID() {
-		return this.id;
-	}
-
 	@Override
 	public String toPayLoad() {
 		return tag;

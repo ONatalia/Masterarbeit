@@ -19,6 +19,7 @@ package org.cocolab.inpro.incremental.unit;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -52,7 +53,7 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  				       Double.isNaN(getLast().endTime()) || // allow addition if previous ends at NaN
  				       getLast().endTime() <= edit.getIU().startTime() + 0.001 // account for floating point error 
  						: "better sort your IUs: " + this + edit;
- 				this.add(edit.getIU()); 
+ 				this.add(edit.getIU(), true); 
  				break;
  			case REVOKE: // assertion errors on REVOKE seem to only happen as a consequence of earlier errors on ADD
  				assert !isEmpty() : "Can't revoke from an empty list: " + edit;
@@ -101,5 +102,20 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  		if (firstIU != null)
  			add(firstIU);
  	}
+
+ 	/**
+ 	 * connect the IUs in the list via their SLLs.
+ 	 * any older SLL asignment will be overwritten
+ 	 */
+	public void connectSLLs() {
+		IUType prev = null;
+		Iterator<IUType> iuIt = iterator();
+		while (iuIt.hasNext()) {
+			IUType iu = iuIt.next();
+			if (iu.getSameLevelLink() == null)
+				iu.connectSLL(prev);
+			prev = iu;
+		}
+	}
  	
 }

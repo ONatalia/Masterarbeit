@@ -20,7 +20,7 @@ public abstract class IU {
 		}
 	}; 
 	private static int IU_idCounter = 0;
-	protected final int id;
+	private final int id;
 
 	protected IU sameLevelLink;
 	
@@ -79,6 +79,14 @@ public abstract class IU {
 		return IU_idCounter++;
 	}
 	
+	/**
+	 * get the ID assigned to this IU
+	 * @return the IU's ID
+	 */
+	public final int getID() {
+		return id;
+	}
+
 	public static void setBaseData(BaseDataKeeper bd) {
 		assert (IU.bd == null) : "You're trying to re-set basedata. This may be a bug.";
 		IU.bd = bd;
@@ -98,11 +106,11 @@ public abstract class IU {
 	
 	public void connectSLL(IU link) {
 		setSameLevelLink(link);
-		if (groundedIn != null) {
+		if (link != null && groundedIn != null) {
 			IU firstGrounding = groundedIn.get(0);
 			IU prevLast;
 			if (link.groundedIn != null) {
-				prevLast = link.groundedIn.get(link.groundedIn.size());
+				prevLast = link.groundedIn.get(link.groundedIn.size() - 1);
 				if (prevLast.getClass() != firstGrounding.getClass()) {
 					throw new RuntimeException("I can only connect IUs of identical types!");
 				}
@@ -112,8 +120,6 @@ public abstract class IU {
 			firstGrounding.connectSLL(prevLast);
 		}
 	}
-	
-
 	
 	/**
 	 * return the start of the timespan this IU covers 
@@ -151,6 +157,9 @@ public abstract class IU {
 		return groundedIn != null ? groundedIn : Collections.EMPTY_LIST;
 	}
 
+	/**
+	 * two IUs are equal if their IDs are the same
+	 */
 	public boolean equals(IU iu) {
 		return (this.id == iu.id); 
 	}
@@ -207,7 +216,7 @@ public abstract class IU {
 	}
 	
 	public String toString() {
-		return id + "," + toLabelLine(); // + "\n";
+		return getID() + "," + toLabelLine(); // + "\n";
 	}
 	
 	public String deepToString() {
@@ -239,7 +248,7 @@ public abstract class IU {
 		if (Double.isNaN(startTime))
 			startTime = 0.0;
 		StringBuilder sb = new StringBuilder("<iu iu_id='");
-		sb.append(this.id);
+		sb.append(this.getID());
 		sb.append("' time='");
 		sb.append(Math.round(startTime * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
 		double duration = duration();
@@ -251,13 +260,13 @@ public abstract class IU {
 		if (this.getSameLevelLink() == null) {
 			sb.append(" sll='top'");
 		} else {
-			sb.append(" sll='" + this.getSameLevelLink().id + "'");
+			sb.append(" sll='" + this.getSameLevelLink().getID() + "'");
 		}
 		if (groundedIn != null && !groundedIn.isEmpty()) {
 	        Iterator<IU> grIt = groundedIn.iterator();
 			sb.append(" gil='");
 	        while (grIt.hasNext()) {
-	                sb.append(grIt.next().id);
+	                sb.append(grIt.next().getID());
 	                if (grIt.hasNext())
 	                        sb.append(",");
 	        }

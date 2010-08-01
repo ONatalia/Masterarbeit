@@ -14,7 +14,7 @@ public class SyllableIU extends IU {
 
 	@Override
 	public String toPayLoad() {
-		return null;
+		return "";
 	}
 
 	public List<SegmentIU> getNucleus() {

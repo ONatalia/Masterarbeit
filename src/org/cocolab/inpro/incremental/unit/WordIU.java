@@ -108,15 +108,6 @@ public class WordIU extends IU {
 		return ((isSilence && iu.isSilence) || pron.equals(iu.pron));
 	}
 	
-	public String toOAAString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(id);
-		sb.append(",'");
-		sb.append(word);
-		sb.append("'");
-		return sb.toString();
-	}
-	
 	public String getWord() {
 		return word;
 	}

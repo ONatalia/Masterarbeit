@@ -330,6 +330,8 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	}
 
 	public synchronized List<WordIU> getWordIUs() {
+		// make sure that words in wordIUs are connected via sll
+		wordIUs.connectSLLs();
 		return wordIUs;
 	}
 	
