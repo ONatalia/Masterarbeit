@@ -30,6 +30,8 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	String referenceText;
 	String referenceFile;
 	
+	boolean dataThrottle;
+	
 	protected boolean ignoreErrors;
 	
 	void printUsage() {
@@ -63,13 +65,17 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -tg <file>     do fake recognition from the given reference textgrid");
 //		System.err.println("    -gr <URL>      recognize using the given JSGF grammar");
 //		System.err.println("    -lm <URL>      recognize using the given language model");
+		System.err.println("    -rt	           when reading from file, run no faster than real-time");
 	}
 
-	/*
-	 * check whether the configuration is valid
+	/**
+	 * check validity of the configuration
+	 * additionally warns if configuration makes no sense
+	 * @return true for valid combinations of configuration options
 	 */
 	boolean checkConfiguration() {
 		boolean success = false;
+		// check for necessary requirements
 		if (inputMode == UNSPECIFIED_INPUT) {
 			printUsage();
 			System.err.println("Must specify one of -M, -R, or -F");
@@ -79,6 +85,9 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		} else {
 			success = true;
 		}
+		// test for nonsense option combinations
+		if (dataThrottle && (inputMode != FILE_INPUT)) 
+			System.err.println("Warning: only throttling speed for file input; your microphone's not faster anyway.");
 		return success;
 	}
 	
@@ -154,6 +163,9 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				i++;
 				incrementalModifier = Integer.parseInt(args[i]);
 			}
+			else if (args[i].equals("-rt")) {
+				dataThrottle = true;
+			}
 			else {
 				printUsage();
 				System.err.println("Illegal argument: " + args[i]);
@@ -184,6 +196,10 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 
 	public int getIncrementalModifier() {
 		return incrementalModifier;
+	}
+	
+	public boolean hasDataThrottle() {
+		return dataThrottle;
 	}
 	
 }

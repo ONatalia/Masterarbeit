@@ -9,6 +9,9 @@ import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Double;
 
+/**
+ * a data processor that throttles the data flow
+ */
 public class DataThrottle extends BaseDataProcessor {
 
 	@S4Double(defaultValue = 1)
@@ -18,13 +21,6 @@ public class DataThrottle extends BaseDataProcessor {
 	
 	private double speed = 1.0;
 	
-    /**
-     * Constructs a data processor that throttles the data flow
-     */
-    public void initialize() {
-        super.initialize();
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -37,6 +33,7 @@ public class DataThrottle extends BaseDataProcessor {
 	
     
 	public Data getData() throws DataProcessingException {
+		getTimer().start();
         Data input = getPredecessor().getData();
         // DataStartSignals are used to start the timer
         if (input instanceof DataStartSignal) {
@@ -53,7 +50,7 @@ public class DataThrottle extends BaseDataProcessor {
 	        	
 	            long waitTime = audioTime - realTime;
 		        if (waitTime > 0) {
-		            System.out.println("waiting " + waitTime + " milliseconds.");
+		            //System.out.println("waiting " + waitTime + " milliseconds.");
 		        	try {
 		        		Thread.sleep(waitTime);
 		        	} catch (Exception e) {
@@ -62,6 +59,7 @@ public class DataThrottle extends BaseDataProcessor {
 		        }
 	        }
         }
+        getTimer().stop();
 		return input;
 	}
 

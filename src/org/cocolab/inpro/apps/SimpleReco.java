@@ -19,6 +19,7 @@ import org.cocolab.inpro.sphinx.decoder.FakeSearch;
 import org.cocolab.inpro.sphinx.frontend.Microphone;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 
+import edu.cmu.sphinx.frontend.DataProcessor;
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
 import edu.cmu.sphinx.linguist.Linguist;
@@ -158,7 +159,13 @@ public class SimpleReco {
 			case RecoCommandLineParser.FILE_INPUT:
 				StreamDataSource sds = (StreamDataSource) cm.lookup("streamDataSource");
 				sds.initialize();
-				fe.setPredecessor(sds);
+				if (clp.hasDataThrottle()) {
+					DataProcessor throttle = (DataProcessor) cm.lookup("dataThrottle");
+					throttle.setPredecessor(sds);
+					fe.setPredecessor(throttle);
+				} else {
+					fe.setPredecessor(sds);
+				}
 				URL audioURL = clp.getAudioURL();
 				logger.info("input from " + audioURL.toString());
 				AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);
