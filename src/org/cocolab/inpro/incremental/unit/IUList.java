@@ -80,6 +80,49 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  		}
 	}
  	
+ 	/** 
+ 	 * Calculate the difference (in edits) between an other and this list.
+ 	 * 
+ 	 * return the edits that are necessary to turn this list into the other list.
+ 	 * 
+ 	 * the following holds: 
+ 	 * other.equals(this.apply(this.diff(other)));
+ 	 * 
+ 	 * @param other the reference list
+ 	 * @return returns the list of edits that have to be applied to this
+ 	 */
+ 	public List<EditMessage<IUType>> diff(List<IUType> other) {
+ 		Iterator<IUType> thisIt = iterator();
+ 		Iterator<IUType> otherIt = other.iterator();
+ 		
+ 		List<EditMessage<IUType>> addEdits = new ArrayList<EditMessage<IUType>>();
+ 		List<EditMessage<IUType>> revokeEdits = new ArrayList<EditMessage<IUType>>();
+ 		
+ 		// check the prefix of both lists
+ 		while (thisIt.hasNext() && otherIt.hasNext()) {
+ 			IUType thisElem = thisIt.next();
+ 			IUType otherElem = otherIt.next();
+ 			if (!thisElem.equals(otherElem)) {
+ 				// handle the first no-match
+ 				revokeEdits.add(new EditMessage<IUType>(EditType.REVOKE, thisElem));
+ 				addEdits.add(new EditMessage<IUType>(EditType.ADD, otherElem));
+ 			}
+ 		}
+ 		// now create revokes for remaining IUs in thisIt
+ 		while (thisIt.hasNext())
+ 			revokeEdits.add(new EditMessage<IUType>(EditType.REVOKE, thisIt.next()));
+ 		// now add remaining IUs from otherIt
+ 		while (otherIt.hasNext())
+ 			addEdits.add(new EditMessage<IUType>(EditType.ADD, otherIt.next()));
+ 		
+ 		// now construct the final list
+ 		Collections.reverse(revokeEdits); // revokes have to be ordered from right to left
+ 		List<EditMessage<IUType>> edits = revokeEdits; // we can just keep the list instead of creating a new one and addAlling the revokes
+ 		edits.addAll(addEdits);
+
+ 		return edits;
+ 	}
+ 	
  	public void add(IUType e, boolean deepSLL) {
  		if (deepSLL) {
  			e.connectSLL(getLast());

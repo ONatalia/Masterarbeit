@@ -11,7 +11,7 @@ import org.cocolab.inpro.incremental.util.ResultUtil;
 
 public abstract class IU {
 	
-	public static final long startupTime = System.currentTimeMillis();
+	public static long startupTime = System.currentTimeMillis();
 	
 	public static final IU FIRST_IU = new IU() {
 		@Override
@@ -36,7 +36,7 @@ public abstract class IU {
 	 * and you want groundedIn to be deeply SLLed to the sameLevelLink's groundedIn-IUs  
 	 */
 	public IU(IU sll, List<IU> groundedIn, boolean deepSLL) {
-		this.creationTime = System.currentTimeMillis();
+		this.creationTime = System.currentTimeMillis() - startupTime;
 		this.id = IU.getNewID();
 		this.groundedIn = groundedIn;
 		if (deepSLL && (sll != null)) {
@@ -247,24 +247,23 @@ public abstract class IU {
 		double startTime = startTime();
 		if (Double.isNaN(startTime))
 			startTime = 0.0;
-		StringBuilder sb = new StringBuilder("<iu iu_id='");
-		sb.append(this.getID());
-		sb.append("' time='");
-		sb.append(Math.round(startTime * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
 		double duration = duration();
 		if (Double.isNaN(duration))
 			duration = 0.0;
+		StringBuilder sb = new StringBuilder("<event time='");
+		sb.append(Math.round(startTime * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
 		sb.append("' duration='");
 		sb.append(Math.round(duration * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
-		sb.append("'");
-		if (this.getSameLevelLink() == null) {
-			sb.append(" sll='top'");
-		} else {
+		sb.append("'><iu id='");
+		int id = this.getID();
+		sb.append(id);
+		sb.append('\'');
+		if (this.getSameLevelLink() != null) {
 			sb.append(" sll='" + this.getSameLevelLink().getID() + "'");
 		}
 		if (groundedIn != null && !groundedIn.isEmpty()) {
 	        Iterator<IU> grIt = groundedIn.iterator();
-			sb.append(" gil='");
+			sb.append(" grin='");
 	        while (grIt.hasNext()) {
 	                sb.append(grIt.next().getID());
 	                if (grIt.hasNext())
@@ -274,12 +273,16 @@ public abstract class IU {
 		}
 		sb.append(">");
 		sb.append(toPayLoad().replace("<", "&lt;").replace(">", "&gt;"));
-		sb.append("</iu>");
+		sb.append("</iu></event>");
 		return sb.toString();
 	}
 	
 	public long getCreationTime() {
 		return creationTime;
+	}
+	
+	public long getAge() {
+		return System.currentTimeMillis() - creationTime;
 	}
 	
 }

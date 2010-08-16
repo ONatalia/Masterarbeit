@@ -15,6 +15,7 @@ import org.cocolab.inpro.apps.util.RecoCommandLineParser;
 import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
+import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.sphinx.decoder.FakeSearch;
 import org.cocolab.inpro.sphinx.frontend.Microphone;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
@@ -62,6 +63,8 @@ public class SimpleReco {
     	setupSource();
     	logger.info("Setting up monitors...");
     	setupMonitors();
+    	logger.info("Configuration has finished");
+    	IU.startupTime = System.currentTimeMillis();
 	}
 	
 	private void setupDeltifier() {
