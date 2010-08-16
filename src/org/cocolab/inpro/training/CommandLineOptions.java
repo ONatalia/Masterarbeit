@@ -7,6 +7,8 @@ import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 
 class CommandLineOptions {
+	
+	private static final String DEFAULT_URL = "http://www.ling.uni-potsdam.de/~timo/cgi-bin/upload.pl";
 
 	private ConfigurationManager cm;
 	URL configURL = DataCollector.class.getResource("config.xml");
@@ -15,6 +17,13 @@ class CommandLineOptions {
 	boolean verbose = false;
 	
 	CommandLineOptions(String[] args) {
+		try {
+			uploadURL = new URL(DEFAULT_URL);
+		} catch(MalformedURLException mue) {
+			System.err.println("ERROR: Cannot interpret default URL " + DEFAULT_URL);
+			System.err.println("Please explicitly specify a URL with the -c option");
+			printUsage();
+		}
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-h")) {
 				printUsage();
@@ -78,6 +87,8 @@ class CommandLineOptions {
 		System.err.println("input selection:");
 		System.err.println("    -c <URL>       URL to Sphinx configuration");
 		System.err.println("    -s <URL>       URL to slide-show configuration");
+		System.err.println("upload options:");
+		System.err.println("    -u <URL>       URL to upload script");
 	}
 	
 	void printUsage(String message) {
