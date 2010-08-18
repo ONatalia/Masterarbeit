@@ -51,7 +51,15 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	
 	private static final Logger logger = Logger.getLogger(ASRWordDeltifier.class);
 	
+	/**
+	 * the number of the frame to which recognition has proceeded, 
+	 * restarts from zero with every recognition restart
+	 */
 	int currentFrame = 0;
+	/** 
+	 * offset to account for token numbers restarting from zero on recognition restarts
+	 * (we want IU times to increase between recognitions, not restart from zero)
+	 */
 	int currentOffset = 0; // measured in centiseconds / frames (since when ?)
 	long startTime = 0;
 	
@@ -105,7 +113,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				((UnitSearchState) s).getUnit().getName().equals("SIL"));
 	}
 	
-	/**
+	/* *
 	 * 
 	 * @param finalToken the token in the result to start deltification from
 	 */
@@ -212,8 +220,8 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 						break;
 					}
 				} else {
+					// this assertion does seem to hurt anymore
 					assert false : newSearchState.getClass().toString() + newSearchState.toString();
-					// assert false; // hmm, I don't know why, but it works without this assertion. and it doesn't hurt
 				}
 				segmentStartTime = segmentEndTime;
 			} else {
@@ -235,6 +243,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		if (addSilenceWord) {
 			WordIU newIU = new WordIU(null);
 			newIU.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, "SIL")));
+			segmentStartTime = segmentEndTime;
 			wordEdits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
 		}
 		// TODO: implement this loop in new method makeAdds() ?
@@ -325,20 +334,24 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		}
 	}
 
+	/** return the change of the hypothesis as a list of edits (on the word level) since the last call */
 	public synchronized List<EditMessage<WordIU>> getWordEdits() {
 		return wordEdits;
 	}
 
+	/** return the current hypothesis as a list of IUs (on the word level) */
 	public synchronized List<WordIU> getWordIUs() {
 		// make sure that words in wordIUs are connected via sll
 		wordIUs.connectSLLs();
 		return wordIUs;
 	}
 	
+	/** the frame count in the IU world; no restarts between recognitions and including non-VAD-times */
 	public synchronized int getCurrentFrame() {
 		return currentFrame + currentOffset;
 	}
 	
+	/** the time that has passed in the IU world; no restarts between recognitions */
 	public synchronized double getCurrentTime() {
 		return (currentFrame + currentOffset) * ResultUtil.FRAME_TO_SECOND_FACTOR;
 	}
