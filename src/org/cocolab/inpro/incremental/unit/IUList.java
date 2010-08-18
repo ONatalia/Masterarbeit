@@ -53,7 +53,7 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  				       Double.isNaN(getLast().endTime()) || // allow addition if previous ends at NaN
  				       getLast().endTime() <= edit.getIU().startTime() + 0.001 // account for floating point error 
  						: "better sort your IUs: " + this + edit;
- 				this.add(edit.getIU(), true); 
+ 				this.add(edit.getIU(), true);
  				break;
  			case REVOKE: // assertion errors on REVOKE seem to only happen as a consequence of earlier errors on ADD
  				assert !isEmpty() : "Can't revoke from an empty list: " + edit;

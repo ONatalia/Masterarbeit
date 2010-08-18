@@ -104,21 +104,23 @@ public abstract class IU {
 		return sameLevelLink;
 	}
 	
-	public void connectSLL(IU link) {
-		setSameLevelLink(link);
-		if (link != null && groundedIn != null) {
-			IU firstGrounding = groundedIn.get(0);
-			IU prevLast;
-			if (link.groundedIn != null) {
-				prevLast = link.groundedIn.get(link.groundedIn.size() - 1);
-				if (prevLast.getClass() != firstGrounding.getClass()) {
-					throw new RuntimeException("I can only connect IUs of identical types!");
-				}
-			} else {
-				prevLast = FIRST_IU;
-			}
-			firstGrounding.connectSLL(prevLast);
-		}
+    public void connectSLL(IU link) {
+    	if (sameLevelLink == null) {
+    		setSameLevelLink(link);
+    		if (link != null && groundedIn != null) {
+    			IU firstGrounding = groundedIn.get(0);
+    			IU prevLast;
+    			if (link.groundedIn != null && link.groundedIn != Collections.EMPTY_LIST) {
+    				prevLast = link.groundedIn.get(link.groundedIn.size() - 1);
+    				if (prevLast.getClass() != firstGrounding.getClass()) {
+    					throw new RuntimeException("I can only connect IUs of identical types!");
+    				}
+    			} else {
+    				prevLast = FIRST_IU;
+    			}
+    			firstGrounding.connectSLL(prevLast);
+    		}
+    	}
 	}
 	
 	/**
