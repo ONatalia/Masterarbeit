@@ -52,7 +52,7 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  				assert isEmpty() || 
  				       Double.isNaN(getLast().endTime()) || // allow addition if previous ends at NaN
  				       getLast().endTime() <= edit.getIU().startTime() + 0.001 // account for floating point error 
- 						: "better sort your IUs: " + this + edit;
+ 						: "you're trying to add an IU that starts before the (previously) last IU ends: " + this + edit;
  				this.add(edit.getIU(), true);
  				break;
  			case REVOKE: // assertion errors on REVOKE seem to only happen as a consequence of earlier errors on ADD
@@ -74,7 +74,17 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
 				apply(edit);
 			}
 	 	} catch (AssertionError ae) {
+ 			logger.fatal("this list contains: ");
+ 			logger.fatal(this);
+ 			logger.fatal("details of list: ");
+ 			for (IUType iu : this) {
+ 				logger.fatal(iu.deepToString());
+ 			}
  			logger.fatal("list of edits given was " + edits);
+ 			logger.fatal("details of list of edits: ");
+ 			for (EditMessage<IUType> edit : edits) {
+ 				logger.fatal(edit.getIU().deepToString());
+ 			}
  			logger.fatal(ae);
  			throw ae;
  		}
@@ -123,6 +133,12 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  		return edits;
  	}
  	
+ 	/**
+ 	 * adds an element and connects its same-level link, if that's not yet set.
+ 	 * @param e the element to add to the list
+ 	 * @param deepSLL determines whether same-level links should be set only
+ 	 * on the element, or also on unconnected IUs in the grounded-in hierarchy.
+ 	 */
  	public void add(IUType e, boolean deepSLL) {
  		if (deepSLL) {
  			e.connectSLL(getLast());
