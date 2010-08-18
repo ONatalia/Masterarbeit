@@ -1,15 +1,12 @@
 package org.cocolab.inpro.incremental;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
+import org.cocolab.inpro.incremental.util.TedAdapter;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -134,43 +131,6 @@ public abstract class IUModule extends PushBuffer {
 			}
 			hasUpdates = false;
 		}	
-	}
-	
-	protected class TedAdapter {
-		private Socket tedSocket;
-	    private PrintWriter tedWriter;
-	    
-	    private boolean connected = false;
-
-	    public TedAdapter(String tedAddress, int tedPort) {
-			try {
-				tedSocket = new Socket(tedAddress, tedPort);
-				tedWriter = new PrintWriter(tedSocket.getOutputStream());
-				connected = true;
-			} catch (IOException e) {
-				Logger.getLogger(TedAdapter.class).warn("Cannot connect to TEDview. I will not retry.");
-				connected = false;
-			}
-		}
-	    
-	    public boolean isConnected() {
-	    	return connected;
-	    }
-	    
-		public void write(String message) {
-			tedWriter.print(message);
-			tedWriter.flush();
-		}
-
-		protected void finalize() {
-	    	tedWriter.close();
-	    	try {
-				tedSocket.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
 	}
 	
 }

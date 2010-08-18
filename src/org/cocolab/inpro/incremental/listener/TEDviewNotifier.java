@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.util.TedAdapter;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -33,6 +34,12 @@ public class TEDviewNotifier extends IUModule {
 
     private TedAdapter tedAdapter;
     
+	int currentFrame = 0;
+
+	public void setCurrentFrame(int frame) {
+		currentFrame = frame;
+	}
+	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
@@ -57,9 +64,16 @@ public class TEDviewNotifier extends IUModule {
 	    	for (IU iu : ius) {
 	    		sbIUs.append(iu.toTEDviewXML());
 	    	}
-	    	sbIUs.append("</event>\n\n");
+	    	sbIUs.append("</event>");
 	    	tedAdapter.write(sbIUs.toString());
 		}
+	}
+	
+	@Override
+	public long getTime() {
+		// an alternative implementation might want to 
+		//return currentFrame * 10;
+		return super.getTime();
 	}
 
 	@Override

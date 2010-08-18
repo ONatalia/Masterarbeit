@@ -34,8 +34,8 @@ public interface SignalFeatureListener extends Configurable, EventListener, Rese
      * @param logEnergy log energy of the frame
      *
      */
-     public void newSignalFeatures(double logEnergy, boolean voicing, double pitch);
+     public void newSignalFeatures(int frame, double logEnergy, boolean voicing, double pitch);
      
-     public void newSignalFeatures(double logEnergy, double rBCEnergy, boolean voicing, double pitch);
+     public void newSignalFeatures(int frame, double logEnergy, double rBCEnergy, boolean voicing, double pitch);
 
 }
