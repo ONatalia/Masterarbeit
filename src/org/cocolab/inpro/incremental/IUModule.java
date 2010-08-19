@@ -68,7 +68,7 @@ public abstract class IUModule extends PushBuffer {
 	}
 	
 	public void logToTedView(String message) {
-		String tedTrack = this.getClass().getCanonicalName();
+		String tedTrack = this.getClass().getSimpleName();
 		StringBuilder sb = new StringBuilder("<event time='");
 		sb.append(getTime());
 		sb.append("' originator='");
