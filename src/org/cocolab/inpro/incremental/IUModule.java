@@ -10,6 +10,7 @@ import org.cocolab.inpro.incremental.util.TedAdapter;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.S4Boolean;
 import edu.cmu.sphinx.util.props.S4ComponentList;
 import edu.cmu.sphinx.util.props.S4Integer;
 import edu.cmu.sphinx.util.props.S4String;
@@ -33,6 +34,10 @@ public abstract class IUModule extends PushBuffer {
     @S4String(defaultValue = "localhost")
     public final static String PROP_TEDVIEW_LOG_ADDRESS = "tedLogAddress";
     
+	@S4Boolean(defaultValue = true)
+	public final static String PROP_LOG_TO_TEDVIEW = "logToTedView";
+	private boolean logToTedView;
+
     protected TedAdapter tedLogAdapter;
     
 	/** the right buffer of this module */
@@ -43,6 +48,7 @@ public abstract class IUModule extends PushBuffer {
 		listeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
 		int tedPort = ps.getInt(PROP_TEDVIEW_LOG_PORT);
 		String tedAddress = ps.getString(PROP_TEDVIEW_LOG_ADDRESS);
+		this.logToTedView = ps.getBoolean(PROP_LOG_TO_TEDVIEW);
 		tedLogAdapter = new TedAdapter(tedAddress, tedPort);
 	}
 	
@@ -68,15 +74,17 @@ public abstract class IUModule extends PushBuffer {
 	}
 	
 	public void logToTedView(String message) {
-		String tedTrack = this.getClass().getSimpleName();
-		StringBuilder sb = new StringBuilder("<event time='");
-		sb.append(getTime());
-		sb.append("' originator='");
-		sb.append(tedTrack);
-		sb.append("'>");
-		sb.append(message.replace("<", "&lt;").replace(">", "&gt;"));
-		sb.append("</event>");
-		tedLogAdapter.write(sb.toString());
+		if (this.logToTedView) {
+			String tedTrack = this.getClass().getSimpleName();
+			StringBuilder sb = new StringBuilder("<event time='");
+			sb.append(getTime());
+			sb.append("' originator='");
+			sb.append(tedTrack);
+			sb.append("'>");
+			sb.append(message.replace("<", "&lt;").replace(">", "&gt;"));
+			sb.append("</event>");
+			tedLogAdapter.write(sb.toString());			
+		}
 	}
 	
 	/**
