@@ -24,13 +24,13 @@ public class PitchCandidate {
 	private int lag = 0;
 	private double score = 0;
 	public int frame = 0;
-	private double pitchInCent = Double.NaN;
+	private double pitchHz = Double.NaN;
 	
 	public PitchCandidate() {}
 	
-	public PitchCandidate(int lag, double score, int samplingFrequency) {
+	public PitchCandidate(int lag, double score, double samplingFrequency) {
 		this.lag = lag;
-		this.pitchInCent = PitchUtils.hzToCent(((double) samplingFrequency) / lag);
+		this.pitchHz = samplingFrequency / lag;
 		this.score = score;
 	}
 	
@@ -42,8 +42,12 @@ public class PitchCandidate {
 		return this.lag;
 	}
 	
+	public double pitchInHz() {
+		return pitchHz;
+	}
+	
 	public double pitchInCent() {
-		return pitchInCent;
+		return PitchUtils.hzToCent(pitchHz);
 	}
 	
 }

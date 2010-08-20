@@ -130,7 +130,7 @@ public class LookAheadPitchTracker extends PitchTracker implements Resetable {
             reader.setInputStream(ais, audioFileURL.getFile());
             
 //            speedTest(fe);
-        	functionalTest(args, fe);
+        	functionalTest(args, cm);
         } catch (IOException e) {
             System.err.println("Problem when loading PitchTracker: " + e);
             e.printStackTrace();

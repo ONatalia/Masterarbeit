@@ -15,15 +15,8 @@ public class TEDviewNotifier implements SignalFeatureListener {
 	}
 
 	@Override
-	public void newSignalFeatures(int frame, double logEnergy, boolean voicing,
+	public void newSignalFeatures(int frame, double power, boolean voicing,
 			double pitch) {
-		send(frame, voicing, pitch);
-	}
-
-	@Override
-	public void newSignalFeatures(int frame, double logEnergy,
-			double rBCEnergy, boolean voicing, double pitch) {
-		// TODO Auto-generated method stub
 		send(frame, voicing, pitch);
 	}
 

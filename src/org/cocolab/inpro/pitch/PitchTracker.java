@@ -1,5 +1,6 @@
 /* 
- * Copyright 2007, 2008, 2009, Timo Baumann, Gabriel Skantze and the Inpro project
+ * Copyright 2007, 2008, 2009, 2010 
+ * Timo Baumann, Gabriel Skantze and the Inpro project
  * 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,17 +18,6 @@
  */
 package org.cocolab.inpro.pitch;
 
-/**
- * Data Processor for voicing-decision and pitch tracking
- * 
- * pitch tracking usually consists of several steps:
- * - preprocessing (e. g. low pass filtering)
- * - period candidate generation (score, auto-correlation, cross-correlation, normalized cross-correlation)
- * - candidate refinement (e. g. thresholding of candidates)
- * - voicing decision and final path determination (dynamic programming, ...)
- * 
- */
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -40,10 +30,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
+
+import org.cocolab.inpro.pitch.notifier.SignalFeatureListener;
 
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
@@ -55,51 +48,66 @@ import edu.cmu.sphinx.frontend.util.StreamDataSource;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.S4ComponentList;
 import edu.cmu.sphinx.util.props.S4Double;
 
+/**
+ * Data Processor for voicing-decision and pitch tracking.
+ * 
+ * pitch tracking usually consists of several steps:
+ * - preprocessing (e. g. low pass filtering)
+ * - period candidate generation (score, auto-correlation, cross-correlation, normalized cross-correlation)
+ * - candidate refinement (e. g. thresholding of candidates)
+ * - voicing decision and final path determination (dynamic programming, ...)
+ */
 public class PitchTracker extends BaseDataProcessor {
 	
-	// TODO: sollten aus Parametern für min/max-Pitch errechnet werden (signal = samplingFrequency / pitch)
-	private int minLag = 26; // entspricht f0 von 600 Hz bei 16 kHz Abtastung; 
-	private int maxLag = 320; // entspricht f0 von 50 Hz bei 16 kHz Abtastung
-	private int samplingFrequency = 16000; // TODO: parametrisieren
+	private static final float SAMPLING_FREQUENCY = 16000f; // TODO: parametrisieren
 	
 	@S4Double(defaultValue = 0.15)
 	public final static String PROP_CAND_SCORE_THRESHOLD = "scoreThreshold";
-	@S4Double(defaultValue = 50.0)
+	private double candidateScoreThreshold; // default set by newProperties()
+	@S4Double(defaultValue = 66.66666666)
 	public final static String PROP_MIN_PITCH_HZ = "minimumPitch";
+	private int maxLag = 320; // samples, entspricht f0 von 50 Hz bei 16 kHz Abtastung
 	@S4Double(defaultValue = 500.0)
 	public final static String PROP_MAX_PITCH_HZ = "maximumPitch";
+	private int minLag = 26; // entspricht f0 von 600 Hz bei 16 kHz Abtastung; 
 	
-	private double candidateScoreThreshold = 0.30; // default set by newProperties()
+	/** 
+	 * the silence threshold below which we don't do any pitch extraction 
+	 * (this avoids division by zero, and especially reduces processing overhead) 
+	 */
 	private double energyThreshold = 5;
 	
 	private double[] signalBuffer;
+	/** 
+	 * pitch can only be assigned to a PitchedDoubleData object a little later, 
+	 * when this data is in the center of the signalBuffer (not the newest
+	 * data on the right of the buffer) but we don't want to buffer the objects 
+	 * before we output them; we therefore output the PDD objects immediately,
+	 * keep reference to them in this queue and fill in the pitch values once
+	 * they have been calculated. The size of the queue (and hence the lag with
+	 * which pitch becomes available) depends on the size of the signalBuffer, 
+	 * which in turn depends on PROP_MIN_PITCH_HZ.
+	 */ 
+	private ArrayBlockingQueue<PitchedDoubleData> pitchAssignmentQueue;
 	
-	protected static boolean debug = false;
+	@S4ComponentList(type = SignalFeatureListener.class)
+	public static final String PROP_LISTENERS = "listeners";	
+	private List<SignalFeatureListener> listeners;
 
-	/**************************
-	 * pre processing
-	 **************************/
+	protected static final boolean debug = false;
 
-    public static double signalPower(double[] samples) {
-        assert samples.length > 0;
-        double sumOfSquares = 0.0f;
-        for (int i = 0; i < samples.length; i++) {
-            double sample = samples[i];
-            sumOfSquares += sample * sample;
-        }
-        return  Math.sqrt((double)sumOfSquares/samples.length);
-    }
-
-	/**************************
+	/* * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * lag scoring
-	 **************************/
-
-	// calculate score of a given signalBuffer and downsample the signalBuffer on the way
+	 * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/** 
+	 * calculate score of a given signalBuffer and downsample the signalBuffer on the way.
+	 * NOTE: this is currently not used in the algorithm implemented below.
+	 */
 	public double[] amdf(double[] signal) {
 		double[] amdf = new double[maxLag + 2];
-		Arrays.fill(amdf, 0, minLag, 0.0f);
 		int numSamples = signal.length;
 		if (minLag < 2) {
 			minLag = 2;
@@ -115,6 +123,7 @@ public class PitchTracker extends BaseDataProcessor {
 		return amdf;
 	}
 	
+	/** calculate the sum magnitude difference square function of a signal. */
 	public double[] smdsf(double[] signal) {
 		double[] smdsf = new double[maxLag];
 		int numSamples = signal.length;
@@ -128,14 +137,11 @@ public class PitchTracker extends BaseDataProcessor {
 		}
 		return smdsf;
 	}
-
 	
-/**/
-	/**************************
+	/* * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * lag score normalization
-	 **************************/
-
-	/* cumulative mean normalization */
+	 * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/** cumulative mean normalization */
 	public double[] cmn(double[] smdsf) {
 		int maxLag = smdsf.length;
 		double[] cmn = new double[maxLag];
@@ -148,56 +154,63 @@ public class PitchTracker extends BaseDataProcessor {
 		return cmn;
 	}
 	
-	/**************************
+	/* * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * candidate generation
-	 **************************/
-
-	/**
-	 * pick global minima in the lagScoreFunction that are smaller than threshold as candidates 
+	 * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/** 
+	 * pick global minima in the lagScoreFunction that are smaller 
+	 * than candidateScoreThreshold as candidates and return the least lag.
+	 * @return the least lag of all the candidates considered
 	 */
-	private double qualityThresheldCandidates(double[] lagScoreFunction, List<PitchCandidate> candidates) {
-		candidates.clear();
-		double leastLag = Double.MAX_VALUE; // start with the maximum 
+	private List<PitchCandidate> qualityThresheldCandidates(double[] lagScoreTrajectory) {
+		List<PitchCandidate> candidates = new ArrayList<PitchCandidate>();
+		double maxVoicing = Double.MAX_VALUE; // start with the maximum 
 		for (int lag = minLag + 1; lag < maxLag - 1; lag++) {
 			// all minima at or below threshold
-			leastLag = Math.min(leastLag, lagScoreFunction[lag]);
-			if ((lagScoreFunction[lag] <= candidateScoreThreshold) &&
-				(lagScoreFunction[lag - 1] > lagScoreFunction[lag]) &&
-				(lagScoreFunction[lag] < lagScoreFunction[lag + 1])) {
-					candidates.add(new PitchCandidate(lag, lagScoreFunction[lag], samplingFrequency));
+			maxVoicing = Math.min(maxVoicing, lagScoreTrajectory[lag]);
+			if ((lagScoreTrajectory[lag] <= candidateScoreThreshold) &&
+				(lagScoreTrajectory[lag - 1] > lagScoreTrajectory[lag]) &&
+				(lagScoreTrajectory[lag] < lagScoreTrajectory[lag + 1])) {
+					candidates.add(new PitchCandidate(lag, lagScoreTrajectory[lag], SAMPLING_FREQUENCY));
 			}
 		}
-		return leastLag;
+		return candidates;
 	}
 	
 	
-	/**************************
-	 * candidate selection
-	 **************************/
-	
-	private int lastBestLag = -1;
-	
-	int trackingCandidateSelection(List<PitchCandidate> candidates) {
-		int lag;
+	/* * * * * * * * * * * * * * * * * * * * * * * * * *
+	 * best candidate selection
+	 * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/** for tracking, we have to keep track of the previously selected lag */
+	private int lastBestLag = -99;
+	/**
+	 * select lag of the candidate that is closest to the most recently selected lag
+	 * (which is recorded in lastBestLag)
+	 * @param candidates
+	 * @return the selected candidate 
+	 */
+	PitchCandidate trackingCandidateSelection(List<PitchCandidate> candidates) {
 		// check if there is a candidate corresponding to the last best candidate
 		for (Iterator<PitchCandidate> iter = candidates.iterator(); iter.hasNext(); ) {
-			lag = iter.next().getLag(); 
+			PitchCandidate candidate = iter.next();
+			int lag = iter.next().getLag(); 
 			if (Math.abs(lag - lastBestLag) < 10) { // TODO: for higher lags (lower freqs), this must be higher than for lower freqs
 				lastBestLag = lag;
-				return lag;
+				return candidate;
 			}
 		}
 		// backoff to simple candidate selection
-		lag = simplisticCandidateSelection(candidates);
-		lastBestLag = lag;
-		return lag;
+		PitchCandidate candidate = simplisticCandidateSelection(candidates);
+		lastBestLag = candidate.getLag();
+		return candidate;
 	}
 	
-	private static int simplisticCandidateSelection(List<PitchCandidate> candidates) {
-		// select the first candidate (with the highest f0)
-		return candidates.get(0).getLag();
+	/** select the first candidate (with the highest f0) */
+	private static PitchCandidate simplisticCandidateSelection(List<PitchCandidate> candidates) {
+		return candidates.get(0);
 	}
 	
+	/** select the candidate with the highest quality (deepest minimum in the lagScoreTrajectory */
 	static PitchCandidate bestCandidateSelection(List<PitchCandidate> candidates) {
 		PitchCandidate bestCandidate = candidates.get(0);
 		for (PitchCandidate candidate : candidates) {
@@ -208,76 +221,104 @@ public class PitchTracker extends BaseDataProcessor {
 		return bestCandidate;
 	}
 	
-	/**************************
+	/* * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * interpolation of selected lag
-	 **************************/
-	double parabolicInterpolation(double[] lagScoreFunction, int lag) {
+	 * * * * * * * * * * * * * * * * * * * * * * * * * */
+	double parabolicInterpolation(double[] lagScoreTrajectory, int lag) {
 		//TODO: implement parabolic interpolation
 		// compare http://www.iua.upf.es/~xserra/cursos/IAM/labs/lab5/lab-5.html
 		// http://ccrma.stanford.edu/~jos/parshl/Peak_Detection_Steps_3.html
 		return lag;
 	}
 	
-	/**************************
+	/* * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * high level pitch tracker
-	 **************************/
-
+	 * * * * * * * * * * * * * * * * * * * * * * * * * */
 	public Data getData() throws DataProcessingException {
 		Data input = getPredecessor().getData();
-        getTimer().start();
+        getTimer().start(); // start timer that keeps track of front-end processing
 		if (input instanceof DoubleData) {
+			PitchedDoubleData output = new PitchedDoubleData((DoubleData) input);
 			double[] newSamples = ((DoubleData) input).getValues();
-			double signalPower = signalPower(newSamples);
-			if (signalBuffer == null) {
-				signalBuffer = new double[maxLag * 2 + 2];
-				Arrays.fill(signalBuffer, 0);
-			}
-			else {
-				System.arraycopy(signalBuffer, newSamples.length, signalBuffer, 0, signalBuffer.length - newSamples.length);
-				System.arraycopy(newSamples, 0, signalBuffer, signalBuffer.length - newSamples.length, newSamples.length);
-				boolean voiced = false;
-				double pitchHz = -1.0f;
-				double voicing = Double.NaN;
-				List<PitchCandidate> candidates = new ArrayList<PitchCandidate>();
-				if (signalPower > energyThreshold) { // TODO: better silence detection, maybe?
-					double[] lagScoreFunction = cmn(smdsf(signalBuffer));
-					// voicing is between 0 (unvoiced) and 1 (voiced)
-					voicing = Math.max(0f, 1.0f - qualityThresheldCandidates(lagScoreFunction, candidates));
-					voiced = !candidates.isEmpty();
-					if (voiced) {
-						int lag = simplisticCandidateSelection(candidates);
-						pitchHz = ((double) samplingFrequency) / lag;
-					} else {
-						lastBestLag = -1;
-					}
+			System.arraycopy(signalBuffer, newSamples.length, signalBuffer, 0, signalBuffer.length - newSamples.length);
+			System.arraycopy(newSamples, 0, signalBuffer, signalBuffer.length - newSamples.length, newSamples.length);
+			List<PitchCandidate> candidates = null;
+			PitchCandidate selectedCandidate = null;
+			if (output.getPower() > energyThreshold) { // TODO: better silence detection, maybe?
+				double[] lagScoreTrajectory = cmn(smdsf(signalBuffer));
+				// voicing is between 0 (unvoiced) and 1 (voiced)
+				candidates = qualityThresheldCandidates(lagScoreTrajectory);
+				if (!candidates.isEmpty()) {
+					selectedCandidate = simplisticCandidateSelection(candidates);
+				} else {
+					lastBestLag = -99;
 				}
-//				System.err.print("\r\t\t\t\t\t" + pitchHz + "\r");
-				input = new PitchedDoubleData((DoubleData) input, voiced, voicing, pitchHz, candidates, signalPower);
 			}
+			// NOTE: the (pitch and score) values of candidate do NOT apply
+			// to the Data processed in this call to getData, but to the Data
+			// that is in the center of the signalBuffer. Hence, we output the
+			// current data in this step WITHOUT setting pitch, etc, and keep
+			// output PitchedDoubleData objects in a queue, to set their values
+			// a once they become known (typical lag is 2 frames for 50Hz, may
+			// be lower for higher PROP_MINIMUM_PITCH)
+			/* transform current input into PitchedDoubleData; do not fill in any values yet */
+			
+			pitchAssignmentQueue.add(output);
+			// fill in values into element in pitchAssignmentQueue and deal with
+			// signal listeners
+			signalListeners(selectedCandidate, candidates);
 		}
-        getTimer().stop();
+        getTimer().stop(); // stop timer that keeps track of front-end processing
 		return input;
 	}
 	
-	/**************************
+	/**
+	 *	signal listeners, and apply values to first element of queue 
+	 * @param candidate or null if no candidate/voiceless
+	 * @param signalPower
+	 */
+	private void signalListeners(PitchCandidate selectedCandidate,
+			List<PitchCandidate> candidates) {
+		if (pitchAssignmentQueue.remainingCapacity() == 0) {
+			boolean voiced = (selectedCandidate != null);
+			double pitchHz = voiced ? selectedCandidate.pitchInHz() : -1f;
+			double voicing = voiced ? Math.max(0f, 1.0f - selectedCandidate.getScore()) : Double.NaN;
+			/* fill in voiced, voicing, pitchHz, candidates to element in queue */
+			PitchedDoubleData pdd = pitchAssignmentQueue.remove();
+			pdd.setPitch(candidates, pitchHz, voiced, voicing);
+			double power = pdd.getPower();
+			int frame = (int) pdd.getFirstSampleNumber() / 160; // frame since start of audio (regardless of VAD)
+    		/* notify listeners */
+			for (SignalFeatureListener sfl : listeners) {
+				sfl.newSignalFeatures(frame, power, voiced, pitchHz);
+			}
+		}
+	}
+
+	/* * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * Configurable
-	 **************************/
+	 * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		// add tracking parameters here
 		candidateScoreThreshold = ps.getDouble(PROP_CAND_SCORE_THRESHOLD);
 		double freq = ps.getDouble(PROP_MIN_PITCH_HZ);
-		maxLag = Double.valueOf(samplingFrequency / freq).intValue();
+		maxLag = Double.valueOf(SAMPLING_FREQUENCY / freq).intValue();
 		//System.err.println("Setting maxLag to " + maxLag);
 		freq = ps.getDouble(PROP_MAX_PITCH_HZ);
-		minLag = Double.valueOf(samplingFrequency / freq).intValue();
+		minLag = Double.valueOf(SAMPLING_FREQUENCY / freq).intValue();
 		//System.err.println("Setting minLag to " + minLag);
+		signalBuffer = new double[maxLag * 2 + 2];
+		Arrays.fill(signalBuffer, 0);
+		int queueSize = ((int) (maxLag / 160)) + 1; // should be 1 for freq_low > 100Hz, 2 for f_l > 50Hz, ...
+		pitchAssignmentQueue = new ArrayBlockingQueue<PitchedDoubleData>(queueSize, false);
+		listeners = ps.getComponentList(PROP_LISTENERS, SignalFeatureListener.class);
 	}
 
-	/**************************
+	/* * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * main 
-	 **************************/
+	 * * * * * * * * * * * * * * * * * * * * * * * * * */
 	
 	private static Queue<Double> getReferencePitch(String filename) {
 		Queue<Double> referencePitch = new LinkedList<Double>();
@@ -297,23 +338,16 @@ public class PitchTracker extends BaseDataProcessor {
 		return referencePitch;
 	}
 	
-	public static void functionalTest(String[] args, BaseDataProcessor fe) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException, DataProcessingException {
-    	Queue<Double> referencePitch;
-    	if (args.length > 1) {
-        	referencePitch = getReferencePitch(args[1]);
-        } else {
-        	referencePitch = new LinkedList<Double>();
-        }
-        // start doing something.
-        Data d;
-        int debugCounter = 0;
-        while ((d = fe.getData()) != null) {
-        	if (d instanceof PitchedDoubleData) {
-//        		debug = (debugCounter == 45) || (debugCounter == 46)
-//        			 || (debugCounter == 47) || (debugCounter == 44);
-        		if (debug) System.out.println("Frame " + debugCounter + ": ");
-        		PitchedDoubleData pdd = (PitchedDoubleData) d;
-        		double pitch = pdd.isVoiced() ? pdd.getPitchHz() : -1.0;
+	public static void functionalTest(String[] args, ConfigurationManager cm) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException, DataProcessingException {
+		// read reference pitch (if available)
+		final Queue<Double> referencePitch = (args.length > 1) 
+    		  ? getReferencePitch(args[1]) : new LinkedList<Double>();
+    	// add a listener for the output
+    	PitchTracker pt = (PitchTracker) cm.lookup("pitchTracker");
+    	pt.listeners.add(new SignalFeatureListener(){
+			@Override
+			public void newSignalFeatures(int frame, double logEnergy,
+					boolean voicing, double pitch) {
         		System.out.printf((Locale) null, "%7.3f", pitch);
         		System.out.print("\t");
         		if (!referencePitch.isEmpty()) {
@@ -324,11 +358,17 @@ public class PitchTracker extends BaseDataProcessor {
         			}
         		}
         		System.out.println();
-            	debugCounter++;
-        	} else if (d instanceof DoubleData) {
-        		//System.out.println("oups.");
-        	}
-        }
+			}
+			@Override
+			public void newProperties(PropertySheet ps)
+					throws PropertyException { }
+			@Override
+			public void reset() { }
+    		
+    	});
+        // drain the frontend
+        BaseDataProcessor fe = (BaseDataProcessor) cm.lookup("frontEnd");
+        while ((fe.getData()) != null) { }
 	}
 	
 	public static void speedTest(BaseDataProcessor fe) throws DataProcessingException {
@@ -370,7 +410,7 @@ public class PitchTracker extends BaseDataProcessor {
             reader.setInputStream(ais, audioFileURL.getFile());
             
 //            speedTest(fe);
-        	functionalTest(args, fe);
+        	functionalTest(args, cm);
         } catch (IOException e) {
             System.err.println("Problem when loading PitchTracker: " + e);
             e.printStackTrace();
@@ -455,7 +495,7 @@ public class PitchTracker extends BaseDataProcessor {
 						// width of valley
 						int lobe_width = lag - last_max_pos;
 						if (debug) {
-							System.err.println("lag: " + last_min_pos + ", corresponding to frequency: " + samplingFrequency / last_min_pos);
+							System.err.println("lag: " + last_min_pos + ", corresponding to frequency: " + SAMPLING_FREQUENCY / last_min_pos);
 							System.err.println("global_max: " + global_max);
 							System.err.println("peak_ratio: " + peak_ratio);
 							System.err.println("height:     " + height);

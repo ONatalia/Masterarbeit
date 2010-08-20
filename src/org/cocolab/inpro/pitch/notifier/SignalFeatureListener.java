@@ -31,11 +31,14 @@ public interface SignalFeatureListener extends Configurable, EventListener, Rese
 	/**
      * Method called when a new set of signal features is available
      *
-     * @param logEnergy log energy of the frame
-     *
+     * @param frame the frame number for this result
+     * @param power average power per sample in the frame
+     * @ param rbcpower average power per sample after filtering the frame with a revised B-curve filter 
+     * @param voicing whether this frame is voiced
+     * @param pitch pitch for this frame
      */
-     public void newSignalFeatures(int frame, double logEnergy, boolean voicing, double pitch);
+     public void newSignalFeatures(int frame, double power, boolean voicing, double pitch);
      
-     public void newSignalFeatures(int frame, double logEnergy, double rBCEnergy, boolean voicing, double pitch);
+//     public void newSignalFeatures(int frame, double power, double rBCEnergy, boolean voicing, double pitch);
 
 }
