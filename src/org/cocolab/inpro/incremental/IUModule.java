@@ -74,7 +74,7 @@ public abstract class IUModule extends PushBuffer {
 		sb.append("' originator='");
 		sb.append(tedTrack);
 		sb.append("'>");
-		sb.append(message);
+		sb.append(message.replace("<", "&lt;").replace(">", "&gt;"));
 		sb.append("</event>");
 		tedLogAdapter.write(sb.toString());
 	}
