@@ -24,7 +24,7 @@ public class AVMUtil {
 	/**
 	 * List of AVMs representing underspecified input (available to composition).
 	 */
-	private ArrayList<AVM> avmList;
+	private ArrayList<AVM> composeList;
 	/**
 	 * List of AVMs representing list of previously resolved AVMs.
 	 */
@@ -38,48 +38,48 @@ public class AVMUtil {
  	
 	/**
 	 * Creates AVMUtil with a list of prototypes (avmStructures) of
-	 * different typed AVMs and a local list of composed AVMs (avmList).
+	 * different typed AVMs and a local list of composed AVMs (composeList).
 	 */
 	public AVMUtil() {
 		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile("res/PentoAVMStructure");
 		worldList = AVMWorldUtil.setAVMsFromFile("res/PentoAVMWorldList", avmStructures);
-		avmList = getAllAVMs();
+		composeList = getAllAVMs();
 		resolvedList = new ArrayList<AVM>();
 //		keepList = new ArrayList<AVM>();
 	}
 
 	/**
 	 * Creates AVMUtil with a list of prototypes (avmStructures) of
-	 * different typed AVMs and a local list of composed AVMs (avmList).
+	 * different typed AVMs and a local list of composed AVMs (composeList).
 	 * Defaults to res/PentoAVMWorldList for world file.
 	 * @param structureFile with list of AVM structures. 
 	 */
 	public AVMUtil(String worldFile) {
 		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile(worldFile);
 		worldList = AVMWorldUtil.setAVMsFromFile("res/PentoAVMWorldList", avmStructures);
-		avmList = getAllAVMs();
+		composeList = getAllAVMs();
 		resolvedList = new ArrayList<AVM>(worldList.size());
 //		keepList = new ArrayList<AVM>();
 	}
 
 	/**
 	 * Creates AVMUtil with a list of prototypes (avmStructures) of
-	 * different typed AVMs and a local list of composed AVMs (avmList).
+	 * different typed AVMs and a local list of composed AVMs (composeList).
 	 * @param structureFile with list of AVMstucture
 	 * @param worldFile with list of AVMs in the world 
 	 */
 	public AVMUtil(String structureFile, String worldFile) {
 		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile(structureFile);
 		worldList = AVMWorldUtil.setAVMsFromFile(worldFile, avmStructures);
-		avmList = getAllAVMs();
+		composeList = getAllAVMs();
 		resolvedList = new ArrayList<AVM>(worldList.size());
 //		keepList = new ArrayList<AVM>();
 	}
 
 	public AVMUtil(AVMUtil c) {
-		this.avmList = new ArrayList<AVM>(c.avmList.size());
-		for (AVM avm : c.avmList) {
-			this.avmList.add(new AVM(avm));
+		this.composeList = new ArrayList<AVM>(c.composeList.size());
+		for (AVM avm : c.composeList) {
+			this.composeList.add(new AVM(avm));
 		}
 		resolvedList = new ArrayList<AVM>(c.resolvedList.size());
 		for (AVM avm : c.resolvedList) {
@@ -94,23 +94,16 @@ public class AVMUtil {
 	/**
 	 * Method to call when a new AVPair becomes known.
 	 * Attempt unification with known AVM prototypes (from avmStructures)
-	 * which incrementally grow with more input.
-	 * @param avp
+	 * which incrementally grow with more input into composeList.
+	 * @param avp the AVPair to compose with
+	 * @return composeList the updated list of AVMs available for composition.
 	 */
 	public ArrayList<AVM> compose(AVPair avp) {
-		// Initialize a new list
-		ArrayList<AVM> newList = new ArrayList<AVM>();
 		// Try setting new AVPair on all known AVMs
-		for (AVM avm : this.avmList) {
-			if (avm.setAttribute(avp)) {
-				// Keep successful ones.
-				newList.add(avm);
-			}
+		for (AVM avm : this.composeList) {
+			avm.setAttribute(avp);
 		}
-		if (this.avmList.size() >= newList.size()) {
-			this.avmList = newList;
-		}
-		return this.avmList;
+		return this.composeList;
 	}
 
 	/**
@@ -126,17 +119,17 @@ public class AVMUtil {
 	}
 
 	/**
-	 * Method to resolve composed AVMs in avmList with
+	 * Method to resolve composed AVMs in composeList with
 	 * known AVMs in worldList. Loops through both and attempts
 	 * unification.
 	 * 
 	 * @return resolveList the new list of resolved AVMs
 	 */
 	public ArrayList<AVM> resolve() {
-		// Loop through known and world AVMs, attempt unification
+		// Loop through composed and world AVMs, attempt unification
 		this.resolvedList.clear();
 		for (AVM worldAVM : worldList) {
-			for (AVM composedAVM : this.avmList) {
+			for (AVM composedAVM : this.composeList) {
 				if (worldAVM.unifies(composedAVM)) {
 					worldAVM.unify(composedAVM);
 					this.resolvedList.add(worldAVM);
@@ -185,10 +178,10 @@ public class AVMUtil {
 	/**
 	 * Sets prototype AVMs to be used for matching
 	 * against (e.g. from new AVPairs).
-	 * getAllAVMs() sets these from known structures.
+	 * getAllAVMs() sets these from previously known structures.
 	 */
 	public void setAllAVMs() {
-		this.avmList = getAllAVMs();
+		this.composeList = getAllAVMs();
 	}
 
 	/**
@@ -196,31 +189,39 @@ public class AVMUtil {
 	 * @param type
 	 */
 	public void setAVMs(String type) {
-		this.avmList = new ArrayList<AVM>();
-		this.avmList.add(new AVM(type, avmStructures));
+		this.composeList = new ArrayList<AVM>();
+		this.composeList.add(new AVM(type, avmStructures));
 	}
 
 	/**
-	 * Unsets AVM of a given type by removing them from avmList list.
+	 * Unsets AVM of a given type by removing them from composeList list.
 	 * @param type
 	 */
 	public void unsetAVMs(String type) {
 		ArrayList<AVM> removeList = new ArrayList<AVM>();
-		for (AVM avm : this.avmList) {
+		for (AVM avm : this.composeList) {
 			if (avm.getType().equals(type)) {
 				removeList.add(avm);
 			}
 		}
-		this.avmList.removeAll(removeList);
+		this.composeList.removeAll(removeList);
 	}
 
 	/**
-	 * Prints out all known AVMs.
+	 * Sets the list of AVMs available for composition.
+	 * @param avmList the avmList to set
+	 */
+	public void setAVMList(ArrayList<AVM> avmList) {
+		this.composeList = avmList;
+	}
+
+	/**
+	 * Prints out all known AVM prototypes.
 	 */
 	private void printAVMs() {
 		logger.info("Composed AVMs:");
-		if (avmList != null) {
-			for (AVM a : this.avmList) {
+		if (composeList != null) {
+			for (AVM a : this.composeList) {
 				logger.info(a.toString());
 			}			
 		} else {
@@ -229,19 +230,51 @@ public class AVMUtil {
 	}
 	
 	/**
-	 * @return the avmList
+	 * Returns a list of composed AVMs.
+	 * @return the composeList
 	 */
 	public ArrayList<AVM> getAVMList() {
-		return avmList;
+		return this.composeList;
 	}
 
 	/**
-	 * @param avmList the avmList to set
+	 * Returns a list of composed AVMs that are not empty
+	 * (i.e. that have already been composed into).
+	 * @return the list of non-empty AVMs
 	 */
-	public void setAvmList(ArrayList<AVM> avmList) {
-		this.avmList = avmList;
+	public ArrayList<AVM> getNonEmptyAVMList() {
+		ArrayList<AVM> nonEmpties = new ArrayList<AVM>();
+		for (AVM avm : this.composeList) {
+			if (!avm.isEmpty()) {
+				nonEmpties.add(avm);
+			}
+		}
+		return nonEmpties;
 	}
 	
+	/**
+	 * Returns a list of (non-empty) AVMs that differ.
+	 * @param lastAVMUtil
+	 * @return
+	 */
+	public ArrayList<AVM> diffAVMLists(AVMUtil au) {
+		if (au.getNonEmptyAVMList().size() == 0) {
+			return this.getNonEmptyAVMList();
+		}
+		ArrayList<AVM> list = new  ArrayList<AVM>();
+		for (AVM newAVM : this.getNonEmptyAVMList()) {
+			for (AVM oldAVM : au.getNonEmptyAVMList()) {
+				if (newAVM.getType().equals(oldAVM.getType())) {
+					if (!newAVM.equals(oldAVM)) {
+						list.add(newAVM);
+					}
+				}
+			}
+		}
+		return list;
+	}
+
+
 	static void interactiveTest() throws IOException {
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 		String line = stdin.readLine();
@@ -283,11 +316,11 @@ public class AVMUtil {
 
 		for (AVPair avp : avps) {
 			System.out.println("Adding tag AVPair '" + avp.toString() + "'.");
-			if (composer.avmList != null) {
+			if (composer.composeList != null) {
 				composer.compose(avp);
 				composer.printAVMs();
 			} 
-			if (composer.avmList != null) {
+			if (composer.composeList != null) {
 				ArrayList<AVM> resolvedList = composer.resolve();
 				if (resolvedList.size() > 0) {
 					System.out.println("Found these that resolve...");
@@ -303,5 +336,5 @@ public class AVMUtil {
 		composer = new AVMUtil();
 		interactiveTest();
 	}
-	
+
 }
