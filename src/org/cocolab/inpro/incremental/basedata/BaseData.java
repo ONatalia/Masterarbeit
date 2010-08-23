@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.BaseDataKeeper;
-import org.cocolab.inpro.pitch.PitchTracker;
 import org.cocolab.inpro.pitch.PitchedDoubleData;
 
 import ddf.minim.effects.RevisedBCurveFilter;
@@ -80,6 +79,12 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 		}
 		return Double.NaN;
 	}
+	
+	public PitchedDoubleData getPitchedData(double time) {
+		@SuppressWarnings("unchecked")
+		TimedData<PitchedDoubleData> td = pitchedData.floor(new TimedData(time));
+		return td.value;
+	}
 
     private double revisedBCurveCorrectedRMS(DoubleData d) {
     	double rms = 0.0d;
@@ -88,13 +93,13 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
     		assert samples.length <= 160;
     		double[] samplesF = Arrays.copyOf(samples, samples.length); 
 	    	rbcFilter.process(samplesF);
-	    	rms = PitchTracker.signalPower(samplesF);
+	    	rms = PitchedDoubleData.signalPower(samplesF);
     	}
         rms = Math.max(rms, 0);
     	return rms;
     }
     
-	private static double percentileFilter(List<Double> list, int windowPosition) {
+	public static double percentileFilter(List<Double> list, int windowPosition) {
 		List<Double> sortedList = new ArrayList<Double>(list);
 		Collections.sort(sortedList);
 		return sortedList.get(windowPosition).doubleValue();

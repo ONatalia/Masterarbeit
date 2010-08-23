@@ -164,14 +164,14 @@ public class PitchTracker extends BaseDataProcessor {
 	 */
 	private List<PitchCandidate> qualityThresheldCandidates(double[] lagScoreTrajectory) {
 		List<PitchCandidate> candidates = new ArrayList<PitchCandidate>();
-		double maxVoicing = Double.MAX_VALUE; // start with the maximum 
 		for (int lag = minLag + 1; lag < maxLag - 1; lag++) {
 			// all minima at or below threshold
-			maxVoicing = Math.min(maxVoicing, lagScoreTrajectory[lag]);
 			if ((lagScoreTrajectory[lag] <= candidateScoreThreshold) &&
 				(lagScoreTrajectory[lag - 1] > lagScoreTrajectory[lag]) &&
 				(lagScoreTrajectory[lag] < lagScoreTrajectory[lag + 1])) {
-					candidates.add(new PitchCandidate(lag, lagScoreTrajectory[lag], SAMPLING_FREQUENCY));
+					double refinedLag = parabolicInterpolation(lagScoreTrajectory[lag - 1], lagScoreTrajectory[lag], lagScoreTrajectory[lag + 1]);
+					double pitchHz = SAMPLING_FREQUENCY / (lag + refinedLag);
+					candidates.add(new PitchCandidate(pitchHz, lagScoreTrajectory[lag]));
 			}
 		}
 		return candidates;
@@ -181,11 +181,12 @@ public class PitchTracker extends BaseDataProcessor {
 	/* * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * best candidate selection
 	 * * * * * * * * * * * * * * * * * * * * * * * * * */
+	private static final double NO_LAST_BEST_PITCH = -9999999;
 	/** for tracking, we have to keep track of the previously selected lag */
-	private int lastBestLag = -99;
+	private double lastBestPitch = NO_LAST_BEST_PITCH;
 	/**
 	 * select lag of the candidate that is closest to the most recently selected lag
-	 * (which is recorded in lastBestLag)
+	 * (which is recorded in lastBestPitch)
 	 * @param candidates
 	 * @return the selected candidate 
 	 */
@@ -193,15 +194,15 @@ public class PitchTracker extends BaseDataProcessor {
 		// check if there is a candidate corresponding to the last best candidate
 		for (Iterator<PitchCandidate> iter = candidates.iterator(); iter.hasNext(); ) {
 			PitchCandidate candidate = iter.next();
-			int lag = iter.next().getLag(); 
-			if (Math.abs(lag - lastBestLag) < 10) { // TODO: for higher lags (lower freqs), this must be higher than for lower freqs
-				lastBestLag = lag;
+			double pitch= iter.next().pitchInCent(); 
+			if (Math.abs(pitch - lastBestPitch) < 60) { // no more than half an octave in 100ms...
+				lastBestPitch = pitch;
 				return candidate;
 			}
 		}
 		// backoff to simple candidate selection
 		PitchCandidate candidate = simplisticCandidateSelection(candidates);
-		lastBestLag = candidate.getLag();
+		lastBestPitch = candidate.pitchInCent();
 		return candidate;
 	}
 	
@@ -224,11 +225,11 @@ public class PitchTracker extends BaseDataProcessor {
 	/* * * * * * * * * * * * * * * * * * * * * * * * * *
 	 * interpolation of selected lag
 	 * * * * * * * * * * * * * * * * * * * * * * * * * */
-	double parabolicInterpolation(double[] lagScoreTrajectory, int lag) {
-		//TODO: implement parabolic interpolation
+	double parabolicInterpolation(double alpha, double beta, double gamma) {
+		return 0.5 * (alpha - gamma) / (alpha - 2 * beta + gamma);
 		// compare http://www.iua.upf.es/~xserra/cursos/IAM/labs/lab5/lab-5.html
 		// http://ccrma.stanford.edu/~jos/parshl/Peak_Detection_Steps_3.html
-		return lag;
+		// http://www.dsprelated.com/dspbooks/sasp/Quadratic_Interpolation_Spectral_Peaks.html
 	}
 	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -251,7 +252,7 @@ public class PitchTracker extends BaseDataProcessor {
 				if (!candidates.isEmpty()) {
 					selectedCandidate = simplisticCandidateSelection(candidates);
 				} else {
-					lastBestLag = -99;
+					lastBestPitch = NO_LAST_BEST_PITCH;
 				}
 			}
 			// NOTE: the (pitch and score) values of candidate do NOT apply
@@ -502,7 +503,7 @@ public class PitchTracker extends BaseDataProcessor {
 							System.err.println("diff:       " + diff);
 							System.err.println("lobe_width: " + lobe_width);							
 						}
-						if (//(Math.abs(lastBestLag - last_min_pos) < 3) || // always allow the peak in the vicinity of the last winning peak
+						if (//(Math.abs(lastBestPitch - last_min_pos) < 3) || // always allow the peak in the vicinity of the last winning peak
 							((peak_ratio >= 0.8) &&
 							(global_max >= 200.0) && // assert signal strength 
 							(height >= 0.3 * global_max) &&

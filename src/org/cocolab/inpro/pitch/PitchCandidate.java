@@ -21,25 +21,19 @@ import org.cocolab.inpro.pitch.util.PitchUtils;
 
 public class PitchCandidate {
 	
-	private int lag = 0;
 	private double score = 0;
 	public int frame = 0;
 	private double pitchHz = Double.NaN;
 	
 	public PitchCandidate() {}
 	
-	public PitchCandidate(int lag, double score, double samplingFrequency) {
-		this.lag = lag;
-		this.pitchHz = samplingFrequency / lag;
+	public PitchCandidate(double pitchHz, double score) {
+		this.pitchHz = pitchHz;
 		this.score = score;
 	}
 	
 	public double getScore() {
 		return this.score;
-	}
-	
-	public int getLag() {
-		return this.lag;
 	}
 	
 	public double pitchInHz() {
