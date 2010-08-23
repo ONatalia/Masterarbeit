@@ -324,9 +324,9 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		if (result.isFinal())
 			recoFinal = true;
 		Token t = result.getBestToken();
-		if (t != null)
-			deltify(result.getBestToken());
-		else {
+		if (t != null) {
+			deltify(t);
+		} else {
 			if (currentFrame > 2) { // there never is for the first two frames, so don't print a message
 				logger.debug("there was no best token at frame " + currentFrame);
 			}
@@ -353,7 +353,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	
 	/** the time that has passed in the IU world; no restarts between recognitions */
 	public synchronized double getCurrentTime() {
-		return (currentFrame + currentOffset) * ResultUtil.FRAME_TO_SECOND_FACTOR;
+		return getCurrentFrame() * ResultUtil.FRAME_TO_SECOND_FACTOR;
 	}
 
 	@Override

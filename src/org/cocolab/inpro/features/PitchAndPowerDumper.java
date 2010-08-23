@@ -40,8 +40,7 @@ public class PitchAndPowerDumper implements SignalFeatureListener {
 	}
 	
 	@Override
-	public void newSignalFeatures(double powEnergy, double rbcEnergy,
-			boolean voicing, double pitch) {
+	public void newSignalFeatures(int frame, double power, boolean voicing, double pitch) {
 		System.out.print(counter++ + "\t");
 		if (voicing) {
 			System.out.printf(Locale.US, "%.2f", pitch);
@@ -50,11 +49,12 @@ public class PitchAndPowerDumper implements SignalFeatureListener {
 		}
 		powList.removeLast();
 		rbcList.removeLast();
-		powList.addFirst(Double.valueOf(powEnergy));
-		rbcList.addFirst(Double.valueOf(rbcEnergy));
+		powList.addFirst(Double.valueOf(power));
+//		rbcList.addFirst(Double.valueOf(rbcEnergy));
 		double smoothedPowEnergy = percentileFilter(powList); 
 		double smoothedRbcEnergy = percentileFilter(rbcList);
-		System.out.printf(Locale.US, "\t%.2f\t%.2f\t%.2f\t%.2f\n", powEnergy, rbcEnergy, smoothedPowEnergy, smoothedRbcEnergy);
+//		System.out.printf(Locale.US, "\t%.2f\t%.2f\t%.2f\t%.2f\n", power, rbcEnergy, smoothedPowEnergy, smoothedRbcEnergy);
+		System.out.printf(Locale.US, "\t%.2f\t%.2f\t%.2f\n", power, smoothedPowEnergy, smoothedRbcEnergy);
 	}
 
 	public void reset() { }

@@ -338,9 +338,9 @@ public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeat
 	}
 
 	@Override
-	public void newSignalFeatures(double logEnergy, double rBCEnergy,
-			boolean voicing, double pitch) {
-		newSignalFeatures(logEnergy, voicing, pitch);
+	public void newSignalFeatures(int frame, double power, boolean voicing,
+			double pitch) {
+		newSignalFeatures(power, voicing, pitch);
 	}
 
 }

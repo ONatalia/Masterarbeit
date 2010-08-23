@@ -31,8 +31,10 @@ public class TedAdapter {
     }
     
 	public void write(String message) {
-		tedWriter.print(message + "\n\n");
-		tedWriter.flush();
+		if (isConnected()) {
+			tedWriter.print(message + "\n\n");
+			tedWriter.flush();
+		}
 	}
 
 	protected void finalize() {

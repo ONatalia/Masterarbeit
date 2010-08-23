@@ -212,18 +212,20 @@ public class SimpleReco {
 	}
 
 	private void setupMonitors() throws InstantiationException, PropertyException {
+		CurrentASRHypothesis casrh = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
+		recognizer.addResultListener(casrh);
 		if (clp.matchesOutputMode(RecoCommandLineParser.OAA_OUTPUT)) {
 			cm.lookup("newWordNotifierAgent");
 		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.TED_OUTPUT)) {
-			cm.lookup("TEDviewNotifier");
+			PushBuffer ted = (PushBuffer) cm.lookup("tedNotifier");
+			casrh.addListener(ted);
 		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
 			cm.lookup("labelWriter");
 		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.CURRHYP_OUTPUT)) {
-			CurrentASRHypothesis cah = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
-			cah.addListener((PushBuffer) cm.lookup("hypViewer"));
+			casrh.addListener((PushBuffer) cm.lookup("hypViewer"));
 		}
 		if (clp.verbose()) {
 			cm.lookup("memoryTracker");
@@ -232,7 +234,7 @@ public class SimpleReco {
 		// this is a little hacky, but so be it
 		if (clp.matchesOutputMode(RecoCommandLineParser.DISPATCHER_OBJECT_OUTPUT)) {
 			MonitorCommandLineParser clp = new MonitorCommandLineParser(new String[] {
-					"-S", "-M"
+					"-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
 				});
 			clp.setInputMode(MonitorCommandLineParser.DISPATCHER_OBJECT_INPUT);
 			try {
