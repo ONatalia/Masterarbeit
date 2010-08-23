@@ -162,10 +162,12 @@ public class SimpleReco {
 			case RecoCommandLineParser.FILE_INPUT:
 				StreamDataSource sds = (StreamDataSource) cm.lookup("streamDataSource");
 				sds.initialize();
-				if (clp.hasDataThrottle()) {
+				if (clp.playAtRealtime()) {
 					DataProcessor throttle = (DataProcessor) cm.lookup("dataThrottle");
+					DataProcessor endpointing = (DataProcessor) cm.lookup("endpointing");
 					throttle.setPredecessor(sds);
-					fe.setPredecessor(throttle);
+					endpointing.setPredecessor(throttle);
+					fe.setPredecessor(endpointing);
 				} else {
 					fe.setPredecessor(sds);
 				}

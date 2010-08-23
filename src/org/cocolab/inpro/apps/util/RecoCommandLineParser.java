@@ -198,7 +198,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		return incrementalModifier;
 	}
 	
-	public boolean hasDataThrottle() {
+	public boolean playAtRealtime() {
 		return dataThrottle;
 	}
 	
