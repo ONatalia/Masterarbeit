@@ -14,16 +14,16 @@
 	     (and hence, how often resultListeners are called) -->
     <property name="step" value="1"/>
     <property name="recognizer" value="recognizer"/>
-    <property name="linguist" value="lexTreeLinguist"/>
-    <property name="searchManager" value="searchManager"/>
     <property name="scorer" value="simpleScorer"/>
-<!--
+
+    <!-- alternatives: flatLinguist | lexTreeLinguist -->
     <property name="linguist"   value="flatLinguist"/> 
-    <property name="grammar" value="ngramGrammar"/>
+
+    <!-- alternatives: fakeSearch | simpleSearch | wordPruningSearch -->
+    <property name="searchManager" value="simpleSearch"/>
+    
+    <!-- alternatives: ngramGrammar | jsgfGrammar | forcedAligner; only relevant with flatLinguist -->
     <property name="grammar" value="jsgfGrammar"/>
-    <property name="grammar" value="forcedAligner"/>
-    <property name="searchManager" value="fakeSearch"/>
--->
     
     <property name="frontend" value="frontend"/>
     <!-- The minimum amount of time in speech (in milliseconds) to be considered as utterance start -->
@@ -75,17 +75,6 @@
         <property name="featureBlockSize" value="${step}"/>
     </component>
 
-<!--
-    <component name="searchManager" type="edu.cmu.sphinx.decoder.search.SimpleBreadthFirstSearchManager">
-        <property name="logMath" value="logMath"/>
-        <property name="linguist" value="flatLinguist"/>
-        <property name="pruner" value="trivialPruner"/>
-        <property name="scorer" value="threadedScorer"/>
-        <property name="activeListFactory" value="standardActiveListFactory"/>
-        <property name="keepAllTokens" value="true"/>
-    </component>
--->
-
     <component name="fakeSearch" type="org.cocolab.inpro.sphinx.decoder.FakeSearch">
         <property name="dictionary" value="dictionary"/>
         <property name="unitManager" value="unitManager"/>
@@ -95,7 +84,16 @@
         <property name="textGrid" value=""/>
     </component>
 
-    <component name="searchManager" type="edu.cmu.sphinx.decoder.search.WordPruningBreadthFirstSearchManager">
+    <component name="simpleSearch" type="edu.cmu.sphinx.decoder.search.SimpleBreadthFirstSearchManager">
+        <property name="logMath" value="logMath"/>
+        <property name="linguist" value="flatLinguist"/>
+        <property name="pruner" value="trivialPruner"/>
+        <property name="scorer" value="threadedScorer"/>
+        <property name="activeListFactory" value="standardActiveListFactory"/>
+        <property name="keepAllTokens" value="true"/>
+    </component>
+
+    <component name="wordPruningSearch" type="edu.cmu.sphinx.decoder.search.WordPruningBreadthFirstSearchManager">
         <property name="logMath" value="logMath"/>
         <property name="linguist" value="${linguist}"/>
         <property name="pruner" value="trivialPruner"/>

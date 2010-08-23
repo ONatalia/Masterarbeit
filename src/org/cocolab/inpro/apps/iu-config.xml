@@ -33,23 +33,17 @@
     <!-- The incremental processing configuration                 -->
     <!-- ******************************************************** -->
     <component name="currentASRHypothesis" type="org.cocolab.inpro.incremental.processor.CurrentASRHypothesis">
-        <property name="recognizer" value="recognizer"/>
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
-    		<item>${semanticComposer}</item>
-    		<item>consoleNotifier</item>
-    		<item>hypViewer</item>
-	     <item>iuBasedFloorTracker</item>
-	     <item>tedNotifier</item>
 <!--
-    		<item>semanticResolver</item>
-          <item>labelWriter2</item>
+    		<item>${semanticComposer}</item>
+	     <item>iuBasedFloorTracker</item>
     		<item>tedNotifier</item>
     		<item>hypViewer</item>
-	     <item>iuBasedFloorTracker</item>
 	     <item>outputForSimpleText</item>
+	     <item>iuNetworkViewer</item>
         	<item>consoleNotifier</item>
          	<item>labelWriter2</item>
     		<item>oaaNotifier</item>
@@ -124,8 +118,10 @@
     <component name="tedNotifier" type="org.cocolab.inpro.incremental.listener.TEDviewNotifier"/>
     <component name="labelWriter2" type="org.cocolab.inpro.incremental.listener.LabelWriter"/>
     <component name="hypViewer" type="org.cocolab.inpro.incremental.listener.CurrentHypothesisViewer"/>
+    <component name="iuNetworkViewer" type="org.cocolab.inpro.incremental.listener.IUNetworkViewer"/>
 
     <component name="oaaDispatchStream" type="org.cocolab.inpro.audio.OAADispatchStream">
+    	<!-- this is an OAA agent name, it has nothing to do with the identically named component below -->
         <property name="agentName" value="dispatchStream"/>
         <property name="goalPrefix" value="x"/>
         <property name="sendSilence" value="false"/>

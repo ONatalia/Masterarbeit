@@ -18,8 +18,8 @@
         <propertylist name="pipeline">
             <item>pitchTracker</item>
             <item>baseDataAdapter1</item>
+
 <!-- 
-            <item>signalFeatureExtractor</item>
 --> 
             <item>preemphasizer</item>
             <item>windower</item>
@@ -87,18 +87,19 @@
 	</component>
 
     <component name="pitchTracker" 
-               type="org.cocolab.inpro.pitch.PitchTracker"> <!-- I don't see the advantage of the LookAheadPitchTracker, sorry -->
+               type="org.cocolab.inpro.pitch.PitchTracker"> 
+<!-- I don't see the advantage of the LookAheadPitchTracker, sorry -->
+<!--        <property name="lookAhead" value="10"/> -->
         <property name="scoreThreshold" value="0.55"/>
         <property name="minimumPitch" value="50"/>
         <property name="maximumPitch" value="500"/>
-<!--        <property name="lookAhead" value="10"/> -->
+        <propertylist name="listeners">
+        	<item>pitchToTed</item>
+        </propertylist>
     </component>
     
-    <component name="signalFeatureExtractor"
-               type="org.cocolab.inpro.pitch.notifier.SignalFeatureExtractor">
-        <property name="listener" value="pitchDumper"/>
-    </component>
     <component name="pitchDumper" type="org.cocolab.inpro.features.PitchAndPowerDumper"/>
+    <component name="pitchToTed" type="org.cocolab.inpro.pitch.notifier.TEDviewNotifier"/>
 	
     <component name="baseDataAdapter1" type="org.cocolab.inpro.incremental.basedata.BaseDataAdapter">
         <property name="dataType" value="pitchedData"/>
