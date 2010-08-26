@@ -15,6 +15,9 @@ import org.apache.log4j.Logger;
  */
 public class AVMUtil {
 
+	/**
+	 * Variable for storing AVM structures.
+	 */
 	private static HashMap<String, HashMap<String, String>> avmStructures;
 	
 	/**
@@ -26,15 +29,13 @@ public class AVMUtil {
 	 */
 	private ArrayList<AVM> composeList;
 	/**
-	 * List of AVMs representing list of previously resolved AVMs.
+	 * List of AVMs representing list of currently resolved AVMs (a subset of worldList).
 	 */
 	private ArrayList<AVM> resolvedList;
-//	/**
-//	 * List of AVMs representing 
-//	 */
-//	private ArrayList<AVM> keepList;
-
- 	private Logger logger = Logger.getLogger(AVMUtil.class);
+	/**
+	 * Logger for AVMUtil
+	 */
+	private Logger logger = Logger.getLogger(AVMUtil.class);
  	
 	/**
 	 * Creates AVMUtil with a list of prototypes (avmStructures) of
@@ -45,7 +46,6 @@ public class AVMUtil {
 		worldList = AVMWorldUtil.setAVMsFromFile("res/PentoAVMWorldList", avmStructures);
 		composeList = getAllAVMs();
 		resolvedList = new ArrayList<AVM>();
-//		keepList = new ArrayList<AVM>();
 	}
 
 	/**
@@ -59,7 +59,6 @@ public class AVMUtil {
 		worldList = AVMWorldUtil.setAVMsFromFile("res/PentoAVMWorldList", avmStructures);
 		composeList = getAllAVMs();
 		resolvedList = new ArrayList<AVM>(worldList.size());
-//		keepList = new ArrayList<AVM>();
 	}
 
 	/**
@@ -73,7 +72,6 @@ public class AVMUtil {
 		worldList = AVMWorldUtil.setAVMsFromFile(worldFile, avmStructures);
 		composeList = getAllAVMs();
 		resolvedList = new ArrayList<AVM>(worldList.size());
-//		keepList = new ArrayList<AVM>();
 	}
 
 	public AVMUtil(AVMUtil c) {
@@ -85,10 +83,6 @@ public class AVMUtil {
 		for (AVM avm : c.resolvedList) {
 			this.resolvedList.add(new AVM(avm));
 		}
-//		keepList = new ArrayList<AVM>(c.keepList.size());
-//		for (AVM avm : c.keepList) {
-//			this.keepList.add(new AVM(avm));
-//		}
 	}
 
 	/**
@@ -142,17 +136,26 @@ public class AVMUtil {
 	}
 	
 	/** 
-	 * Resolves AVMs, returns only a single AVPair of one AVM if one was resolved (else null).
+	 * Resolves AVMs, returns a list of AVPairs for all AVMs
+	 * that resolved as the only ones of their type.
 	 * @return AVPair of AVM that resolved
 	 */
-	public AVPair uniquelyResolve() {
+	public ArrayList<AVPair> uniquelyResolve() {
 		this.resolve();
-		if (this.resolvedList.size() == 1) {
-			this.setAllAVMs();
-			return this.resolvedList.get(0).getAVPairs().get(0);
-		} else {
-			return null;
+		ArrayList<AVPair> uniqueTypes = new ArrayList<AVPair>();
+		for (AVM avm : resolvedList) {
+			boolean resolved = true;
+			for (AVM avm2 : resolvedList) {
+				if (avm.getType().equals(avm2.getType()) && avm != avm2) {
+					resolved = false;
+				}
+			}
+			if (resolved) {
+				uniqueTypes.add(avm.getAVPairs().get(0));
+			}
 		}
+		this.setAllAVMs();
+		return uniqueTypes;
 	}
 
 	/**
@@ -253,27 +256,73 @@ public class AVMUtil {
 	}
 	
 	/**
-	 * Returns a list of (non-empty) AVMs that differ.
+	 * Checks another AVMUtil's composed AVM list.
+	 * Returns a list of (non-empty) AVMs that differ
+	 * or are not in the old AVMUtil's list.
 	 * @param lastAVMUtil
 	 * @return
 	 */
-	public ArrayList<AVM> diffAVMLists(AVMUtil au) {
-		if (au.getNonEmptyAVMList().size() == 0) {
-			return this.getNonEmptyAVMList();
-		}
-		ArrayList<AVM> list = new  ArrayList<AVM>();
-		for (AVM newAVM : this.getNonEmptyAVMList()) {
-			for (AVM oldAVM : au.getNonEmptyAVMList()) {
-				if (newAVM.getType().equals(oldAVM.getType())) {
-					if (!newAVM.equals(oldAVM)) {
-						list.add(newAVM);
-					}
-				}
-			}
-		}
+	public ArrayList<AVM> diffComposedAVMLists(AVMUtil au) {
+		ArrayList<AVM> list = this.diffComposedAVMLists(au.getNonEmptyAVMList());
 		return list;
 	}
 
+	/**
+	 * Compares this AVMUtil's composed AVM list with another AVM list.
+	 * Returns a list of (non-empty) AVMs in this AVMUtils list that differ
+	 * or are not in the other list.
+	 * @param lastAVMUtil
+	 * @return
+	 */
+	public ArrayList<AVM> diffComposedAVMLists(ArrayList<AVM> oldList) {
+//		System.err.println("Diffing new list\n" + this.getNonEmptyAVMList().toString() + "\nAnd old list:\n" + oldList.toString());
+		if (oldList.size() == 0) {
+			return this.getNonEmptyAVMList();
+		}
+		ArrayList<AVM> newList = new ArrayList<AVM>();
+		for (AVM avm : this.getNonEmptyAVMList()) {
+			boolean isNew = true;
+			for (AVM avm2 : oldList) {
+//				System.err.println("Diffing " + avm.toPrettyString() + " and " + avm2.toPrettyString() + ".");
+				if (avm.equals(avm2) || avm == avm2) {
+//					System.err.println("  Same: new AVM " + avm.toPrettyString() + " and " + avm2.toPrettyString() + ".");
+					isNew = false;
+				} else {
+//					System.err.println("Differ: new AVM " + avm.toPrettyString() + " and " + avm2.toPrettyString() + ".");
+				}
+			}
+			if (isNew) {
+//				System.err.println("New AVM found " + avm.toPrettyString() + ".");
+				newList.add(avm);
+			}
+		}				
+		return newList;
+	}
+
+	/**
+	 * Builds a string representation of this AVMUtil ()
+	 * @return string representation of this AVMUtil.
+	 */
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Composed AVMs:\n");
+		if (this.composeList.size() == 0) {
+			sb.append("  Not yet set/Not currently in composition mode.\n");
+		} else {
+			for (AVM avm : this.composeList) {
+				sb.append("   " + avm.toPrettyString() + "\n");
+			}			
+		}
+		sb.append("Resolved AVMs:\n");
+		if (this.resolvedList.size() == 0) {
+			sb.append("  Not yet set/Not currently in resolution mode.\n");
+		} else {
+			for (AVM avm : this.resolvedList) {
+				sb.append("   " + avm.toPrettyString() + "\n");
+			}
+		}		
+		return sb.toString();
+	}
 
 	static void interactiveTest() throws IOException {
 		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));

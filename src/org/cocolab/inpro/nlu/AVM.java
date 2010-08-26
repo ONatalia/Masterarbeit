@@ -386,4 +386,24 @@ public class AVM {
 		return str;
 	}
 
+	/**
+	 * Builds a pretty string representation of the AVM containing only its type and non-empty AVPairs.
+	 * @return pretty string representation of the AVM
+	 */
+	public String toPrettyString() {
+		String str = new String();
+		str += "[ ";
+		str += this.type + " ";
+		if (!this.isEmpty()) {
+			for (String attribute : this.attributes.keySet()) {
+				Object value = attributes.get(attribute);
+				if (value != null) {
+					str += attribute + ":" + value.toString() + " ";
+				}
+			}			
+		}
+		str += "]";
+		return str;
+	}
+
 }
