@@ -91,7 +91,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		if (edits.get(edits.size() - 1).getType() == EditType.COMMIT)
 			return lastNonSilentWord(ius);
 		// if the list ends in <sil>, we also return the last nonsilent word:
-		if (ius.get(ius.size() - 1).isSilence()) {
+		if (ius.size() > 0 && ius.get(ius.size() - 1).isSilence()) {
 			return lastNonSilentWord(ius);
 		}
 		// otherwise, there's no potentially final word
@@ -138,7 +138,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		public TimeOutThread(WordIU endingWord) {
 			super("timeout thread for " + endingWord.getWord());
 			this.endingWord = endingWord;
-			logToTedView("starting timeout for \"" + endingWord.getWord() + "\"");
+			logToTedView(this.hashCode() + "starting timeout for \"" + endingWord.getWord() + "\"");
 		}
 
 		private void sleepSafely(long timeout) {
@@ -155,7 +155,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		
 		private void kill() {
 			killbit = true;
-			logToTedView("killed timeout for " + endingWord);
+			logToTedView(this.hashCode() + "killed timeout for " + endingWord);
 		}
 		
 		private boolean shouldDie() {
@@ -186,19 +186,19 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 				return;
 			if (useProsody) {
 				Signal s = findBoundaryTone();
-				if (s == Signal.EOT_RISING) {
-					logToTedView("found EOT_RISING in word " + endingWord);
+				if (s.equals(Signal.EOT_RISING)) {
+					logToTedView(this.hashCode() + " sending EOT_RISING in word " + endingWord);
 					signalListeners(InternalState.NOT_AWAITING_INPUT, s);
 					return;
 				} else {
-					logToTedView("found " + s + " in word " + endingWord + ";\n sleeping again");
+					logToTedView(this.hashCode() + " found " + s + " in word " + endingWord + ";\n sleeping again");
 				}
 			}
 			sleepSafely(anyProsodyTimeout);
 			if (shouldDie())
 				return;
 			Signal s = findBoundaryTone();
-			logToTedView("found " + s + " in word " + endingWord);
+			logToTedView(this.hashCode() + " sending " + s + " in word " + endingWord);
 			signalListeners(InternalState.NOT_AWAITING_INPUT, s);
 		}
 		

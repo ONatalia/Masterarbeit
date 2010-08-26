@@ -259,6 +259,8 @@ public abstract class IU {
 		sb.append("'><iu id='");
 		int id = this.getID();
 		sb.append(id);
+		sb.append("' created='");
+		sb.append(getCreationTime());
 		sb.append('\'');
 		if (this.getSameLevelLink() != null) {
 			sb.append(" sll='" + this.getSameLevelLink().getID() + "'");
