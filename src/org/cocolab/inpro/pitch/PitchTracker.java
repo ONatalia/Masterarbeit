@@ -237,15 +237,16 @@ public class PitchTracker extends BaseDataProcessor {
 	 * * * * * * * * * * * * * * * * * * * * * * * * * */
 	public Data getData() throws DataProcessingException {
 		Data input = getPredecessor().getData();
+		Data output = input;
         getTimer().start(); // start timer that keeps track of front-end processing
 		if (input instanceof DoubleData) {
-			PitchedDoubleData output = new PitchedDoubleData((DoubleData) input);
+			PitchedDoubleData pdd = new PitchedDoubleData((DoubleData) input);
 			double[] newSamples = ((DoubleData) input).getValues();
 			System.arraycopy(signalBuffer, newSamples.length, signalBuffer, 0, signalBuffer.length - newSamples.length);
 			System.arraycopy(newSamples, 0, signalBuffer, signalBuffer.length - newSamples.length, newSamples.length);
 			List<PitchCandidate> candidates = null;
 			PitchCandidate selectedCandidate = null;
-			if (output.getPower() > energyThreshold) { // TODO: better silence detection, maybe?
+			if (pdd.getPower() > energyThreshold) { // TODO: better silence detection, maybe?
 				double[] lagScoreTrajectory = cmn(smdsf(signalBuffer));
 				// voicing is between 0 (unvoiced) and 1 (voiced)
 				candidates = qualityThresheldCandidates(lagScoreTrajectory);
@@ -264,13 +265,14 @@ public class PitchTracker extends BaseDataProcessor {
 			// be lower for higher PROP_MINIMUM_PITCH)
 			/* transform current input into PitchedDoubleData; do not fill in any values yet */
 			
-			pitchAssignmentQueue.add(output);
+			pitchAssignmentQueue.add(pdd);
 			// fill in values into element in pitchAssignmentQueue and deal with
 			// signal listeners
 			signalListeners(selectedCandidate, candidates);
+			output = pdd;
 		}
         getTimer().stop(); // stop timer that keeps track of front-end processing
-		return input;
+		return output;
 	}
 	
 	/**

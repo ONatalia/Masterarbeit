@@ -49,6 +49,8 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 			DoubleData dd = (DoubleData) d;
 			int frame = (int) dd.getFirstSampleNumber() / 160;
 			melData.add(new TimedData<DoubleData>(frame, dd));
+		} else {
+			logger.warn(d);
 		}
 	}
 
