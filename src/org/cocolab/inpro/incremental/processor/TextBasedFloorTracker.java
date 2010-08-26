@@ -126,4 +126,8 @@ public class TextBasedFloorTracker extends AbstractFloorTracker {
 		}
 	}
 
+	@Override
+	protected void leftBufferUpdate(Collection<? extends IU> ius,
+			List<? extends EditMessage<? extends IU>> edits) { }
+
 }

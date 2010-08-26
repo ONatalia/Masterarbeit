@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.cocolab.inpro.incremental.PushBuffer;
-import org.cocolab.inpro.incremental.listener.FrameAwarePushBuffer;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
@@ -25,7 +24,7 @@ import edu.cmu.sphinx.util.props.S4String;
  */
 public class WordCatcher extends PushBuffer {
 	// Pushbuffer stuff
-	@S4ComponentList(type = FrameAwarePushBuffer.class)
+	@S4ComponentList(type = PushBuffer.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
 	List<PushBuffer> listeners;
 	

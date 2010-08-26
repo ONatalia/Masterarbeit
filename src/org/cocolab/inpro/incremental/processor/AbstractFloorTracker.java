@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.cocolab.inpro.incremental.PushBuffer;
+import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.WordIU;
@@ -22,13 +22,13 @@ import edu.cmu.sphinx.util.props.S4ComponentList;
  * @author timo
  *
  */
-public abstract class AbstractFloorTracker extends PushBuffer {
+public abstract class AbstractFloorTracker extends IUModule {
 
 	private static Logger logger = Logger.getLogger(AbstractFloorTracker.class);
 	
 	@S4ComponentList(type = Listener.class)
-	public final static String PROP_STATE_LISTENERS = "listeners";
-	public List<Listener> listeners;
+	public final static String PROP_STATE_LISTENERS = "ftlisteners";
+	public List<Listener> ftlisteners;
 
 	/** this is used to infer prosody as needed */
 	List<WordIU> mostRecentIUs;
@@ -52,13 +52,14 @@ public abstract class AbstractFloorTracker extends PushBuffer {
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
-		listeners = ps.getComponentList(PROP_STATE_LISTENERS, Listener.class); 
+		super.newProperties(ps);
+		ftlisteners = ps.getComponentList(PROP_STATE_LISTENERS, Listener.class); 
 	}
 
 	protected void signalListeners(InternalState state, Signal signal) {
-		logger.debug("Notifying my listeners about " + signal);
+		logger.debug("Notifying my ftlisteners about " + signal);
 		internalState = state;
-		for (Listener l : listeners) {
+		for (Listener l : ftlisteners) {
 			l.floor(signal, this);
 		}
 	}

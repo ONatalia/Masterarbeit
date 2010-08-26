@@ -39,6 +39,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		risingTimeout = ps.getInt(PROP_RISING_TIMEOUT);
 		anyProsodyTimeout = ps.getInt(PROP_ANY_TIMEOUT);
 		useProsody = ps.getBoolean(PROP_USE_PROSODY);
+		logger.info("started iubasedfloortracker");
 	}
 
 
@@ -51,16 +52,18 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 	@Override
 	public void hypChange(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
-		if (edits != null && edits.size() > 0) {
-			logger.debug(edits);			
+		if (edits != null && !edits.isEmpty()) {
 			if (edits.get(0).getType() == EditType.ADD){
 				logger.debug("found an add -- this means that any timeout thread should be killed");
-				if (timeOutThread != null)
+				if (timeOutThread != null) {
 					timeOutThread.killbit = true;
+					logToTedView("killed a remaining time-out");
+				}
 				timeOutThread = null;
 			}
 			if (edits.get(edits.size() - 1).getType() == EditType.COMMIT) {
 				logger.debug("found a commit!");
+				logToTedView("found a commit!");
 				assert timeOutThread == null : "There shall be no timeout threads during speech";
 				@SuppressWarnings("unchecked")
 				List<WordIU> words = (List<WordIU>) ius;
@@ -98,6 +101,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		public TimeOutThread(WordIU endingWord) {
 			super("timeout thread for " + endingWord.getWord());
 			this.endingWord = endingWord;
+			logToTedView("starting timeout for \"" + endingWord.getWord() + "\"");
 		}
 
 		private void sleepSafely(long timeout) {
@@ -138,17 +142,25 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 			if (useProsody) {
 				Signal s = findBoundaryTone();
 				if (s == Signal.EOT_RISING) {
+					logToTedView("found EOT_RISING");
 					signalListeners(InternalState.NOT_AWAITING_INPUT, s);
 					return;
+				} else {
+					logToTedView("found " + s.toString() + ", sleeping again");
 				}
 			}
 			sleepSafely(anyProsodyTimeout);
 			if (shouldDie())
 				return;
 			Signal s = findBoundaryTone();
+			logToTedView("found " + s);
 			signalListeners(InternalState.NOT_AWAITING_INPUT, s);
 		}
 		
 	}
+
+	@Override
+	protected void leftBufferUpdate(Collection<? extends IU> ius,
+			List<? extends EditMessage<? extends IU>> edits) { }
 
 }
