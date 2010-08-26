@@ -3,7 +3,6 @@ package org.cocolab.inpro.incremental.processor;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
@@ -24,8 +23,6 @@ import edu.cmu.sphinx.util.props.S4ComponentList;
  */
 public abstract class AbstractFloorTracker extends IUModule {
 
-	private static Logger logger = Logger.getLogger(AbstractFloorTracker.class);
-	
 	@S4ComponentList(type = Listener.class)
 	public final static String PROP_STATE_LISTENERS = "ftlisteners";
 	public List<Listener> ftlisteners;

@@ -3,7 +3,6 @@ package org.cocolab.inpro.incremental.listener;
 import java.util.List;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
@@ -29,8 +28,6 @@ public class TEDviewNotifier extends IUModule {
     public final static String PROP_TEDVIEW_PORT = "tedPort";
     @S4String(defaultValue = "localhost")
     public final static String PROP_TEDVIEW_ADDRESS = "tedAddress";
-
-    Logger logger = Logger.getLogger(TEDviewNotifier.class);
 
     private TedAdapter tedAdapter;
     
@@ -70,7 +67,7 @@ public class TEDviewNotifier extends IUModule {
 	}
 	
 	@Override
-	public long getTime() {
+	public int getTime() {
 		// an alternative implementation might want to 
 		//return currentFrame * 10;
 		return super.getTime();

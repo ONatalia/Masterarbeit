@@ -3,6 +3,7 @@ package org.cocolab.inpro.incremental;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
@@ -27,7 +28,7 @@ public abstract class IUModule extends PushBuffer {
 
 	@S4ComponentList(type = PushBuffer.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
-	List<PushBuffer> listeners;
+	List<PushBuffer> iulisteners;
 	
     @S4Integer(defaultValue = 2000)
     public final static String PROP_TEDVIEW_LOG_PORT = "tedLogPort";
@@ -40,12 +41,18 @@ public abstract class IUModule extends PushBuffer {
 
     protected TedAdapter tedLogAdapter;
     
+    protected Logger logger;
+    
 	/** the right buffer of this module */
 	protected final RightBuffer rightBuffer = new RightBuffer();
 	
+	public IUModule() {
+		logger = Logger.getLogger(this.getClass());
+	}
+	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
-		listeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
+		iulisteners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
 		int tedPort = ps.getInt(PROP_TEDVIEW_LOG_PORT);
 		String tedAddress = ps.getString(PROP_TEDVIEW_LOG_ADDRESS);
 		this.logToTedView = ps.getBoolean(PROP_LOG_TO_TEDVIEW);
@@ -64,13 +71,13 @@ public abstract class IUModule extends PushBuffer {
 	public void hypChange(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		leftBufferUpdate(ius, edits);
-		rightBuffer.notify(listeners);		
+		rightBuffer.notify(iulisteners);		
 	}
 
 	/* * * utility methods * * */
 	
-	public long getTime() {
-		return System.currentTimeMillis() - IU.startupTime;
+	public int getTime() {
+		return (int) (System.currentTimeMillis() - IU.startupTime);
 	}
 	
 	public void logToTedView(String message) {
@@ -84,6 +91,8 @@ public abstract class IUModule extends PushBuffer {
 			sb.append(message.replace("<", "&lt;").replace(">", "&gt;"));
 			sb.append("</event>");
 			tedLogAdapter.write(sb.toString());			
+		} else {
+			logger.debug("tedview is not connected: " + message);
 		}
 	}
 	
@@ -114,6 +123,7 @@ public abstract class IUModule extends PushBuffer {
 		@SuppressWarnings("unchecked")
 		public void setBuffer(List<? extends EditMessage<? extends IU>> edits) {
 			ius.apply((EditMessage<IU>) edits);
+			this.edits = (List<EditMessage<IU>>) edits;
 			hasUpdates = !edits.isEmpty();
 		}
 		
