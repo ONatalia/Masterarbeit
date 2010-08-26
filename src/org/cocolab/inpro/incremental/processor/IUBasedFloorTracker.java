@@ -1,9 +1,9 @@
 package org.cocolab.inpro.incremental.processor;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
@@ -28,8 +28,6 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 	public final static String PROP_USE_PROSODY = "useProsody";
 	private boolean useProsody;
 	
-	private static Logger logger = Logger.getLogger(IUBasedFloorTracker.class);
-	
 	TimeOutThread timeOutThread;
 
 	/** @see org.cocolab.inpro.incremental.processor.AbstractFloorTracker#newProperties(edu.cmu.sphinx.util.props.PropertySheet) */
@@ -46,43 +44,82 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 	/** 
 	 * handles creation (and destruction) of time-out threads. 
 	 * Threads are created on commit (i.e. when VAD thinks that the
-	 * user is silent) and (potentially) destroyed on add 
-	 * (i.e. when VAD notices that the user speaks)
+	 * user is silent) and when a <sil> word is added (i.e. when the
+	 * recognizer thinks, that the user is silent);
+	 * running threads are destroyed on add of a non-silence word
+	 * (i.e. when VAD notices that the user speaks and additionally 
+	 * the recognizer thinks that this is not silence)
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void hypChange(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		if (edits != null && !edits.isEmpty()) {
-			if (edits.get(0).getType() == EditType.ADD){
-				logger.debug("found an add -- this means that any timeout thread should be killed");
-				if (timeOutThread != null) {
-					timeOutThread.killbit = true;
-					logToTedView("killed a remaining time-out");
-				}
-				timeOutThread = null;
+			if (hasNewNonSilWord((List<EditMessage<WordIU>>) edits)){
+				killThread();
 			}
-			if (edits.get(edits.size() - 1).getType() == EditType.COMMIT) {
-				logger.debug("found a commit!");
-				logToTedView("found a commit!");
-				assert timeOutThread == null : "There shall be no timeout threads during speech";
-				@SuppressWarnings("unchecked")
-				List<WordIU> words = (List<WordIU>) ius;
-				assert words != null : "hey, if there's a commit, then there must be words!";
-				assert !words.isEmpty() : edits + "" + words;
-				WordIU endingWord = words.get(words.size() - 1);
-				if (endingWord != null && endingWord.isSilence()) {
-					logger.debug("ending word is silence, trying predecessor: " + endingWord);
-					endingWord = (words.size() > 1) ? words.get(words.size() - 2) : null;
-				}
-				logger.debug("will work with: " + endingWord);
-				if (endingWord != null) {
-					timeOutThread = new TimeOutThread(endingWord);
-					timeOutThread.start();
-				}
+			WordIU potentiallyFinalWord = getPotentiallyFinalWord((List<WordIU>) ius, (List<EditMessage<WordIU>>) edits);
+			boolean hasPotentiallyFinalWord = potentiallyFinalWord != null;
+			if (hasPotentiallyFinalWord) {
+				// this conflicts with the logging in the timeoutthread's constructor
+				//logToTedView("found the potentially final word " + potentiallyFinalWord);
+				//assert timeOutThread == null : "There shall be no timeout threads during speech";
+				killThread();
+				timeOutThread = new TimeOutThread(potentiallyFinalWord);
+				timeOutThread.start();				
 			}
 		}
 	}
-
+	
+	/** true if a new non-silence word was added. */
+	private boolean hasNewNonSilWord(List<EditMessage<WordIU>> edits) {
+		boolean hasWord = false;
+		Iterator<EditMessage<WordIU>> it = edits.iterator();
+		while (it.hasNext()) {
+			EditMessage<WordIU> edit = it.next();
+			hasWord = edit.getType() == EditType.ADD && !edit.getIU().isSilence();
+			if (hasWord)
+				break;
+		}
+		return hasWord;
+	}
+	
+	/** true if the list of IUs ends in &lt;sil&gt; or if the list of IUs has been committed */
+	private WordIU getPotentiallyFinalWord(List<WordIU> ius, 
+			List<EditMessage<WordIU>> edits) {
+		// on commit, we return the last non-silent word right away
+		if (edits.get(edits.size() - 1).getType() == EditType.COMMIT)
+			return lastNonSilentWord(ius);
+		// if the list ends in <sil>, we also return the last nonsilent word:
+		if (ius.get(ius.size() - 1).isSilence()) {
+			return lastNonSilentWord(ius);
+		}
+		// otherwise, there's no potentially final word
+		return null;
+	}
+	
+	/** the last nonsilent word from words, or null if none exists */
+	private WordIU lastNonSilentWord(List<WordIU> words) {
+		int lastIndex = words.size();
+		WordIU endingWord = null;
+		do {
+			lastIndex--;
+			endingWord = words.get(lastIndex);
+		} while (lastIndex > 0 && endingWord != null && endingWord.isSilence());
+		if (lastIndex < 0)
+			return null;
+		else 
+			return endingWord;
+	}
+	
+	/** kill a currently running timeout thread */
+	private void killThread() {
+		if (timeOutThread != null) {
+			timeOutThread.kill();
+			timeOutThread = null;
+		}
+	}
+	
 	/**
 	 * handles timing out (and handling) an utterance-final word.
 	 * this waits for a while (@see risingTimeout) before checking
@@ -105,7 +142,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		}
 
 		private void sleepSafely(long timeout) {
-			if (timeout < 5) // ignore microsleeps
+			if (timeout < 3) // ignore microsleeps
 				return;
 			logger.debug("going to sleep for " + timeout + " milliseconds");
 			try {
@@ -116,11 +153,17 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 			logger.debug("waking up after " + timeout + " milliseconds of sleep");
 		}
 		
+		private void kill() {
+			killbit = true;
+			logToTedView("killed timeout for " + endingWord);
+		}
+		
 		private boolean shouldDie() {
 			if (killbit) {
 				logger.debug("killed during timeout");
 				return true;
 			}
+			// every de-referencing of timeOutThread should first set the kill bit
 			assert timeOutThread == this : "I'm running without a killbit, even though floortracker doesn't reference me";
 			return false;
 		}
@@ -136,24 +179,26 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		
 		@Override
 		public void run() {
-			sleepSafely(risingTimeout);
+			int timeoutStart = (int) (endingWord.endTime() * 1000);
+			int timeout = getTime() - timeoutStart + risingTimeout;
+			sleepSafely(timeout);
 			if (shouldDie())
 				return;
 			if (useProsody) {
 				Signal s = findBoundaryTone();
 				if (s == Signal.EOT_RISING) {
-					logToTedView("found EOT_RISING");
+					logToTedView("found EOT_RISING in word " + endingWord);
 					signalListeners(InternalState.NOT_AWAITING_INPUT, s);
 					return;
 				} else {
-					logToTedView("found " + s.toString() + ", sleeping again");
+					logToTedView("found " + s + " in word " + endingWord + ";\n sleeping again");
 				}
 			}
 			sleepSafely(anyProsodyTimeout);
 			if (shouldDie())
 				return;
 			Signal s = findBoundaryTone();
-			logToTedView("found " + s);
+			logToTedView("found " + s + " in word " + endingWord);
 			signalListeners(InternalState.NOT_AWAITING_INPUT, s);
 		}
 		
