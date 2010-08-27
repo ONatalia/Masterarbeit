@@ -59,8 +59,10 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 				killThread();
 			}
 			WordIU potentiallyFinalWord = getPotentiallyFinalWord((List<WordIU>) ius, (List<EditMessage<WordIU>>) edits);
-			boolean hasPotentiallyFinalWord = potentiallyFinalWord != null;
-			if (hasPotentiallyFinalWord) {
+			boolean isNewFinalWord = potentiallyFinalWord != null 
+								&& (timeOutThread == null || 
+									potentiallyFinalWord != timeOutThread.endingWord);
+			if (isNewFinalWord) {
 				// this conflicts with the logging in the timeoutthread's constructor
 				//logToTedView("found the potentially final word " + potentiallyFinalWord);
 				//assert timeOutThread == null : "There shall be no timeout threads during speech";
@@ -154,8 +156,9 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		}
 		
 		private void kill() {
+			if (!killbit)
+				logToTedView(this.hashCode() + "killed timeout for " + endingWord);
 			killbit = true;
-			logToTedView(this.hashCode() + "killed timeout for " + endingWord);
 		}
 		
 		private boolean shouldDie() {
@@ -188,6 +191,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 				Signal s = findBoundaryTone();
 				if (s.equals(Signal.EOT_RISING)) {
 					logToTedView(this.hashCode() + " sending EOT_RISING in word " + endingWord);
+					killbit = true;
 					signalListeners(InternalState.NOT_AWAITING_INPUT, s);
 					return;
 				} else {
@@ -199,6 +203,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 				return;
 			Signal s = findBoundaryTone();
 			logToTedView(this.hashCode() + " sending " + s + " in word " + endingWord);
+			killbit = true;
 			signalListeners(InternalState.NOT_AWAITING_INPUT, s);
 		}
 		
