@@ -148,7 +148,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 				return;
 			logger.debug("going to sleep for " + timeout + " milliseconds");
 			try {
-				Thread.sleep(risingTimeout);
+				Thread.sleep(timeout);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
