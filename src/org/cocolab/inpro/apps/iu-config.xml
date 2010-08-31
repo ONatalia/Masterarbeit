@@ -48,6 +48,8 @@
          	<item>labelWriter2</item>
     		<item>oaaNotifier</item>
 -->
+           <item>${semanticComposer}</item>
+           <item>iuBasedFloorTracker</item>
         </propertylist>
     </component>
 
@@ -80,7 +82,7 @@
 		<property name="useProsody" value="${useProsody}" />
 		<property name="risingProsodyTimeout" value="${risingProsodyTimeout}" />
 		<property name="anyProsodyTimeout" value="${anyProsodyTimeout}" />
-		<propertylist name="listeners">
+		<propertylist name="ftlisteners">
 			<item>${dialogueManager}</item>
 		</propertylist>
 	</component>
@@ -90,7 +92,7 @@
 		</propertylist>
 	</component>
 
-	<component name="dialogueManager" type="org.cocolab.inpro.incremental.processor.DialogueManager">
+	<component name="dialogueManager" type="org.cocolab.inpro.incremental.processor.QUDDialogueManager">
 		<property name="nlu" value="${semanticResolver}"/>
 		<property name="dispatchStream" value="dispatchStream"/>
 	</component>
