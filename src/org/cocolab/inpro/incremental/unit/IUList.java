@@ -58,10 +58,11 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  			case REVOKE: // assertion errors on REVOKE seem to only happen as a consequence of earlier errors on ADD
  				assert !isEmpty() : "Can't revoke from an empty list: " + edit;
  				assert getLast().equals(edit.getIU()) : "Can't apply this edit to the list: " + this + edit;
+ 				assert (!edit.getIU().isCommitted()) : "you're trying to revoke an IU that was previously committed.";
 				this.remove(size() - 1);
 				break;
  			case COMMIT:
- 				// don't do anything on commit
+ 				edit.getIU().commit();
  				break;
  			default:
  				throw new RuntimeException("If you implement new EditTypes, you should also implement their handling!");

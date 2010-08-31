@@ -31,6 +31,8 @@ public abstract class IU {
 	
 	protected long creationTime;
 	
+	private boolean committed = false;
+	
 	/**
 	 * call this, if you want to provide a sameLevelLink and a groundedIn list
 	 * and you want groundedIn to be deeply SLLed to the sameLevelLink's groundedIn-IUs  
@@ -167,6 +169,20 @@ public abstract class IU {
 	}
 	
 	/**
+	 * @return true if this IU has been committed
+	 */
+	public boolean isCommitted() {
+		return this.committed;
+	}
+	
+	/**
+	 * COMMITs this IU.
+	 */
+	public void commit() {
+		this.committed = true;
+	}
+	
+	/**
 	 * this is used to notify an IU that it's status has changed
 	 * for example, in the abstract model, an IU might want to notify
 	 * the grounded-in IUs, that it is now commited, and hence the
@@ -226,6 +242,7 @@ public abstract class IU {
 		sb.append(this.getClass());
 		sb.append(" with content ");
 		sb.append(this.toString());
+		sb.append("\n  Committed: " + this.isCommitted());
 		sb.append("\n  SLL: ");
 		if (sameLevelLink != null) {
 			sb.append(sameLevelLink.toString());
