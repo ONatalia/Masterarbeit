@@ -97,6 +97,7 @@ public class AVMUtil {
 		for (AVM avm : this.composeList) {
 			avm.setAttribute(avp);
 		}
+		System.err.println("Composed: " + this.composeList.toString());
 		return this.composeList;
 	}
 
@@ -305,18 +306,15 @@ public class AVMUtil {
 	 */
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Composed AVMs:\n");
-		if (this.composeList.size() == 0) {
-			sb.append("  Not yet set/Not currently in composition mode.\n");
-		} else {
-			for (AVM avm : this.composeList) {
-				sb.append("   " + avm.toPrettyString() + "\n");
-			}			
+		if (this.getNonEmptyAVMList().size() > 0) {
+			sb.append(this.getNonEmptyAVMList().size() + " composed AVMs:\n");
+			for (AVM avm : this.getNonEmptyAVMList()) {
+				sb.append(avm.toPrettyString() + "\n");
+			}
+
 		}
-		sb.append("Resolved AVMs:\n");
-		if (this.resolvedList.size() == 0) {
-			sb.append("  Not yet set/Not currently in resolution mode.\n");
-		} else {
+		if (this.resolvedList.size() > 0) {
+			sb.append(this.resolvedList.size() + " resolved AVMs:\n");
 			for (AVM avm : this.resolvedList) {
 				sb.append("   " + avm.toPrettyString() + "\n");
 			}

@@ -392,17 +392,17 @@ public class AVM {
 	 */
 	public String toPrettyString() {
 		String str = new String();
-		str += "[ ";
-		str += this.type + " ";
 		if (!this.isEmpty()) {
+			str += "[ ";
+			str += this.type + " ";
 			for (String attribute : this.attributes.keySet()) {
 				Object value = attributes.get(attribute);
 				if (value != null) {
 					str += attribute + ":" + value.toString() + " ";
 				}
-			}			
+			}
+			str += "]";
 		}
-		str += "]";
 		return str;
 	}
 
