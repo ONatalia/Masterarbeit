@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.cocolab.inpro.dm.RNLA;
-import org.cocolab.inpro.nlu.AVPair;
 
 public class DialogueActIU extends IU {
 
@@ -17,16 +16,25 @@ public class DialogueActIU extends IU {
 		this(FIRST_DA_IU, Collections.EMPTY_LIST, null);
 	}
 
-	public DialogueActIU(IU sll, List<IU> groundedIn, AVPair avp) {
+	public DialogueActIU(IU sll, List<IU> groundedIn, RNLA act) {
 		super(sll, groundedIn);
+		this.act = act;
 	}
 
-	public DialogueActIU(IU sll, IU groundedIn, AVPair avp) {
+	public DialogueActIU(IU sll, IU groundedIn, RNLA act) {
 		super(sll, Collections.singletonList(groundedIn));
+		this.act = act;
 	}
 	
 	private boolean isEmpty() {
 		return false;
+	}
+
+	/**
+	 * @return the RNLA act of this IU.
+	 */
+	public RNLA getAct() {
+		return this.act;
 	}
 
 	/**
