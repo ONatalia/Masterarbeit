@@ -56,6 +56,11 @@ public class AVPair {
 		this.value = value;
 	}
 	
+	public void clearValue() {
+		this.value = null;
+	}
+	
+	
 	public String toString() {
 		return getAttribute() + " : " + getValue(); 
 	}
