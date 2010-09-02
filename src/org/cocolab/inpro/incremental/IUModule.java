@@ -122,7 +122,9 @@ public abstract class IUModule extends PushBuffer {
 		// just a list of edits, automatically updates IUs from last call
 		@SuppressWarnings("unchecked")
 		public void setBuffer(List<? extends EditMessage<? extends IU>> edits) {
-			ius.apply((EditMessage<IU>) edits);
+			for (EditMessage edit : edits) {
+				ius.apply(edit);
+			}
 			this.edits = (List<EditMessage<IU>>) edits;
 			hasUpdates = !edits.isEmpty();
 		}
