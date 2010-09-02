@@ -2,6 +2,7 @@ package org.cocolab.inpro.nlu;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Class representing an AVM with methods for equality, unification and setting
@@ -251,6 +252,20 @@ public class AVM {
 	}
 	
 	/**
+	 * Clears values of all AVPairs in this AVM.
+	 */
+	public void clearValues() {
+		List<String> storedAttributes = new ArrayList<String>();
+		for (String a : this.attributes.keySet()) {
+			storedAttributes.add(a);
+		}
+		this.attributes.clear();
+		for (String attribute : storedAttributes) {
+			this.attributes.put(attribute, null);
+		}
+	}
+	
+	/**
 	 * Gets an ArrayList of all AVPairs attributed to this AVM, including null ones.
 	 * @return avps - an ArrayList&lt;AVPair&gt;.
 	 */
@@ -277,6 +292,15 @@ public class AVM {
 	 */
 	public HashMap<String, Object> getAttributes() {
 		return this.attributes;
+	}
+	
+	/**
+	 * Returns a salient AVPair for this AVM. Currently the first one
+	 * from the definition.
+	 * @return the first AVPair in this AVM's definition
+	 */
+	public AVPair getSalientAVPair() {
+		return this.getAVPairs().get(0);
 	}
 
 	/**
