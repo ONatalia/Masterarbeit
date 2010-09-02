@@ -49,10 +49,10 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
 	public void apply(EditMessage<IUType> edit) {
  		switch (edit.type) {
  			case ADD: 
- 				assert isEmpty() || 
- 				       Double.isNaN(getLast().endTime()) || // allow addition if previous ends at NaN
- 				       getLast().endTime() <= edit.getIU().startTime() + 0.001 // account for floating point error 
- 						: "you're trying to add an IU that starts before the (previously) last IU ends: " + this + edit;
+// 				assert isEmpty() ||
+// 				       Double.isNaN(getLast().endTime()) || // allow addition if previous ends at NaN
+// 				       getLast().endTime() <= edit.getIU().startTime() + 0.001 // account for floating point error 
+// 						: "you're trying to add an IU that starts before the (previously) last IU ends: " + this + edit;
  				this.add(edit.getIU(), true);
  				break;
  			case REVOKE: // assertion errors on REVOKE seem to only happen as a consequence of earlier errors on ADD
