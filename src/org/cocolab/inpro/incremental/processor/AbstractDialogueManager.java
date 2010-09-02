@@ -13,7 +13,7 @@ import org.cocolab.inpro.incremental.unit.IU;
  * @author timo, okko
  */
 
-public class AbstractDialogueManager extends IUModule implements AbstractFloorTracker.Listener, AbstractActionManager.Listener {
+public abstract class AbstractDialogueManager extends IUModule implements AbstractFloorTracker.Listener, AbstractActionManager.Listener {
 
 	/**
 	 * Calculates changes from the previous SemIU and updates the InformationState.
