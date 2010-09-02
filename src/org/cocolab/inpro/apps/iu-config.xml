@@ -2,9 +2,10 @@
     <property name="deltifier" value="wasd"/>
     <property name="deltifierParam" value="0"/>
     <property name="baseData" value="baseData"/>
-    <property name="dialogueManager" value="dialogueManager"/>
     <property name="semanticComposer" value="semanticComposer"/>
     <property name="semanticResolver" value="semanticResolver"/>
+    <property name="dialogueManager" value="dialogueManager"/>
+    <property name="actionManager" value="actionManager"/>
     <!-- Domain defs: -->
     <!-- DIGITS -->
     <!-- 
@@ -50,6 +51,8 @@
 -->
            <item>${semanticComposer}</item>
            <item>iuBasedFloorTracker</item>
+           <item>tedNotifier</item>
+           <item>consoleNotifier</item>
         </propertylist>
     </component>
 
@@ -62,6 +65,7 @@
 	    		<item>tedNotifier</item>
           	<item>labelWriter2</item> -->
           	<item>${semanticResolver}</item>
+    			<item>tedNotifier</item>
     			<item>consoleNotifier</item>
         </propertylist>
      </component>
@@ -75,6 +79,8 @@
 	    		<item>tedNotifier</item>
           	<item>labelWriter2</item> -->
     			<item>${dialogueManager}</item>
+    			<item>tedNotifier</item>
+    			<item>consoleNotifier</item> 
         </propertylist>
      </component>
 
@@ -94,8 +100,22 @@
 
 	<component name="dialogueManager" type="org.cocolab.inpro.incremental.processor.QUDDialogueManager">
 		<property name="nlu" value="${semanticResolver}"/>
+		<property name="actionManager" value="${actionManager}"/>
 		<property name="dispatchStream" value="dispatchStream"/>
+		<propertylist name="hypChangeListeners">
+			<item>${actionManager}</item>
+			<item>tedNotifier</item>
+			<item>consoleNotifier</item>
+		</propertylist>
 	</component>
+	
+	<component name="actionManager" type="org.cocolab.inpro.incremental.processor.PentoActionManager">
+		<property name="dispatchStream" value="dispatchStream"/>
+		<propertylist name="amListeners">
+			<item>${dialogueManager}</item>
+		</propertylist>
+	</component>
+	
 
     <component name="baseData" type="org.cocolab.inpro.incremental.basedata.BaseData"/>
 
