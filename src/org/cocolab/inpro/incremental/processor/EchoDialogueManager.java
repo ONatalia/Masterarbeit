@@ -98,7 +98,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 			}
 			case EOT_FALLING: {
 				// Ok- … wordIUs
-				if (utterance.isEmpty()) {
+				if (!utterance.isEmpty()) {
 					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpf.wav"))));
 					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + utterance))));
 				} else {
@@ -108,7 +108,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 			}
 			case EOT_RISING: {
 				// Ok+ … wordIUs
-				if (utterance.isEmpty()) {
+				if (!utterance.isEmpty()) {
 					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpr.wav"))));
 					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + utterance))));					
 				} else {
@@ -118,7 +118,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 			}
 			case EOT_ANY: {
 				// Ok- … wordIUs
-				if (utterance.isEmpty()) {
+				if (!utterance.isEmpty()) {
 					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpf.wav"))));
 					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + utterance))));					
 				} else {
