@@ -4,8 +4,9 @@
     <property name="baseData" value="baseData"/>
     <property name="semanticComposer" value="semanticComposer"/>
     <property name="semanticResolver" value="semanticResolver"/>
-    <property name="dialogueManager" value="dialogueManager"/>
-    <property name="actionManager" value="actionManager"/>
+    <property name="dialogueManager" value="echoDialogueManager"/>
+    <property name="actionManager" value="audioActionManager"/>
+    
     <!-- Domain defs: -->
     <!-- DIGITS -->
     <!-- 
@@ -49,7 +50,7 @@
          	<item>labelWriter2</item>
     		<item>oaaNotifier</item>
 -->
-           <item>${semanticComposer}</item>
+           <item>echoDialogueManager</item>
            <item>iuBasedFloorTracker</item>
            <item>tedNotifier</item>
            <item>consoleNotifier</item>
@@ -109,13 +110,30 @@
 		</propertylist>
 	</component>
 	
+	<component name="echoDialogueManager" type="org.cocolab.inpro.incremental.processor.EchoDialogueManager">
+		<property name="actionManager" value="${actionManager}"/>
+		<propertylist name="hypChangeListeners">
+			<item>${actionManager}</item>
+			<item>tedNotifier</item>
+			<item>consoleNotifier</item>
+		</propertylist>
+	</component>
+
 	<component name="actionManager" type="org.cocolab.inpro.incremental.processor.PentoActionManager">
+		<property name="dispatchStream" value="dispatchStream"/>
+		<propertylist name="amListeners">
+			<item>${dialogueManager}</item>
+			<item>tedNotifier</item>
+    			<item>consoleNotifier</item> 
+		</propertylist>
+	</component>
+	
+	<component name="audioActionManager" type="org.cocolab.inpro.incremental.processor.AudioActionManager">
 		<property name="dispatchStream" value="dispatchStream"/>
 		<propertylist name="amListeners">
 			<item>${dialogueManager}</item>
 		</propertylist>
 	</component>
-	
 
     <component name="baseData" type="org.cocolab.inpro.incremental.basedata.BaseData"/>
 
