@@ -40,6 +40,7 @@
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
 <!--
+		<item>${dialogueManager}</item>
     		<item>${semanticComposer}</item>
 	     <item>iuBasedFloorTracker</item>
     		<item>tedNotifier</item>
@@ -50,10 +51,10 @@
          	<item>labelWriter2</item>
     		<item>oaaNotifier</item>
 -->
-           <item>echoDialogueManager</item>
-           <item>iuBasedFloorTracker</item>
-           <item>tedNotifier</item>
-           <item>consoleNotifier</item>
+		<item>${dialogueManager}</item>
+    		<item>iuBasedFloorTracker</item>
+          <item>tedNotifier</item>
+          <item>consoleNotifier</item>
         </propertylist>
     </component>
 
@@ -123,8 +124,6 @@
 		<property name="dispatchStream" value="dispatchStream"/>
 		<propertylist name="amListeners">
 			<item>${dialogueManager}</item>
-			<item>tedNotifier</item>
-    			<item>consoleNotifier</item> 
 		</propertylist>
 	</component>
 	

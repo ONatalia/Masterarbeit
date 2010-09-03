@@ -28,7 +28,8 @@ import org.apache.log4j.Logger;
 public class IUList<IUType extends IU> extends ArrayList<IUType> {
 
 	private static final Logger logger = Logger.getLogger(IUList.class);
-	
+	private boolean temporallySorted = false;
+
 	IUType firstIU;
 	
 	public IUList() {
@@ -49,10 +50,12 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
 	public void apply(EditMessage<IUType> edit) {
  		switch (edit.type) {
  			case ADD: 
-// 				assert isEmpty() ||
-// 				       Double.isNaN(getLast().endTime()) || // allow addition if previous ends at NaN
-// 				       getLast().endTime() <= edit.getIU().startTime() + 0.001 // account for floating point error 
-// 						: "you're trying to add an IU that starts before the (previously) last IU ends: " + this + edit;
+ 				assert !isTemporallySorted() ||
+ 				       (isTemporallySorted() && (
+ 					   isEmpty() ||
+ 				       Double.isNaN(getLast().endTime()) || // allow addition if previous ends at NaN
+ 				       getLast().endTime() <= edit.getIU().startTime() + 0.001)) // account for floating point error 
+ 						: "you're trying to add an IU that starts before the (previously) last IU ends: " + this + edit;
  				this.add(edit.getIU(), true);
  				break;
  			case REVOKE: // assertion errors on REVOKE seem to only happen as a consequence of earlier errors on ADD
@@ -161,6 +164,22 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  		super.clear();
  		if (firstIU != null)
  			add(firstIU);
+ 	}
+
+ 	/**
+ 	 * Checks if IUs in this list are in strict linear temporal order.
+ 	 * @return true if so, false if not
+ 	 */
+ 	public boolean isTemporallySorted() {
+ 		return this.temporallySorted;
+ 	}
+ 	
+ 	/**
+ 	 * Enforces that IUs in this list be in strict linear temporal order or not.
+ 	 * @params boolean whether to sort this list or not. 
+ 	 */
+ 	public void sortTemporally(boolean sort) {
+ 		this.temporallySorted = sort;
  	}
 
  	/**
