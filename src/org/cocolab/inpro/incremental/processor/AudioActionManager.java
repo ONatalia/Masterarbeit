@@ -27,11 +27,9 @@ public class AudioActionManager extends AbstractActionManager {
 			RNLA r = iu.getAct();
 			switch (edit.getType()) {
 				case REVOKE: 
-					this.shutUp(); // Note: DM can also do this when VAD kicks in.
 					break;
 				case ADD: 
 					assert (r.getAct() == RNLA.Act.PROMPT) : "I can only play prompts, don't make me do anything else."; // kind of brutal, but hey.
-					logger.info("Performing " + r.toString());
 					if (r.doThis()) {
 						logger.info("Speaking: " + r.toString());
 						r.perform(null, null, this.audioDispatcher);
