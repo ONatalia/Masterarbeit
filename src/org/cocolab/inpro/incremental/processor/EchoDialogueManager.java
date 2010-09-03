@@ -56,6 +56,10 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 					this.sentence.remove(newWord);
 					break;
 				case ADD:
+					//Start-of-speech hack until Floor.Signal START works.
+					if (this.sentence.isEmpty()) {
+						this.am.shutUp();
+					}
 					this.sentence.add(newWord);
 					break;
 				case COMMIT:

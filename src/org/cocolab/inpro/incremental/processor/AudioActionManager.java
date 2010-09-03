@@ -27,6 +27,8 @@ public class AudioActionManager extends AbstractActionManager {
 			RNLA r = iu.getAct();
 			switch (edit.getType()) {
 				case REVOKE: 
+					logger.info("Shutting up.");
+					this.shutUp();
 					break;
 				case ADD: 
 					assert (r.getAct() == RNLA.Act.PROMPT) : "I can only play prompts, don't make me do anything else."; // kind of brutal, but hey.
