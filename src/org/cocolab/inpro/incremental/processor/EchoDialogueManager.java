@@ -83,10 +83,10 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	public void floor(AbstractFloorTracker.Signal signal, AbstractFloorTracker floorManager) {
 		logger.info("Floor signal: " + signal);
 		ArrayList<EditMessage<DialogueActIU>> ourEdits = new ArrayList<EditMessage<DialogueActIU>>();
+		List<IU> grin = new ArrayList<IU>(this.sentence);
 		switch (signal) {
 			case NO_INPUT: {
 				// First prompt "mmhh"
-				List<IU> grin = new ArrayList<IU>(this.sentence);
 				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCn.wav"))));
 				break;
 			}
@@ -97,24 +97,32 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 			}
 			case EOT_FALLING: {
 				// Ok- … wordIUs
-				List<IU> grin = new ArrayList<IU>(this.sentence);
-				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpf.wav"))));
-				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + this.sentenceToString()))));
+				if (!this.sentenceToString().isEmpty()) {
+					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpf.wav"))));
+					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + this.sentenceToString()))));
+				} else {
+					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCn.wav"))));
+				}
 				break;
 			}
 			case EOT_RISING: {
 				// Ok+ … wordIUs
-				List<IU> grin = new ArrayList<IU>(this.sentence);
-				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpr.wav"))));
-				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + this.sentenceToString()))));
+				if (!this.sentenceToString().isEmpty()) {
+					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpr.wav"))));
+					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + this.sentenceToString()))));					
+				} else {
+					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCn.wav"))));
+				}
 				break;
 			}
 			case EOT_ANY: {
 				// Ok- … wordIUs
-				logger.info("Sending instructions to speak: 'ok. " + this.sentenceToString() + "'.");
-				List<IU> grin = new ArrayList<IU>(this.sentence);
-				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpf.wav"))));
-				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + this.sentenceToString()))));
+				if (!this.sentenceToString().isEmpty()) {
+					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpf.wav"))));
+					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + this.sentenceToString()))));					
+				} else {
+					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCn.wav"))));
+				}
 				break;
 			}
 		}
