@@ -37,7 +37,7 @@ public class MaryAdapter {
     			mc36 = new de.dfki.lt.mary.client.MaryClient(serverHost, serverPort);
         		break;
         	case mary40:
-    			mc40 = new marytts.client.http.MaryHttpClient(
+        		mc40 = marytts.client.MaryClient.getMaryClient(
 			               new marytts.client.http.Address(serverHost, serverPort)
 			           );
         		break;
