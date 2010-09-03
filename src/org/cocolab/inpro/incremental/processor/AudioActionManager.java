@@ -41,8 +41,12 @@ public class AudioActionManager extends AbstractActionManager {
 				case COMMIT: 
 					break;
 				default: logger.fatal("Found unimplemented EditType!");
-				}
 			}
+		}
+	}
+	
+	public void reset() {
+		
 	}
 
 }

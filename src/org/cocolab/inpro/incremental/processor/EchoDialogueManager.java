@@ -44,7 +44,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	}
 
 	/**
-	 * Calculates changes from the previous SemIU and updates the InformationState.
+	 * Builds the current sentence hypothesis.
 	 */
 	@Override
 	public void leftBufferUpdate(Collection<? extends IU> ius,
@@ -66,21 +66,13 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	}
 
 	/**
-	 * Check if there are outstanding actions, reset if not.
-	 */
-	private void postUpdate() {
-		if (this.sentToDos.isEmpty()) {
-			this.reset();
-		}
-	}
-
-	/**
 	 * Resets the DM and its AM
 	 */
 	@Override
 	public void reset() {
 		logger.info("DM resetting.");
 		this.sentence.clear();
+		this.dialogueActIUs.clear();
 		this.am.reset();
 	}
 
@@ -106,14 +98,14 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 			case EOT_FALLING: {
 				// Ok- … wordIUs
 				List<IU> grin = new ArrayList<IU>(this.sentence);
-				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpf.wav" + this.sentenceToString()))));
+				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpf.wav"))));
 				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + this.sentenceToString()))));
 				break;
 			}
 			case EOT_RISING: {
 				// Ok+ … wordIUs
 				List<IU> grin = new ArrayList<IU>(this.sentence);
-				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpr.wav" + this.sentenceToString()))));
+				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpr.wav"))));
 				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + this.sentenceToString()))));
 				break;
 			}
@@ -127,7 +119,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 			}
 		}
 		this.dialogueActIUs.apply(ourEdits);
-		this.rightBuffer.setBuffer(this.dialogueActIUs, ourEdits);
+		this.rightBuffer.setBuffer(this.dialogueActIUs);
 	}
 	
 	/**
@@ -137,17 +129,21 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	private String sentenceToString() {
 		String ret = "";
 		for (WordIU iu : (ArrayList<WordIU>) this.sentence) {
-			ret += iu.getWord() + " ";
+			if (!iu.isSilence()) {
+				ret += iu.getWord() + " ";				
+			}
 		}
-		return ret;
+		return ret.replaceAll("^ *", "").replaceAll(" *$", "");
 	}
 
 	@Override
 	public void done(DialogueActIU iu) {
 		RNLA r = iu.getAct();
-		this.sentToDos.remove(r);
 		logger.info("Was notified about performed act " + r.toString());
-		this.postUpdate();
+		this.sentToDos.remove(r);
+		if (this.sentToDos.isEmpty()) {
+			this.reset();
+		}
 	}
 
 }
