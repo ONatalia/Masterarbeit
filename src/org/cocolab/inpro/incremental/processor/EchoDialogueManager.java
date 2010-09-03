@@ -129,6 +129,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 		}
 		this.dialogueActIUs.apply(ourEdits);
 		this.rightBuffer.setBuffer(this.dialogueActIUs);
+		this.rightBuffer.notify(this.iulisteners);
 	}
 	
 	/**
