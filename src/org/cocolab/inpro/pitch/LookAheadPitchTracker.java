@@ -20,7 +20,8 @@ package org.cocolab.inpro.pitch;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
@@ -47,7 +48,6 @@ public class LookAheadPitchTracker extends PitchTracker implements Resetable {
 	public final static String PROP_LOOK_AHEAD = "lookAhead";
 
 	int lookAhead;
-	
 	List<Boolean> voicingList;
 	List<Double> pitchList;
 	PitchOptimizer pitchOptimizer;
@@ -70,7 +70,7 @@ public class LookAheadPitchTracker extends PitchTracker implements Resetable {
 	@Override
 	public void reset() {
 		pitchOptimizer = new PitchOptimizer();
-		localQueue = new LinkedList<Data>();
+		localQueue = new ArrayDeque<Data>();
 		framesInQueue = 0;
 		currListPos = 0;
 	}
@@ -90,8 +90,8 @@ public class LookAheadPitchTracker extends PitchTracker implements Resetable {
 			localQueue.add(data);
 		}
 		if (dirty) {
-			voicingList = new LinkedList<Boolean>();
-			pitchList = new LinkedList<Double>();
+			voicingList = new ArrayList<Boolean>();
+			pitchList = new ArrayList<Double>();
 			pitchOptimizer.optimize(voicingList, pitchList);
 		}
 	}

@@ -2,9 +2,10 @@ package org.cocolab.inpro.sphinx.decoder;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
@@ -202,7 +203,7 @@ public class FakeSearch extends NoSearch {
 
 	private class TokenList {
 		// you have to make sure yourself, that the sortedList is sorted!
-		LinkedList<Token> sortedList = new LinkedList<Token>();
+		List<Token> sortedList = new ArrayList<Token>();
 		ListIterator<Token> listIt;
 		
 		void add(Token t) {

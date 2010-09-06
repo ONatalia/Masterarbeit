@@ -2,8 +2,8 @@ package org.cocolab.inpro.audio;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Queue;
 
 import javax.sound.sampled.AudioInputStream;
@@ -25,7 +25,7 @@ public class DispatchStream extends InputStream implements Configurable {
 	private boolean sendSilence;
 
 	InputStream stream;
-	Queue<InputStream> streamQueue = new LinkedList<InputStream>();
+	Queue<InputStream> streamQueue = new ArrayDeque<InputStream>();
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {

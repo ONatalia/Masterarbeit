@@ -11,7 +11,7 @@ public class TEDviewNotifier implements SignalFeatureListener {
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
-		tedAdapter.write("<control originator='pitch' action='new'/><control originator='pitch' action='clear'/>");
+		tedAdapter.write("<control originator='pitch' action='new'/>");
 	}
 
 	@Override

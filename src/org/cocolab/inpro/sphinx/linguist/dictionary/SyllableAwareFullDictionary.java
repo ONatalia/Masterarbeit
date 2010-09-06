@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -73,7 +72,7 @@ public class SyllableAwareFullDictionary extends FullDictionary {
             Unit[] unitsArray = units.toArray(new Unit[units.size()]);
             List<Pronunciation> pronunciations = (List<Pronunciation>) dictionary.get(word);
             if (pronunciations == null) {
-                pronunciations = new LinkedList<Pronunciation>();
+                pronunciations = new ArrayList<Pronunciation>();
             }
             Pronunciation pronunciation = new SyllableAwarePronunciation(unitsArray, syllBoundaries);
             pronunciations.add(pronunciation);

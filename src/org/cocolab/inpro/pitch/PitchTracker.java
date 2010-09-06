@@ -23,11 +23,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Queue;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -66,6 +66,7 @@ public class PitchTracker extends BaseDataProcessor {
 	
 	@S4Double(defaultValue = 0.15)
 	public final static String PROP_CAND_SCORE_THRESHOLD = "scoreThreshold";
+	/** TODO: IS THIS CORRECT? a lower threshold will lead to more (potentially less reliable) candidates */
 	private double candidateScoreThreshold; // default set by newProperties()
 	@S4Double(defaultValue = 66.66666666)
 	public final static String PROP_MIN_PITCH_HZ = "minimumPitch";
@@ -324,7 +325,7 @@ public class PitchTracker extends BaseDataProcessor {
 	 * * * * * * * * * * * * * * * * * * * * * * * * * */
 	
 	private static Queue<Double> getReferencePitch(String filename) {
-		Queue<Double> referencePitch = new LinkedList<Double>();
+		Queue<Double> referencePitch = new ArrayDeque<Double>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			while (br.ready()) {
@@ -344,7 +345,7 @@ public class PitchTracker extends BaseDataProcessor {
 	public static void functionalTest(String[] args, ConfigurationManager cm) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException, DataProcessingException {
 		// read reference pitch (if available)
 		final Queue<Double> referencePitch = (args.length > 1) 
-    		  ? getReferencePitch(args[1]) : new LinkedList<Double>();
+    		  ? getReferencePitch(args[1]) : new ArrayDeque<Double>();
     	// add a listener for the output
     	PitchTracker pt = (PitchTracker) cm.lookup("pitchTracker");
     	pt.listeners.add(new SignalFeatureListener(){

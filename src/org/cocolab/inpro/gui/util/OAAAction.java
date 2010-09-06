@@ -1,7 +1,7 @@
 package org.cocolab.inpro.gui.util;
 
 import java.awt.event.ActionEvent;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -37,14 +37,14 @@ public class OAAAction extends AbstractAction {
 		super(name, null);
 		logger.setLevel(Level.ALL);
 		this.agent = agent;
-		calls = new LinkedList<IclTerm>();
+		calls = new ArrayList<IclTerm>();
 		calls.add(IclTerm.fromString(goal));
 	}
 	
 	public OAAAction(Agent agent, String name, Icon icon, String goal) throws RecognitionException, TokenStreamException {
 		super(name, icon);
 		this.agent = agent;
-		calls = new LinkedList<IclTerm>();
+		calls = new ArrayList<IclTerm>();
 		calls.add(IclTerm.fromString(goal));
 	}
 	

@@ -8,7 +8,7 @@ import edu.cmu.sphinx.util.props.ConfigurationManager;
 
 class CommandLineOptions {
 	
-	private static final String DEFAULT_URL = "http://www.ling.uni-potsdam.de/~timo/cgi-bin/upload.pl";
+	private static final String DEFAULT_URL = "http://www.sfb632.uni-potsdam.de/cgi-timo/upload.pl";
 
 	private ConfigurationManager cm;
 	URL configURL = DataCollector.class.getResource("config.xml");

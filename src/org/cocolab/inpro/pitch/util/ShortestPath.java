@@ -18,7 +18,9 @@
 
 package org.cocolab.inpro.pitch.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class ShortestPath<NodeType> {
 
@@ -36,14 +38,14 @@ public class ShortestPath<NodeType> {
 		queue.clear();
 	}
 	
-	public LinkedList<NodeType> calculate () {
+	public List<NodeType> calculate () {
 					
 		while (!queue.isEmpty()) {
 			Node node = queue.poll();
 			if (node == targetNode) {
-				LinkedList<NodeType> result = new LinkedList<NodeType>();
+				List<NodeType> result = new ArrayList<NodeType>();
 				while (node != null) {
-					result.addFirst(node.payload);
+					result.add(0, node.payload);
 					node = node.previous;
 				}
 				return result;
@@ -119,7 +121,7 @@ public class ShortestPath<NodeType> {
 		}
 	}
 	
-	private class PriorityQueue<T> extends LinkedList<T> {
+	private class PriorityQueue<T> extends ArrayList<T> {
 		/**
 		 * 
 		 */

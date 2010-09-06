@@ -6,10 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class LabelFile {
 
@@ -49,9 +50,9 @@ public class LabelFile {
         return list;
     }
     
-    public static LinkedList<Label> getLabels(String labelFile) throws IOException {
-    	LinkedList<Label> labels = new LinkedList<Label>();
+    public static Queue<Label> getLabels(String labelFile) throws IOException {
     	List<String> lines = getLines(labelFile, 0);
+    	ArrayDeque<Label> labels = new ArrayDeque<Label>(lines.size());
     	double stopTime = 0.0;
     	for (String line : lines) {
     		stopTime = getStopTime(line);

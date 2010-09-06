@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.regex.Pattern;
@@ -35,7 +34,7 @@ public class TextGrid {
 	
 	public static TextGrid newFromTextGridFile(File file) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "ISO-8859-1"));
-		List<String> lines = new LinkedList<String>();
+		List<String> lines = new ArrayList<String>();
 		String line;
 		while ((line = in.readLine()) != null)
             lines.add(line);

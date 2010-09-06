@@ -3,7 +3,7 @@ package org.cocolab.inpro.annotation;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -12,7 +12,7 @@ import org.cocolab.inpro.audio.AudioUtils;
 
 public class LabelledAudioStream extends AudioInputStream {
 
-	LinkedList<Label> labels;
+	Queue<Label> labels;
 	
 	long positionInBytes = 0;
 	long labelEndPosition = 0;
