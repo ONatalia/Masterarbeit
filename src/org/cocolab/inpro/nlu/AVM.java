@@ -414,15 +414,31 @@ public class AVM {
 	 * Builds a pretty string representation of the AVM containing only its type and non-empty AVPairs.
 	 * @return pretty string representation of the AVM
 	 */
+	@SuppressWarnings("unchecked")
 	public String toPrettyString() {
 		String str = new String();
 		if (!this.isEmpty()) {
-			str += "[ ";
-			str += this.type + " ";
+			str += "[ type:" + this.type + "\n";
 			for (String attribute : this.attributes.keySet()) {
 				Object value = attributes.get(attribute);
-				if (value != null) {
-					str += attribute + ":" + value.toString() + " ";
+				if (value instanceof String && !((String) value).isEmpty()) {
+					str += attribute + ":" + value.toString() + "\n";
+				} else if (value instanceof AVM && !((AVM) value).isEmpty()) {
+					str += attribute + ":" + ((AVM) value).toPrettyString();
+				} else if (value instanceof ArrayList && !((ArrayList<AVM>) value).isEmpty()) {
+					boolean printList = false;
+					String substr = "";
+					for (AVM avm : ((ArrayList<AVM>) value)) {
+						if (!avm.isEmpty()) {
+							printList = true;
+							substr += avm.toPrettyString();
+						}
+					}
+					if (printList) {
+						str += attribute + ": [\n";
+						str += substr;
+						str += "]\n";						
+					}
 				}
 			}
 			str += "]";

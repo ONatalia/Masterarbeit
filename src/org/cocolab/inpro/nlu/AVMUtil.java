@@ -230,15 +230,22 @@ public class AVMUtil {
 	 */
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Composed AVMs:\n");
-		for (AVM avm : this.composeList) {
-			if (!avm.isEmpty())
-				sb.append(avm.toPrettyString() + "\n");
+		if (!this.composeList.isEmpty()) {
+			sb.append("Composed AVMs:\n");
+			for (AVM avm : this.composeList) {
+				if (!avm.isEmpty())
+					sb.append(avm.toPrettyString() + "\n");
+			}			
 		}
-		sb.append("Resolved AVMs:\n");
-		for (AVM avm : this.resolvedList) {
-			if (!avm.isEmpty())
-				sb.append(avm.toPrettyString() + "\n");
+		if (!this.resolvedList.isEmpty()) {
+			sb.append("Resolved AVMs:\n");
+			for (AVM avm : this.resolvedList) {
+				if (!avm.isEmpty())
+					sb.append(avm.toPrettyString() + "\n");
+			}			
+		}
+		if (sb.length() == 0) {
+			sb.append("Empty");
 		}
 		return sb.toString();
 	}
