@@ -159,7 +159,7 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  	
  	/**
  	 * Enforces that IUs in this list be in strict linear temporal order or not.
- 	 * @params boolean whether to sort this list or not. 
+ 	 * @param sort whether to assert temporal sorting of this list or not. 
  	 */
  	public void sortTemporally(boolean sort) {
  		this.temporallySorted = sort;

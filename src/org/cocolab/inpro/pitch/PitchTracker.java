@@ -278,8 +278,7 @@ public class PitchTracker extends BaseDataProcessor {
 	
 	/**
 	 *	signal listeners, and apply values to first element of queue 
-	 * @param candidate or null if no candidate/voiceless
-	 * @param signalPower
+	 * @param selectedCandidate or null if no candidate/voiceless
 	 */
 	private void signalListeners(PitchCandidate selectedCandidate,
 			List<PitchCandidate> candidates) {

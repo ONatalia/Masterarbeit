@@ -33,7 +33,7 @@ public interface SignalFeatureListener extends Configurable, EventListener, Rese
      *
      * @param frame the frame number for this result
      * @param power average power per sample in the frame
-     * @ param rbcpower average power per sample after filtering the frame with a revised B-curve filter 
+     * param rbcpower average power per sample after filtering the frame with a revised B-curve filter 
      * @param voicing whether this frame is voiced
      * @param pitch pitch for this frame
      */

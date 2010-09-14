@@ -52,7 +52,7 @@ public class AVMUtil {
 	 * Creates AVMUtil with a list of prototypes (avmStructures) of
 	 * different typed AVMs and a local list of composed AVMs (composeList).
 	 * Defaults to res/PentoAVMWorldList for world file.
-	 * @param structureFile with list of AVM structures. 
+	 * @param worldFile with list of AVM structures. 
 	 */
 	public AVMUtil(String worldFile) {
 		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile(worldFile);

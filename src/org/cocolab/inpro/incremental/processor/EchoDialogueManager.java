@@ -138,7 +138,6 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	
 	/**
 	 * Builds a simple string from currently understood sentence.
-	 * @return
 	 */
 	private String sentenceToString() {
 		String ret = "";
