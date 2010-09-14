@@ -1,10 +1,12 @@
 package org.cocolab.inpro.incremental.basedata;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -101,7 +103,7 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
     	return rms;
     }
     
-	public static double percentileFilter(List<Double> list, int windowPosition) {
+	public static double percentileFilter(Collection<Double> list, int windowPosition) {
 		List<Double> sortedList = new ArrayList<Double>(list);
 		Collections.sort(sortedList);
 		return sortedList.get(windowPosition).doubleValue();
@@ -109,7 +111,7 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 	
 	private void makeLoudness(int smoothingWindow, int windowPosition) {
 		loudnessData.clear();
-		LinkedList<Double> rbcList = new LinkedList<Double>();
+		Deque<Double> rbcList = new ArrayDeque<Double>();
 		for (int i = 0; i < smoothingWindow; i++) {
 			rbcList.add(Double.valueOf(0.0d));
 		}

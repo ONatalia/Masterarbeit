@@ -20,6 +20,7 @@ import org.cocolab.inpro.sphinx.decoder.FakeSearch;
 import org.cocolab.inpro.sphinx.frontend.Microphone;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 
+import edu.cmu.sphinx.decoder.ResultListener;
 import edu.cmu.sphinx.frontend.DataProcessor;
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
@@ -54,15 +55,17 @@ public class SimpleReco {
 		this.clp = clp;
 		this.cm = cm;
     	setupDeltifier();
-    	this.recognizer = (Recognizer) cm.lookup("recognizer");
-    	assert recognizer != null;
 
-    	setupReco();
-    	allocateRecognizer();
+    	setupDecoder();
     	logger.info("Setting up source...");
+
     	setupSource();
     	logger.info("Setting up monitors...");
+
+    	this.recognizer = (Recognizer) cm.lookup("recognizer");
+    	assert recognizer != null;
     	setupMonitors();
+    	allocateRecognizer();
     	logger.info("Configuration has finished");
     	IU.startupTime = System.currentTimeMillis();
 	}
@@ -124,7 +127,6 @@ public class SimpleReco {
 	}
 	
 	public void setupMicrophoneWithEndpointing() {
-		allocateRecognizer();
     	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
 		final Microphone mic = (Microphone) cm.lookup("microphone");
 		FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
@@ -135,7 +137,7 @@ public class SimpleReco {
 	}
 	
 	public void allocateRecognizer() {
-		if (recognizer.getState() == Recognizer.State.DEALLOCATED) {
+		if (recognizer != null && recognizer.getState() == Recognizer.State.DEALLOCATED) {
 	    	logger.info("Allocating recognizer...");
 			recognizer.allocate();
 		}
@@ -192,7 +194,7 @@ public class SimpleReco {
 		}
 	}
 	
-	private void setupReco() throws IOException {
+	private void setupDecoder() throws IOException {
     	if (clp.isRecoMode(RecoCommandLineParser.FORCED_ALIGNER_RECO)) {
     		logger.info("Running in forced alignment mode.");
     		logger.info("Will try to recognize: " + clp.getReference());
@@ -214,8 +216,9 @@ public class SimpleReco {
 	}
 
 	private void setupMonitors() throws InstantiationException, PropertyException {
+		ResultListener resultlistener = (ResultListener) cm.lookup("currentASRHypothesis");
+		recognizer.addResultListener(resultlistener);
 		CurrentASRHypothesis casrh = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
-		recognizer.addResultListener(casrh);
 		if (clp.matchesOutputMode(RecoCommandLineParser.OAA_OUTPUT)) {
 			cm.lookup("newWordNotifierAgent");
 		}

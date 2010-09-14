@@ -133,7 +133,7 @@ public class ActionIU extends IU {
 	
 	@Override
 	public String toPayLoad() {
-		return "Action " + type + " with strength " + actionStrength;
+		return type + (type.isMotion() ? " / " + actionStrength : ""); 
 	}
 	
 	@Override

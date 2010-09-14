@@ -17,10 +17,10 @@
     <property name="scorer" value="simpleScorer"/>
 
     <!-- alternatives: flatLinguist | lexTreeLinguist -->
-    <property name="linguist"   value="flatLinguist"/> 
+    <property name="linguist"   value="lexTreeLinguist"/> 
 
     <!-- alternatives: fakeSearch | simpleSearch | wordPruningSearch -->
-    <property name="searchManager" value="simpleSearch"/>
+    <property name="searchManager" value="wordPruningSearch"/>
     
     <!-- alternatives: ngramGrammar | jsgfGrammar | forcedAligner; only relevant with flatLinguist -->
     <property name="grammar" value="jsgfGrammar"/>
@@ -29,11 +29,11 @@
     <!-- The minimum amount of time in speech (in milliseconds) to be considered as utterance start -->
     <property name="startSpeech" value="100"/>
     <!-- The amount of time in silence (in milliseconds) to be considered as utterance end -->
-    <property name="endSilence" value="200"/>
+    <property name="endSilence" value="250"/>
     <!-- The amount of time (in milliseconds) before speech start to be included as speech data. -->
     <property name="speechLeader" value="30"/>
     <!-- The amount of time (in milliseconds) after speech ends to be included as speech data. -->
-    <property name="speechTrailer" value="150"/>
+    <property name="speechTrailer" value="200"/>
     <!-- The speech classifier threshold. -->
     <property name="threshold" value="15"/>
 
@@ -44,11 +44,11 @@
     <component name="recognizer" type="edu.cmu.sphinx.recognizer.Recognizer">
         <property name="decoder" value="decoder"/>
         <propertylist name="monitors">
-        	<item>currentASRHypothesis</item>
 <!--
+        	<item>threadingListener</item>
+        	<item>currentASRHypothesis</item>
         	<item>confiDancer</item>
             <item>labelWriter </item>
-        	<item>threadingListener</item>
         	<item>speedTracker </item>
             <item>memoryTracker </item>
             <item>newWordNotifierAgent </item>
@@ -61,7 +61,7 @@
         <property name="recognizer" value="${recognizer}"/>
         <property name="queueSize" value="1"/>
         <propertylist name="listeners">
-            <item>currentHypothesis</item>
+            <item>currentASRHypothesis</item>
         </propertylist>
     </component>
 

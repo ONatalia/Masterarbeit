@@ -65,6 +65,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -tg <file>     do fake recognition from the given reference textgrid");
 //		System.err.println("    -gr <URL>      recognize using the given JSGF grammar");
 //		System.err.println("    -lm <URL>      recognize using the given language model");
+//		System.err.println("                   (-lm and -gr are exclusive)");
 		System.err.println("    -rt	           when reading from file, run no faster than real-time");
 	}
 

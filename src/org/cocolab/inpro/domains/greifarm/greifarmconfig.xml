@@ -81,11 +81,10 @@
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
-    		<item>greifarmActor</item>
     		<item>hypViewer</item>
     		<item>tedNotifier</item>
+    		<item>greifarmActor</item>
 <!--
-            <item>consoleNotifier</item>
             <item>semanticResolver</item>
             <item>consoleNotifier</item>
             <item>labelWriter2</item>
@@ -97,6 +96,7 @@
 	<component name="greifarmActor" type="org.cocolab.inpro.domains.greifarm.GreifarmActor">
         <propertylist name="hypChangeListeners">
     		<item>tedNotifier</item>
+<!--            <item>consoleNotifier</item> -->
     	</propertylist>
 	</component>
 
@@ -308,8 +308,8 @@
 
     <component name="endpointing" type="edu.cmu.sphinx.frontend.FrontEnd">
         <propertylist name="pipeline">
-            <item>sessionWavWriter</item> 
 <!--
+            <item>sessionWavWriter</item> 
 -->
             <item>speechClassifier</item>
             <item>speechStateVisualizer</item>
@@ -358,6 +358,10 @@
         <property name="tedTrack" value="audio"/>
         <property name="outFilePattern" value="/tmp/session."/>
     </component>
+
+	<component name="dataThrottle" type="org.cocolab.inpro.sphinx.frontend.DataThrottle">
+		<property name="speed" value="1.0"/>
+	</component>
 
     <component name="speechClassifier" type="edu.cmu.sphinx.frontend.endpoint.SpeechClassifier">
         <property name="threshold" value="${threshold}"/>

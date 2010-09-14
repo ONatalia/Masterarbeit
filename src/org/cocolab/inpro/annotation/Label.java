@@ -1,20 +1,3 @@
-/* 
- * Copyright 2008, 2009, Timo Baumann and the Inpro project
- * 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
- */
 package org.cocolab.inpro.annotation;
 
 import java.io.IOException;
@@ -27,6 +10,7 @@ import java.util.regex.Pattern;
 
 public class Label {
 	
+	/** set of predefined labels that are to be understood as silence */
 	public static final Set<String> SILENCE = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			"<sil>", "SIL", "<p:>", "<s>", "</s>", "", "_")));
 
@@ -40,6 +24,7 @@ public class Label {
 		Pattern.compile("^\\s*text = \"(.*)\"\\s*$") 
 	); 
 	
+	/** factory for labels from textgrid lines */
 	static Label newFromTextGridLines(List<String> lines) throws IOException {
 		assert lines.size() == 3;
 		List<String> params = AnnotationUtil.interpret(lines, tgPatterns);
@@ -47,29 +32,38 @@ public class Label {
 						 Double.parseDouble(params.get(1)), 
 						 params.get(2));
 	}
-	
+
 	public Label(String l) {
 		this(Double.NaN, Double.NaN, l);
 	}
-	
+	/** construct a label from given start and end times, with the given label text */ 
 	public Label(double s, double e, String l) {
 		start = s;
 		end = e;
 		label = l;
 	}
 
+		
+	/** in seconds */
 	public double getStart() {
 		return start;
 	}
 	
+	/** in seconds */
 	public double getEnd() {
 		return end;
 	}
 
+	/** the label itself */
 	public String getLabel() {
 		return label;
 	}
-	
+
+	/** whether the label appears to mark a silence */
+	public boolean isSilence() {
+		return SILENCE.contains(getLabel()); 
+	}
+
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(start);
@@ -86,10 +80,6 @@ public class Label {
 				"        xmax = 1.970000", 
 				"        text = \"Quader\""));
 		System.out.println(l.toString());
-	}
-
-	public boolean isSilence() {
-		return SILENCE.contains(getLabel()); 
 	}
 
 }

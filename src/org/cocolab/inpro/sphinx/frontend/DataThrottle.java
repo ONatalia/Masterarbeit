@@ -1,5 +1,7 @@
 package org.cocolab.inpro.sphinx.frontend;
 
+import org.cocolab.inpro.incremental.unit.IU;
+
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DataProcessingException;
@@ -37,9 +39,14 @@ public class DataThrottle extends BaseDataProcessor {
         Data input = getPredecessor().getData();
         // DataStartSignals are used to start the timer
         if (input instanceof DataStartSignal) {
-        	startTime = System.currentTimeMillis();
-        }
-        else {
+        	long currentTime = System.currentTimeMillis();
+        	startTime = ((DataStartSignal) input).getTime();
+        	System.out.println("it is now " + currentTime);
+        	System.out.println("microphone started at " + startTime);
+        	System.out.println("IU world started at " + IU.startupTime);
+        	System.out.println("shifting IU world by " + (IU.startupTime - startTime) + " ms");
+        	IU.startupTime = startTime;
+        } else {
             // everything except signals are delayed
 	        if ((input instanceof DoubleData)) {
 	        	DoubleData ddinput = (DoubleData) input;

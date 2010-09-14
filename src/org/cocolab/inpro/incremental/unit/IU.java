@@ -9,9 +9,10 @@ import java.util.Locale;
 import org.cocolab.inpro.incremental.BaseDataKeeper;
 import org.cocolab.inpro.incremental.util.ResultUtil;
 
-public abstract class IU {
+public abstract class IU implements Comparable<IU> {
 	
-	public static long startupTime = System.currentTimeMillis();
+	public static long startupTime;
+	static { startupTime = System.currentTimeMillis(); }
 	
 	public static final IU FIRST_IU = new IU() {
 		@Override
@@ -38,8 +39,7 @@ public abstract class IU {
 	 * and you want groundedIn to be deeply SLLed to the sameLevelLink's groundedIn-IUs  
 	 */
 	public IU(IU sll, List<IU> groundedIn, boolean deepSLL) {
-		this.creationTime = System.currentTimeMillis() - startupTime;
-		this.id = IU.getNewID();
+		this();
 		this.groundedIn = groundedIn;
 		if (deepSLL && (sll != null)) {
 			connectSLL(sll);
@@ -71,6 +71,7 @@ public abstract class IU {
 	 */
 	public IU() {
 		this.id = IU.getNewID();
+		this.creationTime = System.currentTimeMillis() - startupTime;
 	}
 	
 	/**
@@ -304,6 +305,15 @@ public abstract class IU {
 	
 	public long getAge() {
 		return System.currentTimeMillis() - creationTime;
+	}
+	
+	/**
+	 * the natural ordering of IUs is based on the IU's ids:
+	 * IUs with lower ids come first 
+	 */
+	@Override
+	public int compareTo(IU other) {
+		return this.id - other.id;
 	}
 	
 }

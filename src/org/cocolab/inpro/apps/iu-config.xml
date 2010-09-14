@@ -1,5 +1,5 @@
 
-    <property name="deltifier" value="wasd"/>
+    <property name="deltifier" value="none"/>
     <property name="deltifierParam" value="0"/>
     <property name="baseData" value="baseData"/>
     <property name="semanticComposer" value="semanticComposer"/>
@@ -40,21 +40,23 @@
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
 <!--
-		<item>${dialogueManager}</item>
-    		<item>${semanticComposer}</item>
-	     <item>iuBasedFloorTracker</item>
     		<item>tedNotifier</item>
+	     	<item>iuBasedFloorTracker</item>
+			<item>${dialogueManager}</item>
+    		<item>tedNotifier</item>
+         	<item>labelWriter2</item>
+    		<item>${semanticComposer}</item>
     		<item>hypViewer</item>
 	     <item>outputForSimpleText</item>
 	     <item>iuNetworkViewer</item>
         	<item>consoleNotifier</item>
          	<item>labelWriter2</item>
     		<item>oaaNotifier</item>
--->
 		<item>${dialogueManager}</item>
     		<item>iuBasedFloorTracker</item>
           <item>tedNotifier</item>
           <item>consoleNotifier</item>
+-->
         </propertylist>
     </component>
 
@@ -87,9 +89,9 @@
      </component>
 
 	<component name="iuBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.IUBasedFloorTracker">
-		<property name="useProsody" value="${useProsody}" />
-		<property name="risingProsodyTimeout" value="${risingProsodyTimeout}" />
-		<property name="anyProsodyTimeout" value="${anyProsodyTimeout}" />
+		<property name="useProsody" value="true" />
+		<property name="risingProsodyTimeout" value="150" />
+		<property name="anyProsodyTimeout" value="600" />
 		<propertylist name="ftlisteners">
 			<item>${dialogueManager}</item>
 		</propertylist>
@@ -169,5 +171,3 @@
     <component name="dispatchStream" type="org.cocolab.inpro.audio.DispatchStream">
         <property name="sendSilence" value="true"/>
     </component>
-
-    
