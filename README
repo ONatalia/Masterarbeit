@@ -10,81 +10,40 @@ _____________________________________________________________
 README to the JAVA sources (and programs) in the inpro project 
 (thus mainly the ASR and closely connected modules).
 
-
-
 0. Resources
 
 The res/ directory contains a few wave files, and some other
 useful scripts and stuff.
 
+1. Applications
 
+All generic applications reside in the org.cocolab.inpro.apps package.
+This directory is also where the default configuration files
+are stored. The configuration file used can be changed in all
+applications described below with the commandline switch "-c".
+ 
+- SimpleReco: main starting point into our world. This executable 
+starts the speech recognition and all modules that are connected
+to it. (Remember? Bottom-up processing.) 
+Speech recognition can be configured to run from file (-F), from
+microphone (-M) or from the network via RTP (-R; notice that our 
+RTP implementation is far from standard-conforming).
+There are options for additional output, to control ASR incrementality
+filtering, and to control special recognition modes (like forced
+alignment or completely fake recognition from a TextGrid). Start
+SimpleReco without arguments to get a list of commandline options.
 
-1. Incremental Recognizer
+- SimpleText: to test higher-level modules, it is often convenient
+to directly input words, instead of just talking into the system.
+This allows for more fine-grained, detailed and repeatable testing.
+SimpleText allows to do just that. By default, SimpleText will start
+in interactive mode. SimpleText -h will give you the list of 
+commandline options.
 
-org.cocolab.inpro.incrementalwavfile.IncrementalWavFile
+- SimpleRTP: This can be used to forward data via RTP which is 
+useful in connection with SimpleReco -R if the recognizer should 
+not run on the local machine. 
+- SimpleMonitor: Likewise, this program can be used to output data
+that is sent to the monitor via RTP.
 
-The fun with Sphinx is in its configuration files, in our case 
-org/cocolab/inpro/incrementalwavfile/digits.config.xml
-
-Depending on the configuration, different monitors are added
-to the recognizer, different processors live in the FrontEnd
-and so on. Some interesting modules:
-
-org.cocolab.inpro.sphinx.instrumentation.FeatureMonitor: 
-writes some EOT features (in arff format) for every audio frame
-
-org.cocolab.inpro.sphinx.instrumentation.LabelWriter:
-writes current (word or phoneme) hypotheses, whenever the 
-hypothesis changes during recognition. Should in future be able
-to pipe this information to TEDview.
-
-org.cocolab.inpro.sphinx.instrumentation.NewWordNotifierAgent:
-OAA-agent (thus you need the OAA facilitator running) that 
-sends the empty goal idASRNewWordsHypothesis('Current list of\
-words hypothesis'). Clients are expected to solve this goal 
-immediately and reply with different goals (For example 
-something like idKEYWORD('hypothesis') )
-
-das, 270508: to get IncrementalWavFile to run, minimally you need to put a
-link to bin/org into InPro directory:
-           ln -s bin/org org
-Otherwise certain config files are not found.
-
-
-2. Batch Mode Recognizer
-
-org.cocolab.inpro.batch.BatchModeRecognizer
-
-has two arguments: (a) config-file: use the same as above, 
-it also contains a batch configuration. (b) List of files to
-work on. Try res/sample.batch as an example.
-
-
-
-3. Talking Agents
-
-The talking agents demonstrate how a complex dialogue partner,
-consisting of several (two) OAA-agents talks to a second 
-(identical) dialogue partner via RTP.
-
-Each dialogue partner consists of a "mouth", 
-org.cocolab.inpro.agents.dispatcher.RTPDispatcherAgent and
-an "ear", org.cocolab.inpro.agents.vad.VADAgent . Both take
-their configuration file as arguments. 
-
-Configuration files are supplied for two dialogue partners 
-(a and b). For a working system you should start:
-
-- the facilitator fac
-- a debug agent (debug_c or debug.jar) (turn on "Trace All" 
-and "TCP Trace Fac." for all the fun)
-- java org.cocolab.inpro.agents.dispatcher.RTPDispatcherAgent rtpdispatcher.a.xml
-- java org.cocolab.inpro.agents.dispatcher.RTPDispatcherAgent rtpdispatcher.b.xml
-- java org.cocolab.inpro.agents.vad.VADAgent vad.a.xml
-- java org.cocolab.inpro.agents.vad.VADAgent vad.b.xml
-
-The two dialogue partners are now connected and happily exchanging
-silence (-). For more fun use the debug agent to solve either
-antoniaPlayFile('file:../res/1984.wav') or berndPlayFile('res/1984.wav').
-(You may also use any other wave file, but the agents will after
-that only talk about 1984. Forever.
+2. Examples

@@ -10,29 +10,24 @@ _____________________________________________________________
 Installation instructions for the JAVA programs in the inpro 
 project (thus mainly the ASR and closely connected modules).
 
-For the moment there are no build instructions, because we use
-Eclipse with Subclipse installed as our build environment.
-Figure it out yourself.
+For the moment there are no explicit build instructions, as we 
+use Eclipse with Subclipse installed as our build environment.
+An ant build file (exported from eclipse) is provided in the
+distribution, but your milleage with this may vary. 
 
 Dependencies:
 =============
 
-1. Sphinx4 (1.0beta):
+1. Sphinx4:
 
 get it at http://sourceforge.net/project/showfiles.php?group_id=1904&package_id=117949
 
-The current (20071022) nightly builds will likely not work, 
-as the configuration management of current Sphinx4 has been 
-heavily reworked. 
+There are a few modifications between stock sphinx and the one we use.
+If you run into troubles, please look on our webpage to see whether you
+should use "our" sphinx4.jar . 
 
-You can either download and build the source distribution
-or just download the binary distribution. All you need is
-the library sphinx4.jar that you want to add to your 
-CLASSPATH.
-
-While you are there, also grab the different acoustic models
-(HUB4, RM1, TIDIGITS and WSJ) and add them to the class path
-as well. 
+All you need is the library sphinx4.jar that you want to add 
+to your CLASSPATH.
 
 1a. German Acoustic Model:
 
@@ -64,10 +59,7 @@ installable via your package manager).
 
 3. Java Media Framework (2.1.1):
 
-get it at http://java.sun.com/products/java-media/jmf/2.1.1/download.html
-
-You may want to install the version optimized for your OS/
-architecture. Add jmf.jar to your CLASSPATH.
+JMF is no longer required for using InproTK
 
 4. weka (3.5.x)
 
@@ -83,14 +75,20 @@ and add it to your CLASSPATH. It also requires vecmath.jar,
 available from https://java3d.dev.java.net/binary-builds.html,
 which must be added to your CLASSPATH as well.
 
-6. maryclient (3.5+)
+6. maryclient
 
 get it from http://mary.dfki.de/
 
-you must have a mary server running if you run an application that
-uses mary (none yet)
+Currently, our code depends on both Mary 3.6's and Mary 4.0's maryclient.jar,
+as we are aiming to support both as TTS server and as the client/server
+protocol has changed between 3.6 and 4.0. However, you can change 
+org.cocolab.inpro.audio.MaryAdapter to get rid of the dependency on one or
+the other.
 
-7. some more libraries (dom4j, junit, log4j, ...)
+7. some more libraries (dom4j, junit, log4j, vecmath, emory-backports, ...)
 
-these should be installable through your system's package manager 
-as they are fairly standard libraries
+These should be installable through your system's package manager 
+as they are fairly standard libraries.
+
+Some more libraries might be in the res/ or lib/ folders. 
+Adding them to your build path might (or might not) help.
