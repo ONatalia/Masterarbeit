@@ -8,6 +8,8 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	public static final int REGULAR_RECO = 0;
 	public static final int FORCED_ALIGNER_RECO = 1;
 	public static final int FAKE_RECO = 2;
+	public static final int GRAMMAR_RECO = 3;
+	public static final int SLM_RECO = 4;
 	
 	public static final int INCREMENTAL = 0;
 	public static final int NON_INCREMENTAL = 1;
@@ -30,6 +32,16 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	String referenceText;
 	String referenceFile;
 	
+	/* stores location of a grammar or SLM */ 
+	URL languageModelURL; 
+	
+	/**
+	 * @return the languageModelURL
+	 */
+	public URL getLanguageModelURL() {
+		return languageModelURL;
+	}
+
 	boolean dataThrottle;
 	
 	protected boolean ignoreErrors;
@@ -63,10 +75,10 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("special recognition modes:");
 		System.err.println("    -fa <text>     do forced alignment with the given reference text");
 		System.err.println("    -tg <file>     do fake recognition from the given reference textgrid");
-//		System.err.println("    -gr <URL>      recognize using the given JSGF grammar");
-//		System.err.println("    -lm <URL>      recognize using the given language model");
-//		System.err.println("                   (-lm and -gr are exclusive)");
-		System.err.println("    -rt	           when reading from file, run no faster than real-time");
+		System.err.println("    -gr <URL>      recognize using the given JSGF grammar");
+		System.err.println("    -lm <URL>      recognize using the given language model");
+		System.err.println("                   (-fa, -tg, -gr, and -lm are exclusive)");
+		System.err.println("    -rt	           when reading from file, run no faster than real-time (includes VAD)");
 	}
 
 	/**
@@ -164,6 +176,16 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				i++;
 				incrementalModifier = Integer.parseInt(args[i]);
 			}
+			else if (args[i].equals("-lm")) {
+				recoMode = SLM_RECO;
+				i++;
+				languageModelURL = new URL(args[i]);
+			} 
+			else if (args[i].equals("-gr")) {
+				recoMode = GRAMMAR_RECO;
+				i++;
+				languageModelURL = new URL(args[i]);
+			} 
 			else if (args[i].equals("-rt")) {
 				dataThrottle = true;
 			}

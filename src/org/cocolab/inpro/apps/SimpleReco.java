@@ -2,6 +2,8 @@ package org.cocolab.inpro.apps;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -16,7 +18,6 @@ import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
 import org.cocolab.inpro.incremental.unit.IU;
-import org.cocolab.inpro.sphinx.decoder.FakeSearch;
 import org.cocolab.inpro.sphinx.frontend.Microphone;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 
@@ -208,8 +209,27 @@ public class SimpleReco {
     		logger.info("Running in fake recognition mode.");
     		logger.info("Reading transcript from: " + clp.getReference());
         	cm.setGlobalProperty("searchManager", "fakeSearch");
-        	FakeSearch fs = (FakeSearch) cm.lookup("fakeSearch");
-        	fs.setTranscript(clp.getReference());
+//        	FakeSearch fs = (FakeSearch) cm.lookup("fakeSearch");
+//        	fs.setTranscript(clp.getReference());
+        	cm.getPropertySheet("fakeSearch").setString("transcriptName", clp.getReference());
+    	} else if (clp.isRecoMode(RecoCommandLineParser.GRAMMAR_RECO)) {
+        	URL lmUrl = clp.getLanguageModelURL();
+    		logger.info("Running with grammar " + lmUrl);
+        	cm.setGlobalProperty("linguist", "flatLinguist");
+        	Pattern regexp = Pattern.compile("^(.*)/(.*?).gram$");
+        	Matcher regexpResult = regexp.matcher(lmUrl.toString());
+        	assert regexpResult.matches() : "mal-formatted grammar URL.";
+        	String grammarLocation = regexpResult.group(1);
+        	String grammarName = regexpResult.group(2);
+        	logger.info(grammarLocation);
+        	cm.getPropertySheet("jsgfGrammar").setString("grammarLocation", grammarLocation);
+        	logger.info(grammarName);
+        	cm.getPropertySheet("jsgfGrammar").setString("grammarName", grammarName);
+    	} else if (clp.isRecoMode(RecoCommandLineParser.SLM_RECO)) {
+    		logger.info("Running with language model " + clp.getLanguageModelURL().toString());
+        	cm.setGlobalProperty("linguist", "lexTreeLinguist");
+    		String lmLocation = clp.getLanguageModelURL().toString();
+    		cm.getPropertySheet("ngram").setString("location", lmLocation);
     	} else {
     		logger.info("Loading recognizer...");
     	}
