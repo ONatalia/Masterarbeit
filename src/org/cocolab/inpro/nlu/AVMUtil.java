@@ -43,8 +43,8 @@ public class AVMUtil {
 	 */
 	public AVMUtil() {
 		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile("res/PentoAVMStructure");
-		worldList = AVMWorldUtil.setAVMsFromFile("res/PentoAVMWorldList", avmStructures);
-		composeList = getAllAVMs();
+//		worldList = AVMWorldUtil.setAVMsFromFile("res/PentoAVMWorldList", avmStructures);
+		composeList = getAVMStructures();
 		resolvedList = new ArrayList<AVM>();
 	}
 
@@ -52,12 +52,12 @@ public class AVMUtil {
 	 * Creates AVMUtil with a list of prototypes (avmStructures) of
 	 * different typed AVMs and a local list of composed AVMs (composeList).
 	 * Defaults to res/PentoAVMWorldList for world file.
-	 * @param worldFile with list of AVM structures. 
+	 * @param structFile with list of AVM structures. 
 	 */
-	public AVMUtil(String worldFile) {
-		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile(worldFile);
-		worldList = AVMWorldUtil.setAVMsFromFile("res/PentoAVMWorldList", avmStructures);
-		composeList = getAllAVMs();
+	public AVMUtil(String structureFile) {
+		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile(structureFile);
+//		worldList = AVMWorldUtil.setAVMsFromFile("res/PentoAVMWorldList", avmStructures);
+		composeList = getAVMStructures();
 		resolvedList = new ArrayList<AVM>(worldList.size());
 	}
 
@@ -70,7 +70,7 @@ public class AVMUtil {
 	public AVMUtil(String structureFile, String worldFile) {
 		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile(structureFile);
 		worldList = AVMWorldUtil.setAVMsFromFile(worldFile, avmStructures);
-		composeList = getAllAVMs();
+		composeList = getAVMStructures();
 		resolvedList = new ArrayList<AVM>(worldList.size());
 	}
 
@@ -160,9 +160,9 @@ public class AVMUtil {
 	}
 
 	/**
-	 * Returns list of known AVMs.
+	 * Returns a list of known AVM structures.
 	 */
-	public ArrayList<AVM> getAllAVMs() {
+	public ArrayList<AVM> getAVMStructures() {
 		ArrayList<AVM> list = new ArrayList<AVM>();
 		for (String type : avmStructures.keySet()) {
 			list.add(new AVM(type, avmStructures));
@@ -174,7 +174,7 @@ public class AVMUtil {
 	 * Resets AVMs used during composition.
 	 */
 	public void resetAVMs() {
-		this.composeList = getAllAVMs();
+		this.composeList = getAVMStructures();
 	}
 
 	/**

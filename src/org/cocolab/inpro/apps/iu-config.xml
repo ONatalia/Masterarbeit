@@ -4,32 +4,11 @@
     <property name="baseData" value="baseData"/>
     <property name="semanticComposer" value="semanticComposer"/>
     <property name="semanticResolver" value="semanticResolver"/>
-    <property name="dialogueManager" value="echoDialogueManager"/>
-    <property name="actionManager" value="audioActionManager"/>
-    
-    <!-- Domain defs: -->
-    <!-- DIGITS -->
-    <!-- 
-        <property name="chunkMarkers" value="in die,field;in der,tile" />
-        <property name="semanticsFile" value="res/PentoAVMWordlList" />
-        <property name="semanticsMapping" value="res/PentoAVMapping" />
-        <property name="structureFile" value="res/PentoAVMStructure" />
-     -->
-    <!-- PENTO -->
-    <!--
-        <property name="chunkMarkers" value="in die,field;in der,tile" />
-        <property name="semanticsFile" value="res/PentoAVMWordlList" />
-        <property name="semanticsMapping" value="res/PentoAVMapping" />
-        <property name="structureFile" value="res/PentoAVMStructure" />
-     -->
-    <!-- Domain: TRAVEL -->
-        <!-- 
-        <property name="chunkMarkers" value="von,origin;nach,destination" />
-        <property name="semanticsFile" value="res/TravelAVMWordlList" />
-        <property name="semanticsMapping" value="res/TravelAVMapping" />
-        <property name="structureFile" value="res/TravelAVMStructure" />
-    -->
-
+    <property name="chunkMarkers" value="in die,field;in der,tile" />
+    <property name="semanticsMapping" value="org/cocolab/inpro/domains/pentomino/resources/PentoAVMapping" />
+    <property name="structureFile" value="org/cocolab/inpro/domains/pentomino/resources/PentoAVMStructure" />
+    <property name="dialogueManager" value="qudDialogueManager"/>
+    <property name="actionManager" value="pentoActionManager"/>
 
     <!-- ******************************************************** -->
     <!-- The incremental processing configuration                 -->
@@ -39,23 +18,24 @@
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
+           <item>${semanticComposer}</item>
 <!--
-    		<item>tedNotifier</item>
-	     	<item>iuBasedFloorTracker</item>
-			<item>${dialogueManager}</item>
-    		<item>tedNotifier</item>
-         	<item>labelWriter2</item>
-    		<item>${semanticComposer}</item>
-    		<item>hypViewer</item>
-	     <item>outputForSimpleText</item>
-	     <item>iuNetworkViewer</item>
-        	<item>consoleNotifier</item>
-         	<item>labelWriter2</item>
-    		<item>oaaNotifier</item>
-		<item>${dialogueManager}</item>
-    		<item>iuBasedFloorTracker</item>
-          <item>tedNotifier</item>
-          <item>consoleNotifier</item>
+           <item>tedNotifier</item>
+           <item>iuBasedFloorTracker</item>
+           <item>${dialogueManager}</item>
+           <item>tedNotifier</item>
+           <item>labelWriter2</item>
+           <item>${semanticComposer}</item>
+           <item>hypViewer</item>
+           <item>outputForSimpleText</item>
+           <item>iuNetworkViewer</item>
+           <item>consoleNotifier</item>
+           <item>labelWriter2</item>
+           <item>oaaNotifier</item>
+           <item>${dialogueManager}</item>
+           <item>iuBasedFloorTracker</item>
+           <item>tedNotifier</item>
+           <item>consoleNotifier</item>
 -->
         </propertylist>
     </component>
@@ -65,80 +45,65 @@
         <property name="structureFile" value="${structureFile}" />
         <property name="chunkMarkers" value="${chunkMarkers}" />
         <propertylist name="hypChangeListeners">
-<!--           <item>consoleNotifier</item> 
-	    		<item>tedNotifier</item>
-          	<item>labelWriter2</item> -->
-          	<item>${semanticResolver}</item>
-    			<item>tedNotifier</item>
-    			<item>consoleNotifier</item>
+              <item>${semanticResolver}</item>
         </propertylist>
      </component>
 
     <component name="semanticResolver" type="org.cocolab.inpro.incremental.processor.SemanticResolver">
-        <property name="semanticsFile" value="${semanticsFile}" />
         <property name="structureFile" value="${structureFile}" />
         <property name="composer" value="${semanticComposer}"/>
         <propertylist name="hypChangeListeners">
-<!--           <item>consoleNotifier</item> 
-	    		<item>tedNotifier</item>
-          	<item>labelWriter2</item> -->
-    			<item>${dialogueManager}</item>
-    			<item>tedNotifier</item>
-    			<item>consoleNotifier</item> 
+                <item>${dialogueManager}</item>
         </propertylist>
      </component>
 
-	<component name="iuBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.IUBasedFloorTracker">
-		<property name="useProsody" value="true" />
-		<property name="risingProsodyTimeout" value="150" />
-		<property name="anyProsodyTimeout" value="600" />
-		<propertylist name="ftlisteners">
-			<item>${dialogueManager}</item>
-		</propertylist>
-	</component>
-	<component name="textBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.TextBasedFloorTracker">
-		<propertylist name="listeners">
-			<item>${dialogueManager}</item>
-		</propertylist>
-	</component>
+    <component name="iuBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.IUBasedFloorTracker">
+        <property name="useProsody" value="true" />
+        <property name="risingProsodyTimeout" value="150" />
+        <property name="anyProsodyTimeout" value="600" />
+        <propertylist name="ftlisteners">
+            <item>${dialogueManager}</item>
+        </propertylist>
+    </component>
+    <component name="textBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.TextBasedFloorTracker">
+        <propertylist name="listeners">
+            <item>${dialogueManager}</item>
+        </propertylist>
+    </component>
 
-	<component name="dialogueManager" type="org.cocolab.inpro.incremental.processor.QUDDialogueManager">
-		<property name="nlu" value="${semanticResolver}"/>
-		<property name="actionManager" value="${actionManager}"/>
-		<property name="dispatchStream" value="dispatchStream"/>
-		<propertylist name="hypChangeListeners">
-			<item>${actionManager}</item>
-			<item>tedNotifier</item>
-			<item>consoleNotifier</item>
-		</propertylist>
-	</component>
-	
-	<component name="echoDialogueManager" type="org.cocolab.inpro.incremental.processor.EchoDialogueManager">
-		<property name="actionManager" value="${actionManager}"/>
-		<propertylist name="hypChangeListeners">
-			<item>${actionManager}</item>
-			<item>tedNotifier</item>
-			<item>consoleNotifier</item>
-		</propertylist>
-	</component>
+    <component name="qudDialogueManager" type="org.cocolab.inpro.incremental.processor.QUDDialogueManager">
+        <property name="nlu" value="${semanticResolver}"/>
+        <property name="actionManager" value="${actionManager}"/>
+        <property name="dispatchStream" value="dispatchStream"/>
+        <propertylist name="hypChangeListeners">
+            <item>${actionManager}</item>
+        </propertylist>
+    </component>
+    
+    <component name="echoDialogueManager" type="org.cocolab.inpro.incremental.processor.EchoDialogueManager">
+        <property name="actionManager" value="${actionManager}"/>
+        <propertylist name="hypChangeListeners">
+            <item>${actionManager}</item>
+        </propertylist>
+    </component>
 
-	<component name="actionManager" type="org.cocolab.inpro.incremental.processor.PentoActionManager">
-		<property name="dispatchStream" value="dispatchStream"/>
-		<propertylist name="amListeners">
-			<item>${dialogueManager}</item>
-		</propertylist>
-	</component>
-	
-	<component name="audioActionManager" type="org.cocolab.inpro.incremental.processor.AudioActionManager">
-		<property name="dispatchStream" value="dispatchStream"/>
-		<propertylist name="amListeners">
-			<item>${dialogueManager}</item>
-		</propertylist>
-	</component>
+    <component name="pentoActionManager" type="org.cocolab.inpro.incremental.processor.PentoActionManager">
+        <property name="dispatchStream" value="dispatchStream"/>
+        <propertylist name="amListeners">
+            <item>${dialogueManager}</item>
+        </propertylist>
+    </component>
+    
+    <component name="audioActionManager" type="org.cocolab.inpro.incremental.processor.AudioActionManager">
+        <property name="dispatchStream" value="dispatchStream"/>
+        <propertylist name="amListeners">
+            <item>${dialogueManager}</item>
+        </propertylist>
+    </component>
 
     <component name="baseData" type="org.cocolab.inpro.incremental.basedata.BaseData"/>
 
-	<component name="none" type="org.cocolab.inpro.incremental.deltifier.ASRWordDeltifier"/>
+    <component name="none" type="org.cocolab.inpro.incremental.deltifier.ASRWordDeltifier"/>
     <component name="nonIncr" type="org.cocolab.inpro.incremental.deltifier.NonIncrementalDeltifier"/>
     <component name="wasd" type="org.cocolab.inpro.incremental.deltifier.WordAdaptiveSmoothingDeltifier">
         <property name="safeWord" value="no" />
@@ -153,7 +118,7 @@
         <property name="smoothing" value="${deltifierParam}"/>
     </component>
 
-	<component name="outputForSimpleText" type="org.cocolab.inpro.incremental.listener.OutputForSimpleText"/>
+    <component name="outputForSimpleText" type="org.cocolab.inpro.incremental.listener.OutputForSimpleText"/>
     <component name="consoleNotifier" type="org.cocolab.inpro.incremental.listener.ConsoleNotifier"/>
     <component name="oaaNotifier" type="org.cocolab.inpro.incremental.listener.OAANotifier"/>
     <component name="tedNotifier" type="org.cocolab.inpro.incremental.listener.TEDviewNotifier"/>
@@ -162,7 +127,7 @@
     <component name="iuNetworkViewer" type="org.cocolab.inpro.incremental.listener.IUNetworkViewer"/>
 
     <component name="oaaDispatchStream" type="org.cocolab.inpro.audio.OAADispatchStream">
-    	<!-- this is an OAA agent name, it has nothing to do with the identically named component below -->
+        <!-- this is an OAA agent name, it has nothing to do with the identically named component below -->
         <property name="agentName" value="dispatchStream"/>
         <property name="goalPrefix" value="x"/>
         <property name="sendSilence" value="false"/>
