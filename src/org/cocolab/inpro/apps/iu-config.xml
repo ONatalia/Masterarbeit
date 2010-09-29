@@ -2,13 +2,7 @@
     <property name="deltifier" value="none"/>
     <property name="deltifierParam" value="0"/>
     <property name="baseData" value="baseData"/>
-    <property name="semanticComposer" value="semanticComposer"/>
-    <property name="semanticResolver" value="semanticResolver"/>
-    <property name="chunkMarkers" value="in die,field;in der,tile" />
-    <property name="semanticsMapping" value="org/cocolab/inpro/domains/pentomino/resources/PentoAVMapping" />
-    <property name="structureFile" value="org/cocolab/inpro/domains/pentomino/resources/PentoAVMStructure" />
-    <property name="dialogueManager" value="qudDialogueManager"/>
-    <property name="actionManager" value="pentoActionManager"/>
+    <property name="dialogueManager" value="echoDialogueManager"/>
 
     <!-- ******************************************************** -->
     <!-- The incremental processing configuration                 -->
@@ -18,42 +12,37 @@
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
-           <item>${semanticComposer}</item>
+           <item>${dialogueManager}</item>
+           <item>iuBasedFloorTracker</item>
 <!--
            <item>tedNotifier</item>
            <item>iuBasedFloorTracker</item>
            <item>${dialogueManager}</item>
-           <item>tedNotifier</item>
            <item>labelWriter2</item>
            <item>${semanticComposer}</item>
            <item>hypViewer</item>
            <item>outputForSimpleText</item>
            <item>iuNetworkViewer</item>
            <item>consoleNotifier</item>
-           <item>labelWriter2</item>
            <item>oaaNotifier</item>
-           <item>${dialogueManager}</item>
-           <item>iuBasedFloorTracker</item>
-           <item>tedNotifier</item>
-           <item>consoleNotifier</item>
 -->
         </propertylist>
     </component>
 
     <component name="semanticComposer" type="org.cocolab.inpro.incremental.processor.SemanticComposer">
-        <property name="semanticsMapping" value="${semanticsMapping}" />
-        <property name="structureFile" value="${structureFile}" />
-        <property name="chunkMarkers" value="${chunkMarkers}" />
+        <property name="semanticsMapping" value="org/cocolab/inpro/domains/pentomino/resources/PentoAVMapping" />
+        <property name="structureFile" value="org/cocolab/inpro/domains/pentomino/resources/PentoAVMStructure" />
+        <property name="chunkMarkers" value="in die,field;in der,tile" />
         <propertylist name="hypChangeListeners">
-              <item>${semanticResolver}</item>
+              <item>semanticResolver</item>
         </propertylist>
      </component>
 
     <component name="semanticResolver" type="org.cocolab.inpro.incremental.processor.SemanticResolver">
-        <property name="structureFile" value="${structureFile}" />
-        <property name="composer" value="${semanticComposer}"/>
+        <property name="structureFile" value="org/cocolab/inpro/domains/pentomino/resources/PentoAVMStructure" />
+        <property name="composer" value="semanticComposer"/>
         <propertylist name="hypChangeListeners">
-                <item>${dialogueManager}</item>
+                <item>qudDialogueManager</item>
         </propertylist>
      </component>
 
@@ -73,31 +62,31 @@
 
     <component name="qudDialogueManager" type="org.cocolab.inpro.incremental.processor.QUDDialogueManager">
         <property name="nlu" value="${semanticResolver}"/>
-        <property name="actionManager" value="${actionManager}"/>
+        <property name="actionManager" value="pentoActionManager"/>
         <property name="dispatchStream" value="dispatchStream"/>
         <propertylist name="hypChangeListeners">
-            <item>${actionManager}</item>
+            <item>pentoActionManager</item>
         </propertylist>
     </component>
     
     <component name="echoDialogueManager" type="org.cocolab.inpro.incremental.processor.EchoDialogueManager">
-        <property name="actionManager" value="${actionManager}"/>
+        <property name="actionManager" value="audioActionManager"/>
         <propertylist name="hypChangeListeners">
-            <item>${actionManager}</item>
+            <item>audioActionManager</item>
         </propertylist>
     </component>
 
     <component name="pentoActionManager" type="org.cocolab.inpro.incremental.processor.PentoActionManager">
         <property name="dispatchStream" value="dispatchStream"/>
         <propertylist name="amListeners">
-            <item>${dialogueManager}</item>
+            <item>qudDialogueManager</item>
         </propertylist>
     </component>
     
     <component name="audioActionManager" type="org.cocolab.inpro.incremental.processor.AudioActionManager">
         <property name="dispatchStream" value="dispatchStream"/>
         <propertylist name="amListeners">
-            <item>${dialogueManager}</item>
+            <item>echoDialogueManager</item>
         </propertylist>
     </component>
 
