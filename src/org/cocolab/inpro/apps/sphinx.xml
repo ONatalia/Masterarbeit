@@ -184,7 +184,7 @@
     <!-- ******************************************************** -->
     <component name="jsgfGrammar" type="edu.cmu.sphinx.jsgf.JSGFGrammar">
         <property name="dictionary" value="dictionary"/>
-        <property name="grammarLocation" value="file:res/"/>
+        <property name="grammarLocation" value="file:src/org/cocolab/inpro/domains/pentomino/resources/"/>
         <property name="grammarName" value="pento"/>
         <property name="logMath" value="logMath"/>
     </component>
