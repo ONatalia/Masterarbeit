@@ -40,7 +40,6 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		logger.info("started iubasedfloortracker");
 	}
 
-
 	/** 
 	 * handles creation (and destruction) of time-out threads. 
 	 * Threads are created on commit (i.e. when VAD thinks that the
@@ -55,6 +54,9 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 	public void hypChange(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		if (edits != null && !edits.isEmpty()) {
+			if (isNotInInput()) { // signal start of speech when input starts
+				signalListeners(InternalState.IN_INPUT, Signal.START);
+			}
 			if (hasNewNonSilWord((List<EditMessage<WordIU>>) edits)){
 				killThread();
 			}

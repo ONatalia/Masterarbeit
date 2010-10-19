@@ -36,6 +36,12 @@ public abstract class AbstractFloorTracker extends IUModule {
 	 */
 	public enum Signal { NO_INPUT, START, EOT_FALLING, EOT_RISING, EOT_ANY }
 
+	/**
+	 * the internal state of the floor tracker:
+	 * - user is silent and we're not expecting her to speak
+	 * - user is silent but we are expecting her to speak (this may lead to a time-out)
+	 * - user is talking (currently no provisions for whether we want her to speak or not) 
+	 */
 	protected enum InternalState { NOT_AWAITING_INPUT, AWAITING_INPUT, IN_INPUT } // not implementing POST_INPUT, because it doesn't mean anything for text 
 	
 	InternalState internalState;
@@ -61,10 +67,12 @@ public abstract class AbstractFloorTracker extends IUModule {
 		}
 	}
 
-	/**
-	 * the interface that the floor manager's listeners must implement
-	 * @author timo
-	 */
+	protected boolean isNotInInput() {
+		return internalState.equals(InternalState.AWAITING_INPUT) || internalState.equals(InternalState.NOT_AWAITING_INPUT);
+	}
+	
+
+	/** the interface that the floor manager's listeners must implement */
 	public interface Listener extends Configurable {
 		/**
 		 * will be called when the floor state changes

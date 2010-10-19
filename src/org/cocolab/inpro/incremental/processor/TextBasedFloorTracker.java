@@ -56,11 +56,6 @@ public class TextBasedFloorTracker extends AbstractFloorTracker {
 	@Override
 	public void reset() { // ignore
 	}
-
-	private boolean isNotInInput() {
-		return internalState.equals(InternalState.AWAITING_INPUT) || internalState.equals(InternalState.NOT_AWAITING_INPUT);
-	}
-	
 	
 	public void setExpect() {
 		if (internalState.equals(InternalState.NOT_AWAITING_INPUT)) {
@@ -73,8 +68,6 @@ public class TextBasedFloorTracker extends AbstractFloorTracker {
 		assert isNotInInput();
 		signal(InternalState.IN_INPUT, Signal.START);
 	}
-	
-
 	
 	private void signal(InternalState inInput, Signal start) {
 		signalListeners(inInput, start);
