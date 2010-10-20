@@ -44,7 +44,7 @@ public abstract class AbstractFloorTracker extends IUModule {
 	 */
 	protected enum InternalState { NOT_AWAITING_INPUT, AWAITING_INPUT, IN_INPUT } // not implementing POST_INPUT, because it doesn't mean anything for text 
 	
-	InternalState internalState;
+	InternalState internalState = InternalState.NOT_AWAITING_INPUT;
 	
 	@SuppressWarnings("unchecked")
 	@Override
