@@ -167,9 +167,14 @@ public class SimpleReco {
 				sds.initialize();
 				if (clp.playAtRealtime()) {
 					DataProcessor throttle = (DataProcessor) cm.lookup("dataThrottle");
+					throttle.initialize();
+					DataProcessor feMonitor = (DataProcessor) cm.lookup("feMonitor");
+					feMonitor.initialize();
 					DataProcessor endpointing = (DataProcessor) cm.lookup("endpointing");
+					endpointing.initialize();
 					throttle.setPredecessor(sds);
-					endpointing.setPredecessor(throttle);
+					feMonitor.setPredecessor(throttle);
+					endpointing.setPredecessor(feMonitor);
 					fe.setPredecessor(endpointing);
 				} else {
 					fe.setPredecessor(sds);
@@ -216,6 +221,7 @@ public class SimpleReco {
         	URL lmUrl = clp.getLanguageModelURL();
     		logger.info("Running with grammar " + lmUrl);
         	cm.setGlobalProperty("linguist", "flatLinguist");
+        	cm.setGlobalProperty("searchManager", "simpleSearch");
         	Pattern regexp = Pattern.compile("^(.*)/(.*?).gram$");
         	Matcher regexpResult = regexp.matcher(lmUrl.toString());
         	assert regexpResult.matches() : "mal-formatted grammar URL.";

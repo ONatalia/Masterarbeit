@@ -40,7 +40,7 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 	boolean checkConfiguration() {
 		// setup defaults
 		if (localPort == 0) { localPort = 42000; }
-		if (bufSize == 0) { bufSize = 8192; }
+		if (bufSize == 0) { bufSize = 4096; }
 		if (((outputMode & FILE_OUTPUT) == FILE_OUTPUT) & (!audioURL.getProtocol().equals("file"))) {
 			printUsage();
 			System.err.println("Can only output to file URLs!");

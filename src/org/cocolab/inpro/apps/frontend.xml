@@ -58,6 +58,8 @@
 	<component name="dataThrottle" type="org.cocolab.inpro.sphinx.frontend.DataThrottle">
 		<property name="speed" value="1.0"/>
 	</component>
+	
+	<component name="feMonitor" type="org.cocolab.inpro.sphinx.frontend.Monitor" />
 
     <component name="sessionWavWriter" type="org.cocolab.inpro.sphinx.frontend.WavTEDLogger">
         <property name="tedTrack" value="audio"/>
