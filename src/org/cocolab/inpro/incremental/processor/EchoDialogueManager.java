@@ -56,10 +56,6 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 					this.sentence.remove(newWord);
 					break;
 				case ADD:
-					//Start-of-speech hack until Floor.Signal START works.
-					if (this.sentence.isEmpty()) {
-						this.am.shutUp();
-					}
 					this.sentence.add(newWord);
 					break;
 				case COMMIT:
@@ -90,24 +86,9 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 		List<IU> grin = new ArrayList<IU>(this.sentence);
 		String utterance = this.sentenceToString();
 		switch (signal) {
-			case NO_INPUT: {
-				// First prompt "mmhh"
-				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCn.wav"))));
-				break;
-			}
 			case START: {
-				// Shut up
+				// Shut up	
 				this.am.shutUp();
-				break;
-			}
-			case EOT_FALLING: {
-				// Ok- … wordIUs
-				if (!utterance.isEmpty()) {
-					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpf.wav"))));
-					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + utterance))));
-				} else {
-					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCn.wav"))));
-				}
 				break;
 			}
 			case EOT_RISING: {
@@ -120,6 +101,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 				}
 				break;
 			}
+			case EOT_FALLING:
 			case EOT_ANY: {
 				// Ok- … wordIUs
 				if (!utterance.isEmpty()) {

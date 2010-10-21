@@ -1,0 +1,5 @@
+#JSGF V1.0 UTF-8 de;
+grammar digits;
+public <digits> = (<command> | [<command>] <digit>+);
+<command> = (ja|nein|genau);
+<digit> = (eins|zwei|drei|vier|fünf|sechs|sieben|acht|neun|null);
