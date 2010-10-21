@@ -256,7 +256,7 @@
        	<property name="showWindow" value="false"/>
     </component>
 
-    <component name="speechMarker" type="edu.cmu.sphinx.frontend.endpoint.SpeechMarker">
+    <component name="speechMarker" type="org.cocolab.inpro.sphinx.frontend.QuickSpeechMarker">
         <property name="startSpeech" value="${startSpeech}"/>
         <property name="endSilence" value="${endSilence}"/>
         <property name="speechLeader" value="${speechLeader}"/>
