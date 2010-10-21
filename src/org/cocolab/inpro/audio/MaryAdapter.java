@@ -29,8 +29,8 @@ public class MaryAdapter {
 	CompatibilityMode compatibilityMode = CompatibilityMode.mary36;
 	
 	public MaryAdapter() {
-        String serverHost = System.getProperty("server.host", "localhost");
-        int serverPort = Integer.getInteger("server.port", 59125).intValue();
+        String serverHost = System.getProperty("mary.host", "localhost");
+        int serverPort = Integer.getInteger("mary.port", 59125).intValue();
         try {
         	switch (compatibilityMode) {
         	case mary36:
