@@ -102,7 +102,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 				break;
 			}
 			case EOT_FALLING:
-			case EOT_ANY: {
+			case EOT_NOT_RISING: {
 				// Ok- … wordIUs
 				if (!utterance.isEmpty()) {
 					ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpf.wav"))));

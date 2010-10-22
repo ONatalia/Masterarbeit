@@ -11,8 +11,12 @@ import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.log4j.Logger;
+import org.cocolab.inpro.features.EOTFeatureAggregator;
 import org.cocolab.inpro.incremental.BaseDataKeeper;
 import org.cocolab.inpro.pitch.PitchedDoubleData;
+import org.cocolab.inpro.pitch.notifier.SignalFeatureListener;
+
+import weka.core.Instance;
 
 import ddf.minim.effects.RevisedBCurveFilter;
 
@@ -22,8 +26,12 @@ import edu.cmu.sphinx.instrumentation.Resetable;
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.S4Component;
 
-public class BaseData implements Configurable, BaseDataKeeper, Resetable {
+public class BaseData implements Configurable, BaseDataKeeper, Resetable, SignalFeatureListener {
+	
+	@S4Component(type = EOTFeatureAggregator.class, defaultClass = EOTFeatureAggregator.class, mandatory = true)
+	public static final String PROP_EOTFA = "eotFeatureAggregator";
 
 	final static Logger logger = Logger.getLogger(BaseData.class);
 	
@@ -34,10 +42,18 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 	ConcurrentSkipListSet<TimedData<DoubleData>> melData = new ConcurrentSkipListSet<TimedData<DoubleData>>(new TimedDataComparator());
 	private ConcurrentSkipListSet<TimedData<Double>> loudnessData = new ConcurrentSkipListSet<TimedData<Double>>(new TimedDataComparator());
 
+	/** contains WEKA instances from EOTFeatureAggregator */
+	ConcurrentSkipListSet<TimedData<Instance>> eotFeatures = new ConcurrentSkipListSet<TimedData<Instance>>(new TimedDataComparator());
+	EOTFeatureAggregator eotfa;
+
 	private RevisedBCurveFilter rbcFilter = new RevisedBCurveFilter();
 
 	@Override
-	public void newProperties(PropertySheet ps) throws PropertyException { }
+	public void newProperties(PropertySheet ps) throws PropertyException {
+		System.err.println(ps.toString());
+		eotfa = (EOTFeatureAggregator) ps.getComponent(PROP_EOTFA);
+		eotfa.printArffHeader();
+	}
 
 	public void addData(Data d, String type) {
 		if (PITCHED_DATA.equals(type)) {
@@ -54,6 +70,13 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 		} else {
 			logger.warn(d);
 		}
+	}
+
+	@Override
+	public void newSignalFeatures(int frame, double power, boolean voicing,
+			double pitch) {
+		eotfa.newSignalFeatures(frame, power, voicing, pitch);
+		eotFeatures.add(new TimedData<Instance>(frame, eotfa.getNewestFeatures()));
 	}
 
 	@Override
@@ -85,8 +108,12 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable {
 	}
 	
 	public PitchedDoubleData getPitchedData(double time) {
-		@SuppressWarnings("unchecked")
-		TimedData<PitchedDoubleData> td = pitchedData.floor(new TimedData(time));
+		TimedData<PitchedDoubleData> td = pitchedData.floor(new TimedData<PitchedDoubleData>(time));
+		return td.value;
+	}
+	
+	public Instance getEOTFeatures(double time) {
+		TimedData<Instance> td = eotFeatures.floor(new TimedData<Instance>(time));
 		return td.value;
 	}
 

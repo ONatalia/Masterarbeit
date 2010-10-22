@@ -9,6 +9,10 @@ import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Component;
 import edu.cmu.sphinx.util.props.S4String;
 
+/**
+ * a frontend processor that sends data to a BaseData instance 
+ * @author timo
+ */
 public class BaseDataAdapter extends BaseDataProcessor {
 
 	@S4Component(type = BaseData.class)

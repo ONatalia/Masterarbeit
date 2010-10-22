@@ -45,6 +45,4 @@ public class AudioActionManager extends AbstractActionManager {
 		}
 	}
 	
-	public void reset() {}
-
 }

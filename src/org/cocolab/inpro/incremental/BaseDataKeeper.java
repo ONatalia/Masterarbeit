@@ -1,5 +1,7 @@
 package org.cocolab.inpro.incremental;
 
+import weka.core.Instance;
+
 /**
  * stores information about the real world(tm)
  * 
@@ -23,4 +25,6 @@ public interface BaseDataKeeper {
 	double getSpectralTilt(double time);
 
 	public double getSpectralTiltQual(double time);
+	
+	public Instance getEOTFeatures(double time);
 }

@@ -82,7 +82,7 @@ public class TextBasedFloorTracker extends AbstractFloorTracker {
 		if (lastWord.hasProsody()) {
 			signal = lastWord.pitchIsRising() ? Signal.EOT_RISING : Signal.EOT_FALLING;
 		} else {
-			signal = Signal.EOT_ANY;
+			signal = Signal.EOT_NOT_RISING;
 		}
 		// TODO: find out what type of signal to send
 		signal(InternalState.NOT_AWAITING_INPUT, signal);

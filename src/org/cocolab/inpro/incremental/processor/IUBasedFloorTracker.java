@@ -8,6 +8,7 @@ import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.WordIU;
+import org.cocolab.inpro.incremental.util.ResultUtil;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -54,7 +55,8 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 	public void hypChange(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		if (edits != null && !edits.isEmpty()) {
-			if (isNotInInput()) { // signal start of speech when input starts
+			if (isNotInInput() && !edits.get(0).getType().equals(EditType.COMMIT)) { 
+				// signal start of speech when input starts
 				signalListeners(InternalState.IN_INPUT, Signal.START);
 			}
 			if (hasNewNonSilWord((List<EditMessage<WordIU>>) edits)){
@@ -177,14 +179,14 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 			// do something with the following: 
 			logger.debug("turnFinalWord is " + endingWord);
 			if (endingWord.hasProsody()) {
-				return endingWord.pitchIsRising() ?  Signal.EOT_RISING : Signal.EOT_ANY;
+				return endingWord.pitchIsRising() ?  Signal.EOT_RISING : Signal.EOT_NOT_RISING;
 			}
-			return Signal.EOT_ANY;
+			return Signal.EOT_NOT_RISING;
 		}
 		
 		@Override
 		public void run() {
-			int timeoutStart = (int) (endingWord.endTime() * 1000);
+			int timeoutStart = (int) (endingWord.endTime() * ((int) ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
 			int timeout = getTime() - timeoutStart + risingTimeout;
 			sleepSafely(timeout);
 			if (shouldDie())
@@ -192,7 +194,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 			if (useProsody) {
 				Signal s = findBoundaryTone();
 				if (s.equals(Signal.EOT_RISING)) {
-					logToTedView(this.hashCode() + " sending EOT_RISING in word " + endingWord);
+					logToTedView(this.hashCode() + " sending " + s + " in word " + endingWord);
 					killbit = true;
 					signalListeners(InternalState.NOT_AWAITING_INPUT, s);
 					return;

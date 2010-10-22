@@ -34,7 +34,7 @@ public abstract class AbstractFloorTracker extends IUModule {
 	 * other modules are notified about floor state if they implement FloorManager.Listener
 	 * and are registered to listen in the configuration file 
 	 */
-	public enum Signal { NO_INPUT, START, EOT_FALLING, EOT_RISING, EOT_ANY }
+	public enum Signal { NO_INPUT, START, EOT_FALLING, EOT_RISING, EOT_NOT_RISING }
 
 	/**
 	 * the internal state of the floor tracker:

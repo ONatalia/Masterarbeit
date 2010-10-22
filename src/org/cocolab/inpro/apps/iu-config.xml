@@ -15,7 +15,6 @@
            <item>${dialogueManager}</item>
            <item>iuBasedFloorTracker</item>
 <!--
-           <item>tedNotifier</item>
            <item>iuBasedFloorTracker</item>
            <item>${dialogueManager}</item>
            <item>labelWriter2</item>
@@ -90,7 +89,17 @@
         </propertylist>
     </component>
 
-    <component name="baseData" type="org.cocolab.inpro.incremental.basedata.BaseData"/>
+    <component name="baseData" type="org.cocolab.inpro.incremental.basedata.BaseData">
+    	<property name="eotFeatureAggregator" value="eotFeatureAggregator" />
+    </component>
+    
+    <component name="eotFeatureAggregator" type="org.cocolab.inpro.features.EOTFeatureAggregator">
+    	<property name="pitchWindows" value="5 10 20 50"/>
+    	<property name="energyWindows" value="5 10 20 50"/>
+    	<property name="vEnergyWindows" value="5 10 20 50"/>
+    	<property name="timeIntoAudio" value="false"/>
+    	<property name="includeFrameCount" value="false"/>
+    </component>
 
     <component name="none" type="org.cocolab.inpro.incremental.deltifier.ASRWordDeltifier"/>
     <component name="nonIncr" type="org.cocolab.inpro.incremental.deltifier.NonIncrementalDeltifier"/>

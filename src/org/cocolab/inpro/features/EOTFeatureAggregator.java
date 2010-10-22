@@ -1,12 +1,5 @@
 package org.cocolab.inpro.features;
 
-/**
- * implements SignalFeatureListener and derives acoustic features 
- * (that may or may not be) useful for EOT detection
- * 
- * 
- */
-
 import org.cocolab.inpro.pitch.notifier.SignalFeatureListener;
 
 import weka.core.Attribute;
@@ -18,25 +11,37 @@ import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Boolean;
+import edu.cmu.sphinx.util.props.S4String;
 import edu.cmu.sphinx.instrumentation.Resetable;
 
+/**
+ * implements SignalFeatureListener and derives acoustic features 
+ * (that may or may not be) useful for EOT detection
+ * @author timo
+ */
 public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeatureListener {
 	
-	private static final String PROP_PITCH_WINDOWS_LIST = "pitchWindows";
-	private static final String PROP_ENERGY_WINDOWS_LIST = "energyWindows";
-	private static final String PROP_VENERGY_WINDOWS_LIST = "vEnergyWindows";
+	@S4String
+	public static final String PROP_PITCH_WINDOWS_LIST = "pitchWindows";
+	@S4String
+	public static final String PROP_ENERGY_WINDOWS_LIST = "energyWindows";
+	@S4String
+	public static final String PROP_VENERGY_WINDOWS_LIST = "vEnergyWindows";
 	
-	private static final String PROP_CLUSTER_TIME = "clusterTime";
-	private static final String PROP_CONTINUOUS_TIME = "continuousTime";
+	@S4Boolean(defaultValue = false)
+	public static final String PROP_CLUSTER_TIME = "clusterTime";
+	@S4Boolean(defaultValue = false)
+	public static final String PROP_CONTINUOUS_TIME = "continuousTime";
 	
-	private static final String PROP_FRAME_COUNT = "timeIntoAudio";
+	@S4Boolean(defaultValue = false)
+	public static final String PROP_FRAME_COUNT = "timeIntoAudio";
 		
 	private static final int[] noSteps = {};
 
 	private int[] energyRegressionSteps;
 	private int[] voicedEnergyRegressionSteps;
 	private int[] pitchRegressionSteps;
-
+	/** names for the sub-parameters for energy, voice and pitch */ 
 	private static final String[] regressionParams = {"Mean", "Slope", "MSE", 
 													  "PredictionError", "Range", "MeanDelta", 
 													  "MinPos", "MaxPos",
@@ -81,9 +86,8 @@ public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeat
 	boolean currentVoicingValue;
 	double currentPitchValue;
 	TimeShiftingAnalysis[] pitchRegressions;
-	
+	/** total number of attributes in an instance */
 	int numAttributes;
-	protected String name;
 	
 	private static Attribute[] createRegressionAttributesFor(int[] steps, String name, FastVector attInfo) {
 		Attribute[] attributes = new Attribute[regressionParams.length * steps.length];
@@ -315,10 +319,6 @@ public class EOTFeatureAggregator implements Resetable, Configurable, SignalFeat
 		createFeatures();
 	}
 
-	public String getName() {
-		return name;
-	}
-	
 	public double getCurrentEnergy() {
 		return currentFrameEnergyValue;
 	}
