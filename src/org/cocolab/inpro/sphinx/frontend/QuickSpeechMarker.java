@@ -67,7 +67,6 @@ public class QuickSpeechMarker extends BaseDataProcessor {
     public static final String PROP_START_SPEECH = "startSpeech";
     private int startSpeechTime;
 
-
     /**
      * The property for the amount of time in silence (in milliseconds) to be
      * considered as utterance end.
@@ -75,7 +74,6 @@ public class QuickSpeechMarker extends BaseDataProcessor {
     @S4Integer(defaultValue = 500)
     public static final String PROP_END_SILENCE = "endSilence";
     private int endSilenceTime;
-
 
     /**
      * The property for the amount of time (in milliseconds) before speech start
@@ -163,6 +161,7 @@ public class QuickSpeechMarker extends BaseDataProcessor {
     	while (state != State.DATA_END && outputQueue.isEmpty()) {
     		processOneInputFrame();
     	}
+    //	System.err.println("buffering " + (buffer.size() + outputQueue.size()) + " elements.");
     	return nextOutputFrame();
     }
     
@@ -231,7 +230,7 @@ public class QuickSpeechMarker extends BaseDataProcessor {
      * what to do when we're in speech. If incoming audio isSpeech, we 
      * can directly release the buffer to outputQueue. If it's not speech,
      * and the silence reaches endSilenceTime, we transition to
-     * end of speech {@link QuickSpeechMarker.endOfSpeech()},
+     * end of speech {@link QuickSpeechMarker#endOfSpeech()},
      * if it's not speech and we release the buffer *if* we are still
      * within speechTrailer amount of silence (otherwise, we have to hold
      * back the remaining frames, because a DataEndSignal may have to be 
@@ -286,6 +285,7 @@ public class QuickSpeechMarker extends BaseDataProcessor {
     	}
     	long collectTime = getCollectTimeOfNextFrame();
     	outputQueue.add(new SpeechStartSignal(collectTime));
+    //	System.err.println("buffer has " + buffer.size() + " elements on speech start.");
     	flushBuffer();
 		state = State.IN_SPEECH;
     }
@@ -295,9 +295,14 @@ public class QuickSpeechMarker extends BaseDataProcessor {
     	assert buffer.size() > 0; 
     	// we should only ever reach this code after we've just added something to the buffer
     	Data d = buffer.get(0);
-    	assert d instanceof SpeechClassifiedData;
-    	SpeechClassifiedData scd = (SpeechClassifiedData) d;
-    	return scd.getCollectTime();
+    	assert d instanceof SpeechClassifiedData || d instanceof DataEndSignal : d;
+    	if (d instanceof SpeechClassifiedData) {
+	    	SpeechClassifiedData scd = (SpeechClassifiedData) d;
+	    	return scd.getCollectTime();
+    	} else {
+    		DataEndSignal des = (DataEndSignal) d;
+        	return des.getTime(); 
+    	}
     }
     
     /** 

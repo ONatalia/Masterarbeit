@@ -41,8 +41,9 @@
     <component name="firstpasser" type="org.cocolab.inpro.sphinx.frontend.DataPasser"/>
     <component name="secondpasser" type="org.cocolab.inpro.sphinx.frontend.DataPasser"/>
  
-    <component name="microphone" type="org.cocolab.inpro.sphinx.frontend.Microphone">
+    <component name="microphone" type="edu.cmu.sphinx.frontend.util.Microphone">
         <property name="closeBetweenUtterances" value="false"/>
+        <property name="bufferSize" value="960" /> <!-- 30ms -->
     </component>
  
     <component name="streamDataSource" type="edu.cmu.sphinx.frontend.util.StreamDataSource">

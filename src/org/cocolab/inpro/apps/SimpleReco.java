@@ -9,6 +9,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.AudioFormat.Encoding;
+import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -18,13 +19,14 @@ import org.cocolab.inpro.audio.AudioUtils;
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
 import org.cocolab.inpro.incremental.unit.IU;
-import org.cocolab.inpro.sphinx.frontend.Microphone;
 import org.cocolab.inpro.sphinx.frontend.RtpRecvProcessor;
 
 import edu.cmu.sphinx.decoder.ResultListener;
 import edu.cmu.sphinx.frontend.DataProcessor;
 import edu.cmu.sphinx.frontend.FrontEnd;
+import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
+import edu.cmu.sphinx.frontend.util.VUMeterMonitor;
 import edu.cmu.sphinx.linguist.Linguist;
 import edu.cmu.sphinx.linguist.language.grammar.ForcedAlignerGrammar;
 import edu.cmu.sphinx.recognizer.Recognizer;
@@ -127,11 +129,25 @@ public class SimpleReco {
 		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
 	}
 	
-	public void setupMicrophoneWithEndpointing() {
+	VUMeterMonitor vumeter;
+	
+	public void setupMicrophoneWithEndpointing()  {
     	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
 		final Microphone mic = (Microphone) cm.lookup("microphone");
 		FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
-		endpoint.setPredecessor(mic);
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				@Override
+				public void run() {
+					vumeter = new VUMeterMonitor();			
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		vumeter.setPredecessor(mic);
+		endpoint.setPredecessor(vumeter);
 		endpoint.initialize();
 		setupMicrophone(mic);
 		fe.setPredecessor(endpoint);

@@ -49,9 +49,9 @@ import javax.swing.SwingWorker;
 import org.cocolab.inpro.apps.SimpleReco;
 import org.cocolab.inpro.gui.util.SpeechStateVisualizer;
 import org.cocolab.inpro.incremental.listener.CurrentHypothesisViewer;
-import org.cocolab.inpro.sphinx.frontend.Microphone;
 import org.cocolab.inpro.sphinx.frontend.WavTEDLogger;
 
+import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
 
