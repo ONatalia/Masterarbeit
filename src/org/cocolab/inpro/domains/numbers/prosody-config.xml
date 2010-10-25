@@ -82,8 +82,6 @@
         <propertylist name="activeListFactories">
             <item>wordActiveListFactory</item>
             <item>wordActiveListFactory</item>
-            <item>wordActiveListFactory</item>
-            <item>standardActiveListFactory</item>
             <item>standardActiveListFactory</item>
             <item>standardActiveListFactory</item>
             <item>standardActiveListFactory</item>
