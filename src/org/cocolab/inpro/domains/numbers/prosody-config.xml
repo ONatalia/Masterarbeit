@@ -30,7 +30,7 @@
     <property name="step" value="1"/>
     <property name="recognizer" value="recognizer"/>
     <property name="scorer" value="simpleScorer"/>
-    <property name="linguist"   value="flatLinguist"/> 
+    <property name="linguist"   value="lexTreeLinguist"/> 
     <property name="searchManager" value="wordPruningSearch"/>
     <property name="grammar" value="jsgfGrammar"/>
     <property name="frontend" value="frontend"/>
@@ -122,6 +122,19 @@
         <property name="languageWeight" value="${languageWeight}"/>
         <property name="unitManager" value="unitManager"/>
     </component>
+    
+    <component name="lexTreeLinguist" type="edu.cmu.sphinx.linguist.lextree.LexTreeLinguist">
+        <property name="logMath" value="logMath"/>
+        <property name="acousticModel" value="acousticModel"/>
+        <property name="languageModel" value="ngram"/>
+        <property name="dictionary" value="dictionary"/>
+        <property name="generateUnitStates" value="true"/>
+        <property name="wantUnigramSmear" value="true"/>
+        <property name="unigramSmearWeight" value="1"/>
+        <property name="silenceInsertionProbability" value="${silenceInsertionProbability}"/>
+        <property name="languageWeight" value="${languageWeight}"/>
+        <property name="unitManager" value="unitManager"/>
+    </component>
 
 
     <!-- ******************************************************** -->
@@ -133,6 +146,14 @@
         <property name="grammarLocation" value="file:src/org/cocolab/inpro/domains/numbers/"/>
         <property name="grammarName" value="digits"/>
         <property name="logMath" value="logMath"/>
+    </component>
+
+    <component name="ngram" type="edu.cmu.sphinx.linguist.language.ngram.SimpleNGramModel">
+        <property name="dictionary" value="dictionary"/>
+        <property name="logMath" value="logMath"/>
+        <property name="location" value="file:src/org/cocolab/inpro/domains/numbers/digits.lm"/>
+        <property name="maxDepth" value="3"/>
+        <property name="unigramWeight" value=".7"/>
     </component>
 
     <!-- ******************************************************** -->
