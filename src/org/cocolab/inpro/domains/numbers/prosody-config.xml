@@ -395,6 +395,7 @@
         <propertylist name="amListeners">
             <item>${dialogueManager}</item>
         </propertylist>
+	<property name="audioPath" value="http://www.ling.uni-potsdam.de/~timo/code/inprotk/demo"/>
     </component>
 
     <component name="eotFeatureAggregator" type="org.cocolab.inpro.features.EOTFeatureAggregator">
