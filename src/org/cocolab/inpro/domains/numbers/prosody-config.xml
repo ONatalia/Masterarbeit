@@ -247,9 +247,11 @@
 
     <component name="endpointing" type="edu.cmu.sphinx.frontend.FrontEnd">
         <propertylist name="pipeline">
-<!--            <item>sessionWavWriter</item> -->
-            <item>speechClassifier</item>
+<!--
+            <item>sessionWavWriter</item>
             <item>speechStateVisualizer</item>
+-->
+            <item>speechClassifier</item>
             <item>speechMarker</item>
             <item>nonSpeechDataFilter</item>
             <item>utteranceWavWriter</item>
