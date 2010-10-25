@@ -23,7 +23,7 @@
     <property name="relativeBeamWidth" value="1E-80"/>
     <property name="absoluteWordBeamWidth" value="50"/>
     <property name="relativeWordBeamWidth" value="1E-60"/>
-    <property name="wordInsertionProbability" value="0.3"/>
+    <property name="wordInsertionProbability" value="0.1"/>
     <property name="languageWeight" value="11.5"/>
     <property name="silenceInsertionProbability" value=".05"/>
     <property name="logLevel" value="WARNING"/>
@@ -38,7 +38,7 @@
     <property name="endSilence" value="250"/>
     <property name="speechLeader" value="30"/>
     <property name="speechTrailer" value="200"/>
-    <property name="threshold" value="20"/>
+    <property name="threshold" value="30"/>
 
     <!-- ******************************************************** -->
     <!-- The recognizer configuration                             -->
@@ -130,7 +130,7 @@
     
     <component name="jsgfGrammar" type="edu.cmu.sphinx.jsgf.JSGFGrammar">
         <property name="dictionary" value="dictionary"/>
-        <property name="grammarLocation" value="http://www.ling.uni-potsdam.de/~timo/code/inprotk/demo/"/>
+        <property name="grammarLocation" value="file:src/org/cocolab/inpro/domains/numbers/"/>
         <property name="grammarName" value="digits"/>
         <property name="logMath" value="logMath"/>
     </component>
@@ -140,7 +140,7 @@
     <!-- ******************************************************** -->
     
     <component name="dictionary" type="org.cocolab.inpro.sphinx.linguist.dictionary.SyllableAwareFullDictionary"> 
-        <property name="dictionaryPath" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab_DE.lex"/>
+        <property name="dictionaryPath" value="file:./org/cocolab/inpro/domains/numbers/digits.lex"/>
         <property name="fillerPath" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab_DE.filler"/>
         <property name="addSilEndingPronunciation" value="false"/>
         <property name="unitManager" value="unitManager"/>
@@ -256,14 +256,12 @@
  
     <component name="microphone" type="edu.cmu.sphinx.frontend.util.Microphone">
         <property name="closeBetweenUtterances" value="false"/>
-        <property name="bufferSize" value="960" /> <!-- 30ms -->
+        <property name="bufferSize" value="960"/>        <!-- 30ms -->
     </component>
 
    <component name="dataThrottle" type="org.cocolab.inpro.sphinx.frontend.DataThrottle">
       <property name="speed" value="1.0"/>
    </component>
-
-	<component name="feMonitor" type="org.cocolab.inpro.sphinx.frontend.Monitor" />
 
     <component name="sessionWavWriter" type="org.cocolab.inpro.sphinx.frontend.WavTEDLogger">
         <property name="tedTrack" value="audio"/>
@@ -300,8 +298,8 @@
         <property name="minimumPitch" value="50"/>
         <property name="maximumPitch" value="500"/>
         <propertylist name="listeners">
-        <item>pitchToTed</item>
-        <item>baseData</item>
+            <item>pitchToTed</item>
+            <item>baseData</item>
         </propertylist>
     </component>
     
@@ -374,19 +372,18 @@
         <propertylist name="amListeners">
             <item>${dialogueManager}</item>
         </propertylist>
-		<property name="audioPath" value="http://www.ling.uni-potsdam.de/~timo/code/inprotk/demo/"/>
+    </component>
+
+    <component name="eotFeatureAggregator" type="org.cocolab.inpro.features.EOTFeatureAggregator">
+        <property name="pitchWindows" value="5 10 20 50"/>
+        <property name="energyWindows" value="5 10 20 50"/>
+        <property name="vEnergyWindows" value="5 10 20 50"/>
+        <property name="timeIntoAudio" value="false"/>
+        <property name="includeFrameCount" value="false"/>
     </component>
 
     <component name="baseData" type="org.cocolab.inpro.incremental.basedata.BaseData">
-    	<property name="eotFeatureAggregator" value="eotFeatureAggregator" />
-    </component>
-    
-    <component name="eotFeatureAggregator" type="org.cocolab.inpro.features.EOTFeatureAggregator">
-    	<property name="pitchWindows" value="5 10 20 50"/>
-    	<property name="energyWindows" value="5 10 20 50"/>
-    	<property name="vEnergyWindows" value="5 10 20 50"/>
-    	<property name="timeIntoAudio" value="false"/>
-    	<property name="includeFrameCount" value="false"/>
+        <property name="eotFeatureAggregator" value="eotFeatureAggregator"/>
     </component>
     <component name="none" type="org.cocolab.inpro.incremental.deltifier.ASRWordDeltifier"/>
     <component name="nonIncr" type="org.cocolab.inpro.incremental.deltifier.NonIncrementalDeltifier"/>
