@@ -16,6 +16,8 @@ public class AudioActionManager extends AbstractActionManager {
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
+		logger.info("Setting audio path to " + this.audioPath);
+		RNLA.setPath(this.audioPath);
 		logger.info("Started AudioActionManager");
 	}
 
@@ -31,8 +33,6 @@ public class AudioActionManager extends AbstractActionManager {
 				case ADD: 
 					assert (r.getAct() == RNLA.Act.PROMPT) : "I can only play prompts, don't make me do anything else.";
 					if (r.doThis()) {
-						logger.info("Setting audio path to " + this.audioPath);
-						r.setPath(this.audioPath);
 						logger.info("Speaking: " + r.toString());
 						r.perform(null, null, this.audioDispatcher);
 						this.signalListeners(iu);
