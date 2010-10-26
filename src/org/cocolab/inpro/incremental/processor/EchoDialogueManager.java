@@ -93,9 +93,11 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 				ourEdits = reply("BCpf.wav");
 			}
 		}
-		this.dialogueActIUs.apply(ourEdits);
-		this.rightBuffer.setBuffer(this.dialogueActIUs, ourEdits);
-		this.rightBuffer.notify(this.iulisteners);
+		if (ourEdits != null) {
+			this.dialogueActIUs.apply(ourEdits);
+			this.rightBuffer.setBuffer(this.dialogueActIUs, ourEdits);
+			this.rightBuffer.notify(this.iulisteners);			
+		}
 	}
 	
 	/** 
