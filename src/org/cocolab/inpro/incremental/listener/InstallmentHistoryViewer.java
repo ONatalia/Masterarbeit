@@ -47,12 +47,14 @@ public class InstallmentHistoryViewer extends PushBuffer {
 		for (int i = Math.max(0, ius.size() - visibleLines); i < ius.size(); i++) {
 			InstallmentIU iiu = iuList.get(i);
 			if (iiu.systemProduced()) {
-				html.append("<tt>SYS:  </tt>");
+				html.append("<font color=\"black\"><tt>SYS:&nbsp; </tt></font>");
+				html.append("<font color=\"blue\">");
 			} else {
-				html.append("<tt>USER: </tt>");
+				html.append("<font color=\"black\"><tt>USER: </tt></font>");
+				html.append("<font color=\"red\">");
 			}
 			html.append(iiu.toPayLoad());
-			html.append("<br>");
+			html.append("</font><br>");
 		}
 		htmlPane.setText(html.toString()); // setText is threadsafe
 	}

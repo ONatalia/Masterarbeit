@@ -334,10 +334,13 @@
         <property name="minimumPitch" value="50"/>
         <property name="maximumPitch" value="500"/>
         <propertylist name="listeners">
-            <item>pitchToTed</item>
+            <!--item>pitchToTed</item-->
             <item>baseData</item>
+            <item>prosodyMonitor</item>
         </propertylist>
     </component>
+    
+    <component name="prosodyMonitor" type="org.cocolab.inpro.pitch.notifier.ProsodyMonitor"/>
     
     <component name="pitchDumper" type="org.cocolab.inpro.features.PitchAndPowerDumper"/>
     <component name="pitchToTed" type="org.cocolab.inpro.pitch.notifier.TEDviewNotifier"/>
