@@ -11,7 +11,7 @@
 
     <property name="deltifier" value="none"/>
     <property name="deltifierParam" value="0"/>
-    <property name="dialogueManager" value="prosodicDialogueManager"/>
+    <property name="dialogueManager" value="echoDialogueManager"/>
     <property name="actionManager" value="audioActionManager"/>
     <property name="baseData" value="baseData"/>
 
@@ -378,14 +378,6 @@
     </component>
 
     <component name="echoDialogueManager" type="org.cocolab.inpro.incremental.processor.EchoDialogueManager">
-        <property name="actionManager" value="${actionManager}"/>
-        <property name="dispatchStream" value="dispatchStream"/>
-        <propertylist name="hypChangeListeners">
-            <item>${actionManager}</item>
-        </propertylist>
-    </component>
-
-    <component name="prosodicDialogueManager" type="org.cocolab.inpro.incremental.processor.ProsodicDialogueManager">
         <property name="actionManager" value="${actionManager}"/>
         <property name="dispatchStream" value="dispatchStream"/>
         <propertylist name="hypChangeListeners">

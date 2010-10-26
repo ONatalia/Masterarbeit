@@ -57,9 +57,11 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  	
  	public void apply(List<EditMessage<IUType>> edits) {
  		try {
-			for (EditMessage<IUType> edit : edits) {
-				apply(edit);
-			}
+ 			if (edits != null) {
+				for (EditMessage<IUType> edit : edits) {
+					apply(edit);
+				}
+ 			}
 	 	} catch (AssertionError ae) {
  			logger.fatal("this list contains: ");
  			logger.fatal(this);
