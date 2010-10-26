@@ -10,16 +10,22 @@ import javax.sound.sampled.AudioInputStream;
 
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.LabelledAudioStream;
+import org.cocolab.inpro.gui.util.SpeechStateVisualizer;
 
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Boolean;
+import edu.cmu.sphinx.util.props.S4Component;
 
 public class DispatchStream extends InputStream implements Configurable {
 
 	private static Logger logger = Logger.getLogger(DispatchStream.class);
-	
+
+	@S4Component(type = SpeechStateVisualizer.class, mandatory = false)
+	public final static String PROP_SPEECH_STATE_VISUALIZER = "speechStateVisualizer";
+	SpeechStateVisualizer ssv;
+
 	@S4Boolean(defaultValue = false)
 	public final static String PROP_SEND_SILENCE = "sendSilence";
 	private boolean sendSilence;
@@ -30,8 +36,9 @@ public class DispatchStream extends InputStream implements Configurable {
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		sendSilence(ps.getBoolean(PROP_SEND_SILENCE));
+		ssv = (SpeechStateVisualizer) ps.getComponent(PROP_SPEECH_STATE_VISUALIZER);
 	}
-	
+
 	public void initialize() { }
 	
 	/** 
@@ -43,11 +50,11 @@ public class DispatchStream extends InputStream implements Configurable {
 	}
 
 	protected void setIsTalking() {
-		// don't do anything by default
+		this.ssv.systemTalking(true);
 	}
 
 	protected void setIsSilent() {
-		// don't do anything by default -> this should rather be a more generic call-back mechanism
+		this.ssv.systemTalking(false);
 	}
 	
 	/* * Higher-level audio enqueuing (or direct play) * */

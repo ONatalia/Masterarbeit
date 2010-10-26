@@ -421,6 +421,7 @@
     <component name="hypViewer" type="org.cocolab.inpro.incremental.listener.CurrentHypothesisViewer"/>
     <component name="dispatchStream" type="org.cocolab.inpro.audio.DispatchStream">
         <property name="sendSilence" value="true"/>
+        <property name="speechStateVisualizer" value="speechStateVisualizer"/>
     </component>
 
 </config>

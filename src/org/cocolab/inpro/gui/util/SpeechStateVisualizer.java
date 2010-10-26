@@ -31,7 +31,7 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 	public final static String PROP_STYLE = "style";
 	Configurable styleResource;
 	
-	JLabel speechIndicator;
+	FourStateJLabel speechIndicator;
 	JFrame f;
 	JToggleButton recordButton;
 	
@@ -39,9 +39,8 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 
 	public SpeechStateVisualizer() {
 		styleResource = this;
-		speechIndicator = new JLabel();
-		setIcons();
-		speechIndicator.setEnabled(false);
+//		speechIndicator = new FourStateJLabel();
+//		speechIndicator.setEnabled(false);
 		recordButton = new JToggleButton(new ImageIcon(SpeechStateVisualizer.class.getResource("media-playback-pause.png"), "PAUSE"));
 		recordButton.setActionCommand("PAUSE");
 		recordButton.setSelectedIcon(new ImageIcon(SpeechStateVisualizer.class.getResource("media-record.png"), "PAUSE"));
@@ -54,22 +53,52 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 		});
 	}
 	
-	private void setIcons() {
-		ImageIcon silentIcon = new ImageIcon(styleResource.getClass().getResource("happyhal-inactive.png"));
-		ImageIcon talkingIcon = new ImageIcon(styleResource.getClass().getResource("happyhal-inactive-vad.png"));
-		speechIndicator.setIcon(talkingIcon);
-		speechIndicator.setDisabledIcon(silentIcon);
+	@SuppressWarnings("serial")
+	private class FourStateJLabel extends JLabel {
+
+		private boolean userIsTalking = false;
+		private boolean systemIsTalking = false;
+		private ImageIcon silentIcon = new ImageIcon(styleResource.getClass().getResource("happyhal-inactive.png"));
+		private ImageIcon bothTalkingIcon = new ImageIcon(styleResource.getClass().getResource("happyhal-active-vad.png"));
+		private ImageIcon userTalkingIcon = new ImageIcon(styleResource.getClass().getResource("happyhal-inactive-vad.png"));
+		private ImageIcon systemTalkingIcon = new ImageIcon(styleResource.getClass().getResource("happyhal-active.png"));
+
+		public FourStateJLabel() {this.setIcon();}
+		
+		public void setIcon(){
+			if (systemIsTalking && userIsTalking) {
+				super.setIcon(bothTalkingIcon);
+			} else if (systemIsTalking) {
+				super.setIcon(systemTalkingIcon);
+			} else if (userIsTalking) {
+				super.setIcon(userTalkingIcon);
+			} else {
+				super.setIcon(silentIcon);
+			}
+		}
+		
+		public void userTalking(boolean talking) {
+			this.userIsTalking = talking;
+			this.setIcon();
+		}
+
+		public void systemTalking(boolean talking) {
+			this.systemIsTalking = talking;
+			this.setIcon();
+		}
 	}
-	
+
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		styleResource = ps.getComponent(PROP_STYLE);
 		if (styleResource == null) 
 			styleResource = this;
+		speechIndicator = new FourStateJLabel();
+		speechIndicator.setEnabled(true);
 		if (ps.getBoolean(PROP_SHOW_WINDOW)) {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-					setIcons();
+					speechIndicator.setIcon();
 					f = new JFrame("speech estimation");
 					JPanel p = new JPanel(new BorderLayout());
 					p.add(speechIndicator, BorderLayout.CENTER);
@@ -86,7 +115,11 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 		isRecording = recording;
 		recordButton.setSelected(recording);
 	}
-	
+
+	public void systemTalking(boolean talking) {
+		speechIndicator.systemTalking(talking);
+	}
+
 	public JLabel getSpeechIndicator() {
 		return speechIndicator;
 	}
@@ -106,7 +139,7 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 		} while (!isRecording);
 		if (d instanceof SpeechClassifiedData) {
 			SpeechClassifiedData scd = (SpeechClassifiedData) d;
-			speechIndicator.setEnabled(scd.isSpeech());
+			speechIndicator.userTalking(scd.isSpeech());
 		}
 		return d;
 	}
