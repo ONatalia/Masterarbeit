@@ -186,6 +186,8 @@
       <property name="dataLocation" value="cd_cont_2000_8/"/>
     </component>
 
+   <component name="feMonitor" type="org.cocolab.inpro.sphinx.frontend.Monitor" />
+
     <component name="unitManager" type="edu.cmu.sphinx.linguist.acoustic.UnitManager"/>
 
 
@@ -281,6 +283,14 @@
     <component name="microphone" type="edu.cmu.sphinx.frontend.util.Microphone">
         <property name="closeBetweenUtterances" value="false"/>
         <property name="bufferSize" value="960"/>        <!-- 30ms -->
+    </component>
+
+    <component name="streamDataSource" type="edu.cmu.sphinx.frontend.util.StreamDataSource">
+        <property name="sampleRate" value="16000"/>
+        <property name="bitsPerSample" value="16"/>
+        <property name="bytesPerRead" value="320"/> <!-- 10ms -->
+        <property name="bigEndianData" value="false"/>
+        <property name="signedData" value="true"/>
     </component>
 
    <component name="dataThrottle" type="org.cocolab.inpro.sphinx.frontend.DataThrottle">
