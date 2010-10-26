@@ -6,10 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.features.TimeShiftingAnalysis;
 import org.cocolab.inpro.incremental.util.ResultUtil;
 import org.cocolab.inpro.nlu.AVPair;
+
+import weka.core.Instance;
 
 import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 
@@ -130,8 +133,12 @@ public class WordIU extends IU {
 	 */
 	public boolean pitchIsRising() {
 		assert hasProsody();
-		if (prosodicFeatures == null)
+		if (prosodicFeatures == null) {
 			prosodicFeatures = new ProsodicFeatures();
+			Instance instance = bd.getEOTFeatures(endTime());
+			System.err.println(instance.toString());
+		}
+		Logger.getLogger(WordIU.class).info(this + " has rising prosody: " + prosodicFeatures.pitchIsRising());
 		return prosodicFeatures.pitchIsRising();
 	}
 	
@@ -152,7 +159,7 @@ public class WordIU extends IU {
 		}
 		
 		public boolean pitchIsRising() {
-			return tsa.getSlope() > 2.5;
+			return tsa.getSlope() > 2.5; // this means: 2.5 half-tones per second
 		} 
 		
 	}
@@ -160,6 +167,20 @@ public class WordIU extends IU {
 	@Override
 	public String toPayLoad() {
 		return word;
+	}
+	
+	/** 
+     * Builds a simple string from a list of wordIUs
+	 * @return a string with the contained words separated by whitespace
+	 */
+	public static String wordsToString(List<WordIU> words) {
+		String ret = "";
+		for (WordIU iu : words) {
+			if (!iu.isSilence()) {
+				ret += iu.getWord() + " ";				
+			}
+		}
+		return ret.replaceAll("^ *", "").replaceAll(" *$", "");
 	}
 	
 }

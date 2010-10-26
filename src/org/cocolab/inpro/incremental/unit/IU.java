@@ -38,9 +38,10 @@ public abstract class IU implements Comparable<IU> {
 	 * call this, if you want to provide a sameLevelLink and a groundedIn list
 	 * and you want groundedIn to be deeply SLLed to the sameLevelLink's groundedIn-IUs  
 	 */
-	public IU(IU sll, List<IU> groundedIn, boolean deepSLL) {
+	@SuppressWarnings("unchecked")
+	public IU(IU sll, List<? extends IU> groundedIn, boolean deepSLL) {
 		this();
-		this.groundedIn = groundedIn;
+		this.groundedIn = (List<IU>) groundedIn;
 		if (deepSLL && (sll != null)) {
 			connectSLL(sll);
 		} else {
@@ -51,11 +52,11 @@ public abstract class IU implements Comparable<IU> {
 	/**
 	 * call this, if you want to provide both a sameLevelLink and a groundedIn list
 	 */
-	public IU(IU sll, List<IU> groundedIn) {
+	public IU(IU sll, List<? extends IU> groundedIn) {
 		this(sll, groundedIn, false);
 	}
 	
-	public IU(List<IU> groundedIn) {
+	public IU(List<? extends IU> groundedIn) {
 		this((IU) null, groundedIn);
 	}
 	

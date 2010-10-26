@@ -10,6 +10,7 @@ import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
+import org.cocolab.inpro.incremental.unit.InstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
 import org.cocolab.inpro.dm.RNLA;
@@ -34,10 +35,12 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	public static final String PROP_ECHO = "echo";
 	private boolean echo;
 
+	final IUList<InstallmentIU> installments = new IUList<InstallmentIU>();
+	
 	final IUList<DialogueActIU> dialogueActIUs = new IUList<DialogueActIU>();
 	final List<RNLA> sentToDos = new ArrayList<RNLA>();
 	
-	private List<WordIU> installment = new ArrayList<WordIU>();
+	private List<WordIU> currentInstallment = new ArrayList<WordIU>();
 
 	/** Sets up the DM. */
 	@Override
@@ -48,35 +51,30 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 		logger.info("Started EchoDialogueManager");
 	}
 
-	/**
-	 * Keeps the current installment hypothesis.
-	 */
+	/** Keeps the current installment hypothesis. */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		// faster and clearer way of saying "we keep a copy of the wordlist" 
-		installment = new ArrayList<WordIU>((Collection<WordIU>)ius);
+		currentInstallment = new ArrayList<WordIU>((Collection<WordIU>)ius);
 	}
 
-	/**
-	 * Resets the DM and its AM
-	 */
+	/** Resets the DM and its AM */
 	@Override
 	public void reset() {
 		super.reset();
 		logger.info("DM resetting.");
 		this.dialogueActIUs.clear();
 		this.am.reset();
-		this.installment.clear();
+		this.currentInstallment.clear();
 	}
 
-	/**
-	 * Listens for floor changes and updates the InformationState
-	 */
+	/** Listens for floor changes and updates the InformationState */
 	@Override
 	public void floor(AbstractFloorTracker.Signal signal, AbstractFloorTracker floorManager) {
 		logger.info("Floor signal: " + signal);
+		installments.add(new InstallmentIU(currentInstallment));
 		List<EditMessage<DialogueActIU>> ourEdits = null;
 		switch (signal) {
 			case START: {
@@ -96,7 +94,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 			}
 		}
 		this.dialogueActIUs.apply(ourEdits);
-		this.rightBuffer.setBuffer(this.dialogueActIUs);
+		this.rightBuffer.setBuffer(this.dialogueActIUs, ourEdits);
 		this.rightBuffer.notify(this.iulisteners);
 	}
 	
@@ -105,30 +103,30 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	 * @return a list of added DialogueActIUs
 	 */
 	private List<EditMessage<DialogueActIU>> reply(String filename) {
-		List<IU> grin = new ArrayList<IU>(this.installment);
-		String tts = this.sentenceToString();
+		List<IU> grin = new ArrayList<IU>(this.currentInstallment);
+		String tts = WordIU.wordsToString(currentInstallment);
 		ArrayList<EditMessage<DialogueActIU>> ourEdits = new ArrayList<EditMessage<DialogueActIU>>();
 		if (!tts.isEmpty()) {
-			ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCpr.wav"))));
-			if (echo) 
-				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + tts))));					
+			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, filename));
+			ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
+			if (filename.equals("BCpr.wav")) {
+				installments.add(new InstallmentIU(daiu, "OK+"));
+			} else {
+				installments.add(new InstallmentIU(daiu, "OK-"));
+			}
+			if (echo) { 
+				daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + tts));
+				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
+				installments.add(new InstallmentIU(daiu, tts));
+			}
 		} else {
-			ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCn.wav"))));
+			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCn.wav"));
+			ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
+			installments.add(new InstallmentIU(daiu, "hm"));
 		}
 		return ourEdits;
 	}
 	
-	/** Builds a simple string from currently understood installment. */
-	private String sentenceToString() {
-		String ret = "";
-		for (WordIU iu : (ArrayList<WordIU>) this.installment) {
-			if (!iu.isSilence()) {
-				ret += iu.getWord() + " ";				
-			}
-		}
-		return ret.replaceAll("^ *", "").replaceAll(" *$", "");
-	}
-
 	/** call this to notify the DM when a dialogueAct has been performed */
 	@Override
 	public void done(DialogueActIU iu) {
