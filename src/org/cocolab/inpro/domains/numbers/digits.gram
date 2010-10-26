@@ -2,4 +2,4 @@
 grammar digits;
 public <digits> = (<command> | [<command>] <digit>+);
 <command> = (ja|nein|genau);
-<digit> = (eins|zwei|zwo|drei|vier|fünf|sechs|sieben|acht|neun|null);
+<digit> = (eins|zwei|zwo|drei|vier|fuenf|sechs|sieben|acht|neun|null);

@@ -5,6 +5,8 @@ drei	d r aI
 vier	f i: 6
 fünf	f Y n f
 fünf	f y: n f
+fuenf	f Y n f
+fuenf	f y: n f
 sechs	z E k s
 sieben	z i: b @ n
 acht	Q a x t
