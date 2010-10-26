@@ -16,14 +16,20 @@ import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DataProcessingException;
 import edu.cmu.sphinx.frontend.endpoint.SpeechClassifiedData;
+import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Boolean;
+import edu.cmu.sphinx.util.props.S4Component;
 
 public class SpeechStateVisualizer extends BaseDataProcessor {
 
 	@S4Boolean(defaultValue = true)
     public final static String PROP_SHOW_WINDOW = "showWindow";
+	
+	@S4Component(type = Configurable.class, mandatory = false)
+	public final static String PROP_STYLE = "style";
+	Configurable styleResource;
 	
 	JLabel speechIndicator;
 	JFrame f;
@@ -32,10 +38,9 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 	boolean isRecording = true;
 
 	public SpeechStateVisualizer() {
-		ImageIcon silentIcon = new ImageIcon(SpeechStateVisualizer.class.getResource("happyhal-inactive.png"));
-		ImageIcon talkingIcon = new ImageIcon(SpeechStateVisualizer.class.getResource("happyhal-inactive-vad.png"));
-		speechIndicator = new JLabel(talkingIcon);
-		speechIndicator.setDisabledIcon(silentIcon);
+		styleResource = this;
+		speechIndicator = new JLabel();
+		setIcons();
 		speechIndicator.setEnabled(false);
 		recordButton = new JToggleButton(new ImageIcon(SpeechStateVisualizer.class.getResource("media-playback-pause.png"), "PAUSE"));
 		recordButton.setActionCommand("PAUSE");
@@ -49,11 +54,22 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 		});
 	}
 	
+	private void setIcons() {
+		ImageIcon silentIcon = new ImageIcon(styleResource.getClass().getResource("happyhal-inactive.png"));
+		ImageIcon talkingIcon = new ImageIcon(styleResource.getClass().getResource("happyhal-inactive-vad.png"));
+		speechIndicator.setIcon(talkingIcon);
+		speechIndicator.setDisabledIcon(silentIcon);
+	}
+	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
+		styleResource = ps.getComponent(PROP_STYLE);
+		if (styleResource == null) 
+			styleResource = this;
 		if (ps.getBoolean(PROP_SHOW_WINDOW)) {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
+					setIcons();
 					f = new JFrame("speech estimation");
 					JPanel p = new JPanel(new BorderLayout());
 					p.add(speechIndicator, BorderLayout.CENTER);
