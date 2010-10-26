@@ -46,7 +46,7 @@ public class InstallmentIU extends IU {
 				while (lastWord != null && lastWord.isSilence) {
 					lastWord = (WordIU) lastWord.sameLevelLink;
 				}
-				if (lastWord.hasProsody()) {
+				if (lastWord != null && lastWord.hasProsody()) {
 					text.append(lastWord.pitchIsRising() ? "+" : "-");
 				} else {
 					System.err.println("no prosody in " + lastWord);
