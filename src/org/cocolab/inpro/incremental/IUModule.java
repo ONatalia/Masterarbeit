@@ -134,7 +134,7 @@ public abstract class IUModule extends PushBuffer {
 			ius = new IUList<IU>();
 			ius.addAll(outputIUs);
 			edits = (List<EditMessage<IU>>) outputEdits;
-			hasUpdates = !edits.isEmpty();
+			hasUpdates = (edits != null) && !edits.isEmpty();
 		}
 		
 		public void notify(PushBuffer listener) {

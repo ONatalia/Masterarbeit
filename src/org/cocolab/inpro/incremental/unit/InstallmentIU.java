@@ -24,15 +24,35 @@ public class InstallmentIU extends IU {
 		this.systemProduced = true;
 		this.tts = tts;
 	}
+	
+	public boolean systemProduced() {
+		return systemProduced;
+	}
+	
+	public boolean userProduced() {
+		return !systemProduced;
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public String toPayLoad() {
 		if (systemProduced) {
 			return tts;
-		} else {
-			String words = WordIU.wordsToString((List<WordIU>) groundedIn());
-			return words;
+		} else { // user produced
+			List<WordIU> words = (List<WordIU>) groundedIn();
+			StringBuilder text = new StringBuilder(WordIU.wordsToString(words));
+			if (!words.isEmpty()) { 
+				WordIU lastWord = words.get(words.size() - 1);
+				while (lastWord != null && lastWord.isSilence) {
+					lastWord = (WordIU) lastWord.sameLevelLink;
+				}
+				if (lastWord.hasProsody()) {
+					text.append(lastWord.pitchIsRising() ? "+" : "-");
+				} else {
+					System.err.println("no prosody in " + lastWord);
+				}
+			}
+			return text.toString();
 		}
 	}
 

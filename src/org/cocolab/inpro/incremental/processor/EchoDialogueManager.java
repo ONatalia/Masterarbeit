@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.cocolab.inpro.incremental.IUModule;
+import org.cocolab.inpro.incremental.listener.InstallmentHistoryViewer;
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
@@ -42,6 +43,8 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	
 	private List<WordIU> currentInstallment = new ArrayList<WordIU>();
 
+	InstallmentHistoryViewer ihv = new InstallmentHistoryViewer();
+	
 	/** Sets up the DM. */
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
@@ -74,7 +77,6 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	@Override
 	public void floor(AbstractFloorTracker.Signal signal, AbstractFloorTracker floorManager) {
 		logger.info("Floor signal: " + signal);
-		installments.add(new InstallmentIU(currentInstallment));
 		List<EditMessage<DialogueActIU>> ourEdits = null;
 		switch (signal) {
 			case START: {
@@ -83,12 +85,14 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 				break;
 			}
 			case EOT_RISING: {
+				installments.add(new InstallmentIU(currentInstallment));
 				// Ok+ … wordIUs
 				ourEdits = reply("BCpr.wav");
 				break;
 			}
 			case EOT_FALLING:
 			case EOT_NOT_RISING: {
+				installments.add(new InstallmentIU(currentInstallment));
 				// Ok- … wordIUs
 				ourEdits = reply("BCpf.wav");
 			}
@@ -98,6 +102,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 			this.rightBuffer.setBuffer(this.dialogueActIUs, ourEdits);
 			this.rightBuffer.notify(this.iulisteners);			
 		}
+		ihv.hypChange(installments, null);
 	}
 	
 	/** 

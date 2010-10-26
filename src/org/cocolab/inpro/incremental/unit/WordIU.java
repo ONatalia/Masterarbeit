@@ -174,13 +174,14 @@ public class WordIU extends IU {
 	 * @return a string with the contained words separated by whitespace
 	 */
 	public static String wordsToString(List<WordIU> words) {
-		String ret = "";
+		StringBuilder ret = new StringBuilder();
 		for (WordIU iu : words) {
 			if (!iu.isSilence()) {
-				ret += iu.getWord() + " ";				
+				ret.append(iu.getWord());
+				ret.append(" ");				
 			}
 		}
-		return ret.replaceAll("^ *", "").replaceAll(" *$", "");
+		return ret.toString().replaceAll("^ *", "").replaceAll(" *$", "");
 	}
 	
 }
