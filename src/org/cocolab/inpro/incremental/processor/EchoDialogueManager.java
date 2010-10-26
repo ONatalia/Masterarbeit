@@ -85,23 +85,21 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 				break;
 			}
 			case EOT_RISING: {
-				installments.add(new InstallmentIU(currentInstallment));
+				installments.add(new InstallmentIU(new ArrayList<WordIU>(currentInstallment)));
 				// Ok+ … wordIUs
 				ourEdits = reply("BCpr.wav");
 				break;
 			}
 			case EOT_FALLING:
 			case EOT_NOT_RISING: {
-				installments.add(new InstallmentIU(currentInstallment));
+				installments.add(new InstallmentIU(new ArrayList<WordIU>(currentInstallment)));
 				// Ok- … wordIUs
 				ourEdits = reply("BCpf.wav");
 			}
 		}
-		if (ourEdits != null) {
-			this.dialogueActIUs.apply(ourEdits);
-			this.rightBuffer.setBuffer(this.dialogueActIUs, ourEdits);
-			this.rightBuffer.notify(this.iulisteners);			
-		}
+		this.dialogueActIUs.apply(ourEdits);
+		this.rightBuffer.setBuffer(this.dialogueActIUs, ourEdits);
+		this.rightBuffer.notify(this.iulisteners);			
 		ihv.hypChange(installments, null);
 	}
 	
