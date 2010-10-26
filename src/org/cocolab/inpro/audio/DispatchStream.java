@@ -50,11 +50,15 @@ public class DispatchStream extends InputStream implements Configurable {
 	}
 
 	protected void setIsTalking() {
-		this.ssv.systemTalking(true);
+		if (ssv != null) {
+			this.ssv.systemTalking(true);			
+		}
 	}
 
 	protected void setIsSilent() {
-		this.ssv.systemTalking(false);
+		if (ssv != null) {
+			this.ssv.systemTalking(false);
+		}
 	}
 	
 	/* * Higher-level audio enqueuing (or direct play) * */
