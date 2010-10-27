@@ -39,8 +39,6 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 
 	public SpeechStateVisualizer() {
 		styleResource = this;
-//		speechIndicator = new FourStateJLabel();
-//		speechIndicator.setEnabled(false);
 		recordButton = new JToggleButton(new ImageIcon(SpeechStateVisualizer.class.getResource("media-playback-pause.png"), "PAUSE"));
 		recordButton.setActionCommand("PAUSE");
 		recordButton.setSelectedIcon(new ImageIcon(SpeechStateVisualizer.class.getResource("media-record.png"), "PAUSE"));
@@ -100,6 +98,7 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 				public void run() {
 					speechIndicator.setIcon();
 					f = new JFrame("speech estimation");
+					f.setLocation(440, 100);
 					JPanel p = new JPanel(new BorderLayout());
 					p.add(speechIndicator, BorderLayout.CENTER);
 					p.add(recordButton, BorderLayout.SOUTH);

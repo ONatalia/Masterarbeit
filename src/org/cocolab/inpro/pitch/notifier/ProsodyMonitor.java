@@ -20,7 +20,7 @@ public class ProsodyMonitor extends JPanel implements SignalFeatureListener {
 	
 	private static final int SPACING = 3;
 	
-	private static final int HEIGHT = 150;
+	private static final int HEIGHT = 110;
 	
 	final List<Double> powerValues = new ArrayList<Double>();
 	Range powerRange = new Range();
@@ -34,6 +34,7 @@ public class ProsodyMonitor extends JPanel implements SignalFeatureListener {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				JFrame f = new JFrame("prosody monitor");
+				f.setLocation(440, 370);
 				f.add(self);
 				f.pack();
 				f.setVisible(true);

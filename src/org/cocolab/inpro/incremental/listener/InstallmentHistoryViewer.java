@@ -26,6 +26,7 @@ public class InstallmentHistoryViewer extends PushBuffer {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				JFrame f = new JFrame("installment history");
+				f.setLocation(0, 100);
 				htmlPane.setPreferredSize(new Dimension(400, 372));
 				JScrollPane scrollPane = new JScrollPane(htmlPane);
 				f.add(scrollPane);

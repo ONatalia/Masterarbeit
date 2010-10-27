@@ -147,7 +147,7 @@ public class SimpleReco {
 			throw new RuntimeException(e);
 		}
 		vumeter.setPredecessor(mic);
-		vumeter.getVuMeterDialog().setLocation(500, 200);
+		vumeter.getVuMeterDialog().setLocation(690, 100);
 		endpoint.setPredecessor(vumeter);
 		endpoint.initialize();
 		setupMicrophone(mic);
