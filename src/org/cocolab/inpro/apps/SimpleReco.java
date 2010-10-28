@@ -131,10 +131,7 @@ public class SimpleReco {
 	
 	VUMeterMonitor vumeter;
 	
-	public void setupMicrophoneWithEndpointing()  {
-    	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
-		final Microphone mic = (Microphone) cm.lookup("microphone");
-		FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
+	private void setupVuMeter() {
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				@Override
@@ -146,8 +143,15 @@ public class SimpleReco {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		vumeter.setPredecessor(mic);
 		vumeter.getVuMeterDialog().setLocation(690, 100);
+	}
+	
+	public void setupMicrophoneWithEndpointing()  {
+    	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
+		final Microphone mic = (Microphone) cm.lookup("microphone");
+		FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
+		setupVuMeter();
+		vumeter.setPredecessor(mic);
 		endpoint.setPredecessor(vumeter);
 		endpoint.initialize();
 		setupMicrophone(mic);
@@ -187,10 +191,12 @@ public class SimpleReco {
 					throttle.initialize();
 					DataProcessor feMonitor = (DataProcessor) cm.lookup("feMonitor");
 					feMonitor.initialize();
+					setupVuMeter();
 					DataProcessor endpointing = (DataProcessor) cm.lookup("endpointing");
 					endpointing.initialize();
 					throttle.setPredecessor(sds);
-					feMonitor.setPredecessor(throttle);
+					vumeter.setPredecessor(throttle);
+					feMonitor.setPredecessor(vumeter);
 					endpointing.setPredecessor(feMonitor);
 					fe.setPredecessor(endpointing);
 				} else {

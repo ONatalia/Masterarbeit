@@ -16,7 +16,7 @@
         <j2se href="http://java.sun.com/products/autodl/j2se" 
             version="1.6+"
             max-heap-size="1024M" 
-	    java-vm-args="-ea"
+		    java-vm-args="-da"
 	/>
         <jar href="Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar" main="false" />
         <jar href="sphinx4.jar" main="false" />
@@ -27,6 +27,7 @@
         <jar href="inpro-0.8.jar" main="true" />
 	<property name="mary.host" value="www.ling.uni-potsdam.de" />
 	<property name="mary.port" value="59125" />
+	<property name="echoDialogueManager[echo]" value="false" />
     </resources>
 
     <security> 

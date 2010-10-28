@@ -115,7 +115,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, filename));
 			ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
 			if (filename.equals("BCpr.wav")) {
-				installments.add(new InstallmentIU(daiu, "OK+"));
+				installments.add(new InstallmentIU(daiu, "JA+"));
 			} else {
 				installments.add(new InstallmentIU(daiu, "OK-"));
 			}

@@ -257,7 +257,7 @@
             <item>speechStateVisualizer</item>
             <item>speechMarker</item>
             <item>nonSpeechDataFilter</item>
-            <item>utteranceWavWriter</item>
+<!--           <item>utteranceWavWriter</item> -->
             <item>timePasser</item>
         </propertylist>
     </component>

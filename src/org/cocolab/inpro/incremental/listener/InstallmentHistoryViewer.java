@@ -18,7 +18,7 @@ public class InstallmentHistoryViewer extends PushBuffer {
 
 	JEditorPane htmlPane;
 	
-	private static final int visibleLines = 20;
+	private static final int visibleLines = 19;
 	
 	public InstallmentHistoryViewer() {
 		htmlPane = new JEditorPane("text/html", "");
