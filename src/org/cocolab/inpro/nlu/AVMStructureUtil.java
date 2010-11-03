@@ -1,8 +1,9 @@
 package org.cocolab.inpro.nlu;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.HashMap;
 
 /**
@@ -13,11 +14,10 @@ public class AVMStructureUtil {
 	
 	// TODO: might make sense to keep previous structures around (in yet another hash map...)
 	// to speed up parseStructureFile
-	public static HashMap<String, HashMap<String, String>> parseStructureFile(String filename) {
+	public static HashMap<String, HashMap<String, String>> parseStructureFile(URL fileURL) {
 		HashMap<String, HashMap<String, String>> avmStructures = new HashMap<String, HashMap<String, String>>();
 		try {
-			BufferedReader lbr;
-			lbr = new BufferedReader(new FileReader(filename));
+			BufferedReader lbr = new BufferedReader(new InputStreamReader(fileURL.openStream()));
 			String line;
 			while ((line = lbr.readLine()) != null) {
 				if (line.startsWith("#") || line.matches("^\\s*$")) continue;
@@ -40,16 +40,8 @@ public class AVMStructureUtil {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		assert (avmStructures != null) : "Could not parse AVM structures in " + filename + ".";
+		assert (avmStructures != null) : "Could not parse AVM structures in " + fileURL.toString() + ".";
 		return avmStructures;
-	}
-	
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		System.out.println(parseStructureFile("res/AVMStructure"));
 	}
 
 }

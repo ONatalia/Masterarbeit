@@ -3,6 +3,8 @@ package org.cocolab.inpro.nlu;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,9 +42,10 @@ public class AVMUtil {
 	/**
 	 * Creates AVMUtil with a list of prototypes (avmStructures) of
 	 * different typed AVMs and a local list of composed AVMs (composeList).
+	 * @throws MalformedURLException 
 	 */
-	public AVMUtil() {
-		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile("res/PentoAVMStructure");
+	public AVMUtil() throws MalformedURLException {
+		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile(new URL("file:res/PentoAVMStructure"));
 //		worldList = AVMWorldUtil.setAVMsFromFile("res/PentoAVMWorldList", avmStructures);
 		composeList = getAVMStructures();
 		resolvedList = new ArrayList<AVM>();
@@ -53,9 +56,10 @@ public class AVMUtil {
 	 * different typed AVMs and a local list of composed AVMs (composeList).
 	 * Defaults to res/PentoAVMWorldList for world file.
 	 * @param structFile with list of AVM structures. 
+	 * @throws MalformedURLException 
 	 */
-	public AVMUtil(String structureFile) {
-		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile(structureFile);
+	public AVMUtil(String structureFile) throws MalformedURLException {
+		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile(new URL(structureFile));
 //		worldList = AVMWorldUtil.setAVMsFromFile("res/PentoAVMWorldList", avmStructures);
 		composeList = getAVMStructures();
 		resolvedList = new ArrayList<AVM>(worldList.size());
@@ -66,9 +70,10 @@ public class AVMUtil {
 	 * different typed AVMs and a local list of composed AVMs (composeList).
 	 * @param structureFile with list of AVMstucture
 	 * @param worldFile with list of AVMs in the world 
+	 * @throws MalformedURLException 
 	 */
-	public AVMUtil(String structureFile, String worldFile) {
-		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile(structureFile);
+	public AVMUtil(String structureFile, String worldFile) throws MalformedURLException {
+		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile(new URL(structureFile));
 		worldList = AVMWorldUtil.setAVMsFromFile(worldFile, avmStructures);
 		composeList = getAVMStructures();
 		resolvedList = new ArrayList<AVM>(worldList.size());
