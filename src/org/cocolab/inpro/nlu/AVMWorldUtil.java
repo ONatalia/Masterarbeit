@@ -3,6 +3,7 @@ package org.cocolab.inpro.nlu;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -56,7 +57,7 @@ public class AVMWorldUtil {
 		String structureFile = "res/AVMStructure";
 		System.out.println(
 				AVMWorldUtil.setAVMsFromFile(worldFile, 
-											 AVMStructureUtil.parseStructureFile(structureFile))
+											 AVMStructureUtil.parseStructureFile(new URL(structureFile)))
 				);
 	}
 
