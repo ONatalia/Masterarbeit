@@ -192,7 +192,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 			else {
 				printUsage();
 				System.err.println("Illegal argument: " + args[i]);
-				System.exit(1);
+				throw new IllegalArgumentException(args[i]);
 			}
 		}
 	}

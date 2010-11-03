@@ -339,7 +339,9 @@ public class SimpleReco {
 	public static void main(String[] args) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException {
 		PropertyConfigurator.configure("log4j.properties");
     	RecoCommandLineParser clp = new RecoCommandLineParser(args);
-    	if (!clp.parsedSuccessfully()) { System.exit(1); }
+    	if (!clp.parsedSuccessfully()) { 
+			throw new IllegalArgumentException("Illegal combination of arguments.");
+    	}
     	SimpleReco simpleReco = new SimpleReco(clp);
     	if (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
     		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
