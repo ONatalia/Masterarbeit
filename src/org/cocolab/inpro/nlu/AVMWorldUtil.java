@@ -1,8 +1,8 @@
 package org.cocolab.inpro.nlu;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,11 +13,10 @@ import java.util.HashMap;
  */
 public class AVMWorldUtil {
 	
-	public static ArrayList<AVM> setAVMsFromFile(String filename, HashMap<String, HashMap<String, String>> avmStructures) {
+	public static ArrayList<AVM> setAVMsFromFile(String fileURL, HashMap<String, HashMap<String, String>> avmStructures) {
 		ArrayList<AVM> list = new ArrayList<AVM>();
 		try {
-			BufferedReader lbr;
-			lbr = new BufferedReader(new FileReader(filename));
+			BufferedReader lbr = new BufferedReader(new InputStreamReader(new URL(fileURL).openStream()));
 			String line;
 			while ((line = lbr.readLine()) != null) {
 				if (line.startsWith("#") || line.matches("^\\s*$")) continue;
@@ -27,7 +26,7 @@ public class AVMWorldUtil {
 				String type = "";
 				for (String token : tokens) {
 					String[] pair = token.split(":");
-					assert pair.length == 2 : "Cannot parse file " + filename + ". Failing line is: " + line;
+					assert pair.length == 2 : "Cannot parse file " + fileURL + ". Failing line is: " + line;
 					if (pair[0].equals("type")) {
 						type = pair[1];
 					} else {
@@ -53,8 +52,8 @@ public class AVMWorldUtil {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String worldFile = "res/AVMWorldList";
-		String structureFile = "res/AVMStructure";
+		String worldFile = "file:res/AVMWorldList";
+		String structureFile = "file:res/AVMStructure";
 		System.out.println(
 				AVMWorldUtil.setAVMsFromFile(worldFile, 
 											 AVMStructureUtil.parseStructureFile(new URL(structureFile)))
