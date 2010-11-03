@@ -39,7 +39,7 @@
 	<argument>http://www.ling.uni-potsdam.de/~timo/code/inprotk/demo/prosody-config.xml</argument>
 	<argument>-O</argument>
 	<argument>-C</argument>
-	<argument>-Is></argument>
+	<argument>-Is</argument>
 	<argument>7</argument>
     </application-desc>
 </jnlp> 

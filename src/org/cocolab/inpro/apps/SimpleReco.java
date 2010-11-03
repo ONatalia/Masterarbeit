@@ -340,7 +340,7 @@ public class SimpleReco {
 		PropertyConfigurator.configure("log4j.properties");
     	RecoCommandLineParser clp = new RecoCommandLineParser(args);
     	if (!clp.parsedSuccessfully()) { 
-			throw new IllegalArgumentException("Illegal combination of arguments.");
+			throw new IllegalArgumentException("No arguments given or illegal combination of arguments.");
     	}
     	SimpleReco simpleReco = new SimpleReco(clp);
     	if (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
