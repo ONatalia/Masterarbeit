@@ -5,18 +5,23 @@ import java.util.List;
 
 /**
  * a simple wrapper for both system and user uttered installments
+ * - for user installments references to recognized WordIUs are kept 
+ *   used to infer the spoken text in toPayload()
+ * - for system installments a reference to the corresponding dialogueAct
+ *   is kept and the spoken text is stored in the variable @see{tts}.
  * @author timo
  *
  */
 public class InstallmentIU extends IU {
 
-	String tts;
+	final String tts;
 	
 	boolean systemProduced; // true: system utterance, false: user utterance
 	
 	public InstallmentIU(List<WordIU> currentInstallment) {
 		super(currentInstallment);
 		this.systemProduced = false;
+		this.tts = null;
 	}
 	
 	public InstallmentIU(DialogueActIU dialogueAct, String tts) {
