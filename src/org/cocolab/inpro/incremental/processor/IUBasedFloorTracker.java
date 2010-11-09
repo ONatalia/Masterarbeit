@@ -41,6 +41,15 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		logger.info("started iubasedfloortracker");
 	}
 
+	/**
+	 * set a timeout to throw a NO_INPUT signal unless something is spoken
+	 * within the next given number of milliseconds
+	 * @param milliseconds the number of milliseconds until the timeout 
+	 */
+	public void installInputTimeout(int milliseconds) {
+		installNewThread(new ExpectingInputTimeOutThread(milliseconds));
+	}
+	
 	/** 
 	 * handles creation (and destruction) of time-out threads. 
 	 * Threads are created on commit (i.e. when VAD thinks that the
@@ -52,7 +61,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void hypChange(Collection<? extends IU> ius,
+	public void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		if (edits != null && !edits.isEmpty()) {
 			if (isNotInInput() && !edits.get(0).getType().equals(EditType.COMMIT)) { 
@@ -64,15 +73,14 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 			}
 			WordIU potentiallyFinalWord = getPotentiallyFinalWord((List<WordIU>) ius, (List<EditMessage<WordIU>>) edits);
 			boolean isNewFinalWord = potentiallyFinalWord != null 
-								&& (timeOutThread == null || 
-									potentiallyFinalWord != timeOutThread.endingWord);
+								&& (timeOutThread == null
+								    || !(timeOutThread instanceof WordTimeOutThread)
+									|| (potentiallyFinalWord != ((WordTimeOutThread) timeOutThread).endingWord));
 			if (isNewFinalWord) {
 				// this conflicts with the logging in the timeoutthread's constructor
 				//logToTedView("found the potentially final word " + potentiallyFinalWord);
 				//assert timeOutThread == null : "There shall be no timeout threads during speech";
-				killThread();
-				timeOutThread = new TimeOutThread(potentiallyFinalWord);
-				timeOutThread.start();				
+				installNewThread(new WordTimeOutThread(potentiallyFinalWord));
 			}
 		}
 	}
@@ -118,6 +126,13 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 			return endingWord;
 	}
 	
+	/** install a new timeout thread */
+	private void installNewThread(TimeOutThread tot) {
+		killThread();
+		timeOutThread = tot;
+		timeOutThread.start();
+	}
+	
 	/** kill a currently running timeout thread */
 	private void killThread() {
 		if (timeOutThread != null) {
@@ -127,27 +142,20 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 	}
 	
 	/**
-	 * handles timing out (and handling) an utterance-final word.
-	 * this waits for a while (@see risingTimeout) before checking
-	 * whether the word's pitch was rising. If it is, we send off
-	 * a signal. Otherwise we wait a little longer and only then
-	 * send a signal.
+	 * supports classes for timing out and sending signals 
 	 * @author timo
 	 */
-	private class TimeOutThread extends Thread {
-
+	private abstract class TimeOutThread extends Thread {
+	
 		/** if set, this timeout thread will not do anything when its timer runs out */
 		boolean killbit = false;
-		/** the word that we'll inspect for rising pitch */
-		WordIU endingWord;
 		
-		public TimeOutThread(WordIU endingWord) {
-			super("timeout thread for " + endingWord.getWord());
-			this.endingWord = endingWord;
-			logToTedView(this.hashCode() + "starting timeout for \"" + endingWord.getWord() + "\"");
+		/** create thread with a given name */
+		public TimeOutThread(String name) {
+			super(name);
 		}
-
-		private void sleepSafely(long timeout) {
+	
+		protected void sleepSafely(long timeout) {
 			if (timeout < 3) // ignore microsleeps
 				return;
 			logger.debug("going to sleep for " + timeout + " milliseconds");
@@ -160,12 +168,12 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		}
 		
 		private void kill() {
-			if (!killbit)
-				logToTedView(this.hashCode() + "killed timeout for " + endingWord);
 			killbit = true;
+			if (!killbit)
+				logToTedView(this.hashCode() + "killed timeout thread " + this.getName());
 		}
 		
-		private boolean shouldDie() {
+		protected boolean shouldDie() {
 			if (killbit) {
 				logger.debug("killed during timeout");
 				return true;
@@ -173,6 +181,35 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 			// every de-referencing of timeOutThread should first set the kill bit
 			assert timeOutThread == this : "I'm running without a killbit, even though floortracker doesn't reference me";
 			return false;
+		}
+		
+		protected void signal(Signal s) {
+			logToTedView(this.getName() + " sending " + s);
+			killbit = true;
+			signalListeners(InternalState.NOT_AWAITING_INPUT, s);	
+		}
+		
+		@Override
+		public abstract void run();
+		
+	}
+
+	/**
+	 * times out and sends signals on an utterance-final word.
+	 * this waits for a while (@see risingTimeout) before checking
+	 * whether the word's pitch was rising. If it is, we send off
+	 * a signal. Otherwise we wait a little longer (@see anyProsodyTimeout) 
+	 * and only then send a signal.
+	 */
+	private class WordTimeOutThread extends TimeOutThread {
+		
+		/** the word that we'll inspect for rising pitch */
+		WordIU endingWord;
+
+		public WordTimeOutThread(WordIU endingWord) {
+			super("timeout thread for " + endingWord.getWord());
+			this.endingWord = endingWord;
+			logToTedView(this.getName() + "starting timeout for \"" + endingWord.getWord() + "\"");
 		}
 
 		private Signal findBoundaryTone() {
@@ -194,27 +231,37 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 			if (useProsody) {
 				Signal s = findBoundaryTone();
 				if (s.equals(Signal.EOT_RISING)) {
-					logToTedView(this.hashCode() + " sending " + s + " in word " + endingWord);
-					killbit = true;
-					signalListeners(InternalState.NOT_AWAITING_INPUT, s);
+					signal(s);
 					return;
 				} else {
-					logToTedView(this.hashCode() + " found " + s + " in word " + endingWord + ";\n sleeping again");
+					logToTedView(this.getName() + " found " + s + " in word " + endingWord + ";\n sleeping again");
 				}
 			}
 			sleepSafely(anyProsodyTimeout);
 			if (shouldDie())
 				return;
 			Signal s = findBoundaryTone();
-			logToTedView(this.hashCode() + " sending " + s + " in word " + endingWord);
-			killbit = true;
-			signalListeners(InternalState.NOT_AWAITING_INPUT, s);
+			signal(s);
+		}
+	}
+	
+	private class ExpectingInputTimeOutThread extends TimeOutThread {
+		
+		int timeout;
+
+		public ExpectingInputTimeOutThread(int milliseconds) {
+			super("input expecting timeout (" + milliseconds + " ms)");
+			this.timeout = milliseconds;
+		}
+
+		@Override
+		public void run() {
+			sleepSafely(timeout);
+			if (shouldDie())
+				return;
+			signal(Signal.NO_INPUT);
 		}
 		
 	}
-
-	@Override
-	protected void leftBufferUpdate(Collection<? extends IU> ius,
-			List<? extends EditMessage<? extends IU>> edits) { }
 
 }

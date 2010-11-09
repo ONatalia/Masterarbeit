@@ -48,7 +48,7 @@ public abstract class AbstractFloorTracker extends IUModule {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public void hypChange(Collection<? extends IU> ius,
+	public void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		mostRecentIUs = (List<WordIU>) ius;
 	}

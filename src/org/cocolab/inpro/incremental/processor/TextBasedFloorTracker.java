@@ -43,7 +43,7 @@ public class TextBasedFloorTracker extends AbstractFloorTracker {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void hypChange(Collection<? extends IU> ius,
+	public void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		// TODO: check type of IUs (right now, we only expect WordIUs)
 		// TODO: not only react to WordIUs, but to more interesting stuff
@@ -118,9 +118,5 @@ public class TextBasedFloorTracker extends AbstractFloorTracker {
 			eotButton.setEnabled(true); //!isNotInInput());
 		}
 	}
-
-	@Override
-	protected void leftBufferUpdate(Collection<? extends IU> ius,
-			List<? extends EditMessage<? extends IU>> edits) { }
 
 }
