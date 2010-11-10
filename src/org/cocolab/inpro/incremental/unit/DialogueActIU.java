@@ -3,25 +3,25 @@ package org.cocolab.inpro.incremental.unit;
 import java.util.Collections;
 import java.util.List;
 
-import org.cocolab.inpro.dm.RNLA;
+import org.cocolab.inpro.dm.PentoDialogueAct;
 
 public class DialogueActIU extends IU {
 
 	public static final DialogueActIU FIRST_DA_IU = new DialogueActIU(); 
 	
-	private RNLA act;
+	private PentoDialogueAct act;
 
 	@SuppressWarnings("unchecked")
 	public DialogueActIU() {
 		this(FIRST_DA_IU, Collections.EMPTY_LIST, null);
 	}
 
-	public DialogueActIU(IU sll, List<IU> groundedIn, RNLA act) {
+	public DialogueActIU(IU sll, List<IU> groundedIn, PentoDialogueAct act) {
 		super(sll, groundedIn);
 		this.act = act;
 	}
 
-	public DialogueActIU(IU sll, IU groundedIn, RNLA act) {
+	public DialogueActIU(IU sll, IU groundedIn, PentoDialogueAct act) {
 		super(sll, Collections.singletonList(groundedIn));
 		this.act = act;
 	}
@@ -33,7 +33,7 @@ public class DialogueActIU extends IU {
 	/**
 	 * @return the RNLA act of this IU.
 	 */
-	public RNLA getAct() {
+	public PentoDialogueAct getAct() {
 		return this.act;
 	}
 

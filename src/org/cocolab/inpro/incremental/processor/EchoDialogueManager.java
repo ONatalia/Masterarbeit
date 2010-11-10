@@ -14,7 +14,7 @@ import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.InstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
-import org.cocolab.inpro.dm.RNLA;
+import org.cocolab.inpro.dm.PentoDialogueAct;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -39,7 +39,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	final IUList<InstallmentIU> installments = new IUList<InstallmentIU>();
 	
 	final IUList<DialogueActIU> dialogueActIUs = new IUList<DialogueActIU>();
-	final List<RNLA> sentToDos = new ArrayList<RNLA>();
+	final List<PentoDialogueAct> sentToDos = new ArrayList<PentoDialogueAct>();
 	
 	private List<WordIU> currentInstallment = new ArrayList<WordIU>();
 
@@ -112,7 +112,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 		String tts = WordIU.wordsToString(currentInstallment);
 		ArrayList<EditMessage<DialogueActIU>> ourEdits = new ArrayList<EditMessage<DialogueActIU>>();
 		if (!tts.isEmpty()) {
-			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, filename));
+			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new PentoDialogueAct(PentoDialogueAct.Act.PROMPT, filename));
 			ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
 			if (filename.equals("BCpr.wav")) {
 				installments.add(new InstallmentIU(daiu, "JA+"));
@@ -120,12 +120,12 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 				installments.add(new InstallmentIU(daiu, "OK-"));
 			}
 			if (echo) { 
-				daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "tts: " + tts));
+				daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new PentoDialogueAct(PentoDialogueAct.Act.PROMPT, "tts: " + tts));
 				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
 				installments.add(new InstallmentIU(daiu, tts));
 			}
 		} else {
-			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new RNLA(RNLA.Act.PROMPT, "BCn.wav"));
+			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new PentoDialogueAct(PentoDialogueAct.Act.PROMPT, "BCn.wav"));
 			ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
 			installments.add(new InstallmentIU(daiu, "hm"));
 		}
@@ -135,7 +135,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	/** call this to notify the DM when a dialogueAct has been performed */
 	@Override
 	public void done(DialogueActIU iu) {
-		RNLA r = iu.getAct();
+		PentoDialogueAct r = iu.getAct();
 		logger.info("Was notified about performed act " + r.toString());
 		this.sentToDos.remove(r);
 		if (this.sentToDos.isEmpty()) {
