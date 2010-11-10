@@ -14,7 +14,7 @@ import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.InstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
-import org.cocolab.inpro.dm.PentoDialogueAct;
+import org.cocolab.inpro.dm.acts.PentoDialogueAct;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;

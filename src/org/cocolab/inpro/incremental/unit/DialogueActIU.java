@@ -3,7 +3,7 @@ package org.cocolab.inpro.incremental.unit;
 import java.util.Collections;
 import java.util.List;
 
-import org.cocolab.inpro.dm.PentoDialogueAct;
+import org.cocolab.inpro.dm.acts.PentoDialogueAct;
 
 public class DialogueActIU extends IU {
 

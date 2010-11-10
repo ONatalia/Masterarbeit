@@ -1,20 +1,32 @@
 package org.cocolab.inpro.nlu;
 
 /**
- * A simple attribute-value pair.
+ * A simple attribute-value pair. Attributes are always strings,
+ * values can be any object.
  * @author okko
  */
 public class AVPair {
 
+	/**
+	 * Attribute and values
+	 */
 	private String attribute;
-	/* what kind of Objects can be values? */
 	private Object value;
+	// TODO: restrict to only specific object types
 
+	/**
+	 * Constructor building AVPair from two strings for 
+	 * attribute and value
+	 */
 	public AVPair(String attribute, String value) {
 		this.attribute = attribute;
 		this.value = value;
 	}
 
+	/**
+	 * Constructor building AVPair from attribute String and 
+	 * Object value
+	 */
 	public AVPair(String attribute, Object value) {
 		this.attribute = attribute;
 		this.value = value;
@@ -48,26 +60,55 @@ public class AVPair {
 		return this.attribute;
 	}
 	
+	/**
+	 * Gets this AVPair's value
+	 * @return this avp's value
+	 */
 	public Object getValue() {
 		return this.value;
 	}
 	
+	/**
+	 * Sets this AVPair's value
+	 * @param value
+	 */
 	public void setValue(Object value) {
 		this.value = value;
 	}
 	
+	/**
+	 * Clears this AVPair's value
+	 */
 	public void clearValue() {
 		this.value = null;
 	}
 	
-	
+	/**
+	 * Builds a string representation of this AVPair
+	 * @return this avp's string rep
+	 */
 	public String toString() {
 		return getAttribute() + " : " + getValue(); 
 	}
 	
+	/**
+	 * Compares this AVPair to another
+	 * @param avp the AVPair to compare to
+	 * @return true if they have the same attribute and value, else false
+	 */
 	public boolean equals(AVPair avp) {
 		return (this.attribute.equals(avp.attribute) &&
 				this.value.equals(avp.value));
 	}
+	
+	/**
+	 * Checks if this AVP matches a string representation
+	 * @param string the string to compare to
+	 * @return true if this AVPair's string representation matches the string.
+	 */
+	public boolean equals(String string) {
+		return (this.toString().equals(string) || (this.toString().replace(" : ", ":").equals(string))) ;
+	}
+
 
 }

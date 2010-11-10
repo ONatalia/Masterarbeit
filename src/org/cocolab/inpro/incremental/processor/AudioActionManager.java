@@ -3,7 +3,7 @@ package org.cocolab.inpro.incremental.processor;
 import java.util.Collection;
 import java.util.List;
 
-import org.cocolab.inpro.dm.PentoDialogueAct;
+import org.cocolab.inpro.dm.acts.PentoDialogueAct;
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
