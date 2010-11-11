@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.listener.InstallmentHistoryViewer;
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
@@ -26,7 +25,7 @@ import edu.cmu.sphinx.util.props.S4Component;
  * 
  * @author timo, okko
  */
-public class EchoDialogueManager extends IUModule implements AbstractFloorTracker.Listener, PentoActionManager.Listener {
+public class EchoDialogueManager extends AbstractDialogueManager implements AbstractFloorTracker.Listener, PentoActionManager.Listener {
 
 	@S4Component(type = AudioActionManager.class, mandatory = true)
 	public static final String PROP_AM = "actionManager";
@@ -59,7 +58,9 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	@Override
 	public void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
-		// faster and clearer way of saying "we keep a copy of the wordlist" 
+		super.leftBufferUpdate(ius, edits);
+		if (this.updating)
+			return;
 		currentInstallment = new ArrayList<WordIU>((Collection<WordIU>)ius);
 	}
 
@@ -76,7 +77,10 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	/** Listens for floor changes and updates the InformationState */
 	@Override
 	public void floor(AbstractFloorTracker.Signal signal, AbstractFloorTracker floorManager) {
-		logger.info("Floor signal: " + signal);
+		super.floor(signal, floorManager);
+		if (this.updating)
+			return;
+		this.updating = true;
 		List<EditMessage<DialogueActIU>> ourEdits = null;
 		switch (signal) {
 			case START: {
@@ -101,6 +105,7 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 		this.rightBuffer.setBuffer(this.dialogueActIUs, ourEdits);
 		this.rightBuffer.notify(this.iulisteners);			
 		ihv.hypChange(installments, null);
+		this.postUpdate();
 	}
 	
 	/** 
@@ -135,6 +140,9 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 	/** call this to notify the DM when a dialogueAct has been performed */
 	@Override
 	public void done(DialogueActIU iu) {
+		super.done(iu);
+		if (this.updating)
+			return;
 		PentoDialogueAct r = iu.getAct();
 		logger.info("Was notified about performed act " + r.toString());
 		this.sentToDos.remove(r);
@@ -142,5 +150,5 @@ public class EchoDialogueManager extends IUModule implements AbstractFloorTracke
 			this.reset();
 		}
 	}
-	
+
 }
