@@ -13,6 +13,7 @@ import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.InstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
+import org.cocolab.inpro.dm.acts.AbstractDialogueAct;
 import org.cocolab.inpro.dm.acts.PentoDialogueAct;
 
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -61,7 +62,9 @@ public class EchoDialogueManager extends AbstractDialogueManager implements Abst
 		super.leftBufferUpdate(ius, edits);
 		if (this.updating)
 			return;
+		this.updating = true;
 		currentInstallment = new ArrayList<WordIU>((Collection<WordIU>)ius);
+		this.postUpdate();
 	}
 
 	/** Resets the DM and its AM */
@@ -72,6 +75,9 @@ public class EchoDialogueManager extends AbstractDialogueManager implements Abst
 		this.dialogueActIUs.clear();
 		this.am.reset();
 		this.currentInstallment.clear();
+		this.doneQueue.clear();
+		this.leftBufferQueue.clear();
+		this.floorSignalQueue.clear();
 	}
 
 	/** Listens for floor changes and updates the InformationState */
@@ -143,12 +149,14 @@ public class EchoDialogueManager extends AbstractDialogueManager implements Abst
 		super.done(iu);
 		if (this.updating)
 			return;
-		PentoDialogueAct r = iu.getAct();
+		this.updating = true;
+		AbstractDialogueAct r = iu.getAct();
 		logger.info("Was notified about performed act " + r.toString());
 		this.sentToDos.remove(r);
 		if (this.sentToDos.isEmpty()) {
 			this.reset();
 		}
+		this.postUpdate();
 	}
 
 }

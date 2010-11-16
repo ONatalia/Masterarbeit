@@ -1,170 +1,108 @@
 package org.cocolab.inpro.incremental.processor;
 
-
-import java.util.ArrayList;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
-import java.util.ListIterator;
 
-import org.cocolab.inpro.dm.acts.PentoDialogueAct;
-import org.cocolab.inpro.incremental.listener.InstallmentHistoryViewer;
+import org.cocolab.inpro.dm.isu.IUNetworkUpdateEngine;
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
-import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
-import org.cocolab.inpro.incremental.unit.InstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
-import org.cocolab.inpro.nlu.AVPair;
+import org.cocolab.inpro.nlu.AVPairMappingUtil;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Component;
+import edu.cmu.sphinx.util.props.S4String;
 
 public class NumbersDialogueManager extends AbstractDialogueManager implements AbstractFloorTracker.Listener, AbstractActionManager.Listener {
 
-	/** ActionManager configuration */
+	/** The ActionManager component configuration variables */
 	@S4Component(type = AudioActionManager.class, mandatory = true)
 	public static final String PROP_AM = "actionManager";
+	/** The ActionManager component */
 	private AudioActionManager am;
-
-	/** Input/State/Output tracking variables */
-	private final IUList<InstallmentIU> installments = new IUList<InstallmentIU>();
-	private IUList<WordIU> currentUserUtterance = new IUList<WordIU>();
-	private IUList<InstallmentIU> collectedDigits = new IUList<InstallmentIU>();
-	private IUList<InstallmentIU> confirmedDigits = new IUList<InstallmentIU>();
-	final IUList<DialogueActIU> dialogueActIUs = new IUList<DialogueActIU>();
-
-	/** State variables */
-	private enum State {COLLECTING, CONFIRMING}
-	private State state = State.COLLECTING;
+	/** The lexical semantics mapping configuration variables */
+	@S4String(mandatory = true)
+	public final static String PROP_LEX_SEMANTICS = "lexicalSemantics";
 
 	/**
-	 * Installment viewer.
+	 * Update Engine holding rules, information state and interfaces
+	 * for new input/output IUs.
 	 */
-	private InstallmentHistoryViewer ihv = new InstallmentHistoryViewer();
+	private IUNetworkUpdateEngine updateEngine = new IUNetworkUpdateEngine();
 
-	/** Sets up the DM. */
+	/**
+	 * Sets up the DM.
+	 */
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		this.am = (AudioActionManager) ps.getComponent(PROP_AM);
+		String lexicalSemanticsPath = ps.getString(PROP_LEX_SEMANTICS);
+		try {
+			WordIU.setAVPairs(AVPairMappingUtil.readAVPairs(new URL(lexicalSemanticsPath)));
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.fatal("Could not set WordIU's AVPairs from file " + lexicalSemanticsPath);
+		}
+
 	}
 
-	/** Keeps the words for grounding the current user installment. */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
-		this.currentUserUtterance.addAll((Collection<WordIU>)ius);
+		System.err.println(ius.toString());
+		System.err.println(edits.toString());
+//		super.leftBufferUpdate(ius, edits);
+//		if (this.updating) {
+//			return;
+//		}
+//		this.updating = true;
+		for (EditMessage<? extends IU> edit : edits) {
+			switch (edit.getType()) {
+			case ADD: {
+				// Just apply the rules with each new word
+				this.updateEngine.applyRules((WordIU) edit.getIU());
+				break;
+			}
+			case REVOKE: {
+				// Ditto, but make sure to revoke word first
+				edit.getIU().revoke();
+				this.updateEngine.applyRules((WordIU) edit.getIU());
+				break;
+			}
+			case COMMIT: break; //TODO: maybe commit all grin IUs on the IS?
+			}
+		}
+		IUList<DialogueActIU> newOutput = new IUList<DialogueActIU>();
+		newOutput.addAll(this.updateEngine.getNewOutputAndClear());
+		System.err.println("AM should now be performing output:");
+		System.err.println(newOutput.toString());
+//		super.postUpdate();
 	}
 
-	/** Listens for floor changes and updates the InformationState */
-	@SuppressWarnings("unchecked")
-	@Override
+	public void done(DialogueActIU iu) {
+//		super.done(iu);
+//		if (this.updating)
+//			return;
+//		super.postUpdate();
+	}
+
 	public void floor(AbstractFloorTracker.Signal signal, AbstractFloorTracker floorManager) {
-		List<EditMessage<DialogueActIU>> ourEdits = new ArrayList<EditMessage<DialogueActIU>>();
-		switch (signal) {
-			case START: {
-				this.am.shutUp();
-				break;
-			}
-			case EOT_RISING:
-			case EOT_FALLING:
-			case EOT_NOT_RISING: {
-				this.installments.add(new InstallmentIU(this.currentUserUtterance));
-				this.currentUserUtterance.clear();
-				this.parseInstallment(); // Do the digits magic here.
-				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.reply("BCpf")));
-				break;
-			}
-		}
-		this.dialogueActIUs.apply(ourEdits);
-		this.rightBuffer.setBuffer(this.dialogueActIUs, ourEdits);
-		this.rightBuffer.notify(this.iulisteners);
-		ihv.hypChange(installments, null);
+//		super.floor(signal, floorManager);
+//		if (this.updating)
+//			return;
+//		switch(signal){
+//		case START: {
+//			this.am.shutUp();
+//		}
+//		}
+//		super.postUpdate();
 	}
-
-	/**
-	 * @return String of words
-	 */
-	@SuppressWarnings("unchecked")
-	private void parseInstallment() {
-		InstallmentIU lui = this.getLastUserInstallment();
-		InstallmentIU sui = this.getLastSystemInstallment(); 
-		switch(this.state) {
-		case COLLECTING: {
-			for (WordIU word : (List<WordIU>) lui.groundedIn().get(0).groundedIn()) {
-				AVPair sem = word.getAVPairs().get(0);
-				if (sem.equals("boolean:true")) {
-					// ignore "yes" input in collecting state
-				} else if (sem.equals("boolean:false")) {
-					this.getLastUnconfirmedInstallment();
-				} else if (sem.getAttribute().matches("dig")) {
-					
-				}
-			}
-			break;
-		}
-		case CONFIRMING: {
-			for (WordIU word : (List<WordIU>) lui.groundedIn().get(0).groundedIn()) {
-				AVPair sem = word.getAVPairs().get(0);
-				if (sem.equals("boolean:true")) {
-					// ignore "yes" input in collecting state
-				} else if (sem.equals("boolean:false")) {
-					this.getLastUnconfirmedInstallment();
-				} else if (sem.getAttribute().matches("dig")) {
-					
-				}
-			}
-			break;
-		}
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private DialogueActIU reply(String file) {
-		return new DialogueActIU(this.dialogueActIUs.getLast(), (List<IU>) this.getLastUserInstallment().groundedIn(), new PentoDialogueAct(PentoDialogueAct.Act.PROMPT, "BCpf.wav" ));
-	}
-	
-	private InstallmentIU getLastUserInstallment() {
-		ListIterator<InstallmentIU> i = this.installments.listIterator();
-		while (i.hasPrevious()) {
-			if (i.previous().userProduced()) {
-				return (InstallmentIU) i;
-			}
-		}
-		return InstallmentIU.FIRST_USER_INSTALLMENT_IU;
-	}
-	
-	private InstallmentIU getLastSystemInstallment() {
-		ListIterator<InstallmentIU> i = this.installments.listIterator();
-		while (i.hasPrevious()) {
-			if (i.previous().systemProduced()) {
-				return (InstallmentIU) i;
-			}
-		}
-		return InstallmentIU.FIRST_SYSTEM_INSTALLMENT_IU;
-	}
-	
-	private InstallmentIU getLastUnconfirmedInstallment() {
-		ListIterator<InstallmentIU> i = this.collectedDigits.listIterator();
-		while (i.hasPrevious()) {
-			if (i.previous().systemProduced()) {
-				return (InstallmentIU) i;
-			}
-		}
-		return InstallmentIU.FIRST_SYSTEM_INSTALLMENT_IU;		
-	}
-
-	/** Resets the DM and its AM */
-	@Override
-	public void reset() {
-		super.reset();
-		this.am.reset();
-		this.collectedDigits.clear();
-	}
-
-	public void done(DialogueActIU iu) {}
 
 }

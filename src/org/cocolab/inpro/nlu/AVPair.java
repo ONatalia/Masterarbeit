@@ -85,10 +85,17 @@ public class AVPair {
 	
 	/**
 	 * Builds a string representation of this AVPair
+	 * in the form of "attribute : value".
 	 * @return this avp's string rep
 	 */
 	public String toString() {
-		return getAttribute() + " : " + getValue(); 
+		String att = this.getAttribute();
+		String val = this.getValue().toString();
+		if (att == null)
+			att = "null";
+		if (val == null)
+			val = null;
+		return att + " : " + val; 
 	}
 	
 	/**
@@ -97,6 +104,10 @@ public class AVPair {
 	 * @return true if they have the same attribute and value, else false
 	 */
 	public boolean equals(AVPair avp) {
+		if (avp == null)
+			return false;
+		if (this.value == null && avp.getValue() == null)
+			return (this.attribute.equals(avp.getAttribute()));		
 		return (this.attribute.equals(avp.attribute) &&
 				this.value.equals(avp.value));
 	}

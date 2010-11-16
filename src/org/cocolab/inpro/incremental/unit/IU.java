@@ -33,6 +33,7 @@ public abstract class IU implements Comparable<IU> {
 	protected long creationTime;
 	
 	private boolean committed = false;
+	private boolean revoked = false;
 	
 	/**
 	 * call this, if you want to provide a sameLevelLink and a groundedIn list
@@ -42,6 +43,11 @@ public abstract class IU implements Comparable<IU> {
 	public IU(IU sll, List<? extends IU> groundedIn, boolean deepSLL) {
 		this();
 		this.groundedIn = (List<IU>) groundedIn;
+		if (groundedIn != null) {
+			for (IU grin : this.groundedIn) {
+				grin.ground(this);
+			}			
+		}
 		if (deepSLL && (sll != null)) {
 			connectSLL(sll);
 		} else {
@@ -162,6 +168,11 @@ public abstract class IU implements Comparable<IU> {
 	public List<? extends IU> groundedIn() {
 		return groundedIn != null ? groundedIn : Collections.EMPTY_LIST;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<? extends IU> grounds() {
+		return grounds != null ? grounds : Collections.EMPTY_LIST;
+	}
 
 	/**
 	 * two IUs are equal if their IDs are the same
@@ -185,6 +196,20 @@ public abstract class IU implements Comparable<IU> {
 	}
 	
 	/**
+	 * @return true if this IU has been revoked
+	 */
+	public boolean isRevoked() {
+		return this.revoked;
+	}
+
+	/**
+	 * COMMITs this IU.
+	 */
+	public void revoke() {
+		this.revoked = true;
+	}
+	
+	/**
 	 * this is used to notify an IU that it's status has changed
 	 * for example, in the abstract model, an IU might want to notify
 	 * the grounded-in IUs, that it is now commited, and hence the
@@ -204,11 +229,13 @@ public abstract class IU implements Comparable<IU> {
 	public void update(EditType edit) {
 		switch (edit) {
 			case COMMIT: // commit what you're grounding
+				this.commit();
 				for (IU iu : groundedIn()) {
 					iu.update(edit);
 				}
 				break;
 			case REVOKE: // revoke what is grounded in you
+				this.revoke();
 				if (grounds != null)
 					for (IU iu : grounds) {
 						iu.update(edit);
@@ -223,10 +250,20 @@ public abstract class IU implements Comparable<IU> {
 			// we typically ground just 1 IU, so there's no need for an initial capacity of 10
 			grounds = new ArrayList<IU>(1);
 		}
-		if (!grounds.contains(iu)) 
+		if (!grounds.contains(iu)) {
 			grounds.add((IU) iu);
-		if (!iu.groundedIn.contains(this))
-			iu.groundedIn.add(this);
+			iu.groundIn(this);
+		}
+	}
+
+	public void groundIn(IU iu) {
+		if (this.groundedIn == null) {
+			this.groundedIn = new ArrayList<IU>();
+		} else {
+			this.groundedIn = new ArrayList<IU>(this.groundedIn);
+		}
+		if (!this.groundedIn.contains(iu))
+			this.groundedIn.add(iu);
 	}
 	
 	public abstract String toPayLoad();

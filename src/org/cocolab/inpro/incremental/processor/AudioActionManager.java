@@ -26,7 +26,8 @@ public class AudioActionManager extends AbstractActionManager {
 			List<? extends EditMessage<? extends IU>> edits) {
 		for (EditMessage<? extends IU> edit : edits) {
 			DialogueActIU iu = (DialogueActIU) edit.getIU();
-			PentoDialogueAct r = iu.getAct();
+			// TODO: maybe refactor PentoDialogueAct to something more generic.
+			PentoDialogueAct r = (PentoDialogueAct) iu.getAct();
 			switch (edit.getType()) {
 				case REVOKE: 
 					break;

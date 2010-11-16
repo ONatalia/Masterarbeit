@@ -30,7 +30,6 @@ public abstract class AbstractDialogueManager extends IUModule implements Abstra
 	 * Must call postUpdate() if calling this method.
 	 */
 	public void floor(AbstractFloorTracker.Signal signal, AbstractFloorTracker floorManager) {
-		logger.info("Floor signal: " + signal);
 		if (this.updating) {
 			this.floorSignalQueue.add(signal);
 		}
@@ -44,7 +43,6 @@ public abstract class AbstractDialogueManager extends IUModule implements Abstra
 	@Override
 	public void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
-		logger.info("Edit Message: " + edits.toString());
 		if (this.updating) {
 			this.leftBufferQueue.addAll((List<EditMessage<IU>>) edits);
 		}	
@@ -56,7 +54,6 @@ public abstract class AbstractDialogueManager extends IUModule implements Abstra
 	 * Must call postUpdate() if calling this method.
 	 */
 	public void done(DialogueActIU iu) {
-		logger.info("Dialogue Act performed: " + iu.toString());
 		if (this.updating) {
 			this.doneQueue.add(iu);
 		}
@@ -64,7 +61,7 @@ public abstract class AbstractDialogueManager extends IUModule implements Abstra
 
 	/**
 	 * To call when updates are done. Implements the queue/dequeue logic.
-	 * Must be called after done(), floor() and leftBufferUpdate().
+	 * Must be called after/at end of done(), floor() and leftBufferUpdate().
 	 */
 	protected void postUpdate() {
 		this.updating = false;
@@ -91,9 +88,10 @@ public abstract class AbstractDialogueManager extends IUModule implements Abstra
 		if (!localDoneQueue.isEmpty()) {
 			for (DialogueActIU iu : localDoneQueue) {
 				this.done(iu);
+				this.doneQueue.remove(iu);
 			}
-			this.doneQueue.removeAll(localDoneQueue);
 			if (!this.doneQueue.isEmpty()) {
+				System.err.println(this.doneQueue.toString());
 				this.postUpdate();
 			}			
 		}

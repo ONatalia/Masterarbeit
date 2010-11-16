@@ -45,7 +45,8 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  				assert !isEmpty() : "Can't revoke from an empty list: " + edit;
  				assert getLast().equals(edit.getIU()) : "Can't apply this edit to the list: " + this + edit;
  				assert (!edit.getIU().isCommitted()) : "you're trying to revoke an IU that was previously committed.";
-				this.remove(size() - 1);
+ 				edit.getIU().revoke();
+ 				this.remove(size() - 1);
 				break;
  			case COMMIT:
  				edit.getIU().commit();
