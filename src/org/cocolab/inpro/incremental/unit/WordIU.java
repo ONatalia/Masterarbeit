@@ -50,6 +50,10 @@ public class WordIU extends IU {
 		isSilence = true;
 	}
 	
+	public boolean hasAVPairs() {
+		return avPairs.get(getWord()) != null;
+	}
+	
 	public List<AVPair> getAVPairs() {
 		return avPairs.get(this.getWord());
 	}

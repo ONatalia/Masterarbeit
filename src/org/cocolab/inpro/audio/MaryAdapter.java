@@ -12,7 +12,8 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
 /**
- * our connection to mary; currently, this only supports Mary 3.6
+ * our connection to mary; currently, this only supports Mary 3.6,
+ * but this will be extended to Mary 4.1
  * 
  * The server host and port can be selected with
  * "server.host" and "server.port", which defaults to localhost:59125.
@@ -23,9 +24,9 @@ import javax.sound.sampled.AudioSystem;
  */
 public class MaryAdapter {
 	de.dfki.lt.mary.client.MaryClient mc36;
-	marytts.client.MaryClient mc40;
+	marytts.client.MaryClient mc41;
 	
-	enum CompatibilityMode { mary36, mary40 };
+	enum CompatibilityMode { mary36, mary41 };
 	CompatibilityMode compatibilityMode = CompatibilityMode.mary36;
 	
 	public MaryAdapter() {
@@ -36,8 +37,8 @@ public class MaryAdapter {
         	case mary36:
     			mc36 = new de.dfki.lt.mary.client.MaryClient(serverHost, serverPort);
         		break;
-        	case mary40:
-        		mc40 = marytts.client.MaryClient.getMaryClient(
+        	case mary41:
+        		mc41 = marytts.client.MaryClient.getMaryClient(
 			               new marytts.client.http.Address(serverHost, serverPort)
 			           );
         		break;
@@ -59,9 +60,9 @@ public class MaryAdapter {
 			mc36.process(text, inputType, outputType, audioType,
 					defaultVoiceName, baos);
 			return baos;
-		case mary40:
+		case mary41:
 			String locale = "de";
-			mc40.process(text, inputType, outputType, locale, audioType,
+			mc41.process(text, inputType, outputType, locale, audioType,
 					defaultVoiceName, baos);
 			return baos;
 		default:

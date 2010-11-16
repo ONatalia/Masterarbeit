@@ -10,6 +10,8 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.spi.AudioFileReader;
 
+//import org.kc7bfi.jflac.sound.spi.FlacAudioFileReader;
+
 public class AudioUtils {
 
 	public static AudioInputStream getAudioStreamForURL(URL audioFileURL) throws UnsupportedAudioFileException, IOException {
@@ -20,6 +22,10 @@ public class AudioUtils {
 				audioFileURL.getFile().endsWith(".NIS")) {
 				AudioFileReader sfr = new SphereFileReader(); 
 				ais = sfr.getAudioInputStream(audioFileURL);
+		} else if (audioFileURL.getFile().endsWith(".flac")) {
+			ais = null;
+		//	FlacAudioFileReader fafr = new FlacAudioFileReader();
+		//	ais = fafr.getAudioInputStream(audioFileURL);
 		} else {
 			//System.err.println(AudioSystem.getAudioFileFormat(audioFileURL));
 	        ais = AudioSystem.getAudioInputStream(audioFileURL);

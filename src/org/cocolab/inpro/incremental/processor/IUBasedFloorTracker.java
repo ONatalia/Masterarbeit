@@ -148,7 +148,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 	private abstract class TimeOutThread extends Thread {
 	
 		/** if set, this timeout thread will not do anything when its timer runs out */
-		boolean killbit = false;
+		private boolean killbit = false;
 		
 		/** create thread with a given name */
 		public TimeOutThread(String name) {
@@ -183,8 +183,10 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 			return false;
 		}
 		
-		protected void signal(Signal s) {
+		protected synchronized void signal(Signal s) {
 			logToTedView(this.getName() + " sending " + s);
+			if (shouldDie())
+				return;
 			killbit = true;
 			signalListeners(InternalState.NOT_AWAITING_INPUT, s);	
 		}
