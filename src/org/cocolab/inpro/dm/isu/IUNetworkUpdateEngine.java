@@ -15,12 +15,24 @@ import org.cocolab.inpro.incremental.unit.DialogueActIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.incremental.unit.IUList;
 
+/**
+ * A rule-based update engine that keeps a set of rules and an information
+ * state to apply its rules to. Keeps a list of inputs and outputs to
+ * interface with a dialogue manager.
+ * @author okko
+ *
+ */
 public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 
 	private IUNetworkInformationState is;
 	private IUList<WordIU> input = new IUList<WordIU>();
 	private IUList<DialogueActIU> output = new IUList<DialogueActIU>();
 
+	/**
+	 * A simple contructor initiating an empty information state and 
+	 * a generic top-down search update mechanism producing GROUND,
+	 * CLARIFY and REQUEST output.
+	 */
 	public IUNetworkUpdateEngine() {
 		rules.add(new UnintegrateRevokedInputRule());
 		rules.add(new IntegrateNextInputRule());
@@ -34,21 +46,37 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 		this.is = new IUNetworkInformationState();
 	}
 
+	/**
+	 * Adds new input words to the input to process.
+	 * @param ius the list of WordIUs to process.
+	 */
 	public void addInput(IUList<WordIU> ius) {
 		IUList<WordIU> oldWords = new IUList<WordIU>(this.input);
 		ius.removeAll(oldWords);
 		this.input = ius;
 	}
 
+	/**
+	 * Adds a new input word to the input to process.
+	 * @param iu the WordIU to process.
+	 */
 	public void addInput(WordIU iu) {
 		if (!this.input.contains(iu))
 			this.input.add(iu);
 	}
 
+	/**
+	 * Getter method for output.
+	 * @return all output DialogueActIUs
+	 */
 	public IUList<DialogueActIU> getOutput() {
 		return this.output;
 	}
 	
+	/**
+	 * Getter method that returns new output and then clears it.
+	 * @return newOutput a list of new output DialogueActIUs to perform.
+	 */
 	public IUList<DialogueActIU> getNewOutputAndClear() {
 		IUList<DialogueActIU> newOutput = new IUList<DialogueActIU>(this.output);
 		this.output.clear();
@@ -84,8 +112,9 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 	/**
 	 * Applies all rules that trigger to the information state, in
 	 * the order in which they were loaded.
-	 * If a rule changes the state when applied, the process is
-	 * restarted from the top.
+	 * If applying a rule changes the information state, the process is
+	 * restarted from the top and repeated until no more changes take effect.
+	 * (The risk of infinite recursion must be tested by the rule designer.)
 	 */
 	@Override
 	public void applyRules() {
