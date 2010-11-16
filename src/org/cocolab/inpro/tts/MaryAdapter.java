@@ -19,7 +19,7 @@ import javax.sound.sampled.AudioSystem;
  * "server.host" and "server.port", which defaults to localhost:59125.
  * 
  * the mary voice to use can be selected with the system property
- * "org.cocolab.inpro.tts.visual.voice". The default voice is "male"
+ * "org.cocolab.inpro.tts.voice". The default voice is "male"
  * (i.e. we let mary decide what male voice to use)
  * @author timo
  */

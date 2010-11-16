@@ -176,8 +176,14 @@ public class SegmentModel {
 	 * spanning this time.
 	 */
 	public void insertSegment(String newSegment, int time) {
+		boolean insertAfter;
 		Segment currentLabel = getSegmentAt(time);
-		boolean insertAfter = (time - currentLabel.getCenter()) > 0;
+		if (currentLabel != null) {
+			insertAfter = (time - currentLabel.getCenter()) > 0;
+		} else { // this must be after the very last segment
+			currentLabel = segments.get(segments.size() - 1);
+			insertAfter = true;
+		}
 		int currentIndex = segments.indexOf(currentLabel);
 		if (insertAfter) {
 			int endTime = currentLabel.getEndTime();
