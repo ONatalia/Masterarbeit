@@ -117,7 +117,15 @@ public class VisualTTS extends JPanel {
 			editDialog.setText(mbrola);
 			editDialog.setVisible();
 			if (!editDialog.aborted())
-				setNewSegmentModel(SegmentModel.readFromString(editDialog.getText()));
+				try {
+					SegmentModel newSm = SegmentModel.readFromString(editDialog.getText());
+					setNewSegmentModel(newSm);
+				} catch(Throwable t) {
+					// notify of error
+					JOptionPane.showMessageDialog(null, "Problem parsing your input. Your changes will be discarded. Please try again.\nError message was: \n" + t.toString());
+					// and try again
+					editAction.actionPerformed(e);
+				}
 		}
 	};
 	
