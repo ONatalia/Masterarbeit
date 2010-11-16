@@ -1,4 +1,4 @@
-package org.cocolab.inpro.audio;
+package org.cocolab.inpro.tts;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,8 +19,9 @@ import javax.sound.sampled.AudioSystem;
  * "server.host" and "server.port", which defaults to localhost:59125.
  * 
  * the mary voice to use can be selected with the system property
- * "de.timobaumann.tts.voice". The default voice is "male"
+ * "org.cocolab.inpro.tts.visual.voice". The default voice is "male"
  * (i.e. we let mary decide what male voice to use)
+ * @author timo
  */
 public class MaryAdapter {
 	de.dfki.lt.mary.client.MaryClient mc36;
@@ -108,7 +109,7 @@ public class MaryAdapter {
         String inputType = "MBROLA";
         String outputType = "AUDIO";
         String audioType = "WAVE";
-        String defaultVoiceName = System.getProperty("de.timobaumann.tts.voice", "de2");
+        String defaultVoiceName = System.getProperty("org.cocolab.inpro.tts.visual.voice", "de2");
         ByteArrayOutputStream baos = process(mbrola, inputType, outputType, audioType,
 			    defaultVoiceName);
 		return baos;

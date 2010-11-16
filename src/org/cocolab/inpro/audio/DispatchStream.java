@@ -11,6 +11,7 @@ import javax.sound.sampled.AudioInputStream;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.LabelledAudioStream;
 import org.cocolab.inpro.gui.util.SpeechStateVisualizer;
+import org.cocolab.inpro.tts.MaryAdapter;
 
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
