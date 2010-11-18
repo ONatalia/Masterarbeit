@@ -24,7 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import org.cocolab.inpro.tts.SegmentModel;
-import org.cocolab.inpro.tts.SegmentModel.PitchMark;
+import org.cocolab.inpro.tts.SegmentModel.SegmentBoundPitchMark;
 import org.cocolab.inpro.tts.SegmentModel.PitchRange;
 import org.cocolab.inpro.tts.SegmentModel.Segment;
 
@@ -213,7 +213,7 @@ public class SegmentPanel extends JPanel {
 	Action deletePitchMarkAction = new AbstractAction("Punkt löschen") {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			PitchMark pm = getPitchMarkAtPosition(popupPoint);
+			SegmentBoundPitchMark pm = getPitchMarkAtPosition(popupPoint);
 			segmentModel.remove(pm);
 			callSynthesis();
 		}
@@ -260,8 +260,8 @@ public class SegmentPanel extends JPanel {
 		return false;
 	}
 	
-	private PitchMark getPitchMarkAtPosition(Point p1) {
-		for (HotSpot<PitchMark> p2 : getPitchPoints()) {
+	private SegmentBoundPitchMark getPitchMarkAtPosition(Point p1) {
+		for (HotSpot<SegmentBoundPitchMark> p2 : getPitchPoints()) {
 			if (p2.matches(p1))
 				return p2.getItem();
 		}
@@ -277,14 +277,14 @@ public class SegmentPanel extends JPanel {
         return new Dimension((int) (segmentModel.getDuration() * zoom), PANEL_HEIGHT);
     }
     
-    private List<HotSpot<PitchMark>> getPitchPoints() {
-    	List<HotSpot<PitchMark>> pointList = new ArrayList<HotSpot<PitchMark>>();
+    private List<HotSpot<SegmentBoundPitchMark>> getPitchPoints() {
+    	List<HotSpot<SegmentBoundPitchMark>> pointList = new ArrayList<HotSpot<SegmentBoundPitchMark>>();
         List<Segment> segments = getSegmentModel().getSegments();
         for (Segment l : segments) {
-        	for (PitchMark pm : l.getPitchMarks()) {
+        	for (SegmentBoundPitchMark pm : l.getPitchMarks()) {
         		int x = positionAtTime(pm.getTime());
         		int y = positionForPitch(pm.getPitch());
-        		pointList.add(new HotSpot<PitchMark>(x, y, pm, PITCH_HOTSPOT_SIZE));
+        		pointList.add(new HotSpot<SegmentBoundPitchMark>(x, y, pm, PITCH_HOTSPOT_SIZE));
         	}
         }
         return Collections.unmodifiableList(pointList);

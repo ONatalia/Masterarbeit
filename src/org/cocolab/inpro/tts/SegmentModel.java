@@ -11,10 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * the data model that can be manipulated by VisualTTS.
@@ -52,7 +49,7 @@ public class SegmentModel {
 	}
 	
 	/** read from a list of lines, which  */
-	public static SegmentModel readFromLines(List<String> lines) {
+	public static SegmentModel readFromMbrolaLines(List<String> lines) {
 		List<Segment> segments = new ArrayList<Segment>(lines.size());
 		int startTime = 0; // in milliseconds
     	for (String line : lines) {
@@ -77,7 +74,7 @@ public class SegmentModel {
     		Segment segmentUnderConstruction = new Segment(labelText, startTime, duration, pitchMarks);
     		while (st.hasMoreTokens()) {
     			String pitchMarkString = st.nextToken();
-    			pitchMarks.add(new PitchMark(pitchMarkString, segmentUnderConstruction));
+    			pitchMarks.add(new PitchMark(pitchMarkString));
     		}
     		segments.add(segmentUnderConstruction);
     		startTime += duration;
@@ -87,7 +84,7 @@ public class SegmentModel {
 	
 	public static SegmentModel readFromString(String mbrola) {
 		List<String> lines = Arrays.<String>asList(mbrola.split("\n"));
-		return readFromLines(lines);
+		return readFromMbrolaLines(lines);
 	}
 	
 	/** create a segment model from an mbrola-formatted input stream */
@@ -99,7 +96,7 @@ public class SegmentModel {
 			e.printStackTrace();
 			lines = Collections.<String>emptyList();
 		}
-		return readFromLines(lines);
+		return readFromMbrolaLines(lines);
 	}
 	
 	private static List<String> getLines(InputStream is) throws IOException {
@@ -214,7 +211,7 @@ public class SegmentModel {
 		l.addPitchMark(time, pitch);
 	}
 	
-	public void remove(PitchMark pm) {
+	public void remove(SegmentBoundPitchMark pm) {
 		if (pm != null) {
 			pm.owner.removePitchMark(pm);
 		}
@@ -277,13 +274,16 @@ public class SegmentModel {
 		private String label;
 		private int startTime;
 		private int duration;
-		private List<PitchMark> pitchMarks;
+		private List<SegmentBoundPitchMark> pitchMarks;
 
 		public Segment(String label, int startTime, int duration, List<PitchMark> pms) {
 			this.label = label;
 			this.startTime = startTime;
 			this.duration = duration;
-			this.pitchMarks = pms;
+			this.pitchMarks = new ArrayList<SegmentBoundPitchMark>(pms.size());
+			for (PitchMark pm : pms) {
+				pitchMarks.add(new SegmentBoundPitchMark(pm, this));
+			}
 		}
 		
 		public Segment(String labelText, int startTime, int duration) {
@@ -327,7 +327,7 @@ public class SegmentModel {
 		}
 
 		/** return an unmodifiable view of the pitch marks */
-		public List<PitchMark> getPitchMarks() {
+		public List<SegmentBoundPitchMark> getPitchMarks() {
 			return Collections.unmodifiableList(pitchMarks);
 		}
 		
@@ -337,9 +337,9 @@ public class SegmentModel {
 		}
 		
 		public void addPitchMark(int time, int pitch) {
-			PitchMark newpm = new PitchMark(time, pitch, this);
+			SegmentBoundPitchMark newpm = new SegmentBoundPitchMark(time, pitch, this);
 			int index = 0;
-			for (PitchMark pm : pitchMarks) {
+			for (SegmentBoundPitchMark pm : pitchMarks) {
 				if (pm.position > newpm.position) {
 					break;
 				}
@@ -378,53 +378,24 @@ public class SegmentModel {
 		}
 	}
 	
-	/**
-	 * a PitchMark
-	 */
-	public static class PitchMark {
-		private final double position; // as a percentage
-		private double pitch;
-		private final Segment owner;
-
-		/** create a pitchMark from an mbrola pitchmark-string */
-		public PitchMark(String pitchMarkString, Segment owner) {
-			assert pitchMarkString.matches("\\((\\d+),(\\d+)\\)") : pitchMarkString;
-			Pattern format = Pattern.compile("\\((\\d+),(\\d+)\\)");
-			Matcher m = format.matcher(pitchMarkString);
-			assert m.matches();
-			assert m.groupCount() == 2;
-			position = (new Scanner(m.group(1))).nextDouble() * 0.01;
-			pitch = (new Scanner(m.group(2))).nextDouble();
+	public static class SegmentBoundPitchMark extends PitchMark {
+		Segment owner;
+		
+		public SegmentBoundPitchMark(PitchMark pm, Segment owner) {
+			super(pm.position, pm.pitch);
 			this.owner = owner;
 		}
 		
-		public void setPitch(float pitch) {
-			this.pitch = pitch;
-		}
-
-		public PitchMark(int time, int pitch, Segment owner) {
-			this.pitch = pitch;
+		public SegmentBoundPitchMark(int time, int pitch, Segment owner) {
+			super((time - owner.startTime) / (float) owner.duration, pitch);
 			this.owner = owner;
-			this.position = (time - owner.startTime) / (float) owner.duration;
-		}
-		
-		public String toString() {
-			return "(" + ((int) (position * 100)) + "," + ((int) pitch) + ")"; 
-		}
-		
-		/** returns the time of this pitch mark given the label's boundaries */
-		private int getTime(int startTime, int duration) {
-			return (int) (startTime + position * duration);
 		}
 		
 		/** returns the time of this pitch mark given the owning label */
 		public int getTime() {
 			return getTime(owner.startTime, owner.duration);
 		}
-		
-		public int getPitch() {
-			return (int) pitch;
-		}
+
 	}
 	
 	/**
