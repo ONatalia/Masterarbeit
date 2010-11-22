@@ -1,4 +1,4 @@
-package org.cocolab.inpro.annotation;
+package org.cocolab.inpro.audio;
 
 import java.io.IOException;
 import java.io.InputStream;
