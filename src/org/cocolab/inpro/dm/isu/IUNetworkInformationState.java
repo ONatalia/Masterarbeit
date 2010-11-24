@@ -3,7 +3,10 @@ package org.cocolab.inpro.dm.isu;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.cocolab.inpro.dm.acts.SimpleDialogueAct;
+import org.cocolab.inpro.dm.acts.ClarifyDialogueAct;
+import org.cocolab.inpro.dm.acts.GroundDialogueAct;
+import org.cocolab.inpro.dm.acts.RequestDialogueAct;
+import org.cocolab.inpro.dm.acts.SpeakDialogueAct;
 import org.cocolab.inpro.dm.isu.rule.AbstractIUNetworkRule;
 import org.cocolab.inpro.incremental.unit.ContribIU;
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
@@ -60,7 +63,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 * Getter method for this IS's next input to process.
 	 * @return nextInput the next word input to process
 	 */
-	private WordIU getNextInput() {
+	public WordIU getNextInput() {
 		return nextInput;
 	}
 	
@@ -73,6 +76,14 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	}
 
 	/**
+	 * Getter for this IS's contributions network
+	 * @return contributions the list of ContribIUs 
+	 */
+	public IUList<ContribIU> getContributions() {
+		return this.contributions;
+	}
+
+	/**
 	 * Gets the current focus contribution.
 	 * This is defined as the contribution that was most
 	 * recently integrated with input.
@@ -80,7 +91,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 * @return the most recently integrated contribution
 	 */
 	public ContribIU getFocusContrib() {
-		ContribIU focus = ContribIU.FIRST_CONTRIB_IU;
+		ContribIU focus = this.root;
 		for (ContribIU iu : this.contributions) {
 			// End time is inherited from input. Greater is later.
 			if (iu.endTime() > focus.endTime()) {
@@ -130,7 +141,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
-	 * @true if successful
+	 * The current contribution is added to the list of potential candidates for integration.
+	 * @return true if successful
 	 */
 	@Override
 	public boolean addCurrentContribToIntegrateList() {
@@ -221,6 +233,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public boolean integrateNextInput() {
 		if (!this.integrateList.get(0).groundedIn().contains(this.getNextInput())) {
 			this.getNextInput().ground(this.integrateList.get(0));
+			this.nextOutput = new DialogueActIU((IU) DialogueActIU.FIRST_DA_IU, this.integrateList.get(0), new GroundDialogueAct());
 			this.currentContrib = this.integrateList.get(0);
 			this.nextInput = null;
 			this.integrateList.clear();
@@ -238,7 +251,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	@Override
 	public boolean clarifyNextInput() {
 		List<IU> grin = new ArrayList<IU>(this.integrateList);
-		this.nextOutput = new DialogueActIU((IU) DialogueActIU.FIRST_DA_IU, grin, new SimpleDialogueAct(SimpleDialogueAct.Act.CLARIFY));
+		this.nextOutput = new DialogueActIU((IU) DialogueActIU.FIRST_DA_IU, grin, new ClarifyDialogueAct());
 		this.currentContrib = this.getFocusContrib();
 		this.nextInput = null;
 		this.integrateList.clear();
@@ -252,7 +265,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 */
 	@Override
 	public boolean requestMoreInfoAboutFocus() {
-		this.nextOutput = new DialogueActIU((IU) DialogueActIU.FIRST_DA_IU, this.getFocusContrib(), new SimpleDialogueAct(SimpleDialogueAct.Act.REQUEST));
+		this.nextOutput = new DialogueActIU((IU) DialogueActIU.FIRST_DA_IU, this.getFocusContrib(), new RequestDialogueAct());
 		this.currentContrib = this.getFocusContrib();
 		this.nextInput = null;
 		this.integrateList.clear();
@@ -262,9 +275,11 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * A Precondition method that queries the information state.
-	 * Checks if the IS's current contribution integrates with next input.
+	 * Checks if the IS's current contribution can integrate with next input.
 	 * This is the case if the current contribution hasn't already integrated with
 	 * current input during search and isn't already grounded in other input.
+	 * In addition, if another contribution that doesn't require clarification also
+	 * integrates, the current one is barred from integration.
 	 * Barring these conditions, a payload check is performed to check if integration
 	 * is possible.
 	 * Also tracks the contributions tries during the current search by adding
@@ -278,11 +293,18 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		this.visited.add(this.getCurrentContrib());
 		if (this.integrateList.contains(this.getCurrentContrib())) {
 			// contrib doesn't integrate input if it already integrates this input
-			return false;			
+			return false;
 		}
 		for (IU iu : this.currentContrib.groundedIn()) {
 			if (iu.getClass().equals(this.nextInput.getClass())) {
 				// contrib doesn't integrate input if it's already grounded in input/output
+				return false;
+			}
+		}
+		for (ContribIU iu : this.integrateList) {
+			if (!iu.clarify()) {
+				// contrib shouldn't integrate input if another one
+				// that doesn't want to be clarified was already marked for integration
 				return false;
 			}
 		}
@@ -298,7 +320,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 * @return true if so
 	 */
 	@Override
-	public boolean currentContribHasNextSSL() {
+	public boolean currentContribHasNextSLL() {
 		if (this.nextInput == null)
 			return false;
 		for (IU iu : this.contributions) {
@@ -314,7 +336,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * A Precondition method that queries the information state.
-	 * Checks if the IS's current contribution grounds another contribution
+	 * Checks if the IS's current contribution grounds another contribution.
 	 * @return true if so 
 	 */
 	@Override
@@ -369,6 +391,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	/**
 	 * A Precondition method that queries the information state.
 	 * Checks if the IS's integrate list has exactly one member contribution
+	 * or several of which at least one doesn't require clarification.
 	 * that integrates with current input.
 	 * @return true if so
 	 */
@@ -376,7 +399,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public boolean integrateListHasOneMember() {
 		if (this.nextInput == null)
 			return false;
-		return (this.integrateList.size() == 1);
+		return  (this.integrateList.size() == 1);
 	}
 
 	/**
@@ -405,8 +428,11 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	}
 
 	/**
-	 * 
+	 * An Effect method that updates the information state and returns true if successful.
+	 * Removes next input from any contributions it grounds.
+	 * @true if successful
 	 */
+
 	@Override
 	public boolean unintegrateNextInput() {
 		boolean stateChanged = false;
@@ -416,7 +442,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 				this.nextInput.grounds().remove(iu);
 				this.nextInput = null;
 				stateChanged = true;
-			}			
+				//TODO: revoke DAs grounded in current contribution.
+			}
 		}
 		return stateChanged;
 	}

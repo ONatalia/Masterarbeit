@@ -29,40 +29,21 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 	private IUList<DialogueActIU> output = new IUList<DialogueActIU>();
 
 	/**
-	 * A simple contructor initiating an empty information state and 
+	 * A simple constructor initiating an empty information state and 
 	 * a generic top-down search update mechanism producing GROUND,
 	 * CLARIFY and REQUEST output.
 	 */
 	public IUNetworkUpdateEngine() {
 		rules.add(new UnintegrateRevokedInputRule());
-		rules.add(new IntegrateNextInputRule());
 		rules.add(new MarkContribIfIntegratesRule());
 		rules.add(new MoveSearchDownRule());
 		rules.add(new MoveSearchRightRule());
 		rules.add(new MoveSearchLeftRule());
 		rules.add(new MoveSearchUpRule());
+		rules.add(new IntegrateNextInputRule());
 		rules.add(new ClarifyNextInputRule());
 		rules.add(new RequestMoreInfoRule());
 		this.is = new IUNetworkInformationState();
-	}
-
-	/**
-	 * Adds new input words to the input to process.
-	 * @param ius the list of WordIUs to process.
-	 */
-	public void addInput(IUList<WordIU> ius) {
-		IUList<WordIU> oldWords = new IUList<WordIU>(this.input);
-		ius.removeAll(oldWords);
-		this.input = ius;
-	}
-
-	/**
-	 * Adds a new input word to the input to process.
-	 * @param iu the WordIU to process.
-	 */
-	public void addInput(WordIU iu) {
-		if (!this.input.contains(iu))
-			this.input.add(iu);
 	}
 
 	/**
@@ -73,39 +54,34 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 		return this.output;
 	}
 	
-	/**
-	 * Getter method that returns new output and then clears it.
-	 * @return newOutput a list of new output DialogueActIUs to perform.
-	 */
-	public IUList<DialogueActIU> getNewOutputAndClear() {
-		IUList<DialogueActIU> newOutput = new IUList<DialogueActIU>(this.output);
-		this.output.clear();
-		return newOutput;
+	public IUNetworkInformationState getInformationState() {
+		return this.is;
 	}
 
 	/**
-	 * Applies update rules for input that needs (un-)integration.
+	 * Adds a word to input then applies update rules for any input
+	 * word that needs (un-)integration.
 	 * @param iu
 	 */
 	public void applyRules(WordIU iu) {
-		this.addInput(iu);
+		if (!this.input.contains(iu))
+			this.input.add(iu);
 		for (WordIU word : this.input) {
 			System.err.println(word.toString());
 			if (word.getAVPairs() == null) {  // Do not process word without semantics
 				System.err.println("Skipping meaningless " + word.toString());
 				continue;
-			}
-			if (word.isRevoked() && word.grounds().isEmpty()) { // Do not process revoked words that don't ground anything 
+			} else if (word.isRevoked() && word.grounds().isEmpty()) { // Do not process revoked words that don't ground anything 
 				System.err.println("Skipping revoked " + word.toString());
 				continue;
-			}
-			if (!word.isRevoked() && !word.grounds().isEmpty()) { // Do not process added words that already ground something
+			} else if (!word.isRevoked() && !word.grounds().isEmpty()) { // Do not process added words that already ground something
 				System.err.println("Skipping added " + word.toString());
 				continue;
+			} else { // Process all other words
+				System.err.println("Processing " + word.toString());
+				is.setNextInput(word);
+				this.applyRules();				
 			}
-			System.err.println("Processing " + word.toString());
-			is.setNextInput(word);
-			this.applyRules();
 		}
 	}
 
@@ -118,7 +94,6 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 	 */
 	@Override
 	public void applyRules() {
-		System.err.println(this.is.toString());
 		boolean restart = false;
 		for (AbstractRule r : rules) {
 			if (r.triggers(is)) {
@@ -134,7 +109,7 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 		if (restart) {
 			this.applyRules();
 		} else {
-			System.err.println("No rules applied.");
+			System.err.println("No rules applied. Stopping.");
 		}
 	}
 

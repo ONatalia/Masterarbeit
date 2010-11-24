@@ -4,7 +4,7 @@ import org.cocolab.inpro.nlu.AVPair;
 
 /**
  * A convenience class for bundling intransitive, transitive, ditransitive
- * argument structures.
+ * argument structures for use in dialogue acts.
  * Arguments are simple String representations.
  * @author okko
  *

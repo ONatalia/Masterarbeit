@@ -8,7 +8,7 @@ public class MoveSearchRightRule extends AbstractIUNetworkRule {
 	@Override
 	public boolean triggers(AbstractInformationState is) {
 //		System.err.println("Testing trigger for " + this.toString());
-		return (((IUNetworkInformationState) is).currentContribHasNextSSL());
+		return (((IUNetworkInformationState) is).currentContribHasNextSLL());
 	}
 
 	@Override

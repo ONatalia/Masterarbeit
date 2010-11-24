@@ -1,30 +1,14 @@
 package org.cocolab.inpro.dm.acts;
 
-import org.cocolab.inpro.nlu.AVPair;
-
 public abstract class AbstractDialogueAct {
 
-	/**
-	 * This dialogue act's argument structure
-	 */
-	ArgumentStruct arguments;
-	/**
-	 * Flags the 'performed' status of this dialogue act 
-	 */
-	boolean done;
-	
-	/**
-	 * Gets the argument for this RNLAs Act.
-	 * @return argument
-	 */
-	public ArgumentStruct getArgument() {
-		return this.arguments;
-	}
+	/** Flags the 'performed' status of this dialogue act */
+	protected boolean done = false;
 
 	/**
 	 * Setter for whether this act has been performed.
-	 * Successful only of not done already.
-	 * @return success of this action.
+	 * Successful only if not done already.
+	 * @return success of this method
 	 */
 	public boolean doThis() {
 		if (this.done) {
@@ -36,6 +20,8 @@ public abstract class AbstractDialogueAct {
 
 	/**
 	 * Setter to undo this act.
+	 * Successful only if done already.
+	 * @return success of this method
 	 */
 	public boolean undoThis() {
 		if (this.done) {
@@ -54,19 +40,7 @@ public abstract class AbstractDialogueAct {
 	}
 	
 	/**
-	 * Attempts re-setting (replacing) the arguments of this dialogue from an AVPair.
-	 * Succeeds if the current value of either argument equals the attribute of
-	 * the AVPair and results in replacement by its value.
-	 * @param avp the AVPair to reset from.
-	 */
-	public boolean setArgument(AVPair avp) {
-		if (this.arguments == null)
-			return false;
-		return this.arguments.resetArgumentfromAVPair(avp);
-	}
-
-	/**
-	 * Builds and returns a string representation of this RNLA.
+	 * Builds and returns a string representation of this dialogue act.
 	 */
 	abstract public String toString();
 

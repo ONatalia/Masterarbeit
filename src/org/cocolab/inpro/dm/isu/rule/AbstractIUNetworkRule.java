@@ -4,7 +4,7 @@ public abstract class AbstractIUNetworkRule extends AbstractRule {
 
 	public abstract interface Triggers {
 		boolean currentContribIntegratesNextInput();
-		boolean currentContribHasNextSSL();
+		boolean currentContribHasNextSLL();
 		boolean currentContribHasSSL();
 		boolean currentContribGroundsSomething();
 		boolean currentContribIsGroundedInSomething();
