@@ -119,12 +119,20 @@ public class DispatchStream extends InputStream implements Configurable {
 		playStream(audioStream, skipQueue);
 	}
 	
+	public void playSilence(int ms, boolean skipQueue) {
+		if (skipQueue)
+			setStream(new SilenceStream(ms));
+		else
+			addStream(new SilenceStream(ms));		
+	}
+	
 	public void playStream(InputStream audioStream, boolean skipQueue) {
 		if (skipQueue)
 			setStream(audioStream);
 		else
 			addStream(audioStream);		
 	}
+	
 	
 	/* * Stream and Stream Queue handling * */
 	
