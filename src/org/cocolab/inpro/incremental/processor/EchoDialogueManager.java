@@ -12,9 +12,8 @@ import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.InstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
-
-import org.cocolab.inpro.dm.acts.AbstractDialogueAct;
-import org.cocolab.inpro.dm.acts.PentoDialogueAct;
+import org.cocolab.inpro.audio.DispatchStream;
+import org.cocolab.inpro.dm.acts.SpeakDialogueAct;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -22,35 +21,38 @@ import edu.cmu.sphinx.util.props.S4Boolean;
 import edu.cmu.sphinx.util.props.S4Component;
 
 /**
- * Echo DM that sends prompts on timeouts repeating last input.
- * 
+ * Echo DM that sends prompts on timeouts repeating last input preceded by a short
+ * confirmation with prosodic mirroring of input.
  * @author timo, okko
  */
-public class EchoDialogueManager extends AbstractDialogueManager implements AbstractFloorTracker.Listener, PentoActionManager.Listener {
+public class EchoDialogueManager extends AbstractDialogueManager implements AbstractFloorTracker.Listener {
 
-	@S4Component(type = AudioActionManager.class, mandatory = true)
-	public static final String PROP_AM = "actionManager";
-	private AudioActionManager am;
-	
 	@S4Boolean(defaultValue = true)
 	public static final String PROP_ECHO = "echo";
 	private boolean echo;
 
-	final IUList<InstallmentIU> installments = new IUList<InstallmentIU>();
-	
-	final IUList<DialogueActIU> dialogueActIUs = new IUList<DialogueActIU>();
-	final List<PentoDialogueAct> sentToDos = new ArrayList<PentoDialogueAct>();
-	
-	private List<WordIU> currentInstallment = new ArrayList<WordIU>();
+	@S4Component(type = DispatchStream.class)
+	public static final String PROP_DISPATCHER = "dispatchStream";
+	private DispatchStream audioDispatcher;
 
-	InstallmentHistoryViewer ihv = new InstallmentHistoryViewer();
-	
+	@S4Component(type = IUBasedFloorTracker.class)
+	public static final String PROP_FLOOR_TRACKER = "floorTracker";
+	private IUBasedFloorTracker floorTracker;
+
+	private final IUList<InstallmentIU> installments = new IUList<InstallmentIU>();	
+	private final IUList<DialogueActIU> dialogueActIUs = new IUList<DialogueActIU>();
+	private List<WordIU> currentInstallment = new ArrayList<WordIU>();
+	private InstallmentHistoryViewer ihv = new InstallmentHistoryViewer();
+
 	/** Sets up the DM. */
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
-		am = (AudioActionManager) ps.getComponent(PROP_AM);
-		echo = ps.getBoolean(PROP_ECHO);
+		this.echo = ps.getBoolean(PROP_ECHO);
+		this.audioDispatcher = (DispatchStream) ps.getComponent(PROP_DISPATCHER);
+		this.floorTracker = (IUBasedFloorTracker) ps.getComponent(PROP_FLOOR_TRACKER);
+		this.reply("Hallo! Bitte nennen Sie mir Ihre Kontonummer!");
+		this.floorTracker.installInputTimeout(12000);
 		logger.info("Started EchoDialogueManager");
 	}
 
@@ -59,104 +61,88 @@ public class EchoDialogueManager extends AbstractDialogueManager implements Abst
 	@Override
 	public void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
-		super.leftBufferUpdate(ius, edits);
-		if (this.updating)
-			return;
-		this.updating = true;
-		currentInstallment = new ArrayList<WordIU>((Collection<WordIU>)ius);
-		this.postUpdate();
+		this.currentInstallment = new ArrayList<WordIU>((Collection<WordIU>) ius);
 	}
 
-	/** Resets the DM and its AM */
+	/** Resets the DM */
 	@Override
 	public void reset() {
-		super.reset();
-		logger.info("DM resetting.");
+		logger.info("Reset EchoDialogueManager");
 		this.dialogueActIUs.clear();
-		this.am.reset();
 		this.currentInstallment.clear();
-		this.doneQueue.clear();
-		this.leftBufferQueue.clear();
-		this.floorSignalQueue.clear();
 	}
 
 	/** Listens for floor changes and updates the InformationState */
 	@Override
 	public void floor(AbstractFloorTracker.Signal signal, AbstractFloorTracker floorManager) {
-		super.floor(signal, floorManager);
-		if (this.updating)
-			return;
-		this.updating = true;
-		List<EditMessage<DialogueActIU>> ourEdits = null;
 		switch (signal) {
-			case START: {
-				// Shut up	
-				this.am.shutUp();
-				break;
-			}
-			case EOT_RISING: {
-				installments.add(new InstallmentIU(new ArrayList<WordIU>(currentInstallment)));
-				// Ok+ … wordIUs
-				ourEdits = reply("BCpr.wav");
-				break;
-			}
-			case EOT_FALLING:
-			case EOT_NOT_RISING: {
-				installments.add(new InstallmentIU(new ArrayList<WordIU>(currentInstallment)));
-				// Ok- … wordIUs
-				ourEdits = reply("BCpf.wav");
-			}
+		case START: {
+			this.audioDispatcher.clearStream();
+			break;
 		}
-		this.dialogueActIUs.apply(ourEdits);
-		this.rightBuffer.setBuffer(this.dialogueActIUs, ourEdits);
-		this.rightBuffer.notify(this.iulisteners);			
-		ihv.hypChange(installments, null);
-		this.postUpdate();
+		case NO_INPUT: {
+			this.reply(null);
+			this.floorTracker.installInputTimeout(12000);
+			break;
+		}
+		case EOT_RISING: {
+			this.reply("Ja?");
+			this.floorTracker.installInputTimeout(2500);
+			break;
+		}
+		case EOT_FALLING:
+		case EOT_NOT_RISING: {
+			if (WordIU.wordsToString(currentInstallment).isEmpty()) {
+				// Only recognized silence words
+				this.reply("hm");
+			} else {
+				this.reply("OK!");				
+			}
+			this.floorTracker.installInputTimeout(5000);
+			break;	
+		}
+		}
 	}
 	
 	/** 
-	 * convenience method against code-duplication.
-	 * @return a list of added DialogueActIUs
+	 * Convenience method that tracks system installments and dialogue acts
+	 * and produces audio output.
+	 * @param the system utterance
 	 */
-	private List<EditMessage<DialogueActIU>> reply(String filename) {
+	private void reply(String systemUtterance) {
 		List<IU> grin = new ArrayList<IU>(this.currentInstallment);
-		String tts = WordIU.wordsToString(currentInstallment);
+		String userUtterance = WordIU.wordsToString(currentInstallment);
 		ArrayList<EditMessage<DialogueActIU>> ourEdits = new ArrayList<EditMessage<DialogueActIU>>();
-		if (!tts.isEmpty()) {
-			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new PentoDialogueAct(PentoDialogueAct.Act.PROMPT, filename));
+		if (!userUtterance.isEmpty()) {
+			System.err.println(userUtterance);
+			// Something to echo
+			this.installments.add(new InstallmentIU(new ArrayList<WordIU>(currentInstallment)));
+			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new SpeakDialogueAct(systemUtterance));
 			ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
-			if (filename.equals("BCpr.wav")) {
-				installments.add(new InstallmentIU(daiu, "JA+"));
-			} else {
-				installments.add(new InstallmentIU(daiu, "OK-"));
-			}
+			this.installments.add(new InstallmentIU(daiu, systemUtterance));
+			this.audioDispatcher.playTTS(systemUtterance, false);
 			if (echo) { 
-				daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new PentoDialogueAct(PentoDialogueAct.Act.PROMPT, "tts: " + tts));
+				daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new SpeakDialogueAct(userUtterance));
 				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
-				installments.add(new InstallmentIU(daiu, tts));
+				installments.add(new InstallmentIU(daiu, userUtterance));
+				this.audioDispatcher.playTTS(userUtterance, false);
 			}
-		} else {
-			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new PentoDialogueAct(PentoDialogueAct.Act.PROMPT, "BCn.wav"));
+		} else if (systemUtterance != null && userUtterance.isEmpty() ) {
+			// Nothing to echo, but something to say
+			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, null);
 			ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
-			installments.add(new InstallmentIU(daiu, "hm"));
+			installments.add(new InstallmentIU(daiu, systemUtterance));
+			this.audioDispatcher.playTTS(systemUtterance, false);
+		} else {
+			// Nothing new to say, nothing to echo
+			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new SpeakDialogueAct("Hallo, sind sie noch da?"));
+			ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
+			installments.add(new InstallmentIU(daiu, "Hallo, sind sie noch da?"));
+			this.audioDispatcher.playTTS("Hallo, sind sie noch da?", false);
 		}
-		return ourEdits;
-	}
-	
-	/** call this to notify the DM when a dialogueAct has been performed */
-	@Override
-	public void done(DialogueActIU iu) {
-		super.done(iu);
-		if (this.updating)
-			return;
-		this.updating = true;
-		AbstractDialogueAct r = iu.getAct();
-		logger.info("Was notified about performed act " + r.toString());
-		this.sentToDos.remove(r);
-		if (this.sentToDos.isEmpty()) {
-			this.reset();
-		}
-		this.postUpdate();
+		this.dialogueActIUs.apply(ourEdits);
+		this.ihv.hypChange(this.installments, null);
+		this.currentInstallment.clear();
 	}
 
 }

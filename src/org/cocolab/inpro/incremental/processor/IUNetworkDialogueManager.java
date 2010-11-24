@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.cocolab.inpro.dm.isu.IUNetworkUpdateEngine;
+import org.cocolab.inpro.incremental.IUModule;
+import org.cocolab.inpro.incremental.unit.ContribIU;
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
@@ -15,19 +17,20 @@ import org.cocolab.inpro.nlu.AVPairMappingUtil;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
-import edu.cmu.sphinx.util.props.S4Component;
+import edu.cmu.sphinx.util.props.S4ComponentList;
 import edu.cmu.sphinx.util.props.S4String;
 
-public class NumbersDialogueManager extends AbstractDialogueManager implements AbstractFloorTracker.Listener, AbstractActionManager.Listener {
+// TODO: try what-from-to-on-at agenda IU dialogue without clarifications.
 
-	/** The ActionManager component configuration variables */
-	@S4Component(type = AudioActionManager.class, mandatory = true)
-	public static final String PROP_AM = "actionManager";
-	/** The ActionManager component */
-	private AudioActionManager am;
+public class IUNetworkDialogueManager extends AbstractDialogueManager implements AudioActionManager.Listener {
+
 	/** The lexical semantics mapping configuration variables */
 	@S4String(mandatory = true)
 	public final static String PROP_LEX_SEMANTICS = "lexicalSemantics";
+	/** The internal state listener configuration */
+	@S4ComponentList(type = IUModule.class)
+	public final static String PROP_STATE_LISTENERS = "stateListeners";
+	protected List<IUModule> stateListeners;
 
 	/**
 	 * Update Engine holding rules, information state and interfaces
@@ -41,7 +44,6 @@ public class NumbersDialogueManager extends AbstractDialogueManager implements A
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
-		this.am = (AudioActionManager) ps.getComponent(PROP_AM);
 		String lexicalSemanticsPath = ps.getString(PROP_LEX_SEMANTICS);
 		try {
 			WordIU.setAVPairs(AVPairMappingUtil.readAVPairs(new URL(lexicalSemanticsPath)));
@@ -49,20 +51,17 @@ public class NumbersDialogueManager extends AbstractDialogueManager implements A
 			e.printStackTrace();
 			logger.fatal("Could not set WordIU's AVPairs from file " + lexicalSemanticsPath);
 		}
-
+		this.stateListeners = ps.getComponentList(PROP_STATE_LISTENERS, IUModule.class);
+		this.logToTedView("Initial State:\n" + this.updateEngine.getInformationState().toString());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
-		System.err.println(ius.toString());
-		System.err.println(edits.toString());
-//		super.leftBufferUpdate(ius, edits);
-//		if (this.updating) {
-//			return;
-//		}
-//		this.updating = true;
+		super.leftBufferUpdate(ius, edits);
+		if (this.updating)
+			return;
+		this.updating = true;
 		for (EditMessage<? extends IU> edit : edits) {
 			switch (edit.getType()) {
 			case ADD: {
@@ -76,33 +75,34 @@ public class NumbersDialogueManager extends AbstractDialogueManager implements A
 				this.updateEngine.applyRules((WordIU) edit.getIU());
 				break;
 			}
-			case COMMIT: break; //TODO: maybe commit all grin IUs on the IS?
+			case COMMIT: break; //TODO: commit all grin IUs on the IS?
 			}
 		}
-		IUList<DialogueActIU> newOutput = new IUList<DialogueActIU>();
-		newOutput.addAll(this.updateEngine.getNewOutputAndClear());
-		System.err.println("AM should now be performing output:");
-		System.err.println(newOutput.toString());
-//		super.postUpdate();
+		this.postUpdate();
+	}
+	
+	/**
+	 * Update state listeners and right buffer, then call super.postUpdate() to release locks. 
+	 */
+	protected void postUpdate() {
+		this.rightBuffer.setBuffer(this.updateEngine.getOutput());
+		this.logToTedView("New State:\n" + this.updateEngine.getInformationState().toString());
+		IUList<ContribIU> newList = new IUList<ContribIU>();
+		List<EditMessage<ContribIU>> contributionEdits = this.updateEngine.getInformationState().getContributions().diff(newList);
+		contributionEdits = newList.diff(this.updateEngine.getInformationState().getContributions());
+		for (IUModule listener : this.stateListeners) {
+			listener.hypChange(this.updateEngine.getInformationState().getContributions(), contributionEdits);
+		}
+		super.postUpdate();
 	}
 
 	public void done(DialogueActIU iu) {
-//		super.done(iu);
-//		if (this.updating)
-//			return;
-//		super.postUpdate();
-	}
-
-	public void floor(AbstractFloorTracker.Signal signal, AbstractFloorTracker floorManager) {
-//		super.floor(signal, floorManager);
-//		if (this.updating)
-//			return;
-//		switch(signal){
-//		case START: {
-//			this.am.shutUp();
-//		}
-//		}
-//		super.postUpdate();
+		super.done(iu);
+		if (this.updating)
+			return;
+		this.updating = true;
+		this.logToTedView("New State:\n" + this.updateEngine.getInformationState().toString());
+		super.postUpdate();
 	}
 
 }

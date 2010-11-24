@@ -11,13 +11,14 @@ import org.cocolab.inpro.incremental.unit.IU;
 
 /**
  * An abstract DM. Has basic provisions for action management and floor tracking.
+ * Also provides mechanisms for queuing input while its updating.
  * @author timo, okko
  */
 
-public abstract class AbstractDialogueManager extends IUModule implements AbstractFloorTracker.Listener, AbstractActionManager.Listener {
+public abstract class AbstractDialogueManager extends IUModule implements AbstractFloorTracker.Listener, AudioActionManager.Listener {
 
 	/** Flag for whether the DM is currently updating itself */
-	boolean updating = false;
+	protected boolean updating = false;
 	/** Queue for left-buffer EditMessages for post-update processing */
 	protected List<EditMessage<IU>> leftBufferQueue = new ArrayList<EditMessage<IU>>();
 	/** Queue for performed DialogueActs for post-update processing */
