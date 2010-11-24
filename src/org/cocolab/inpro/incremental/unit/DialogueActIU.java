@@ -4,7 +4,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.cocolab.inpro.dm.acts.AbstractDialogueAct;
-import org.cocolab.inpro.dm.acts.SimpleDialogueAct;
+import org.cocolab.inpro.dm.acts.ClarifyDialogueAct;
+import org.cocolab.inpro.dm.acts.GroundDialogueAct;
+import org.cocolab.inpro.dm.acts.RequestDialogueAct;
+import org.cocolab.inpro.dm.acts.SpeakDialogueAct;
 
 public class DialogueActIU extends IU {
 
@@ -15,11 +18,6 @@ public class DialogueActIU extends IU {
 	@SuppressWarnings("unchecked")
 	public DialogueActIU() {
 		this(FIRST_DA_IU, Collections.EMPTY_LIST, null);
-	}
-
-	public DialogueActIU(IU sll, List<IU> groundedIn, SimpleDialogueAct act) {
-		super(sll, groundedIn);
-		this.act = act;
 	}
 
 	public DialogueActIU(IU sll, List<IU> groundedIn, AbstractDialogueAct act) {
@@ -37,10 +35,28 @@ public class DialogueActIU extends IU {
 	}
 
 	/**
-	 * @return the RNLA act of this IU.
+	 * @return the dialogue act of this IU.
 	 */
 	public AbstractDialogueAct getAct() {
 		return this.act;
+	}
+	
+	/**
+	 * Getter for a string representation of the utterance associated with this IU's act.
+	 * @return
+	 */
+	public String getUtterance() {
+		if (this.act instanceof RequestDialogueAct) {
+			return ((ContribIU) this.groundedIn.get(0)).getRequestString();
+		} else if (this.act instanceof ClarifyDialogueAct) {
+			return ((ContribIU) this.groundedIn.get(0)).getClarificationString();
+		} else if (this.act instanceof GroundDialogueAct) {
+			return ((ContribIU) this.groundedIn.get(0)).getGroundingString();
+		} else if (this.act instanceof SpeakDialogueAct) {
+			return ((SpeakDialogueAct) this.act).getUtterance();
+		} else {
+			return "";
+		}
 	}
 
 	/**
@@ -50,6 +66,10 @@ public class DialogueActIU extends IU {
 	 */
 	public boolean samePayload(DialogueActIU siu) {
 		return this.toPayLoad().equals(siu.toPayLoad());
+	}
+	
+	public void perform() {
+		this.commit();
 	}
 
 	@Override
