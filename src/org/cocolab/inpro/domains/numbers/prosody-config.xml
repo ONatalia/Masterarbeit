@@ -389,21 +389,28 @@
             <item>${dialogueManager}</item>
         </propertylist>
     </component>
-
-    <component name="echoDialogueManager" type="org.cocolab.inpro.incremental.processor.EchoDialogueManager">
-        <property name="actionManager" value="${actionManager}"/>
-        <property name="dispatchStream" value="dispatchStream"/>
-        <propertylist name="hypChangeListeners">
-            <item>${actionManager}</item>
+    
+    <component name="textBasedFloorTracker" type="org.cocolab.inpro.incremental.processor.TextBasedFloorTracker">
+        <property name="useProsody" value="true" />
+        <property name="risingProsodyTimeout" value="150" />
+        <property name="anyProsodyTimeout" value="600" />
+        <propertylist name="ftlisteners">
+            <item>${dialogueManager}</item>
         </propertylist>
     </component>
 
+    <component name="echoDialogueManager" type="org.cocolab.inpro.incremental.processor.EchoDialogueManager">
+        <property name="echo" value="true" />
+        <property name="dispatchStream" value="dispatchStream" />
+        <property name="floorTracker" value="iuBasedFloorTracker" />
+    </component>
+
     <component name="audioActionManager" type="org.cocolab.inpro.incremental.processor.AudioActionManager">
+        <property name="audioPath" value="http://www.ling.uni-potsdam.de/~timo/code/inprotk/demo"/>
         <property name="dispatchStream" value="dispatchStream"/>
         <propertylist name="amListeners">
             <item>${dialogueManager}</item>
         </propertylist>
-	<property name="audioPath" value="http://www.ling.uni-potsdam.de/~timo/code/inprotk/demo"/>
     </component>
 
     <component name="eotFeatureAggregator" type="org.cocolab.inpro.features.EOTFeatureAggregator">

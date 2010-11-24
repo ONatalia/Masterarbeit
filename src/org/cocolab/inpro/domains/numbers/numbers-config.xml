@@ -379,6 +379,7 @@
            <item>${dialogueManager}</item>
            <item>hypViewer</item>
            <item>iuBasedFloorTracker</item>
+           <item>tedNotifier</item>
         </propertylist>
     </component>
 
@@ -388,6 +389,7 @@
         <property name="anyProsodyTimeout" value="600" />
         <propertylist name="ftlisteners">
             <item>${dialogueManager}</item>
+            <item>${actionManager}</item>
         </propertylist>
     </component>
 
@@ -397,15 +399,20 @@
         <property name="anyProsodyTimeout" value="600" />
         <propertylist name="ftlisteners">
             <item>${dialogueManager}</item>
+            <item>${actionManager}</item>
         </propertylist>
     </component>
     
-    <component name="numbersDialogueManager" type="org.cocolab.inpro.incremental.processor.NumbersDialogueManager">
+    <component name="numbersDialogueManager" type="org.cocolab.inpro.incremental.processor.IUNetworkDialogueManager">
         <property name="actionManager" value="${actionManager}"/>
         <property name="lexicalSemantics" value="${lexicalSemantics}"/>
         <property name="dispatchStream" value="dispatchStream"/>
+        <propertylist name="stateListeners">
+            <item>tedNotifier</item>
+        </propertylist>
         <propertylist name="hypChangeListeners">
-            <item>${actionManager}</item>
+          <item>tedNotifier</item>
+          <item>${actionManager}</item>
         </propertylist>
     </component>
 
