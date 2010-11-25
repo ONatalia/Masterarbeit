@@ -1,5 +1,6 @@
 package org.cocolab.inpro.incremental.processor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -56,7 +57,11 @@ public abstract class AbstractFloorTracker extends IUModule {
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
-		ftlisteners = ps.getComponentList(PROP_STATE_LISTENERS, Listener.class); 
+		List<Object> listeners = ps.getComponentList(PROP_STATE_LISTENERS, Object.class);
+		ftlisteners = new ArrayList<Listener>();
+		for (Object o : listeners)
+			if (o instanceof Listener)
+				ftlisteners.add((Listener) o);
 	}
 
 	protected void signalListeners(InternalState state, Signal signal) {

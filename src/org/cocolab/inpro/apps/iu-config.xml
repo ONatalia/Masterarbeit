@@ -74,6 +74,10 @@
             <item>audioActionManager</item>
         </propertylist>
     </component>
+    
+    <component name="turnCompleter" type="org.cocolab.inpro.incremental.processor.TurnCompleter">
+		<property name="dispatchStream" value="dispatchStream" />
+    </component>
 
     <component name="pentoActionManager" type="org.cocolab.inpro.incremental.processor.PentoActionManager">
         <property name="dispatchStream" value="dispatchStream"/>

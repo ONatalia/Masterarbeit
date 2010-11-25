@@ -342,7 +342,7 @@ public abstract class IU implements Comparable<IU> {
 	}
 	
 	public long getAge() {
-		return System.currentTimeMillis() - creationTime;
+		return System.currentTimeMillis() - startupTime - creationTime;
 	}
 	
 	/**
