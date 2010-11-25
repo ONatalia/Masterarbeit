@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
+import org.cocolab.inpro.dm.isu.IUNetworkDomainUtil;
 import org.cocolab.inpro.dm.isu.IUNetworkUpdateEngine;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.ContribIU;
@@ -17,6 +18,7 @@ import org.cocolab.inpro.nlu.AVPairMappingUtil;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.S4Component;
 import edu.cmu.sphinx.util.props.S4ComponentList;
 import edu.cmu.sphinx.util.props.S4String;
 
@@ -31,15 +33,19 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 	@S4ComponentList(type = IUModule.class)
 	public final static String PROP_STATE_LISTENERS = "stateListeners";
 	protected List<IUModule> stateListeners;
+	@S4Component(type = IUNetworkDomainUtil.class)
+	public final static String PROP_DOMAIN = "domain";
+	protected IUNetworkDomainUtil domain;
 
+	
 	/**
 	 * Update Engine holding rules, information state and interfaces
 	 * for new input/output IUs.
 	 */
-	private IUNetworkUpdateEngine updateEngine = new IUNetworkUpdateEngine();
+	private IUNetworkUpdateEngine updateEngine;
 
 	/**
-	 * Sets up the DM.
+	 * Sets up the DM with lexical semantics and state listeners.
 	 */
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
@@ -51,8 +57,11 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 			e.printStackTrace();
 			logger.fatal("Could not set WordIU's AVPairs from file " + lexicalSemanticsPath);
 		}
+		this.domain = (IUNetworkDomainUtil) ps.getComponent(PROP_DOMAIN);
 		this.stateListeners = ps.getComponentList(PROP_STATE_LISTENERS, IUModule.class);
+		this.updateEngine = new IUNetworkUpdateEngine(this.domain);
 		this.logToTedView("Initial State:\n" + this.updateEngine.getInformationState().toString());
+		logger.info(this.updateEngine.getInformationState().toString());
 	}
 
 	@Override
@@ -82,7 +91,8 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 	}
 	
 	/**
-	 * Update state listeners and right buffer, then call super.postUpdate() to release locks. 
+	 * Update state listeners and right buffer, then call
+	 * super.postUpdate() to release locks. 
 	 */
 	protected void postUpdate() {
 		this.rightBuffer.setBuffer(this.updateEngine.getOutput());

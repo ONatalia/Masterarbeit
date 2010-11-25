@@ -6,14 +6,12 @@ import java.util.List;
 import org.cocolab.inpro.dm.acts.ClarifyDialogueAct;
 import org.cocolab.inpro.dm.acts.GroundDialogueAct;
 import org.cocolab.inpro.dm.acts.RequestDialogueAct;
-import org.cocolab.inpro.dm.acts.SpeakDialogueAct;
 import org.cocolab.inpro.dm.isu.rule.AbstractIUNetworkRule;
 import org.cocolab.inpro.incremental.unit.ContribIU;
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.WordIU;
-import org.cocolab.inpro.nlu.AVPair;
 
 /**
  * An information state consisting of a network of ContribIU contributions that can integrate with new input.
@@ -46,17 +44,52 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	/**
 	 * Generic constructor for an IUNetworkInformationState
 	 */
-	public IUNetworkInformationState() {
-		ContribIU root = new ContribIU(null, ContribIU.FIRST_CONTRIB_IU, new AVPair("root", "true"));
-		ContribIU dig1 = new ContribIU(null, root, new AVPair("digit", "?"));
-		ContribIU dig2 = new ContribIU(dig1, root, new AVPair("digit", "?"));
-		ContribIU dig3 = new ContribIU(dig2, root, new AVPair("digit", "?"));
-		this.contributions.add(root);
-		this.contributions.add(dig1);
-		this.contributions.add(dig2);
-		this.contributions.add(dig3);
-		this.currentContrib = root;
+	public IUNetworkInformationState() {}
+	
+	/**
+	 * Constructor building contributions network from a list of
+	 * ContribIU's. Root is assumed to be the first one if none have
+	 * a payload designating it as root.
+	 * @param contributions the list
+	 */
+	public IUNetworkInformationState(IUList<ContribIU> contributions) {
+		this.contributions = contributions;
+		for (ContribIU iu : this.contributions) {
+			if (iu.getContribution().equals("root:true")) {
+				this.root = iu;
+				break;
+			}
+		}
+		if (this.root == null) 
+			this.root = this.contributions.get(0);
+		this.currentContrib = this.root;	// Start search at root
+	}
+	
+	/**
+	 * Constructor building contributions network from a
+	 * single root IU's grounded in links.
+	 * @param root
+	 */
+	public IUNetworkInformationState(ContribIU root) {
 		this.root = root;
+		this.addGrinIUs(root);
+
+	}
+
+	/**
+	 * Convenience method that recursively adds any new IUs grounded in a given IU
+	 * to the contributions network.
+	 * @param iu the IU and its GrIns to add to the contribution network.
+	 */
+	private void addGrinIUs(ContribIU iu) {
+		if (!this.contributions.contains(iu)) {
+			this.contributions.add(iu);
+			for (IU grin : iu.grounds()) {
+				if (grin instanceof ContribIU) {
+					this.addGrinIUs((ContribIU) grin);
+				}
+			}
+		}
 	}
 
 	/**
@@ -82,7 +115,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public IUList<ContribIU> getContributions() {
 		return this.contributions;
 	}
-
+	
 	/**
 	 * Gets the current focus contribution.
 	 * This is defined as the contribution that was most

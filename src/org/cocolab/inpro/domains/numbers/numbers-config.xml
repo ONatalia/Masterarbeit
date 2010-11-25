@@ -14,6 +14,7 @@
     <property name="dialogueManager" value="numbersDialogueManager"/>
     <property name="actionManager" value="numbersActionManager"/>
     <property name="lexicalSemantics" value="http://www.ling.uni-potsdam.de/~okko/demo/digit.mappings" />
+    <property name="constributions" value="contributions" />
     <property name="baseData" value="baseData"/>
 
     <!-- ******************************************************** -->
@@ -388,7 +389,6 @@
         <property name="risingProsodyTimeout" value="150" />
         <property name="anyProsodyTimeout" value="600" />
         <propertylist name="ftlisteners">
-            <item>${dialogueManager}</item>
             <item>${actionManager}</item>
         </propertylist>
     </component>
@@ -398,15 +398,17 @@
         <property name="risingProsodyTimeout" value="150" />
         <property name="anyProsodyTimeout" value="600" />
         <propertylist name="ftlisteners">
-            <item>${dialogueManager}</item>
             <item>${actionManager}</item>
         </propertylist>
     </component>
     
+    <component name="contributions" type="org.cocolab.inpro.domains.numbers.dm.NumbersContribIU">
+    
     <component name="numbersDialogueManager" type="org.cocolab.inpro.incremental.processor.IUNetworkDialogueManager">
-        <property name="actionManager" value="${actionManager}"/>
-        <property name="lexicalSemantics" value="${lexicalSemantics}"/>
+        <!--  <property name="actionManager" value="${actionManager}"/> -->
         <property name="dispatchStream" value="dispatchStream"/>
+        <property name="lexicalSemantics" value="${lexicalSemantics}"/>
+        <property name="contributions" value="${constributions}"/>
         <propertylist name="stateListeners">
             <item>tedNotifier</item>
         </propertylist>

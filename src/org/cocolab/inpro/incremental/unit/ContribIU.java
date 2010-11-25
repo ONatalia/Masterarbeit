@@ -24,39 +24,76 @@ import edu.emory.mathcs.backport.java.util.Collections;
  */
 public class ContribIU extends IU {
 
-	private AVPair contribution;
-	private int confidence = 0;
-	private boolean clarify = false;
-	private String requestString = "Wie kann ich Ihnen helfen?";
-	private String clarificationString;
-	private String groundingString;
+	protected AVPair contribution;
+	protected int confidence = 0;
+	protected boolean clarify = false;
+	protected String requestString;
+	protected String clarificationString;
+	protected String groundingString;
 
 	public static final ContribIU FIRST_CONTRIB_IU = new ContribIU(); 
 
+	/**
+	 * Empty constructor.
+	 */
 	public ContribIU() {
 		super(null, null);
 	}
 
+	/**
+	 * Constructor with contribution and clarification parameters
+	 * @param sll Same level link IU
+	 * @param grin Grounded-in IU
+	 * @param contribution AVPair describing this contribution
+	 * @param clarify boolean denoting if this contribution should be disambiguated
+	 */
 	@SuppressWarnings("unchecked")
 	public ContribIU(IU sll, IU grin, AVPair contribution, boolean clarify) {
-		this(sll, Collections.singletonList(grin), contribution);
-		this.clarify = clarify;
+		this(sll, Collections.singletonList(grin), contribution, clarify, null, null, null);
 	}
 
+	/**
+	 * Constructor with contribution parameter
+	 * @param sll Same level link IU
+	 * @param grin Grounded-in IU
+ 	 * @param contribution AVPair describing this contribution
+	 */
 	@SuppressWarnings("unchecked")
-	public ContribIU(IU sll, IU grin, AVPair contribution) {
-		this(sll, Collections.singletonList(grin), contribution);
+	public ContribIU(IU sll, IU grin, AVPair contribution, boolean clarify,
+			String requestString, String clarificationString, String groundingString) {
+		this(sll, Collections.singletonList(grin), contribution, clarify, requestString, clarificationString, groundingString);
 	}
 
-	public ContribIU(IU sll, List<? extends IU> grin, AVPair contribution, boolean clarify) {
+	/**
+	 * Full constructor with contribution, clarification and utterance string
+	 * descriptors.
+	 * @param sll Same level link IU
+	 * @param grin Grounded-in IU
+	 * @param contribution AVPair describing this contribution
+	 * @param clarify boolean denoting if this contribution should be disambiguated
+	 * @param requestString the default request string for utterance construction
+	 * @param clarificationString the default clarification string for utterance construction
+	 * @param groundingString the default grounding string for utterance construction
+	 */
+	public ContribIU(IU sll, List<? extends IU> grin, AVPair contribution, boolean clarify,
+			String requestString, String clarificationString, String groundingString) {
 		super(sll, grin);
 		this.contribution = contribution;
 		this.clarify = clarify;
+		this.requestString = requestString;
+		this.clarificationString = clarificationString;
+		this.groundingString = groundingString;
 	}
 
+	/**
+	 * Constructor with contribution and clarification parameters
+	 * @param sll Same level link IU
+	 * @param grin Grounded-in IUs
+	 * @param contribution AVPair describing this contribution
+	 * @param clarify boolean denoting if this contribution should be disambiguated
+	 */
 	public ContribIU(IU sll, List<? extends IU> grin, AVPair contribution) {
-		super(sll, grin);
-		this.contribution = contribution;
+		this(sll, grin, contribution, false, null, null, null);
 	}
 	
 	public boolean integratesWith(IU iu) {
@@ -100,6 +137,10 @@ public class ContribIU extends IU {
 		return this.clarify;
 	}
 	
+	public AVPair getContribution() {
+		return this.contribution;
+	}
+	
 	public String getClarificationString() {
 		if (this.clarificationString == null) {
 			if (this.contribution != null) {
@@ -121,6 +162,8 @@ public class ContribIU extends IU {
 	}
 
 	public String getRequestString() {
+		if (this.requestString == null)
+			return "Wie kann ich Ihnen helfen?";
 		return this.requestString;
 	}
 

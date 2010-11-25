@@ -39,7 +39,7 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 	public static final String PROP_DISPATCHER = "dispatchStream";
 	protected DispatchStream audioDispatcher;
 
-	@S4String
+	@S4String(mandatory = false)
 	public static final String PROP_AUDIO_PATH = "audioPath";
 	protected static String audioPath;
 
@@ -82,8 +82,13 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 					File audio = new File(line.split(",")[1]);
 					if (audio.exists()) {
 						utteranceMap.put(utterance, audio);
-					} else if (new File(audioPath + audio.toString()).exists()) {
-						utteranceMap.put(utterance, new File(audioPath + audio.toString()));
+					} else if (audioPath != null) {
+						audio = new File(audioPath + audio.toString());
+						if (audio.exists()) {
+							utteranceMap.put(utterance, new File(audioPath + audio.toString()));
+						} else {
+							this.logger.warn("Cannot find and won't add audio file " + audio.toString());
+						}
 					} else {
 						this.logger.warn("Cannot find and won't add audio file " + audio.toString());
 					}

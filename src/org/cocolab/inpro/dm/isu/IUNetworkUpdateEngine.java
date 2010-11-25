@@ -33,7 +33,7 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 	 * a generic top-down search update mechanism producing GROUND,
 	 * CLARIFY and REQUEST output.
 	 */
-	public IUNetworkUpdateEngine() {
+	public IUNetworkUpdateEngine(IUNetworkDomainUtil u) {
 		rules.add(new UnintegrateRevokedInputRule());
 		rules.add(new MarkContribIfIntegratesRule());
 		rules.add(new MoveSearchDownRule());
@@ -43,7 +43,7 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 		rules.add(new IntegrateNextInputRule());
 		rules.add(new ClarifyNextInputRule());
 		rules.add(new RequestMoreInfoRule());
-		this.is = new IUNetworkInformationState();
+		this.is = new IUNetworkInformationState(u.getContributions());
 	}
 
 	/**
