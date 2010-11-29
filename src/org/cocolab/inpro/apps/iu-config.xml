@@ -134,6 +134,11 @@
         <property name="goalPrefix" value="x"/>
         <property name="sendSilence" value="false"/>
     </component>
+    
+    <component name="dotNotifier" type="org.cocolab.inpro.incremental.listener.IUNetworkToDOT">
+        <property name="runDot" value="true" />
+        <property name="outputFormat" value="png" />
+    </component>
 
     <component name="dispatchStream" type="org.cocolab.inpro.audio.DispatchStream">
         <property name="sendSilence" value="true"/>
