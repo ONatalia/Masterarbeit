@@ -3,6 +3,7 @@ package org.cocolab.inpro.dm.isu;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.cocolab.inpro.dm.acts.AbstractDialogueAct;
 import org.cocolab.inpro.dm.acts.ClarifyDialogueAct;
 import org.cocolab.inpro.dm.acts.GroundDialogueAct;
 import org.cocolab.inpro.dm.acts.RequestDialogueAct;
@@ -196,8 +197,11 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			if (iu.getSameLevelLink() != null) {
 				if (iu.getSameLevelLink().equals(this.getCurrentContrib())) {
 					this.currentContrib = iu;
+					if (!this.visited.contains(this.currentContrib)) {
+						this.visited.add(this.currentContrib);
+					}
 					return true;
-				}				
+				}
 			}
 		}
 		return false;
@@ -213,6 +217,9 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		for (IU iu : this.getCurrentContrib().grounds()) {
 			if (iu instanceof ContribIU) {
 				this.currentContrib = (ContribIU) iu;
+				if (!this.visited.contains(this.currentContrib)) {
+					this.visited.add(this.currentContrib);					
+				}
 				return true;
 			}
 		}
@@ -230,6 +237,9 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			return false;
 		if (this.getCurrentContrib().getSameLevelLink() != null) {
 			this.currentContrib = (ContribIU) this.getCurrentContrib().getSameLevelLink();
+			if (!this.visited.contains(this.currentContrib)) {
+				this.visited.add(this.currentContrib);
+			}
 			return true;
 		}
 		return false;
@@ -248,6 +258,9 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			for (IU iu : this.getCurrentContrib().groundedIn()) {
 				if (iu instanceof ContribIU) {
 					this.currentContrib = (ContribIU) iu;
+					if (!this.visited.contains(this.currentContrib)) {
+						this.visited.add(this.currentContrib);
+					}
 					return true;
 				}
 			}
@@ -258,7 +271,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
 	 * Integrates the current contribution with the next input if possible.
-	 * Clears next input and integrated and visitied contributions list to restart the
+	 * Clears next input and integrated and visited contributions list to restart the
 	 * search with new input.
 	 * @true if successful
 	 */
@@ -271,7 +284,18 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			this.nextInput = null;
 			this.integrateList.clear();
 			this.visited.clear();
-			//TODO: revoke clarification and request output grounded in current contrib here.
+			for (IU iu : this.currentContrib.grounds()) {
+				if (iu instanceof DialogueActIU) {
+					AbstractDialogueAct act = ((DialogueActIU) iu).getAct();
+					if (act instanceof ClarifyDialogueAct ||
+							act instanceof RequestDialogueAct) {
+						//TODO: AM must make sure to comit when execute
+						//TODO: make sure to not revoke committed ones.
+						//TODO: the IS should return an EditMessage list instead of DialogueActIUs
+						iu.revoke();
+					}
+				}
+			}
 			return true;
 		}
 		return false;
@@ -323,7 +347,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public boolean currentContribIntegratesNextInput() {
 		if (this.nextInput == null)
 			return false;
-		this.visited.add(this.getCurrentContrib());
+//		this.visited.add(this.getCurrentContrib());
 		if (this.integrateList.contains(this.getCurrentContrib())) {
 			// contrib doesn't integrate input if it already integrates this input
 			return false;
@@ -369,7 +393,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * A Precondition method that queries the information state.
-	 * Checks if the IS's current contribution grounds another contribution.
+	 * Checks if the IS's current contribution grounds another contribution that hasn't been visited yet.
 	 * @return true if so 
 	 */
 	@Override
@@ -378,8 +402,10 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			return false;
 		for (IU iu : this.getCurrentContrib().grounds()) {
 			if (iu instanceof ContribIU) {
-				if (!this.visited.contains(iu))
-					return true;
+				if (!this.visited.contains(iu)) {
+					System.err.println(this.visited.toString() + " should not not contain \n" + iu.toString());
+					return true;					
+				}
 			}
 		}
 		return false;

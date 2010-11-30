@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.cocolab.inpro.dm.isu.IUNetworkDomainUtil;
 import org.cocolab.inpro.dm.isu.IUNetworkUpdateEngine;
-import org.cocolab.inpro.incremental.IUModule;
+import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.unit.ContribIU;
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
@@ -30,9 +30,9 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 	@S4String(mandatory = true)
 	public final static String PROP_LEX_SEMANTICS = "lexicalSemantics";
 	/** The internal state listener configuration */
-	@S4ComponentList(type = IUModule.class)
+	@S4ComponentList(type = PushBuffer.class)
 	public final static String PROP_STATE_LISTENERS = "stateListeners";
-	protected List<IUModule> stateListeners;
+	protected List<PushBuffer> stateListeners;
 	@S4Component(type = IUNetworkDomainUtil.class)
 	public final static String PROP_DOMAIN = "domain";
 	protected IUNetworkDomainUtil domain;
@@ -58,7 +58,7 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 			logger.fatal("Could not set WordIU's AVPairs from file " + lexicalSemanticsPath);
 		}
 		this.domain = (IUNetworkDomainUtil) ps.getComponent(PROP_DOMAIN);
-		this.stateListeners = ps.getComponentList(PROP_STATE_LISTENERS, IUModule.class);
+		this.stateListeners = ps.getComponentList(PROP_STATE_LISTENERS, PushBuffer.class);
 		this.updateEngine = new IUNetworkUpdateEngine(this.domain);
 		this.logToTedView("Initial State:\n" + this.updateEngine.getInformationState().toString());
 		logger.info(this.updateEngine.getInformationState().toString());
@@ -100,7 +100,7 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 		IUList<ContribIU> newList = new IUList<ContribIU>();
 		List<EditMessage<ContribIU>> contributionEdits = this.updateEngine.getInformationState().getContributions().diff(newList);
 		contributionEdits = newList.diff(this.updateEngine.getInformationState().getContributions());
-		for (IUModule listener : this.stateListeners) {
+		for (PushBuffer listener : this.stateListeners) {
 			listener.hypChange(this.updateEngine.getInformationState().getContributions(), contributionEdits);
 		}
 		super.postUpdate();
