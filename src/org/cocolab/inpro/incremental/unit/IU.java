@@ -252,8 +252,8 @@ public abstract class IU implements Comparable<IU> {
 		}
 		if (!grounds.contains(iu)) {
 			grounds.add((IU) iu);
-			iu.groundIn(this);
 		}
+		iu.groundIn(this);
 	}
 
 	public void removeGrin(List<IU> ius) {
@@ -278,8 +278,11 @@ public abstract class IU implements Comparable<IU> {
 		} else {
 			this.groundedIn = new ArrayList<IU>(this.groundedIn);
 		}
-		if (!this.groundedIn.contains(iu))
+		if (!this.groundedIn.contains(iu)) {
 			this.groundedIn.add(iu);
+			iu.ground(this);
+		}
+			
 	}
 	
 	public abstract String toPayLoad();

@@ -39,9 +39,9 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	private ContribIU currentContrib;
 	/** The list of contributions with which input can be integrated. Filled during search and cleared afterwards. */
 	private IUList<ContribIU> integrateList = new IUList<ContribIU>();
-	/** A list of contributions that were visited during search. Filled during seach and cleared afterwards.  */
+	/** A list of contributions that were visited during search. Filled during search and cleared afterwards.  */
 	private IUList<ContribIU> visited = new IUList<ContribIU>();
-	/** The DialogueActIU representing nextOutput. Remains 'current' output until a new one is written. */
+	/** The DialogueActIU representing nextOutput. Remains 'current' output until a new one is created. */
 	private DialogueActIU nextOutput;
 
 	/**
@@ -280,19 +280,29 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 */
 	@Override
 	public boolean integrateNextInput() {
-		if (!this.integrateList.get(0).groundedIn().contains(this.getNextInput())) {
-			this.getNextInput().ground(this.integrateList.get(0));
+		ContribIU marked = this.integrateList.get(0);
+		// If marked contribution isn't already grounded in next input
+		if (!marked.groundedIn().contains(this.getNextInput())) {
+			// do so now
+			this.nextInput.ground(marked);
+			marked.groundIn(this.nextInput);
+			// output a grounding dialogue act
 			this.nextOutput = new DialogueActIU(this.nextOutput, this.integrateList.get(0), new GroundDialogueAct());
-			this.currentContrib = this.integrateList.get(0);
+			// move focus to the newly integrated contribution
+			this.currentContrib = marked;
+			// clear next input (we just integrated some)
 			this.nextInput = null;
+			// clear the integrate list (we just integrated some)
 			this.integrateList.clear();
+			// clear the visited list for the next search
 			this.visited.clear();
-			for (IU iu : this.currentContrib.grounds()) {
+			// revoke requests and clarifications grounded in integrated contribution 
+			for (IU iu : marked.grounds()) {
 				if (iu instanceof DialogueActIU) {
 					AbstractDialogueAct act = ((DialogueActIU) iu).getAct();
 					if (act instanceof ClarifyDialogueAct ||
 							act instanceof RequestDialogueAct) {
-						//TODO: AM must make sure to comit when execute
+						//TODO: AM must make sure to commit when execute
 						//TODO: make sure to not revoke committed ones.
 						//TODO: the IS should return an EditMessage list instead of DialogueActIUs
 						iu.revoke();
@@ -489,7 +499,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
-	 * Removes grin links to next input from any contributions next input grounds.
+	 * Removes grin links between input and any contributions grounded in it.
+	 * Also re-grounds previous input.
 	 * @true if successful
 	 */
 	@Override
@@ -499,9 +510,23 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			if (iu.groundedIn().contains(this.nextInput)) {
 				iu.groundedIn().remove(this.nextInput);
 				this.nextInput.grounds().remove(iu);
-				this.nextInput = null;
+				if (this.nextInput.getAVPairs().get(0).equals("bool:false")) {
+					// Reintegrating previous input
+					// TODO: make this a separate rule (triggering before this one)
+					boolean seekSLL = true;
+					while(seekSLL) {
+ 						this.nextInput = (WordIU) this.nextInput.getSameLevelLink();
+ 						if (this.nextInput.getAVPairs() != null) {
+ 							// TODO: This is an assumption, that the last word iu to have meaning was the one that was elliptically unintegrated before.
+ 							seekSLL=false;
+ 						}
+					}
+				} else {
+					this.nextInput = null;
+				}
 				for (IU daiu : iu.grounds()) {
 					if (daiu instanceof DialogueActIU) {
+						System.err.println("Revoking " + daiu.toString());
 						daiu.revoke();
 						// TODO: add an edit message REVOKE to return instead.
 					}
@@ -557,9 +582,11 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 					// add a glue contribution for integrating input
 					ContribIU glue = new ContribIU(null, iu, new AVPair("undo:true"), false, null, null, null);
 					glue.groundIn(this.nextInput);
-//					glue.groundIn(this.root);
+					glue.groundIn(iu);
+					this.contributions.add(glue);
 					// and creating undo output
 					this.nextOutput = new DialogueActIU(this.nextOutput, glue, new UndoDialogueAct());
+					this.nextInput.commit();
 					this.nextInput = null;
 					this.integrateList.clear();
 					this.visited.clear();
@@ -580,6 +607,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public boolean nextInputIsNo() {
 		if (this.nextInput == null)
 			return false;
+		if (this.nextInput.getAVPairs() == null)
+			return false;
 		return this.nextInput.getAVPairs().get(0).equals("bool:false");
 	}
 
@@ -591,6 +620,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	@Override
 	public boolean nextInputIsYes() {
 		if (this.nextInput == null)
+			return false;
+		if (this.nextInput.getAVPairs() == null)
 			return false;
 		return this.nextInput.getAVPairs().get(0).equals("bool:true");
 	}

@@ -105,6 +105,9 @@ public class ContribIU extends IU {
 		if (this.contribution == null)
 			return false;
 		if (iu instanceof WordIU) {
+			if (((WordIU) iu).getAVPairs() == null) {
+				return false;
+			}
 			for (AVPair avp: ((WordIU) iu).getAVPairs()) {
 				if (avp.equals(this.contribution)) {
 					return true;
