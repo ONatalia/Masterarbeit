@@ -256,6 +256,22 @@ public abstract class IU implements Comparable<IU> {
 		}
 	}
 
+	public void removeGrin(List<IU> ius) {
+		for (IU iu : ius) {
+			this.removeGrin(iu);
+		}
+	}
+
+	public void removeGrin(IU iu) {
+		this.groundedIn.remove(iu);
+	}
+
+	public void groundIn(List<IU> ius) {
+		for (IU iu : ius) {
+			this.groundIn(iu);
+		}
+	}
+
 	public void groundIn(IU iu) {
 		if (this.groundedIn == null) {
 			this.groundedIn = new ArrayList<IU>();

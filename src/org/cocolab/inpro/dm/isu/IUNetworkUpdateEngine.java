@@ -2,6 +2,8 @@ package org.cocolab.inpro.dm.isu;
 
 import org.cocolab.inpro.dm.isu.rule.AbstractRule;
 import org.cocolab.inpro.dm.isu.rule.ClarifyNextInputRule;
+import org.cocolab.inpro.dm.isu.rule.ConfirmLastOutputRule;
+import org.cocolab.inpro.dm.isu.rule.DisconfirmLastOutputRule;
 import org.cocolab.inpro.dm.isu.rule.IntegrateNextInputRule;
 import org.cocolab.inpro.dm.isu.rule.MarkContribIfIntegratesRule;
 import org.cocolab.inpro.dm.isu.rule.MoveSearchDownRule;
@@ -34,15 +36,17 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 	 * CLARIFY and REQUEST output.
 	 */
 	public IUNetworkUpdateEngine(IUNetworkDomainUtil u) {
-		rules.add(new UnintegrateRevokedInputRule());
-		rules.add(new MarkContribIfIntegratesRule());
-		rules.add(new MoveSearchDownRule());
-		rules.add(new MoveSearchRightRule());
-		rules.add(new MoveSearchLeftRule());
-		rules.add(new MoveSearchUpRule());
-		rules.add(new IntegrateNextInputRule());
-		rules.add(new ClarifyNextInputRule());
-		rules.add(new RequestMoreInfoRule());
+		rules.add(new UnintegrateRevokedInputRule());			// REVOKE output grounded in revoked input
+		rules.add(new MarkContribIfIntegratesRule());			// Remember the ContribIU we're currently looking at if it integrates input
+		rules.add(new MoveSearchDownRule());					// Look further down in the contribution network (if we haven't yet.)
+		rules.add(new MoveSearchRightRule());					// Look further right in the contribution network (if we haven't yet.)
+		rules.add(new MoveSearchLeftRule());					// Look further left in the contribution network
+		rules.add(new MoveSearchUpRule());						// Look further up in the contribution network
+		rules.add(new IntegrateNextInputRule());				// Integrate marked input, if one was marked
+		rules.add(new ConfirmLastOutputRule());					// If a Yes didn't explicitly integrate, use it to confirm last output (do not clarify it)
+		rules.add(new DisconfirmLastOutputRule());				// If a No didn't explicitly integrate, use it to dis-confirm last output (do not clarify it)
+		rules.add(new ClarifyNextInputRule());					// Clarify next input, if more than one was marked
+		rules.add(new RequestMoreInfoRule());					// Request more input about current focus contribution
 		this.is = new IUNetworkInformationState(u.getContributions());
 	}
 
@@ -69,16 +73,16 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 		for (WordIU word : this.input) {
 			System.err.println(word.toString());
 			if (word.getAVPairs() == null) {  // Do not process word without semantics
-				System.err.println("Skipping meaningless " + word.toString());
+//				System.err.println("Skipping meaningless " + word.toString());
 				continue;
 			} else if (word.isRevoked() && word.grounds().isEmpty()) { // Do not process revoked words that don't ground anything 
-				System.err.println("Skipping revoked " + word.toString());
+//				System.err.println("Skipping revoked but irrelevant " + word.toString());
 				continue;
 			} else if (!word.isRevoked() && !word.grounds().isEmpty()) { // Do not process added words that already ground something
-				System.err.println("Skipping added " + word.toString());
+//				System.err.println("Skipping added but integrated " + word.toString());
 				continue;
 			} else { // Process all other words
-				System.err.println("Processing " + word.toString());
+				System.err.println("Processing new word " + word.toString());
 				is.setNextInput(word);
 				this.applyRules();				
 			}

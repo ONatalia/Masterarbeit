@@ -12,6 +12,8 @@ public abstract class AbstractIUNetworkRule extends AbstractRule {
 		boolean integrateListHasMoreThanOneMember();
 		boolean integrateListIsEmpty();
 		boolean nextInputIsRevoked();
+		boolean nextInputIsNo();
+		boolean nextInputIsYes();
 	}
 
 	public abstract interface Effects {
@@ -24,6 +26,8 @@ public abstract class AbstractIUNetworkRule extends AbstractRule {
 		boolean clarifyNextInput();
 		boolean requestMoreInfoAboutFocus();
 		boolean unintegrateNextInput();
+		boolean integrateYesEllipsis();
+		boolean integrateNoEllipsis();
 	}
 
 }

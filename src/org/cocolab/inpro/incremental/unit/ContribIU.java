@@ -57,6 +57,11 @@ public class ContribIU extends IU {
 	 * @param sll Same level link IU
 	 * @param grin Grounded-in IU
  	 * @param contribution AVPair describing this contribution
+ 	 * @param clarify boolean denoting if this contribution should be disambiguated
+	 * @param requestString the default request string for utterance construction
+	 * @param clarificationString the default clarification string for utterance construction
+	 * @param groundingString the default grounding string for utterance construction
+
 	 */
 	@SuppressWarnings("unchecked")
 	public ContribIU(IU sll, IU grin, AVPair contribution, boolean clarify,
