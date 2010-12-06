@@ -34,10 +34,7 @@ public class MaryAdapter {
 	
 	private static MaryAdapter maryAdapter = new MaryAdapter();
 	
-	public static MaryAdapter getMary() {
-		return maryAdapter;
-	}
-	
+	/** private constructor, this class is a singleton */
 	private MaryAdapter() {
         String serverHost = System.getProperty("mary.host", "localhost");
         int serverPort = Integer.getInteger("mary.port", 59125).intValue();
@@ -58,6 +55,10 @@ public class MaryAdapter {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public static MaryAdapter getInstance() {
+		return maryAdapter;
 	}
 	
 	private ByteArrayOutputStream process(String query, String inputType, String outputType, String audioType) throws UnknownHostException, IOException {

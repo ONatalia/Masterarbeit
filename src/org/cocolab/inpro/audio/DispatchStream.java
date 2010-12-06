@@ -40,6 +40,8 @@ Exception in thread "dispatcher object source" java.lang.ArrayIndexOutOfBoundsEx
 	at org.cocolab.inpro.apps.SimpleMonitor$2.run(SimpleMonitor.java:206)
 	at java.lang.Thread.run(Thread.java:662)
 
+
+ * TODO: would it be nice to directly output SysInstallmentIUs?
  * @author timo
  */
 public class DispatchStream extends InputStream implements Configurable {
@@ -110,7 +112,7 @@ public class DispatchStream extends InputStream implements Configurable {
 	}
 	
 	public void playTTS(String tts, boolean skipQueue) {
-		InputStream audioStream = MaryAdapter.getMary().text2audio(tts);
+		InputStream audioStream = MaryAdapter.getInstance().text2audio(tts);
 		playStream(audioStream, skipQueue);
 	}
 	

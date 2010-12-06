@@ -9,6 +9,12 @@ import javax.sound.sampled.AudioInputStream;
 import org.cocolab.inpro.tts.IUUtil;
 import org.cocolab.inpro.tts.MaryAdapter;
 
+/**
+ *
+ * TODO: add support for canned audio (i.e. read from WAV and TextGrid, maybe even transparently)
+ * TODO: cache previously synthesized audio
+ * @author timo
+ */
 public class SysInstallmentIU extends InstallmentIU {
 	
 	AudioInputStream synthesizedAudio;
@@ -16,7 +22,7 @@ public class SysInstallmentIU extends InstallmentIU {
 	@SuppressWarnings("unchecked") // allow cast from List<WordIU> to List<IU>
 	public SysInstallmentIU(String tts) {
 		super(null, tts);
-		InputStream is = MaryAdapter.getMary().text2maryxml(tts);
+		InputStream is = MaryAdapter.getInstance().text2maryxml(tts);
 		List<WordIU> words = Collections.<WordIU>emptyList();
 		try {
 			words = IUUtil.wordIUsFromMaryXML(is);
@@ -34,7 +40,7 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	public void synthesize() {
 		String mbrola = toMbrola();
-		synthesizedAudio = MaryAdapter.getMary().mbrola2audio(mbrola);
+		synthesizedAudio = MaryAdapter.getInstance().mbrola2audio(mbrola);
 	}
 	
 	@SuppressWarnings("unchecked") // allow cast of groundedIn to List<WordIU> 

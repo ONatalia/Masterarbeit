@@ -181,7 +181,7 @@ public class IUUtil {
 	}
 	
 	public static void main(String[] args) throws FileNotFoundException, JAXBException, TransformerException {
-		MaryAdapter ma = MaryAdapter.getMary();
+		MaryAdapter ma = MaryAdapter.getInstance();
 		//InputStream is = IUUtil.class.getResourceAsStream("example.maryxml");
 		InputStream is = ma.text2maryxml("nordwind und sonne");
 
