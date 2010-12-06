@@ -22,21 +22,24 @@ import edu.cmu.sphinx.util.props.S4Component;
 import edu.cmu.sphinx.util.props.S4ComponentList;
 import edu.cmu.sphinx.util.props.S4String;
 
-// TODO: try what-from-to-on-at agenda IU dialogue without clarifications.
-
 public class IUNetworkDialogueManager extends AbstractDialogueManager implements AudioActionManager.Listener {
 
 	/** The lexical semantics mapping configuration variables */
 	@S4String(mandatory = true)
+	/** The lexical semantics configuration property string */
 	public final static String PROP_LEX_SEMANTICS = "lexicalSemantics";
 	/** The internal state listener configuration */
 	@S4ComponentList(type = PushBuffer.class)
+	/** The state listeners configuration property string */
 	public final static String PROP_STATE_LISTENERS = "stateListeners";
+	/** The list of state listeners */
 	protected List<PushBuffer> stateListeners;
+	/** The domain utility configuration */
 	@S4Component(type = IUNetworkDomainUtil.class)
+	/** The domain utility configuration property string */
 	public final static String PROP_DOMAIN = "domain";
+	/** The domain utility wrapping information state creation */
 	protected IUNetworkDomainUtil domain;
-
 	
 	/**
 	 * Update Engine holding rules, information state and interfaces
@@ -51,15 +54,14 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		String lexicalSemanticsPath = ps.getString(PROP_LEX_SEMANTICS);
-		try {
-			WordIU.setAVPairs(AVPairMappingUtil.readAVPairs(new URL(lexicalSemanticsPath)));
-		} catch (IOException e) {
+		try {WordIU.setAVPairs(AVPairMappingUtil.readAVPairs(new URL(lexicalSemanticsPath)));} catch (IOException e) {
 			e.printStackTrace();
 			logger.fatal("Could not set WordIU's AVPairs from file " + lexicalSemanticsPath);
 		}
 		this.domain = (IUNetworkDomainUtil) ps.getComponent(PROP_DOMAIN);
 		this.stateListeners = ps.getComponentList(PROP_STATE_LISTENERS, PushBuffer.class);
 		this.updateEngine = new IUNetworkUpdateEngine(this.domain);
+		this.updateStateListeners();
 		this.logToTedView("Initial State:\n" + this.updateEngine.getInformationState().toString());
 		logger.info(this.updateEngine.getInformationState().toString());
 	}
@@ -95,15 +97,20 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 	 * super.postUpdate() to release locks. 
 	 */
 	protected void postUpdate() {
-		this.rightBuffer.setBuffer(this.updateEngine.getOutput());
+//		this.rightBuffer.setBuffer(this.updateEngine.getOutput());
+		this.rightBuffer.setBuffer(this.updateEngine.getEdits());
 		this.logToTedView("New State:\n" + this.updateEngine.getInformationState().toString());
+		this.updateStateListeners();
+		super.postUpdate();
+	}
+	
+	private void updateStateListeners() {
 		IUList<ContribIU> newList = new IUList<ContribIU>();
 		List<EditMessage<ContribIU>> contributionEdits = this.updateEngine.getInformationState().getContributions().diff(newList);
 		contributionEdits = newList.diff(this.updateEngine.getInformationState().getContributions());
 		for (PushBuffer listener : this.stateListeners) {
 			listener.hypChange(this.updateEngine.getInformationState().getContributions(), contributionEdits);
 		}
-		super.postUpdate();
 	}
 
 	public void done(DialogueActIU iu) {

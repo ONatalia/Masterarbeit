@@ -264,6 +264,7 @@ public abstract class IU implements Comparable<IU> {
 
 	public void removeGrin(IU iu) {
 		this.groundedIn.remove(iu);
+		iu.grounds.remove(this);
 	}
 
 	public void groundIn(List<IU> ius) {

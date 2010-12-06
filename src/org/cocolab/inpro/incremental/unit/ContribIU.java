@@ -204,7 +204,7 @@ public class ContribIU extends IU {
 		if ((groundedIn != null) && (groundedIn.size() > 0)) {
 			double time = 0;
 			for (IU iu : this.groundedIn()) {
-				if (iu.endTime() != Double.NaN) {
+				if (Double.isNaN(iu.endTime())) {
 					if (iu.endTime() > time)
 						time = iu.endTime();
 				}
