@@ -43,6 +43,10 @@ public class Label {
 		label = l;
 	}
 
+	/** copy constructor */
+	public Label(Label l) {
+		this(l.getStart(), l.getEnd(), l.getLabel());
+	}
 		
 	/** in seconds */
 	public double getStart() {
@@ -74,6 +78,14 @@ public class Label {
 		return sb.toString();
 	}
 	
+	public StringBuilder toMbrola() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(label);
+		sb.append(" ");
+		sb.append((int) ((end - start) * 1000));
+		return sb;
+	}
+
 	public static void main(String[] args) throws IOException {
 		Label l = newFromTextGridLines(Arrays.asList(
 				"        xmin = 0.910000", 

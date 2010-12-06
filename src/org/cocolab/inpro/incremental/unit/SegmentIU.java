@@ -36,6 +36,11 @@ public class SegmentIU extends IU {
 		assert (Label.SILENCE.contains(segment) || VOWELS.contains(segment) || CONSONANTS.contains(segment)) : "segment " + segment + " is neither a vowel, consonant nor silence I could understand.";
 		this.l = new Label(segment);
 	}
+	
+	public SegmentIU(Label l) {
+		assert (Label.SILENCE.contains(l.getLabel()) || VOWELS.contains(l.getLabel()) || CONSONANTS.contains(l.getLabel())) : "segment " + l.getLabel() + " is neither a vowel, consonant nor silence I could understand.";
+		this.l = l;
+	}
 
 	public void updateLabel(Label l) {
 		assert (this.l.getLabel().equals(l.getLabel())) : "my label is " + this.l.toString() + ", was asked to update with " + l.toString();
@@ -84,6 +89,13 @@ public class SegmentIU extends IU {
 	@Override
 	public String toPayLoad() {
 		return l.getLabel();
+	}
+
+	/** this segment represented as an mbrola line */
+	public StringBuilder toMbrolaLine() {
+		StringBuilder sb = new StringBuilder(l.toMbrola());
+		sb.append("\n");
+		return sb;
 	}
 	
 }

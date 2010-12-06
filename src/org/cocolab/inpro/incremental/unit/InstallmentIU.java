@@ -17,7 +17,7 @@ public class InstallmentIU extends IU {
 	/**
 	 * String holding the system reponse
 	 */
-	final String tts;
+	protected String tts;
 	/**
 	 * Variable specifying who produced this installment
 	 */
@@ -47,7 +47,7 @@ public class InstallmentIU extends IU {
 	 * @param tts the spoken string
 	 */
 	public InstallmentIU(DialogueActIU dialogueAct, String tts) {
-		super(Collections.<IU>singletonList(dialogueAct));
+		super(dialogueAct != null ? Collections.<IU>singletonList(dialogueAct) : Collections.<IU>emptyList());
 		this.systemProduced = true;
 		this.tts = tts;
 	}

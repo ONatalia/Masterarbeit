@@ -29,6 +29,10 @@ public class WordIU extends IU {
 		this(pron.getWord().getSpelling(), pron, sll, groundedIn);
 	}
 	
+	public WordIU(String spelling, WordIU sll, List<IU> groundedIn) {
+		this(spelling, null, sll, groundedIn);
+	}
+	
 	protected WordIU(String word, Pronunciation pron, WordIU sll, List<IU> groundedIn) {
 		super(sll, groundedIn, true);
 		this.pron = pron;
@@ -186,6 +190,15 @@ public class WordIU extends IU {
 			}
 		}
 		return ret.toString().replaceAll("^ *", "").replaceAll(" *$", "");
+	}
+
+	public StringBuilder toMbrolaLines() {
+		StringBuilder sb = new StringBuilder("; ");
+		sb.append(toPayLoad());
+		for (SegmentIU seg : getSegments()) {
+			sb.append(seg.toMbrolaLine());
+		}
+		return sb;
 	}
 	
 }

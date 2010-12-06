@@ -109,13 +109,8 @@ public class DispatchStream extends InputStream implements Configurable {
 		playStream(audioStream, skipQueue);
 	}
 	
-	private MaryAdapter maryAdapter;
-	
 	public void playTTS(String tts, boolean skipQueue) {
-		if (maryAdapter == null) {
-			maryAdapter = new MaryAdapter();
-		}
-		InputStream audioStream = maryAdapter.text2audio(tts);
+		InputStream audioStream = MaryAdapter.getMary().text2audio(tts);
 		playStream(audioStream, skipQueue);
 	}
 	

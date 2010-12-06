@@ -73,7 +73,7 @@ public class VisualTTS extends JPanel {
 		super();
 		MaryAdapter maryAdapter;
 		try {
-			maryAdapter = new MaryAdapter();
+			maryAdapter = MaryAdapter.getMary();
 		} catch(Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Problem connecting to TTS server: \n" + e.toString());
