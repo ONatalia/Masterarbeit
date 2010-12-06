@@ -11,6 +11,8 @@ import org.cocolab.inpro.dm.acts.UndoDialogueAct;
 import org.cocolab.inpro.dm.isu.rule.AbstractIUNetworkRule;
 import org.cocolab.inpro.incremental.unit.ContribIU;
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
+import org.cocolab.inpro.incremental.unit.EditMessage;
+import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.WordIU;
@@ -41,8 +43,10 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	private IUList<ContribIU> integrateList = new IUList<ContribIU>();
 	/** A list of contributions that were visited during search. Filled during search and cleared afterwards.  */
 	private IUList<ContribIU> visited = new IUList<ContribIU>();
-	/** The DialogueActIU representing nextOutput. Remains 'current' output until a new one is created. */
+	/** The DialogueActIU representing nextOutput added or revoked. Remains 'current' output until a new one is created. */
 	private DialogueActIU nextOutput;
+	/** A list of edit messages produced as a result of (all previous and present) changes to the IS. */
+	private List<EditMessage<DialogueActIU>> outputEdits = new ArrayList<EditMessage<DialogueActIU>>();
 
 	/**
 	 * Generic constructor for an IUNetworkInformationState
@@ -69,6 +73,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		this.currentContrib = this.root;
 		// Generate request output about next focus.
 		this.nextOutput = new DialogueActIU((IU) DialogueActIU.FIRST_DA_IU, this.getNextFocusContrib(), new RequestDialogueAct());
+		this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
 	}
 	
 	/**
@@ -131,9 +136,11 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 */
 	public ContribIU getFocusContrib() {
 		ContribIU focus = this.root;
+		System.err.println("Setting focus to root.");
 		for (ContribIU iu : this.contributions) {
 			// End time is inherited from input. Greater is later.
 			if (iu.endTime() > focus.endTime()) {
+				System.err.println("Setting focus to " + iu.toString());
 				focus = iu;
 			}
 		}
@@ -141,7 +148,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	}
 
 	/**
-	 * Getter method returning the IS's next focus ContribIU (the first one that is grounded in the current contrib.)
+	 * Getter method returning the IS's next focus ContribIU
+	 * (this is the first contribution that is grounded in the current focus contribution.)
 	 * @return nextFocus  the next contribution that is grounded in current focus.
 	 */
 	public ContribIU getNextFocusContrib() {
@@ -288,6 +296,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			marked.groundIn(this.nextInput);
 			// output a grounding dialogue act
 			this.nextOutput = new DialogueActIU(this.nextOutput, this.integrateList.get(0), new GroundDialogueAct());
+			this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
 			// move focus to the newly integrated contribution
 			this.currentContrib = marked;
 			// clear next input (we just integrated some)
@@ -302,10 +311,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 					AbstractDialogueAct act = ((DialogueActIU) iu).getAct();
 					if (act instanceof ClarifyDialogueAct ||
 							act instanceof RequestDialogueAct) {
-						//TODO: AM must make sure to commit when execute
-						//TODO: make sure to not revoke committed ones.
-						//TODO: the IS should return an EditMessage list instead of DialogueActIUs
-						iu.revoke();
+						this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.REVOKE, (DialogueActIU) iu));
+
 					}
 				}
 			}
@@ -322,6 +329,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public boolean clarifyNextInput() {
 		List<IU> grin = new ArrayList<IU>(this.integrateList);
 		this.nextOutput = new DialogueActIU(this.nextOutput, grin, new ClarifyDialogueAct());
+		this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
 		this.currentContrib = this.getFocusContrib();
 		this.nextInput = null;
 		this.integrateList.clear();
@@ -336,6 +344,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	@Override
 	public boolean requestMoreInfoAboutFocus() {
 		this.nextOutput = new DialogueActIU(this.nextOutput, this.getFocusContrib(), new RequestDialogueAct());
+		this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
 		this.currentContrib = this.getFocusContrib();
 		this.nextInput = null;
 		this.integrateList.clear();
@@ -508,27 +517,34 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		boolean stateChanged = false;
 		for (ContribIU iu : this.contributions) {
 			if (iu.groundedIn().contains(this.nextInput)) {
-				iu.groundedIn().remove(this.nextInput);
-				this.nextInput.grounds().remove(iu);
-				if (this.nextInput.getAVPairs().get(0).equals("bool:false")) {
-					// Reintegrating previous input
-					// TODO: make this a separate rule (triggering before this one)
+				if (this.nextInput.getAVPairs().get(0).equals("bool:false")
+//						&& ((ContribIU) this.nextInput.grounds().get(0)).getContribution().equals("undo:true")) {
+						&& (iu.getContribution().equals("undo:true"))) {
+					// Reintegrating previous input if an ellipsis 'no' was unitegrated
+					// First move the current contrib to the last contibution before "no"
+					this.currentContrib = (ContribIU) iu.groundedIn().get(0); // current contrib is whatever came before "no"
+					// then unground it
+					iu.removeGrin(this.nextInput);
+					// then find the last input IU to integrate something.
 					boolean seekSLL = true;
 					while(seekSLL) {
  						this.nextInput = (WordIU) this.nextInput.getSameLevelLink();
  						if (this.nextInput.getAVPairs() != null) {
- 							// TODO: This is an assumption, that the last word iu to have meaning was the one that was elliptically unintegrated before.
+ 							System.err.println("reintegrating " + this.nextInput);
+ 							// Assume last meaningful input was the one that the ellipsis unintegrated
  							seekSLL=false;
  						}
 					}
 				} else {
+					// Nothing to reintegrate.
+					// Non-elliptical "no"s and other input simply get their grounding contribution links removed
+					iu.removeGrin(this.nextInput);
 					this.nextInput = null;
 				}
 				for (IU daiu : iu.grounds()) {
 					if (daiu instanceof DialogueActIU) {
 						System.err.println("Revoking " + daiu.toString());
-						daiu.revoke();
-						// TODO: add an edit message REVOKE to return instead.
+						this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.REVOKE, (DialogueActIU) daiu));
 					}
 				}
 				stateChanged = true;
@@ -586,6 +602,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 					this.contributions.add(glue);
 					// and creating undo output
 					this.nextOutput = new DialogueActIU(this.nextOutput, glue, new UndoDialogueAct());
+					this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
 					this.nextInput.commit();
 					this.nextInput = null;
 					this.integrateList.clear();
@@ -634,6 +651,15 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public DialogueActIU getNextOutput() {
 		return this.nextOutput;
 	}
+	
+	/**
+	 * Getter for the next output to perform.
+	 * @return
+	 */
+	public List<EditMessage<DialogueActIU>> getEdits() {
+		return this.outputEdits;
+	}
+
 
 	/**
 	 * Builds and returns a String representation of the IS.

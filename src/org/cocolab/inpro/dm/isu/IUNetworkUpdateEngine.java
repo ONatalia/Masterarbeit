@@ -1,5 +1,8 @@
 package org.cocolab.inpro.dm.isu;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.cocolab.inpro.dm.isu.rule.AbstractRule;
 import org.cocolab.inpro.dm.isu.rule.ClarifyNextInputRule;
 import org.cocolab.inpro.dm.isu.rule.ConfirmLastOutputRule;
@@ -14,6 +17,7 @@ import org.cocolab.inpro.dm.isu.rule.RequestMoreInfoRule;
 import org.cocolab.inpro.dm.isu.rule.UnintegrateRevokedInputRule;
 
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
+import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.incremental.unit.IUList;
 
@@ -28,7 +32,8 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 
 	private IUNetworkInformationState is;
 	private IUList<WordIU> input = new IUList<WordIU>();
-	private IUList<DialogueActIU> output = new IUList<DialogueActIU>();
+//	private IUList<DialogueActIU> output = new IUList<DialogueActIU>();
+	private List<EditMessage<DialogueActIU>> edits = new ArrayList<EditMessage<DialogueActIU>>();
 
 	/**
 	 * A simple constructor initiating an empty information state and 
@@ -54,10 +59,22 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 	 * Getter method for output.
 	 * @return all output DialogueActIUs
 	 */
-	public IUList<DialogueActIU> getOutput() {
-		return this.output;
+//	public IUList<DialogueActIU> getOutput() {
+//		return this.output;
+//	}
+
+	/**
+	 * Getter method for output edits.
+	 * @return all output DialogueActIUs edit messages
+	 */
+	public List<EditMessage<DialogueActIU>> getEdits() {
+		return this.edits;
 	}
-	
+
+	/**
+	 * 
+	 * @return
+	 */
 	public IUNetworkInformationState getInformationState() {
 		return this.is;
 	}
@@ -68,25 +85,32 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 	 * @param iu
 	 */
 	public void applyRules(WordIU iu) {
-		if (!this.input.contains(iu))
+		if (!this.input.contains(iu)) 
 			this.input.add(iu);
+		System.err.println("Processing new word " + iu.toString());
+		is.setNextInput(iu);
+		this.applyRules();			
+		// TODO: only process words that need processing (remove once integrated uniquely).
+		IUList<WordIU> keep = new IUList<WordIU>();
 		for (WordIU word : this.input) {
 			System.err.println(word.toString());
 			if (word.getAVPairs() == null) {  // Do not process word without semantics
-//				System.err.println("Skipping meaningless " + word.toString());
+				System.err.println("Skipping meaningless " + word.toString());
 				continue;
 			} else if (word.isRevoked() && word.grounds().isEmpty()) { // Do not process revoked words that don't ground anything 
-//				System.err.println("Skipping revoked but irrelevant " + word.toString());
+				System.err.println("Skipping revoked but irrelevant " + word.toString());
 				continue;
 			} else if (!word.isRevoked() && !word.grounds().isEmpty()) { // Do not process added words that already ground something
-//				System.err.println("Skipping added but integrated " + word.toString());
+				System.err.println("Skipping added but integrated " + word.toString());
 				continue;
 			} else { // Process all other words
+				keep.add(word);
 				System.err.println("Processing new word " + word.toString());
 				is.setNextInput(word);
 				this.applyRules();				
 			}
 		}
+		this.input = keep;
 	}
 
 	/**
@@ -102,9 +126,10 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 		for (AbstractRule r : rules) {
 			if (r.triggers(is)) {
 				if (r.apply(is)) {
-					if (is.getNextOutput() != null)
-						if (!this.output.contains(is.getNextOutput()))
-							this.output.add(is.getNextOutput());
+					this.edits = is.getEdits();
+//					if (is.getNextOutput() != null)
+//						if (!this.output.contains(is.getNextOutput()))
+//							this.output.add(is.getNextOutput());
 					restart = true;
 					break;
 				}
