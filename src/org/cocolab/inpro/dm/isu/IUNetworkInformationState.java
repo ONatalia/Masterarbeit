@@ -226,14 +226,14 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 * @true if successful
 	 */
 	@Override
-	public boolean moveCurrentContribDown() {
+	public boolean moveCurrentContribUp() {
 		for (IU iu : this.getCurrentContrib().grounds()) {
 			if (iu instanceof ContribIU) {
 				this.currentContrib = (ContribIU) iu;
 				if (!this.visited.contains(this.currentContrib)) {
 					this.visited.add(this.currentContrib);
-					return true;
 				}
+				return true;
 			}
 		}
 		return false;
@@ -252,8 +252,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			this.currentContrib = (ContribIU) this.getCurrentContrib().getSameLevelLink();
 			if (!this.visited.contains(this.currentContrib)) {
 				this.visited.add(this.currentContrib);
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}
@@ -264,7 +264,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 * @true if successful
 	 */
 	@Override
-	public boolean moveCurrentContribUp() {
+	public boolean moveCurrentContribDown() {
 		if (this.nextInput == null)
 			return false;
 		for (IU iu : this.getCurrentContrib().groundedIn()) {
@@ -272,8 +272,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 				this.currentContrib = (ContribIU) iu;
 				if (!this.visited.contains(this.currentContrib)) {
 					this.visited.add(this.currentContrib);
+					return true;
 				}
-				return true;
 			}
 		}
 		return false;
@@ -423,9 +423,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			return false;
 		for (IU iu : this.getCurrentContrib().grounds()) {
 			if (iu instanceof ContribIU) {
-				if (!this.visited.contains(iu)) {
-					return true;					
-				}
+				return true;
 			}
 		}
 		return false;
@@ -457,11 +455,11 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public boolean currentContribIsGroundedInSomething() {
 		if (this.nextInput == null)
 			return false;
-		if (this.getCurrentContrib().equals(this.root))
-			return false;
 		for (IU iu : this.getCurrentContrib().groundedIn()) {
 			if (iu instanceof ContribIU) {
-				return true;
+				if (!this.visited.contains(iu)) {
+					return true;					
+				}
 			}
 		}
 		return false;

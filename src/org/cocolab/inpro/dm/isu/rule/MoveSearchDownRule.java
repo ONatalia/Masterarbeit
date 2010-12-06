@@ -8,7 +8,7 @@ public class MoveSearchDownRule extends AbstractIUNetworkRule {
 	@Override
 	public boolean triggers(AbstractInformationState is) {
 //		System.err.println("Testing trigger for " + this.toString());
-		return (((IUNetworkInformationState) is).currentContribGroundsSomething());
+		return (((IUNetworkInformationState) is).currentContribIsGroundedInSomething());
 	}
 
 	@Override
