@@ -174,7 +174,7 @@ public class IUNetworkToDOT extends PushBuffer {
 	private void printSLL(IU iu, IU sll) {
 		int id1 = iu.getID();
 		int id2 = sll.getID();
-		outStream.println("\"" + id1 + "\" -> \"" + id2 + "\";");
+		outStream.println("\"" + id1 + "\" -> \"" + id2 + "\" [style=dotted];");
 	}
 
 	private void printGrin(IU iu, IU gr) {
