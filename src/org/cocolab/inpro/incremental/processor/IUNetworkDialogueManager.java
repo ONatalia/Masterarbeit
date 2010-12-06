@@ -97,7 +97,6 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 	 * super.postUpdate() to release locks. 
 	 */
 	protected void postUpdate() {
-//		this.rightBuffer.setBuffer(this.updateEngine.getOutput());
 		this.rightBuffer.setBuffer(this.updateEngine.getEdits());
 		this.logToTedView("New State:\n" + this.updateEngine.getInformationState().toString());
 		this.updateStateListeners();
