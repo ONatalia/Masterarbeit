@@ -75,8 +75,10 @@ public class ThreadingListener implements ResultListener,
         	((Recognizer) recognizer).addStateListener(this);
         }
         queueSize = ps.getInt(PROP_QUEUE_SIZE);
-        @SuppressWarnings("unused")
 		List<ResultListener> resultListeners = ps.getComponentList(PROP_LISTENERS, ResultListener.class);
+        for (ResultListener rl : resultListeners) {
+        	addResultListener(rl);
+        }
 	}
 	
 	@Override
