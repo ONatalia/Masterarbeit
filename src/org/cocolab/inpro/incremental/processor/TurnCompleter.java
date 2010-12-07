@@ -5,10 +5,12 @@ import java.util.Collection;
 import java.util.List;
 
 import org.cocolab.inpro.audio.DispatchStream;
+import org.cocolab.inpro.domains.turncompleter.CompletionEvaluator;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -21,7 +23,13 @@ public class TurnCompleter extends IUModule {
 	public static final String PROP_DISPATCHER = "dispatchStream";
 	DispatchStream audioDispatcher;
 	
+	@S4Component(type = CompletionEvaluator.class, mandatory = false)
+	public static final String PROP_EVALUATOR = "evaluator";
+	CompletionEvaluator evaluator;
+	
 	private static int OUTPUT_BUFFER_DELAY = 150;
+	
+	private SysInstallmentIU fullInstallment;
 	
 	/** statically set av pairs for digits/numbers * /
 	static {
@@ -48,43 +56,50 @@ public class TurnCompleter extends IUModule {
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		audioDispatcher = (DispatchStream) ps.getComponent(PROP_DISPATCHER);
+		evaluator = (CompletionEvaluator) ps.getComponent(PROP_EVALUATOR);
+		String fullText = "nordwind und sonne einst stritten sich nordwind und sonne wer von ihnen beiden wohl der stärkere wäre als ein wanderer der in einen warmen mantel gehüllt war des weges daherkam sie wurden einig dass derjenige für den stärkeren gelten sollte der den wanderer zwingen würde seinen mantel abzunehmen";
+		fullInstallment = new SysInstallmentIU(fullText);
 	}
 	
-	@SuppressWarnings("unchecked") // cast of edit list to WordIUs 
+	@SuppressWarnings("unchecked") // casts from IU to WordIU 
 	@Override
 	protected void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
-		EditMessage<WordIU> edit = (edits.isEmpty()) ? null : (EditMessage<WordIU>) edits.get(edits.size() - 1);
-		if (edit != null && edit.getType().equals(EditType.ADD)) {
-			WordIU word = edit.getIU();
-//				if (word.hasAVPairs()) {
-//					AVPair avp = word.getAVPairs().get(0);
-//					int value = (Integer) avp.getValue();
-//					if (value == 4) { // whenever we hear the word "four"
-//						doComplete((List<WordIU>) ius, "fünf sechs sieben acht");
-//					}
-//				}
-			if (nonSilWords((List<WordIU>) ius) == 6 && !word.isSilence()) {
+		//TODO: on commit: remove committed words from fullUtterance, re-TTS the installmentIU
+		EditMessage<WordIU> edit = (edits.isEmpty()) ? null : (EditMessage<WordIU>) lastElement(edits);
+		List<WordIU> inputWords = (List<WordIU>) ius;
+		// we only ever do something on the addition of a word which is not a silence
+		if (edit != null && edit.getType().equals(EditType.ADD) && !edit.getIU().isSilence()) {
+			if (shouldFire(inputWords)) {
+				WordIU word = edit.getIU();
 				System.err.println("going to fire after " + word.getWord());
-				doComplete((List<WordIU>) ius, "fünf sechs sieben acht");
+				doComplete(inputWords, fullInstallment);
 			}
 		}
 	}
 	
+	/** 
+	 * determine whether we should complete the utterance based on the words heard so far
+	 * currently, the algorithm decides to *always* (repeatedly) fire when the expected prefix is recognized  
+	 */
+	private boolean shouldFire(List<WordIU> words) {
+		// always fire if there were at least 3 words and the expected prefix is matched
+		return (nonSilWords(words) >= 3 && fullInstallment.matchesPrefix(words));
+	}
+	
+	/** return the number of non silent words in the given word list */
 	private int nonSilWords(List<WordIU> words) {
 		int count = 0;
-		for (WordIU word : words) {
+		for (WordIU word : words)
 			if (!word.isSilence())
-				System.err.print("\t" + word);
 				count++;
-		}
-		System.err.println();
 		return count;
 	}
 	
-	private void doComplete(List<WordIU> input, String completion) {
-		WordIU currentWord = input.get(input.size() - 1);
-		// let's analyze the word-beginnings (but only for non-silence words
+	
+	private void doComplete(List<WordIU> input, SysInstallmentIU fullInstallment) {
+		WordIU currentWord = lastElement(input);
+		// let's analyze the word-beginnings (but only for non-silence words)
 		List<Double> wordStarts = getWordStarts(input);
 		double extrapolatedTime = extrapolateNext(wordStarts);
 		// getAge() counts in milliseconds, the other values are in seconds
@@ -92,7 +107,7 @@ public class TurnCompleter extends IUModule {
 		System.err.println(currentWord.startTime());
 		System.err.println(currentWord.getAge());
 		long whenToStart1 = (long) (1000 * (extrapolatedTime - currentWord.startTime())) - currentWord.getAge();
-		System.err.println("assuming output buffer delay (ms) " + OUTPUT_BUFFER_DELAY);
+		System.err.println("assuming input+output buffer delay (ms) " + OUTPUT_BUFFER_DELAY);
 		whenToStart1 -= OUTPUT_BUFFER_DELAY;
 		int whenToStart = (int) Math.max(0, whenToStart1);
 		try {
@@ -122,4 +137,9 @@ public class TurnCompleter extends IUModule {
 		return wordStarts;
 	}
 
+	/** utility which unfortunately is not part of java.util. */
+	private <T> T lastElement(List<T> list) {
+		return list.get(list.size() - 1);
+	}
+	
 }
