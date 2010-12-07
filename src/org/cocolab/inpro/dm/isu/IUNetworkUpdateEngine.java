@@ -90,22 +90,27 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 		System.err.println("Processing new word " + iu.toString());
 		is.setNextInput(iu);
 		this.applyRules();			
-		// TODO: only process words that need processing (remove once integrated uniquely).
+		// keep track of words that were processed 
 		IUList<WordIU> keep = new IUList<WordIU>();
 		for (WordIU word : this.input) {
 			System.err.println(word.toString());
-			if (word.getAVPairs() == null) {  // Do not process word without semantics
+			if (word.getAVPairs() == null) {
+				// Do not process word without semantics
 				System.err.println("Skipping meaningless " + word.toString());
 				continue;
-			} else if (word.isRevoked() && word.grounds().isEmpty()) { // Do not process revoked words that don't ground anything 
-				System.err.println("Skipping revoked but irrelevant " + word.toString());
+			} else if (word.isRevoked() && word.grounds().isEmpty()) {
+				// Do not process revoked words that don't ground anything 
+				System.err.println("Skipping revoked, irrelevant " + word.toString());
 				continue;
-			} else if (!word.isRevoked() && !word.grounds().isEmpty()) { // Do not process added words that already ground something
-				System.err.println("Skipping added but integrated " + word.toString());
+			} else if (!word.isRevoked() && !word.grounds().isEmpty()) {
+				// Do not process added words that already ground something
+				System.err.println("Skipping already integrated " + word.toString());
 				continue;
-			} else { // Process all other words
+			} else {
+				// Process all other words
 				keep.add(word);
-				System.err.println("Processing new word " + word.toString());
+				String status = word.isRevoked() ? "new" : "revoked";
+				System.err.println("Processing " + status + " word " + word.toString());
 				is.setNextInput(word);
 				this.applyRules();				
 			}

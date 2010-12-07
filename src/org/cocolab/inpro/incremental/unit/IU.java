@@ -151,10 +151,22 @@ public abstract class IU implements Comparable<IU> {
 	 */
 	public double endTime() {
 		if ((groundedIn != null) && (groundedIn.size() > 0)) {
-			return groundedIn.get(groundedIn.size() - 1).endTime();
+			double time = 0;
+			for (IU iu : this.groundedIn()) {
+				if (Double.isNaN(iu.endTime())) {
+					if (iu.endTime() > time)
+						time = iu.endTime();
+				}
+			}
+			return time;
 		} else {
 			return Double.NaN;
 		}
+//		if ((groundedIn != null) && (groundedIn.size() > 0)) {
+//			return groundedIn.get(groundedIn.size() - 1).endTime();
+//		} else {
+//			return Double.NaN;
+//		}
 	}
 	
 	/**

@@ -37,6 +37,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	private IUList<ContribIU> contributions = new IUList<ContribIU>();
 	/** The root ContribIU that represents the first node in the contributions network. */
 	private ContribIU root;
+	/** The focus ContribIU that represents the last node in the contributions network to integrate. */
+	private ContribIU focus;
 	/** A variable that holds the contribution currently looked at while searching for contributions to integrate new input with. */
 	private ContribIU currentContrib;
 	/** The list of contributions with which input can be integrated. Filled during search and cleared afterwards. */
@@ -67,12 +69,14 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 				break;
 			}
 		}
+		// Root is the first known if not specified
 		if (this.root == null) 
 			this.root = this.contributions.get(0);
-		// Always start search at root
+		// Always start search and focus at root
 		this.currentContrib = this.root;
+		this.focus = this.root;
 		// Generate request output about next focus.
-		this.nextOutput = new DialogueActIU((IU) DialogueActIU.FIRST_DA_IU, this.getNextFocusContrib(), new RequestDialogueAct());
+		this.nextOutput = new DialogueActIU((IU) DialogueActIU.FIRST_DA_IU, this.root, new RequestDialogueAct());
 		this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
 	}
 	
@@ -127,42 +131,52 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		return this.contributions;
 	}
 	
-	/**
-	 * Gets the current focus contribution.
-	 * This is defined as the contribution that was most
-	 * recently integrated with input.
-	 * Returns the first contribution of none are integrated.
-	 * @return the most recently integrated contribution
-	 */
-	public ContribIU getFocusContrib() {
-		ContribIU focus = this.root;
-		System.err.println("Setting focus to root.");
-		for (ContribIU iu : this.contributions) {
-			// End time is inherited from input. Greater is later.
-			if (iu.endTime() > focus.endTime()) {
-				System.err.println("Setting focus to " + iu.toString());
-				focus = iu;
-			}
-		}
-		return focus;
-	}
+//	/**
+//	 * Gets the current focus contribution.
+//	 * This is defined as the contribution that was most
+//	 * recently integrated with input.
+//	 * Returns the first contribution of none are integrated.
+//	 * @return the most recently integrated contribution
+//	 */
+//	public ContribIU getFocusContrib() {
+////		ContribIU focus = this.root;
+////		for (ContribIU iu : this.contributions) {
+////			// End time is inherited from input. Greater is later.
+////			if (iu.endTime() > focus.endTime()) {
+////				focus = iu;
+////			}
+////		}
+////		System.err.println("Setting focus to " + focus.toString());
+////		return focus;
+//		System.err.println("Focus is " + this.focus);
+//		return this.focus;
+//	}
 
-	/**
-	 * Getter method returning the IS's next focus ContribIU
-	 * (this is the first contribution that is grounded in the current focus contribution.)
-	 * @return nextFocus  the next contribution that is grounded in current focus.
-	 */
-	public ContribIU getNextFocusContrib() {
-		ContribIU nextFocus = this.getFocusContrib();
-		if (!this.getFocusContrib().groundedIn().isEmpty()) {
-			for (IU iu : this.getFocusContrib().groundedIn()) {
-				if (iu instanceof ContribIU) {
-					 nextFocus = (ContribIU) iu;
-				}
-			}
-		}
-		return nextFocus;
-	}
+//	/**
+//	 * Getter method returning the IS's next focus ContribIU
+//	 * (this is the first contribution that is grounded in the current focus contribution.)
+//	 * @return nextFocus  the next contribution that is grounded in current focus.
+//	 */
+//	public ContribIU setNextFocusContrib() {
+//		if (this.focus.groundedIn().size() > 0) {
+//			ContribIU nextFocus = this.focus;
+//			for (IU iu : this.focus.groundedIn()) {
+//				if (!(iu instanceof ContribIU)) {
+//					if (!this.focus.groundedIn().isEmpty()) {
+//						for (IU ciu : this.focus.groundedIn()) {
+//							if (ciu instanceof ContribIU) {
+//								 nextFocus = (ContribIU) ciu;
+//							}
+//						}
+//					}
+//					break;
+//				}
+//			}
+//			System.err.println("Moving focus to " + nextFocus.toString());
+//			this.focus = nextFocus;
+//		}
+//		return this.focus;
+//	}
 
 	/**
 	 * Getter method returning the IS's current contribution
@@ -299,6 +313,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
 			// move focus to the newly integrated contribution
 			this.currentContrib = marked;
+			this.focus = marked;
 			// clear next input (we just integrated some)
 			this.nextInput = null;
 			// clear the integrate list (we just integrated some)
@@ -330,7 +345,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		List<IU> grin = new ArrayList<IU>(this.integrateList);
 		this.nextOutput = new DialogueActIU(this.nextOutput, grin, new ClarifyDialogueAct());
 		this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
-		this.currentContrib = this.getFocusContrib();
+		this.currentContrib = this.focus;
 		this.nextInput = null;
 		this.integrateList.clear();
 		this.visited.clear();
@@ -343,9 +358,9 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 */
 	@Override
 	public boolean requestMoreInfoAboutFocus() {
-		this.nextOutput = new DialogueActIU(this.nextOutput, this.getFocusContrib(), new RequestDialogueAct());
+		this.nextOutput = new DialogueActIU(this.nextOutput, this.focus, new RequestDialogueAct());
 		this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
-		this.currentContrib = this.getFocusContrib();
+		this.currentContrib = this.focus;
 		this.nextInput = null;
 		this.integrateList.clear();
 		this.visited.clear();
@@ -515,30 +530,35 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		boolean stateChanged = false;
 		for (ContribIU iu : this.contributions) {
 			if (iu.groundedIn().contains(this.nextInput)) {
-				if (this.nextInput.getAVPairs().get(0).equals("bool:false")
-//						&& ((ContribIU) this.nextInput.grounds().get(0)).getContribution().equals("undo:true")) {
-						&& (iu.getContribution().equals("undo:true"))) {
+				if (this.nextInput.getAVPairs().get(0).equals("bool:false") && (iu.getContribution().equals("undo:true"))) {
 					// Reintegrating previous input if an ellipsis 'no' was unitegrated
 					// First move the current contrib to the last contibution before "no"
 					this.currentContrib = (ContribIU) iu.groundedIn().get(0); // current contrib is whatever came before "no"
 					// then unground it
 					iu.removeGrin(this.nextInput);
-					// then find the last input IU to integrate something.
-					boolean seekSLL = true;
-					while(seekSLL) {
- 						this.nextInput = (WordIU) this.nextInput.getSameLevelLink();
- 						if (this.nextInput.getAVPairs() != null) {
- 							System.err.println("reintegrating " + this.nextInput);
- 							// Assume last meaningful input was the one that the ellipsis unintegrated
- 							seekSLL=false;
- 						}
+					iu.revoke();
+					for (IU input : iu.groundedIn()) {
+						if (!(input instanceof ContribIU)) {
+							this.nextInput = (WordIU) input;		// assuming word ius as input - could also be semius though.
+						}
 					}
+					// then find the last input IU to integrate something.
+//					boolean seekSLL = true;
+//					while(seekSLL) {
+// 						this.nextInput = (WordIU) this.nextInput.getSameLevelLink();
+// 						if (this.nextInput.getAVPairs() != null) {
+// 							System.err.println("reintegrating " + this.nextInput);
+// 							// Assume last meaningful input was the one that the ellipsis unintegrated
+// 							seekSLL=false;
+// 						}
+//					}
 				} else {
 					// Nothing to reintegrate.
 					// Non-elliptical "no"s and other input simply get their grounding contribution links removed
 					iu.removeGrin(this.nextInput);
 					this.nextInput = null;
 				}
+				// Revoke output dialogue act ius.
 				for (IU daiu : iu.grounds()) {
 					if (daiu instanceof DialogueActIU) {
 						System.err.println("Revoking " + daiu.toString());
@@ -548,6 +568,14 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 				stateChanged = true;
 			}
 		}
+		List<ContribIU> revoked = new ArrayList<ContribIU>();
+		for (IU iu : this.contributions) {
+			// Remove any contributions that may have been revoked in the meantime
+			if (iu instanceof ContribIU && iu.isRevoked()) {
+				revoked.add((ContribIU) iu);
+			}
+		}
+		this.contributions.removeAll(revoked);
 		return stateChanged;
 	}
 	
@@ -566,6 +594,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			if (iu instanceof ContribIU) {
 				this.nextInput.ground(iu);
 				this.nextInput = null;
+				this.currentContrib = (ContribIU) iu;
+				this.focus = (ContribIU) iu;
 				this.integrateList.clear();
 				this.visited.clear();
 				return true;
@@ -597,12 +627,16 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 					ContribIU glue = new ContribIU(null, iu, new AVPair("undo:true"), false, null, null, null);
 					glue.groundIn(this.nextInput);
 					glue.groundIn(iu);
+					glue.groundIn(remove);
 					this.contributions.add(glue);
 					// and creating undo output
 					this.nextOutput = new DialogueActIU(this.nextOutput, glue, new UndoDialogueAct());
 					this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
-					this.nextInput.commit();
+//					this.nextInput.commit();
+					// set focus and restart search and 
 					this.nextInput = null;
+					this.currentContrib = (ContribIU) iu;  // may not want this...
+					this.focus = (ContribIU) iu;           // may not want this...
 					this.integrateList.clear();
 					this.visited.clear();
 					return true;

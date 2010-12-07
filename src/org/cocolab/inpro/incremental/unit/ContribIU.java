@@ -195,25 +195,25 @@ public class ContribIU extends IU {
 		return this.confidence;
 	}
 	
-	/**
-	 * Getter for this contributions end time (which is the latest
-	 * end time of any known iu to ground it.
-	 */
-	@Override
-	public double endTime() {
-		if ((groundedIn != null) && (groundedIn.size() > 0)) {
-			double time = 0;
-			for (IU iu : this.groundedIn()) {
-				if (Double.isNaN(iu.endTime())) {
-					if (iu.endTime() > time)
-						time = iu.endTime();
-				}
-			}
-			return time;
-		} else {
-			return Double.NaN;
-		}
-	}
+//	/**
+//	 * Getter for this contributions end time (which is the latest
+//	 * end time of any known iu to ground it.
+//	 */
+//	@Override
+//	public double endTime() {
+//		if ((groundedIn != null) && (groundedIn.size() > 0)) {
+//			double time = 0;
+//			for (IU iu : this.groundedIn()) {
+//				if (Double.isNaN(iu.endTime())) {
+//					if (iu.endTime() > time)
+//						time = iu.endTime();
+//				}
+//			}
+//			return time;
+//		} else {
+//			return Double.NaN;
+//		}
+//	}
 
 	@Override
 	public String toPayLoad() {
