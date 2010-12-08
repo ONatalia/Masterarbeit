@@ -100,7 +100,6 @@ public class MaryAdapter {
         ByteArrayInputStream bais = null;
 		try {
 	        ByteArrayOutputStream baos = process(query, inputType, outputType, audioType);
-			System.err.println(baos.toString());
 			bais = new ByteArrayInputStream(baos.toByteArray());
 		} catch (IOException e) {
 			e.printStackTrace();

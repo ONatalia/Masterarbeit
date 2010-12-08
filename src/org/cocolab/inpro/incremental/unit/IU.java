@@ -170,7 +170,7 @@ public abstract class IU implements Comparable<IU> {
 	}
 	
 	/**
-	 * @return the duration of the IU, that is, endTime() - startTime()
+	 * @return the duration of the IU in seconds, that is, endTime() - startTime()
 	 */
 	public double duration() {
 		return endTime() - startTime();

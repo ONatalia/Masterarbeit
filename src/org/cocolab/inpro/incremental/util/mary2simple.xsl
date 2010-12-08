@@ -26,6 +26,7 @@
    <xsl:element name="ph">
     <xsl:attribute name="d"><xsl:apply-templates select="@duration" /></xsl:attribute>
     <xsl:attribute name="p"><xsl:text>_</xsl:text></xsl:attribute>
+    <xsl:attribute name="end"><xsl:apply-templates select="preceding::mary:ph[1]/attribute::end" /></xsl:attribute>
    </xsl:element>
   </xsl:element>
  </xsl:element>

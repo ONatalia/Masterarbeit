@@ -37,7 +37,7 @@ public class WordIU extends IU {
 		super(sll, groundedIn, true);
 		this.pron = pron;
 		this.word = word;
-		isSilence = this.word.equals(("<sil>"));
+		isSilence = this.word.equals("<sil>");
 	}
 	
 	/**
@@ -101,7 +101,7 @@ public class WordIU extends IU {
 	 * @param otherWord the word to base the new timings on
 	 */
 	public void updateTimings(WordIU otherWord) {
-		assert this.wordEquals(otherWord) : "Can't update segment timings based on a different word's segments";
+		assert this.pronunciationEquals(otherWord) : "Can't update segment timings based on a different word's segments";
 		List<Label> newLabels = new ArrayList<Label>();
 		for (SegmentIU segment : otherWord.getSegments()) {
 			newLabels.add(segment.l);
@@ -109,14 +109,20 @@ public class WordIU extends IU {
 		updateSegments(newLabels);
 	}
 	
-	public boolean wordEquals(Pronunciation pron) {
+	public boolean pronunciationEquals(Pronunciation pron) {
 		// words are equal if their pronunciations match
 		// OR if the word is silent and the other's pronunciation is silent as well
 		return ((isSilence && pron.getWord().isFiller()) || this.pron.equals(pron));
 	}
 	
-	public boolean wordEquals(WordIU iu) {
+	public boolean pronunciationEquals(WordIU iu) {
+		assert pron != null;
+		assert iu.pron != null;
 		return ((isSilence && iu.isSilence) || pron.equals(iu.pron));
+	}
+	
+	public boolean spellingEquals(WordIU iu) {
+		return (iu != null) && (getWord().equals(iu.getWord()));
 	}
 	
 	public String getWord() {

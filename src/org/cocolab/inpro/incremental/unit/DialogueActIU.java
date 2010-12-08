@@ -6,8 +6,8 @@ import java.util.List;
 import org.cocolab.inpro.dm.acts.AbstractDialogueAct;
 import org.cocolab.inpro.dm.acts.ClarifyDialogueAct;
 import org.cocolab.inpro.dm.acts.GroundDialogueAct;
+import org.cocolab.inpro.dm.acts.InformDialogueAct;
 import org.cocolab.inpro.dm.acts.RequestDialogueAct;
-import org.cocolab.inpro.dm.acts.SpeakDialogueAct;
 
 public class DialogueActIU extends IU {
 
@@ -15,9 +15,8 @@ public class DialogueActIU extends IU {
 	
 	private AbstractDialogueAct act;
 
-	@SuppressWarnings("unchecked")
 	public DialogueActIU() {
-		this(FIRST_DA_IU, Collections.EMPTY_LIST, null);
+		this(FIRST_DA_IU, Collections.<IU>emptyList(), null);
 	}
 
 	public DialogueActIU(IU sll, List<IU> groundedIn, AbstractDialogueAct act) {
@@ -52,8 +51,8 @@ public class DialogueActIU extends IU {
 			return ((ContribIU) this.groundedIn.get(0)).getClarificationString();
 		} else if (this.act instanceof GroundDialogueAct) {
 			return ((ContribIU) this.groundedIn.get(0)).getGroundingString();
-		} else if (this.act instanceof SpeakDialogueAct) {
-			return ((SpeakDialogueAct) this.act).getUtterance();
+		} else if (this.act instanceof InformDialogueAct) {
+			return ((InformDialogueAct) this.act).getUtterance();
 		} else {
 			return "";
 		}

@@ -3,6 +3,7 @@ package org.cocolab.inpro.incremental.listener;
 import java.util.List;
 import java.util.Collection;
 
+import org.cocolab.inpro.incremental.FrameAware;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
@@ -10,6 +11,7 @@ import org.cocolab.inpro.incremental.util.TedAdapter;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.S4Boolean;
 import edu.cmu.sphinx.util.props.S4Integer;
 import edu.cmu.sphinx.util.props.S4String;
 
@@ -22,17 +24,28 @@ import edu.cmu.sphinx.util.props.S4String;
  * 
  * @author timo
  */
-public class TEDviewNotifier extends IUModule {
+public class TEDviewNotifier extends IUModule implements FrameAware {
 
     @S4Integer(defaultValue = 2000)
     public final static String PROP_TEDVIEW_PORT = "tedPort";
     @S4String(defaultValue = "localhost")
     public final static String PROP_TEDVIEW_ADDRESS = "tedAddress";
 
+    /** 
+     * if set to true, TEDview event times will disregard any processing delays 
+     * and use theoretical frame timings instead; 
+     * if false, actual wall-clock time will be used for event times (default) 
+     */
+    @S4Boolean(defaultValue = false)
+    public final static String PROP_LOGICAL_TIME = "useLogicalTime";
+
+    private boolean useLogicalTime = false;
+    
     private TedAdapter tedAdapter;
     
 	int currentFrame = 0;
 
+	@Override
 	public void setCurrentFrame(int frame) {
 		currentFrame = frame;
 	}
@@ -44,6 +57,7 @@ public class TEDviewNotifier extends IUModule {
 		String tedAddress = ps.getString(PROP_TEDVIEW_ADDRESS);
 		int tedLogPort = ps.getInt(PROP_TEDVIEW_LOG_PORT);
 		String tedLogAddress = ps.getString(PROP_TEDVIEW_LOG_ADDRESS);
+		useLogicalTime = ps.getBoolean(PROP_LOGICAL_TIME);
 		if (tedPort != tedLogPort || !tedAddress.equals(tedLogAddress))
 			tedAdapter = new TedAdapter(tedAddress, tedPort);
 		else
@@ -68,9 +82,10 @@ public class TEDviewNotifier extends IUModule {
 	
 	@Override
 	public int getTime() {
-		// an alternative implementation might want to 
-		//return currentFrame * 10;
-		return super.getTime();
+		if (useLogicalTime)
+			return currentFrame * 10;
+		else
+			return super.getTime();
 	}
 
 	@Override

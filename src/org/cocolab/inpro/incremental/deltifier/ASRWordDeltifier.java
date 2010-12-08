@@ -189,7 +189,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				Pronunciation pron = ((WordSearchState) newToken.getSearchState()).getPronunciation();
 				WordIU prevIU = wordIt.next();
 				// check if the words matches and break once we reach the point where they don't match anymore
-				if (!prevIU.wordEquals(pron)) {
+				if (!prevIU.pronunciationEquals(pron)) {
 					wordIt.previous(); // go back the one word that didn't match anymore
 					newIt.previous();
 					break;

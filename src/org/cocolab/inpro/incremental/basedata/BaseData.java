@@ -50,9 +50,8 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable, Signal
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
-		System.err.println(ps.toString());
 		eotfa = (EOTFeatureAggregator) ps.getComponent(PROP_EOTFA);
-		eotfa.printArffHeader();
+	//	eotfa.printArffHeader();
 	}
 
 	public void addData(Data d, String type) {

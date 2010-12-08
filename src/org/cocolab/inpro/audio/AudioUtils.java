@@ -16,18 +16,17 @@ public class AudioUtils {
 
 	public static AudioInputStream getAudioStreamForURL(URL audioFileURL) throws UnsupportedAudioFileException, IOException {
 		AudioInputStream ais;
-		if (audioFileURL.getFile().endsWith(".sph") ||
-				audioFileURL.getFile().endsWith(".SPH") ||
-				audioFileURL.getFile().endsWith(".nis") ||
-				audioFileURL.getFile().endsWith(".NIS")) {
-				AudioFileReader sfr = new SphereFileReader(); 
-				ais = sfr.getAudioInputStream(audioFileURL);
-		} else if (audioFileURL.getFile().endsWith(".flac")) {
-			ais = null;
-		//	FlacAudioFileReader fafr = new FlacAudioFileReader();
-		//	ais = fafr.getAudioInputStream(audioFileURL);
+		String lowerCaseURL = audioFileURL.getFile().toLowerCase();
+		if (lowerCaseURL.endsWith(".sph") ||
+			lowerCaseURL.endsWith(".nis")) {
+			AudioFileReader sfr = new SphereFileReader(); 
+			ais = sfr.getAudioInputStream(audioFileURL);
+//		} else if (lowerCaseURL.endsWith(".flac")) {
+//			ais = null;
+//			FlacAudioFileReader fafr = new FlacAudioFileReader();
+//			ais = fafr.getAudioInputStream(audioFileURL);
 		} else {
-			//System.err.println(AudioSystem.getAudioFileFormat(audioFileURL));
+//			System.err.println(AudioSystem.getAudioFileFormat(audioFileURL));
 	        ais = AudioSystem.getAudioInputStream(audioFileURL);
 		}
 		return ais;

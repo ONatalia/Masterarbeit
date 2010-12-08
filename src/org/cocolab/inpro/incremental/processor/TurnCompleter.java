@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.cocolab.inpro.audio.DispatchStream;
 import org.cocolab.inpro.domains.turncompleter.CompletionEvaluator;
+import org.cocolab.inpro.incremental.FrameAware;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
@@ -17,7 +18,7 @@ import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Component;
 
-public class TurnCompleter extends IUModule {
+public class TurnCompleter extends IUModule implements FrameAware {
 
 	@S4Component(type = DispatchStream.class, mandatory = true)
 	public static final String PROP_DISPATCHER = "dispatchStream";
@@ -27,6 +28,7 @@ public class TurnCompleter extends IUModule {
 	public static final String PROP_EVALUATOR = "evaluator";
 	CompletionEvaluator evaluator;
 	
+	@SuppressWarnings("unused")
 	private static int OUTPUT_BUFFER_DELAY = 150;
 	
 	private SysInstallmentIU fullInstallment;
@@ -57,7 +59,9 @@ public class TurnCompleter extends IUModule {
 		super.newProperties(ps);
 		audioDispatcher = (DispatchStream) ps.getComponent(PROP_DISPATCHER);
 		evaluator = (CompletionEvaluator) ps.getComponent(PROP_EVALUATOR);
-		String fullText = "nordwind und sonne einst stritten sich nordwind und sonne wer von ihnen beiden wohl der stärkere wäre als ein wanderer der in einen warmen mantel gehüllt war des weges daherkam sie wurden einig dass derjenige für den stärkeren gelten sollte der den wanderer zwingen würde seinen mantel abzunehmen";
+//		String fullText = "nordwind und sonne einst stritten sich nordwind und sonne wer von ihnen beiden wohl der stärkere wäre als ein wanderer der in einen warmen mantel gehüllt war des weges daherkam sie wurden einig dass derjenige für den stärkeren gelten sollte der den wanderer zwingen würde seinen mantel abzunehmen";
+//		String fullText = "nordwind und sonne: einst stritten sich nordwind und sonne, wer von ihnen beiden wohl der stärkere wäre; als ein wanderer der in einen warmen mantel gehüllt war, des weges daherkam; sie wurden einig, dass derjenige für den stärkeren gelten sollte, der den wanderer zwingen würde, seinen mantel abzunehmen";
+		String fullText = "der nordwind blies mit aller macht; aber je mehr er blies, desto fester hüllte sich der wanderer in seinen mantel ein; endlich gab der nordwind den kampf auf; nun erwärmte die sonne die luft mit ihren freundlichen strahlen, und schon nach wenigen augenblicken zog der wanderer seinen mantel aus; da musste der nordwind zugeben, dass die sonne von ihnen beiden der stärkere war";
 		fullInstallment = new SysInstallmentIU(fullText);
 	}
 	
@@ -70,6 +74,7 @@ public class TurnCompleter extends IUModule {
 		List<WordIU> inputWords = (List<WordIU>) ius;
 		// we only ever do something on the addition of a word which is not a silence
 		if (edit != null && edit.getType().equals(EditType.ADD) && !edit.getIU().isSilence()) {
+			System.err.println(edit.getIU().getWord());
 			if (shouldFire(inputWords)) {
 				WordIU word = edit.getIU();
 				System.err.println("going to fire after " + word.getWord());
@@ -98,37 +103,63 @@ public class TurnCompleter extends IUModule {
 	
 	
 	private void doComplete(List<WordIU> input, SysInstallmentIU fullInstallment) {
-		WordIU currentWord = lastElement(input);
+//		WordIU currentWord = lastElement(input);
 		// let's analyze the word-beginnings (but only for non-silence words)
-		List<Double> wordStarts = getWordStarts(input);
-		double extrapolatedTime = extrapolateNext(wordStarts);
+		double extrapolatedTime = extrapolateStart(input, fullInstallment);
 		// getAge() counts in milliseconds, the other values are in seconds
 		System.err.println("expecting next word at (s) " + extrapolatedTime);
-		System.err.println(currentWord.startTime());
-		System.err.println(currentWord.getAge());
-		long whenToStart1 = (long) (1000 * (extrapolatedTime - currentWord.startTime())) - currentWord.getAge();
-		System.err.println("assuming input+output buffer delay (ms) " + OUTPUT_BUFFER_DELAY);
-		whenToStart1 -= OUTPUT_BUFFER_DELAY;
-		int whenToStart = (int) Math.max(0, whenToStart1);
-		try {
-			if (whenToStart > 0) {
-				System.err.println("I'm " + whenToStart + " ms early, inserting silence.");
-				audioDispatcher.playSilence(whenToStart, true);
-			}
-			audioDispatcher.playFile("file:/home/timo/inpro/experimente/039_finisher/fuenfsechssiebenacht.wav", false);
-			System.err.println("now (whenToStart1 was " + whenToStart1 + " ms)");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}		
+		evaluator.newOnsetResult(lastElement(input), extrapolatedTime, this.currentFrame);
 	}
 
-	/** extrapolate the start time of the next word from a list of previous word starts */ 
-	private double extrapolateNext(List<Double> wordStarts) {
-		// start out with a very simple approach: start(last word) - start(first word) / (number of words - 1) 
-		return wordStarts.get(wordStarts.size() - 1) + (wordStarts.get(wordStarts.size() - 1) - wordStarts.get(0)) / (wordStarts.size() - 1);
+	/** extrapolate the start time of the next word from a list of previously spoken words */ 
+//	private double extrapolateStart(List<WordIU> prefix, SysInstallmentIU fullInstallment) {
+//		// this implementation assumes that all words are (more or less) of equal length,
+//		// allowing it to only look at word starts and extrapolate the next word start based on this
+//		List<Double> wordStarts = getWordStarts(prefix);
+//		// start out with a very simple approach: start(last word) - start(first word) / (number of words - 1)
+//		return getDuration(prefix) / prefix.size()
+//		return wordStarts.get(wordStarts.size() - 1) + (lastElement(wordStarts) - wordStarts.get(0)) / (wordStarts.size() - 1);
+//	}
+	private double extrapolateStart(List<WordIU> prefix, SysInstallmentIU fullInstallment) {
+		/*
+		 * this implementation uses a duration model based on MaryTTS
+		 * 
+		 * we compare the duration of a TTSed utterance with the spoken words 
+		 * (except for the most recent word, which is likely still being spoken).
+		 * From this we can deduce a speech rate relative to the TTS (i.e. faster
+		 * or slower) and use this as a factor to the TTS's most recent word's 
+		 * duration, which should give the duration of the currently spoken word
+		 */
+		WordIU currentlySpokenWord = lastElement(prefix);
+		List<WordIU> completedPrefix = new ArrayList<WordIU>(prefix);
+		completedPrefix.remove(currentlySpokenWord);
+		List<WordIU> fullTtsPrefix = fullInstallment.getPrefix(prefix);
+		List<WordIU> completedTtsPrefix = new ArrayList<WordIU>(fullTtsPrefix);
+		WordIU currentlyTtsedWord = lastElement(fullTtsPrefix);
+		completedTtsPrefix.remove(currentlyTtsedWord);
+		double ttsDuration = getDurationWithoutPauses(completedTtsPrefix);
+		double userDuration = getDurationWithoutPauses(completedPrefix);
+		System.err.println("user/tts ratio: " + (userDuration / ttsDuration));
+		return currentlySpokenWord.startTime() + (currentlyTtsedWord.duration() * userDuration / ttsDuration);
+	}
+
+	/** time spanned by all words (TODO: currently including silence) in the list */
+	@SuppressWarnings("unused")
+	private double getDuration(List<WordIU> words) {
+		return lastElement(words).endTime() - words.get(0).startTime();
+	}
+	
+	private double getDurationWithoutPauses(List<WordIU> words) {
+		double dur = 0;
+		for (WordIU word : words) {
+			if (!word.isSilence())
+				dur += word.duration();
+		}
+		return dur;
 	}
 
 	/** extract the start times of given words (ignoring silence) */ 
+	@SuppressWarnings("unused")
 	private List<Double> getWordStarts(List<WordIU> ius) {
 		List<Double> wordStarts = new ArrayList<Double>(ius.size());
 		for (WordIU word : ius)
@@ -136,7 +167,16 @@ public class TurnCompleter extends IUModule {
 				wordStarts.add(word.startTime());
 		return wordStarts;
 	}
+	
+	int currentFrame = 0;
 
+	@Override
+	public void setCurrentFrame(int frame) {
+		currentFrame = frame;
+	}
+	
+
+	
 	/** utility which unfortunately is not part of java.util. */
 	private <T> T lastElement(List<T> list) {
 		return list.get(list.size() - 1);

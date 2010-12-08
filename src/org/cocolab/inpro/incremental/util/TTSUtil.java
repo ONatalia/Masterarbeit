@@ -1,4 +1,4 @@
-package org.cocolab.inpro.tts;
+package org.cocolab.inpro.incremental.util;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -27,14 +27,16 @@ import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
+import org.cocolab.inpro.tts.MaryAdapter;
+import org.cocolab.inpro.tts.PitchMark;
 
-public class IUUtil {
+public class TTSUtil {
 	
 	public static List<WordIU> wordIUsFromMaryXML(InputStream is) throws JAXBException, TransformerException {
 		JAXBContext context = JAXBContext.newInstance(Paragraph.class);
 		JAXBResult result = new JAXBResult(context);
 		TransformerFactory tf = TransformerFactory.newInstance();
-		Transformer t = tf.newTransformer(new StreamSource(IUUtil.class.getResourceAsStream("mary2simple.xsl")));
+		Transformer t = tf.newTransformer(new StreamSource(TTSUtil.class.getResourceAsStream("mary2simple.xsl")));
 		t.transform(new StreamSource(is), result);
 		Paragraph paragraph = (Paragraph) result.getResult(); //unmarshaller.unmarshal(is);
 		return paragraph.getWordIUs();
@@ -182,13 +184,13 @@ public class IUUtil {
 	
 	public static void main(String[] args) throws FileNotFoundException, JAXBException, TransformerException {
 		MaryAdapter ma = MaryAdapter.getInstance();
-		//InputStream is = IUUtil.class.getResourceAsStream("example.maryxml");
+		//InputStream is = TTSUtil.class.getResourceAsStream("example.maryxml");
 		InputStream is = ma.text2maryxml("nordwind und sonne");
 
 		JAXBContext context = JAXBContext.newInstance(Paragraph.class);
 		JAXBResult result = new JAXBResult(context);
 		TransformerFactory tf = TransformerFactory.newInstance();
-		Transformer t = tf.newTransformer(new StreamSource(IUUtil.class.getResourceAsStream("mary2simple.xsl")));
+		Transformer t = tf.newTransformer(new StreamSource(TTSUtil.class.getResourceAsStream("mary2simple.xsl")));
 		t.transform(new StreamSource(is), result);
 		
 		Paragraph paragraph = (Paragraph) result.getResult(); //unmarshaller.unmarshal(is);
