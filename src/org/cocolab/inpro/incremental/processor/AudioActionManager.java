@@ -110,7 +110,6 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 			List<? extends EditMessage<? extends IU>> edits) {
 		for (EditMessage<? extends IU> edit : edits) {
 			this.toPerform.apply((EditMessage<DialogueActIU>) edit);
-			// TODO: DM ISU may have revoked some of these without sending a message.
 		}
 	}
 

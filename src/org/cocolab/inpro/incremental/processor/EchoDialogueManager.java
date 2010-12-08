@@ -13,7 +13,7 @@ import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.InstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.audio.DispatchStream;
-import org.cocolab.inpro.dm.acts.SpeakDialogueAct;
+import org.cocolab.inpro.dm.acts.InformDialogueAct;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -117,12 +117,12 @@ public class EchoDialogueManager extends AbstractDialogueManager implements Abst
 			System.err.println(userUtterance);
 			// Something to echo
 			this.installments.add(new InstallmentIU(new ArrayList<WordIU>(currentInstallment)));
-			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new SpeakDialogueAct(systemUtterance));
+			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new InformDialogueAct(systemUtterance));
 			ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
 			this.installments.add(new InstallmentIU(daiu, systemUtterance));
 			this.audioDispatcher.playTTS(systemUtterance, false);
 			if (echo) { 
-				daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new SpeakDialogueAct(userUtterance));
+				daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new InformDialogueAct(userUtterance));
 				ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
 				installments.add(new InstallmentIU(daiu, userUtterance));
 				this.audioDispatcher.playTTS(userUtterance, false);
@@ -135,7 +135,7 @@ public class EchoDialogueManager extends AbstractDialogueManager implements Abst
 			this.audioDispatcher.playTTS(systemUtterance, false);
 		} else {
 			// Nothing new to say, nothing to echo
-			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new SpeakDialogueAct("Hallo, sind sie noch da?"));
+			DialogueActIU daiu = new DialogueActIU(this.dialogueActIUs.getLast(), grin, new InformDialogueAct("Hallo, sind sie noch da?"));
 			ourEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, daiu));
 			installments.add(new InstallmentIU(daiu, "Hallo, sind sie noch da?"));
 			this.audioDispatcher.playTTS("Hallo, sind sie noch da?", false);

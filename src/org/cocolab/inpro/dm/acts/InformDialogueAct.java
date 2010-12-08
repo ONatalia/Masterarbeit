@@ -5,12 +5,12 @@ package org.cocolab.inpro.dm.acts;
  * @author okko
  *
  */
-public class SpeakDialogueAct extends AbstractDialogueAct {
+public class InformDialogueAct extends AbstractDialogueAct {
 	
 	/** The string representation of the utterance. Defaults to an empty string. */
 	private String utterance = "";
 	
-	public SpeakDialogueAct(String utterance) {
+	public InformDialogueAct(String utterance) {
 		this.utterance = utterance;
 	}
 
