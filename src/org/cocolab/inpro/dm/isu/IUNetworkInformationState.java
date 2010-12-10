@@ -3,6 +3,7 @@ package org.cocolab.inpro.dm.isu;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.dm.acts.AbstractDialogueAct;
 import org.cocolab.inpro.dm.acts.ClarifyDialogueAct;
 import org.cocolab.inpro.dm.acts.GroundDialogueAct;
@@ -49,6 +50,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	private DialogueActIU nextOutput;
 	/** A list of edit messages produced as a result of (all previous and present) changes to the IS. */
 	private List<EditMessage<DialogueActIU>> outputEdits = new ArrayList<EditMessage<DialogueActIU>>();
+	/** A logger */
+	private Logger logger;
 
 	/**
 	 * Generic constructor for an IUNetworkInformationState
@@ -107,12 +110,12 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		}
 	}
 
-	/**
-	 * Getter method for this IS's next input to process.
-	 * @return nextInput the next word input to process
+	/** 
+	 * Sets the logger
+	 * @param logger the logger to log to.
 	 */
-	public WordIU getNextInput() {
-		return nextInput;
+	public void setLogger(Logger logger) {
+		this.logger = logger;
 	}
 	
 	/**
@@ -124,6 +127,25 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	}
 
 	/**
+	 * Getter for the next output to perform.
+	 * @return
+	 */
+	public DialogueActIU getNextOutput() {
+		return this.nextOutput;
+	}
+
+	/**
+	 * Getter for the next output to perform.
+	 * @return
+	 */
+	public List<EditMessage<DialogueActIU>> getNewEdits() {
+		List<EditMessage<DialogueActIU>> ret = new ArrayList<EditMessage<DialogueActIU>>();
+		ret.addAll(outputEdits);
+		this.outputEdits.clear();
+		return ret;
+	}
+
+	/**
 	 * Getter for this IS's contributions network
 	 * @return contributions the list of ContribIUs 
 	 */
@@ -131,53 +153,6 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		return this.contributions;
 	}
 	
-//	/**
-//	 * Gets the current focus contribution.
-//	 * This is defined as the contribution that was most
-//	 * recently integrated with input.
-//	 * Returns the first contribution of none are integrated.
-//	 * @return the most recently integrated contribution
-//	 */
-//	public ContribIU getFocusContrib() {
-////		ContribIU focus = this.root;
-////		for (ContribIU iu : this.contributions) {
-////			// End time is inherited from input. Greater is later.
-////			if (iu.endTime() > focus.endTime()) {
-////				focus = iu;
-////			}
-////		}
-////		System.err.println("Setting focus to " + focus.toString());
-////		return focus;
-//		System.err.println("Focus is " + this.focus);
-//		return this.focus;
-//	}
-
-//	/**
-//	 * Getter method returning the IS's next focus ContribIU
-//	 * (this is the first contribution that is grounded in the current focus contribution.)
-//	 * @return nextFocus  the next contribution that is grounded in current focus.
-//	 */
-//	public ContribIU setNextFocusContrib() {
-//		if (this.focus.groundedIn().size() > 0) {
-//			ContribIU nextFocus = this.focus;
-//			for (IU iu : this.focus.groundedIn()) {
-//				if (!(iu instanceof ContribIU)) {
-//					if (!this.focus.groundedIn().isEmpty()) {
-//						for (IU ciu : this.focus.groundedIn()) {
-//							if (ciu instanceof ContribIU) {
-//								 nextFocus = (ContribIU) ciu;
-//							}
-//						}
-//					}
-//					break;
-//				}
-//			}
-//			System.err.println("Moving focus to " + nextFocus.toString());
-//			this.focus = nextFocus;
-//		}
-//		return this.focus;
-//	}
-
 	/**
 	 * Getter method returning the IS's current contribution
 	 * @return currentContrib this IS's current ContribIU
@@ -186,6 +161,28 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		if (this.currentContrib == null)
 			return this.root;
 		return this.currentContrib;
+	}
+
+	/**
+	 * A convenience method to look through currently active contributions
+	 * returning whatever integrated last.
+	 * @return the last contribution to integrate
+	 */
+	private ContribIU getLastIntegrated() {
+		double et = 0;
+		ContribIU ret = this.root;
+		for (ContribIU iu : this.contributions) {
+			for (IU wiu : iu.groundedIn()) {
+				if (wiu instanceof WordIU) {
+					if (wiu.endTime() > et) {
+						et = wiu.endTime();
+						ret = iu;
+					}
+				}
+			}
+		}
+		System.err.println("Last int: "+ ret.toString());
+		return ret;
 	}
 
 	/**
@@ -247,7 +244,19 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 				if (!this.visited.contains(this.currentContrib)) {
 					this.visited.add(this.currentContrib);
 				}
-				return true;
+				if (this.currentContrib.equals(this.focus)) {
+					if (this.integrateList.isEmpty()) {
+						// continue applying other rules only
+						// if we haven't found anything that integrates
+						// below the current focus.
+						return true;
+					} else {
+						return false;
+					}
+				} else {
+					return true;
+				}
+
 			}
 		}
 		return false;
@@ -295,6 +304,72 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
+	 * Removes grin links between input and any contributions grounded in it.
+	 * Also re-grounds previous input.
+	 * @true if successful
+	 */
+	@Override
+	public boolean unintegrateNextInput() {
+		boolean restart = false;
+		for (ContribIU iu : this.contributions) {
+			if (iu.groundedIn().contains(this.nextInput)) {
+				if (this.nextInput.getAVPairs().get(0).equals("bool:false") && (iu.getContribution().equals("undo:true"))) {
+					// If an elliptical 'no' is being unitegrated
+					// the contribution that 'no' referred to (attached to undo:true), should be re-integrated
+					this.focus = (ContribIU) iu.groundedIn().get(0);
+					// and the 'no' unintegrated 
+					iu.removeGrin(this.nextInput);
+					iu.revoke();
+					for (IU input : iu.groundedIn()) {
+						if (!(input instanceof ContribIU)) {
+							this.nextInput = (WordIU) input;
+							restart = true;
+						}
+					}
+				} else if (iu.getContribution().equals("clarify:true")) {
+					iu.removeGrin(this.nextInput);
+					iu.revoke();
+					this.nextInput = null;
+					this.focus = this.getLastIntegrated();
+					restart = true;
+				} else {
+					// Other input simply get their grounding contribution links removed
+					iu.removeGrin(this.nextInput);
+					this.nextInput = null;
+					this.focus = this.getLastIntegrated();
+					restart = true;
+				}
+				this.currentContrib = this.focus;
+				// Revoke output dialogue act ius that are grounded in revoked input.
+				List<DialogueActIU> unground = new ArrayList<DialogueActIU>();
+				for (IU daiu : iu.grounds()) {
+					if (daiu instanceof DialogueActIU) {
+						logger.info("Revoking " + daiu.toString());
+						this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.REVOKE, (DialogueActIU) daiu));
+						this.nextOutput = (DialogueActIU) this.nextOutput.getSameLevelLink(); //FIXME: potential scope issues in assuming the previous output here
+						unground.add((DialogueActIU) daiu);
+					}
+				}
+				// and remove grin links to contributions (because the edit message created here may not be applied in time).
+				for (DialogueActIU daiu : unground) {
+					daiu.removeGrin(iu);
+				}
+			}
+		}
+		// Remove any contributions that may have been revoked above
+		List<ContribIU> revoked = new ArrayList<ContribIU>();
+		for (IU iu : this.contributions) {
+	
+			if (iu instanceof ContribIU && iu.isRevoked()) {
+				revoked.add((ContribIU) iu);
+			}
+		}
+		this.contributions.removeAll(revoked);
+		return restart;
+	}
+
+	/**
+	 * An Effect method that updates the information state and returns true if successful.
 	 * Integrates the current contribution with the next input if possible.
 	 * Clears next input and integrated and visited contributions list to restart the
 	 * search with new input.
@@ -304,7 +379,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public boolean integrateNextInput() {
 		ContribIU marked = this.integrateList.get(0);
 		// If marked contribution isn't already grounded in next input
-		if (!marked.groundedIn().contains(this.getNextInput())) {
+		if (!marked.groundedIn().contains(this.nextInput)) {
 			// do so now
 			this.nextInput.ground(marked);
 			marked.groundIn(this.nextInput);
@@ -320,14 +395,26 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			this.integrateList.clear();
 			// clear the visited list for the next search
 			this.visited.clear();
-			// revoke requests and clarifications grounded in integrated contribution 
+			// revoke uncommited requests and clarifications grounded in integrated contribution 
 			for (IU iu : marked.grounds()) {
 				if (iu instanceof DialogueActIU) {
 					AbstractDialogueAct act = ((DialogueActIU) iu).getAct();
 					if (act instanceof ClarifyDialogueAct ||
 							act instanceof RequestDialogueAct) {
-						this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.REVOKE, (DialogueActIU) iu));
-
+						if (!iu.isCommitted()) {
+							this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.REVOKE, (DialogueActIU) iu));
+							marked.removeGrin(iu);
+						}						
+					}
+				} else if (iu instanceof ContribIU) {
+					if (((ContribIU) iu).getContribution().equals("clarify:true")) {
+						this.contributions.remove(iu);
+						for (IU wiu : iu.groundedIn()) {
+							if (wiu instanceof WordIU) {
+								this.nextInput = (WordIU) wiu;
+								break;
+							}
+						}
 					}
 				}
 			}
@@ -338,12 +425,83 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
+	 * Ground last GROUND DA output's grin contribution in yes input.
+	 * @true if successful
+	 */
+	@Override
+	public boolean integrateYesEllipsis() {
+		if (!(this.nextOutput.getAct() instanceof GroundDialogueAct)) {
+			// only do this for grounding DAs
+			return false;
+		}
+		for (IU iu : this.nextOutput.groundedIn()) {
+			if (iu instanceof ContribIU) {
+				this.nextInput.ground(iu);
+				this.nextInput = null;
+				this.currentContrib = (ContribIU) iu;
+				this.focus = (ContribIU) iu;
+				this.integrateList.clear();
+				this.visited.clear();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * An Effect method that updates the information state and returns true if successful.
+	 * Revokes last output and grin links to any contributions it grounds.
+	 * @true if successful
+	 */
+	@Override
+	public boolean integrateNoEllipsis() { 
+		logger.info("Next output: " + this.nextOutput.toString());
+		logger.info(" Next input: " + this.nextInput.toString());
+		if (this.nextOutput.getAct() instanceof GroundDialogueAct) {  	// FIXME: scope issues with nextOutput
+			// only do this for grounding or undoable DAs
+			for (IU iu : this.nextOutput.groundedIn()) {
+				if (iu instanceof ContribIU) {
+					// unground contribution in lb
+					List<IU> remove = new ArrayList<IU>();
+					for (IU grin : iu.groundedIn()) {
+						if (!(grin instanceof ContribIU)) {
+							remove.add(grin);
+						}
+					}
+					iu.removeGrin(remove);
+					// add a glue contribution for integrating input
+					ContribIU glue = new ContribIU(null, iu, new AVPair("undo:true"), false, null, null, null);
+					glue.groundIn(this.nextInput);
+					glue.groundIn(iu);
+					glue.groundIn(remove);
+					this.contributions.add(glue);
+					// and creating undo output
+					this.nextOutput = new DialogueActIU(this.nextOutput, glue, new UndoDialogueAct());
+					this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
+					// set focus and restart search 
+					this.nextInput = null;
+					this.currentContrib = (ContribIU) iu;  // may not want this...
+					this.focus = (ContribIU) iu;           // may not want this...
+					this.integrateList.clear();
+					this.visited.clear();
+					return true;
+				}
+			}
+			return false;
+		}
+		return false;
+	}
+
+	/**
+	 * An Effect method that updates the information state and returns true if successful.
 	 * @true if successful
 	 */
 	@Override
 	public boolean clarifyNextInput() {
-		List<IU> grin = new ArrayList<IU>(this.integrateList);
-		this.nextOutput = new DialogueActIU(this.nextOutput, grin, new ClarifyDialogueAct());
+		ContribIU glue = new ContribIU(null, this.integrateList, new AVPair("clarify:true"),false,"Was meinten Sie?",null,null);
+		glue.groundIn(this.nextInput);
+		this.contributions.add(glue);
+		this.nextOutput = new DialogueActIU(this.nextOutput, glue, new ClarifyDialogueAct());
 		this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
 		this.currentContrib = this.focus;
 		this.nextInput = null;
@@ -520,134 +678,6 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	}
 
 	/**
-	 * An Effect method that updates the information state and returns true if successful.
-	 * Removes grin links between input and any contributions grounded in it.
-	 * Also re-grounds previous input.
-	 * @true if successful
-	 */
-	@Override
-	public boolean unintegrateNextInput() {
-		boolean stateChanged = false;
-		for (ContribIU iu : this.contributions) {
-			if (iu.groundedIn().contains(this.nextInput)) {
-				if (this.nextInput.getAVPairs().get(0).equals("bool:false") && (iu.getContribution().equals("undo:true"))) {
-					// Reintegrating previous input if an ellipsis 'no' was unitegrated
-					// First move the current contrib to the last contibution before "no"
-					this.currentContrib = (ContribIU) iu.groundedIn().get(0); // current contrib is whatever came before "no"
-					// then unground it
-					iu.removeGrin(this.nextInput);
-					iu.revoke();
-					for (IU input : iu.groundedIn()) {
-						if (!(input instanceof ContribIU)) {
-							this.nextInput = (WordIU) input;		// assuming word ius as input - could also be semius though.
-						}
-					}
-					// then find the last input IU to integrate something.
-//					boolean seekSLL = true;
-//					while(seekSLL) {
-// 						this.nextInput = (WordIU) this.nextInput.getSameLevelLink();
-// 						if (this.nextInput.getAVPairs() != null) {
-// 							System.err.println("reintegrating " + this.nextInput);
-// 							// Assume last meaningful input was the one that the ellipsis unintegrated
-// 							seekSLL=false;
-// 						}
-//					}
-				} else {
-					// Nothing to reintegrate.
-					// Non-elliptical "no"s and other input simply get their grounding contribution links removed
-					iu.removeGrin(this.nextInput);
-					this.nextInput = null;
-				}
-				// Revoke output dialogue act ius.
-				for (IU daiu : iu.grounds()) {
-					if (daiu instanceof DialogueActIU) {
-						System.err.println("Revoking " + daiu.toString());
-						this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.REVOKE, (DialogueActIU) daiu));
-					}
-				}
-				stateChanged = true;
-			}
-		}
-		List<ContribIU> revoked = new ArrayList<ContribIU>();
-		for (IU iu : this.contributions) {
-			// Remove any contributions that may have been revoked in the meantime
-			if (iu instanceof ContribIU && iu.isRevoked()) {
-				revoked.add((ContribIU) iu);
-			}
-		}
-		this.contributions.removeAll(revoked);
-		return stateChanged;
-	}
-	
-	/**
-	 * An Effect method that updates the information state and returns true if successful.
-	 * Ground last GROUND DA output's grin contribution in yes input.
-	 * @true if successful
-	 */
-	@Override
-	public boolean integrateYesEllipsis() {
-		if (!(this.nextOutput.getAct() instanceof GroundDialogueAct)) {
-			// only do this for grounding DAs
-			return false;
-		}			
-		for (IU iu : this.nextOutput.groundedIn()) {
-			if (iu instanceof ContribIU) {
-				this.nextInput.ground(iu);
-				this.nextInput = null;
-				this.currentContrib = (ContribIU) iu;
-				this.focus = (ContribIU) iu;
-				this.integrateList.clear();
-				this.visited.clear();
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * An Effect method that updates the information state and returns true if successful.
-	 * Revokes last output and grin links to any contributions it grounds.
-	 * @true if successful
-	 */
-	@Override
-	public boolean integrateNoEllipsis() {
-		if (this.nextOutput.getAct() instanceof GroundDialogueAct) {
-			// only do this for grounding or undoable DAs
-			for (IU iu : this.nextOutput.groundedIn()) {
-				if (iu instanceof ContribIU) {
-					// unground contribution in lb
-					List<IU> remove = new ArrayList<IU>();
-					for (IU grin : iu.groundedIn()) {
-						if (!(grin instanceof ContribIU)) {
-							remove.add(grin);
-						}
-					}
-					iu.removeGrin(remove);
-					// add a glue contribution for integrating input
-					ContribIU glue = new ContribIU(null, iu, new AVPair("undo:true"), false, null, null, null);
-					glue.groundIn(this.nextInput);
-					glue.groundIn(iu);
-					glue.groundIn(remove);
-					this.contributions.add(glue);
-					// and creating undo output
-					this.nextOutput = new DialogueActIU(this.nextOutput, glue, new UndoDialogueAct());
-					this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
-//					this.nextInput.commit();
-					// set focus and restart search and 
-					this.nextInput = null;
-					this.currentContrib = (ContribIU) iu;  // may not want this...
-					this.focus = (ContribIU) iu;           // may not want this...
-					this.integrateList.clear();
-					this.visited.clear();
-					return true;
-				}
-			}
-			return false;
-		}
-		return false;
-	}
-
-	/**
 	 * A Precondition method that queries the information state.
 	 * Checks if the IS's next input is bool:true
 	 * @return true if so
@@ -675,45 +705,28 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		return this.nextInput.getAVPairs().get(0).equals("bool:true");
 	}
 
-
-	/**
-	 * Getter for the next output to perform.
-	 * @return
-	 */
-	public DialogueActIU getNextOutput() {
-		return this.nextOutput;
-	}
-	
-	/**
-	 * Getter for the next output to perform.
-	 * @return
-	 */
-	public List<EditMessage<DialogueActIU>> getEdits() {
-		return this.outputEdits;
-	}
-
-
 	/**
 	 * Builds and returns a String representation of the IS.
 	 * @return string the String representation
 	 */
 	public String toString() {
 		String ret;
-		ret  = "-------\n";
-		if (this.nextInput == null)
-			ret += "  Next Input:\n\tnone\n";
-		else
-			ret += "  Next Input:\n\t" + this.nextInput.toString() + "\n";
+		ret  = "-INFORMATION STATE------\n";
+		ret += "  Next Input:\n\t";
+		ret += this.nextInput != null && this.nextInput.isRevoked() ? "(revoked) " : "(added) ";
+		ret += this.nextInput == null ? "none\n" : this.nextInput.toString() + "\n";
 		ret += "  Contributions:\n";
-		ret += "\t" + this.contributions.toString() + "\n";
+		for (ContribIU iu : this.contributions) {
+			ret += "\t" + iu.toString() + "\n";
+		}
+		ret += "    Focus Contribution:\n";
+		ret += "\t" + this.focus.toString() + "\n";
 		ret += "  Current Contribution:\n";
-		ret += "\t" + this.getCurrentContrib().toString() + "\n";
+		ret += "\t" + this.currentContrib.toString() + "\n";
 		ret += "  Integration Canditates:\n";
 		ret += "\t" + this.integrateList.toString() + "\n";
-		if (this.nextOutput == null)
-			ret += "  Next Output:\n\tnone\n";
-		else
-			ret += "  Next Output:\n\t" + this.nextOutput.toString() + "\n";
+		ret += "  Next Output:\n\t";
+		ret += this.nextOutput == null ? "none\n" : this.nextOutput.toString() + "\n";
 		return ret;
 	}
 	

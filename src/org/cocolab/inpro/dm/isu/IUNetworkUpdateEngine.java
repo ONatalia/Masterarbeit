@@ -3,6 +3,7 @@ package org.cocolab.inpro.dm.isu;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.dm.isu.rule.AbstractRule;
 import org.cocolab.inpro.dm.isu.rule.ClarifyNextInputRule;
 import org.cocolab.inpro.dm.isu.rule.ConfirmLastOutputRule;
@@ -19,21 +20,22 @@ import org.cocolab.inpro.dm.isu.rule.UnintegrateRevokedInputRule;
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.WordIU;
-import org.cocolab.inpro.incremental.unit.IUList;
 
 /**
  * A rule-based update engine that keeps a set of rules and an information
- * state to apply its rules to. Keeps a list of inputs and outputs to
+ * state to apply its rules to. Keeps a list output IU edits to
  * interface with a dialogue manager.
  * @author okko
  *
  */
 public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 
+	/** The information state to update*/
 	private IUNetworkInformationState is;
-	private IUList<WordIU> input = new IUList<WordIU>();
-//	private IUList<DialogueActIU> output = new IUList<DialogueActIU>();
+	/** The IU edits to return on request */
 	private List<EditMessage<DialogueActIU>> edits = new ArrayList<EditMessage<DialogueActIU>>();
+	/** The logger */
+	private Logger logger;
 
 	/**
 	 * A simple constructor initiating an empty information state and 
@@ -55,24 +57,24 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 		this.is = new IUNetworkInformationState(u.getContributions());
 	}
 
+	public void setLogger(Logger logger) {
+		this.logger = logger;
+		this.is.setLogger(this.logger);
+	}
+	
 	/**
-	 * Getter method for output.
-	 * @return all output DialogueActIUs
+	 * Getter method for output edits. Returns and clears current list of edit messages.
+	 * @return all new output DialogueActIUs edit messages
 	 */
-//	public IUList<DialogueActIU> getOutput() {
-//		return this.output;
-//	}
-
-	/**
-	 * Getter method for output edits.
-	 * @return all output DialogueActIUs edit messages
-	 */
-	public List<EditMessage<DialogueActIU>> getEdits() {
-		return this.edits;
+	public List<EditMessage<DialogueActIU>> getNewEdits() {
+		List<EditMessage<DialogueActIU>> ret = new ArrayList<EditMessage<DialogueActIU>>();
+		ret.addAll(this.edits);
+		this.edits.clear();
+		return ret;
 	}
 
 	/**
-	 * 
+	 * Getter for the information state.
 	 * @return
 	 */
 	public IUNetworkInformationState getInformationState() {
@@ -80,42 +82,19 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 	}
 
 	/**
-	 * Adds a word to input then applies update rules for any input
-	 * word that needs (un-)integration.
-	 * @param iu
+	 * Sets the input word on the information state and calls the update rules.
+	 * @param iu the input word IU
 	 */
 	public void applyRules(WordIU iu) {
-		if (!this.input.contains(iu)) 
-			this.input.add(iu);
-		System.err.println("Processing new word " + iu.toString());
-		is.setNextInput(iu);
-		this.applyRules();			
-		// keep track of words that were processed 
-		IUList<WordIU> keep = new IUList<WordIU>();
-		for (WordIU word : this.input) {
-			System.err.println(word.toString());
-			if (word.getAVPairs() == null) {
-				// Do not process word without semantics
-				System.err.println("Skipping meaningless " + word.toString());
-				continue;
-			} else if (word.isRevoked() && word.grounds().isEmpty()) {
-				// Do not process revoked words that don't ground anything 
-				System.err.println("Skipping revoked, irrelevant " + word.toString());
-				continue;
-			} else if (!word.isRevoked() && !word.grounds().isEmpty()) {
-				// Do not process added words that already ground something
-				System.err.println("Skipping already integrated " + word.toString());
-				continue;
-			} else {
-				// Process all other words
-				keep.add(word);
-				String status = word.isRevoked() ? "new" : "revoked";
-				System.err.println("Processing " + status + " word " + word.toString());
-				is.setNextInput(word);
-				this.applyRules();				
-			}
+		String status = iu.isRevoked() ? "revoked" : "added";
+		if (iu.getAVPairs() == null || iu.getAVPairs().isEmpty()) {
+			logger.info("Skipping meaningless " + status + " word " + iu.toString());
+		} else {
+			logger.info("Processing " + status + " word " + iu.toString());
+			is.setNextInput(iu);
+			this.applyRules();
+			
 		}
-		this.input = keep;
 	}
 
 	/**
@@ -130,12 +109,10 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 		boolean restart = false;
 		for (AbstractRule r : rules) {
 			if (r.triggers(is)) {
-				if (r.apply(is)) {
-					this.edits = is.getEdits();
-//					if (is.getNextOutput() != null)
-//						if (!this.output.contains(is.getNextOutput()))
-//							this.output.add(is.getNextOutput());
-					restart = true;
+				restart = r.apply(is);
+				logger.info(this.is.toString());
+				if (restart) {
+					this.edits.addAll(is.getNewEdits());
 					break;
 				}
 			}
@@ -143,7 +120,7 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 		if (restart) {
 			this.applyRules();
 		} else {
-			System.err.println("No rules applied. Stopping.");
+			logger.info("No rules applied. Stopping.");
 		}
 	}
 

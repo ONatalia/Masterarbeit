@@ -15,7 +15,7 @@ public class MarkContribIfIntegratesRule extends AbstractIUNetworkRule {
 
 	@Override
 	public boolean apply(AbstractInformationState is) {
-		System.err.println(this.toString() + " triggered.");
+//		System.err.println(this.toString() + " triggered.");
 		return (((IUNetworkInformationState) is).addCurrentContribToIntegrateList());
 	}
 
