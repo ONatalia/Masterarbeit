@@ -10,7 +10,6 @@ import java.io.PrintStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
@@ -103,6 +102,7 @@ public class IUNetworkToDOT extends PushBuffer {
 	public void hypChange(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		if (edits != null && !edits.isEmpty()) {
+			this.nodeClusters.clear();
 			try {
 				out = new File("/tmp/out." + this.getNewFileID() + ".dot");
 				outStream = new PrintStream(out);
@@ -112,7 +112,6 @@ public class IUNetworkToDOT extends PushBuffer {
 			Set<IU> processedIUs = new HashSet<IU>();
 			Queue<IU> iuProcessingQueue = new ArrayDeque<IU>();
 			List<IU> iuList = new ArrayList<IU>(ius);
-			Collections.reverse(iuList);
 			iuProcessingQueue.addAll(iuList);
 			printHead();
 			while (!iuProcessingQueue.isEmpty()) {
@@ -180,7 +179,8 @@ public class IUNetworkToDOT extends PushBuffer {
 	private void printGrin(IU iu, IU gr) {
 		int id1 = iu.getID();
 		int id2 = gr.getID();
-		outStream.println("\"" + id1 + "\" -> \"" + id2 + "\" [constraint=false];");
+		boolean constraint = iu.getClass() == gr.getClass() ? true : false;
+		outStream.println("\"" + id1 + "\" -> \"" + id2 + "\" [constraint=" + constraint + "];");
 	}
 	
 	private void printTail() {
