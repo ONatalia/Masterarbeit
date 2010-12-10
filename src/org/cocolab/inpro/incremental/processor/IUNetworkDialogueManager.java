@@ -54,18 +54,24 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		String lexicalSemanticsPath = ps.getString(PROP_LEX_SEMANTICS);
-		try {WordIU.setAVPairs(AVPairMappingUtil.readAVPairs(new URL(lexicalSemanticsPath)));} catch (IOException e) {
+		try {
+			WordIU.setAVPairs(AVPairMappingUtil.readAVPairs(new URL(lexicalSemanticsPath)));
+		} catch (IOException e) {
 			e.printStackTrace();
 			logger.fatal("Could not set WordIU's AVPairs from file " + lexicalSemanticsPath);
 		}
 		this.domain = (IUNetworkDomainUtil) ps.getComponent(PROP_DOMAIN);
 		this.stateListeners = ps.getComponentList(PROP_STATE_LISTENERS, PushBuffer.class);
 		this.updateEngine = new IUNetworkUpdateEngine(this.domain);
-		this.updateStateListeners();
-		this.logToTedView("Initial State:\n" + this.updateEngine.getInformationState().toString());
-		logger.info(this.updateEngine.getInformationState().toString());
+		this.updateEngine.setLogger(this.logger);
+		this.updateAll();
+		logger.info("DM started");
 	}
 
+	/**
+	 * Updates the IS with ADDed or REVOKEd WordIUs.
+	 * Calls {@link updateAll()} to update listeners.
+	 */
 	@Override
 	public void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
@@ -86,23 +92,26 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 				this.updateEngine.applyRules((WordIU) edit.getIU());
 				break;
 			}
-			case COMMIT: break; //TODO: commit all grin IUs on the IS?
+			case COMMIT: break;
 			}
 		}
-		this.postUpdate();
+		this.updateAll();
 	}
 	
 	/**
 	 * Update state listeners and right buffer, then call
-	 * super.postUpdate() to release locks. 
+	 * {@link super.postUpdate()} to release locks. 
 	 */
-	protected void postUpdate() {
-		this.rightBuffer.setBuffer(this.updateEngine.getEdits());
-		this.logToTedView("New State:\n" + this.updateEngine.getInformationState().toString());
+	protected void updateAll() {
 		this.updateStateListeners();
+		this.logToTedView("State:\n" + this.updateEngine.getInformationState().toString());
+		this.rightBuffer.setBuffer(this.updateEngine.getNewEdits());
 		super.postUpdate();
 	}
 	
+	/**
+	 * Updates internal state listeners.
+	 */
 	private void updateStateListeners() {
 		IUList<ContribIU> newList = new IUList<ContribIU>();
 		List<EditMessage<ContribIU>> contributionEdits = this.updateEngine.getInformationState().getContributions().diff(newList);

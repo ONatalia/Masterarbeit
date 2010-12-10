@@ -28,19 +28,30 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 
 	/** Configuration for reading utterance audio files from an external file. */
 	@S4String(mandatory = false)
+	/** Config property for utterance map file name */
 	public static final String PROP_UTTERANCE_MAP = "utteranceMap";
+	/** The utterance map file name */
 	private static String utteranceMapFile;
 
+	/** Config for list of components that listen to AM output*/ 
 	@S4ComponentList(type = Listener.class)
+	/** Config property of list of components that listen to AM output*/
 	public final static String PROP_STATE_LISTENERS = "amListeners";
+	/** List of components that listen to AM output*/
 	public List<Listener> amListeners;
 
+	/** Config for audio output steam */
 	@S4Component(type = DispatchStream.class)
+	/** Config property for audio output steam */
 	public static final String PROP_DISPATCHER = "dispatchStream";
+	/** Audio output steam */
 	protected DispatchStream audioDispatcher;
 
+	/** Config for audio file location */
 	@S4String(mandatory = false)
+	/** Config property for audio file location */
 	public static final String PROP_AUDIO_PATH = "audioPath";
+	/** Audio file location */
 	protected static String audioPath;
 
 	/** A map of utterance strings and corresponding audio files. */
@@ -111,6 +122,7 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 		for (EditMessage<? extends IU> edit : edits) {
 			this.toPerform.apply((EditMessage<DialogueActIU>) edit);
 		}
+		logger.info("now need to perform " + this.toPerform.toString());
 	}
 
 	/**
