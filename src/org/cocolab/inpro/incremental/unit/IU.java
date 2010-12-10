@@ -162,11 +162,6 @@ public abstract class IU implements Comparable<IU> {
 		} else {
 			return Double.NaN;
 		}
-//		if ((groundedIn != null) && (groundedIn.size() > 0)) {
-//			return groundedIn.get(groundedIn.size() - 1).endTime();
-//		} else {
-//			return Double.NaN;
-//		}
 	}
 	
 	/**
@@ -276,7 +271,8 @@ public abstract class IU implements Comparable<IU> {
 
 	public void removeGrin(IU iu) {
 		this.groundedIn.remove(iu);
-		iu.grounds.remove(this);
+		if (iu.grounds != null)
+			iu.grounds.remove(this);
 	}
 
 	public void groundIn(List<IU> ius) {

@@ -26,7 +26,7 @@ public class ContribIU extends IU {
 
 	protected AVPair contribution;
 	protected int confidence = 0;
-	protected boolean clarify = false;
+	protected boolean clarify = true;
 	protected String requestString;
 	protected String clarificationString;
 	protected String groundingString;
