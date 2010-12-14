@@ -151,6 +151,11 @@ public class ContribIU extends IU {
 	
 	public String getClarificationString() {
 		if (this.clarificationString == null) {
+			for (IU iu : this.groundedIn) {
+				if (iu instanceof WordIU) {
+					return ((WordIU) iu).getWord();
+				}
+			}
 			if (this.contribution != null) {
 				return this.contribution.getAttribute();
 			}
@@ -159,14 +164,20 @@ public class ContribIU extends IU {
 	}
 
 	public String getGroundingString() {
-		if (this.groundingString == null) {
-			for (IU iu : this.groundedIn()) {
-				if (iu instanceof WordIU) {
-					return ((WordIU) iu).getWord() + " ";
-				}
-			}			
+		if (this.groundingString != null)
+			return this.groundingString;
+		String ret = "";
+		for (IU iu : this.grounds()) {
+			if (iu instanceof ContribIU) {
+				ret += ((ContribIU) iu).getGroundingString() + " ";
+			}
 		}
-		return this.groundingString;
+		for (IU iu : this.groundedIn()) {
+			if (iu instanceof WordIU) {
+				ret += ((WordIU) iu).getWord() + " ";
+			}
+		}
+		return ret;
 	}
 
 	public String getRequestString() {

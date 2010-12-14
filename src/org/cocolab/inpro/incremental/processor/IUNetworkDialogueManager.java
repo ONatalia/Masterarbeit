@@ -80,19 +80,21 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 			return;
 		this.updating = true;
 		for (EditMessage<? extends IU> edit : edits) {
-			switch (edit.getType()) {
-			case ADD: {
-				// Just apply the rules with each new word
-				this.updateEngine.applyRules((WordIU) edit.getIU());
-				break;
-			}
-			case REVOKE: {
-				// Ditto, but make sure to revoke word first
-				edit.getIU().revoke();
-				this.updateEngine.applyRules((WordIU) edit.getIU());
-				break;
-			}
-			case COMMIT: break;
+			if (!((WordIU) edit.getIU()).isSilence()) {
+				switch (edit.getType()) {
+				case ADD: {
+					// Just apply the rules with each new word
+					this.updateEngine.applyRules((WordIU) edit.getIU());
+					break;
+				}
+				case REVOKE: {
+					// Ditto, but make sure to revoke word first
+					edit.getIU().revoke();
+					this.updateEngine.applyRules((WordIU) edit.getIU());
+					break;
+				}
+				case COMMIT: break;
+				}				
 			}
 		}
 		this.updateAll();

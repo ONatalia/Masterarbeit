@@ -81,6 +81,10 @@ public class IUNetworkToDOT extends PushBuffer {
 		runDot = ps.getBoolean(PROP_RUN_DOT);
 		outputFormat = ps.getString(PROP_OUTPUT_FORMAT);
 		display = ps.getBoolean(PROP_DISPLAY_OUTPUT);
+		if (display && !outputFormat.equals("png")) {
+			System.err.println("Setting output format to 'png' to properly display IU network");
+			this.outputFormat = "png";
+		}
 		if (this.display) {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {

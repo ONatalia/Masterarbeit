@@ -9,7 +9,9 @@ public class InformDialogueAct extends AbstractDialogueAct {
 	
 	/** The string representation of the utterance. Defaults to an empty string. */
 	private String utterance = "";
-	
+
+	public InformDialogueAct() {}
+
 	public InformDialogueAct(String utterance) {
 		this.utterance = utterance;
 	}

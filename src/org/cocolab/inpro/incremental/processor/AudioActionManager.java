@@ -31,14 +31,14 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 	/** Config property for utterance map file name */
 	public static final String PROP_UTTERANCE_MAP = "utteranceMap";
 	/** The utterance map file name */
-	private static String utteranceMapFile;
+	protected static String utteranceMapFile;
 
 	/** Config for list of components that listen to AM output*/ 
 	@S4ComponentList(type = Listener.class)
 	/** Config property of list of components that listen to AM output*/
 	public final static String PROP_STATE_LISTENERS = "amListeners";
 	/** List of components that listen to AM output*/
-	public List<Listener> amListeners;
+	protected List<Listener> amListeners;
 
 	/** Config for audio output steam */
 	@S4Component(type = DispatchStream.class)
@@ -46,6 +46,13 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 	public static final String PROP_DISPATCHER = "dispatchStream";
 	/** Audio output steam */
 	protected DispatchStream audioDispatcher;
+
+	/** Config for floor tracker */
+	@S4Component(type = IUBasedFloorTracker.class)
+	/** Config property for floor tracker */
+	public static final String PROP_FLOOR_TRACKER = "floorTracker";
+	/** The floor tracker */
+	protected IUBasedFloorTracker floorTracker;
 
 	/** Config for audio file location */
 	@S4String(mandatory = false)
@@ -55,26 +62,9 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 	protected static String audioPath;
 
 	/** A map of utterance strings and corresponding audio files. */
-	private static Map<String, File> utteranceMap = new HashMap<String, File>();
-
+	protected static Map<String, File> utteranceMap = new HashMap<String, File>();
 	/** List of dialogue act IUs to perform whenever possible. */
-	private IUList<DialogueActIU> toPerform = new IUList<DialogueActIU>();
-
-	@Override
-	public void newProperties(PropertySheet ps) throws PropertyException {
-		super.newProperties(ps);
-		audioDispatcher = (DispatchStream) ps.getComponent(PROP_DISPATCHER);
-		amListeners = ps.getComponentList(PROP_STATE_LISTENERS, Listener.class);
-		audioPath = ps.getString(PROP_AUDIO_PATH);
-		utteranceMapFile = ps.getString(PROP_UTTERANCE_MAP);
-		if (utteranceMapFile != null) {
-			this.loadUtteranceMap();
-		} else {
-			logger.info("Not loading utterance files.");
-		}
-
-		logger.info("Started AudioActionManager");
-	}
+	protected IUList<DialogueActIU> toPerform = new IUList<DialogueActIU>();
 
 	/**
 	 * Reads file names corresponding to utterances strings from a file
@@ -112,6 +102,23 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 		}
 	}
 
+	@Override
+	public void newProperties(PropertySheet ps) throws PropertyException {
+		super.newProperties(ps);
+		audioDispatcher = (DispatchStream) ps.getComponent(PROP_DISPATCHER);
+		amListeners = ps.getComponentList(PROP_STATE_LISTENERS, Listener.class);
+		floorTracker = (IUBasedFloorTracker) ps.getComponent(PROP_FLOOR_TRACKER);
+		audioPath = ps.getString(PROP_AUDIO_PATH);
+		utteranceMapFile = ps.getString(PROP_UTTERANCE_MAP);
+		if (utteranceMapFile != null) {
+			this.loadUtteranceMap();
+		} else {
+			logger.info("Not loading utterance files.");
+		}
+
+		logger.info("Started AudioActionManager");
+	}
+
 	/**
 	 * Remembers what the current left buffer IUs are.
 	 */
@@ -145,12 +152,11 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 		case EOT_RISING:
 		case EOT_NOT_RISING: {
 			for (DialogueActIU iu : this.toPerform) {
-				logger.info("Playing " + iu.getUtterance());
 				if (utteranceMap.containsKey(iu.getUtterance())) {
-					logger.info("…from file");
+					logger.info("Playing from file " + iu.getUtterance());
 					this.audioDispatcher.playFile(utteranceMap.get(iu.getUtterance()).toString(), false);
 				} else {
-					logger.info("…from tts");
+					logger.info("Playing via tts " + iu.getUtterance());
 					this.audioDispatcher.playTTS(iu.getUtterance(), false);					
 				}
 //				logger.info("Playing silence");

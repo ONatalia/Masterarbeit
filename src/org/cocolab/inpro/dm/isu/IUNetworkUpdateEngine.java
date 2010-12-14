@@ -110,7 +110,7 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 		for (AbstractRule r : rules) {
 			if (r.triggers(is)) {
 				restart = r.apply(is);
-				logger.info(this.is.toString());
+//				logger.info(this.is.toString());
 				if (restart) {
 					this.edits.addAll(is.getNewEdits());
 					break;

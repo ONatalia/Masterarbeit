@@ -380,11 +380,17 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		ContribIU marked = this.integrateList.get(0);
 		// If marked contribution isn't already grounded in next input
 		if (!marked.groundedIn().contains(this.nextInput)) {
-			// do so now
+			// do so now, after deciding output.
+			AbstractDialogueAct newAct;
+			if (marked.groundedIn().isEmpty()) {
+				newAct = new GroundDialogueAct();
+			} else {
+				newAct = new RequestDialogueAct();
+			}
 			this.nextInput.ground(marked);
 			marked.groundIn(this.nextInput);
 			// output a grounding dialogue act
-			this.nextOutput = new DialogueActIU(this.nextOutput, this.integrateList.get(0), new GroundDialogueAct());
+			this.nextOutput = new DialogueActIU(this.nextOutput, marked, newAct);
 			this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
 			// move focus to the newly integrated contribution
 			this.currentContrib = marked;
@@ -395,12 +401,12 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			this.integrateList.clear();
 			// clear the visited list for the next search
 			this.visited.clear();
-			// revoke uncommited requests and clarifications grounded in integrated contribution 
+			// revoke uncommitted requests and clarifications grounded in integrated contribution 
 			for (IU iu : marked.grounds()) {
 				if (iu instanceof DialogueActIU) {
 					AbstractDialogueAct act = ((DialogueActIU) iu).getAct();
-					if (act instanceof ClarifyDialogueAct ||
-							act instanceof RequestDialogueAct) {
+					if (act instanceof ClarifyDialogueAct) {
+						//|| act instanceof RequestDialogueAct) {
 						if (!iu.isCommitted()) {
 							this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.REVOKE, (DialogueActIU) iu));
 							marked.removeGrin(iu);
