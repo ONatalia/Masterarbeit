@@ -45,10 +45,13 @@ public class DialogueActIU extends IU {
 	 * @return
 	 */
 	public String getUtterance() {
+		if (this.groundedIn.isEmpty()) {
+			return "";
+		}
 		if (this.act instanceof RequestDialogueAct) {
 			return ((ContribIU) this.groundedIn.get(0)).getRequestString();
 		} else if (this.act instanceof ClarifyDialogueAct) {
-			return ((ContribIU) this.groundedIn.get(0)).getClarificationString();
+			return "Was meinten Sie mit " + ((ContribIU) this.groundedIn.get(0)).getClarificationString();
 		} else if (this.act instanceof GroundDialogueAct) {
 			return ((ContribIU) this.groundedIn.get(0)).getGroundingString();
 		} else if (this.act instanceof InformDialogueAct) {
