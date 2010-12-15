@@ -11,6 +11,7 @@ import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
@@ -31,6 +32,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	@SuppressWarnings("unused")
 	private static int OUTPUT_BUFFER_DELAY = 150;
 	
+	private IUList<WordIU> committedWords;
 	private SysInstallmentIU fullInstallment;
 	
 	/** statically set av pairs for digits/numbers * /
@@ -60,9 +62,10 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		audioDispatcher = (DispatchStream) ps.getComponent(PROP_DISPATCHER);
 		evaluator = (CompletionEvaluator) ps.getComponent(PROP_EVALUATOR);
 //		String fullText = "nordwind und sonne einst stritten sich nordwind und sonne wer von ihnen beiden wohl der stärkere wäre als ein wanderer der in einen warmen mantel gehüllt war des weges daherkam sie wurden einig dass derjenige für den stärkeren gelten sollte der den wanderer zwingen würde seinen mantel abzunehmen";
-//		String fullText = "nordwind und sonne: einst stritten sich nordwind und sonne, wer von ihnen beiden wohl der stärkere wäre; als ein wanderer der in einen warmen mantel gehüllt war, des weges daherkam; sie wurden einig, dass derjenige für den stärkeren gelten sollte, der den wanderer zwingen würde, seinen mantel abzunehmen";
-		String fullText = "der nordwind blies mit aller macht; aber je mehr er blies, desto fester hüllte sich der wanderer in seinen mantel ein; endlich gab der nordwind den kampf auf; nun erwärmte die sonne die luft mit ihren freundlichen strahlen, und schon nach wenigen augenblicken zog der wanderer seinen mantel aus; da musste der nordwind zugeben, dass die sonne von ihnen beiden der stärkere war";
+		String fullText = "nordwind und sonne: einst stritten sich nordwind und sonne, wer von ihnen beiden wohl der stärkere wäre; als ein wanderer der in einen warmen mantel gehüllt war, des weges daherkam; sie wurden einig, dass derjenige für den stärkeren gelten sollte, der den wanderer zwingen würde, seinen mantel abzunehmen";
+//		String fullText = "der nordwind blies mit aller macht; aber je mehr er blies, desto fester hüllte sich der wanderer in seinen mantel ein; endlich gab der nordwind den kampf auf; nun erwärmte die sonne die luft mit ihren freundlichen strahlen, und schon nach wenigen augenblicken zog der wanderer seinen mantel aus; da musste der nordwind zugeben, dass die sonne von ihnen beiden der stärkere war";
 		fullInstallment = new SysInstallmentIU(fullText);
+		committedWords = new IUList<WordIU>();
 	}
 	
 	@SuppressWarnings("unchecked") // casts from IU to WordIU 
@@ -74,12 +77,13 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		List<WordIU> inputWords = (List<WordIU>) ius;
 		// we only ever do something on the addition of a word which is not a silence
 		if (edit != null && edit.getType().equals(EditType.ADD) && !edit.getIU().isSilence()) {
-			System.err.println(edit.getIU().getWord());
-			if (shouldFire(inputWords)) {
-				WordIU word = edit.getIU();
-				System.err.println("going to fire after " + word.getWord());
-				doComplete(inputWords, fullInstallment);
+			List<WordIU> fullInput = new ArrayList<WordIU>(committedWords);
+			fullInput.addAll(inputWords);
+			if (shouldFire(fullInput)) {
+				doComplete(fullInput, fullInstallment);
 			}
+		} else if (edit != null && edit.getType().equals(EditType.COMMIT)) {
+			committedWords.addAll(inputWords);
 		}
 	}
 	
@@ -103,12 +107,9 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	
 	
 	private void doComplete(List<WordIU> input, SysInstallmentIU fullInstallment) {
-//		WordIU currentWord = lastElement(input);
-		// let's analyze the word-beginnings (but only for non-silence words)
 		double extrapolatedTime = extrapolateStart(input, fullInstallment);
-		// getAge() counts in milliseconds, the other values are in seconds
-		System.err.println("expecting next word at (s) " + extrapolatedTime);
 		evaluator.newOnsetResult(lastElement(input), extrapolatedTime, this.currentFrame);
+		// TODO: actually output the completion, not only log it to the evaluator
 	}
 
 	/** extrapolate the start time of the next word from a list of previously spoken words */ 
@@ -131,19 +132,18 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		 * duration, which should give the duration of the currently spoken word
 		 */
 		WordIU currentlySpokenWord = lastElement(prefix);
-		List<WordIU> completedPrefix = new ArrayList<WordIU>(prefix);
-		completedPrefix.remove(currentlySpokenWord);
+		List<WordIU> completedUserPrefix = new ArrayList<WordIU>(prefix);
+		completedUserPrefix.remove(currentlySpokenWord);
 		List<WordIU> fullTtsPrefix = fullInstallment.getPrefix(prefix);
-		List<WordIU> completedTtsPrefix = new ArrayList<WordIU>(fullTtsPrefix);
-		WordIU currentlyTtsedWord = lastElement(fullTtsPrefix);
-		completedTtsPrefix.remove(currentlyTtsedWord);
-		double ttsDuration = getDurationWithoutPauses(completedTtsPrefix);
-		double userDuration = getDurationWithoutPauses(completedPrefix);
-		System.err.println("user/tts ratio: " + (userDuration / ttsDuration));
-		return currentlySpokenWord.startTime() + (currentlyTtsedWord.duration() * userDuration / ttsDuration);
+		List<WordIU> completedTTSPrefix = new ArrayList<WordIU>(fullTtsPrefix);
+		WordIU currentlyTTSedWord = lastElement(fullTtsPrefix);
+		completedTTSPrefix.remove(currentlyTTSedWord);
+		double  ttsDuration = getDurationWithoutPauses(completedTTSPrefix);
+		double userDuration = getDurationWithoutPauses(completedUserPrefix);
+		return currentlySpokenWord.startTime() + (currentlyTTSedWord.duration() * userDuration / ttsDuration);
 	}
 
-	/** time spanned by all words (TODO: currently including silence) in the list */
+	/** time spanned by all words */
 	@SuppressWarnings("unused")
 	private double getDuration(List<WordIU> words) {
 		return lastElement(words).endTime() - words.get(0).startTime();
@@ -174,8 +174,6 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	public void setCurrentFrame(int frame) {
 		currentFrame = frame;
 	}
-	
-
 	
 	/** utility which unfortunately is not part of java.util. */
 	private <T> T lastElement(List<T> list) {

@@ -37,7 +37,7 @@ public class CompletionEvaluator extends PushBuffer {
 //								   " and expected next onset was " + expectedOnset);
 					System.err.print(String.format(Locale.ENGLISH, "%.3f\t%.3f\t", 
 										evalEntry.logicalTimeUntilOnset(), 
-										evalEntry.wordendTimeUntilOnset(word)));
+										evalEntry.wordendUntilOnset(word)));
 				}
 				System.err.println();
 			}
@@ -60,7 +60,7 @@ public class CompletionEvaluator extends PushBuffer {
 			return onset - (frameCount * ResultUtil.FRAME_TO_SECOND_FACTOR);
 		}
 		
-		private double wordendTimeUntilOnset(WordIU word) {
+		private double wordendUntilOnset(WordIU word) {
 			return onset - word.endTime();
 		}
 	}
