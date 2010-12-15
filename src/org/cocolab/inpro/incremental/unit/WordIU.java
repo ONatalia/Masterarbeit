@@ -207,4 +207,73 @@ public class WordIU extends IU {
 		return sb;
 	}
 	
+	/** returns a new list with all silent words removed */
+	public static List<WordIU> removeSilentWords(List<WordIU> words) {
+		List<WordIU> outList = new ArrayList<WordIU>(words);
+		Iterator<WordIU> iter = outList.iterator();
+		while (iter.hasNext()) {
+			if (iter.next().isSilence())
+				iter.remove();
+		}
+		return outList;
+	}
+	
+	public static boolean spellingEqual(List<WordIU> a, List<WordIU> b) {
+		boolean equality = (a.size() == b.size());
+		if (equality) // only bother if lists are of same size
+			for (int i = 0; i < a.size(); i++)
+				if (!a.get(i).spellingEquals(b.get(i)))
+					equality = false;
+		return equality;
+	}
+	
+	/** 
+	 * calculate the WER between two lists of words based on the levenshtein distance 
+	 * code adapted from http://www.merriampark.com/ldjava.htm
+	 * list a is taken as the reference for word error rate normalization 
+	 */
+	public static double getWER(List<WordIU> a, List<WordIU> b) {
+		if (a == null || b == null)
+			throw new IllegalArgumentException("Strings must not be null");
+		int n = a.size();
+		int m = b.size();
+		// handle special cases with empty lists 
+		if (n == 0)
+			return m;
+		else if (m == 0)
+			return n;
+		int p[] = new int[n + 1]; // 'previous' cost array, horizontally
+		int c[] = new int[n + 1]; // cost array, horizontally
+		// indexes into strings s and t
+		// initialize costs
+		for (int i = 0; i < n; i++)
+			p[i] = i;
+		
+		for (int j = 1; j <= m; j++) {
+			WordIU bCurrent = b.get(j - 1);
+			c[0] = j;
+			for (int i = 1; i <= n; i++) {
+				int cost = a.get(i - 1).spellingEquals(bCurrent) ? 0 : 1;
+				// minimum of cell to the left+1, to the top+1, diagonally left
+				// and up + cost
+				c[i] = min(c[i - 1] + 1, 
+						   p[i] + 1, 
+						   p[i - 1] + cost);
+			}
+			// swap current and previous cost arrays
+			int s[];
+			s = p;
+			p = c;
+			c = s;
+		}
+		
+		return c[n] / a.size();
+	}
+	
+	/** used internally in getWER */
+	private static final int min(int a, int b, int c) {
+		return Math.min(Math.min(a, b), c);
+	}
+
+	
 }
