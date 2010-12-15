@@ -19,7 +19,7 @@ public class SegmentIU extends IU {
 			"U", "U:", "'U", "'U:", "''U", "''U:", "'Y", "'Y:", "''Y")));
 */
 	public static final Set<String> CONSONANTS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			"b", "cc", "C", "d", "f", "g", "h", "j", "k", "l", "m", "n", "nn", "N", "p", "qq", "?", "Q", "r", "rr", "R", "s", "ss", "S", "t", "ts", "v", "x", "z", "Z")));
+			"b", "cc", "C", "d", "f", "pf", "g", "h", "j", "k", "l", "m", "n", "nn", "N", "p", "qq", "?", "Q", "r", "rr", "R", "s", "ss", "S", "t", "ts", "tS", "v", "x", "z", "Z")));
 // for swedish:
 /*			"b", "B", "d", "D", 
 			"F", "g", "G", "H", 
