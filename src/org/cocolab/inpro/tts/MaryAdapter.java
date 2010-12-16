@@ -27,11 +27,11 @@ public class MaryAdapter {
 	de.dfki.lt.mary.client.MaryClient mc36;
 	marytts.client.MaryClient mc41;
 	
-	public static final String DEFAULT_VOICE = "de6";
+	public static final String DEFAULT_VOICE = System.getProperty("mary.voice", "de2");
 	
 	enum CompatibilityMode { mary36, mary41 };
-	CompatibilityMode compatibilityMode = CompatibilityMode.mary41;
-	
+	CompatibilityMode compatibilityMode = (System.getProperty("mary.version") != null && System.getProperty("mary.version").equals("4.1")) ? CompatibilityMode.mary41 : CompatibilityMode.mary36;
+
 	private static MaryAdapter maryAdapter = new MaryAdapter();
 	
 	/** private constructor, this class is a singleton */
