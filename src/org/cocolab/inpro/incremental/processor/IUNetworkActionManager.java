@@ -24,9 +24,20 @@ public class IUNetworkActionManager extends AudioActionManager {
 			break;
 		}
 		case EOT_RISING: {
-			this.playSystemUtterance("Ok?");
+			// Just a ground quickly if necessary, else grunt.
 			timeout = 5000;
-			// Only ground quickly
+			boolean ground = false;
+			for (DialogueActIU iu : this.toPerform) {
+				if (iu.getAct() instanceof GroundDialogueAct) {
+					ground = true;
+				}
+			}
+			if (ground) {
+				this.playSystemUtterance("Verstehe.");
+			} else {
+				this.playSystemUtterance("Und?");
+			}
+			break;
 		}
 		case EOT_FALLING:
 		case EOT_NOT_RISING: {
@@ -38,7 +49,7 @@ public class IUNetworkActionManager extends AudioActionManager {
 				AbstractDialogueAct act = iu.getAct();
 				if (act instanceof GroundDialogueAct) {
 					ground += " " + iu.getUtterance();
-					// TODO: Notify 'done' listeners here...
+					this.signalListeners(iu);
 				} else  if (act instanceof ClarifyDialogueAct) {
 					clarify = iu.getUtterance();
 				} else if (act instanceof RequestDialogueAct) {
@@ -47,7 +58,7 @@ public class IUNetworkActionManager extends AudioActionManager {
 			}
 			if (!ground.isEmpty()) {
 				// play all grounding acts,
-				this.playSystemUtterance("Ok!" + ground);
+				this.playSystemUtterance("Gut!" + ground);
 				timeout = 5000;
 			}
 			if (!clarify.isEmpty()) {
@@ -78,7 +89,6 @@ public class IUNetworkActionManager extends AudioActionManager {
 			logger.info("Playing via tts " + string);
 			this.audioDispatcher.playTTS(string, false);					
 		}
-
 	}
 
 }

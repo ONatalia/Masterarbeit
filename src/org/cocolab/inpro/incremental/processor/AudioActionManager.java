@@ -14,6 +14,7 @@ import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.processor.AbstractFloorTracker.Signal;
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
+import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
 
@@ -120,14 +121,20 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 	}
 
 	/**
-	 * Remembers what the current left buffer IUs are.
+	 * Remembers what the current left buffer dialogue act IUs are.
+	 * Performs them later when floor is availabe.
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		for (EditMessage<? extends IU> edit : edits) {
-			this.toPerform.apply((EditMessage<DialogueActIU>) edit);
+			if ((this.toPerform.contains(edit.getIU()) && edit.getType() != EditType.REVOKE)
+					|| edit.getType() == EditType.ADD) {
+				// cheating by only applying revokes of ius that haven't been revoked or removed locally.
+				// skipping commits...
+				this.toPerform.apply((EditMessage<DialogueActIU>) edit);				
+			}
 		}
 		logger.info("now need to perform " + this.toPerform.toString());
 	}
