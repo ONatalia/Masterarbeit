@@ -246,9 +246,9 @@ public class WordIU extends IU {
 		int c[] = new int[n + 1]; // cost array, horizontally
 		// indexes into strings s and t
 		// initialize costs
-		for (int i = 0; i < n; i++)
+		for (int i = 0; i <= n; i++) {
 			p[i] = i;
-		
+		}
 		for (int j = 1; j <= m; j++) {
 			WordIU bCurrent = b.get(j - 1);
 			c[0] = j;
@@ -266,8 +266,7 @@ public class WordIU extends IU {
 			p = c;
 			c = s;
 		}
-		
-		return c[n] / a.size();
+		return ((double) p[n]) / a.size();
 	}
 	
 	/** used internally in getWER */

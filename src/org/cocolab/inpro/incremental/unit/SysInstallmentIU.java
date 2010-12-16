@@ -56,11 +56,94 @@ public class SysInstallmentIU extends InstallmentIU {
 	}
 	
 	/** 
+	 * Is this SysInstallmentIU similar(*) to the given words?
+	 * similarity is parameterizable:
+	 *   - the WER between the two sequences must be <= maxWER
+	 *   - a number of ultimate words in the prefix must be identical 
+	 * silence words are ignored in the comparison
+	 */
+	public FuzzyMatchResult fuzzyMatching(List<WordIU> otherPrefix, double maxWER, int matchingLastWords) {
+		// look at matchingLastWords to find out which potential prefixes exist
+		otherPrefix = WordIU.removeSilentWords(otherPrefix);
+		if (otherPrefix.size() < matchingLastWords) 
+			return new FuzzyMatchResult();
+		List<WordIU> otherPrefixesLastWords = getLastNElements(otherPrefix, matchingLastWords);
+		List<List<WordIU>> myPrefixesMatchingLastWords = getPrefixesMatchingLastWords(otherPrefixesLastWords);
+		// find the prefix with lowest error rate
+		double wer = Double.MAX_VALUE;
+		List<WordIU> myPrefix = null;
+		Iterator<List<WordIU>> myPrefIter = myPrefixesMatchingLastWords.iterator();
+		while (wer > maxWER && myPrefIter.hasNext()) {
+			List<WordIU> myCurrPref = myPrefIter.next();
+			double thisWER = WordIU.getWER(WordIU.removeSilentWords(myCurrPref), otherPrefix);
+			if (thisWER < wer) {
+				wer = thisWER;
+				myPrefix = myCurrPref;
+			}
+		}
+		// return true if the prefix's WER is lower than maxWER
+		// we should probably rather return an object to encapsulate  
+		// the truth value, the prefix and the remainder (if applicable)  
+		assert myPrefix != null == wer <= maxWER;
+		return new FuzzyMatchResult(myPrefix, wer);
+	}
+	
+	public boolean fuzzyMatchesPrefix(List<WordIU> otherPrefix, double maxWER, int matchingLastWords) {
+		return fuzzyMatching(otherPrefix, maxWER, matchingLastWords).matches();
+	}
+	
+	public class FuzzyMatchResult {
+		List<WordIU> prefix = null;
+		// TODO
+		List<WordIU> remainder = Collections.<WordIU>emptyList();
+		double wer = Double.MAX_VALUE;
+		
+		FuzzyMatchResult() {}
+		FuzzyMatchResult(List<WordIU> prefix, double wer) {
+			this.wer = wer;
+			this.prefix = prefix;
+		}
+		
+		public boolean matches() {
+			return prefix != null;
+		}
+		
+		public List<WordIU> getPrefix() {
+			return prefix;
+		}
+		
+		// TODO
+		public List<WordIU> getRemainder() {
+			return null;
+		}
+	}
+	
+	/** return all prefixes of this installment that end in the given last words */
+	private List<List<WordIU>> getPrefixesMatchingLastWords(List<WordIU> lastWords) {
+		List<List<WordIU>> returnList = new ArrayList<List<WordIU>>();
+		List<WordIU> myWords = myWords();
+		for (int i = 0; i <= myWords.size() - lastWords.size(); i++) {
+			List<WordIU> subList = myWords.subList(i, i + lastWords.size());
+			if (lastWords.size() == 0 || WordIU.spellingEqual(WordIU.removeSilentWords(subList), lastWords)) {
+				List<WordIU> myPrefix = myWords.subList(0, i+ lastWords.size());
+				returnList.add(Collections.unmodifiableList(myPrefix));
+			}
+		}
+		return returnList;
+	}
+	
+	/** utility to return the last N elements from a list as an unmodifiable list */
+	private static <T> List<T> getLastNElements(List<T> list, int n) {
+		assert n >= 0;
+		return Collections.unmodifiableList(list.subList(list.size() - n, list.size()));
+	}
+	
+	/** 
 	 * returns true if this SysInstallmentIU starts with the given words
 	 * silence words are ignored in the comparison
 	 */
 	public boolean matchesPrefix(List<WordIU> prefix) {
-		Iterator<WordIU> myIter= myWords().iterator();
+		Iterator<WordIU> myIter = myWords().iterator();
 		boolean isPrefix = true;
 		for (WordIU prefWord : prefix) {
 			if (!prefWord.isSilence()) {
@@ -96,7 +179,9 @@ public class SysInstallmentIU extends InstallmentIU {
 		return myPrefix;
 	}
 	
-	/** get all the words (including silences) that follow the prefix */
+	/** get all the words (including silences) that follow the prefix
+	 * TODO: THIS IS NOT TESTED (OR USED) YET 
+	 * */
 	public List<WordIU> getRemainder(List<WordIU> prefix) {
 		assert matchesPrefix(prefix);
 		Iterator<WordIU> myIter= myWords().iterator();

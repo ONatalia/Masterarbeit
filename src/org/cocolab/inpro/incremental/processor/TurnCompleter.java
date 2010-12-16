@@ -14,6 +14,7 @@ import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
+import org.cocolab.inpro.incremental.unit.SysInstallmentIU.FuzzyMatchResult;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -79,8 +80,9 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		if (edit != null && edit.getType().equals(EditType.ADD) && !edit.getIU().isSilence()) {
 			List<WordIU> fullInput = new ArrayList<WordIU>(committedWords);
 			fullInput.addAll(inputWords);
-			if (shouldFire(fullInput)) {
-				doComplete(fullInput, fullInstallment);
+			FuzzyMatchResult fmatch = fullInstallment.fuzzyMatching(fullInput, 0.2, 2);
+			if (shouldFire(fullInput, fmatch)) {
+				doComplete(fullInput, fullInstallment, fmatch);
 			}
 		} else if (edit != null && edit.getType().equals(EditType.COMMIT)) {
 			committedWords.addAll(inputWords);
@@ -91,23 +93,14 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	 * determine whether we should complete the utterance based on the words heard so far
 	 * currently, the algorithm decides to *always* (repeatedly) fire when the expected prefix is recognized  
 	 */
-	private boolean shouldFire(List<WordIU> words) {
+	private boolean shouldFire(List<WordIU> words, FuzzyMatchResult fmatch) {
 		// always fire if there were at least 3 words and the expected prefix is matched
-		return (nonSilWords(words) >= 3 && fullInstallment.matchesPrefix(words));
+		//System.err.println(fullInstallment.fuzzyMatchesPrefix(words, 0.02, 2) + "" + words);
+		return (WordIU.removeSilentWords(words).size() > 2 && fmatch.matches());
 	}
 	
-	/** return the number of non silent words in the given word list */
-	private int nonSilWords(List<WordIU> words) {
-		int count = 0;
-		for (WordIU word : words)
-			if (!word.isSilence())
-				count++;
-		return count;
-	}
-	
-	
-	private void doComplete(List<WordIU> input, SysInstallmentIU fullInstallment) {
-		double extrapolatedTime = extrapolateStart(input, fullInstallment);
+	private void doComplete(List<WordIU> input, SysInstallmentIU fullInstallment, FuzzyMatchResult fmatch) {
+		double extrapolatedTime = extrapolateStart(input, fullInstallment, fmatch);
 		evaluator.newOnsetResult(lastElement(input), extrapolatedTime, this.currentFrame);
 		// TODO: actually output the completion, not only log it to the evaluator
 	}
@@ -119,11 +112,9 @@ public class TurnCompleter extends IUModule implements FrameAware {
 //		List<Double> wordStarts = getWordStarts(prefix);
 //		// start out with a very simple approach: start(last word) - start(first word) / (number of words - 1)
 //		return getDuration(prefix) / prefix.size()
-//		return wordStarts.get(wordStarts.size() - 1) + (lastElement(wordStarts) - wordStarts.get(0)) / (wordStarts.size() - 1);
 //	}
-	private double extrapolateStart(List<WordIU> prefix, SysInstallmentIU fullInstallment) {
-		/*
-		 * this implementation uses a duration model based on MaryTTS
+	private double extrapolateStart(List<WordIU> prefix, SysInstallmentIU fullInstallment, FuzzyMatchResult fmatch) {
+		/* this implementation uses a duration model based on MaryTTS
 		 * 
 		 * we compare the duration of a TTSed utterance with the spoken words 
 		 * (except for the most recent word, which is likely still being spoken).
@@ -134,7 +125,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		WordIU currentlySpokenWord = lastElement(prefix);
 		List<WordIU> completedUserPrefix = new ArrayList<WordIU>(prefix);
 		completedUserPrefix.remove(currentlySpokenWord);
-		List<WordIU> fullTtsPrefix = fullInstallment.getPrefix(prefix);
+		List<WordIU> fullTtsPrefix = fmatch.getPrefix();
 		List<WordIU> completedTTSPrefix = new ArrayList<WordIU>(fullTtsPrefix);
 		WordIU currentlyTTSedWord = lastElement(fullTtsPrefix);
 		completedTTSPrefix.remove(currentlyTTSedWord);
@@ -143,12 +134,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		return currentlySpokenWord.startTime() + (currentlyTTSedWord.duration() * userDuration / ttsDuration);
 	}
 
-	/** time spanned by all words */
-	@SuppressWarnings("unused")
-	private double getDuration(List<WordIU> words) {
-		return lastElement(words).endTime() - words.get(0).startTime();
-	}
-	
+	/** time spanned by all non-silent words */
 	private double getDurationWithoutPauses(List<WordIU> words) {
 		double dur = 0;
 		for (WordIU word : words) {
@@ -158,16 +144,6 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		return dur;
 	}
 
-	/** extract the start times of given words (ignoring silence) */ 
-	@SuppressWarnings("unused")
-	private List<Double> getWordStarts(List<WordIU> ius) {
-		List<Double> wordStarts = new ArrayList<Double>(ius.size());
-		for (WordIU word : ius)
-			if (!word.isSilence())
-				wordStarts.add(word.startTime());
-		return wordStarts;
-	}
-	
 	int currentFrame = 0;
 
 	@Override
