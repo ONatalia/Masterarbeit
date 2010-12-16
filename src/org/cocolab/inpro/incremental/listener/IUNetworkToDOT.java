@@ -52,11 +52,11 @@ public class IUNetworkToDOT extends PushBuffer {
 	/** Whether to show dot output images. This is not thread-safe and makes system calls. Use for debug or inspection only!*/
 	private boolean display;
 	
-	/** String for image extension, defaults to .svg */
-	@S4String(defaultValue = "svg")
+	/** String for image extension, defaults to .png */
+	@S4String(defaultValue = "png")
 	/** Property for string for image extension */
 	public final static String PROP_OUTPUT_FORMAT = "outputFormat";
-	/** String for image extension, defaults to .svg */
+	/** String for image extension, defaults to .png */
 	private String outputFormat;
 
 	/** Output file ID counter. Increases with each edit. */
@@ -81,9 +81,12 @@ public class IUNetworkToDOT extends PushBuffer {
 		runDot = ps.getBoolean(PROP_RUN_DOT);
 		outputFormat = ps.getString(PROP_OUTPUT_FORMAT);
 		display = ps.getBoolean(PROP_DISPLAY_OUTPUT);
-		if (display && !outputFormat.equals("png")) {
-			System.err.println("Setting output format to 'png' to properly display IU network");
-			this.outputFormat = "png";
+		if (display) {
+			System.err.println("Warning: turn off display of dot output if you're using real audio input.");
+			if (!outputFormat.equals("png")) {
+				System.err.println("Forcing output format to 'png' to display IU network");				
+				this.outputFormat = "png";
+			}
 		}
 		if (this.display) {
 			SwingUtilities.invokeLater(new Runnable() {
@@ -133,6 +136,7 @@ public class IUNetworkToDOT extends PushBuffer {
 							printGrin(iu, gr);
 						}
 						iuProcessingQueue.addAll(grin);
+						
 					}
 				}
 				processedIUs.add(iu);
@@ -157,21 +161,7 @@ public class IUNetworkToDOT extends PushBuffer {
 		int id = iu.getID();
 		String label = iu.getClass().getSimpleName() + "\\n" + iu.toPayLoad();
 		outStream.println("\"" + id + "\" [label=\"" + label + "\" shape=box, style=rounded];");
-		// Build clusters for IU types.
-		if (nodeClusters.isEmpty()) {
-			List<IU> newCluster = new ArrayList<IU>();
-			newCluster.add(iu);
-			nodeClusters.add(newCluster);
-		} else {
-			for (List<IU> cluster : nodeClusters) {
-				if (cluster.get(0).getClass() == iu.getClass()) {
-					if (!cluster.contains(iu)) {
-						cluster.add(iu);
-						break;
-					}
-				}
-			}
-		}
+		this.addToIUCluster(iu);
 	}
 	
 	private void printSLL(IU iu, IU sll) {
@@ -187,11 +177,31 @@ public class IUNetworkToDOT extends PushBuffer {
 		outStream.println("\"" + id1 + "\" -> \"" + id2 + "\" [constraint=" + constraint + "];");
 	}
 	
+	private void addToIUCluster(IU iu) {
+		// Build clusters for IU types for subgraphs.
+		boolean added = false;
+		for (List<IU> cluster : nodeClusters) {
+			if (cluster.get(0).getClass() == iu.getClass()) {
+				if (!cluster.contains(iu)) {
+					cluster.add(iu);
+					added = true;
+					break;
+				}
+			}
+		}
+		if (!added) {
+			List<IU> newCluster = new ArrayList<IU>();
+			newCluster.add(iu);
+			nodeClusters.add(newCluster);
+		}
+	}
+	
 	private void printTail() {
 		if (!nodeClusters.isEmpty()) {
 			for (List<IU> cluster : this.nodeClusters) {
 				if (!cluster.isEmpty()) {
 					outStream.println("subgraph cluster" + cluster.get(0).getClass().getSimpleName() + " {");
+					outStream.println("label=" + cluster.get(0).getClass().getSimpleName());
 					for (IU iu : cluster) {
 						outStream.println("\"" + iu.getID() + "\"");
 					}
