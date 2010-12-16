@@ -19,6 +19,14 @@ import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.nlu.AVPair;
 
+// TODO: YesNo - make integration/unintegration separate rules, with different scopes: 1. self-correction/confirmation, 2. performed output, 3. explicit confirmation, 4. partial clarification
+// TODO: Reproduce and debug unintegrated rule trigger loop
+// TODO: Move output strings away from ContribIU
+// TODO: Make IU queries generic, move IU-specific queries to IU.java
+// TODO: Focus, move right/down when necessary, i.e. system-initiated topic/focus-changes when current focus is fully integrated.
+// TODO: AM.signalListeners() - implement 'done' update rules
+// TODO: AM, prettier output
+
 /**
  * An information state consisting of a network of ContribIU contributions that can integrate with new input.
  * Provides query methods for preconditions of update rule triggers and update methods for applying
@@ -181,7 +189,6 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 				}
 			}
 		}
-		System.err.println("Last int: "+ ret.toString());
 		return ret;
 	}
 
@@ -312,12 +319,15 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public boolean unintegrateNextInput() {
 		boolean restart = false;
 		for (ContribIU iu : this.contributions) {
+			// Find what contributions are grounded in revoked input 
 			if (iu.groundedIn().contains(this.nextInput)) {
 				if (this.nextInput.getAVPairs().get(0).equals("bool:false") && (iu.getContribution().equals("undo:true"))) {
-					// If an elliptical 'no' is being unitegrated
-					// the contribution that 'no' referred to (attached to undo:true), should be re-integrated
+					// if a 'no' is being unitegrated
+					// the contribution that 'no' referred to
+					// (attached to a glue-contribution with undo:true),
+					// should be re-integrated
+					// and the 'no' itself unintegrated (revoked for now, removed below).
 					this.focus = (ContribIU) iu.groundedIn().get(0);
-					// and the 'no' unintegrated 
 					iu.removeGrin(this.nextInput);
 					iu.revoke();
 					for (IU input : iu.groundedIn()) {
@@ -431,15 +441,15 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
-	 * Ground last GROUND DA output's grin contribution in yes input.
+	 * Ground contributions grounded-in any last output in current 'yes' input.
 	 * @true if successful
 	 */
 	@Override
 	public boolean integrateYesEllipsis() {
-		if (!(this.nextOutput.getAct() instanceof GroundDialogueAct)) {
-			// only do this for grounding DAs
-			return false;
-		}
+		// Do this for all types of output?
+//		if (!(this.nextOutput.getAct() instanceof GroundDialogueAct)) {
+//			return false;
+//		}
 		for (IU iu : this.nextOutput.groundedIn()) {
 			if (iu instanceof ContribIU) {
 				this.nextInput.ground(iu);
