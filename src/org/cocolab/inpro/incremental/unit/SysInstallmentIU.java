@@ -57,7 +57,7 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	/** 
 	 * Is this SysInstallmentIU similar(*) to the given words?
-	 * similarity is parameterizable:
+	 * (*) similarity is parameterizable:
 	 *   - the WER between the two sequences must be <= maxWER
 	 *   - a number of ultimate words in the prefix must be identical 
 	 * silence words are ignored in the comparison
@@ -68,40 +68,42 @@ public class SysInstallmentIU extends InstallmentIU {
 		if (otherPrefix.size() < matchingLastWords) 
 			return new FuzzyMatchResult();
 		List<WordIU> otherPrefixesLastWords = getLastNElements(otherPrefix, matchingLastWords);
-		List<List<WordIU>> myPrefixesMatchingLastWords = getPrefixesMatchingLastWords(otherPrefixesLastWords);
+		List<Prefix> myPrefixesMatchingLastWords = getPrefixesMatchingLastWords(otherPrefixesLastWords);
 		// find the prefix with lowest error rate
 		double wer = Double.MAX_VALUE;
-		List<WordIU> myPrefix = null;
-		Iterator<List<WordIU>> myPrefIter = myPrefixesMatchingLastWords.iterator();
+		Prefix myPrefix = null;
+		Iterator<Prefix> myPrefIter = myPrefixesMatchingLastWords.iterator();
 		while (wer > maxWER && myPrefIter.hasNext()) {
-			List<WordIU> myCurrPref = myPrefIter.next();
+			Prefix myCurrPref = myPrefIter.next();
 			double thisWER = WordIU.getWER(WordIU.removeSilentWords(myCurrPref), otherPrefix);
 			if (thisWER < wer) {
 				wer = thisWER;
 				myPrefix = myCurrPref;
 			}
 		}
-		// return true if the prefix's WER is lower than maxWER
-		// we should probably rather return an object to encapsulate  
-		// the truth value, the prefix and the remainder (if applicable)  
+		// return no-match if the prefix's WER is higher than maxWER
+		if (wer > maxWER)
+			myPrefix = null;
 		assert myPrefix != null == wer <= maxWER;
 		return new FuzzyMatchResult(myPrefix, wer);
 	}
 	
-	public boolean fuzzyMatchesPrefix(List<WordIU> otherPrefix, double maxWER, int matchingLastWords) {
-		return fuzzyMatching(otherPrefix, maxWER, matchingLastWords).matches();
-	}
-	
+	/**
+	 * class that describes the result of (fuzzily) matching this installment 
+	 * against a list of words that potentially form a prefix of this installment
+	 * @author timo
+	 */
 	public class FuzzyMatchResult {
 		List<WordIU> prefix = null;
-		// TODO
 		List<WordIU> remainder = Collections.<WordIU>emptyList();
 		double wer = Double.MAX_VALUE;
 		
-		FuzzyMatchResult() {}
-		FuzzyMatchResult(List<WordIU> prefix, double wer) {
+		private FuzzyMatchResult() {}
+		private FuzzyMatchResult(Prefix prefix, double wer) {
 			this.wer = wer;
 			this.prefix = prefix;
+			if (prefix != null)
+				this.remainder = prefix.getRemainder();
 		}
 		
 		public boolean matches() {
@@ -112,96 +114,48 @@ public class SysInstallmentIU extends InstallmentIU {
 			return prefix;
 		}
 		
-		// TODO
 		public List<WordIU> getRemainder() {
-			return null;
+			return remainder;
 		}
 	}
 	
 	/** return all prefixes of this installment that end in the given last words */
-	private List<List<WordIU>> getPrefixesMatchingLastWords(List<WordIU> lastWords) {
-		List<List<WordIU>> returnList = new ArrayList<List<WordIU>>();
+	private List<Prefix> getPrefixesMatchingLastWords(List<WordIU> lastWords) {
+		List<Prefix> returnList = new ArrayList<Prefix>();
 		List<WordIU> myWords = myWords();
 		for (int i = 0; i <= myWords.size() - lastWords.size(); i++) {
 			List<WordIU> subList = myWords.subList(i, i + lastWords.size());
 			if (lastWords.size() == 0 || WordIU.spellingEqual(WordIU.removeSilentWords(subList), lastWords)) {
-				List<WordIU> myPrefix = myWords.subList(0, i+ lastWords.size());
-				returnList.add(Collections.unmodifiableList(myPrefix));
+				Prefix myPrefix = new Prefix(myWords.subList(0, i + lastWords.size()), myWords.subList(i + lastWords.size(), myWords.size()));
+				returnList.add(myPrefix);
 			}
 		}
 		return returnList;
+	}
+	
+	/**
+	 * a prefix of a list of words, which also includes the remainder 
+	 * (i.e. the part of the original list that is not part of this prefix)
+	 * @author timo
+	 */
+	@SuppressWarnings("serial")
+	private static class Prefix extends ArrayList<WordIU> {
+		private List<WordIU> remainder;
+
+		public Prefix(List<WordIU> prefix, List<WordIU> remainder) {
+			super(Collections.unmodifiableList(prefix));
+			this.remainder = Collections.unmodifiableList(remainder);
+		}
+		
+		List<WordIU> getRemainder() {
+			return remainder;
+		}
 	}
 	
 	/** utility to return the last N elements from a list as an unmodifiable list */
 	private static <T> List<T> getLastNElements(List<T> list, int n) {
 		assert n >= 0;
 		return Collections.unmodifiableList(list.subList(list.size() - n, list.size()));
-	}
-	
-	/** 
-	 * returns true if this SysInstallmentIU starts with the given words
-	 * silence words are ignored in the comparison
-	 */
-	public boolean matchesPrefix(List<WordIU> prefix) {
-		Iterator<WordIU> myIter = myWords().iterator();
-		boolean isPrefix = true;
-		for (WordIU prefWord : prefix) {
-			if (!prefWord.isSilence()) {
-				WordIU myWord = myIter.hasNext() ? myIter.next() : null;
-				while (myWord != null && myIter.hasNext() && myWord.isSilence()) {
-					myWord = myIter.next();
-				}
-				if (!prefWord.spellingEquals(myWord)) {
-					isPrefix = false;
-				}
-			}
-		}
-		return isPrefix;
-	}
-	
-	public List<WordIU> getPrefix(List<WordIU> prefix) {
-		assert matchesPrefix(prefix);
-		List<WordIU> myPrefix = new ArrayList<WordIU>();
-		Iterator<WordIU> myIter= myWords().iterator();
-		for (WordIU prefWord : prefix) {
-			if (!prefWord.isSilence()) { // skip silences in user input
-				WordIU myWord = myIter.next();
-				while (myWord.isSilence()) { // skip silences in tts input
-					myWord = myIter.next();
-				}
-				if (prefWord.spellingEquals(myWord)) {
-					myPrefix.add(myWord);
-				} else {
-					break;
-				}
-			}
-		}
-		return myPrefix;
-	}
-	
-	/** get all the words (including silences) that follow the prefix
-	 * TODO: THIS IS NOT TESTED (OR USED) YET 
-	 * */
-	public List<WordIU> getRemainder(List<WordIU> prefix) {
-		assert matchesPrefix(prefix);
-		Iterator<WordIU> myIter= myWords().iterator();
-		List<WordIU> remainder = new ArrayList<WordIU>();
-		WordIU myWord = null;
-		for (WordIU prefWord : prefix) {
-			if (!prefWord.isSilence()) {
-				myWord = myIter.next();
-				if (!myWord.isSilence() && !prefWord.spellingEquals(myWord)) {
-					break;
-				}
-			}
-		}
-		if (myWord != null) {
-			remainder.add(myWord);
-		}
-		while (myIter.hasNext()) {
-			remainder.add(myIter.next());
-		}
-		return Collections.<WordIU>unmodifiableList(remainder);
 	}
 	
 	@SuppressWarnings("unchecked") // allow cast of groundedIn to List<WordIU> 

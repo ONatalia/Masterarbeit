@@ -19,6 +19,7 @@ import org.cocolab.inpro.incremental.unit.SysInstallmentIU.FuzzyMatchResult;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Component;
+import edu.cmu.sphinx.util.props.S4String;
 
 public class TurnCompleter extends IUModule implements FrameAware {
 
@@ -30,42 +31,29 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	public static final String PROP_EVALUATOR = "evaluator";
 	CompletionEvaluator evaluator;
 	
+	@S4String(defaultValue = "eins zwei drei vier fünf sechs sieben")
+	public static final String PROP_FULL_UTTERANCE = "fullUtterance";
+	
 	@SuppressWarnings("unused")
 	private static int OUTPUT_BUFFER_DELAY = 150;
 	
 	private IUList<WordIU> committedWords;
 	private SysInstallmentIU fullInstallment;
 	
-	/** statically set av pairs for digits/numbers * /
-	static {
-		Map<String, List<AVPair>> avPairs = new HashMap<String, List<AVPair>>();
-		avPairs.put("null", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(0))));
-		avPairs.put("eins", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(1))));
-		avPairs.put("zwei", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(2))));
-		avPairs.put("zwo", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(2))));
-		avPairs.put("drei", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(3))));
-		avPairs.put("vier", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(4))));
-		avPairs.put("fünf", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(5))));
-		avPairs.put("fuenf", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(5))));
-		avPairs.put("sechs", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(6))));
-		avPairs.put("sieben", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(7))));
-		avPairs.put("acht", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(8))));
-		avPairs.put("neun", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(9))));
-		avPairs.put("zehn", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(10))));
-		avPairs.put("elf", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(11))));
-		avPairs.put("zwölf", Collections.<AVPair>singletonList(new AVPair("num", Integer.valueOf(12))));
-		WordIU.setAVPairs(avPairs);
-	} */
+	/** full input at one point in time */
+	List<WordIU> fullInput;
+	/** fuzzy match of the full input against the expected full installment */
+	FuzzyMatchResult fmatch;
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		audioDispatcher = (DispatchStream) ps.getComponent(PROP_DISPATCHER);
 		evaluator = (CompletionEvaluator) ps.getComponent(PROP_EVALUATOR);
-//		String fullText = "nordwind und sonne einst stritten sich nordwind und sonne wer von ihnen beiden wohl der stärkere wäre als ein wanderer der in einen warmen mantel gehüllt war des weges daherkam sie wurden einig dass derjenige für den stärkeren gelten sollte der den wanderer zwingen würde seinen mantel abzunehmen";
-		String fullText = "nordwind und sonne: einst stritten sich nordwind und sonne, wer von ihnen beiden wohl der stärkere wäre; als ein wanderer der in einen warmen mantel gehüllt war, des weges daherkam; sie wurden einig, dass derjenige für den stärkeren gelten sollte, der den wanderer zwingen würde, seinen mantel abzunehmen";
+//		String fullText = "nordwind und sonne: einst stritten sich nordwind und sonne, wer von ihnen beiden wohl der stärkere wäre; als ein wanderer der in einen warmen mantel gehüllt war, des weges daherkam; sie wurden einig, dass derjenige für den stärkeren gelten sollte, der den wanderer zwingen würde, seinen mantel abzunehmen";
 //		String fullText = "der nordwind blies mit aller macht; aber je mehr er blies, desto fester hüllte sich der wanderer in seinen mantel ein; endlich gab der nordwind den kampf auf; nun erwärmte die sonne die luft mit ihren freundlichen strahlen, und schon nach wenigen augenblicken zog der wanderer seinen mantel aus; da musste der nordwind zugeben, dass die sonne von ihnen beiden der stärkere war";
-		fullInstallment = new SysInstallmentIU(fullText);
+		String fullUtterance = ps.getString(PROP_FULL_UTTERANCE);
+		fullInstallment = new SysInstallmentIU(fullUtterance);
 		committedWords = new IUList<WordIU>();
 	}
 	
@@ -73,18 +61,20 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	@Override
 	protected void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
-		//TODO: on commit: remove committed words from fullUtterance, re-TTS the installmentIU
+		// we will only generate completions for the last element of the edit list
+		// because when words are added with a follower, the first word is likely to be over already 
 		EditMessage<WordIU> edit = (edits.isEmpty()) ? null : (EditMessage<WordIU>) lastElement(edits);
 		List<WordIU> inputWords = (List<WordIU>) ius;
 		// we only ever do something on the addition of a word which is not a silence
 		if (edit != null && edit.getType().equals(EditType.ADD) && !edit.getIU().isSilence()) {
-			List<WordIU> fullInput = new ArrayList<WordIU>(committedWords);
+			fullInput = new ArrayList<WordIU>(committedWords);
 			fullInput.addAll(inputWords);
-			FuzzyMatchResult fmatch = fullInstallment.fuzzyMatching(fullInput, 0.2, 2);
-			if (shouldFire(fullInput, fmatch)) {
-				doComplete(fullInput, fullInstallment, fmatch);
+			fmatch = fullInstallment.fuzzyMatching(fullInput, 0.2, 2);
+			if (shouldFire()) {
+				doComplete();
 			}
 		} else if (edit != null && edit.getType().equals(EditType.COMMIT)) {
+			//on commit: remove committed words from fullUtterance, re-TTS the installmentIU
 			committedWords.addAll(inputWords);
 		}
 	}
@@ -93,16 +83,24 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	 * determine whether we should complete the utterance based on the words heard so far
 	 * currently, the algorithm decides to *always* (repeatedly) fire when the expected prefix is recognized  
 	 */
-	private boolean shouldFire(List<WordIU> words, FuzzyMatchResult fmatch) {
+	private boolean shouldFire() {
 		// always fire if there were at least 3 words and the expected prefix is matched
 		//System.err.println(fullInstallment.fuzzyMatchesPrefix(words, 0.02, 2) + "" + words);
-		return (WordIU.removeSilentWords(words).size() > 2 && fmatch.matches());
+		return (WordIU.removeSilentWords(fullInput).size() > 2 && fmatch.matches());
 	}
 	
-	private void doComplete(List<WordIU> input, SysInstallmentIU fullInstallment, FuzzyMatchResult fmatch) {
-		double extrapolatedTime = extrapolateStart(input, fullInstallment, fmatch);
-		evaluator.newOnsetResult(lastElement(input), extrapolatedTime, this.currentFrame);
+	private void doComplete() {
+		double estimatedSpeechRate = estimateSpeechRate();
+		double extrapolatedTime = extrapolateStart();
+		List<WordIU> completion = fmatch.getRemainder();
+		WordIU nextWord = completion.get(0);
+		double nextWordEndEstimate = extrapolatedTime + nextWord.duration() * estimatedSpeechRate;
+		evaluator.newOnsetResult(lastElement(fullInput), extrapolatedTime, this.currentFrame, nextWord, nextWordEndEstimate);
 		// TODO: actually output the completion, not only log it to the evaluator
+		// this consists of two steps: 
+		// a) deep-copy and scale the SysInstallmentIU
+		// b) think hard about how best to do pitch-scaling
+		// c) synthesize and play the completion
 	}
 
 	/** extrapolate the start time of the next word from a list of previously spoken words */ 
@@ -113,7 +111,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 //		// start out with a very simple approach: start(last word) - start(first word) / (number of words - 1)
 //		return getDuration(prefix) / prefix.size()
 //	}
-	private double extrapolateStart(List<WordIU> prefix, SysInstallmentIU fullInstallment, FuzzyMatchResult fmatch) {
+	private double extrapolateStart() {
 		/* this implementation uses a duration model based on MaryTTS
 		 * 
 		 * we compare the duration of a TTSed utterance with the spoken words 
@@ -122,8 +120,16 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		 * or slower) and use this as a factor to the TTS's most recent word's 
 		 * duration, which should give the duration of the currently spoken word
 		 */
-		WordIU currentlySpokenWord = lastElement(prefix);
-		List<WordIU> completedUserPrefix = new ArrayList<WordIU>(prefix);
+		WordIU currentlySpokenWord = lastElement(fullInput);
+		List<WordIU> fullTtsPrefix = fmatch.getPrefix();
+		WordIU currentlyTTSedWord = lastElement(fullTtsPrefix);
+		return currentlySpokenWord.startTime() + (currentlyTTSedWord.duration() * estimateSpeechRate());
+	}
+	
+	/** estimate the correction factor relative to the TTS's speech rate */
+	private double estimateSpeechRate() {
+		WordIU currentlySpokenWord = lastElement(fullInput);
+		List<WordIU> completedUserPrefix = new ArrayList<WordIU>(fullInput);
 		completedUserPrefix.remove(currentlySpokenWord);
 		List<WordIU> fullTtsPrefix = fmatch.getPrefix();
 		List<WordIU> completedTTSPrefix = new ArrayList<WordIU>(fullTtsPrefix);
@@ -131,7 +137,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		completedTTSPrefix.remove(currentlyTTSedWord);
 		double  ttsDuration = getDurationWithoutPauses(completedTTSPrefix);
 		double userDuration = getDurationWithoutPauses(completedUserPrefix);
-		return currentlySpokenWord.startTime() + (currentlyTTSedWord.duration() * userDuration / ttsDuration);
+		return userDuration / ttsDuration; 
 	}
 
 	/** time spanned by all non-silent words */
