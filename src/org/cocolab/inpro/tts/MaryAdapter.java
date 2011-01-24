@@ -12,77 +12,28 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
 /**
- * our connection to mary; currently, this only supports Mary 3.6,
- * but this will be extended to Mary 4.1
+ * our connection to mary; with support for versions 3.6 and 4.1
  * 
  * The server host and port can be selected with
- * "server.host" and "server.port", which defaults to localhost:59125.
+ * "mary.host" and "mary.port", which defaults to localhost:59125.
  * 
  * the mary voice to use can be selected with the system property
- * "org.cocolab.inpro.tts.voice". The default voice is "male"
+ * "mary.voice". The default voice is "male"
  * (i.e. we let mary decide what male voice to use)
  * @author timo
  */
-public class MaryAdapter {
+public abstract class MaryAdapter {
 	de.dfki.lt.mary.client.MaryClient mc36;
 	marytts.client.MaryClient mc41;
 	
-	public static final String DEFAULT_VOICE = System.getProperty("mary.voice", "de2");
-	
-	enum CompatibilityMode { mary36, mary41 };
-	CompatibilityMode compatibilityMode = System.getProperty("mary.version", "3.6").equals("4.1") 
-													? CompatibilityMode.mary41 
-													: CompatibilityMode.mary36;
-
-	private static MaryAdapter maryAdapter = new MaryAdapter();
-	
-	/** private constructor, this class is a singleton */
-	private MaryAdapter() {
-        String serverHost = System.getProperty("mary.host", "localhost");
-        int serverPort = Integer.getInteger("mary.port", 59125).intValue();
-        try {
-        	switch (compatibilityMode) {
-        	case mary36:
-    			mc36 = new de.dfki.lt.mary.client.MaryClient(serverHost, serverPort);
-        		break;
-        	case mary41:
-        		mc41 = marytts.client.MaryClient.getMaryClient(
-			               new marytts.client.http.Address(serverHost, serverPort)
-			           );
-        		break;
-        	default:
-        		throw new RuntimeException();
-        	}
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-	}
+	private static MaryAdapter maryAdapter = new MaryAdapterImpl();
 	
 	public static MaryAdapter getInstance() {
 		return maryAdapter;
 	}
 	
-	private ByteArrayOutputStream process(String query, String inputType, String outputType, String audioType) throws UnknownHostException, IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        String defaultVoiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
-		switch (compatibilityMode) {
-		case mary36:
-			if (inputType.equals("TEXT"))
-				inputType = "TEXT_DE";
-			mc36.process(query, inputType, outputType, audioType,
-					defaultVoiceName, baos);
-			return baos;
-		case mary41:
-			String locale = "de";
-			mc41.process(query, inputType, outputType, locale, audioType,
-					defaultVoiceName, baos);
-			return baos;
-		default:
-			throw new RuntimeException();
-		}
-	}
-	
+	protected abstract ByteArrayOutputStream process(String query, String inputType, String outputType, String audioType) throws UnknownHostException, IOException;
+
 	private AudioInputStream getAudioInputStreamFromMary(String query, String inputType) {
         String outputType = "AUDIO";
         String audioType = "WAVE";
