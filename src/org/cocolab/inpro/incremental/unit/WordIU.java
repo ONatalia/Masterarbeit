@@ -201,11 +201,30 @@ public class WordIU extends IU {
 	public StringBuilder toMbrolaLines() {
 		StringBuilder sb = new StringBuilder("; ");
 		sb.append(toPayLoad());
+		sb.append("\n");
 		for (SegmentIU seg : getSegments()) {
 			sb.append(seg.toMbrolaLine());
 		}
 		return sb;
 	}
+	
+	public void appendMaryXML(StringBuilder sb) {
+		if ("<sil>".equals(toPayLoad())) {
+			sb.append("<boundary duration='");
+			sb.append(duration());
+			sb.append("'/>\n");
+		} else { 
+			sb.append("<t>\n");
+			sb.append(toPayLoad());
+			sb.append("\n<syllable>\n");
+			for (SegmentIU seg : getSegments()) {
+				seg.appendMaryXML(sb);
+			}
+			sb.append("</syllable>\n</t>\n");
+		}
+	}
+
+
 	
 	/** returns a new list with all silent words removed */
 	public static List<WordIU> removeSilentWords(List<WordIU> words) {
@@ -273,6 +292,5 @@ public class WordIU extends IU {
 	private static final int min(int a, int b, int c) {
 		return Math.min(Math.min(a, b), c);
 	}
-
 	
 }

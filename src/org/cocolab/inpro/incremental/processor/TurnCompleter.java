@@ -2,6 +2,9 @@ package org.cocolab.inpro.incremental.processor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.cocolab.inpro.audio.DispatchStream;
@@ -45,13 +48,14 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	/** fuzzy match of the full input against the expected full installment */
 	FuzzyMatchResult fmatch;
 	
+	/** first WordIUs of completions that have been output are stored here */
+	private HashSet<WordIU> triggerWords = new HashSet<WordIU>();
+	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		audioDispatcher = (DispatchStream) ps.getComponent(PROP_DISPATCHER);
 		evaluator = (CompletionEvaluator) ps.getComponent(PROP_EVALUATOR);
-//		String fullText = "nordwind und sonne: einst stritten sich nordwind und sonne, wer von ihnen beiden wohl der stärkere wäre; als ein wanderer der in einen warmen mantel gehüllt war, des weges daherkam; sie wurden einig, dass derjenige für den stärkeren gelten sollte, der den wanderer zwingen würde, seinen mantel abzunehmen";
-//		String fullText = "der nordwind blies mit aller macht; aber je mehr er blies, desto fester hüllte sich der wanderer in seinen mantel ein; endlich gab der nordwind den kampf auf; nun erwärmte die sonne die luft mit ihren freundlichen strahlen, und schon nach wenigen augenblicken zog der wanderer seinen mantel aus; da musste der nordwind zugeben, dass die sonne von ihnen beiden der stärkere war";
 		String fullUtterance = ps.getString(PROP_FULL_UTTERANCE);
 		fullInstallment = new SysInstallmentIU(fullUtterance);
 		committedWords = new IUList<WordIU>();
@@ -81,12 +85,32 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	
 	/** 
 	 * determine whether we should complete the utterance based on the words heard so far
-	 * currently, the algorithm decides to *always* (repeatedly) fire when the expected prefix is recognized  
+	 * 
+	 * THE FOLLOWING IS NOT TRUE ANYMORE: 
+	 * currently, the algorithm decides to *always* (repeatedly)
+	 * fire when the expected prefix is recognized  
 	 */
 	private boolean shouldFire() {
 		// always fire if there were at least 3 words and the expected prefix is matched
 		//System.err.println(fullInstallment.fuzzyMatchesPrefix(words, 0.02, 2) + "" + words);
-		return (WordIU.removeSilentWords(fullInput).size() > 2 && fmatch.matches());
+		boolean hasFired = hasFiredForTrigger();
+		return (WordIU.removeSilentWords(fullInput).size() > 2 && fmatch.matches() && !hasFired);
+	}
+	
+	/**
+	 * find out whether we have already fired for a word, to avoid stuttering; 
+	 * research shows that the first prediction for a word is as good as any 
+	 * later prediction so there's no value in trying repeatedly   
+	 */
+	private boolean hasFiredForTrigger() {
+		List<WordIU> prefix = fmatch.getPrefix();
+		WordIU triggerWord = prefix != null && prefix.size() > 0 ? prefix.get(prefix.size() - 1) : null;
+		if (triggerWord == null || triggerWords.contains(triggerWord)) {
+			return true;
+		} else {
+			triggerWords.add(triggerWord);
+			return false;
+		}
 	}
 	
 	private void doComplete() {
@@ -97,10 +121,18 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		double nextWordEndEstimate = extrapolatedTime + nextWord.duration() * estimatedSpeechRate;
 		evaluator.newOnsetResult(lastElement(fullInput), extrapolatedTime, this.currentFrame, nextWord, nextWordEndEstimate);
 		// TODO: actually output the completion, not only log it to the evaluator
+		// have a new thread which sleeps a certain time (while synthesizing) and then outputs to dispatchStream
 		// this consists of two steps: 
 		// a) deep-copy and scale the SysInstallmentIU
+		SysInstallmentIU output = new SysInstallmentIU(Collections.<WordIU>singletonList(nextWord));
+		output.scaleDeepCopyAndStartAtZero(estimatedSpeechRate);
 		// b) think hard about how best to do pitch-scaling
 		// c) synthesize and play the completion
+		long startTime = System.currentTimeMillis();
+		output.synthesize(); // --> this may be slow and has to be on a different thread!
+		long duration = System.currentTimeMillis() - startTime;
+		//System.err.println(output.toMbrola());
+		logger.info(nextWord.toPayLoad() + " took " + duration + " milliseconds");
 	}
 
 	/** extrapolate the start time of the next word from a list of previously spoken words */ 

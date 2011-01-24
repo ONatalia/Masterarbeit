@@ -8,8 +8,11 @@ import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
 
+import org.apache.commons.collections.iterators.EmptyListIterator;
+import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.util.TTSUtil;
 import org.cocolab.inpro.tts.MaryAdapter;
+import org.cocolab.inpro.tts.PitchMark;
 
 /**
  *
@@ -40,15 +43,56 @@ public class SysInstallmentIU extends InstallmentIU {
 		groundedIn = (List) words;
 	}
 	
-	public void synthesize() {
-		String mbrola = toMbrola();
-		synthesizedAudio = MaryAdapter.getInstance().mbrola2audio(mbrola);
+	@SuppressWarnings("unchecked") // allow cast from List<WordIU> to List<IU>
+	public SysInstallmentIU(List<WordIU> words) {
+		super(null, "");
+		groundedIn = (List) words;
 	}
 	
-	private String toMbrola() {
-		List<WordIU> words = myWords();
+	@SuppressWarnings("unchecked")
+	public void scaleDeepCopyAndStartAtZero(double scale) {
+		List<WordIU> newWords = new ArrayList<WordIU>();
+		WordIU prevWord = null;
+		double startTime = startTime();
+		for (WordIU w : getWords()) {
+			List<SegmentIU> newSegments = new ArrayList<SegmentIU>();
+			for (SegmentIU seg : w.getSegments()) {
+				// TODO: these will have to become SysSegementIUs when I add pitch-scaling!
+				newSegments.add(new SysSegmentIU(new Label(
+						(seg.l.getStart() - startTime) * scale, 
+						(seg.l.getEnd() - startTime) * scale, 
+						seg.l.getLabel()
+				), seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).pitchMarks : Collections.<PitchMark>emptyList()));
+			}
+			newWords.add(new WordIU(w.word, prevWord, (List) newSegments));
+		}
+		groundedIn = (List) newWords;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<WordIU> getWords() {
+		return (List<WordIU>) (List) groundedIn;
+	}
+	
+	public void synthesize() {
+//		String mbrola = toMbrola();
+//		synthesizedAudio = MaryAdapter.getInstance().mbrola2audio(mbrola);
+		String maryXML = toMaryXML();
+		synthesizedAudio = MaryAdapter.getInstance().maryxml2audio(maryXML);
+	}
+	
+	public String toMaryXML() {
+		StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<maryxml xmlns=\"http://mary.dfki.de/2002/MaryXML\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"0.5\" xml:lang=\"de\">\n<p>\n<s>\n<phrase>\n");
+		for (WordIU word : myWords()) {
+			word.appendMaryXML(sb);
+		}
+		sb.append("</phrase>\n</s>\n</p>\n</maryxml>");
+		return sb.toString();
+	}
+	
+	public String toMbrola() {
 		StringBuilder sb = new StringBuilder();
-		for (WordIU word : words) {
+		for (WordIU word : myWords()) {
 			sb.append(word.toMbrolaLines());
 		}
 		sb.append("#\n");

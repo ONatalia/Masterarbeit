@@ -97,5 +97,9 @@ public class SegmentIU extends IU {
 		sb.append("\n");
 		return sb;
 	}
+
+	public void appendMaryXML(StringBuilder sb) {
+		throw new UnsupportedOperationException("only SysSegmentIUs can be converted to MaryXML!");
+	}
 	
 }

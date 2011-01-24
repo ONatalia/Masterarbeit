@@ -18,8 +18,8 @@ public class PitchMark {
 	
 	/** create a pitchMark from an mbrola pitchmark-string */
 	public PitchMark(String pitchMarkString) {
-		assert pitchMarkString.matches("\\((\\d+),(\\d+)\\)") : pitchMarkString;
-		Pattern format = Pattern.compile("\\((\\d+),(\\d+)\\)");
+		assert pitchMarkString.matches("\\(?(\\d+),(\\d+)\\)?") : pitchMarkString;
+		Pattern format = Pattern.compile("\\(?(\\d+),(\\d+)\\)?");
 		Matcher m = format.matcher(pitchMarkString);
 		if (!m.matches()) { // we have to match, whether assertions are enabled or not
 			assert false; 

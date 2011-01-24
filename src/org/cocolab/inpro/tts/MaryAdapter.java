@@ -76,6 +76,10 @@ public abstract class MaryAdapter {
 		return getAudioInputStreamFromMary(mbrola, "MBROLA");
 	}
 	
+	public AudioInputStream maryxml2audio(String maryxml) {
+		return getAudioInputStreamFromMary(maryxml, "ACOUSTPARAMS");
+	}
+	
 	public void mbrola2file(String mbrola, File file) throws UnknownHostException, IOException {
         ByteArrayOutputStream baos = process(mbrola, "MBROLA", "AUDIO", "WAVE");
 		FileOutputStream fos = new FileOutputStream(file);

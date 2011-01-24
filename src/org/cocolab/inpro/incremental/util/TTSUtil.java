@@ -1,6 +1,7 @@
 package org.cocolab.inpro.incremental.util;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,8 +37,22 @@ public class TTSUtil {
 		JAXBContext context = JAXBContext.newInstance(Paragraph.class);
 		JAXBResult result = new JAXBResult(context);
 		TransformerFactory tf = TransformerFactory.newInstance();
-		Transformer t = tf.newTransformer(new StreamSource(TTSUtil.class.getResourceAsStream("mary2simple.xsl")));
-		t.transform(new StreamSource(is), result);
+		Transformer t;
+		is.mark(Integer.MAX_VALUE);
+		try {
+			t = tf.newTransformer(new StreamSource(TTSUtil.class.getResourceAsStream("mary2simple.xsl")));
+			t.transform(new StreamSource(is), result);
+		} catch (TransformerException te) {
+			try {
+				is.reset();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot reset stream");
+			}
+			System.err.print(is);
+			te.printStackTrace();
+			throw new RuntimeException(te);
+		}
 		Paragraph paragraph = (Paragraph) result.getResult(); //unmarshaller.unmarshal(is);
 		return paragraph.getWordIUs();
 	}
@@ -134,6 +149,8 @@ public class TTSUtil {
 				List<String> pitchStrings; 
 				if (f0List.contains(" ")) { 
 					pitchStrings = Arrays.<String>asList(f0List.split(" "));
+				} else if (f0List.contains(")(")) {
+					pitchStrings = Arrays.<String>asList(f0List.split("\\)\\("));
 				} else {
 					pitchStrings = Collections.<String>singletonList(f0List);
 				}
