@@ -30,7 +30,9 @@ public class MaryAdapter {
 	public static final String DEFAULT_VOICE = System.getProperty("mary.voice", "de2");
 	
 	enum CompatibilityMode { mary36, mary41 };
-	CompatibilityMode compatibilityMode = (System.getProperty("mary.version") != null && System.getProperty("mary.version").equals("4.1")) ? CompatibilityMode.mary41 : CompatibilityMode.mary36;
+	CompatibilityMode compatibilityMode = System.getProperty("mary.version", "3.6").equals("4.1") 
+													? CompatibilityMode.mary41 
+													: CompatibilityMode.mary36;
 
 	private static MaryAdapter maryAdapter = new MaryAdapter();
 	
