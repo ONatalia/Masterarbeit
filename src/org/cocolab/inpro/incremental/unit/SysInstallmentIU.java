@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
 
-import org.apache.commons.collections.iterators.EmptyListIterator;
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.util.TTSUtil;
 import org.cocolab.inpro.tts.MaryAdapter;
@@ -79,6 +78,10 @@ public class SysInstallmentIU extends InstallmentIU {
 //		synthesizedAudio = MaryAdapter.getInstance().mbrola2audio(mbrola);
 		String maryXML = toMaryXML();
 		synthesizedAudio = MaryAdapter.getInstance().maryxml2audio(maryXML);
+	}
+	
+	public AudioInputStream getAudio() {
+		return synthesizedAudio;
 	}
 	
 	public String toMaryXML() {

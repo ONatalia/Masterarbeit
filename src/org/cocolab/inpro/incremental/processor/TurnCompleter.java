@@ -3,7 +3,6 @@ package org.cocolab.inpro.incremental.processor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -18,6 +17,7 @@ import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.incremental.unit.SysInstallmentIU.FuzzyMatchResult;
+import org.cocolab.inpro.incremental.util.ResultUtil;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -37,8 +37,8 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	@S4String(defaultValue = "eins zwei drei vier fünf sechs sieben")
 	public static final String PROP_FULL_UTTERANCE = "fullUtterance";
 	
-	@SuppressWarnings("unused")
-	private static int OUTPUT_BUFFER_DELAY = 150;
+	/** in seconds, very rough estimate */
+	private static double OUTPUT_BUFFER_DELAY = 0.050;
 	
 	private IUList<WordIU> committedWords;
 	private SysInstallmentIU fullInstallment;
@@ -120,21 +120,51 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		WordIU nextWord = completion.get(0);
 		double nextWordEndEstimate = extrapolatedTime + nextWord.duration() * estimatedSpeechRate;
 		evaluator.newOnsetResult(lastElement(fullInput), extrapolatedTime, this.currentFrame, nextWord, nextWordEndEstimate);
-		// TODO: actually output the completion, not only log it to the evaluator
-		// have a new thread which sleeps a certain time (while synthesizing) and then outputs to dispatchStream
 		// this consists of two steps: 
 		// a) deep-copy and scale the SysInstallmentIU
 		SysInstallmentIU output = new SysInstallmentIU(Collections.<WordIU>singletonList(nextWord));
 		output.scaleDeepCopyAndStartAtZero(estimatedSpeechRate);
-		// b) think hard about how best to do pitch-scaling
+		// b) think hard about how best to do pitch-scaling (TODO)
 		// c) synthesize and play the completion
-		long startTime = System.currentTimeMillis();
-		output.synthesize(); // --> this may be slow and has to be on a different thread!
-		long duration = System.currentTimeMillis() - startTime;
-		//System.err.println(output.toMbrola());
-		logger.info(nextWord.toPayLoad() + " took " + duration + " milliseconds");
+		// have a new thread which sleeps a certain time (while synthesizing) and then outputs to dispatchStream
+		double holdingTime = extrapolatedTime - this.currentFrame * ResultUtil.FRAME_TO_SECOND_FACTOR;
+		InstallmentPlayer ip = new InstallmentPlayer(holdingTime, output);
+		ip.start();
 	}
-
+	
+	class InstallmentPlayer extends Thread {
+		SysInstallmentIU output;
+		/** in seconds */
+		double holdingTime; 
+		public InstallmentPlayer(double holdingTime, SysInstallmentIU output) {
+			this.holdingTime = holdingTime;
+			this.output = output;
+		}
+		
+		@Override
+		public void run() {
+			long startTime = System.currentTimeMillis();
+			if (holdingTime < OUTPUT_BUFFER_DELAY) {
+				logger.info("oups, I'm already starting late by " + holdingTime);
+			}
+			output.synthesize(); // TODO: this may be slow and has to be on a different thread!
+			// TODO: actually play after the holding time is over
+			long duration = System.currentTimeMillis() - startTime; // in milliseconds
+			logger.info(output.getWords().get(0).toPayLoad() + " took " + duration + " milliseconds");
+			holdingTime -= duration * 0.001;
+			if (holdingTime < OUTPUT_BUFFER_DELAY) {
+				logger.info("oups, after synthesis I'm late by " + holdingTime);
+			} else {
+				try {
+					Thread.sleep((long) ((holdingTime - OUTPUT_BUFFER_DELAY) * 1000));
+				} catch (InterruptedException e) {
+					logger.info("interrupted while sleeping.");
+				}
+			}
+			audioDispatcher.playStream(output.getAudio(), true);
+		}
+	}
+	
 	/** extrapolate the start time of the next word from a list of previously spoken words */ 
 //	private double extrapolateStart(List<WordIU> prefix, SysInstallmentIU fullInstallment) {
 //		// this implementation assumes that all words are (more or less) of equal length,

@@ -22,26 +22,7 @@ import edu.cmu.sphinx.util.props.S4Component;
 /**
  * WARNING: there may be threading issues in this class
  * 
- * Exception in thread "dispatcher object source" java.lang.ArrayIndexOutOfBoundsException: Array index out of range: -1
-	at java.util.Arrays.rangeCheck(Arrays.java:1309)
-	at java.util.Arrays.fill(Arrays.java:2567)
-	at org.cocolab.inpro.audio.DispatchStream.read(DispatchStream.java:164)
-	at org.cocolab.inpro.apps.SimpleMonitor$2.run(SimpleMonitor.java:206)
-	at java.lang.Thread.run(Thread.java:662)
-
--> the problem occurs, when bytesRead was -1, which - I believe - can happen
-if an audio stream has a duration in a multiple of 160 bytes.
-i hope this has been fixed, please tell me when you still see this error. (timo) 
-
-Exception in thread "dispatcher object source" java.lang.ArrayIndexOutOfBoundsException: Array index out of range: -1
-	at java.util.Arrays.rangeCheck(Arrays.java:1309)
-	at java.util.Arrays.fill(Arrays.java:2567)
-	at org.cocolab.inpro.audio.DispatchStream.read(DispatchStream.java:176)
-	at org.cocolab.inpro.apps.SimpleMonitor$2.run(SimpleMonitor.java:206)
-	at java.lang.Thread.run(Thread.java:662)
-
-
- * TODO: would it be nice to directly output SysInstallmentIUs?
+ * TODO: would it be nice to directly output SysInstallmentIUs? --> yes, indeed.
  * @author timo
  */
 public class DispatchStream extends InputStream implements Configurable {
