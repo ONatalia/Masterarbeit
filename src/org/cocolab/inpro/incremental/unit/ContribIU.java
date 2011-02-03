@@ -82,7 +82,9 @@ public class ContribIU extends IU {
 				if (avp.equals(this.contribution)) {
 					return true;
 				} else if (avp.getAttribute().equals(this.contribution.getAttribute())) {
-					if (this.contribution.getValue() == null || this.contribution.getValue().equals("?")) {
+					if (this.contribution.getValue() == null ||
+							this.contribution.getValue().equals("?") ||
+							this.overwrite) {
 						return true;
 					}
 				}
@@ -103,14 +105,23 @@ public class ContribIU extends IU {
 	}
 	
 	/**
-	 * Checks if this contribution needs clarification (or if a DM can assume
-	 * that the first match of this type is correct.)
+	 * Checks if this contribution should be clarified
+	 * in case of ambiguous input
 	 * @return true if so
 	 */
 	public boolean clarify() {
 		return this.clarify;
 	}
-	
+
+	/**
+	 * Checks if this contribution can be grounded in
+	 * new input even if already grounded.
+	 * @return true if so
+	 */
+	public boolean overwrite() {
+		return this.overwrite;
+	}
+
 	public AVPair getContribution() {
 		return this.contribution;
 	}
