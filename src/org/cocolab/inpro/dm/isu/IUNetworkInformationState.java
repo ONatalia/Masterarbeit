@@ -19,13 +19,13 @@ import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.nlu.AVPair;
 
-// TODO: YesNo - make integration/unintegration separate rules, with different scopes: 1. self-correction/confirmation, 2. performed output, 3. explicit confirmation, 4. partial clarification
-// TODO: Reproduce and debug unintegrated rule trigger loop
+// FIXME: at the first unintegrate rule doesn't reintegrate when 'no' is revoked
+// FIXME: Focus, move right/down when necessary, i.e. system-initiated topic/focus-changes when current focus is fully integrated.
 // TODO: Move output strings away from ContribIU
-// TODO: Make IU queries generic, move IU-specific queries to IU.java
-// TODO: Focus, move right/down when necessary, i.e. system-initiated topic/focus-changes when current focus is fully integrated.
+// TODO: YesNo - make integration/unintegration separate rules, with different scopes: 1. self-correction/confirmation, 2. performed output, 3. explicit confirmation, 4. partial clarification
 // TODO: AM.signalListeners() - implement 'done' update rules
-// TODO: AM, prettier output
+// TODO: Make IU queries generic, move IU-specific queries to IU.java
+
 
 /**
  * An information state consisting of a network of ContribIU contributions that can integrate with new input.
@@ -331,6 +331,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 					iu.removeGrin(this.nextInput);
 					iu.revoke();
 					for (IU input : iu.groundedIn()) {
+						// reintegrate by assigning old input to nextInput and restarting rules.
 						if (!(input instanceof ContribIU)) {
 							this.nextInput = (WordIU) input;
 							restart = true;
@@ -345,6 +346,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 				} else {
 					// Other input simply get their grounding contribution links removed
 					iu.removeGrin(this.nextInput);
+					iu.getContribution().setValue("?");
 					this.nextInput = null;
 					this.focus = this.getLastIntegrated();
 					restart = true;
@@ -399,6 +401,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			}
 			this.nextInput.ground(marked);
 			marked.groundIn(this.nextInput);
+			marked.getContribution().setValue(this.nextInput.getAVPairs().get(0).getValue());
 			// output a grounding dialogue act
 			this.nextOutput = new DialogueActIU(this.nextOutput, marked, newAct);
 			this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
@@ -411,12 +414,11 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			this.integrateList.clear();
 			// clear the visited list for the next search
 			this.visited.clear();
-			// revoke uncommitted requests and clarifications grounded in integrated contribution 
+			// revoke uncommitted clarifications grounded in integrated contribution (these are now clarified)
 			for (IU iu : marked.grounds()) {
 				if (iu instanceof DialogueActIU) {
 					AbstractDialogueAct act = ((DialogueActIU) iu).getAct();
 					if (act instanceof ClarifyDialogueAct) {
-						//|| act instanceof RequestDialogueAct) {
 						if (!iu.isCommitted()) {
 							this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.REVOKE, (DialogueActIU) iu));
 							marked.removeGrin(iu);
@@ -485,8 +487,9 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 						}
 					}
 					iu.removeGrin(remove);
+					((ContribIU) iu).getContribution().setValue("?");
 					// add a glue contribution for integrating input
-					ContribIU glue = new ContribIU(null, iu, new AVPair("undo:true"), false, null, null, null);
+					ContribIU glue = new ContribIU(null, iu, new AVPair("undo:true"), false, false);
 					glue.groundIn(this.nextInput);
 					glue.groundIn(iu);
 					glue.groundIn(remove);
@@ -514,7 +517,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 */
 	@Override
 	public boolean clarifyNextInput() {
-		ContribIU glue = new ContribIU(null, this.integrateList, new AVPair("clarify:true"),false,"Was meinten Sie?",null,null);
+		ContribIU glue = new ContribIU(null, this.integrateList, new AVPair("clarify:true"), false, false);
 		glue.groundIn(this.nextInput);
 		this.contributions.add(glue);
 		this.nextOutput = new DialogueActIU(this.nextOutput, glue, new ClarifyDialogueAct());
@@ -562,6 +565,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			// contrib doesn't integrate input if it already integrates this input
 			return false;
 		}
+		// allow "overwrites" if allowed.
 		for (IU iu : this.currentContrib.groundedIn()) {
 			if (iu.getClass().equals(this.nextInput.getClass())) {
 				// contrib doesn't integrate input if it's already grounded in input/output

@@ -2,12 +2,7 @@ package org.cocolab.inpro.incremental.unit;
 
 import java.util.Collections;
 import java.util.List;
-
 import org.cocolab.inpro.dm.acts.AbstractDialogueAct;
-import org.cocolab.inpro.dm.acts.ClarifyDialogueAct;
-import org.cocolab.inpro.dm.acts.GroundDialogueAct;
-import org.cocolab.inpro.dm.acts.InformDialogueAct;
-import org.cocolab.inpro.dm.acts.RequestDialogueAct;
 
 public class DialogueActIU extends IU {
 
@@ -38,27 +33,6 @@ public class DialogueActIU extends IU {
 	 */
 	public AbstractDialogueAct getAct() {
 		return this.act;
-	}
-	
-	/**
-	 * Getter for a string representation of the utterance associated with this IU's act.
-	 * @return
-	 */
-	public String getUtterance() {
-		if (this.groundedIn.isEmpty()) {
-			return "";
-		}
-		if (this.act instanceof RequestDialogueAct) {
-			return ((ContribIU) this.groundedIn.get(0)).getRequestString();
-		} else if (this.act instanceof ClarifyDialogueAct) {
-			return "Was meinten Sie mit " + ((ContribIU) this.groundedIn.get(0)).getClarificationString();
-		} else if (this.act instanceof GroundDialogueAct) {
-			return ((ContribIU) this.groundedIn.get(0)).getGroundingString();
-		} else if (this.act instanceof InformDialogueAct) {
-			return ((InformDialogueAct) this.act).getUtterance();
-		} else {
-			return "";
-		}
 	}
 
 	/**

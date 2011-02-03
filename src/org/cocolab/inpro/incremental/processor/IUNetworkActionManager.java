@@ -7,6 +7,14 @@ import org.cocolab.inpro.dm.acts.RequestDialogueAct;
 import org.cocolab.inpro.incremental.processor.AbstractFloorTracker.Signal;
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
 
+/**
+ * Implements utterance execution for DialogueActIUs grounded-in 
+ * a wider IU network.
+ * Applies basic trial intonation logic for rising vs non-rising pitch
+ * and throws timeouts accordingly.
+ * @author okko
+ *
+ */
 public class IUNetworkActionManager extends AudioActionManager {
 
 	@Override
@@ -14,12 +22,11 @@ public class IUNetworkActionManager extends AudioActionManager {
 		int timeout = 0;
 		switch (signal) {
 		case NO_INPUT: {
-			this.playSystemUtterance("Ja? Hallo?");
+			this.playNegGroundingUtterance();
 			timeout = 7000;
 			break;
 		}
 		case START: {
-			logger.info("Shutting up");
 			this.shutUp();
 			break;
 		}
@@ -33,41 +40,44 @@ public class IUNetworkActionManager extends AudioActionManager {
 				}
 			}
 			if (ground) {
-				this.playSystemUtterance("Verstehe.");
+				this.playShortPosGroundingUtterance();
 			} else {
-				this.playSystemUtterance("Und?");
+				this.playShortNegGroundingUtterance();
 			}
 			break;
 		}
 		case EOT_FALLING:
 		case EOT_NOT_RISING: {
-			String clarify = "";
-			String request = "";
-			String ground = "";
+			boolean clarify = false;
+			boolean request = false;
+			boolean ground = false;
 			for (DialogueActIU iu : this.toPerform) {
-				// ignore undo acts,
 				AbstractDialogueAct act = iu.getAct();
 				if (act instanceof GroundDialogueAct) {
-					ground += " " + iu.getUtterance();
+					ground = true;
 					this.signalListeners(iu);
 				} else  if (act instanceof ClarifyDialogueAct) {
-					clarify = iu.getUtterance();
+					clarify = true;
 				} else if (act instanceof RequestDialogueAct) {
-					request = iu.getUtterance();
+					request = true;
 				}
 			}
-			if (!ground.isEmpty()) {
-				// play all grounding acts,
-				this.playSystemUtterance("Gut!" + ground);
+			if (ground) {
+				// play all grounding acts…
+				this.playPosGroundingUtterance();
 				timeout = 5000;
 			}
-			if (!clarify.isEmpty()) {
-				// then the last clarification act or (if none),
-				this.playSystemUtterance(clarify);
+			if (clarify) {
+				// …then clarification act or (if none)…
+				this.playClarificationUtterance();
 				timeout = 8000;
-			} else if (!request.isEmpty()) {
-				// then the last request act.
-				this.playSystemUtterance(request);
+			} else if (request) {
+				// …then the last request act.
+				this.playRequestUtterance();
+				timeout = 8000;
+			} else {
+				 // or a quick Q if there was no new DA to perform.
+				this.playNegGroundingUtterance();
 				timeout = 8000;
 			}
 			logger.info("Clearing todo…");
@@ -79,6 +89,42 @@ public class IUNetworkActionManager extends AudioActionManager {
 			logger.info("Setting new noinput timeout of " + timeout + "ms…");
 			this.floorTracker.installInputTimeout(timeout);
 		}
+	}
+	
+	protected void playNoInputUtterance() {
+		// Ja? Hallo?
+		this.playSystemUtterance("Ja? Hallo?");
+	}
+
+	
+	protected void playShortPosGroundingUtterance() {
+		// Gut!
+		this.playSystemUtterance("Gut!");
+	}
+	
+	protected void playShortNegGroundingUtterance() {
+		// Und?
+		this.playSystemUtterance("Und?");
+	}
+	
+	protected void playPosGroundingUtterance() {
+		// Verstehe.
+		this.playSystemUtterance("Verstehe.");
+	}
+
+	protected void playNegGroundingUtterance() {
+		// Wie bitte?
+		this.playSystemUtterance("Wie bitte?");
+	}
+	
+	protected void playClarificationUtterance() {
+		// Was meintene Sie damit?
+		this.playSystemUtterance("Was meintene Sie damit?");
+	}
+
+	protected void playRequestUtterance() {
+		// Wie kann ich Ihnen noch helfen?
+		this.playSystemUtterance("Ok, dafür bräuchte ich noch mehr Informationen!");
 	}
 	
 	private void playSystemUtterance(String string) {

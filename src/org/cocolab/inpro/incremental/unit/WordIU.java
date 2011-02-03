@@ -149,8 +149,8 @@ public class WordIU extends IU {
 		assert hasProsody();
 		if (prosodicFeatures == null) {
 			prosodicFeatures = new ProsodicFeatures();
-			Instance instance = bd.getEOTFeatures(endTime());
-			System.err.println(instance.toString());
+//			Instance instance = bd.getEOTFeatures(endTime());
+//			System.err.println(instance.toString());
 		}
 		Logger.getLogger(WordIU.class).info(this + " has rising prosody: " + prosodicFeatures.pitchIsRising());
 		return prosodicFeatures.pitchIsRising();

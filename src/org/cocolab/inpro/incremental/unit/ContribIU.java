@@ -24,12 +24,14 @@ import edu.emory.mathcs.backport.java.util.Collections;
  */
 public class ContribIU extends IU {
 
+	/** This IU's payload - represented as an attribute-value pair*/
 	protected AVPair contribution;
+	/** This IU's confidence - initially 0.*/
 	protected int confidence = 0;
-	protected boolean clarify = true;
-	protected String requestString;
-	protected String clarificationString;
-	protected String groundingString;
+	/** Boolean for whether this contribution should be clarified against others in case of ambiguous input. */
+	protected boolean clarify;
+	/** Boolean for whether new input can overwrite existing input. */
+	protected boolean overwrite;
 
 	public static final ContribIU FIRST_CONTRIB_IU = new ContribIU(); 
 
@@ -48,59 +50,27 @@ public class ContribIU extends IU {
 	 * @param clarify boolean denoting if this contribution should be disambiguated
 	 */
 	@SuppressWarnings("unchecked")
-	public ContribIU(IU sll, IU grin, AVPair contribution, boolean clarify) {
-		this(sll, Collections.singletonList(grin), contribution, clarify, null, null, null);
-	}
-
-	/**
-	 * Constructor with contribution parameter
-	 * @param sll Same level link IU
-	 * @param grin Grounded-in IU
- 	 * @param contribution AVPair describing this contribution
- 	 * @param clarify boolean denoting if this contribution should be disambiguated
-	 * @param requestString the default request string for utterance construction
-	 * @param clarificationString the default clarification string for utterance construction
-	 * @param groundingString the default grounding string for utterance construction
-
-	 */
-	@SuppressWarnings("unchecked")
-	public ContribIU(IU sll, IU grin, AVPair contribution, boolean clarify,
-			String requestString, String clarificationString, String groundingString) {
-		this(sll, Collections.singletonList(grin), contribution, clarify, requestString, clarificationString, groundingString);
-	}
-
-	/**
-	 * Full constructor with contribution, clarification and utterance string
-	 * descriptors.
-	 * @param sll Same level link IU
-	 * @param grin Grounded-in IU
-	 * @param contribution AVPair describing this contribution
-	 * @param clarify boolean denoting if this contribution should be disambiguated
-	 * @param requestString the default request string for utterance construction
-	 * @param clarificationString the default clarification string for utterance construction
-	 * @param groundingString the default grounding string for utterance construction
-	 */
-	public ContribIU(IU sll, List<? extends IU> grin, AVPair contribution, boolean clarify,
-			String requestString, String clarificationString, String groundingString) {
-		super(sll, grin);
+	public ContribIU(IU sll, IU grin, AVPair contribution, boolean clarify, boolean overwrite) {
+		super(sll, Collections.singletonList(grin));
 		this.contribution = contribution;
 		this.clarify = clarify;
-		this.requestString = requestString;
-		this.clarificationString = clarificationString;
-		this.groundingString = groundingString;
+		this.overwrite = overwrite;
 	}
-
+	
 	/**
 	 * Constructor with contribution and clarification parameters
 	 * @param sll Same level link IU
-	 * @param grin Grounded-in IUs
+	 * @param grin Grounded-in IU
 	 * @param contribution AVPair describing this contribution
 	 * @param clarify boolean denoting if this contribution should be disambiguated
 	 */
-	public ContribIU(IU sll, List<? extends IU> grin, AVPair contribution) {
-		this(sll, grin, contribution, false, null, null, null);
+	public ContribIU(IU sll, List<? extends IU> grin, AVPair contribution, boolean clarify, boolean overwrite) {
+		super(sll, grin);
+		this.contribution = contribution;
+		this.clarify = clarify;
+		this.overwrite = overwrite;
 	}
-	
+
 	public boolean integratesWith(IU iu) {
 		if (this.contribution == null)
 			return false;
@@ -113,8 +83,6 @@ public class ContribIU extends IU {
 					return true;
 				} else if (avp.getAttribute().equals(this.contribution.getAttribute())) {
 					if (this.contribution.getValue() == null || this.contribution.getValue().equals("?")) {
-						// Overwrites an inital "?" value...
-//						this.contribution.setValue(avp.getValue());
 						return true;
 					}
 				}
@@ -127,8 +95,6 @@ public class ContribIU extends IU {
 				if (this.contribution.getValue() == null) {
 					return true;
 				} else if (this.contribution.getValue().equals("?")) {
-					// Overwrites an inital "?" value...
-//					this.contribution.setValue(avp.getValue());
 					return true;
 				}
 			}
@@ -147,43 +113,6 @@ public class ContribIU extends IU {
 	
 	public AVPair getContribution() {
 		return this.contribution;
-	}
-	
-	public String getClarificationString() {
-		if (this.clarificationString == null) {
-			for (IU iu : this.groundedIn) {
-				if (iu instanceof WordIU) {
-					return ((WordIU) iu).getWord();
-				}
-			}
-			if (this.contribution != null) {
-				return this.contribution.getAttribute();
-			}
-		}
-		return this.clarificationString;
-	}
-
-	public String getGroundingString() {
-		if (this.groundingString != null)
-			return this.groundingString;
-		String ret = "";
-		for (IU iu : this.grounds()) {
-			if (iu instanceof ContribIU) {
-				ret += ((ContribIU) iu).getGroundingString() + " ";
-			}
-		}
-		for (IU iu : this.groundedIn()) {
-			if (iu instanceof WordIU) {
-				ret += ((WordIU) iu).getWord() + " ";
-			}
-		}
-		return ret;
-	}
-
-	public String getRequestString() {
-		if (this.requestString == null)
-			return "Wie kann ich Ihnen helfen?";
-		return this.requestString;
 	}
 
 	/**
@@ -205,26 +134,6 @@ public class ContribIU extends IU {
 	public int confidence() {
 		return this.confidence;
 	}
-	
-//	/**
-//	 * Getter for this contributions end time (which is the latest
-//	 * end time of any known iu to ground it.
-//	 */
-//	@Override
-//	public double endTime() {
-//		if ((groundedIn != null) && (groundedIn.size() > 0)) {
-//			double time = 0;
-//			for (IU iu : this.groundedIn()) {
-//				if (Double.isNaN(iu.endTime())) {
-//					if (iu.endTime() > time)
-//						time = iu.endTime();
-//				}
-//			}
-//			return time;
-//		} else {
-//			return Double.NaN;
-//		}
-//	}
 
 	@Override
 	public String toPayLoad() {
