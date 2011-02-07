@@ -90,7 +90,7 @@ public class IUNetworkActionManager extends AudioActionManager {
 			this.floorTracker.installInputTimeout(timeout);
 		}
 	}
-	
+
 	protected void playNoInputUtterance() {
 		// Ja? Hallo?
 		this.playSystemUtterance("Ja? Hallo?");

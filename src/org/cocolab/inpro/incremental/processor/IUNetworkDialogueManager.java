@@ -14,6 +14,7 @@ import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
 import org.cocolab.inpro.incremental.unit.WordIU;
+import org.cocolab.inpro.nlu.AVPair;
 import org.cocolab.inpro.nlu.AVPairMappingUtil;
 
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -79,12 +80,16 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 		if (this.updating)
 			return;
 		this.updating = true;
+		boolean reset = false;
 		for (EditMessage<? extends IU> edit : edits) {
 			if (!((WordIU) edit.getIU()).isSilence()) {
 				switch (edit.getType()) {
 				case ADD: {
-					// Just apply the rules with each new word
-					this.updateEngine.applyRules((WordIU) edit.getIU());
+					// Just apply the rules with each new word that isn't a hard reset)
+					if (((WordIU) edit.getIU()).getAVPairs() != null && 
+					!((WordIU) edit.getIU()).getAVPairs().get(0).equals(new AVPair("reset:true"))) {
+						this.updateEngine.applyRules((WordIU) edit.getIU());
+					}
 					break;
 				}
 				case REVOKE: {
@@ -93,10 +98,18 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 					this.updateEngine.applyRules((WordIU) edit.getIU());
 					break;
 				}
-				case COMMIT: break;
-				}				
+				case COMMIT: {
+					if (((WordIU) edit.getIU()).getAVPairs() != null && 
+							((WordIU) edit.getIU()).getAVPairs().get(0).equals(new AVPair("reset:true"))) {
+						reset = true;
+					}
+					break;
+				}
+				}
 			}
 		}
+		if (reset)
+			this.reset();
 		this.updateAll();
 	}
 	
@@ -120,6 +133,17 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 		contributionEdits = newList.diff(this.updateEngine.getInformationState().getContributions());
 		for (PushBuffer listener : this.stateListeners) {
 			listener.hypChange(this.updateEngine.getInformationState().getContributions(), contributionEdits);
+		}
+	}
+
+	public void reset() {
+		logger.info("Resetting DM.");
+		super.postUpdate();
+		this.leftBufferQueue.clear();
+		this.updateEngine = new IUNetworkUpdateEngine(this.domain);
+		this.updateEngine.setLogger(this.logger);
+		for (PushBuffer listener : this.iulisteners) {
+			listener.reset();
 		}
 	}
 

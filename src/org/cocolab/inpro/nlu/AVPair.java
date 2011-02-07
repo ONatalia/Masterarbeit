@@ -51,7 +51,7 @@ public class AVPair {
 	public AVPair(String attval) {
 		assert (attval.contains(":"));
 		String[] tokens = attval.split("\\s*:\\s*");
-		assert (tokens.length == 2);
+		assert (tokens.length == 2) : "Malformed AVPair string: " + attval;
 		this.attribute = tokens[0];
 		this.value = tokens[1];
 	}

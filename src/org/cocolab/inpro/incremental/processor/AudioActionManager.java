@@ -158,19 +158,19 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 		case EOT_FALLING:
 		case EOT_RISING:
 		case EOT_NOT_RISING: {
-			for (DialogueActIU iu : this.toPerform) {
-				if (utteranceMap.containsKey(iu.getUtterance())) {
-					logger.info("Playing from file " + iu.getUtterance());
-					this.audioDispatcher.playFile(utteranceMap.get(iu.getUtterance()).toString(), false);
-				} else {
-					logger.info("Playing via tts " + iu.getUtterance());
-					this.audioDispatcher.playTTS(iu.getUtterance(), false);					
-				}
+//			for (DialogueActIU iu : this.toPerform) {
+//				if (utteranceMap.containsKey(iu.getUtterance())) {
+//					logger.info("Playing from file " + iu.getUtterance());
+//					this.audioDispatcher.playFile(utteranceMap.get(iu.getUtterance()).toString(), false);
+//				} else {
+//					logger.info("Playing via tts " + iu.getUtterance());
+//					this.audioDispatcher.playTTS(iu.getUtterance(), false);					
+//				}
 //				logger.info("Playing silence");
 //				this.audioDispatcher.playSilence(500, false);
-			}
-			logger.info("Clearing todo…");
-			this.toPerform.clear();
+//			}
+//			logger.info("Clearing todo…");
+//			this.toPerform.clear();
 			logger.info(this.toPerform.toString());
 			break;
 		}
@@ -204,5 +204,11 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 	public interface Listener extends Configurable {
 		public void done(DialogueActIU iu);
 	}
+	
+	public void reset() {
+		logger.info("Resetting AM.");
+		this.toPerform.clear();
+	}
+
 
 }

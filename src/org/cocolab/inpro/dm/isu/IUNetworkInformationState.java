@@ -136,10 +136,18 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * Getter for the next output to perform.
-	 * @return
+	 * @return nextOutput
 	 */
 	public DialogueActIU getNextOutput() {
 		return this.nextOutput;
+	}
+
+	/**
+	 * Getter for the current focus
+	 * @return focus
+	 */
+	public ContribIU getFocus() {
+		return this.focus;
 	}
 
 	/**
@@ -165,7 +173,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 * Getter method returning the IS's current contribution
 	 * @return currentContrib this IS's current ContribIU
 	 */
-	private ContribIU getCurrentContrib() {
+	public ContribIU getCurrentContrib() {
 		if (this.currentContrib == null)
 			return this.root;
 		return this.currentContrib;
@@ -224,9 +232,16 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 */
 	@Override
 	public boolean moveCurrentContribRight() {
+		if (this.nextInput == null)
+			return false;
+		if (this.currentContrib.equals(this.focus) && 
+				!this.integrateList.isEmpty()) {
+			// continue search only if nothing below focus integrated
+			return false;
+		}
 		for (ContribIU iu : this.contributions) {
 			if (iu.getSameLevelLink() != null) {
-				if (iu.getSameLevelLink().equals(this.getCurrentContrib())) {
+				if (iu.getSameLevelLink().equals(this.currentContrib)) {
 					this.currentContrib = iu;
 					if (!this.visited.contains(this.currentContrib)) {
 						this.visited.add(this.currentContrib);
@@ -240,30 +255,25 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
-	 * Moves the current contribution down to its first grounded-in contribution. 
+	 * Moves the current contribution up to its first grounding contribution. 
 	 * @true if successful
 	 */
 	@Override
 	public boolean moveCurrentContribUp() {
-		for (IU iu : this.getCurrentContrib().grounds()) {
+		if (this.nextInput == null)
+			return false;
+		if (this.currentContrib.equals(this.focus) && 
+				!this.integrateList.isEmpty()) {
+			// continue search only if nothing below focus integrated
+			return false;
+		}
+		for (IU iu : this.currentContrib.grounds()) {
 			if (iu instanceof ContribIU) {
 				this.currentContrib = (ContribIU) iu;
 				if (!this.visited.contains(this.currentContrib)) {
 					this.visited.add(this.currentContrib);
 				}
-				if (this.currentContrib.equals(this.focus)) {
-					if (this.integrateList.isEmpty()) {
-						// continue applying other rules only
-						// if we haven't found anything that integrates
-						// below the current focus.
-						return true;
-					} else {
-						return false;
-					}
-				} else {
-					return true;
-				}
-
+				return true;
 			}
 		}
 		return false;
@@ -278,7 +288,12 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public boolean moveCurrentContribLeft() {
 		if (this.nextInput == null)
 			return false;
-		if (this.getCurrentContrib().getSameLevelLink() != null) {
+		if (this.currentContrib.equals(this.focus) && 
+				!this.integrateList.isEmpty()) {
+			// continue search only if nothing below focus integrated
+			return false;
+		}
+		if (this.currentContrib.getSameLevelLink() != null) {
 			this.currentContrib = (ContribIU) this.getCurrentContrib().getSameLevelLink();
 			if (!this.visited.contains(this.currentContrib)) {
 				this.visited.add(this.currentContrib);
@@ -290,7 +305,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
-	 * Attempts moving the current contrib uup to the first grounding contribution.
+	 * Attempts moving the current contrib down to the first grounded-in contribution.
 	 * @true if successful
 	 */
 	@Override
@@ -371,7 +386,6 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		// Remove any contributions that may have been revoked above
 		List<ContribIU> revoked = new ArrayList<ContribIU>();
 		for (IU iu : this.contributions) {
-	
 			if (iu instanceof ContribIU && iu.isRevoked()) {
 				revoked.add((ContribIU) iu);
 			}
@@ -503,6 +517,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 					this.focus = (ContribIU) iu;           // may not want this...
 					this.integrateList.clear();
 					this.visited.clear();
+					System.err.println("FOCUS IS: " + this.focus.toString());
+
 					return true;
 				}
 			}
@@ -565,22 +581,25 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			// contrib doesn't integrate input if it already integrates this input
 			return false;
 		}
-		// allow "overwrites" if allowed.
+		// contrib doesn't integrate input if it's already grounded
+		// in input/output and shouldn't be "overwritten"
 		for (IU iu : this.currentContrib.groundedIn()) {
 			if (iu.getClass().equals(this.nextInput.getClass())) {
-				// contrib doesn't integrate input if it's already grounded in input/output
-				return false;
+				if (!this.currentContrib.overwrite()) {
+					return false;
+				}
 			}
 		}
 		for (ContribIU iu : this.integrateList) {
 			if (!iu.clarify()) {
 				// contrib shouldn't integrate input if another one
-				// that doesn't want to be clarified was already marked for integration
+				// that doesn't want to be clarified was
+				// already marked for integration
 				return false;
 			}
 		}
 		// barring the above, make the payload check against input.
-		return this.getCurrentContrib().integratesWith(this.nextInput);
+		return this.currentContrib.integratesWith(this.nextInput);
 	}
 
 	/**

@@ -40,7 +40,9 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 	/**
 	 * A simple constructor initiating an empty information state and 
 	 * a generic top-down search update mechanism producing GROUND,
-	 * CLARIFY and REQUEST output.
+	 * CLARIFY and REQUEST output. Can handle YesNo input for system-
+	 * and user-self-correction. Sensitive to input revokes and output
+	 * commits.
 	 */
 	public IUNetworkUpdateEngine(IUNetworkDomainUtil u) {
 		rules.add(new UnintegrateRevokedInputRule());			// REVOKE output grounded in revoked input
@@ -93,7 +95,6 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 			logger.info("Processing " + status + " word " + iu.toString());
 			is.setNextInput(iu);
 			this.applyRules();
-			
 		}
 	}
 
@@ -110,19 +111,16 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 		for (AbstractRule r : rules) {
 			if (r.triggers(is)) {
 				restart = r.apply(is);
-//				logger.info(this.is.toString());
 				if (restart) {
 					this.edits.addAll(is.getNewEdits());
+//					logger.info("Focus is: " + this.is.getFocus().toString());
 					break;
 				}
 			}
 		}
 		if (restart) {
 			this.applyRules();
-		} else {
-			logger.info("No rules applied. Stopping.");
 		}
 	}
-
 
 }

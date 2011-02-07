@@ -122,8 +122,54 @@ public class ContribIU extends IU {
 		return this.overwrite;
 	}
 
+	/** 
+	 * Getter for this IU's contribution's attribute-value pair representation.
+	 * @return the AVPair representation
+	 */
 	public AVPair getContribution() {
 		return this.contribution;
+	}
+	
+	public ContribIU getNext() {
+//		return (ContribIU) this.nextSameLevelLink;
+		return null;
+	}
+
+	public ContribIU getPrevious() {
+		return (ContribIU) this.sameLevelLink;
+	}
+
+	public ContribIU getNextUp() {
+		for (IU iu : this.grounds) {
+			if (iu instanceof ContribIU) {
+				return (ContribIU) iu;
+			}
+		}
+		return null;
+	}
+
+	public ContribIU getNextDown() {
+		for (IU iu : this.groundedIn) {
+			if (iu instanceof ContribIU) {
+				return (ContribIU) iu;
+			}
+		}
+		return null;		
+	}
+
+	/**
+	 * Checks if this contribution is grounded in at least one IU that is not another contribution
+	 * @return true if so
+	 */
+	public boolean isIntegrated() {
+		for (IU iu : this.groundedIn) {
+			if (iu.getClass().equals(this.getClass())) {
+				System.err.println(this.toString() + " is integrated.");
+				return true;
+			}
+		}
+		System.err.println(this.toString() + " is not integrated.");
+		return false;
 	}
 
 	/**
