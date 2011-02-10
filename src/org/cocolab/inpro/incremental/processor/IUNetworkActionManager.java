@@ -1,5 +1,8 @@
 package org.cocolab.inpro.incremental.processor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.cocolab.inpro.dm.acts.AbstractDialogueAct;
 import org.cocolab.inpro.dm.acts.ClarifyDialogueAct;
 import org.cocolab.inpro.dm.acts.GroundDialogueAct;
@@ -17,6 +20,7 @@ import org.cocolab.inpro.incremental.unit.DialogueActIU;
  */
 public class IUNetworkActionManager extends AudioActionManager {
 
+	@SuppressWarnings({"unchecked"})
 	@Override
 	public void floor(Signal signal, AbstractFloorTracker floorManager) {
 		int timeout = 0;
@@ -51,15 +55,23 @@ public class IUNetworkActionManager extends AudioActionManager {
 			boolean clarify = false;
 			boolean request = false;
 			boolean ground = false;
-			for (DialogueActIU iu : this.toPerform) {
+			List<DialogueActIU> toPerformCopy = (ArrayList<DialogueActIU>) this.toPerform.clone();
+			List<DialogueActIU> performed = new ArrayList<DialogueActIU>();
+			for (DialogueActIU iu : toPerformCopy) {
 				AbstractDialogueAct act = iu.getAct();
 				if (act instanceof GroundDialogueAct) {
 					ground = true;
 					this.signalListeners(iu);
+//					iu.commit();
+					performed.add(iu);
 				} else  if (act instanceof ClarifyDialogueAct) {
 					clarify = true;
+					performed.add(iu);
+//					iu.commit();
 				} else if (act instanceof RequestDialogueAct) {
 					request = true;
+					performed.add(iu);
+//					iu.commit();
 				}
 			}
 			if (ground) {
@@ -82,6 +94,7 @@ public class IUNetworkActionManager extends AudioActionManager {
 			}
 			logger.info("Clearing todo…");
 			this.toPerform.clear();
+			this.toPerform.removeAll(performed);
 			break;
 		}
 		}
@@ -124,10 +137,10 @@ public class IUNetworkActionManager extends AudioActionManager {
 
 	protected void playRequestUtterance() {
 		// Wie kann ich Ihnen noch helfen?
-		this.playSystemUtterance("Ok, dafür bräuchte ich noch mehr Informationen!");
+		this.playSystemUtterance("Ich benoetige noch mehr Informationen!");
 	}
 	
-	private void playSystemUtterance(String string) {
+	protected void playSystemUtterance(String string) {
 		if (utteranceMap.containsKey(string)) {
 			logger.info("Playing from file " + string);
 			this.audioDispatcher.playFile(utteranceMap.get(string).toString(), false);

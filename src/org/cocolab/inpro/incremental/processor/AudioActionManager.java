@@ -126,7 +126,7 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void leftBufferUpdate(Collection<? extends IU> ius,
+	public synchronized void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		for (EditMessage<? extends IU> edit : edits) {
 			if ((this.toPerform.contains(edit.getIU()) && edit.getType() != EditType.REVOKE)

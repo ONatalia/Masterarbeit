@@ -20,12 +20,11 @@ import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.nlu.AVPair;
 
 // FIXME: at the first unintegrate rule doesn't reintegrate when 'no' is revoked
+// FIXME: contributions that are grounded after a commit, not an add do not overwrite.
 // FIXME: Focus, move right/down when necessary, i.e. system-initiated topic/focus-changes when current focus is fully integrated.
-// TODO: Move output strings away from ContribIU
 // TODO: YesNo - make integration/unintegration separate rules, with different scopes: 1. self-correction/confirmation, 2. performed output, 3. explicit confirmation, 4. partial clarification
 // TODO: AM.signalListeners() - implement 'done' update rules
 // TODO: Make IU queries generic, move IU-specific queries to IU.java
-
 
 /**
  * An information state consisting of a network of ContribIU contributions that can integrate with new input.
@@ -361,7 +360,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 				} else {
 					// Other input simply get their grounding contribution links removed
 					iu.removeGrin(this.nextInput);
-					iu.getContribution().setValue("?");
+//					iu.getContribution().setValue("?");
 					this.nextInput = null;
 					this.focus = this.getLastIntegrated();
 					restart = true;
@@ -407,14 +406,14 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		// If marked contribution isn't already grounded in next input
 		if (!marked.groundedIn().contains(this.nextInput)) {
 			// do so now, after deciding output.
-			AbstractDialogueAct newAct;
-			if (marked.groundedIn().isEmpty()) {
-				newAct = new GroundDialogueAct();
-			} else {
-				newAct = new RequestDialogueAct();
+			AbstractDialogueAct newAct = new GroundDialogueAct();
+			for (IU iu : marked.groundedIn()) {
+				if (iu instanceof ContribIU) {
+					newAct = new RequestDialogueAct();
+				}
 			}
 			this.nextInput.ground(marked);
-			marked.groundIn(this.nextInput);
+			marked.groundIn(this.nextInput); 
 			marked.getContribution().setValue(this.nextInput.getAVPairs().get(0).getValue());
 			// output a grounding dialogue act
 			this.nextOutput = new DialogueActIU(this.nextOutput, marked, newAct);
@@ -428,7 +427,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			this.integrateList.clear();
 			// clear the visited list for the next search
 			this.visited.clear();
-			// revoke uncommitted clarifications grounded in integrated contribution (these are now clarified)
+			// revoke uncommitted clarifications grounded in integrated contribution (these are now assumed clarified)
 			for (IU iu : marked.grounds()) {
 				if (iu instanceof DialogueActIU) {
 					AbstractDialogueAct act = ((DialogueActIU) iu).getAct();
@@ -440,13 +439,14 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 					}
 				} else if (iu instanceof ContribIU) {
 					if (((ContribIU) iu).getContribution().equals("clarify:true")) {
+						iu.revoke();
 						this.contributions.remove(iu);
-						for (IU wiu : iu.groundedIn()) {
-							if (wiu instanceof WordIU) {
-								this.nextInput = (WordIU) wiu;
-								break;
-							}
-						}
+//						for (IU wiu : iu.groundedIn()) {
+//							if (wiu instanceof WordIU) {
+////								this.nextInput = (WordIU) wiu;
+//								break;
+//							}
+//						}
 					}
 				}
 			}
