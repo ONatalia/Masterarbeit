@@ -490,8 +490,6 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 */
 	@Override
 	public boolean integrateNoEllipsis() { 
-		logger.info("Next output: " + this.nextOutput.toString());
-		logger.info(" Next input: " + this.nextInput.toString());
 		if (this.nextOutput.getAct() instanceof GroundDialogueAct) {  	// FIXME: scope issues with nextOutput
 			// only do this for grounding or undoable DAs
 			for (IU iu : this.nextOutput.groundedIn()) {
