@@ -372,7 +372,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 					if (daiu instanceof DialogueActIU) {
 						logger.info("Revoking " + daiu.toString());
 						this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.REVOKE, (DialogueActIU) daiu));
-						this.nextOutput = (DialogueActIU) this.nextOutput.getSameLevelLink(); //FIXME: potential scope issues in assuming the previous output here
+						if (this.nextOutput != null)
+							this.nextOutput = (DialogueActIU) this.nextOutput.getSameLevelLink();
 						unground.add((DialogueActIU) daiu);
 					}
 				}
@@ -466,6 +467,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 //		if (!(this.nextOutput.getAct() instanceof GroundDialogueAct)) {
 //			return false;
 //		}
+		if (this.nextOutput == null)
+			return false;
 		for (IU iu : this.nextOutput.groundedIn()) {
 			if (iu instanceof ContribIU) {
 				this.nextInput.ground(iu);
