@@ -518,8 +518,6 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 					this.focus = (ContribIU) iu;           // may not want this...
 					this.integrateList.clear();
 					this.visited.clear();
-					System.err.println("FOCUS IS: " + this.focus.toString());
-
 					return true;
 				}
 			}
