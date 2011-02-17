@@ -11,6 +11,8 @@ import java.net.UnknownHostException;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
+import org.apache.log4j.Logger;
+
 /**
  * our connection to mary; with support for versions 3.6 and 4.1
  * 
@@ -23,12 +25,55 @@ import javax.sound.sampled.AudioSystem;
  * @author timo
  */
 public abstract class MaryAdapter {
-	de.dfki.lt.mary.client.MaryClient mc36;
-	marytts.client.MaryClient mc41;
+
+	enum CompatibilityMode { MARY36EXTERNAL, MARY41EXTERNAL, MARY41INTERNAL;	
+		public static CompatibilityMode fromString(String mode) {
+			if ("4.1".equals(mode)) return MARY41EXTERNAL; 
+			if ("internal".equals(mode)) return MARY41INTERNAL;
+			return MARY36EXTERNAL;
+		}
+	};
 	
-	private static MaryAdapter maryAdapter = new MaryAdapterImpl();
+	public static CompatibilityMode compatibilityMode = CompatibilityMode.fromString(
+								System.getProperty("mary.version", "3.6"));
+
+    private static Logger logger = Logger.getLogger(MaryAdapter.class);
+
+    private static MaryAdapter maryAdapter;
 	
+	public static void initializeMary() {
+		initializeMary(compatibilityMode);
+	}
+	
+	private static void initializeMary(CompatibilityMode compatibilityMode) {
+		logger.info("initializing Mary in compatibility mode " + compatibilityMode);
+		maryAdapter = null;
+		try {
+			switch (compatibilityMode) {
+			case MARY36EXTERNAL: 
+				maryAdapter = new MaryAdapter36();
+				break;
+			case MARY41EXTERNAL:
+				maryAdapter = new MaryAdapter41();
+				break;
+			case MARY41INTERNAL:
+				try {
+					maryAdapter = new MaryAdapter41internal();
+				} catch (Exception e) {
+					logger.info("could not start MaryAdapter41internal");
+					e.printStackTrace();
+				}
+			}
+		} catch (IOException e) {
+			logger.info("could not start external Mary Adapter");
+			e.printStackTrace();
+		}
+	}
+
 	public static MaryAdapter getInstance() {
+		if (maryAdapter == null) {
+			initializeMary();
+		}
 		return maryAdapter;
 	}
 	

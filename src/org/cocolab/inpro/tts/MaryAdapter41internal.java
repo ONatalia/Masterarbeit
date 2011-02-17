@@ -34,56 +34,16 @@ import marytts.server.Request;
 import marytts.util.MaryUtils;
 import marytts.util.Pair;
 
-public class MaryAdapterImpl extends MaryAdapter {
+public class MaryAdapter41internal extends MaryAdapter {
 
 	public static final String DEFAULT_VOICE = System.getProperty("mary.voice", "de2");
 	
-    private static Logger logger = Logger.getLogger(MaryAdapterImpl.class);
+    private static Logger logger = Logger.getLogger(MaryAdapter41internal.class);
 
-	enum CompatibilityMode { MARY36EXTERNAL, MARY41EXTERNAL, MARY41INTERNAL;
-		public static CompatibilityMode fromString(String mode) {
-			if ("4.1".equals(mode)) return MARY41EXTERNAL; 
-			if ("internal".equals(mode)) return MARY41INTERNAL;
-			return MARY36EXTERNAL;
-		}
-	};
-	CompatibilityMode compatibilityMode = CompatibilityMode.fromString(
-									System.getProperty("mary.version", "3.6"));
-
-	/** private constructor, this class is a singleton */
-	MaryAdapterImpl() {
-        try {
-        	switch (compatibilityMode) {
-        	case MARY36EXTERNAL:
-        		compatibilityMode = CompatibilityMode.MARY36EXTERNAL;
-                String serverHost = System.getProperty("mary.host", "localhost");
-                int serverPort = Integer.getInteger("mary.port", 59125).intValue();
-    			mc36 = new de.dfki.lt.mary.client.MaryClient(serverHost, serverPort);
-        		break;
-        	case MARY41EXTERNAL:
-        		compatibilityMode = CompatibilityMode.MARY41EXTERNAL;
-                serverHost = System.getProperty("mary.host", "localhost");
-                serverPort = Integer.getInteger("mary.port", 59125).intValue();
-        		mc41 = marytts.client.MaryClient.getMaryClient(
-			               new marytts.client.http.Address(serverHost, serverPort)
-			           );
-        		break;
-        	case MARY41INTERNAL:
-        		try {
-        			startupInternalMary();
-        		} catch (Exception e) {
-        			System.err.println("Error setting up internal mary:");
-        			e.printStackTrace();
-        			throw new RuntimeException(e);
-        		}
-        		break;
-        	default:
-        		throw new RuntimeException();
-        	}
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+	/** private constructor, this class is a singleton 
+	 * @throws Exception */
+	MaryAdapter41internal() throws Exception {
+		startupInternalMary();
 	}
 	
 	// startup-code mostly copied from marytts.server.Mary
@@ -170,46 +130,30 @@ public class MaryAdapterImpl extends MaryAdapter {
 	protected ByteArrayOutputStream process(String query, String inputType, String outputType, String audioType) throws UnknownHostException, IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
         String defaultVoiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
-		switch (compatibilityMode) {
-		case MARY36EXTERNAL:
-			if (inputType.equals("TEXT"))
-				inputType = "TEXT_DE";
-			mc36.process(query, inputType, outputType, audioType,
-					defaultVoiceName, baos);
-			return baos;
-		case MARY41EXTERNAL:
-			String locale = "de";
-			mc41.process(query, inputType, outputType, locale, audioType,
-					defaultVoiceName, baos);
-			return baos;
-		case MARY41INTERNAL:
-	        MaryDataType mInputType = MaryDataType.get(inputType);
-	        MaryDataType mOutputType = MaryDataType.get(outputType);
-	        Locale mLocale = MaryUtils.string2locale("de");
-	        Voice voice = Voice.getVoice(DEFAULT_VOICE);
-	        AudioFormat audioFormat = voice.dbAudioFormat();
-	        logger.info("audioFormat is " + audioFormat);
-	        AudioFileFormat.Type audioFileFormatType = //MaryAudioUtils.getAudioFileFormatType(audioType);
-	        						AudioFileFormat.Type.WAVE;
-	        logger.info("audioFileFormatType is " + audioFileFormatType);
-	        AudioFileFormat audioFileFormat = new AudioFileFormat(audioFileFormatType, audioFormat, AudioSystem.NOT_SPECIFIED);
-	        logger.info("audioFileFormat is " + audioFileFormat);
-	        Request request = new Request(mInputType, mOutputType, mLocale, voice, 
-	        							  (String) null, (String) null, 
-	        							  // the following true ↓ is experimental (switches on streaming)
-	        							  1, audioFileFormat, true, (String) null);
-	        try {
-		        request.setInputData(query);
-		        request.process();
-		        request.writeOutputData(baos);
-	        } catch (Exception e) {
-	        	e.printStackTrace();
-	        	throw new RuntimeException(e);
-	        }
-	        return baos;
-		default:
-			throw new RuntimeException();
-		}
+        MaryDataType mInputType = MaryDataType.get(inputType);
+        MaryDataType mOutputType = MaryDataType.get(outputType);
+        Locale mLocale = MaryUtils.string2locale("de");
+        Voice voice = Voice.getVoice(defaultVoiceName);
+        AudioFormat audioFormat = voice.dbAudioFormat();
+        logger.info("audioFormat is " + audioFormat);
+        AudioFileFormat.Type audioFileFormatType = //MaryAudioUtils.getAudioFileFormatType(audioType);
+        						AudioFileFormat.Type.WAVE;
+        logger.info("audioFileFormatType is " + audioFileFormatType);
+        AudioFileFormat audioFileFormat = new AudioFileFormat(audioFileFormatType, audioFormat, AudioSystem.NOT_SPECIFIED);
+        logger.info("audioFileFormat is " + audioFileFormat);
+        Request request = new Request(mInputType, mOutputType, mLocale, voice, 
+        							  (String) null, (String) null, 
+        							  // the following true ↓ is experimental (switches on streaming)
+        							  1, audioFileFormat, true, (String) null);
+        try {
+	        request.setInputData(query);
+	        request.process();
+	        request.writeOutputData(baos);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	throw new RuntimeException(e);
+        }
+        return baos;
 	}
 	
 }
