@@ -147,13 +147,6 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 		}
 	}
 
-	public void done(DialogueActIU iu) {
-		super.done(iu);
-		if (this.updating)
-			return;
-		this.updating = true;
-		this.logToTedView("New State:\n" + this.updateEngine.getInformationState().toString());
-		super.postUpdate();
-	}
+	public void done(DialogueActIU iu) {}
 
 }
