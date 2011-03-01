@@ -3,15 +3,18 @@ A GUI to manipulate (improve, mimic, parody) Mary TTS.
 The TTS's unit and prosody model can be manipulated and
 this can be resynthesized. For example, TTS errors can be
 corrected, prosody can be improved, etc.
- * @author timo
 
 <h2>TODO before release:</h2> 
 <ul>
 <li>change to Mary 4.1.1 (which supports duration and pitch adaptation with HMM voices)</li>
+<ul>
+	<li>however, HMM voices have a continuous pitch track, which would be horribly annoying</li>
+</ul>
 <li>Mary-Anbindung konfigurierbar machen</li>
-<li>tatsächliche Intonationskurve errechnen und auch darstellen &rarr; mpfh, beschissen</li>
-<li>"Wussten Sie schon"-Box für unentdeckbare Features<ul>
+<li>support different languages (english, who cares about tibetan?)</li> 
+<li>tatsächliche Intonationskurve errechnen und auch darstellen &rarr; mphf, beschissen</li>
 	<li>mithilfe von l2fprod (liegt aufm Desktop)</li>
+<li>"Wussten Sie schon"-Box für unentdeckbare Features<ul>
 	<li>Grenzen und Pitchpunkte durch drag/drop verschieben</li>
 	<li>Shift beim verschieben ändert nur diese Grenze, nicht alle folgenden</li>
 	<li>bei Rechtsklick im Segmentteil erscheint ein Pop-Up Menü mit dem Segmente eingefügt, geändert und gelöscht werden können.</li>

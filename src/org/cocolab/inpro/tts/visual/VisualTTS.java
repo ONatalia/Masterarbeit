@@ -34,7 +34,6 @@ import javax.swing.event.ChangeListener;
 import org.cocolab.inpro.tts.MaryAdapter;
 import org.cocolab.inpro.tts.SegmentModel;
 
-
 /**
  * A GUI to manipulate (improve, mimic, parody) Mary TTS.
  * The TTS's unit and prosody model can be manipulated and
@@ -70,7 +69,7 @@ public class VisualTTS extends JPanel {
 	private final JFileChooser fileChooser = new JFileChooser();
 
 	VisualTTS() {
-		super();
+		assert (SwingUtilities.isEventDispatchThread());
 		MaryAdapter maryAdapter;
 		try {
 			maryAdapter = MaryAdapter.getInstance();

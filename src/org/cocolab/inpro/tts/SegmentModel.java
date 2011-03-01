@@ -71,11 +71,11 @@ public class SegmentModel {
     			throw nfe;
     		}
     		List<PitchMark> pitchMarks = new ArrayList<PitchMark>();
-    		Segment segmentUnderConstruction = new Segment(labelText, startTime, duration, pitchMarks);
     		while (st.hasMoreTokens()) {
     			String pitchMarkString = st.nextToken();
     			pitchMarks.add(new PitchMark(pitchMarkString));
     		}
+    		Segment segmentUnderConstruction = new Segment(labelText, startTime, duration, pitchMarks);
     		segments.add(segmentUnderConstruction);
     		startTime += duration;
     	}
@@ -92,6 +92,7 @@ public class SegmentModel {
 		List<String> lines;
 		try {
 			lines = getLines(is);
+			System.err.println(lines);
 		} catch (IOException e) {
 			e.printStackTrace();
 			lines = Collections.<String>emptyList();

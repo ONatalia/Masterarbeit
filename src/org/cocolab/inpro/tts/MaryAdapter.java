@@ -45,7 +45,7 @@ public abstract class MaryAdapter {
 		initializeMary(compatibilityMode);
 	}
 	
-	private static void initializeMary(CompatibilityMode compatibilityMode) {
+	public static void initializeMary(CompatibilityMode compatibilityMode) {
 		logger.info("initializing Mary in compatibility mode " + compatibilityMode);
 		maryAdapter = null;
 		try {
