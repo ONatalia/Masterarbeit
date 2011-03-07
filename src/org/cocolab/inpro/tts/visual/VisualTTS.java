@@ -277,7 +277,7 @@ public class VisualTTS extends JPanel {
 	}
 	
 	private static void createAndShowGUI() {
-		JFrame frame = new JFrame("VisualTTS");
+		JFrame frame = new JFrame("GooeyMary");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// add our object
 		JPanel mainPanel = new VisualTTS();

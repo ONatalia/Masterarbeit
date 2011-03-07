@@ -30,7 +30,7 @@ import edu.cmu.sphinx.util.props.S4Component;
 
 public class BaseData implements Configurable, BaseDataKeeper, Resetable, SignalFeatureListener {
 	
-	@S4Component(type = EOTFeatureAggregator.class, defaultClass = EOTFeatureAggregator.class, mandatory = true)
+	@S4Component(type = EOTFeatureAggregator.class, defaultClass = EOTFeatureAggregator.class, mandatory = false)
 	public static final String PROP_EOTFA = "eotFeatureAggregator";
 
 	final static Logger logger = Logger.getLogger(BaseData.class);
@@ -74,8 +74,10 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable, Signal
 	@Override
 	public void newSignalFeatures(int frame, double power, boolean voicing,
 			double pitch) {
-		eotfa.newSignalFeatures(frame, power, voicing, pitch);
-		eotFeatures.add(new TimedData<Instance>(frame, eotfa.getNewestFeatures()));
+		if (eotfa != null) {
+			eotfa.newSignalFeatures(frame, power, voicing, pitch);
+			eotFeatures.add(new TimedData<Instance>(frame, eotfa.getNewestFeatures()));
+		}
 	}
 
 	@Override

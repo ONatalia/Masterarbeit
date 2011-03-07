@@ -12,8 +12,6 @@ import org.cocolab.inpro.features.TimeShiftingAnalysis;
 import org.cocolab.inpro.incremental.util.ResultUtil;
 import org.cocolab.inpro.nlu.AVPair;
 
-import weka.core.Instance;
-
 import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 
 public class WordIU extends IU {

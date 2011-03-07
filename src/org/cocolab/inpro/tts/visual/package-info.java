@@ -11,6 +11,12 @@ corrected, prosody can be improved, etc.
 	<li>however, HMM voices have a continuous pitch track, which would be horribly annoying</li>
 </ul>
 <li>Mary-Anbindung konfigurierbar machen</li>
+<li>make audio more responsive</li>
+<ul>
+	<li>abort playing/streaming if another edit is about to happen</li>
+	<li>option to not automatically play after every edit</li>
+	<li>use mp3 for streaming?</li>
+</li>
 <li>support different languages (english, who cares about tibetan?)</li> 
 <li>tatsächliche Intonationskurve errechnen und auch darstellen &rarr; mphf, beschissen</li>
 	<li>mithilfe von l2fprod (liegt aufm Desktop)</li>
@@ -21,7 +27,6 @@ corrected, prosody can be improved, etc.
 	<li>Mit den Knöpfen oben links können PHO-Dateien importiert und exportiert, sowie Audiodateien gespeichert werden</li>
 	<li>...</li>
 </ul></li>
-<li>use mp3 for streaming?</li>
 <li>see also <a href="http://pascal.kgw.tu-berlin.de/expressive-speech/online/synthesis/german/en/ia-en.php">http://pascal.kgw.tu-berlin.de/expressive-speech/online/synthesis/german/en/ia-en.php</a></li>
 <li>see also <a href="http://kitt.cl.uzh.ch/clab/dialogsysteme/ilap_mary/">http://kitt.cl.uzh.ch/clab/dialogsysteme/ilap_mary/</a></li>
 </ul>

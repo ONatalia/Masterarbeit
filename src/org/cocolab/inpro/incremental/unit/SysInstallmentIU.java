@@ -68,11 +68,6 @@ public class SysInstallmentIU extends InstallmentIU {
 		groundedIn = (List) newWords;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<WordIU> getWords() {
-		return (List<WordIU>) (List) groundedIn;
-	}
-	
 	public void synthesize() {
 //		String mbrola = toMbrola();
 //		synthesizedAudio = MaryAdapter.getInstance().mbrola2audio(mbrola);
@@ -86,7 +81,7 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	public String toMaryXML() {
 		StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<maryxml xmlns=\"http://mary.dfki.de/2002/MaryXML\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"0.5\" xml:lang=\"de\">\n<p>\n<s>\n<phrase>\n");
-		for (WordIU word : myWords()) {
+		for (WordIU word : getWords()) {
 			word.appendMaryXML(sb);
 		}
 		sb.append("</phrase>\n</s>\n</p>\n</maryxml>");
@@ -95,7 +90,7 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	public String toMbrola() {
 		StringBuilder sb = new StringBuilder();
-		for (WordIU word : myWords()) {
+		for (WordIU word : getWords()) {
 			sb.append(word.toMbrolaLines());
 		}
 		sb.append("#\n");
@@ -169,7 +164,7 @@ public class SysInstallmentIU extends InstallmentIU {
 	/** return all prefixes of this installment that end in the given last words */
 	private List<Prefix> getPrefixesMatchingLastWords(List<WordIU> lastWords) {
 		List<Prefix> returnList = new ArrayList<Prefix>();
-		List<WordIU> myWords = myWords();
+		List<WordIU> myWords = getWords();
 		for (int i = 0; i <= myWords.size() - lastWords.size(); i++) {
 			List<WordIU> subList = myWords.subList(i, i + lastWords.size());
 			if (lastWords.size() == 0 || WordIU.spellingEqual(WordIU.removeSilentWords(subList), lastWords)) {
@@ -206,8 +201,18 @@ public class SysInstallmentIU extends InstallmentIU {
 	}
 	
 	@SuppressWarnings("unchecked") // allow cast of groundedIn to List<WordIU> 
-	private List<WordIU> myWords() {
+	public List<WordIU> getWords() {
 		return (List<WordIU>) groundedIn();
+	}
+	
+	@Override
+	public String toPayLoad() {
+		StringBuilder sb = new StringBuilder();
+		for (WordIU word : getWords()) {
+			sb.append(word.toPayLoad());
+			sb.append(" ");
+		}
+		return sb.toString();
 	}
 	
 	public static void main(String[] args) {

@@ -11,8 +11,8 @@ import edu.cmu.sphinx.frontend.util.StreamDataSource;
 import edu.cmu.sphinx.tools.audio.AudioData;
 import edu.cmu.sphinx.tools.audio.AudioPlayer;
 import edu.cmu.sphinx.tools.audio.SpectrogramPanel;
-import edu.cmu.sphinx.tools.audio.Utils;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
+import edu.cmu.sphinx.util.props.PropertySheet;
 
 /** 
  * a SpectrogramPanel which also handles playing audio
@@ -21,16 +21,14 @@ import edu.cmu.sphinx.util.props.ConfigurationManager;
 @SuppressWarnings("serial")
 class AudioPanel extends SpectrogramPanel {
 	private AudioPlayer player;
+	PropertySheet properties;
 
 	AudioPanel() {
 		ConfigurationManager cm = new ConfigurationManager(VisualTTS.class.getResource("spectrogram.config.xml"));
 		FrontEnd fe = (FrontEnd) cm.lookup("frontEnd");
-		StreamDataSource sds = (StreamDataSource) cm.lookup("streamDataSource");
-		this.frontEnd = fe;
-		this.dataSource = sds;
-		this.audio = new AudioData();
-		this.player = new AudioPlayer(audio);
-		player.start();
+		properties = cm.getPropertySheet("streamDataSource");
+		dataSource = (StreamDataSource) cm.lookup("streamDataSource");
+		frontEnd = fe;
 	}
 
 	public void setZoom(float zoom) {
@@ -46,7 +44,11 @@ class AudioPanel extends SpectrogramPanel {
 
 	public void setAudio(AudioInputStream ais) {
 		try {
-			audio.setAudioData(Utils.toSignedPCM(ais));
+			audio = new AudioData(ais);
+			player = new AudioPlayer(audio);
+			player.start();
+			properties.setInt("sampleRate", (int) ais.getFormat().getSampleRate());
+			dataSource.newProperties(properties);
 			computeSpectrogram();
 		} catch (IOException e) {
 			e.printStackTrace();

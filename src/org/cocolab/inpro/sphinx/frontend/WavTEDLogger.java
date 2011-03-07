@@ -31,6 +31,17 @@ public class WavTEDLogger extends WavWriter {
     
     public WavTEDLogger() {
     	dumpFilePath = "";
+    	final WavTEDLogger self = this;
+		Runnable shutdownHook = new Runnable() {
+			public void run() {
+				try {
+					self.finalize();
+				} catch (Throwable e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
     }
     
 	@Override
