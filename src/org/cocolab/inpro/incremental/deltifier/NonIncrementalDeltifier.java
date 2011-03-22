@@ -5,6 +5,13 @@ import java.util.List;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.WordIU;
 
+/**
+ * A deltifier which does not output any intermediate hypotheses.
+ * Output IUs are only provided when the ASR result is final.
+ * Thus, this deltifier effectively "switches off" incrementality.
+ * 
+ * @author timo
+ */
 public class NonIncrementalDeltifier extends ASRWordDeltifier {
 
 	/** 

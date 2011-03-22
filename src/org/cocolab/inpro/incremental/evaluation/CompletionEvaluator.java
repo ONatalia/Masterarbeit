@@ -1,49 +1,24 @@
-package org.cocolab.inpro.domains.turncompleter;
+package org.cocolab.inpro.incremental.evaluation;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Queue;
 
-import org.cocolab.inpro.incremental.PushBuffer;
-import org.cocolab.inpro.incremental.unit.EditMessage;
-import org.cocolab.inpro.incremental.unit.EditType;
-import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.incremental.util.ResultUtil;
 
-public class CompletionEvaluator extends PushBuffer {
+public class CompletionEvaluator extends BasicEvaluator {
 
-	private Queue<EvalEntry> onsetResults = new LinkedList<EvalEntry>();
-	
-	private List<WordIU> wordsToEvaluate = new ArrayList<WordIU>();
+	private final Queue<EvalEntry> onsetResults = new LinkedList<EvalEntry>();
 	
 	public void newOnsetResult(WordIU word, double onsetTime, int frameCount, WordIU nextWord, double nextWordEndEstimate) {
 		onsetResults.add(new EvalEntry(word, onsetTime, frameCount, nextWord, nextWordEndEstimate));
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void hypChange(Collection<? extends IU> ius,
-			List<? extends EditMessage<? extends IU>> edits) {
-		boolean committedFlag = false;
-		for (EditMessage edit : edits) {
-			if (edit.getType().equals(EditType.COMMIT)) {
-				WordIU word = (WordIU) edit.getIU();
-				wordsToEvaluate.add(word);
-				committedFlag = true;
-			}
-		}
-		if (committedFlag)
-			evaluate();
-	}
-	
-	private void evaluate() {
-		for (int i = 0; i < wordsToEvaluate.size(); i++) {
-			WordIU word = wordsToEvaluate.get(i);
-			WordIU nextWord = i + 1 < wordsToEvaluate.size() ? wordsToEvaluate.get(i + 1) : null;
+	protected void evaluate() {
+		for (int i = 0; i < committedWords.size(); i++) {
+			WordIU word = committedWords.get(i);
+			WordIU nextWord = i + 1 < committedWords.size() ? committedWords.get(i + 1) : null;
 			System.err.print("!GREPME!\t");
 			// add all reference word info here, only eval-stuff goes into the while-loop below
 			System.err.print(String.format(Locale.ENGLISH, 
@@ -70,7 +45,7 @@ public class CompletionEvaluator extends PushBuffer {
 			}
 			System.err.println();
 		}
-		wordsToEvaluate.clear();
+		committedWords.clear();
 	}
 	
 	private class EvalEntry {

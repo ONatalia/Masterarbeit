@@ -49,7 +49,7 @@ public class WordCatcher extends PushBuffer {
 					System.out.println("Jeder nur ein " + wordToCatch + ", bitte!");
 					//}
 				}
-			}/* else if (edit.getType() == EditType.COMMIT) {
+			}/* else if (edit.getType().isCommit()) {
 				wordCaught = false;
 			}*/
 

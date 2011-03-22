@@ -7,9 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.cocolab.inpro.audio.DispatchStream;
-import org.cocolab.inpro.domains.turncompleter.CompletionEvaluator;
 import org.cocolab.inpro.incremental.FrameAware;
 import org.cocolab.inpro.incremental.IUModule;
+import org.cocolab.inpro.incremental.evaluation.CompletionEvaluator;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
@@ -77,7 +77,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 			if (shouldFire()) {
 				doComplete();
 			}
-		} else if (edit != null && edit.getType().equals(EditType.COMMIT)) {
+		} else if (edit != null && edit.getType().isCommit()) {
 			//on commit: remove committed words from fullUtterance, re-TTS the installmentIU
 			committedWords.addAll(inputWords);
 		}

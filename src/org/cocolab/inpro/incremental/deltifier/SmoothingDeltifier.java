@@ -196,7 +196,7 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 	}
 
 	/**
-	 * stores the maturity for a given  edit message
+	 * stores the maturity for a given edit message
 	 */
 	protected class SmoothingCounter {
 		EditMessage<WordIU> edit;

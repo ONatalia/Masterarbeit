@@ -31,7 +31,7 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  	}
 
 	public void apply(EditMessage<IUType> edit) {
- 		switch (edit.type) {
+ 		switch (edit.getType()) {
  			case ADD: 
  				assert !isTemporallySorted() ||
  				       (isTemporallySorted() && (
@@ -80,18 +80,7 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  		}
 	}
  	
- 	/** 
- 	 * Calculate the difference (in edits) between an other and this list.
- 	 * 
- 	 * return the edits that are necessary to turn this list into the other list.
- 	 * 
- 	 * the following holds: 
- 	 * other.equals(this.apply(this.diff(other)));
- 	 * 
- 	 * @param other the reference list
- 	 * @return returns the list of edits that have to be applied to this
- 	 */
- 	public List<EditMessage<IUType>> diff(List<IUType> other) {
+ 	private List<EditMessage<IUType>> calculateDiff(List<IUType> other, boolean relaxedEquality) {
  		Iterator<IUType> thisIt = iterator();
  		Iterator<IUType> otherIt = other.iterator();
  		
@@ -102,7 +91,9 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  		while (thisIt.hasNext() && otherIt.hasNext()) {
  			IUType thisElem = thisIt.next();
  			IUType otherElem = otherIt.next();
- 			if (!thisElem.equals(otherElem)) {
+ 			if (!(thisElem.equals(otherElem) || 
+ 				 (relaxedEquality && thisElem.payloadEquals(otherElem))
+ 			   )) {
  				// handle the first no-match
  				revokeEdits.add(new EditMessage<IUType>(EditType.REVOKE, thisElem));
  				addEdits.add(new EditMessage<IUType>(EditType.ADD, otherElem));
@@ -121,6 +112,30 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  		edits.addAll(addEdits);
 
  		return edits;
+ 	}
+ 	
+ 	/** 
+ 	 * Calculate the difference (in edits) between an other and this list.
+ 	 * 
+ 	 * return the edits that are necessary to turn this list into the other list.
+ 	 * 
+ 	 * the following holds: 
+ 	 * other.equals(this.apply(this.diff(other)));
+ 	 * (except that apply does not return a value but changes its argument...)
+ 	 * 
+ 	 * @param other the reference list
+ 	 * @return returns the list of edits that have to be applied to this
+ 	 */
+ 	public List<EditMessage<IUType>> diff(List<IUType> other) {
+ 		return calculateDiff(other, false);
+ 	}
+ 	
+ 	/**
+ 	 * similar in spirit to diff, this method allows differences 
+ 	 * in IU identity, but not in IU payload
+ 	 */
+ 	public List<EditMessage<IUType>> diffByPayload(List<IUType> other) {
+ 		return calculateDiff(other, true);
  	}
  	
  	/**

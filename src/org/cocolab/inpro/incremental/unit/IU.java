@@ -188,6 +188,14 @@ public abstract class IU implements Comparable<IU> {
 	}
 	
 	/**
+	 * compares IUs based on their payload (i.e., ignoring differing IDs)
+	 * equals() implies payloadEquals(), but not the other way around
+	 */
+	public boolean payloadEquals(IU iu) {
+		return (this.toPayLoad().equals(iu.toPayLoad()));
+	}
+	
+	/**
 	 * @return true if this IU has been committed
 	 */
 	public boolean isCommitted() {

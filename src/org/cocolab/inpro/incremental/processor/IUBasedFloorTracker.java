@@ -64,7 +64,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 	public void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		if (edits != null && !edits.isEmpty()) {
-			if (isNotInInput() && !edits.get(0).getType().equals(EditType.COMMIT)) { 
+			if (isNotInInput() && !edits.get(0).getType().isCommit()) { 
 				// signal start of speech when input starts
 				signalListeners(InternalState.IN_INPUT, Signal.START);
 			}
@@ -102,7 +102,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 	private WordIU getPotentiallyFinalWord(List<WordIU> ius, 
 			List<EditMessage<WordIU>> edits) {
 		// on commit, we return the last non-silent word right away
-		if (edits.get(edits.size() - 1).getType() == EditType.COMMIT)
+		if (edits.get(edits.size() - 1).getType().isCommit())
 			return lastNonSilentWord(ius);
 		// if the list ends in <sil>, we also return the last nonsilent word:
 		if (ius.size() > 0 && ius.get(ius.size() - 1).isSilence()) {

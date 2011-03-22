@@ -2,8 +2,8 @@ package org.cocolab.inpro.incremental.unit;
 
 public class EditMessage<IUType extends IU> {
 
-	EditType type;
-	private IUType iu;
+	private final EditType type;
+	private final IUType iu;
 	
 	public EditMessage(EditType edit, IUType iu) {
 		this.type = edit;
