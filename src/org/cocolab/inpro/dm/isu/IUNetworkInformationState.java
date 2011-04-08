@@ -368,14 +368,25 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 				this.currentContrib = this.focus;
 				// Revoke output dialogue act ius that are grounded in revoked input.
 				List<DialogueActIU> unground = new ArrayList<DialogueActIU>();
+				List<DialogueActIU> revokeOrUndo = new ArrayList<DialogueActIU>();
 				for (IU daiu : iu.grounds()) {
 					if (daiu instanceof DialogueActIU) {
-						logger.info("Revoking " + daiu.toString());
+						revokeOrUndo.add((DialogueActIU) daiu);
+					}
+				}
+				for (DialogueActIU daiu : revokeOrUndo) {
+					if (daiu.isCommitted()) {
+						logger.info("UNDOING");
+						this.nextOutput = new DialogueActIU(this.nextOutput, iu, new UndoDialogueAct());
+						this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
+					} else {
+						logger.info("REVOKING");
 						this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.REVOKE, (DialogueActIU) daiu));
 						if (this.nextOutput != null)
 							this.nextOutput = (DialogueActIU) this.nextOutput.getSameLevelLink();
-						unground.add((DialogueActIU) daiu);
+						unground.add((DialogueActIU) daiu);							
 					}
+
 				}
 				// and remove grin links to contributions (because the edit message created here may not be applied in time).
 				for (DialogueActIU daiu : unground) {
