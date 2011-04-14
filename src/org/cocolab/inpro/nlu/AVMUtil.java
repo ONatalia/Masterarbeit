@@ -72,7 +72,7 @@ public class AVMUtil {
 	 * @param worldFile with list of AVMs in the world 
 	 * @throws MalformedURLException 
 	 */
-	public AVMUtil(String structureFile, String worldFile) throws MalformedURLException {
+	public AVMUtil(String worldFile, String structureFile) throws MalformedURLException {
 		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile(new URL(structureFile));
 		worldList = AVMWorldUtil.setAVMsFromFile(worldFile, avmStructures);
 		composeList = getAVMStructures();
