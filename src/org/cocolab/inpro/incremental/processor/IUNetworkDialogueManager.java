@@ -13,6 +13,7 @@ import org.cocolab.inpro.incremental.unit.DialogueActIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
+import org.cocolab.inpro.incremental.unit.SemIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.nlu.AVPair;
 import org.cocolab.inpro.nlu.AVPairMappingUtil;
@@ -82,30 +83,27 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 		this.updating = true;
 		boolean reset = false;
 		for (EditMessage<? extends IU> edit : edits) {
-			if (!((WordIU) edit.getIU()).isSilence()) {
-				switch (edit.getType()) {
-				case ADD: {
-					// Just apply the rules with each new word that isn't a hard reset)
-					if (((WordIU) edit.getIU()).getAVPairs() != null && 
-					!((WordIU) edit.getIU()).getAVPairs().get(0).equals(new AVPair("reset:true"))) {
-						this.updateEngine.applyRules((WordIU) edit.getIU());
-					}
-					break;
+			SemIU sem = (SemIU) edit.getIU();
+			switch (edit.getType()) {
+			case ADD: {
+				// Just apply the rules with each new word that isn't a hard reset)
+				if (sem.getAVPair() != null && !sem.getAVPair().equals("reset:true")) {
+					this.updateEngine.applyRules(sem);
 				}
-				case REVOKE: {
-					// Ditto, but make sure to revoke word first
-					edit.getIU().revoke();
-					this.updateEngine.applyRules((WordIU) edit.getIU());
-					break;
+				break;
+			}
+			case REVOKE: {
+				// Ditto, but make sure to revoke word first
+				sem.revoke();
+				this.updateEngine.applyRules(sem);
+				break;
+			}
+			case COMMIT: {
+				if (sem.getAVPair().equals(new AVPair("reset:true"))) {
+					reset = true;
 				}
-				case COMMIT: {
-					if (((WordIU) edit.getIU()).getAVPairs() != null && 
-							((WordIU) edit.getIU()).getAVPairs().get(0).equals(new AVPair("reset:true"))) {
-						reset = true;
-					}
-					break;
-				}
-				}
+				break;
+			}
 			}
 		}
 		if (reset)

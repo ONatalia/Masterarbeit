@@ -86,6 +86,7 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  		
  		List<EditMessage<IUType>> addEdits = new ArrayList<EditMessage<IUType>>();
  		List<EditMessage<IUType>> revokeEdits = new ArrayList<EditMessage<IUType>>();
+ 		List<EditMessage<IUType>> commitEdits = new ArrayList<EditMessage<IUType>>();
  		
  		// check the prefix of both lists
  		while (thisIt.hasNext() && otherIt.hasNext()) {
@@ -97,6 +98,10 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  				// handle the first no-match
  				revokeEdits.add(new EditMessage<IUType>(EditType.REVOKE, thisElem));
  				addEdits.add(new EditMessage<IUType>(EditType.ADD, otherElem));
+ 				break;
+ 			} else if (!thisElem.isCommitted() && otherElem.isCommitted() ) {
+ 				// handle commits (which should occur only in the prefix)
+ 				commitEdits.add(new EditMessage<IUType>(EditType.COMMIT, otherElem));
  			}
  		}
  		// now create revokes for remaining IUs in thisIt
@@ -105,7 +110,7 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  		// now add remaining IUs from otherIt
  		while (otherIt.hasNext())
  			addEdits.add(new EditMessage<IUType>(EditType.ADD, otherIt.next()));
- 		
+
  		// now construct the final list
  		Collections.reverse(revokeEdits); // revokes have to be ordered from right to left
  		List<EditMessage<IUType>> edits = revokeEdits; // we can just keep the list instead of creating a new one and addAlling the revokes

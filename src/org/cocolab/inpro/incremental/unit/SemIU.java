@@ -1,5 +1,6 @@
 package org.cocolab.inpro.incremental.unit;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -9,7 +10,7 @@ public class SemIU extends IU {
 
 	public static final SemIU FIRST_SEM_IU = new SemIU(); 
 	
-	private AVPair avp;
+	private List<AVPair> avps = new ArrayList<AVPair>();
 
 	@SuppressWarnings("unchecked")
 	public SemIU() {
@@ -18,20 +19,29 @@ public class SemIU extends IU {
 
 	public SemIU(IU sll, List<IU> groundedIn, AVPair avp) {
 		super(sll, groundedIn);
-		this.avp = avp;
+		this.avps.add(avp);
 	}
 
 	public SemIU(IU sll, IU groundedIn, AVPair avp) {
 		super(sll, Collections.singletonList(groundedIn));
-		this.avp = avp;
+		this.avps.add(avp);
+	}
+
+	public SemIU(IU sll, IU groundedIn, List<AVPair> avps) {
+		super(sll, Collections.singletonList(groundedIn));
+		this.avps = avps;
 	}
 
 	public AVPair getAVPair() {
-		return this.avp;
+		return this.avps.get(0);
+	}
+	
+	public List<AVPair> getAVPairs() {
+		return this.avps;
 	}
 
 	public boolean isEmpty() {
-		return (this.avp == null);
+		return this.avps.isEmpty();
 	}
 	
 	/**
@@ -40,7 +50,7 @@ public class SemIU extends IU {
 	 * @return true if each SemIUs string representations of their payload (AVPairs)
 	 */
 	public boolean samePayload(SemIU siu) {
-		return (this.avp.equals(siu.avp));
+		return (this.avps.equals(siu.avps));
 	}
 
 	@Override
@@ -51,8 +61,7 @@ public class SemIU extends IU {
 		else if (isEmpty())
 			payLoad = "empty";
 		else
-			payLoad = avp.toString();
-			
+			payLoad = avps.toString();
 		return "<" + payLoad + ">";
 	}
 

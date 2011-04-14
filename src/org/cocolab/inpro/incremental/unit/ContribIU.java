@@ -1,5 +1,6 @@
 package org.cocolab.inpro.incremental.unit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.cocolab.inpro.nlu.AVPair;
@@ -74,33 +75,27 @@ public class ContribIU extends IU {
 	public boolean integratesWith(IU iu) {
 		if (this.contribution == null)
 			return false;
+		List<AVPair> avps = new ArrayList<AVPair>();
 		if (iu instanceof WordIU) {
-			if (((WordIU) iu).getAVPairs() == null) {
-				return false;
-			}
-			for (AVPair avp: ((WordIU) iu).getAVPairs()) {
-				if (avp.equals(this.contribution)) {
-					return true;
-				} else if (avp.getAttribute().equals(this.contribution.getAttribute())) {
-					if (this.contribution.getValue() == null ||
-							this.contribution.getValue().equals("?") ||
-							this.overwrite) {
-						return true;
-					}
-				}
-			}
+			avps = ((WordIU) iu).getAVPairs();
 		} else if (iu instanceof SemIU) {
-			AVPair avp = ((SemIU) iu).getAVPair();
+			avps = ((SemIU) iu).getAVPairs();
+		} else {
+			return false;
+		}
+		if (avps == null)
+			return false;
+		for (AVPair avp : avps) {
 			if (avp.equals(this.contribution)) {
 				return true;
 			} else if (avp.getAttribute().equals(this.contribution.getAttribute())) {
-				if (this.contribution.getValue() == null) {
-					return true;
-				} else if (this.contribution.getValue().equals("?")) {
+				if (this.contribution.getValue() == null ||
+						this.contribution.getValue().equals("?") ||
+						this.overwrite) {
 					return true;
 				}
 			}
-		}			
+		}
 		return false; 
 	}
 	

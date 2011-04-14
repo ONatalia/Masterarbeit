@@ -16,6 +16,7 @@ import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IUList;
+import org.cocolab.inpro.incremental.unit.SemIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.nlu.AVPair;
 
@@ -40,7 +41,7 @@ import org.cocolab.inpro.nlu.AVPair;
 public class IUNetworkInformationState extends AbstractInformationState implements AbstractIUNetworkRule.Triggers, AbstractIUNetworkRule.Effects {
 
 	/** The next input variable - a WordIU that represents the next input word that was added or revoked to process */
-	private WordIU nextInput;
+	private SemIU nextInput;
 	/** The contributions network - a List of (ideally) networked ContribIU representing the total set of available nodes with which new input can be integrated */
 	private IUList<ContribIU> contributions = new IUList<ContribIU>();
 	/** The root ContribIU that represents the first node in the contributions network. */
@@ -129,8 +130,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 * Setter method for the IS's next input to process.
 	 * @param word the next word input to process.
 	 */
-	public void setNextInput(WordIU word) {
-		this.nextInput = word;
+	public void setNextInput(SemIU sem) {
+		this.nextInput = sem;
 	}
 
 	/**
@@ -335,7 +336,9 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		for (ContribIU iu : this.contributions) {
 			// Find what contributions are grounded in revoked input 
 			if (iu.groundedIn().contains(this.nextInput)) {
-				if (this.nextInput.getAVPairs().get(0).equals("bool:false") && (iu.getContribution().equals("undo:true"))) {
+//				if (this.nextInput.getAVPairs().get(0).equals("bool:false") && (iu.getContribution().equals("undo:true"))) {
+				AVPair next = this.nextInput.getAVPair();
+				if (next.equals("bool:false") && (iu.getContribution().equals("undo:true"))) {
 					// if a 'no' is being unitegrated
 					// the contribution that 'no' referred to
 					// (attached to a glue-contribution with undo:true),
@@ -347,7 +350,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 					for (IU input : iu.groundedIn()) {
 						// reintegrate by assigning old input to nextInput and restarting rules.
 						if (!(input instanceof ContribIU)) {
-							this.nextInput = (WordIU) input;
+							this.nextInput = (SemIU) input;
 							restart = true;
 						}
 					}
@@ -426,7 +429,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			}
 			this.nextInput.ground(marked);
 			marked.groundIn(this.nextInput); 
-			marked.getContribution().setValue(this.nextInput.getAVPairs().get(0).getValue());
+			marked.getContribution().setValue(this.nextInput.getAVPair().getValue());
 			// output a grounding dialogue act
 			this.nextOutput = new DialogueActIU(this.nextOutput, marked, newAct);
 			this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
@@ -735,9 +738,9 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public boolean nextInputIsNo() {
 		if (this.nextInput == null)
 			return false;
-		if (this.nextInput.getAVPairs() == null)
+		if (this.nextInput.getAVPair() == null)
 			return false;
-		return this.nextInput.getAVPairs().get(0).equals("bool:false");
+		return this.nextInput.getAVPair().equals("bool:false");
 	}
 
 	/**
@@ -749,9 +752,9 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public boolean nextInputIsYes() {
 		if (this.nextInput == null)
 			return false;
-		if (this.nextInput.getAVPairs() == null)
+		if (this.nextInput.getAVPair() == null)
 			return false;
-		return this.nextInput.getAVPairs().get(0).equals("bool:true");
+		return this.nextInput.getAVPair().equals("bool:true");
 	}
 
 	/**

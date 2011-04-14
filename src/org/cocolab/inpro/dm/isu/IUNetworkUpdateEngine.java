@@ -19,7 +19,7 @@ import org.cocolab.inpro.dm.isu.rule.UnintegrateRevokedInputRule;
 
 import org.cocolab.inpro.incremental.unit.DialogueActIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
-import org.cocolab.inpro.incremental.unit.WordIU;
+import org.cocolab.inpro.incremental.unit.SemIU;
 
 /**
  * A rule-based update engine that keeps a set of rules and an information
@@ -87,12 +87,12 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 	 * Sets the input word on the information state and calls the update rules.
 	 * @param iu the input word IU
 	 */
-	public void applyRules(WordIU iu) {
+	public void applyRules(SemIU iu) {
 		String status = iu.isRevoked() ? "revoked" : "added";
-		if (iu.getAVPairs() == null || iu.getAVPairs().isEmpty()) {
-			logger.info("Skipping meaningless " + status + " word " + iu.toString());
+		if (iu.getAVPair() == null) {
+			logger.info("Skipping meaningless " + status + " sem " + iu.toString());
 		} else {
-			logger.info("Processing " + status + " word " + iu.toString());
+			logger.info("Processing " + status + " sem " + iu.toString());
 			is.setNextInput(iu);
 			this.applyRules();
 		}
@@ -113,7 +113,6 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 				restart = r.apply(is);
 				if (restart) {
 					this.edits.addAll(is.getNewEdits());
-//					logger.info("Focus is: " + this.is.getFocus().toString());
 					break;
 				}
 			}
