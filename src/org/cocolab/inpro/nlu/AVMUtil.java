@@ -25,7 +25,7 @@ public class AVMUtil {
 	/**
 	 * List of fully specified AVMs representing world objects (available to resolution).
 	 */
-	private static ArrayList<AVM> worldList = new ArrayList<AVM>();
+	private ArrayList<AVM> worldList = new ArrayList<AVM>();
 	/**
 	 * List of underspecified AVMs representing possible input (available to composition).
 	 */
@@ -60,7 +60,6 @@ public class AVMUtil {
 	 */
 	public AVMUtil(String structureFile) throws MalformedURLException {
 		AVMUtil.avmStructures = AVMStructureUtil.parseStructureFile(new URL(structureFile));
-//		worldList = AVMWorldUtil.setAVMsFromFile("res/PentoAVMWorldList", avmStructures);
 		composeList = getAVMStructures();
 		resolvedList = new ArrayList<AVM>(worldList.size());
 	}
@@ -84,9 +83,13 @@ public class AVMUtil {
 		for (AVM avm : c.composeList) {
 			this.composeList.add(new AVM(avm));
 		}
-		resolvedList = new ArrayList<AVM>(c.resolvedList.size());
+		this.resolvedList = new ArrayList<AVM>(c.resolvedList.size());
 		for (AVM avm : c.resolvedList) {
 			this.resolvedList.add(new AVM(avm));
+		}
+		this.worldList = new ArrayList<AVM>(c.worldList.size());
+		for (AVM avm : c.worldList) {
+			this.worldList.add(new AVM(avm));
 		}
 	}
 
@@ -187,7 +190,7 @@ public class AVMUtil {
 	 * Disallows all others.
 	 * @param type The type of AVM to allow
 	 */
-	public void setAVMs(String type) {
+	public void allowAVMsByType(String type) {
 		this.composeList = new ArrayList<AVM>();
 		this.composeList.add(new AVM(type, avmStructures));
 	}
@@ -213,6 +216,14 @@ public class AVMUtil {
 	 */
 	public void setComposeList(ArrayList<AVM> avmList) {
 		this.composeList = avmList;
+	}
+
+	/**
+	 * Sets the list of AVMs available for resolution.
+	 * @param avmList the list of AVMs in the world to set to
+	 */
+	public void setWorldList(ArrayList<AVM> avmList) {
+		this.worldList = avmList;
 	}
 
 	/**
