@@ -740,7 +740,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			return false;
 		if (this.nextInput.getAVPair() == null)
 			return false;
-		return this.nextInput.getAVPair().equals("bool:false");
+		AVPair avp = this.nextInput.getAVPair();
+		return avp.equals("bool:false") || avp.equals("correct:no");
 	}
 
 	/**
@@ -754,7 +755,8 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			return false;
 		if (this.nextInput.getAVPair() == null)
 			return false;
-		return this.nextInput.getAVPair().equals("bool:true");
+		AVPair avp = this.nextInput.getAVPair();
+		return avp.equals("bool:true") || avp.equals("correct:yes");
 	}
 
 	/**
