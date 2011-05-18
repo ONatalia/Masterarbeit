@@ -132,7 +132,7 @@ public class IUNetworkActionManager extends AudioActionManager {
 	
 	protected void playClarificationUtterance() {
 		// Was meintene Sie damit?
-		this.playSystemUtterance("Was meintene Sie damit?");
+		this.playSystemUtterance("Was meinten Sie damit?");
 	}
 
 	protected void playRequestUtterance() {

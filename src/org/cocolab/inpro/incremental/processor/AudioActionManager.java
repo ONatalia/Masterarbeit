@@ -3,6 +3,7 @@ package org.cocolab.inpro.incremental.processor;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,41 +64,24 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 	protected static String audioPath;
 
 	/** A map of utterance strings and corresponding audio files. */
-	protected static Map<String, File> utteranceMap = new HashMap<String, File>();
+	protected static Map<String, String> utteranceMap = new HashMap<String, String>();
 	/** List of dialogue act IUs to perform whenever possible. */
 	protected IUList<DialogueActIU> toPerform = new IUList<DialogueActIU>();
 
 	/**
-	 * Reads file names corresponding to utterances strings from a file
+	 * Reads file names corresponding to utterances strings from an url
 	 * and adds them to a local map if they can be found.
 	 */
 	private void loadUtteranceMap() {
 		try {
-			URL url = new URL(utteranceMapFile);
-			File file = new File(url.toURI());
-			if (file.exists()) {
-				this.logger.info("Loading utterance map.");
-				BufferedReader br = new BufferedReader(new FileReader(file));
-				String line;
-				while ((line = br.readLine()) != null) {
-					String utterance = line.split(",")[0];
-					File audio = new File(line.split(",")[1]);
-					if (audio.exists()) {
-						utteranceMap.put(utterance, audio);
-					} else if (audioPath != null) {
-						audio = new File(audioPath + audio.toString());
-						if (audio.exists()) {
-							utteranceMap.put(utterance, new File(audioPath + audio.toString()));
-						} else {
-							this.logger.warn("Cannot find and won't add audio file " + audio.toString());
-						}
-					} else {
-						this.logger.warn("Cannot find and won't add audio file " + audio.toString());
-					}
-			    }
-			} else {
-				this.logger.warn("Cannot find file " + utteranceMapFile);
-			}
+			BufferedReader br = new BufferedReader(new InputStreamReader(new URL(utteranceMapFile).openStream()));
+			String line;
+			while ((line = br.readLine()) != null) {
+				String utterance = line.split(",")[0];
+				URL audio = new URL(line.split(",")[1]);
+				logger.info("Adding " + audio.toString());
+				utteranceMap.put(utterance, audio.toString());
+		    }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -112,6 +96,7 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 		audioPath = ps.getString(PROP_AUDIO_PATH);
 		utteranceMapFile = ps.getString(PROP_UTTERANCE_MAP);
 		if (utteranceMapFile != null) {
+			this.logger.info("Loading utterances from: " + utteranceMapFile);
 			this.loadUtteranceMap();
 		} else {
 			logger.info("Not loading utterance files.");
