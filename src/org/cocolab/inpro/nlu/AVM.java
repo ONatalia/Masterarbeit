@@ -35,7 +35,8 @@ public class AVM {
 	 * Copy constructor.
 	 * @param avm - the AVM to copy.
 	 */
-	protected AVM (AVM avm) {
+	@SuppressWarnings("unchecked")
+	protected AVM(AVM avm) {
 		type = avm.type;
 		monotonic = avm.monotonic;
 		// do a deep copy of attributes
@@ -44,6 +45,12 @@ public class AVM {
 			Object value = avm.attributes.get(attribute);
 			if (value instanceof AVM) {
 				value = new AVM((AVM) value);
+			} else if (value instanceof ArrayList) {
+				ArrayList<AVM> newValue = new ArrayList<AVM>();
+				for (AVM newAVM : (ArrayList<AVM>) value) {
+					newValue.add(new AVM(newAVM));
+				}
+				value = newValue;
 			}
 			attributes.put(attribute, value);
 		}

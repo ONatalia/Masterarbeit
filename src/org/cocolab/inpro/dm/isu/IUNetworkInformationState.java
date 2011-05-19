@@ -333,12 +333,13 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	@Override
 	public boolean unintegrateNextInput() {
 		boolean restart = false;
+		List<ContribIU> revoked = new ArrayList<ContribIU>();
 		for (ContribIU iu : this.contributions) {
 			// Find what contributions are grounded in revoked input 
 			if (iu.groundedIn().contains(this.nextInput)) {
 //				if (this.nextInput.getAVPairs().get(0).equals("bool:false") && (iu.getContribution().equals("undo:true"))) {
 				AVPair next = this.nextInput.getAVPair();
-				if (next.equals("bool:false") && (iu.getContribution().equals("undo:true"))) {
+				if ((next.equals("bool:false") || next.equals("correct:no")) && (iu.getContribution().equals("undo:true"))) {
 					// if a 'no' is being unitegrated
 					// the contribution that 'no' referred to
 					// (attached to a glue-contribution with undo:true),
@@ -347,16 +348,22 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 					this.focus = (ContribIU) iu.groundedIn().get(0);
 					iu.removeGrin(this.nextInput);
 					iu.revoke();
-					for (IU input : iu.groundedIn()) {
-						// reintegrate by assigning old input to nextInput and restarting rules.
-						if (!(input instanceof ContribIU)) {
-							this.nextInput = (SemIU) input;
+					revoked.add(iu);
+					for (IU other : iu.groundedIn()) {
+						if (other instanceof SemIU) {
+							// reintegrate by assigning old input to nextInput and restarting rules.
+							this.nextInput = (SemIU) other;
 							restart = true;
+						} else if (other instanceof ContribIU) {
+							// remove links here
+							System.err.println("Ungrounding " + iu.toPayLoad() + " from " + other.toPayLoad());
+							iu.removeGrin(other);
 						}
 					}
 				} else if (iu.getContribution().equals("clarify:true")) {
 					iu.removeGrin(this.nextInput);
 					iu.revoke();
+					revoked.add(iu);
 					this.nextInput = null;
 					this.focus = this.getLastIntegrated();
 					restart = true;
@@ -379,17 +386,14 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 				}
 				for (DialogueActIU daiu : revokeOrUndo) {
 					if (daiu.isCommitted()) {
-						logger.info("UNDOING");
 						this.nextOutput = new DialogueActIU(this.nextOutput, iu, new UndoDialogueAct());
 						this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
 					} else {
-						logger.info("REVOKING");
 						this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.REVOKE, (DialogueActIU) daiu));
 						if (this.nextOutput != null)
 							this.nextOutput = (DialogueActIU) this.nextOutput.getSameLevelLink();
 						unground.add((DialogueActIU) daiu);							
 					}
-
 				}
 				// and remove grin links to contributions (because the edit message created here may not be applied in time).
 				for (DialogueActIU daiu : unground) {
@@ -398,12 +402,6 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 			}
 		}
 		// Remove any contributions that may have been revoked above
-		List<ContribIU> revoked = new ArrayList<ContribIU>();
-		for (IU iu : this.contributions) {
-			if (iu instanceof ContribIU && iu.isRevoked()) {
-				revoked.add((ContribIU) iu);
-			}
-		}
 		this.contributions.removeAll(revoked);
 		return restart;
 	}
