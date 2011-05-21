@@ -30,7 +30,7 @@ public class SysSegmentIU extends SegmentIU {
 	
 	public void appendMaryXML(StringBuilder sb) {
 		sb.append("<ph d='");
-		sb.append((int) (l.getEnd() * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
+		sb.append((int) (l.getDuration() * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
 		sb.append("' end='");
 		sb.append(l.getEnd());
 		sb.append("' f0='");

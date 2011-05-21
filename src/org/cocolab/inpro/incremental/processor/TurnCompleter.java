@@ -85,10 +85,6 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	
 	/** 
 	 * determine whether we should complete the utterance based on the words heard so far
-	 * 
-	 * THE FOLLOWING IS NOT TRUE ANYMORE: 
-	 * currently, the algorithm decides to *always* (repeatedly)
-	 * fire when the expected prefix is recognized  
 	 */
 	private boolean shouldFire() {
 		// always fire if there were at least 3 words and the expected prefix is matched
@@ -118,36 +114,46 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		double extrapolatedTime = extrapolateStart();
 		List<WordIU> completion = fmatch.getRemainder();
 		WordIU nextWord = completion.get(0);
-		double nextWordEndEstimate = extrapolatedTime + nextWord.duration() * estimatedSpeechRate;
-		evaluator.newOnsetResult(lastElement(fullInput), extrapolatedTime, this.currentFrame, nextWord, nextWordEndEstimate);
-		// this consists of two steps: 
-		// a) deep-copy and scale the SysInstallmentIU
-		SysInstallmentIU output = new SysInstallmentIU(Collections.<WordIU>singletonList(nextWord));
-		output.scaleDeepCopyAndStartAtZero(estimatedSpeechRate);
-		// b) think hard about how best to do pitch-scaling (TODO)
-		// c) synthesize and play the completion
-		// have a new thread which sleeps a certain time (while synthesizing) and then outputs to dispatchStream
-		double holdingTime = extrapolatedTime - this.currentFrame * ResultUtil.FRAME_TO_SECOND_FACTOR;
-		InstallmentPlayer ip = new InstallmentPlayer(holdingTime, output);
-		ip.start();
+		if (!nextWord.isSilence()) {
+			double nextWordEndEstimate = extrapolatedTime + nextWord.duration() * estimatedSpeechRate;
+			evaluator.newOnsetResult(lastElement(fullInput), extrapolatedTime, this.currentFrame, nextWord, nextWordEndEstimate);
+			// this consists of two steps: 
+			// a) deep-copy and scale the SysInstallmentIU
+			SysInstallmentIU output = new SysInstallmentIU(Collections.<WordIU>singletonList(nextWord));
+			output.scaleDeepCopyAndStartAtZero(estimatedSpeechRate);
+			// b) think hard about how best to do pitch-scaling (TODO)
+			// c) synthesize and play the completion
+			// have a new thread which sleeps a certain time (while synthesizing) and then outputs to dispatchStream
+			double holdingTime = extrapolatedTime - this.currentFrame * ResultUtil.FRAME_TO_SECOND_FACTOR;
+			InstallmentPlayer ip = new InstallmentPlayer(holdingTime, output);
+			ip.start();
+		}
 	}
 	
+	/** outputs a given system installment after the given holding time has passed */
 	class InstallmentPlayer extends Thread {
 		SysInstallmentIU output;
 		/** in seconds */
 		double holdingTime; 
+		boolean aborted = false;
 		public InstallmentPlayer(double holdingTime, SysInstallmentIU output) {
 			this.holdingTime = holdingTime;
 			this.output = output;
 		}
 		
+		/** if this is called before run() completes, then no output will be sent to the speakers */
+		public void abort() {
+			this.aborted = true;
+		}
+		
+		/** synthesize output and initiate playback after holdingTime has passed */
 		@Override
 		public void run() {
 			long startTime = System.currentTimeMillis();
 			if (holdingTime < OUTPUT_BUFFER_DELAY) {
 				logger.info("oups, I'm already starting late by " + holdingTime);
 			}
-			output.synthesize(); // TODO: this may be slow and has to be on a different thread!
+			output.synthesize(); 
 			// TODO: actually play after the holding time is over
 			long duration = System.currentTimeMillis() - startTime; // in milliseconds
 			logger.info(output.getWords().get(0).toPayLoad() + " took " + duration + " milliseconds");
@@ -161,7 +167,9 @@ public class TurnCompleter extends IUModule implements FrameAware {
 					logger.info("interrupted while sleeping.");
 				}
 			}
-			audioDispatcher.playStream(output.getAudio(), true);
+			if (!aborted) {
+				audioDispatcher.playStream(output.getAudio(), true);
+			}
 		}
 	}
 	
