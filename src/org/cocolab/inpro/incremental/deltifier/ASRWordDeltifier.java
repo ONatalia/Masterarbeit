@@ -37,7 +37,7 @@ import edu.cmu.sphinx.util.props.PropertySheet;
  * to store the ASR's (or one of the ASR's) current hypothesis
  * 
  * you would usually call deltify() (either on the result or a specific token from the n-best-list)
- * and afterwards retrieve the WordIUs and edits via getIUs() and getEdits()
+ * and afterwards retrieve the WordIUs and edits since the previous call via getIUs() and getEdits()
  * 
  * Descendents of this class implement methods described in NAACL-HLT 2009
  * 

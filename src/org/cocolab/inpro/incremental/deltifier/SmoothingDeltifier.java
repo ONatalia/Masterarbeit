@@ -75,11 +75,15 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 		// keep a copy of the original wordIUs
 		saveOutputLists();
 		// calculate would-be edits the standard way
-		super.deltify(token);
+		basicDeltify(token);
 		if (!recoFinal) {
 			handleIncomingWordIUs(); 
 			applySmoothingQueueToOutputWords();
 		}
+	}
+	
+	protected void basicDeltify(Token token) {
+		super.deltify(token);
 	}
 
 	/**
