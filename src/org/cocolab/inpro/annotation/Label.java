@@ -57,6 +57,11 @@ public class Label {
 	public double getEnd() {
 		return end;
 	}
+	
+	/** in seconds */
+	public double getDuration() {
+		return end - start;
+	}
 
 	/** the label itself */
 	public String getLabel() {
