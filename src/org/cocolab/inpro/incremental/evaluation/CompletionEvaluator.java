@@ -7,6 +7,10 @@ import java.util.Queue;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.incremental.util.ResultUtil;
 
+/**
+ * receives timing predictions from the TurnCompleter and evalutes 
+ * them once these words are committed
+ */
 public class CompletionEvaluator extends BasicEvaluator {
 
 	private final Queue<EvalEntry> onsetResults = new LinkedList<EvalEntry>();
@@ -87,5 +91,5 @@ public class CompletionEvaluator extends BasicEvaluator {
 			return triggerWord.toString() + ", frames: "+ frameCount + ", onset: " + onset;
 		}
 	}
-	
+
 }

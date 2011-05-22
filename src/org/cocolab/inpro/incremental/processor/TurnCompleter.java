@@ -26,13 +26,13 @@ import edu.cmu.sphinx.util.props.S4String;
 
 public class TurnCompleter extends IUModule implements FrameAware {
 
-	@S4Component(type = DispatchStream.class, mandatory = true)
+	@S4Component(type = DispatchStream.class, mandatory = false)
 	public static final String PROP_DISPATCHER = "dispatchStream";
-	DispatchStream audioDispatcher;
 	
 	@S4Component(type = CompletionEvaluator.class, mandatory = false)
 	public static final String PROP_EVALUATOR = "evaluator";
-	CompletionEvaluator evaluator;
+	
+	private List<CompletionAdapter> compAdapters;
 	
 	@S4String(defaultValue = "eins zwei drei vier fünf sechs sieben")
 	public static final String PROP_FULL_UTTERANCE = "fullUtterance";
@@ -40,25 +40,35 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	/** in seconds, very rough estimate */
 	private static double OUTPUT_BUFFER_DELAY = 0.050;
 	
-	private IUList<WordIU> committedWords;
 	private SysInstallmentIU fullInstallment;
 	
-	/** full input at one point in time */
+	/** history of words that have previously been recognized */
+	private IUList<WordIU> committedWords;
+	/** full user input at one point in time: words that have been committed + currently hypothesized words */
 	List<WordIU> fullInput;
 	/** fuzzy match of the full input against the expected full installment */
 	FuzzyMatchResult fmatch;
 	
-	/** first WordIUs of completions that have been output are stored here */
-	private HashSet<WordIU> triggerWords = new HashSet<WordIU>();
+	/** words from fullInstallment that have been output are stored here */
+	private HashSet<WordIU> wordsTriggered = new HashSet<WordIU>();
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
-		audioDispatcher = (DispatchStream) ps.getComponent(PROP_DISPATCHER);
-		evaluator = (CompletionEvaluator) ps.getComponent(PROP_EVALUATOR);
 		String fullUtterance = ps.getString(PROP_FULL_UTTERANCE);
 		fullInstallment = new SysInstallmentIU(fullUtterance);
 		committedWords = new IUList<WordIU>();
+		
+		compAdapters = new ArrayList<CompletionAdapter>();
+		CompletionEvaluator evaluator = (CompletionEvaluator) ps.getComponent(PROP_EVALUATOR);
+		if (evaluator != null) {
+			compAdapters.add(new CompletionEvalAdapter(evaluator));
+		}
+		DispatchStream audioDispatcher = (DispatchStream) ps.getComponent(PROP_DISPATCHER);
+		if (audioDispatcher != null) {
+			compAdapters.add(new CompletionPlayer(audioDispatcher));
+		}
+
 	}
 	
 	@SuppressWarnings("unchecked") // casts from IU to WordIU 
@@ -74,7 +84,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 			fullInput = new ArrayList<WordIU>(committedWords);
 			fullInput.addAll(inputWords);
 			fmatch = fullInstallment.fuzzyMatching(fullInput, 0.2, 2);
-			if (shouldFire()) {
+			if (fmatch.matches() && shouldFire()) {
 				doComplete();
 			}
 		} else if (edit != null && edit.getType().isCommit()) {
@@ -83,105 +93,54 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		}
 	}
 	
-	/** 
-	 * determine whether we should complete the utterance based on the words heard so far
-	 */
+	/** determine whether we should complete the utterance based on the words heard so far */
 	private boolean shouldFire() {
-		// always fire if there were at least 3 words and the expected prefix is matched
-		//System.err.println(fullInstallment.fuzzyMatchesPrefix(words, 0.02, 2) + "" + words);
-		boolean hasFired = hasFiredForTrigger();
-		return (WordIU.removeSilentWords(fullInput).size() > 2 && fmatch.matches() && !hasFired);
+		// always fire if there were at least 3 words and we haven't yet fired for this word
+		return (!hasFiredForTrigger() && WordIU.removeSilentWords(fullInput).size() > 2);
 	}
 	
 	/**
 	 * find out whether we have already fired for a word, to avoid stuttering; 
-	 * research shows that the first prediction for a word is as good as any 
-	 * later prediction so there's no value in trying repeatedly   
+	 * initial experiments shows that the first prediction for a word is as  
+	 * good as any later prediction so there's no value in trying repeatedly   
 	 */
 	private boolean hasFiredForTrigger() {
 		List<WordIU> prefix = fmatch.getPrefix();
-		WordIU triggerWord = prefix != null && prefix.size() > 0 ? prefix.get(prefix.size() - 1) : null;
-		if (triggerWord == null || triggerWords.contains(triggerWord)) {
+		WordIU triggerWord = (prefix != null && prefix.size() > 0) ? prefix.get(prefix.size() - 1) : null;
+		if (triggerWord == null || wordsTriggered.contains(triggerWord)) {
 			return true;
 		} else {
-			triggerWords.add(triggerWord);
+			wordsTriggered.add(triggerWord);
 			return false;
 		}
 	}
 	
 	private void doComplete() {
 		double estimatedSpeechRate = estimateSpeechRate();
-		double extrapolatedTime = extrapolateStart();
-		List<WordIU> completion = fmatch.getRemainder();
-		WordIU nextWord = completion.get(0);
-		if (!nextWord.isSilence()) {
-			double nextWordEndEstimate = extrapolatedTime + nextWord.duration() * estimatedSpeechRate;
-			evaluator.newOnsetResult(lastElement(fullInput), extrapolatedTime, this.currentFrame, nextWord, nextWordEndEstimate);
-			// this consists of two steps: 
-			// a) deep-copy and scale the SysInstallmentIU
-			SysInstallmentIU output = new SysInstallmentIU(Collections.<WordIU>singletonList(nextWord));
-			output.scaleDeepCopyAndStartAtZero(estimatedSpeechRate);
-			// b) think hard about how best to do pitch-scaling (TODO)
-			// c) synthesize and play the completion
-			// have a new thread which sleeps a certain time (while synthesizing) and then outputs to dispatchStream
-			double holdingTime = extrapolatedTime - this.currentFrame * ResultUtil.FRAME_TO_SECOND_FACTOR;
-			InstallmentPlayer ip = new InstallmentPlayer(holdingTime, output);
-			ip.start();
-		}
-	}
-	
-	/** outputs a given system installment after the given holding time has passed */
-	class InstallmentPlayer extends Thread {
-		SysInstallmentIU output;
-		/** in seconds */
-		double holdingTime; 
-		boolean aborted = false;
-		public InstallmentPlayer(double holdingTime, SysInstallmentIU output) {
-			this.holdingTime = holdingTime;
-			this.output = output;
-		}
+		double estimatedStartTime = extrapolateStart(estimatedSpeechRate);
+		// this is the logic that decides what the completion should be (it could very well be different!)
+		List<WordIU> remainder = fmatch.getRemainder();
+		WordIU nextWord = remainder.get(0);
+		// now generate the completion this consists of two steps: 
+		// a) deep-copy and scale the SysInstallmentIU
+		SysInstallmentIU output = new SysInstallmentIU(Collections.<WordIU>singletonList(nextWord));
+		output.scaleDeepCopyAndStartAtZero(estimatedSpeechRate);
 		
-		/** if this is called before run() completes, then no output will be sent to the speakers */
-		public void abort() {
-			this.aborted = true;
-		}
-		
-		/** synthesize output and initiate playback after holdingTime has passed */
-		@Override
-		public void run() {
-			long startTime = System.currentTimeMillis();
-			if (holdingTime < OUTPUT_BUFFER_DELAY) {
-				logger.info("oups, I'm already starting late by " + holdingTime);
-			}
-			output.synthesize(); 
-			// TODO: actually play after the holding time is over
-			long duration = System.currentTimeMillis() - startTime; // in milliseconds
-			logger.info(output.getWords().get(0).toPayLoad() + " took " + duration + " milliseconds");
-			holdingTime -= duration * 0.001;
-			if (holdingTime < OUTPUT_BUFFER_DELAY) {
-				logger.info("oups, after synthesis I'm late by " + holdingTime);
-			} else {
-				try {
-					Thread.sleep((long) ((holdingTime - OUTPUT_BUFFER_DELAY) * 1000));
-				} catch (InterruptedException e) {
-					logger.info("interrupted while sleeping.");
-				}
-			}
-			if (!aborted) {
-				audioDispatcher.playStream(output.getAudio(), true);
-			}
+		// c) synthesize and play the completion
+		for (CompletionAdapter ca : compAdapters) {
+			ca.newCompletion(estimatedStartTime, output);
 		}
 	}
 	
 	/** extrapolate the start time of the next word from a list of previously spoken words */ 
 //	private double extrapolateStart(List<WordIU> prefix, SysInstallmentIU fullInstallment) {
+//	// start out with a very simple approach: start(last word) - start(first word) / (number of words - 1)
 //		// this implementation assumes that all words are (more or less) of equal length,
 //		// allowing it to only look at word starts and extrapolate the next word start based on this
 //		List<Double> wordStarts = getWordStarts(prefix);
-//		// start out with a very simple approach: start(last word) - start(first word) / (number of words - 1)
 //		return getDuration(prefix) / prefix.size()
 //	}
-	private double extrapolateStart() {
+	private double extrapolateStart(double estimatedSpeechRate) {
 		/* this implementation uses a duration model based on MaryTTS
 		 * 
 		 * we compare the duration of a TTSed utterance with the spoken words 
@@ -193,7 +152,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		WordIU currentlySpokenWord = lastElement(fullInput);
 		List<WordIU> fullTtsPrefix = fmatch.getPrefix();
 		WordIU currentlyTTSedWord = lastElement(fullTtsPrefix);
-		return currentlySpokenWord.startTime() + (currentlyTTSedWord.duration() * estimateSpeechRate());
+		return currentlySpokenWord.startTime() + (currentlyTTSedWord.duration() * estimatedSpeechRate);
 	}
 	
 	/** estimate the correction factor relative to the TTS's speech rate */
@@ -220,13 +179,107 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		return dur;
 	}
 
-	int currentFrame = 0;
+	public interface CompletionAdapter {
+		public void newCompletion(double estimatedStartTime, SysInstallmentIU completion);
+	}
+	
+	private class CompletionEvalAdapter implements CompletionAdapter {
+		CompletionEvaluator ce;
 
+		CompletionEvalAdapter(CompletionEvaluator ce) {
+			this.ce = ce;
+		}
+		
+		@Override
+		public void newCompletion(double estimatedStartTime,
+				SysInstallmentIU completion) {
+			// TODO Auto-generated method stub
+			WordIU nextWord = completion.getWords().get(0);
+			double nextWordEndEstimate = estimatedStartTime + nextWord.duration();
+			ce.newOnsetResult(lastElement(fullInput), estimatedStartTime, currentFrame, nextWord, nextWordEndEstimate);
+		}
+	}
+	
+	/**
+	 * completions will only be played if they don't start with a pause
+	 */
+	private class CompletionPlayer implements CompletionAdapter {
+		DispatchStream audioDispatcher;
+		public CompletionPlayer(DispatchStream audioDispatcher) {
+			this.audioDispatcher = audioDispatcher;
+		}
+
+		@Override
+		public void newCompletion(double estimatedStartTime, SysInstallmentIU completion) {
+			double holdingTime = estimatedStartTime - currentFrame * ResultUtil.FRAME_TO_SECOND_FACTOR;
+			WordIU nextWord = completion.getWords().get(0);
+			if (!nextWord.isSilence()) {
+				InstallmentPlayer ip = new InstallmentPlayer(holdingTime, completion);
+				ip.start();
+			}
+		}
+	
+		/* * * * * * * * * * * * * * * * * * *
+		 * InstallmentPlayer for timed output
+		 * * * * * * * * * * * * * * * * * * */
+		/** outputs a given system installment after the given holding time has passed */
+		class InstallmentPlayer extends Thread {
+			SysInstallmentIU output;
+			/** in seconds */
+			double holdingTime; 
+			boolean aborted = false;
+			public InstallmentPlayer(double holdingTime, SysInstallmentIU output) {
+				this.holdingTime = holdingTime;
+				this.output = output;
+			}
+			
+			/** if this is called before run() completes, then no output will be sent to the speakers */
+			@SuppressWarnings("unused")
+			public void abort() {
+				this.aborted = true;
+			}
+			
+			/** synthesize output and initiate playback after holdingTime has passed */
+			@Override
+			public void run() {
+				long startTime = System.currentTimeMillis();
+				if (holdingTime < OUTPUT_BUFFER_DELAY) {
+					logger.info("oups, I'm already starting late by " + holdingTime);
+				}
+				output.synthesize(); 
+				// TODO: actually play after the holding time is over
+				long duration = System.currentTimeMillis() - startTime; // in milliseconds
+				logger.info(output.getWords().get(0).toPayLoad() + " took " + duration + " milliseconds");
+				holdingTime -= duration * 0.001;
+				if (holdingTime < OUTPUT_BUFFER_DELAY) {
+					logger.info("oups, after synthesis I'm late by " + holdingTime);
+				} else {
+					try {
+						Thread.sleep((long) ((holdingTime - OUTPUT_BUFFER_DELAY) * 1000));
+					} catch (InterruptedException e) {
+						logger.info("interrupted while sleeping.");
+					}
+				}
+				if (!aborted) {
+					audioDispatcher.playStream(output.getAudio(), true);
+				}
+			}
+		}
+	}
+
+
+	/* * * * * * * * * * * * * * * *
+	 * implementation of FrameAware
+	 * * * * * * * * * * * * * * * */
+	int currentFrame = 0;
 	@Override
 	public void setCurrentFrame(int frame) {
 		currentFrame = frame;
 	}
 	
+	/* * * * * * * * * * *
+	 * utility operations
+	 * * * * * * * * * * */
 	/** utility which unfortunately is not part of java.util. */
 	private <T> T lastElement(List<T> list) {
 		return list.get(list.size() - 1);

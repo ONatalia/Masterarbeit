@@ -99,9 +99,9 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	/** 
 	 * Is this SysInstallmentIU similar(*) to the given words?
-	 * (*) similarity is parameterizable:
-	 *   - the WER between the two sequences must be <= maxWER
-	 *   - a number of ultimate words in the prefix must be identical 
+	 * (*) similarity is parameterizable:<br>
+	 *   - the WER between the two sequences must be <= maxWER<br>
+	 *   - a number of ultimate words in the prefix must be identical<br> 
 	 * silence words are ignored in the comparison
 	 */
 	public FuzzyMatchResult fuzzyMatching(List<WordIU> otherPrefix, double maxWER, int matchingLastWords) {
