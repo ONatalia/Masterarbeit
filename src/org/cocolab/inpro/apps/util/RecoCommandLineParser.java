@@ -11,6 +11,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	public static final int GRAMMAR_RECO = 3;
 	public static final int SLM_RECO = 4;
 	
+	public static final int DEFAULT_DELTIFIER = -1;
 	public static final int INCREMENTAL = 0;
 	public static final int NON_INCREMENTAL = 1;
 	public static final int SMOOTHED_INCREMENTAL = 2;
@@ -27,7 +28,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	int recoMode;
 	
 	public int rtpPort;
-	int incrementalMode;
+	int incrementalMode = DEFAULT_DELTIFIER;
 	int incrementalModifier;
 	String referenceText;
 	String referenceFile;

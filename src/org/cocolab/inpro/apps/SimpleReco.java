@@ -74,19 +74,24 @@ public class SimpleReco {
 	}
 	
 	private void setupDeltifier() {
-		String ASRfilter;
+		String ASRfilter = null;
 		switch (clp.getIncrementalMode()) {
 			case RecoCommandLineParser.FIXEDLAG_INCREMENTAL : ASRfilter = "fixedLag"; break;
 			case RecoCommandLineParser.INCREMENTAL : ASRfilter = "none"; break;
 			case RecoCommandLineParser.NON_INCREMENTAL : ASRfilter = "nonIncr"; break;
 			case RecoCommandLineParser.SMOOTHED_INCREMENTAL : ASRfilter = "smoothing"; break;
+			case RecoCommandLineParser.DEFAULT_DELTIFIER : break;
 			default : throw new RuntimeException("something's wrong");
 		}
-		logger.info("Setting ASR filter to " + ASRfilter);
-		cm.setGlobalProperty("deltifier", ASRfilter);
-		if (!ASRfilter.equals("none")) {
-			logger.info("Setting filter parameter to " + clp.getIncrementalModifier());
-			cm.setGlobalProperty("deltifierParam", Integer.toString(clp.getIncrementalModifier()));
+		if (ASRfilter != null) {
+			logger.info("Setting ASR filter to " + ASRfilter);
+			cm.setGlobalProperty("deltifier", ASRfilter);
+			if (!ASRfilter.equals("none")) {
+				logger.info("Setting filter parameter to " + clp.getIncrementalModifier());
+				cm.setGlobalProperty("deltifierParam", Integer.toString(clp.getIncrementalModifier()));
+			}
+		} else {
+			logger.info("Leaving ASR filter at config-file's value.");
 		}
 	}
 
@@ -288,7 +293,7 @@ public class SimpleReco {
 		// this is a little hacky, but so be it
 		if (clp.matchesOutputMode(RecoCommandLineParser.DISPATCHER_OBJECT_OUTPUT)) {
 			MonitorCommandLineParser clp = new MonitorCommandLineParser(new String[] {
-					"-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
+					"-F", "file:/tmp/monitor.raw", "-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
 				});
 			clp.setInputMode(MonitorCommandLineParser.DISPATCHER_OBJECT_INPUT);
 			try {
