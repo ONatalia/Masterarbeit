@@ -2,7 +2,6 @@ package org.cocolab.inpro.audio;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 
+import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.LabelledAudioStream;
@@ -147,19 +148,13 @@ public class DispatchStream extends InputStream implements Configurable {
 			playFile(ttsCache.get(tts), skipQueue);
 		} else {
 			try {
-				InputStream audioStream = MaryAdapter.getInstance().text2audio(tts);
+				AudioInputStream audioStream = MaryAdapter.getInstance().text2audio(tts);
 				if (audioStream.markSupported()) {
 					audioStream.mark(Integer.MAX_VALUE);
 				}
 				File tmpFile = File.createTempFile("ttsCache", ".wav");
 				tmpFile.deleteOnExit();
-				FileOutputStream fos = new FileOutputStream(tmpFile);
-				byte[] buffer = new byte[4096];
-				int len = audioStream.read(buffer);
-				while (len != -1) {
-					fos.write(buffer);
-					len = audioStream.read(buffer);
-				}
+				AudioSystem.write(audioStream, AudioFileFormat.Type.WAVE, tmpFile);
 				ttsCache.put(tts, tmpFile.toURI().toURL().toString());
 				if (audioStream.markSupported()) {
 					audioStream.reset();

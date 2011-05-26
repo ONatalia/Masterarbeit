@@ -1,8 +1,5 @@
 package org.cocolab.inpro.incremental.processor;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
