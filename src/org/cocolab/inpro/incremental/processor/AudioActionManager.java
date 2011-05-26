@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.cocolab.inpro.audio.DispatchStream;
 import org.cocolab.inpro.incremental.IUModule;
@@ -61,29 +59,8 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 	/** Audio file location */
 	protected static String audioPath;
 
-	/** A map of utterance strings and corresponding audio files. */
-	protected static Map<String, String> utteranceMap = new HashMap<String, String>();
 	/** List of dialogue act IUs to perform whenever possible. */
 	protected IUList<DialogueActIU> toPerform = new IUList<DialogueActIU>();
-
-	/**
-	 * Reads file names corresponding to utterances strings from an url
-	 * and adds them to a local map if they can be found.
-	 */
-	private void loadUtteranceMap() {
-		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(new URL(utteranceMapFile).openStream()));
-			String line;
-			while ((line = br.readLine()) != null) {
-				String utterance = line.split(",")[0];
-				URL audio = new URL(line.split(",")[1]);
-				logger.info("Adding " + audio.toString());
-				utteranceMap.put(utterance, audio.toString());
-		    }
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
@@ -95,7 +72,7 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 		utteranceMapFile = ps.getString(PROP_UTTERANCE_MAP);
 		if (utteranceMapFile != null) {
 			this.logger.info("Loading utterances from: " + utteranceMapFile);
-			this.loadUtteranceMap();
+			audioDispatcher.initializeTTSCache(utteranceMapFile, audioPath);
 		} else {
 			logger.info("Not loading utterance files.");
 		}

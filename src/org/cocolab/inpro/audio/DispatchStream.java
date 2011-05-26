@@ -1,9 +1,16 @@
 package org.cocolab.inpro.audio;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Queue;
 
 import javax.sound.sampled.AudioInputStream;
@@ -37,6 +44,9 @@ public class DispatchStream extends InputStream implements Configurable {
 	public final static String PROP_SEND_SILENCE = "sendSilence";
 	private boolean sendSilence;
 
+	/** A map of tts strings and corresponding audio files. */
+	private static Map<String, String> ttsCache = new HashMap<String, String>();
+
 	InputStream stream;
 	Queue<InputStream> streamQueue = new ArrayDeque<InputStream>();
 	
@@ -45,9 +55,49 @@ public class DispatchStream extends InputStream implements Configurable {
 		sendSilence(ps.getBoolean(PROP_SEND_SILENCE));
 		ssv = (SpeechStateVisualizer) ps.getComponent(PROP_SPEECH_STATE_VISUALIZER);
 	}
-
-	public void initialize() { }
 	
+	public void initialize() {  }
+
+	/**
+	 * Reads file names corresponding to utterances strings from a file
+	 * and adds them to a local map if they can be found.
+	 */
+	public void initializeTTSCache(String utteranceMapFile, String audioPath) {
+		try {
+			URL url = new URL(utteranceMapFile);
+			// workaround for relative local paths 
+			if (url.toURI().isOpaque()) {
+				url = new URL(new File(".").toURI().toURL(), url.toString());
+			}
+			File file = new File(url.toURI());
+			if (file.exists()) {
+				logger.info("Loading utterance map.");
+				BufferedReader br = new BufferedReader(new FileReader(file));
+				String line;
+				while ((line = br.readLine()) != null) {
+					String utterance = line.split(",")[0];
+					File audio = new File(line.split(",")[1]);
+					if (audio.exists()) {
+						ttsCache.put(utterance, audio.toURI().toURL().toString());
+					} else if (audioPath != null) {
+						audio = new File(audioPath + audio.toString());
+						if (audio.exists()) {
+							ttsCache.put(utterance, audioPath + audio.toString());
+						} else {
+							logger.warn("Cannot find and won't add audio file " + audio.toString());
+						}
+					} else {
+						logger.warn("Cannot find and won't add audio file " + audio.toString());
+					}
+			    }
+			} else {
+				logger.warn("Cannot find file " + utteranceMapFile);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	/** 
 	 * determines whether digital zeroes are sent during silence,
 	 * or whether the stream just stalls 
@@ -93,8 +143,37 @@ public class DispatchStream extends InputStream implements Configurable {
 	}
 	
 	public void playTTS(String tts, boolean skipQueue) {
-		InputStream audioStream = MaryAdapter.getInstance().text2audio(tts);
-		playStream(audioStream, skipQueue);
+		if (ttsCache.containsKey(tts)) {
+			playFile(ttsCache.get(tts), skipQueue);
+		} else {
+			try {
+				InputStream audioStream = MaryAdapter.getInstance().text2audio(tts);
+				if (audioStream.markSupported()) {
+					audioStream.mark(Integer.MAX_VALUE);
+				}
+				File tmpFile = File.createTempFile("ttsCache", ".wav");
+				tmpFile.deleteOnExit();
+				FileOutputStream fos = new FileOutputStream(tmpFile);
+				byte[] buffer = new byte[4096];
+				int len = audioStream.read(buffer);
+				while (len != -1) {
+					fos.write(buffer);
+					len = audioStream.read(buffer);
+				}
+				ttsCache.put(tts, tmpFile.toURI().toURL().toString());
+				if (audioStream.markSupported()) {
+					audioStream.reset();
+					playStream(audioStream, skipQueue);
+				} else {
+					playTTS(tts, skipQueue);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				logger.warn("Couldn't cache TTS for " + tts);
+				InputStream audioStream = MaryAdapter.getInstance().text2audio(tts);
+				playStream(audioStream, skipQueue);
+			}
+		}
 	}
 	
 	public void playSilence(int ms, boolean skipQueue) {

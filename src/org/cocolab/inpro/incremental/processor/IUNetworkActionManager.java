@@ -141,13 +141,7 @@ public class IUNetworkActionManager extends AudioActionManager {
 	}
 	
 	protected void playSystemUtterance(String string) {
-		if (utteranceMap.containsKey(string)) {
-			logger.info("Playing from file " + string);
-			this.audioDispatcher.playFile(utteranceMap.get(string).toString(), false);
-		} else {
-			logger.info("Playing via tts " + string);
-			this.audioDispatcher.playTTS(string, false);					
-		}
+		this.audioDispatcher.playTTS(string, false);					
 	}
 
 }
