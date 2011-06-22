@@ -33,18 +33,25 @@ public class IUNetworkToDOT extends PushBuffer {
 
 	/** String for dot executable */
 	@S4String(defaultValue = "/usr/local/bin/dot")
-	/** Property for ftring for dot executable */
+	/** Property for string for dot executable */
 	public final static String PROP_DOT = "dot";
 	/** The dot executable */
 	private File dot;
-	
+
+	/** String, comma-separated, for what iu types to display */
+	@S4String(defaultValue = "")
+	/** Property for string for iu types to display <br/> Beware that the iumodule that you hook this into must have links to the types you specify here (sll or grin). */
+	public final static String PROP_IU_TYPES = "iuTypes";
+	/** The string of comma separated iu types */
+	private List<String> iuTypes = new ArrayList<String>();
+
 	/** Boolean for determining whether to turn dot output into images */
 	@S4Boolean(defaultValue = false)
 	/** Property for boolean for determining whether to turn dot output into images */
 	public final static String PROP_RUN_DOT = "runDot";
 	/** Whether to turn dot output into images */
 	private boolean runDot;
-	
+
 	/** Boolean for whether to show dot output images */
 	@S4Boolean(defaultValue = false)
 	/** Property for boolean for whether to show dot output images */
@@ -71,6 +78,11 @@ public class IUNetworkToDOT extends PushBuffer {
 	JFrame f = new JFrame("IU Network");;
 	/** Label for display of output */
 	JLabel l;
+	
+	/** Offset of time for when the first dot file was written. */
+	private long offset;
+	/** Time for when the last dot file was written. */
+	private long last;
 
 	/**
 	 * Sets up the dot listener
@@ -88,6 +100,13 @@ public class IUNetworkToDOT extends PushBuffer {
 				this.outputFormat = "png";
 			}
 		}
+		if (!ps.getString(PROP_IU_TYPES).isEmpty()) {
+			String[] strings = ps.getString(PROP_IU_TYPES).split(",");
+			for (String string : strings) {
+				this.iuTypes.add(string);
+				System.err.println("Displaying " + string);
+			}
+		}
 		if (this.display) {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
@@ -103,6 +122,7 @@ public class IUNetworkToDOT extends PushBuffer {
 			});
 
 		}
+		this.offset = System.currentTimeMillis();
 	}
 
 	@Override
@@ -136,15 +156,18 @@ public class IUNetworkToDOT extends PushBuffer {
 							printGrin(iu, gr);
 						}
 						iuProcessingQueue.addAll(grin);
-						
 					}
 				}
 				processedIUs.add(iu);
 			}
 			printTail();
 			this.outStream.close();
+			long now = System.currentTimeMillis() - this.offset;
+			double r = 1.0 / (now-last)*1000;
+			last = now;
 			if (runDot)
 				runDot();
+			System.err.println("BATCH: /Users/okko/Desktop/Resources/ffmpeg -r " + r + " -f image2 -i '" + out.toString() + ".png' " + out.toString() + ".mov");
 		}
 	}
 	
@@ -158,23 +181,29 @@ public class IUNetworkToDOT extends PushBuffer {
 	}
 
 	private void printNode(IU iu) {
-		int id = iu.getID();
-		String label = iu.getClass().getSimpleName() + "\\n" + iu.toPayLoad();
-		outStream.println("\"" + id + "\" [label=\"" + label + "\" shape=box, style=rounded];");
-		this.addToIUCluster(iu);
+		if (this.iuTypes.isEmpty() || this.iuTypes.contains(iu.getClass().getSimpleName())) {
+			int id = iu.getID();
+			String label = iu.getClass().getSimpleName() + "\\n" + iu.toPayLoad();
+			outStream.println("\"" + id + "\" [label=\"" + label + "\" shape=box, style=rounded];");
+			this.addToIUCluster(iu);			
+		}
 	}
 	
 	private void printSLL(IU iu, IU sll) {
-		int id1 = iu.getID();
-		int id2 = sll.getID();
-		outStream.println("\"" + id1 + "\" -> \"" + id2 + "\" [style=dotted];");
+		if (this.iuTypes.isEmpty() || (this.iuTypes.contains(iu.getClass().getSimpleName()) && this.iuTypes.contains(sll.getClass().getSimpleName()))) {
+			int id1 = iu.getID();
+			int id2 = sll.getID();
+			outStream.println("\"" + id1 + "\" -> \"" + id2 + "\" [style=dotted];");
+		}
 	}
 
 	private void printGrin(IU iu, IU gr) {
-		int id1 = iu.getID();
-		int id2 = gr.getID();
-		boolean constraint = iu.getClass() == gr.getClass() ? true : false;
-		outStream.println("\"" + id1 + "\" -> \"" + id2 + "\" [constraint=" + constraint + "];");
+		if (this.iuTypes.isEmpty() || (this.iuTypes.contains(iu.getClass().getSimpleName()) && this.iuTypes.contains(gr.getClass().getSimpleName()))) {
+			int id1 = iu.getID();
+			int id2 = gr.getID();
+			boolean constraint = iu.getClass() == gr.getClass() ? true : false;
+			outStream.println("\"" + id1 + "\" -> \"" + id2 + "\" [constraint=" + constraint + "];");			
+		}
 	}
 	
 	private void addToIUCluster(IU iu) {
@@ -223,6 +252,7 @@ public class IUNetworkToDOT extends PushBuffer {
 				try {
 					String cmd = this.dot.toString() + " -O -T" + this.outputFormat + " " + this.out;
 					Process p = Runtime.getRuntime().exec(cmd);
+					System.err.println("BATCH: " + cmd);
 					if (this.display) {
 						p.waitFor();  // Not thread-safe!
 						File imageFile = new File(this.out + "." + this.outputFormat);

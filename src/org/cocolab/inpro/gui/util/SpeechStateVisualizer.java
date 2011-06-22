@@ -98,7 +98,7 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 				public void run() {
 					speechIndicator.setIcon();
 					f = new JFrame("speech estimation");
-					f.setLocation(440, 100);
+					f.setLocation(500, 100);
 					JPanel p = new JPanel(new BorderLayout());
 					p.add(speechIndicator, BorderLayout.CENTER);
 					p.add(recordButton, BorderLayout.SOUTH);

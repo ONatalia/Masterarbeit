@@ -283,7 +283,41 @@ public class AVM {
 		}
 		return avps;
 	}
-	
+
+	/**
+	 * Gets an ArrayList of all AVPairs attributed to this AVM, including null ones.
+	 * If the attribute's value is another (list of) AVM(s), it returns those as pairs.
+	 * @return avps - an ArrayList&lt;AVPair&gt;.
+	 */
+	@SuppressWarnings("unchecked")
+	public ArrayList<AVPair> getDeepAVPairs() {
+		ArrayList<AVPair> avps = new ArrayList<AVPair>();
+		for (String attribute : this.attributes.keySet()) {
+			Object o = this.attributes.get(attribute);
+			if (o instanceof AVM) {
+				for (AVPair avp : ((AVM) o).getDeepAVPairs()) {
+					if (avp.getValue() != null && avp.getAttribute() != null)
+						if (!avps.contains(avp))
+							avps.add(avp);
+				}
+			} else if (o instanceof ArrayList) {
+				for (AVM avm : ((ArrayList<AVM>) o)) {
+					for (AVPair avp : avm.getDeepAVPairs()) {
+						if (avp.getValue() != null && avp.getAttribute() != null)
+							if (!avps.contains(avp))
+								avps.add(avp);
+					}
+				}
+			} else {
+				AVPair avp = new AVPair(attribute, this.attributes.get(attribute));
+				if (avp.getValue() != null && avp.getAttribute() != null)
+					if (!avps.contains(avp))
+						avps.add(avp);
+			}
+		}
+		return avps;
+	}
+
 	/**
 	 * Returns the type of this AVM.
 	 * @return this.type

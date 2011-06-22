@@ -267,6 +267,50 @@ public class AVMUtil {
 	}
 
 	/**
+	 * Builds and returns a readable string representation of this AVMUtil's compose list.
+	 * @return string representation of this AVMUtil's compose list.
+	 */
+	public String composeListToString() {
+		StringBuilder sb = new StringBuilder();
+		if (!this.composeList.isEmpty()) {
+			for (AVM avm : this.composeList) {
+				if (!avm.isEmpty()) {
+					sb.append("{" + avm.getType() + "\n");
+					for (AVPair avp : avm.getDeepAVPairs()) {
+						sb.append("   " + avp.toString() + "\n");
+					}
+					sb.append("}\n");
+				}
+			}			
+		} else {
+			sb.append("<empty>\n");
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * Builds and returns a readable string representation of this AVMUtil's resolve list.
+	 * @return string representation of this AVMUtil's resolve list.
+	 */
+	public String resolveListToString() {
+		StringBuilder sb = new StringBuilder();
+		if (!this.resolvedList.isEmpty()) {
+			for (AVM avm : this.resolvedList) {
+				if (!avm.isEmpty()) {
+					sb.append("{" + avm.getType() + "\n");
+					for (AVPair avp : avm.getDeepAVPairs()) {
+						sb.append("   " + avp.toString() + "\n");
+					}
+					sb.append("}\n");
+				}
+			}			
+		} else {
+			sb.append("<empty>\n");
+		}
+		return sb.toString();
+	}
+
+	/**
 	 * Command line test utility.
 	 * Type in AVPairs "attribute:value" to test composition.
 	 * Type 'exit' to quit and 'new' to restart.

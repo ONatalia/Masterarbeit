@@ -349,17 +349,19 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 					iu.removeGrin(this.nextInput);
 					iu.revoke();
 					revoked.add(iu);
+					ContribIU unground = new ContribIU();
 					for (IU other : iu.groundedIn()) {
-						if (other instanceof SemIU) {
-							// reintegrate by assigning old input to nextInput and restarting rules.
+						if (other instanceof ContribIU) {
+							// remove links to here
+							unground = (ContribIU) other;
+						} else if (other instanceof SemIU) {
+							// reintegrate by assigning old input to nextInput and restart rules.
 							this.nextInput = (SemIU) other;
 							restart = true;
-						} else if (other instanceof ContribIU) {
-							// remove links here
-							System.err.println("Ungrounding " + iu.toPayLoad() + " from " + other.toPayLoad());
-							iu.removeGrin(other);
 						}
 					}
+					iu.removeGrin(unground);						
+					System.err.println("Next input = " + this.nextInput.toPayLoad());
 				} else if (iu.getContribution().equals("clarify:true")) {
 					iu.removeGrin(this.nextInput);
 					iu.revoke();
@@ -764,21 +766,16 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	public String toString() {
 		String ret;
 		ret  = "-INFORMATION STATE------\n";
-		ret += "  Next Input:\n\t";
-		ret += this.nextInput != null && this.nextInput.isRevoked() ? "(revoked) " : "(added) ";
-		ret += this.nextInput == null ? "none\n" : this.nextInput.toString() + "\n";
 		ret += "  Contributions:\n";
 		for (ContribIU iu : this.contributions) {
 			ret += "\t" + iu.toString() + "\n";
+			ret += "\tGrounded-in Input:\n";
+			for (IU sem : iu.groundedIn()) {
+				if (sem instanceof SemIU) {
+					ret += "\t\t" + sem.toString() + "\n";
+				}
+			}
 		}
-		ret += "    Focus Contribution:\n";
-		ret += "\t" + this.focus.toString() + "\n";
-		ret += "  Current Contribution:\n";
-		ret += "\t" + this.currentContrib.toString() + "\n";
-		ret += "  Integration Canditates:\n";
-		ret += "\t" + this.integrateList.toString() + "\n";
-		ret += "  Next Output:\n\t";
-		ret += this.nextOutput == null ? "none\n" : this.nextOutput.toString() + "\n";
 		return ret;
 	}
 	

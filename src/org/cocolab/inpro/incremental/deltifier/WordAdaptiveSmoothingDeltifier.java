@@ -26,8 +26,8 @@ import edu.cmu.sphinx.util.props.S4String;
 public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 	
 	@S4String(defaultValue="drop")
-	public final static String PROP_SAFE_WORD = "safeWord";
-	public String safeWord;
+	public final static String PROP_SAFE_WORDS = "safeWords";
+	public List<String> safeWords = new ArrayList<String>();
 
 	@S4String(defaultValue="stop")
 	public final static String PROP_URGENT_WORD = "urgentWord";
@@ -35,7 +35,10 @@ public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
-		safeWord = (String) ps.getString(PROP_SAFE_WORD);
+		for (String s : ((String) ps.getString(PROP_SAFE_WORDS)).split(",")) {
+			System.err.println("Adding safe word " + s);
+			safeWords.add(s);
+		}
 		urgentWord = (String) ps.getString(PROP_URGENT_WORD);
 	}
 
@@ -61,7 +64,8 @@ public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 	protected boolean isStaySafeWord(EditMessage<WordIU> edit) {
 		return (edit.getIU().getAVPairs() != null && 
 				edit.getIU().getAVPairs().size() > 0 &&
-				edit.getIU().getAVPairs().get(0).getValue().equals(this.safeWord));
+				this.safeWords.contains(edit.getIU().getAVPairs().get(0).getValue()));
+//				edit.getIU().getAVPairs().get(0).getValue().equals(this.safeWord));
 	}
 	
 	/**
