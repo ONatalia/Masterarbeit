@@ -71,7 +71,7 @@ public abstract class IUModule extends PushBuffer {
 	public void hypChange(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		leftBufferUpdate(ius, edits);
-		rightBuffer.notify(iulisteners);		
+		rightBuffer.notify(iulisteners);
 	}
 
 	/* * * utility methods * * */
@@ -144,6 +144,8 @@ public abstract class IUModule extends PushBuffer {
 		}
 		
 		public void notify(List<PushBuffer> listeners) {
+			if (listeners == null)
+				return;
 			for (PushBuffer listener : listeners) {
 				notify(listener);
 			}
