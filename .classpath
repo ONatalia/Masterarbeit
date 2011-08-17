@@ -28,20 +28,23 @@
 	<classpathentry kind="lib" path="/opt/java/WSJ_8gau_13dCep_8kHz_31mel_200Hz_3500Hz.jar"/>
 	<classpathentry kind="lib" path="/opt/java/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="lib" path="/opt/java/KCoRS_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-	<classpathentry kind="lib" path="/usr/share/java/vecmath1.2.jar">
+	<classpathentry kind="lib" path="/opt/java/vecmath1.2.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/usr/share/doc/libvecmath1.2-java/api/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="/opt/java/antlr-oaa.jar"/>
-	<classpathentry kind="lib" path="/usr/share/java/log4j-1.2.jar"/>
+	<classpathentry kind="lib" path="/opt/java/log4j-1.2.7.jar"/>
 	<classpathentry kind="lib" path="/opt/java/dom4j-1.5.2.jar"/>
-	<classpathentry kind="lib" path="/usr/share/java/backport-util-concurrent-2.2.jar"/>
+	<classpathentry kind="lib" path="/opt/java/backport-util-concurrent.jar"/>
 	<classpathentry kind="lib" path="/usr/share/java/junit.jar"/>
 	<classpathentry kind="lib" path="/opt/java/maryclient.jar" sourcepath="/opt/pkg/mary/java/de"/>
 	<classpathentry kind="lib" path="/opt/java/voxforgeDE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="lib" path="res/broker.jar"/>
 	<classpathentry kind="lib" path="/opt/java/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="lib" path="res/jrtp_1.0a.jar"/>
+	<classpathentry kind="lib" path="/opt/java/jgraph.jar"/>
+	<classpathentry kind="lib" path="/opt/java/mary-common.jar"/>
+	<classpathentry kind="lib" path="/opt/java/mary-de.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

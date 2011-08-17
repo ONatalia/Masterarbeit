@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -70,30 +71,25 @@ public class DispatchStream extends InputStream implements Configurable {
 			if (url.toURI().isOpaque()) {
 				url = new URL(new File(".").toURI().toURL(), url.toString());
 			}
-			File file = new File(url.toURI());
-			if (file.exists()) {
-				logger.info("Loading utterance map.");
-				BufferedReader br = new BufferedReader(new FileReader(file));
-				String line;
-				while ((line = br.readLine()) != null) {
-					String utterance = line.split(",")[0];
-					File audio = new File(line.split(",")[1]);
+			BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+			logger.info("Loading utterance map.");
+			String line;
+			while ((line = br.readLine()) != null) {
+				String utterance = line.split(",")[0];
+				File audio = new File(line.split(",")[1]);
+				if (audio.exists()) {
+					ttsCache.put(utterance, audio.toURI().toURL().toString());
+				} else if (audioPath != null) {
+					audio = new File(audioPath + audio.toString());
 					if (audio.exists()) {
-						ttsCache.put(utterance, audio.toURI().toURL().toString());
-					} else if (audioPath != null) {
-						audio = new File(audioPath + audio.toString());
-						if (audio.exists()) {
-							ttsCache.put(utterance, audioPath + audio.toString());
-						} else {
-							logger.warn("Cannot find and won't add audio file " + audio.toString());
-						}
+						ttsCache.put(utterance, audioPath + audio.toString());
 					} else {
 						logger.warn("Cannot find and won't add audio file " + audio.toString());
 					}
-			    }
-			} else {
-				logger.warn("Cannot find file " + utteranceMapFile);
-			}
+				} else {
+					logger.warn("Cannot find and won't add audio file " + audio.toString());
+				}
+		    }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
