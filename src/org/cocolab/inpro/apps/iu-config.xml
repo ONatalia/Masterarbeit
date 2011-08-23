@@ -70,6 +70,8 @@
     
     <component name="echoDialogueManager" type="org.cocolab.inpro.incremental.processor.EchoDialogueManager">
         <property name="actionManager" value="audioActionManager"/>
+        <property name="floorTracker" value="iuBasedFloorTracker"/>
+        <property name="dispatchStream" value="dispatchStream" />
         <propertylist name="hypChangeListeners">
             <item>audioActionManager</item>
         </propertylist>
@@ -88,6 +90,7 @@
     
     <component name="audioActionManager" type="org.cocolab.inpro.incremental.processor.AudioActionManager">
         <property name="dispatchStream" value="dispatchStream"/>
+        <property name="floorTracker" value="iuBasedFloorTracker"/>
         <propertylist name="amListeners">
             <item>echoDialogueManager</item>
         </propertylist>
