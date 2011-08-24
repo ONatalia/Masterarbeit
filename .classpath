@@ -1,50 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="lib" path="/usr/lib/jvm/java-6-sun/jre/lib/rt.jar" sourcepath="/usr/lib/jvm/java-6-sun/src.zip">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/usr/local/share/doc/sun-java6/docs/api/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/mary3/java-diff.jar"/>
+	<classpathentry kind="lib" path="lib/mary3/maryclient.jar"/>
+	<classpathentry kind="lib" path="lib/oaa2/antlr-oaa.jar"/>
+	<classpathentry kind="lib" path="lib/oaa2/oaa2.jar"/>
+	<classpathentry kind="lib" path="lib/weka.jar"/>
+	<classpathentry kind="lib" path="lib/drej.jar"/>
+	<classpathentry kind="lib" path="lib/sphinx4/jsapi.jar"/>
+	<classpathentry kind="lib" path="lib/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+	<classpathentry kind="lib" path="lib/mary4/commons-collections-3.2.1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/mary4/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/mary4/commons-io-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/mary4/commons-lang-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/mary4/freetts-de.jar"/>
+	<classpathentry kind="lib" path="lib/mary4/freetts.jar"/>
+	<classpathentry kind="lib" path="lib/mary4/jtok.jar"/>
+	<classpathentry kind="lib" path="lib/mary4/mary-common.jar"/>
+	<classpathentry kind="lib" path="lib/mary4/mary-de.jar"/>
+	<classpathentry kind="lib" path="lib/mary4/mary-mbrola.jar"/>
+	<classpathentry kind="lib" path="lib/mary4/maxent-2.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/mary4/opennlp-tools-1.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/sphinx4/sphinx4.jar"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/opt/java/sphinx4.jar" sourcepath="/opt/java/sphinx4.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/opt/pkg/sphinx/doc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/opt/java/oaa2.jar" sourcepath="/home/timo/inpro/oaa2.3.2/src/oaalib/java/src">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/opt/pkg/oaa/runtime/agentlib/docs/api"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/opt/java/jmf.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/opt/pkg/jmf/doc/api/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/opt/java/weka.jar" sourcepath="/opt/pkg/weka/weka-src.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/opt/pkg/weka/doc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/opt/java/drej.jar"/>
-	<classpathentry kind="lib" path="/opt/java/RM1_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-	<classpathentry kind="lib" path="/opt/java/TIDIGITS_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-	<classpathentry kind="lib" path="/opt/java/WSJ_8gau_13dCep_8kHz_31mel_200Hz_3500Hz.jar"/>
-	<classpathentry kind="lib" path="/opt/java/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-	<classpathentry kind="lib" path="/opt/java/KCoRS_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-	<classpathentry kind="lib" path="/opt/java/vecmath1.2.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/usr/share/doc/libvecmath1.2-java/api/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="/opt/java/antlr-oaa.jar"/>
-	<classpathentry kind="lib" path="/opt/java/log4j-1.2.7.jar"/>
-	<classpathentry kind="lib" path="/opt/java/dom4j-1.5.2.jar"/>
-	<classpathentry kind="lib" path="/opt/java/backport-util-concurrent.jar"/>
-	<classpathentry kind="lib" path="/usr/share/java/junit.jar"/>
-	<classpathentry kind="lib" path="/opt/java/maryclient.jar" sourcepath="/opt/pkg/mary/java/de"/>
-	<classpathentry kind="lib" path="/opt/java/voxforgeDE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-	<classpathentry kind="lib" path="res/broker.jar"/>
-	<classpathentry kind="lib" path="/opt/java/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-	<classpathentry kind="lib" path="res/jrtp_1.0a.jar"/>
-	<classpathentry kind="lib" path="/opt/java/jgraph.jar"/>
-	<classpathentry kind="lib" path="/opt/java/mary-common.jar"/>
-	<classpathentry kind="lib" path="/opt/java/mary-de.jar"/>
+	<classpathentry kind="lib" path="lib/jrtp_1.0a.jar"/>
+	<classpathentry kind="lib" path="lib/srilmtbremake.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/jflac.jar"/>
+	<classpathentry kind="lib" path="/usr/share/java/log4j-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
