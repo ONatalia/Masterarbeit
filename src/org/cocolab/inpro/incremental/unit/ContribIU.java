@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.cocolab.inpro.nlu.AVPair;
 
-import edu.emory.mathcs.backport.java.util.Collections;
+import java.util.Collections;
 
 /**
  * A contribution to larger dialogue/discourse.<br/>
@@ -50,7 +50,6 @@ public class ContribIU extends IU {
 	 * @param contribution AVPair describing this contribution
 	 * @param clarify boolean denoting if this contribution should be disambiguated
 	 */
-	@SuppressWarnings("unchecked")
 	public ContribIU(IU sll, IU grin, AVPair contribution, boolean clarify, boolean overwrite) {
 		super(sll, Collections.singletonList(grin));
 		this.contribution = contribution;
