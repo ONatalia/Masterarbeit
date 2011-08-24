@@ -18,15 +18,31 @@ import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DataProcessingException;
 import edu.cmu.sphinx.frontend.DoubleData;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
+import edu.cmu.sphinx.util.props.PropertyException;
+import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.S4Boolean;
 
 public class Monitor extends BaseDataProcessor {
 
+	@S4Boolean(defaultValue = false)
+	public final static String PROP_MUTE = "mute";
+	
+	private boolean mute = false;
+	
     SourceDataLine line;
 	
+    @Override
+    public void newProperties(PropertySheet ps) throws PropertyException {
+    	super.newProperties(ps);
+    	mute = ps.getBoolean(PROP_MUTE);
+    }
+    
 	@Override
 	public void initialize() {
 		initLogger();
-		setupSpeakers();
+		if (!mute) {
+			setupSpeakers();
+		}
 	}
 	
 	/** setup output to speakers */
@@ -56,7 +72,7 @@ public class Monitor extends BaseDataProcessor {
 	@Override
 	public Data getData() throws DataProcessingException {
 		Data d = getPredecessor().getData();
-		if (d instanceof DoubleData) {
+		if (!mute && (d instanceof DoubleData)) {
 			DoubleData dd = (DoubleData) d;
 			addData(dd.getValues());
 		}
