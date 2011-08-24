@@ -79,7 +79,7 @@
         <property name="recognizer" value="recognizer"/>
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
-        <property name="baseData" value="${baseData}"/>
+     <!--   <property name="baseData" value="${baseData}"/> -->
         <propertylist name="hypChangeListeners">
     		<item>hypViewer</item>
     		<item>tedNotifier</item>
@@ -334,8 +334,9 @@
         </propertylist>
     </component>
  
-    <component name="microphone" type="org.cocolab.inpro.sphinx.frontend.Microphone">
+    <component name="microphone" type="edu.cmu.sphinx.frontend.util.Microphone">
         <property name="closeBetweenUtterances" value="false"/>
+        <property name="bufferSize" value="960" /> <!-- 30ms -->
     </component>
  
     <component name="streamDataSource" type="edu.cmu.sphinx.frontend.util.StreamDataSource">

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import org.cocolab.inpro.audio.DispatchStream;
@@ -83,6 +84,18 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		if (edit != null && edit.getType().equals(EditType.ADD) && !edit.getIU().isSilence()) {
 			fullInput = new ArrayList<WordIU>(committedWords);
 			fullInput.addAll(inputWords);
+			StringBuilder wordsSoFar = new StringBuilder();
+			for (Iterator<WordIU> wIt = fullInput.iterator(); wIt.hasNext();) {
+				WordIU word = wIt.next();
+				if (!word.isSilence()) {
+					wordsSoFar.append(word.toPayLoad());
+					if (wIt.hasNext()) {
+						wordsSoFar.append(" ");
+					}
+				}
+			}
+			logger.info("new installment " + wordsSoFar.toString());
+			fullInstallment = new SysInstallmentIU(wordsSoFar.toString());
 			fmatch = fullInstallment.fuzzyMatching(fullInput, 0.2, 2);
 			if (fmatch.matches() && shouldFire()) {
 				doComplete();
@@ -166,7 +179,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		completedTTSPrefix.remove(currentlyTTSedWord);
 		double  ttsDuration = getDurationWithoutPauses(completedTTSPrefix);
 		double userDuration = getDurationWithoutPauses(completedUserPrefix);
-		return userDuration / ttsDuration; 
+		return userDuration / ttsDuration;
 	}
 
 	/** time spanned by all non-silent words */
@@ -193,7 +206,6 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		@Override
 		public void newCompletion(double estimatedStartTime,
 				SysInstallmentIU completion) {
-			// TODO Auto-generated method stub
 			WordIU nextWord = completion.getWords().get(0);
 			double nextWordEndEstimate = estimatedStartTime + nextWord.duration();
 			ce.newOnsetResult(lastElement(fullInput), estimatedStartTime, currentFrame, nextWord, nextWordEndEstimate);

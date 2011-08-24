@@ -12,8 +12,8 @@
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
-           <item>${dialogueManager}</item>
-           <item>iuBasedFloorTracker</item>
+<!--           <item>${dialogueManager}</item> 
+           <item>iuBasedFloorTracker</item> -->
 <!--
            <item>iuBasedFloorTracker</item>
            <item>${dialogueManager}</item>

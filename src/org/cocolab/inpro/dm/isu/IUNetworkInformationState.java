@@ -3,7 +3,6 @@ package org.cocolab.inpro.dm.isu;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.cocolab.inpro.dm.acts.AbstractDialogueAct;
 import org.cocolab.inpro.dm.acts.ClarifyDialogueAct;
 import org.cocolab.inpro.dm.acts.GroundDialogueAct;
@@ -58,9 +57,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	private DialogueActIU nextOutput;
 	/** A list of edit messages produced as a result of (all previous and present) changes to the IS. */
 	private List<EditMessage<DialogueActIU>> outputEdits = new ArrayList<EditMessage<DialogueActIU>>();
-	/** A logger */
-	private Logger logger;
-
+	
 	/**
 	 * Generic constructor for an IUNetworkInformationState
 	 */
@@ -118,14 +115,6 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		}
 	}
 
-	/** 
-	 * Sets the logger
-	 * @param logger the logger to log to.
-	 */
-	public void setLogger(Logger logger) {
-		this.logger = logger;
-	}
-	
 	/**
 	 * Setter method for the IS's next input to process.
 	 * @param word the next word input to process.

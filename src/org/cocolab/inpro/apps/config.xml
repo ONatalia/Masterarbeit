@@ -18,5 +18,6 @@
 	&frontend;
     &iuconfig;
 
+<!--property name="logLevel" value="FINE"/-->
 
 </config>

@@ -61,7 +61,6 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 
 	public void setLogger(Logger logger) {
 		this.logger = logger;
-		this.is.setLogger(this.logger);
 	}
 	
 	/**

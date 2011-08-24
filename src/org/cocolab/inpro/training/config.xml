@@ -36,7 +36,7 @@
     <property name="deltifier" value="none"/>
     
     <property name="frontend" value="frontend"/>
-    <property name="baseData" value="baseData"/>
+    <!--property name="baseData" value="baseData"/-->
     <!-- The minimum amount of time in speech (in milliseconds) to be considered as utterance start -->
     <property name="startSpeech" value="200"/>
     <!-- The amount of time in silence (in milliseconds) to be considered as utterance end -->
@@ -55,7 +55,7 @@
     <component name="recognizer" type="edu.cmu.sphinx.recognizer.Recognizer">
         <property name="decoder" value="decoder"/>
         <propertylist name="monitors">
-        	<item>threadingListener</item>
+        	<item>currentHypothesis</item>
         </propertylist>
     </component>
 
@@ -75,7 +75,7 @@
         <property name="recognizer" value="recognizer"/>
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
-        <property name="baseData" value="${baseData}"/>
+        <!--property name="baseData" value="${baseData}"/-->
         <propertylist name="hypChangeListeners">
     		<item>hypViewer</item>
         </propertylist>
