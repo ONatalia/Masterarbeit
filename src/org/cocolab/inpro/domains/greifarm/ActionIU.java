@@ -99,7 +99,7 @@ public class ActionIU extends IU {
 	// this tries to resolve CONTINUE and REVERSE, leaving only explicit directions
 	public ActionType realizedDirection() {
 		if (type.isImplicitDirection()) {
-			if (sameLevelLink != null) {
+			if (previousSameLevelLink != null) {
 				if (type == ActionType.CONTINUE) {
 					return predecessor().realizedDirection();
 				} else { // REVERSE
@@ -107,7 +107,7 @@ public class ActionIU extends IU {
 				}
 			} 
 		} else if (type == ActionType.STOP) {
-			if (sameLevelLink != null) {
+			if (previousSameLevelLink != null) {
 				return predecessor().realizedDirection();
 			}
 		}
@@ -115,7 +115,7 @@ public class ActionIU extends IU {
 	}
 	
 	private ActionIU predecessor() {
-		return (ActionIU) sameLevelLink;
+		return (ActionIU) previousSameLevelLink;
 	}
 	
 	public ActionType getType() {

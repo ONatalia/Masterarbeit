@@ -23,7 +23,8 @@ public abstract class IU implements Comparable<IU> {
 	private static int IU_idCounter = 0;
 	private final int id;
 
-	protected IU sameLevelLink;
+	protected IU previousSameLevelLink;
+	protected List<IU> nextSameLevelLinks;
 	
 	protected List<IU> groundedIn;
 	protected List<IU> grounds; 
@@ -51,7 +52,10 @@ public abstract class IU implements Comparable<IU> {
 		if (deepSLL && (sll != null)) {
 			connectSLL(sll);
 		} else {
-			this.sameLevelLink = sll;
+			this.previousSameLevelLink = sll;
+			if (sll != null) {
+				sll.addNextSameLevelLink(this);
+			}
 		}
 	}
 	
@@ -72,7 +76,7 @@ public abstract class IU implements Comparable<IU> {
 	public IU(IU sll) {
 		this(sll, null);
 	}
-	
+		
 	/**
 	 * this constructor must be called in order to acquire an IU with a valid ID. 
 	 */
@@ -103,19 +107,32 @@ public abstract class IU implements Comparable<IU> {
 	}
 
 	public void setSameLevelLink(IU link) {
-		if (sameLevelLink != null) {
+		if (previousSameLevelLink != null) {
 			throw new RuntimeException("SLL may not be changed");
 		} else {
-			sameLevelLink = link;
+			previousSameLevelLink = link;
+			if (link != null) {
+				link.addNextSameLevelLink(this);
+			}
 		}
 	}
 	
-	public IU getSameLevelLink() {
-		return sameLevelLink;
+	public void addNextSameLevelLink(IU iu) {
+		if (nextSameLevelLinks == null)
+			nextSameLevelLinks = new ArrayList<IU>();
+		nextSameLevelLinks.add(iu);
 	}
-	
+
+	public IU getSameLevelLink() {
+		return previousSameLevelLink;
+	}
+
+	public List<IU> getNextSameLevelLink() {
+		return nextSameLevelLinks;
+	}
+
     public void connectSLL(IU link) {
-    	if (sameLevelLink == null) {
+    	if (previousSameLevelLink == null) {
     		setSameLevelLink(link);
     		if (link != null && groundedIn != null) {
     			IU firstGrounding = groundedIn.get(0);
@@ -318,8 +335,8 @@ public abstract class IU implements Comparable<IU> {
 		sb.append(this.toString());
 		sb.append("\n  Committed: " + this.isCommitted());
 		sb.append("\n  SLL: ");
-		if (sameLevelLink != null) {
-			sb.append(sameLevelLink.toString());
+		if (previousSameLevelLink != null) {
+			sb.append(previousSameLevelLink.toString());
 		} else {
 			sb.append("none");
 		}

@@ -130,7 +130,7 @@ public class ContribIU extends IU {
 	}
 
 	public ContribIU getPrevious() {
-		return (ContribIU) this.sameLevelLink;
+		return (ContribIU) this.previousSameLevelLink;
 	}
 
 	public ContribIU getNextUp() {

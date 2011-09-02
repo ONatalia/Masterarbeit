@@ -28,7 +28,7 @@ public class TextualWordIU extends WordIU {
 	
 	@Override
 	public double startTime() {
-		return (sameLevelLink == null) ? Double.NaN : sameLevelLink.endTime();
+		return (previousSameLevelLink == null) ? Double.NaN : previousSameLevelLink.endTime();
 	}
 	
 	/**
