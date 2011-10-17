@@ -32,7 +32,7 @@ import edu.cmu.sphinx.util.props.S4Boolean;
 public class IUNetworkToDOT extends PushBuffer {
 
 	/** String for dot executable */
-	@S4String(defaultValue = "/usr/local/bin/dot")
+	@S4String(defaultValue = "/usr/bin/dot")
 	/** Property for string for dot executable */
 	public final static String PROP_DOT = "dot";
 	/** The dot executable */

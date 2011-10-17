@@ -1,0 +1,187 @@
+/**
+ * 
+ */
+package org.cocolab.inpro.irmrsc.parser;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
+import java.util.ListIterator;
+
+import org.cocolab.inpro.irmrsc.simplepcfg.Production;
+import org.cocolab.inpro.irmrsc.simplepcfg.Symbol;
+
+// TODO:
+// - copy constructor
+// - funktionalität in kleine methoden auslagern (z.B. popTop, pushSyms, addDerive...? 
+
+/**
+ * @author andreas
+ *
+ */
+public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
+	
+	private List<String> mDerivation; // sequence of rules used
+	private Deque<Symbol> mStack; // sequence of nonterminal symbols that need to be accounted for
+	private double mProbability; // product of all probabilities of rules used in mDerivation
+	private double mFigureOfMerit; // product of mProbability and a lookahead probability 
+	private List<String> remainingString;
+	
+	public CandidateAnalysis(List<String> mDerivation,
+			Deque<Symbol> mStack, double mProbability, double mFigureOfMerit,
+			List<String> remainingString) {
+		this.mDerivation = new ArrayList<String>(mDerivation);
+		this.mStack = new ArrayDeque<Symbol>(mStack);
+		this.mProbability = mProbability;
+		this.mFigureOfMerit = mFigureOfMerit;
+		this.remainingString = new ArrayList<String>(remainingString);
+	}
+	
+	public CandidateAnalysis(Deque<Symbol> mStack) {
+		this.mDerivation = new ArrayList<String>();
+		this.mStack = new ArrayDeque<Symbol>(mStack);
+		this.mProbability = 1.0;
+		this.mFigureOfMerit = 1.0;
+		this.remainingString = new ArrayList<String>();
+	}
+	
+	public CandidateAnalysis(CandidateAnalysis ca) {
+		this.mDerivation = new ArrayList();
+		for (String rule : ca.mDerivation) this.mDerivation.add(rule);
+		this.mStack = new ArrayDeque<Symbol>();
+		for (Symbol s : ca.mStack) this.mStack.addLast(new Symbol(s));
+		this.mProbability = ca.mProbability;
+		this.mFigureOfMerit = ca.mFigureOfMerit;
+		this.remainingString = new ArrayList<String>();
+		for (String s : ca.remainingString) this.remainingString.add(s); 
+	}
+	
+	public CandidateAnalysis expand(Production p) {
+		// obsolete test
+		Symbol LHS = p.getLHS();
+		if (! (LHS.equals(mStack.peek()))) {
+			return null;
+		}
+		// prepare derivation
+		List<String> newDerivation = new ArrayList<String>(mDerivation);
+		newDerivation.add(p.getID());
+		// prepare stack
+		Deque<Symbol> newStack = new ArrayDeque<Symbol>(mStack);
+		newStack.pop();
+		List<Symbol> RHS = p.getRHS();
+		ListIterator<Symbol> i = RHS.listIterator(RHS.size());
+		while(i.hasPrevious()) {
+			newStack.push(i.previous());
+		}
+		// prepare weights
+		double newProbability = mProbability * p.getProbability();
+		double newFigureOfMerit = mFigureOfMerit; // TODO: insert calculation here
+		// prepare rest
+		List<String> newRemainingString =  new ArrayList<String>(remainingString);
+		// build object
+		CandidateAnalysis ca = new CandidateAnalysis(newDerivation, newStack, newProbability, newFigureOfMerit, newRemainingString);
+		return ca;
+	}
+	
+	public CandidateAnalysis deletion(Symbol nextToken) {
+		Symbol deletionSymbol = new Symbol("("+nextToken.getSymbol()+")");
+		return match(deletionSymbol);
+	}
+	
+	public CandidateAnalysis match(Symbol nextToken) {
+		// obsolete test
+//		if (! (nextToken.equals(mStack.peek()))) {
+//			return null;
+//		}
+		// prepare derivation
+		List<String> newDerivation =  new ArrayList<String>(mDerivation);
+		newDerivation.add(nextToken.getSymbol());
+		// prepare stack
+		Deque<Symbol> newStack = new ArrayDeque<Symbol>(mStack);
+		newStack.pop();
+		// prepare weights
+		double newProbability = mProbability; // TODO: there should be no terminal probability, right?
+		double newFigureOfMerit = mFigureOfMerit; // TODO: insert calculation here
+		// prepare rest
+		List<String> newRemainingString = new ArrayList<String>(remainingString);
+		// build object
+		CandidateAnalysis ca = new CandidateAnalysis(newDerivation, newStack, newProbability, newFigureOfMerit, newRemainingString);
+		return ca;
+	}
+
+	public boolean isComplete() {
+		return mStack.isEmpty();
+	}
+	
+	public Symbol getTopSymbol() {
+		return mStack.peek();
+	}
+	
+	/**
+	 * @return the mProbability
+	 */
+	public double getProbability() {
+		return mProbability;
+	}
+	
+	public void degradeProbability(double f) {
+		mProbability *= f;
+	}
+
+	/**
+	 * @return the mFigureOfMerit
+	 */
+	public double getFigureOfMerit() {
+		return mFigureOfMerit;
+	}
+
+	public int getNumberOfInsertions() {
+		int i = 0;
+		for (String rule : mDerivation) {
+			if (rule.equals("+")) {
+				i++;
+			}
+		}
+		return i;
+	}
+	
+	public int getNumberOfDeletions() {
+		int i = 0;
+		for (String rule : mDerivation) {
+			if (rule.equals("()")) {
+				i++;
+			}
+		}
+		return i;
+	}
+	
+	@Override
+    public int compareTo(CandidateAnalysis y) {
+		if(mProbability < y.getProbability()) {
+			return 1;
+		}
+		if(mProbability > y.getProbability()) {
+			return -1;
+		}
+		return 0;
+    }
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "[D=" + mDerivation
+				//+ ", mFigureOfMerit=" + mFigureOfMerit
+				+ ", " + mProbability
+				+ "%, S=" + mStack + "]"; 
+				//", remainingString=" + remainingString + "]";
+	}
+
+
+	
+	
+}
+
+
