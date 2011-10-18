@@ -9,11 +9,12 @@ public class CandidateAnalysisIU extends IU {
 
 	private CandidateAnalysis candidateAnalysis;
 
+	// this could better be a CAIU with the usual first CA: with stack(startsymbol)
 	public static final CandidateAnalysisIU FIRST_CA_IU = new CandidateAnalysisIU();
 	
 	@SuppressWarnings("unchecked")
 	public CandidateAnalysisIU() {
-		this(FIRST_CA_IU, Collections.EMPTY_LIST, null);
+		this(FIRST_CA_IU, Collections.EMPTY_LIST, null);		
 	}
 
 	public CandidateAnalysisIU(IU sll, List<IU> groundedIn, CandidateAnalysis CandidateAnalysis) {

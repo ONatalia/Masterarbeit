@@ -1,7 +1,6 @@
 package org.cocolab.inpro.incremental.processor;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,7 +13,6 @@ import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.TagIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
-import org.cocolab.inpro.nlu.AVMUtil;
 import org.cocolab.inpro.nlu.AVPair;
 import org.cocolab.inpro.nlu.AVPairMappingUtil;
 

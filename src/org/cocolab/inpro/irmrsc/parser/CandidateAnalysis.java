@@ -22,16 +22,20 @@ import org.cocolab.inpro.irmrsc.simplepcfg.Symbol;
  */
 public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	
-	private List<String> mDerivation; // sequence of rules used
+	private List<String> mDerivation; // sequence of all rules used
+	private List<String> mLastDerive; // last incremental part of the derivation
+	private CandidateAnalysis mAntecedent; // former analysis of which this is an extension
 	private Deque<Symbol> mStack; // sequence of nonterminal symbols that need to be accounted for
 	private double mProbability; // product of all probabilities of rules used in mDerivation
 	private double mFigureOfMerit; // product of mProbability and a lookahead probability 
 	private List<String> remainingString;
 	
-	public CandidateAnalysis(List<String> mDerivation,
+	public CandidateAnalysis(List<String> mDerivation, List<String> mLastDerive, CandidateAnalysis mAntecedent,
 			Deque<Symbol> mStack, double mProbability, double mFigureOfMerit,
 			List<String> remainingString) {
 		this.mDerivation = new ArrayList<String>(mDerivation);
+		this.mLastDerive = new ArrayList<String>(mLastDerive);
+		this.mAntecedent = mAntecedent; // link not copy
 		this.mStack = new ArrayDeque<Symbol>(mStack);
 		this.mProbability = mProbability;
 		this.mFigureOfMerit = mFigureOfMerit;
@@ -40,6 +44,8 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	
 	public CandidateAnalysis(Deque<Symbol> mStack) {
 		this.mDerivation = new ArrayList<String>();
+		this.mLastDerive = new ArrayList<String>();
+		this.mAntecedent = null; // first element
 		this.mStack = new ArrayDeque<Symbol>(mStack);
 		this.mProbability = 1.0;
 		this.mFigureOfMerit = 1.0;
@@ -49,6 +55,9 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	public CandidateAnalysis(CandidateAnalysis ca) {
 		this.mDerivation = new ArrayList();
 		for (String rule : ca.mDerivation) this.mDerivation.add(rule);
+		this.mLastDerive = new ArrayList();
+		for (String rule : ca.mLastDerive) this.mLastDerive.add(rule);
+		this.mAntecedent = ca.mAntecedent; // link not copy
 		this.mStack = new ArrayDeque<Symbol>();
 		for (Symbol s : ca.mStack) this.mStack.addLast(new Symbol(s));
 		this.mProbability = ca.mProbability;
@@ -59,13 +68,15 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	
 	public CandidateAnalysis expand(Production p) {
 		// obsolete test
-		Symbol LHS = p.getLHS();
-		if (! (LHS.equals(mStack.peek()))) {
-			return null;
-		}
+//		Symbol LHS = p.getLHS();
+//		if (! (LHS.equals(mStack.peek()))) {
+//			return null;
+//		}
 		// prepare derivation
 		List<String> newDerivation = new ArrayList<String>(mDerivation);
 		newDerivation.add(p.getID());
+		List<String> newLastDerive = new ArrayList<String>(mLastDerive);
+		newLastDerive.add(p.getID());
 		// prepare stack
 		Deque<Symbol> newStack = new ArrayDeque<Symbol>(mStack);
 		newStack.pop();
@@ -80,7 +91,7 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		// prepare rest
 		List<String> newRemainingString =  new ArrayList<String>(remainingString);
 		// build object
-		CandidateAnalysis ca = new CandidateAnalysis(newDerivation, newStack, newProbability, newFigureOfMerit, newRemainingString);
+		CandidateAnalysis ca = new CandidateAnalysis(newDerivation, newLastDerive, this.mAntecedent, newStack, newProbability, newFigureOfMerit, newRemainingString);
 		return ca;
 	}
 	
@@ -97,6 +108,8 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		// prepare derivation
 		List<String> newDerivation =  new ArrayList<String>(mDerivation);
 		newDerivation.add(nextToken.getSymbol());
+		List<String> newLastDerive =  new ArrayList<String>(mLastDerive);
+		newLastDerive.add(nextToken.getSymbol());
 		// prepare stack
 		Deque<Symbol> newStack = new ArrayDeque<Symbol>(mStack);
 		newStack.pop();
@@ -106,10 +119,18 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		// prepare rest
 		List<String> newRemainingString = new ArrayList<String>(remainingString);
 		// build object
-		CandidateAnalysis ca = new CandidateAnalysis(newDerivation, newStack, newProbability, newFigureOfMerit, newRemainingString);
+		CandidateAnalysis ca = new CandidateAnalysis(newDerivation, newLastDerive, this, newStack, newProbability, newFigureOfMerit, newRemainingString);
 		return ca;
 	}
 
+	public void newIncrementalStep() {
+		this.mLastDerive = new ArrayList<String>();
+	}
+	
+	public CandidateAnalysis getAntecedent() {
+		return this.mAntecedent;
+	}
+	
 	public boolean isComplete() {
 		return mStack.isEmpty();
 	}
@@ -172,7 +193,7 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	 */
 	@Override
 	public String toString() {
-		return "[D=" + mDerivation
+		return "[LD=" + mLastDerive
 				//+ ", mFigureOfMerit=" + mFigureOfMerit
 				+ ", " + mProbability
 				+ "%, S=" + mStack + "]"; 

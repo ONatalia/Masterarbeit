@@ -1,16 +1,13 @@
 package org.cocolab.inpro.incremental.unit;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.cocolab.inpro.nlu.AVPair;
 
 public class TagIU extends IU {
 
 	final String tag;
 
-	public static final TagIU FIRST_TAG_IU = new TagIU(); 
+	public static final TagIU FIRST_TAG_IU = new TagIU("$begin"); 
 	
 	@SuppressWarnings("unchecked")
 	public TagIU() {

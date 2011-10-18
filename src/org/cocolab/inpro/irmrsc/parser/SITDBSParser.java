@@ -37,16 +37,15 @@ public class SITDBSParser {
 		mBaseBeamFactor = 0.001;
 		reset();
 	}
+	
+	public SITDBSParser(Grammar g, double bbf, CandidateAnalysis startCA) {
+		mQueue = new PriorityQueue<CandidateAnalysis>();
+		CandidateAnalysis ca = new CandidateAnalysis(startCA);
+		mQueue.add(ca);
+	}
 
 	public SITDBSParser(SITDBSParser p) {
-		if (p == null) {
-			// move the parameters to config
-			Grammar grammar = new Grammar();
-			grammar.loadXML("/home/andreas/workspace/ISem/data/PlayGrammar.xml");
-			this.mGrammar = grammar;
-			this.mBaseBeamFactor = 0.001;
-			this.reset();
-		} else {
+		if (p != null) {
 			this.mGrammar = p.mGrammar;
 			this.mBaseBeamFactor = p.mBaseBeamFactor;
 			this.mQueue = new PriorityQueue<CandidateAnalysis>();
@@ -62,6 +61,9 @@ public class SITDBSParser {
 	public void feed(Symbol nextToken) {
 		System.out.println("Feed parser: "+nextToken);
 		PriorityQueue<CandidateAnalysis> newQueue = new PriorityQueue<CandidateAnalysis>(5);
+		// clear list of rule applications of the last incremental step
+		for (CandidateAnalysis ca : mQueue) ca.newIncrementalStep();
+		// begin parsing
 		while (true) {
 			CandidateAnalysis ca = mQueue.poll();
 			if (ca == null) {
