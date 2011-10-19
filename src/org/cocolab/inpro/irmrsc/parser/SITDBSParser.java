@@ -21,7 +21,7 @@ public class SITDBSParser {
 	public static final int maxCandidatesLimit = 1000;
 	public static final int maxDeletions = 2;
 	public static final int maxInsertion = 4;
-	
+
 	private PriorityQueue<CandidateAnalysis> mQueue;
 	private Grammar mGrammar;
 	private double mBaseBeamFactor;
@@ -60,20 +60,29 @@ public class SITDBSParser {
 	
 	public void feed(Symbol nextToken) {
 		System.out.println("Feed parser: "+nextToken);
-		PriorityQueue<CandidateAnalysis> newQueue = new PriorityQueue<CandidateAnalysis>(5);
-		// clear list of rule applications of the last incremental step
-		for (CandidateAnalysis ca : mQueue) ca.newIncrementalStep();
+		
+		// make a new queue for the results of parsing the current token
+		PriorityQueue<CandidateAnalysis> newQueue = new PriorityQueue<CandidateAnalysis>(2);
+		
+		// make a working-copy (deep) of the queue and prepare the next incremental step
+		PriorityQueue<CandidateAnalysis> currentQueue = new PriorityQueue<CandidateAnalysis>(mQueue.size());
+		for (CandidateAnalysis oldCA : mQueue) {
+			CandidateAnalysis newCA = new CandidateAnalysis(oldCA);
+			newCA.newIncrementalStep(oldCA);
+			currentQueue.add(newCA);
+		}
+		
 		// begin parsing
 		while (true) {
-			CandidateAnalysis ca = mQueue.poll();
+			if (currentQueue.size() >= maxCandidatesLimit) {
+				// max size reached; await next token
+				System.out.println(": max size reached");
+				break;
+			}
+			CandidateAnalysis ca = currentQueue.poll();
 			if (ca == null) {
 				// no more candidate analysis on the queue; await next token
 				System.out.println(": no more ca on queue");
-				break;
-			}
-			if (mQueue.size() >= maxCandidatesLimit) {
-				// max size reached; await next token
-				System.out.println(": max size reached");
 				break;
 			}
 			if (! newQueue.isEmpty()) {
@@ -108,7 +117,7 @@ public class SITDBSParser {
 				// TODO: use left corner relation here: relrule = g.getLCsatisfyingProdExpSym(topSym, nextToken)
 				for (String id : relevantProductions) {
 					Production p = mGrammar.getProduction(id);
-					mQueue.add(ca.expand(p));
+					currentQueue.add(ca.expand(p));
 				}
 			}
 		}
@@ -133,6 +142,7 @@ public class SITDBSParser {
 	public void info() {
 		for (CandidateAnalysis ca : mQueue) {
 			System.out.println(ca);
+			System.out.println(ca.printDerivation());
 		}
 	}
 	

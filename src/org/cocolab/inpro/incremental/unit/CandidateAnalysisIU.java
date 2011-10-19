@@ -34,5 +34,9 @@ public class CandidateAnalysisIU extends IU {
 		} 
 		return this.candidateAnalysis.toString();
 	}
+	
+	public CandidateAnalysis getCandidateAnalysis () {
+		return candidateAnalysis;
+	}
 
 }

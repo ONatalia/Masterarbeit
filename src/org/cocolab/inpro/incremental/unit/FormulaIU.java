@@ -20,10 +20,21 @@ public class FormulaIU extends IU {
 		super(sll, groundedIn);
 		this.formula = formula;
 	}
+	
+	public FormulaIU(IU sll, IU groundedIn, Formula formula) {
+		super(sll, Collections.singletonList(groundedIn));
+		this.formula = formula;
+	}
 
 	@Override
 	public String toPayLoad() {
+		if (formula == null) {
+			return "";
+		}
 		return this.formula.toString();
 	}
 
+	public Formula getFormula () {
+		return formula;
+	}
 }

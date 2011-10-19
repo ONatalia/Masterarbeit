@@ -53,9 +53,9 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	}
 	
 	public CandidateAnalysis(CandidateAnalysis ca) {
-		this.mDerivation = new ArrayList();
+		this.mDerivation = new ArrayList<String>();
 		for (String rule : ca.mDerivation) this.mDerivation.add(rule);
-		this.mLastDerive = new ArrayList();
+		this.mLastDerive = new ArrayList<String>();
 		for (String rule : ca.mLastDerive) this.mLastDerive.add(rule);
 		this.mAntecedent = ca.mAntecedent; // link not copy
 		this.mStack = new ArrayDeque<Symbol>();
@@ -106,10 +106,11 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 //			return null;
 //		}
 		// prepare derivation
+		String s = "m("+nextToken.getSymbol()+")";
 		List<String> newDerivation =  new ArrayList<String>(mDerivation);
-		newDerivation.add(nextToken.getSymbol());
+		newDerivation.add(s);
 		List<String> newLastDerive =  new ArrayList<String>(mLastDerive);
-		newLastDerive.add(nextToken.getSymbol());
+		newLastDerive.add(s);
 		// prepare stack
 		Deque<Symbol> newStack = new ArrayDeque<Symbol>(mStack);
 		newStack.pop();
@@ -119,12 +120,13 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		// prepare rest
 		List<String> newRemainingString = new ArrayList<String>(remainingString);
 		// build object
-		CandidateAnalysis ca = new CandidateAnalysis(newDerivation, newLastDerive, this, newStack, newProbability, newFigureOfMerit, newRemainingString);
+		CandidateAnalysis ca = new CandidateAnalysis(newDerivation, newLastDerive, this.mAntecedent, newStack, newProbability, newFigureOfMerit, newRemainingString);
 		return ca;
 	}
 
-	public void newIncrementalStep() {
+	public void newIncrementalStep(CandidateAnalysis oldCA) {
 		this.mLastDerive = new ArrayList<String>();
+		this.mAntecedent = oldCA;
 	}
 	
 	public CandidateAnalysis getAntecedent() {
@@ -157,6 +159,10 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		return mFigureOfMerit;
 	}
 
+	public List<String> getLastDerive() {
+		return mLastDerive;
+	}
+	
 	public int getNumberOfInsertions() {
 		int i = 0;
 		for (String rule : mDerivation) {
@@ -193,16 +199,21 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	 */
 	@Override
 	public String toString() {
-		return "[LD=" + mLastDerive
-				//+ ", mFigureOfMerit=" + mFigureOfMerit
-				+ ", " + mProbability
-				+ "%, S=" + mStack + "]"; 
-				//", remainingString=" + remainingString + "]";
+		return "LD=" + mLastDerive + "\\n"
+				+ "P=" + mProbability + "%\\n"
+				+ "S=" + mStack;
 	}
 
-
-	
-	
+	public String printDerivation() {
+		Deque<String> l = new ArrayDeque<String>();
+		l.addFirst(this.mLastDerive.toString());
+		CandidateAnalysis ca = this.mAntecedent;
+		while (ca != null) {
+			l.addFirst(ca.mLastDerive.toString());
+			ca = ca.mAntecedent;
+		}
+		return l.toString();
+	}
 }
 
 

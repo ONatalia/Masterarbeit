@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.io.*;
+import java.net.URL;
+
 import org.jdom.*;
 import org.jdom.input.*;
 
@@ -139,10 +141,12 @@ public class Grammar {
 		return mProductions.keySet().contains(id);
 	}
 	
-	public void loadXML(String filename) {
+	@SuppressWarnings("unchecked")
+	public void loadXML(URL url) {
+		String filename = url.toString();
 		try {
 			SAXBuilder builder = new SAXBuilder();
-			Document doc = builder.build(new File(filename));
+			Document doc = builder.build(url);
 			Element root = doc.getRootElement();
 			if (root.getName() == "simplecfggrammar") {
 				mStart = new Symbol(root.getAttributeValue("start"));

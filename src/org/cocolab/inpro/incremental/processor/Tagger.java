@@ -29,7 +29,7 @@ import edu.cmu.sphinx.util.props.S4String;
 public class Tagger extends IUModule {
 
 	@S4String(defaultValue = "res/PentoAVMapping")
-	public final static String PROP_WORD_SEMANTICS = "semanticsMapping";
+	public final static String PROP_WORD_SEMANTICS = "lookupTags";
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {

@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -63,6 +63,28 @@ public class Formula extends VariableEnvironment
 		mEqs = new ArrayList<VariableIDPair>();		
 	}
 	
+	
+	// this is a hack: the constructor signature arbitrarily marks,
+	public Formula (String startSymbol) {
+		this();
+		
+	}
+	
+	// make a simple new formula for a lexical object
+	public Formula (String lexname, Variable.Type semtype) {
+		this();
+		// make variable ids
+		int l=0, a=1, i=2;
+		// make and add variables
+		mVariables.put(l, new Variable(l, Variable.Type.LABEL));
+		mVariables.put(a, new Variable(a, Variable.Type.ANCHOR));
+		mVariables.put(i, new Variable(i, semtype));
+		// make hook
+		mHook = new Hook(l,a,i);
+		// make and add lexical relation
+		mRels.add(new Relation(l,a,i,lexname,Relation.Type.LEXICAL));	
+	}
+	
 	// applies all variable equalities
 	public void reduce () {
 		// iterate all variable equalities
@@ -95,16 +117,11 @@ public class Formula extends VariableEnvironment
 	// implemented as mutation. if fc fails use another method to build
 	// gracefully degraded results.
 	public boolean forwardCombine(Formula fo) {
-		// require reduced formulas? why should i?
-		//if (! this.isReduced()) this.reduce();
-		//if (! fo.isReduced()) fo.reduce();
-		
 		// copy argument formula so that it is not changed by renumbering
 		Formula f = new Formula(fo);
 		// renumber f
 		f.renumber(this.getMaxID()+1);
-		
-		System.out.println(f+""+f.mVariables+"\n");
+		System.out.println("N "+f);
 		
 		// join variable assignments
 		for (Map.Entry<Integer, Variable> e : f.mVariables.entrySet()) {
@@ -178,17 +195,27 @@ public class Formula extends VariableEnvironment
 	}
 	
 	// reassigns new indices for all variables in this expression 
-	// starting from StartIndex
+	// starting from 0
 	public void renumber() {
 		this.renumber(0);
 	}
 	
-	// TODO: This does not change the variable ids in the formula!
-	// move to Formula and leave a simple one-entry-rename-function here.
+	// reassigns new indices for all variables in this expression 
+	// starting from StartIndex
 	public void renumber(int StartIndex) {
+		int myMaxID = this.getMaxID();
+		if (StartIndex <= myMaxID) {
+			this.rerenumber(myMaxID+1);
+		}
+		this.rerenumber(StartIndex);
+	}
+	
+	// if startindex is smaller than the max index in this formula, bad things will happen.
+	private void rerenumber(int StartIndex) {
 		int cntNewID = StartIndex;
 		Map<Integer,Integer> oldToNewIDs = new HashMap<Integer,Integer>();
 		HashMap<Integer,Variable> newVariables = new HashMap<Integer,Variable>(this.mVariables);
+		// need deep copy?
 		for (Map.Entry<Integer,Variable> e : mVariables.entrySet()) {
 			int key = e.getKey();
 			Variable v = e.getValue();
@@ -219,19 +246,17 @@ public class Formula extends VariableEnvironment
 	@Override
 	public String toString() {
 		StringBuilder s = new StringBuilder();
-		s.append(mHook+" { ");
+		s.append("[ "+mHook+" { ");
 		for (Hook h : mSlots)
 			s.append(h+" ");
-		s.append("}\n");
+		s.append("}\\n");
 		for (Relation r : mRels)
-			s.append(r+" ");
-		s.append("\n");
+			s.append(r+",\\n");
 		for (VariableIDPair p : mScons)
-			s.append("qeq("+getVariableString(p.getLeft())+","+getVariableString(p.getRight())+") ");
-		s.append("\n");
+			s.append("qeq("+getVariableString(p.getLeft())+","+getVariableString(p.getRight())+"),\\n");
 		for (VariableIDPair p : mEqs)
-			s.append(getVariableString(p.getLeft())+"="+getVariableString(p.getRight())+" ");
-		
+			s.append(getVariableString(p.getLeft())+"="+getVariableString(p.getRight())+",\\n");
+		s.append("]");
 		// replace all variable id string representations (of the form #v1) by their
 		// correct string according to the variable assignment and the types stored
 		// there.
@@ -249,6 +274,7 @@ public class Formula extends VariableEnvironment
 	}
 	
 	// initializes this object from XML element: <rmrsincrement>
+	@SuppressWarnings("unchecked")
 	public void parseXML(Element e) {
 		List<Element> children = e.getChildren();
 		if (children != null && children.size() == 5) {

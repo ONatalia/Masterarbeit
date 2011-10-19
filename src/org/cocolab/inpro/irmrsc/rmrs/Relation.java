@@ -139,6 +139,7 @@ public class Relation implements VariableIDsInterpretable {
 			mArgumentGiven = false;
 			mArgument = Integer.MAX_VALUE;
 		} else {
+			mArgumentGiven = true;
 			mArgument = Integer.parseInt(e.getAttributeValue("i"));
 		}
 	}
