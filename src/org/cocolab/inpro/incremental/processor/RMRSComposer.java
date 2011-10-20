@@ -20,8 +20,10 @@ import org.cocolab.inpro.irmrsc.rmrs.RMRSLoader;
 import org.cocolab.inpro.irmrsc.rmrs.SemanticMacro;
 import org.cocolab.inpro.irmrsc.rmrs.Variable;
 
+import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.S4Component;
 import edu.cmu.sphinx.util.props.S4String;
 
 
@@ -30,10 +32,14 @@ public class RMRSComposer extends IUModule {
 	@S4String()
 	public final static String PROP_SEM_MACROS_FILE = "semMacrosFile";
 	private String semMacrosFile;
-	
+
 	@S4String()
 	public final static String PROP_SEM_RULES_FILE = "semRulesFile";
 	private String semRulesFile;
+
+	@S4Component(type = Resolver.class, mandatory = false)
+	public final static String PROP_RESOLVER = "resolver";
+	private Resolver resolver;
 	
 	@S4String()
 	public final static String PROP_TAG_LEXICON_FILE = "tagLexiconFile";
@@ -44,9 +50,9 @@ public class RMRSComposer extends IUModule {
 	private Map<String,Formula> semanticRules  = new HashMap<String,Formula>();
 	private Map<String,Variable.Type> semanticTypesOfTags = new HashMap<String,Variable.Type>();
 	private Map<CandidateAnalysisIU,FormulaIU> states = new HashMap<CandidateAnalysisIU,FormulaIU>();
-	
+
 	private static FormulaIU firstUsefulFormulaIU;
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
@@ -66,7 +72,7 @@ public class RMRSComposer extends IUModule {
 				}
 			}
 			System.out.println("Successfully loaded "+semanticMacrosLongname.size()+" semantic macros.");
-			
+
 			// load semantic rules
 			semRulesFile = ps.getString(PROP_SEM_RULES_FILE);
 			// parse all and put the formulas in semanticRules
@@ -92,6 +98,10 @@ public class RMRSComposer extends IUModule {
 			firstUsefulFormulaIU = new FormulaIU(FormulaIU.FIRST_FORMULA_IU, Collections.EMPTY_LIST, semanticMacrosLongname.get("init"));
 			this.states.put(CandidateAnalysisIU.FIRST_CA_IU,firstUsefulFormulaIU);
 
+			
+			//Set up the resolver
+			this.resolver = (Resolver) ps.getComponent(PROP_RESOLVER);
+			System.out.println("Set up resolver: " + this.resolver.toString());			
 		} catch (MalformedURLException e1) {
 			e1.printStackTrace();
 		}
@@ -114,7 +124,6 @@ public class RMRSComposer extends IUModule {
 				case ADD:
 					CandidateAnalysisIU previousCa = (CandidateAnalysisIU) ca.getSameLevelLink();
 					if (previousCa != null) {
-						System.out.println("Ping");
 						FormulaIU previousFIU = firstUsefulFormulaIU;
 						if (previousCa.grounds().size() > 0) {
 							System.out.println("Pong");
@@ -149,7 +158,10 @@ public class RMRSComposer extends IUModule {
 						}
 						FormulaIU newFIU = new FormulaIU(previousFIU, ca, newForm);
 						newEdits.add(new EditMessage<FormulaIU>(EditType.ADD, newFIU));
-						states.put(ca,newFIU);						
+						states.put(ca,newFIU);
+						if (!resolver.resolves(newForm)) {
+							// TODO: change the IU network if the formula (or its predicates) do not resolve
+						}
 					} else {
 						//TODO: can this happen?
 					}
@@ -165,6 +177,22 @@ public class RMRSComposer extends IUModule {
 			}
 		}
 		this.rightBuffer.setBuffer(newEdits);
+	}
+
+	/**
+	 * Interface to call whenever a Formula needs to check if its relations
+	 * resolve with something in the world.
+	 * @author okko
+	 *
+	 */
+	public interface Resolver extends Configurable {
+		/**
+		 * Called whenever a new FormulaIU is created to determine
+		 * if its relations match something in the world.
+		 * @param f the formula
+		 * @return true of f's relations hold in the world, i.e. in the implementing class
+		 */
+		public boolean resolves(Formula f);
 	}
 
 }
