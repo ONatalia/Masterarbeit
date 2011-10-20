@@ -18,9 +18,9 @@ import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.TagIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.irmrsc.rmrs.Formula;
-import org.cocolab.inpro.irmrsc.rmrs.RMRSLoader;
 import org.cocolab.inpro.irmrsc.rmrs.SemanticMacro;
 import org.cocolab.inpro.irmrsc.rmrs.Variable;
+import org.cocolab.inpro.irmrsc.util.RMRSLoader;
 import org.cocolab.inpro.nlu.AVPair;
 
 import edu.cmu.sphinx.util.props.Configurable;
@@ -169,6 +169,7 @@ public class RMRSComposer extends IUModule {
 							System.out.println("= "+newForm);
 							newForm.reduce();
 							//newForm.renumber(0);
+							//System.out.println(newForm.getNominalAssertions());
 						}
 						FormulaIU newFIU = new FormulaIU(previousFIU, ca, newForm);
 						newEdits.add(new EditMessage<FormulaIU>(EditType.ADD, newFIU));

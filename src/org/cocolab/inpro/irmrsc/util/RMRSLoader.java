@@ -1,4 +1,4 @@
-package org.cocolab.inpro.irmrsc.rmrs;
+package org.cocolab.inpro.irmrsc.util;
 
 import java.io.IOException;
 import java.net.URL;
@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.cocolab.inpro.irmrsc.rmrs.Formula;
+import org.cocolab.inpro.irmrsc.rmrs.SemanticMacro;
+import org.cocolab.inpro.irmrsc.rmrs.Variable;
 import org.cocolab.inpro.irmrsc.rmrs.Variable.Type;
 import org.jdom.Document;
 import org.jdom.Element;

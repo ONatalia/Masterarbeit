@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.cocolab.inpro.irmrsc.util.SimpleAssertion;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -300,6 +301,56 @@ public class Formula extends VariableEnvironment
 		}
 		matcher.appendTail(sb);
 		return sb.toString();
+	}
+	
+	// not yet fully working
+	public List<SimpleAssertion> getNominalAssertions() {
+		List<SimpleAssertion> l = new ArrayList<SimpleAssertion>();
+		// find all individual variables and look where they occur
+		Set<Integer> anchorsIDsOfRelevantRelations = new TreeSet<Integer>();
+		for (Variable v : mVariables.values()) {
+			if (v.getType() == Variable.Type.INDIVIDUAL) {
+				int id = v.getID();
+				// find all relations concerning it
+				for (Relation r : mRels) {
+					if (r.isAbout(id)) {
+						anchorsIDsOfRelevantRelations.add(r.getAnchor());
+					}
+				}
+			}
+		}
+		// find predicate and all arguments for the relevant anchor
+		for (Integer i : anchorsIDsOfRelevantRelations) {
+			Relation lex  = null;
+			Relation arg1 = null;
+			Relation arg2 = null;
+			for (Relation r : mRels) {
+				if(r.isAnchoredAs(i)) {
+					if (r.getType() == Relation.Type.LEXICAL) {
+						lex = r;
+						continue;
+					}
+					if (r.getType() == Relation.Type.ARGREL) {
+						if (r.getName().equals("ARG1")) arg1 = r;
+						if (r.getName().equals("ARG2")) arg2 = r;
+						continue;
+					}
+				}
+			}
+			// now build SimpleAssert
+			if(lex != null) {
+				String name = lex.getName();
+				List<Integer> ids = new ArrayList<Integer>(2);
+				if (arg1 != null) {
+					ids.add(arg1.getArgument());
+					if (arg2 != null) {
+						ids.add(arg2.getArgument());
+					}
+				}
+				l.add(new SimpleAssertion(name,ids));
+			}
+		}
+		return l;
 	}
 	
 	// initializes this object from XML element: <rmrsincrement>

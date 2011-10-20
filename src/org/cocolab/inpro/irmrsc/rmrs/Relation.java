@@ -72,6 +72,19 @@ public class Relation implements VariableIDsInterpretable {
 	public Type getType() {
 		return mType;
 	}
+	
+	public boolean isAbout(int variableID) {
+		if (mArgumentGiven) {
+			if (mArgument == variableID) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean isAnchoredAs(int variableID) {
+		return (mAnchor == variableID);
+	}
 
 	public Set<Integer> getVariableIDs() {
 		Set<Integer> l = new TreeSet<Integer>();
