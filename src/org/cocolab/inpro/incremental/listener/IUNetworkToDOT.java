@@ -1,6 +1,5 @@
 package org.cocolab.inpro.incremental.listener;
 
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -32,7 +31,7 @@ import edu.cmu.sphinx.util.props.S4Boolean;
 public class IUNetworkToDOT extends PushBuffer {
 
 	/** String for dot executable */
-	@S4String(defaultValue = "/usr/bin/dot")
+	@S4String(defaultValue = "/usr/local/bin/dot")
 	/** Property for string for dot executable */
 	public final static String PROP_DOT = "dot";
 	/** The dot executable */
@@ -258,18 +257,10 @@ public class IUNetworkToDOT extends PushBuffer {
 						File imageFile = new File(this.out + "." + this.outputFormat);
 						if (imageFile.exists()) {
 							ImageIcon icon = new ImageIcon(imageFile.toString());
-							if (icon.getIconHeight() > l.getHeight() || icon.getIconWidth() > l.getWidth()) {
-								float wFactor = (float) l.getWidth() / (float) icon.getIconWidth();
-								float hFactor = (float) l.getHeight() / (float) icon.getIconHeight();
-								float factor = wFactor > hFactor ? hFactor : wFactor;
-								Image img = icon.getImage();
-								BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-								Graphics g = bi.createGraphics();
-								int w = (int) (icon.getIconWidth() * factor);
-								int h = (int) (icon.getIconHeight() * factor);
-								g.drawImage(img, 0, 0, w, h, null);
-								icon = new ImageIcon(bi);								
-							}
+							Image image = icon.getImage();
+							image = image.getScaledInstance(l.getWidth(), -1, Image.SCALE_SMOOTH);
+							image = image.getScaledInstance(-1, l.getHeight(), Image.SCALE_SMOOTH);
+							icon.setImage(image);
 							l.setIcon(icon);
 						} else {
 							System.err.println("Cannot find output: " + dot.toString());
