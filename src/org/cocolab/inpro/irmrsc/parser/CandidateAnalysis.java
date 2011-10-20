@@ -3,6 +3,7 @@
  */
 package org.cocolab.inpro.irmrsc.parser;
 
+import java.text.DecimalFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -200,7 +201,7 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	@Override
 	public String toString() {
 		return "LD=" + mLastDerive + "\\n"
-				+ "P=" + mProbability + "%\\n"
+				+ "P=" + new DecimalFormat("###.##").format(100*mProbability) + "%\\n"
 				+ "S=" + mStack;
 	}
 

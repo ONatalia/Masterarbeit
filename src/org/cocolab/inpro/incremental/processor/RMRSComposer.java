@@ -35,9 +35,14 @@ public class RMRSComposer extends IUModule {
 	public final static String PROP_SEM_RULES_FILE = "semRulesFile";
 	private String semRulesFile;
 	
+	@S4String()
+	public final static String PROP_TAG_LEXICON_FILE = "tagLexiconFile";
+	private String tagLexiconFile;
+	
 	private Map<String,Formula> semanticMacrosLongname = new HashMap<String,Formula>();
 	private Map<String,Formula> semanticMacrosShortname = new HashMap<String,Formula>();
 	private Map<String,Formula> semanticRules  = new HashMap<String,Formula>();
+	private Map<String,Variable.Type> semanticTypesOfTags = new HashMap<String,Variable.Type>();
 	private Map<CandidateAnalysisIU,FormulaIU> states = new HashMap<CandidateAnalysisIU,FormulaIU>();
 	
 	private static FormulaIU firstUsefulFormulaIU;
@@ -78,12 +83,15 @@ public class RMRSComposer extends IUModule {
 			}
 			System.out.println("Successfully loaded "+rules.size()+" semantic rules.");
 			
-			//System.out.println(semanticMacrosLongname);
+			// load tag lexicon
+			tagLexiconFile = ps.getString(PROP_TAG_LEXICON_FILE);
+			semanticTypesOfTags = RMRSLoader.loadTagLexicon(new URL(tagLexiconFile));
+			System.out.println("Successfully loaded "+semanticTypesOfTags.size()+" associations of semantic types and POS tags.");
+			
+			// initialize first formula iu
 			firstUsefulFormulaIU = new FormulaIU(FormulaIU.FIRST_FORMULA_IU, Collections.EMPTY_LIST, semanticMacrosLongname.get("init"));
-			//System.out.println(CandidateAnalysisIU.FIRST_CA_IU);
-			//System.out.println(firstUsefulFormulaIU);
 			this.states.put(CandidateAnalysisIU.FIRST_CA_IU,firstUsefulFormulaIU);
-			//System.out.println(states);
+
 		} catch (MalformedURLException e1) {
 			e1.printStackTrace();
 		}
@@ -122,8 +130,8 @@ public class RMRSComposer extends IUModule {
 							// go through all new syntactic rule applications
 							if (rule.startsWith("m(")) {
 								// the current rule is a lexical one; build lexical formula. 
-								String tag = rule.substring(2, rule.length()-1);
-								Variable.Type type = Variable.Type.INDEX;
+								String tag = rule.substring(2, rule.length()-1);								
+								Variable.Type type = semanticTypesOfTags.get(tag);
 								String lexname = tag;
 								// map tagnames to Variable.Type.s
 								Formula lexitem = new Formula(lexname, type);

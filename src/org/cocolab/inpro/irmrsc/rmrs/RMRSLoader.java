@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.cocolab.inpro.irmrsc.rmrs.Variable.Type;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -54,6 +55,39 @@ public class RMRSLoader {
 					String id = rule.getAttributeValue("id");
 					String longname = rule.getChild("refmacro").getAttributeValue("longname");
 					map.put(id, longname);
+				}
+			}
+		} catch (IOException e) {
+			System.out.println(e);
+		} catch (JDOMException e) {
+			System.out.println(e);
+		}
+		return map;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static Map<String,Variable.Type> loadTagLexicon (URL fileURL) {
+		Map<String,Variable.Type> map = new HashMap<String,Variable.Type>();
+		SAXBuilder builder = new SAXBuilder();	
+		try {
+			Document doc = builder.build(fileURL.openStream());
+			Element root = doc.getRootElement();
+			if (root.getName() == "taglexicon") {
+				List<Element> entries = root.getChildren("map");
+				for (Element entry : entries) {
+					String tag = entry.getAttributeValue("tag");
+					String type = entry.getAttributeValue("type");
+					Variable.Type mType = Variable.Type.UNDERSPEC;
+					if (type != null && type.length() == 1) {
+						switch(type.charAt(0)) {
+						case 'i' : mType = Variable.Type.INDEX; break;
+						case 'x' : mType = Variable.Type.INDIVIDUAL; break;
+						case 'e' : mType = Variable.Type.EVENT; break;
+						}
+					} else {
+						System.out.println("Warning: No specific semantic type given for tag"+tag+".");
+					}
+					map.put(tag, mType);
 				}
 			}
 		} catch (IOException e) {

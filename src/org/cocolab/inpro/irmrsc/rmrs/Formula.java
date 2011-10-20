@@ -100,6 +100,34 @@ public class Formula extends VariableEnvironment
 				this.mVariables.remove(oldID);
 				this.replaceVariableID(oldID, newID);
 			} else {
+				// check type hierarchy: indexes can be specified to x or e.
+				int oldID = reduce.getID();
+				int newID = reduceTo.getID();
+				if (reduceTo.getType() == Variable.Type.INDEX) {
+					switch(reduce.getType()) {
+					case EVENT:
+						reduceTo.setType(Variable.Type.EVENT);
+						this.mVariables.remove(oldID);
+						this.replaceVariableID(oldID, newID);
+						break;
+					case INDIVIDUAL:
+						reduceTo.setType(Variable.Type.INDIVIDUAL);
+						this.mVariables.remove(oldID);
+						this.replaceVariableID(oldID, newID);
+						break;
+					}
+				}
+				if (reduce.getType() == Variable.Type.INDEX){
+					// no need to replace reduceTo type, but replace ids.
+					switch(reduceTo.getType()) {
+					case EVENT:
+					case INDIVIDUAL:
+						this.mVariables.remove(oldID);
+						this.replaceVariableID(oldID, newID);
+						break;
+					}
+				}
+				
 				// cnt mismatches, reduce gracefully
 				// TODO:
 			}
@@ -245,8 +273,9 @@ public class Formula extends VariableEnvironment
 
 	@Override
 	public String toString() {
+		// i'm using \\n line feeds here for the dot notifier
 		StringBuilder s = new StringBuilder();
-		s.append("[ "+mHook+" { ");
+		s.append("[ "+mHook+" \\n{ ");
 		for (Hook h : mSlots)
 			s.append(h+" ");
 		s.append("}\\n");
