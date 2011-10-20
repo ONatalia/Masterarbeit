@@ -60,6 +60,22 @@ public class WordIU extends IU {
 		return avPairs.get(this.getWord());
 	}
 	
+	/**
+	 * Retrieves all values of an WordIU's AVPairs, given an attribute.
+	 * 
+	 * @param attribute the attribute to retrieve
+	 * @return the list of values of a given word's AVPairs that matched the attribute.
+	 */
+	public List<String> getValues(String attribute) {
+		List<String> values = new ArrayList<String>();
+		for (AVPair avp : WordIU.avPairs.get(this.getWord())) {
+			if (avp.getAttribute().equals(attribute)) {
+				values.add((String) avp.getValue());
+			}
+		}
+		return values;
+	}
+	
 	@SuppressWarnings("unchecked") // the untyped list in the call to Collections.checkedList
 	public List<SegmentIU> getSegments() {
 		List<IU> returnList;
@@ -129,6 +145,10 @@ public class WordIU extends IU {
 	
 	public boolean isSilence() {
 		return isSilence;
+	}
+	
+	public boolean isBackchannel() {
+		return this.pitchIsRising() && this.word.equals("hm");
 	}
 	
 	public static void setAVPairs(Map<String, List<AVPair>> avPairs) {
