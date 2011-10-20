@@ -58,13 +58,15 @@ public class Tagger extends IUModule {
 					}
 					break;
 				case ADD:
-					for (AVPair tagPair : newWord.getAVPairs()) {
-						TagIU sll = TagIU.FIRST_TAG_IU;
-						if (newWord.getSameLevelLink().grounds().size() > 0) {
-							//TODO: hier mal 
-							sll = (TagIU) newWord.getSameLevelLink().grounds().get(0);
+					if (newWord.getAVPairs() != null) {
+						for (AVPair tagPair : newWord.getAVPairs()) {
+							TagIU sll = TagIU.FIRST_TAG_IU;
+							if (newWord.getSameLevelLink().grounds().size() > 0) {
+								//TODO: hier mal 
+								sll = (TagIU) newWord.getSameLevelLink().grounds().get(0);
+							}
+							newEdits.add(new EditMessage<TagIU>(EditType.ADD, new TagIU(sll, Collections.singletonList(newWord), (String) tagPair.getValue())));
 						}
-						newEdits.add(new EditMessage<TagIU>(EditType.ADD, new TagIU(sll, Collections.singletonList(newWord), (String) tagPair.getValue())));
 					}
 					break;
 				case COMMIT:
