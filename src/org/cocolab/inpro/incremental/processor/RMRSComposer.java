@@ -15,10 +15,13 @@ import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.FormulaIU;
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.TagIU;
+import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.irmrsc.rmrs.Formula;
 import org.cocolab.inpro.irmrsc.rmrs.RMRSLoader;
 import org.cocolab.inpro.irmrsc.rmrs.SemanticMacro;
 import org.cocolab.inpro.irmrsc.rmrs.Variable;
+import org.cocolab.inpro.nlu.AVPair;
 
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -141,8 +144,19 @@ public class RMRSComposer extends IUModule {
 								// the current rule is a lexical one; build lexical formula. 
 								String tag = rule.substring(2, rule.length()-1);								
 								Variable.Type type = semanticTypesOfTags.get(tag);
-								String lexname = tag;
-								// map tagnames to Variable.Type.s
+								String lexname = tag.toUpperCase(); // if no better information is there
+								// find the word/lemma
+								TagIU tiu = (TagIU) ca.groundedIn().get(0);
+								WordIU wiu = (WordIU) tiu.groundedIn().get(0);
+								if (wiu != null) {
+									List<String> l = wiu.getValues("lemma");
+									if (l.size() > 0) {
+										lexname = l.get(0);
+									}									
+								}
+								List<AVPair> pairs = wiu.getAVPairs();
+								System.out.println(pairs);
+								
 								Formula lexitem = new Formula(lexname, type);
 								System.out.println("+ "+rule+"\n+ "+lexitem);
 								newForm.forwardCombine(lexitem);
