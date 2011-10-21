@@ -66,7 +66,13 @@ public class SimpleAssertion {
 		StringBuilder sb = new StringBuilder();
 		sb.append(predicateName+"(");
 		if (arguments.size() > 0) {
-			for (Integer i : arguments) sb.append(i.toString()+",");
+			for (Integer i : arguments) {
+				if (i != null) {
+					sb.append(i.toString()+",");
+				} else {
+					sb.append(",");
+				}
+			}
 			sb.deleteCharAt(sb.length()-1);
 		}
 		sb.append(")");

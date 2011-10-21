@@ -79,11 +79,19 @@ public class Formula extends VariableEnvironment
 		// make and add variables
 		mVariables.put(l, new Variable(l, Variable.Type.LABEL));
 		mVariables.put(a, new Variable(a, Variable.Type.ANCHOR));
-		mVariables.put(i, new Variable(i, semtype));
+		if (semtype != null) {
+			mVariables.put(i, new Variable(i, semtype));
+		} else {
+			mVariables.put(i, new Variable(i, Variable.Type.UNDERSPEC));
+		}
 		// make hook
 		mHook = new Hook(l,a,i);
 		// make and add lexical relation
-		mRels.add(new Relation(l,a,i,lexname,Relation.Type.LEXICAL));	
+		if (semtype != null) {
+			mRels.add(new Relation(l,a,i,lexname,Relation.Type.LEXICAL));
+		} else {
+			mRels.add(new Relation(l,a,lexname,Relation.Type.LEXICAL));
+		}
 	}
 	
 	// applies all variable equalities
@@ -150,7 +158,7 @@ public class Formula extends VariableEnvironment
 		Formula f = new Formula(fo);
 		// renumber f
 		f.renumber(this.getMaxID()+1);
-		System.out.println("N "+f);
+		System.out.println("N "+f.toRMRSString());
 		
 		// join variable assignments
 		for (Map.Entry<Integer, Variable> e : f.mVariables.entrySet()) {
@@ -274,6 +282,15 @@ public class Formula extends VariableEnvironment
 
 	@Override
 	public String toString() {
+		List<SimpleAssertion> l = this.getUnscopedPredicateLogic();
+		StringBuilder sb = new StringBuilder();
+		for (SimpleAssertion sa : l) {
+			sb.append(sa.toString()+"\\n");
+		}
+		return sb.toString();
+	}
+		
+	public String toRMRSString() {
 		// i'm using \\n line feeds here for the dot notifier
 		StringBuilder s = new StringBuilder();
 		s.append("[ "+mHook+" \\n{ ");
@@ -303,6 +320,61 @@ public class Formula extends VariableEnvironment
 		return sb.toString();
 	}
 	
+
+	public List<SimpleAssertion> getUnscopedPredicateLogic() {
+		List<SimpleAssertion> l = new ArrayList<SimpleAssertion>();
+		// find all anchors ids
+		Set<Integer> anchorsIDs = new TreeSet<Integer>();
+		for (Variable v : mVariables.values()) {
+			if (v.getType() == Variable.Type.ANCHOR) {
+				int aid = v.getID();
+				String name = "_";
+				Integer arg0 = null;
+				Integer arg1 = null;
+				Integer arg2 = null;
+				// get all relations of that anchor
+				for (Relation r : mRels) {
+					if (r.isAnchoredAs(aid)) {
+						// arrange predicate argument structure
+						switch (r.getType()) {
+						case NONLEXICAL:
+						case LEXICAL:
+							name = r.getName();
+							if (r.hasArgument()) {
+								arg0 = r.getArgument();
+							}
+							break;
+						case ARGREL:
+							String argrelname = r.getName();
+							if (argrelname.equals("BV")) {
+								arg0 = r.getArgument();
+								break;
+							}
+							if (argrelname.equals("ARG1") || argrelname.equals("RSTR")) {
+								arg1 = r.getArgument();
+								break;
+							}
+							if (argrelname.equals("ARG2") || argrelname.equals("BODY")) {
+								arg2 = r.getArgument();
+								break;
+							}
+						}
+					}
+				}
+				// build a SimpleAssertion				
+				if (arg0 == null && arg1 == null && arg2 == null && name.equals("_")) {
+					// do nothing
+				} else {
+					List<Integer> ids = new ArrayList<Integer>(3);
+					ids.add(arg0); ids.add(arg1); ids.add(arg2);
+					l.add(new SimpleAssertion(name,ids));
+				}
+			}
+		}
+		return l;
+	}
+	
+	
 	// not yet fully working
 	public List<SimpleAssertion> getNominalAssertions() {
 		List<SimpleAssertion> l = new ArrayList<SimpleAssertion>();
@@ -331,6 +403,7 @@ public class Formula extends VariableEnvironment
 						continue;
 					}
 					if (r.getType() == Relation.Type.ARGREL) {
+						if (r.getName().equals("BV")) arg1 = r;
 						if (r.getName().equals("ARG1")) arg1 = r;
 						if (r.getName().equals("ARG2")) arg2 = r;
 						continue;
@@ -339,8 +412,14 @@ public class Formula extends VariableEnvironment
 			}
 			// now build SimpleAssert
 			if(lex != null) {
-				String name = lex.getName();
 				List<Integer> ids = new ArrayList<Integer>(2);
+				String name = lex.getName();
+				// here take index if nominal:
+				if (lex.hasArgument()) {
+					if (this.mVariables.get(lex.getArgument()).getType() == Variable.Type.INDIVIDUAL) {
+						ids.add(lex.getArgument());
+					}
+				}				
 				if (arg1 != null) {
 					ids.add(arg1.getArgument());
 					if (arg2 != null) {

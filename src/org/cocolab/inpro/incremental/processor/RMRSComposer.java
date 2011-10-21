@@ -138,7 +138,7 @@ public class RMRSComposer extends IUModule {
 						System.out.println("-------");
 						Formula newForm = new Formula(previousFIU.getFormula());
 						for (String rule : lastDerive) {
-							System.out.println("= "+newForm);
+							System.out.println("= "+newForm.toRMRSString());
 							// go through all new syntactic rule applications
 							if (rule.startsWith("m(")) {
 								// the current rule is a lexical one; build lexical formula. 
@@ -155,21 +155,22 @@ public class RMRSComposer extends IUModule {
 									}									
 								}
 								List<AVPair> pairs = wiu.getAVPairs();
-								System.out.println(pairs);
+								System.out.println("P "+pairs);
 								
 								Formula lexitem = new Formula(lexname, type);
-								System.out.println("+ "+rule+"\n+ "+lexitem);
+								System.out.println("+ "+rule+"\n+ "+lexitem.toRMRSString());
 								newForm.forwardCombine(lexitem);
 							} else {
 								// the current rule is a syntactic one; get rule semantics from map.
 								Formula rulesem = semanticRules.get(rule);
-								System.out.println("+ "+rule+"\n+ "+rulesem);
+								System.out.println("+ "+rule+"\n+ "+rulesem.toRMRSString());
 								newForm.forwardCombine(rulesem);
 							}
-							System.out.println("= "+newForm);
+							System.out.println("= "+newForm.toRMRSString());
 							newForm.reduce();
 							//newForm.renumber(0);
-							//System.out.println(newForm.getNominalAssertions());
+							System.out.println("= "+newForm.toRMRSString());
+							System.out.println(newForm.getNominalAssertions());
 						}
 						FormulaIU newFIU = new FormulaIU(previousFIU, ca, newForm);
 						newEdits.add(new EditMessage<FormulaIU>(EditType.ADD, newFIU));

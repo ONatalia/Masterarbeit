@@ -86,6 +86,7 @@ public class RMRSLoader {
 						case 'i' : mType = Variable.Type.INDEX; break;
 						case 'x' : mType = Variable.Type.INDIVIDUAL; break;
 						case 'e' : mType = Variable.Type.EVENT; break;
+						case '_' : mType = null; break;
 						}
 					} else {
 						System.out.println("Warning: No specific semantic type given for tag"+tag+".");
