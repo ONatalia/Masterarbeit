@@ -176,7 +176,10 @@ public class RMRSComposer extends IUModule {
 						newEdits.add(new EditMessage<FormulaIU>(EditType.ADD, newFIU));
 						states.put(ca,newFIU);
 						if (!resolver.resolves(newForm)) {
+							System.err.println("Nothing resolved...");
 							// TODO: change the IU network if the formula (or its predicates) do not resolve
+						} else {
+							System.err.println("Something resolved...");
 						}
 					} else {
 						//TODO: can this happen?

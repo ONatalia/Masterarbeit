@@ -3,7 +3,6 @@ package org.cocolab.inpro.irmrsc.util;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * A simple representation of logical predicates.
  * The arguments are given as integers, representing untyped
@@ -13,6 +12,7 @@ import java.util.List;
  */
 public class SimpleAssertion {
 
+	public static enum Type { INTRANSITIVE, TRANSITIVE, DITRANSITIVE; }
 	private String predicateName;
 	private List<Integer> arguments;
 	
@@ -56,6 +56,19 @@ public class SimpleAssertion {
 	 */
 	public int getNumberOfArguments() {
 		return arguments.size();
+	}
+	
+	/**
+	 * Gets the type of assertions (transtivive with one, ditransitive with two or intransitive with 0 arguments)
+	 * @return the Type
+	 */
+	public Type getType() {
+		if (this.getNumberOfArguments() == 2) {
+			return Type.DITRANSITIVE;
+		} else if (this.getNumberOfArguments() == 1) {
+			return Type.TRANSITIVE;
+		}
+		return Type.INTRANSITIVE;
 	}
 
 	/* (non-Javadoc)
