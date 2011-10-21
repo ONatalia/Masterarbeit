@@ -129,8 +129,7 @@ public class RMRSComposer extends IUModule {
 					if (previousCa != null) {
 						FormulaIU previousFIU = firstUsefulFormulaIU;
 						if (previousCa.grounds().size() > 0) {
-							System.out.println("Pong");
-							previousFIU = (FormulaIU) states.get(previousCa);//.grounds().get(0);
+							previousFIU = (FormulaIU) states.get(previousCa);
 						}
 						List<String> lastDerive = ca.getCandidateAnalysis().getLastDerive();
 						System.out.println(firstUsefulFormulaIU);

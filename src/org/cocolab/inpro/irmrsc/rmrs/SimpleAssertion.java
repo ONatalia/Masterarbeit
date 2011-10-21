@@ -1,7 +1,9 @@
-package org.cocolab.inpro.irmrsc.util;
+package org.cocolab.inpro.irmrsc.rmrs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A simple representation of logical predicates.
@@ -10,7 +12,7 @@ import java.util.List;
  * @author andreas
  *
  */
-public class SimpleAssertion {
+public class SimpleAssertion implements VariableIDsInterpretable {
 
 	public static enum Type { INTRANSITIVE, TRANSITIVE, DITRANSITIVE; }
 	private String predicateName;
@@ -90,5 +92,22 @@ public class SimpleAssertion {
 		}
 		sb.append(")");
 		return sb.toString();
+	}
+
+	@Override
+	public Set<Integer> getVariableIDs() {
+		return new TreeSet<Integer>(arguments);
+	}
+
+	@Override
+	public void replaceVariableID(int oldID, int newID) {
+		List<Integer> newArguments = new ArrayList<Integer>(arguments.size());
+		for (Integer i : arguments) {
+			if (i.intValue() == oldID) {
+				newArguments.add(new Integer(newID));
+			} else {
+				newArguments.add(i);
+			}
+		}
 	}
 }

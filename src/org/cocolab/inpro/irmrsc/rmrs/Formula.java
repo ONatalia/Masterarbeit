@@ -14,7 +14,6 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.cocolab.inpro.irmrsc.util.SimpleAssertion;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -364,10 +363,25 @@ public class Formula extends VariableEnvironment
 				// build a SimpleAssertion				
 				if (arg0 == null && arg1 == null && arg2 == null && name.equals("_")) {
 					// do nothing
-				} else {
+					continue;
+				} 
+				if (arg0 != null && arg1 != null && arg2 != null) {
 					List<Integer> ids = new ArrayList<Integer>(3);
 					ids.add(arg0); ids.add(arg1); ids.add(arg2);
 					l.add(new SimpleAssertion(name,ids));
+					continue;
+				}
+				if (arg0 != null && arg1 != null && arg2 == null) {
+					List<Integer> ids = new ArrayList<Integer>(2);
+					ids.add(arg0); ids.add(arg1);
+					l.add(new SimpleAssertion(name,ids));
+					continue;
+				} 
+				if (arg0 != null && arg1 == null && arg2 == null) {
+					List<Integer> ids = new ArrayList<Integer>(1);
+					ids.add(arg0);
+					l.add(new SimpleAssertion(name,ids));
+					continue;
 				}
 			}
 		}
