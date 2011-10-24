@@ -17,10 +17,16 @@ import org.cocolab.inpro.irmrsc.simplepcfg.Symbol;
  * Simple incremental top down beam search parser
  */
 public class SITDBSParser {
+	
+	// counters for evaluations statistics
+	public static int cntExpansions = 0;
+	public static int cntDegradations = 0;
+	
 
 	public static final int maxCandidatesLimit = 1000;
 	public static final int maxDeletions = 2;
 	public static final int maxInsertion = 4;
+	public static final String fillerRuleAndTagName = "fill";
 
 	private PriorityQueue<CandidateAnalysis> mQueue;
 	private Grammar mGrammar;
@@ -54,11 +60,11 @@ public class SITDBSParser {
 		}
 	}
 
-	public void feed(String nextToken) {
-		this.feed(new Symbol(nextToken));
+	public int feed(String nextToken) {
+		return this.feed(new Symbol(nextToken));
 	}
 	
-	public void feed(Symbol nextToken) {
+	public int feed(Symbol nextToken) {
 		System.out.println("Feed parser: "+nextToken);
 		
 		// make a new queue for the results of parsing the current token
@@ -71,6 +77,16 @@ public class SITDBSParser {
 			newCA.newIncrementalStep(oldCA);
 			currentQueue.add(newCA);
 		}
+		
+		// special case if we have a filler
+		if (nextToken.getSymbol().equals(fillerRuleAndTagName)) {
+			for (CandidateAnalysis ca : currentQueue) {
+				ca.consumeFiller(fillerRuleAndTagName);
+			}
+			mQueue = currentQueue;
+			return getNumberOfCompletableAnalyses();
+		}
+		
 		
 		// begin parsing
 		while (true) {
@@ -116,20 +132,76 @@ public class SITDBSParser {
 				List<String> relevantProductions = mGrammar.getProductionsExpandingSymbol(topSymbol); //TODO: here: think about how add insertions support
 				// TODO: use left corner relation here: relrule = g.getLCsatisfyingProdExpSym(topSym, nextToken)
 				for (String id : relevantProductions) {
+					cntExpansions++;
 					Production p = mGrammar.getProduction(id);
 					currentQueue.add(ca.expand(p));
 				}
 			}
 		}
 		// make newQueue the new mQueue
-		// problem: wenn newqueue leer, fehler+ende.
-		// problem: satz ende aber derivation offen. wir brauch sowas wie isCompletable by with n*eps // closing of XZ-rules. vllt mit einem $S endmarker?
-		// 
 		mQueue = newQueue;
+		return getNumberOfCompletableAnalyses();
+	}
+	
+	public int getNumberOfCompletableAnalyses () {
+		int cnt = 0;
+		for (CandidateAnalysis ca : mQueue) {
+			// check if already complete
+			if (ca.isComplete()) {
+				cnt++;
+				continue;
+			}
+			// check if completable
+			Deque<Symbol> stack = ca.getStack();
+			boolean caIsCompletable = true;
+			for (Symbol sym : stack) {
+				if (! mGrammar.isEliminable(sym)) {
+					caIsCompletable = false;
+					break;
+				}
+			}
+			if (caIsCompletable) cnt++;
+		}
+		return cnt;
+	}
+	
+	public boolean complete() {
+		for (CandidateAnalysis ca : mQueue) {
+			// check if already complete
+			if (ca.isComplete()) {
+				continue;
+			}
+			// check if completable
+			Deque<Symbol> stack = ca.getStack();
+			boolean caIsCompletable = true;
+			for (Symbol sym : stack) {
+				if (! mGrammar.isEliminable(sym)) {
+					caIsCompletable = false;
+					break;
+				}
+			}
+			// complete all completable
+			if (caIsCompletable) {}
+		}
+		return true;
 	}
 	
 	public PriorityQueue<CandidateAnalysis> getQueue() {
 		return this.mQueue;
+	}
+	
+	public CandidateAnalysis degradeAnalysis (CandidateAnalysis ca, double malus) {
+		// remove the ca from the queue, degrade it and add it again.
+		if (this.mQueue.remove(ca)) {
+			cntDegradations++;
+			ca.degradeProbability(malus);
+			mQueue.add(ca);
+			System.out.println(" CA found, degraded and readded.");
+			return ca;
+		} else {
+			System.out.println(" CA not found!");
+			return null;
+		}
 	}
 
 	public void reset() {

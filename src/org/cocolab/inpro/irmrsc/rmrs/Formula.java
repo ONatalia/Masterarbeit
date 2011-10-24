@@ -281,12 +281,13 @@ public class Formula extends VariableEnvironment
 
 	@Override
 	public String toString() {
-		List<SimpleAssertion> l = this.getUnscopedPredicateLogic();
-		StringBuilder sb = new StringBuilder();
-		for (SimpleAssertion sa : l) {
-			sb.append(sa.toString()+"\\n");
-		}
-		return sb.toString();
+		return this.toRMRSString();
+//		List<SimpleAssertion> l = this.getUnscopedPredicateLogic();
+//		StringBuilder sb = new StringBuilder();
+//		for (SimpleAssertion sa : l) {
+//			sb.append(sa.toString()+"\\n");
+//		}
+//		return sb.toString();
 	}
 		
 	public String toRMRSString() {
@@ -295,13 +296,14 @@ public class Formula extends VariableEnvironment
 		s.append("[ "+mHook+" \\n{ ");
 		for (Hook h : mSlots)
 			s.append(h+" ");
-		s.append("}\\n");
+		s.append("}");
 		for (Relation r : mRels)
-			s.append(r+",\\n");
+			s.append("\\n"+r+",");
 		for (VariableIDPair p : mScons)
-			s.append("qeq("+getVariableString(p.getLeft())+","+getVariableString(p.getRight())+"),\\n");
+			s.append("\\nqeq("+getVariableString(p.getLeft())+","+getVariableString(p.getRight())+"),");
 		for (VariableIDPair p : mEqs)
-			s.append(getVariableString(p.getLeft())+"="+getVariableString(p.getRight())+",\\n");
+			s.append("\\n"+getVariableString(p.getLeft())+"="+getVariableString(p.getRight())+",");
+		s.deleteCharAt(s.length()-1);
 		s.append("]");
 		// replace all variable id string representations (of the form #v1) by their
 		// correct string according to the variable assignment and the types stored

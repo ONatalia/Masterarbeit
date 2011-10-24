@@ -44,6 +44,10 @@ public class RMRSComposer extends IUModule {
 	public final static String PROP_RESOLVER = "resolver";
 	private Resolver resolver;
 	
+	@S4Component(type = TagParser.class)
+	public static final String PROP_PARSER = "parser";
+	protected TagParser parser;
+	
 	@S4String()
 	public final static String PROP_TAG_LEXICON_FILE = "tagLexiconFile";
 	private String tagLexiconFile;
@@ -55,7 +59,11 @@ public class RMRSComposer extends IUModule {
 	private Map<CandidateAnalysisIU,FormulaIU> states = new HashMap<CandidateAnalysisIU,FormulaIU>();
 
 	private static FormulaIU firstUsefulFormulaIU;
-
+	
+	private final static double MALUS_SEMANTIC_MISMATCH = 0.7;
+	private final static double MALUS_NO_REFERENCE_RESOLUTION = 0.5;
+	
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
@@ -100,11 +108,14 @@ public class RMRSComposer extends IUModule {
 			// initialize first formula iu
 			firstUsefulFormulaIU = new FormulaIU(FormulaIU.FIRST_FORMULA_IU, Collections.EMPTY_LIST, semanticMacrosLongname.get("init"));
 			this.states.put(CandidateAnalysisIU.FIRST_CA_IU,firstUsefulFormulaIU);
-
 			
-			//Set up the resolver
+			// Set up the resolver
 			this.resolver = (Resolver) ps.getComponent(PROP_RESOLVER);
-			System.out.println("Set up resolver: " + this.resolver.toString());			
+			System.out.println("Set up resolver: " + this.resolver.toString());		
+			
+			// Set up the parser
+			this.parser = (TagParser) ps.getComponent(PROP_PARSER);
+			
 		} catch (MalformedURLException e1) {
 			e1.printStackTrace();
 		}
@@ -141,7 +152,7 @@ public class RMRSComposer extends IUModule {
 							// go through all new syntactic rule applications
 							if (rule.startsWith("m(")) {
 								// the current rule is a lexical one; build lexical formula. 
-								String tag = rule.substring(2, rule.length()-1);								
+								String tag = rule.substring(2, rule.length()-1);						
 								Variable.Type type = semanticTypesOfTags.get(tag);
 								String lexname = tag.toUpperCase(); // if no better information is there
 								// find the word/lemma
@@ -177,6 +188,7 @@ public class RMRSComposer extends IUModule {
 						if (!resolver.resolves(newForm)) {
 							System.err.println("Nothing resolved...");
 							// TODO: change the IU network if the formula (or its predicates) do not resolve
+							parser.degradeAnalysis(ca, MALUS_NO_REFERENCE_RESOLUTION);
 						} else {
 							System.err.println("Something resolved...");
 						}

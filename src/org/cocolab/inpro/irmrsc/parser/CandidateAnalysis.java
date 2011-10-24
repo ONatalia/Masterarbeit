@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import org.cocolab.inpro.irmrsc.simplepcfg.Production;
 import org.cocolab.inpro.irmrsc.simplepcfg.Symbol;
@@ -125,6 +126,11 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		return ca;
 	}
 
+	public void consumeFiller(String fillername) {
+		this.mDerivation.add(fillername);
+		this.mLastDerive.add(fillername);
+	}
+	
 	public void newIncrementalStep(CandidateAnalysis oldCA) {
 		this.mLastDerive = new ArrayList<String>();
 		this.mAntecedent = oldCA;
@@ -138,8 +144,23 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		return mStack.isEmpty();
 	}
 	
+	public boolean isCompletable(Set<Symbol> epsilonproductions) {
+		boolean completable = true;
+		for (Symbol sym : mStack) {
+			if (! epsilonproductions.contains(sym)) {
+				completable = false;
+				break;
+			}
+		}
+		return completable;
+	}
+	
 	public Symbol getTopSymbol() {
 		return mStack.peek();
+	}
+	
+	public Deque<Symbol> getStack() {
+		return mStack;
 	}
 	
 	/**
@@ -200,8 +221,14 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	 */
 	@Override
 	public String toString() {
+		String p = "";
+		if ((mProbability * 100) < 1) {
+			p = new DecimalFormat("###.#####").format(100*mProbability);
+		} else {
+			p = new DecimalFormat("###.##").format(100*mProbability);
+		}
 		return "LD=" + mLastDerive + "\\n"
-				+ "P=" + new DecimalFormat("###.##").format(100*mProbability) + "%\\n"
+				+ "P=" + p + "%\\n"
 				+ "S=" + mStack;
 	}
 

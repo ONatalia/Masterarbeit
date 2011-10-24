@@ -35,8 +35,8 @@ public class TagParser extends IUModule {
 	private double baseBeamFactor;
 	
 	private Map<TagIU,SITDBSParser> states = new HashMap<TagIU,SITDBSParser>();
-	//private Map<CandidateAnalysis, CandidateAnalysisIU> mapToCapsule = new HashMap<CandidateAnalysis, CandidateAnalysisIU>();
-	// die Map geht nicht weil equal nicht für die CAs nicht so gesetzt werden kann wie nötig. stattdessen:
+	
+	/** keep track of all analyses (in order to be able to find the right IU for a given CA. */
 	private List<CandidateAnalysisIU> analyses = new ArrayList<CandidateAnalysisIU>();
 	
 	public static String startSymbol;
@@ -92,14 +92,12 @@ public class TagParser extends IUModule {
 					TagIU previousTag = (TagIU) tag.getSameLevelLink();
 					SITDBSParser newState = new SITDBSParser(this.states.get(previousTag));
 					if (newState != null){
-						newState.feed(tag.toPayLoad());
+						int remainingAnalyses = newState.feed(tag.toPayLoad());
 						this.states.put(tag,newState);
 						for (CandidateAnalysis ca : newState.getQueue()) {
 							CandidateAnalysisIU sll = CandidateAnalysisIU.FIRST_CA_IU;
-							
 							CandidateAnalysis ante = ca.getAntecedent();
 							if (ante != null) {
-								//CandidateAnalysisIU anteIU = mapToCapsule.get(ante);
 								List<CandidateAnalysisIU> potentialAntecedents = findIU(ante);
 								for (CandidateAnalysisIU potentialAnte : potentialAntecedents) {
 									if (potentialAnte != null && potentialAnte.groundedIn().contains(previousTag)) {
@@ -109,9 +107,9 @@ public class TagParser extends IUModule {
 								}
 							}
 							CandidateAnalysisIU newCAIU = new CandidateAnalysisIU(sll, tag, ca);
-							//mapToCapsule.put(ca, newCAIU);
 							analyses.add(newCAIU);
 							newEdits.add(new EditMessage<CandidateAnalysisIU>(EditType.ADD, newCAIU));
+							//System.out.println("Remaining analyses: "+remainingAnalyses);
 						}						
 					}
 					break;
@@ -128,4 +126,37 @@ public class TagParser extends IUModule {
 		this.rightBuffer.setBuffer(newEdits);
 	}
 
+	public void degradeAnalysis(CandidateAnalysisIU caiu, double malus) {
+		System.err.println("! Degrade ca="+caiu.getCandidateAnalysis().toString()+" by "+malus+".");
+
+		double originalWeight = caiu.getCandidateAnalysis().getProbability();
+		double targetWeight = originalWeight * malus;
+
+		// find the parser state containing this candidate analysis and modify its weight
+		TagIU tagiu = (TagIU) caiu.groundedIn().get(0);
+		SITDBSParser parserStateToModify = this.states.get(tagiu);
+		CandidateAnalysis degradedCA = parserStateToModify.degradeAnalysis(caiu.getCandidateAnalysis(), malus);
+		
+		if(degradedCA != null) {
+			// the ca was found in the parser queue and degraded successfully.
+			
+			// now modify the CA referenced in the CAIU.
+			if (caiu.getCandidateAnalysis().getProbability() == targetWeight) {
+				//System.out.println(" The CAIUs weight is already degraded.");
+			} else {
+				// it seems, this is never the case.
+				caiu.getCandidateAnalysis().degradeProbability(malus);
+				//System.out.println(" The CAIUs weight has been degraded.");
+				
+			}
+			
+			// now modify the CA referenced in the list.
+			// it likewise seems, this is not needed: the objects are all referenced
+			//System.out.println(analyses);
+			
+		} else {
+			System.err.println(" The CA could not be degraded.");
+		}
+	}
+	
 }
