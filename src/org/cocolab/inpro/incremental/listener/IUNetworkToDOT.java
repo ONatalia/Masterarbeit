@@ -166,7 +166,7 @@ public class IUNetworkToDOT extends PushBuffer {
 			last = now;
 			if (runDot)
 				runDot();
-			System.err.println("BATCH: /Users/okko/Desktop/Resources/ffmpeg -r " + r + " -f image2 -i '" + out.toString() + ".png' " + out.toString() + ".mov");
+//			System.err.println("BATCH: /Users/okko/Desktop/Resources/ffmpeg -r " + r + " -f image2 -i '" + out.toString() + ".png' " + out.toString() + ".mov");
 		}
 	}
 	
