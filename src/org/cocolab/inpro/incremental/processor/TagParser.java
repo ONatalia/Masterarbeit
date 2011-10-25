@@ -65,7 +65,9 @@ public class TagParser extends IUModule {
 		Iterator<CandidateAnalysisIU> i = analyses.iterator();
 		while(i.hasNext()) {
 			CandidateAnalysisIU iu = i.next();
-			if(ca.toString().equals(iu.toPayLoad())) {
+			//TODO this is a hack: we compare the fullstring-representation of the CAs. a better alternative would be to
+			// properly implement equal-like functions for CA and all subobjects.
+			if(ca.toFullString().equals(iu.getCandidateAnalysis().toFullString())) {
 				l.add(iu);
 			}
 		}

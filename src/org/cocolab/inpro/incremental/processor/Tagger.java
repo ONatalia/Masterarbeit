@@ -28,6 +28,8 @@ import edu.cmu.sphinx.util.props.S4String;
  */
 public class Tagger extends IUModule {
 
+	public final static String NO_TAG_TAG = "unknown";
+	
 	@S4String(defaultValue = "res/PentoAVMapping")
 	public final static String PROP_WORD_SEMANTICS = "lookupTags";
 
@@ -69,6 +71,13 @@ public class Tagger extends IUModule {
 								newEdits.add(new EditMessage<TagIU>(EditType.ADD, new TagIU(sll, Collections.singletonList(newWord), (String) tagPair.getValue())));
 							}
 						}
+					} else {
+						// the word did not recieve a tag; be robust
+						TagIU sll = TagIU.FIRST_TAG_IU;
+						if (newWord.getSameLevelLink().grounds().size() > 0) {
+							sll = (TagIU) newWord.getSameLevelLink().grounds().get(0);
+						}
+						newEdits.add(new EditMessage<TagIU>(EditType.ADD, new TagIU(sll, Collections.singletonList(newWord), NO_TAG_TAG)));
 					}
 					break;
 				case COMMIT:

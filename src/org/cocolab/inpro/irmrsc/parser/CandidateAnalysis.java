@@ -216,19 +216,30 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		return 0;
     }
 	
+	/*
+		this.mDerivation = new ArrayList<String>(mDerivation);
+		this.mLastDerive = new ArrayList<String>(mLastDerive);
+		this.mAntecedent = mAntecedent; // link not copy
+		this.mStack = new ArrayDeque<Symbol>(mStack);
+		this.mProbability = mProbability;
+		this.mFigureOfMerit = mFigureOfMerit;
+		this.remainingString = new ArrayList<String>(remainingString);
+	 */
+
+	public String toFullString() {
+		return "D=" + mDerivation + " "
+				+ "LD=" + mLastDerive + " "
+				+ "P=" + new DecimalFormat("###.######").format(100*mProbability) + "%\\n"
+				+ "S=" + mStack;
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		String p = "";
-		if ((mProbability * 100) < 1) {
-			p = new DecimalFormat("###.#####").format(100*mProbability);
-		} else {
-			p = new DecimalFormat("###.##").format(100*mProbability);
-		}
 		return "LD=" + mLastDerive + "\\n"
-				+ "P=" + p + "%\\n"
+				+ "P=" + new DecimalFormat("###.######").format(100*mProbability) + "%\\n"
 				+ "S=" + mStack;
 	}
 
