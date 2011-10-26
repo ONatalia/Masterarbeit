@@ -157,7 +157,7 @@ public class Formula extends VariableEnvironment
 		Formula f = new Formula(fo);
 		// renumber f
 		f.renumber(this.getMaxID()+1);
-		System.out.println("N "+f.toRMRSString());
+//		System.out.println("N "+f.toRMRSString());
 		
 		// join variable assignments
 		for (Map.Entry<Integer, Variable> e : f.mVariables.entrySet()) {

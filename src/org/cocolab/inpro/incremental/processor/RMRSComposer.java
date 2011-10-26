@@ -79,10 +79,10 @@ public class RMRSComposer extends IUModule {
 				if (! (shortname == null)) {
 					semanticMacrosShortname.put(shortname, m.getFormula());
 				} else {
-					System.out.println("Warning: No shortname given for macro "+m.getLongName()+".");
+					logger.info("Warning: No shortname given for macro "+m.getLongName()+".");
 				}
 			}
-			System.out.println("Successfully loaded "+semanticMacrosLongname.size()+" semantic macros.");
+			logger.info("Successfully loaded "+semanticMacrosLongname.size()+" semantic macros.");
 
 			// load semantic rules
 			semRulesFile = ps.getString(PROP_SEM_RULES_FILE);
@@ -93,17 +93,17 @@ public class RMRSComposer extends IUModule {
 				String rulename = e.getKey();
 				String longname = e.getValue();
 				if (! semanticMacrosLongname.containsKey(longname)) {
-					System.out.println("Error: Semantic macro with longname '"+longname+"' cannot be found.");
+					logger.info("Error: Semantic macro with longname '"+longname+"' cannot be found.");
 				} else {
 					semanticRules.put(rulename, semanticMacrosLongname.get(longname));
 				}					
 			}
-			System.out.println("Successfully loaded "+rules.size()+" semantic rules.");
+			logger.info("Successfully loaded "+rules.size()+" semantic rules.");
 			
 			// load tag lexicon
 			tagLexiconFile = ps.getString(PROP_TAG_LEXICON_FILE);
 			semanticTypesOfTags = RMRSLoader.loadTagLexicon(new URL(tagLexiconFile));
-			System.out.println("Successfully loaded "+semanticTypesOfTags.size()+" associations of semantic types and POS tags.");
+			logger.info("Successfully loaded "+semanticTypesOfTags.size()+" associations of semantic types and POS tags.");
 			
 			// initialize first formula iu
 			firstUsefulFormulaIU = new FormulaIU(FormulaIU.FIRST_FORMULA_IU, Collections.EMPTY_LIST, semanticMacrosLongname.get("init"));
@@ -111,7 +111,7 @@ public class RMRSComposer extends IUModule {
 			
 			// Set up the resolver
 			this.resolver = (Resolver) ps.getComponent(PROP_RESOLVER);
-			System.out.println("Set up resolver: " + this.resolver.toString());		
+			logger.info("Set up resolver: " + this.resolver.toString());		
 			
 			// Set up the parser
 			this.parser = (TagParser) ps.getComponent(PROP_PARSER);
@@ -143,12 +143,10 @@ public class RMRSComposer extends IUModule {
 							previousFIU = (FormulaIU) states.get(previousCa);
 						}
 						List<String> lastDerive = ca.getCandidateAnalysis().getLastDerive();
-						System.out.println(firstUsefulFormulaIU);
-						
-						System.out.println("-------");
+						logger.debug("-------");
 						Formula newForm = new Formula(previousFIU.getFormula());
 						for (String rule : lastDerive) {
-							System.out.println("= "+newForm.toRMRSString());
+							logger.debug("= "+newForm.toRMRSString());
 							// go through all new syntactic rule applications
 							if (rule.startsWith("m(")) {
 								// the current rule is a lexical one; build lexical formula. 
@@ -165,32 +163,28 @@ public class RMRSComposer extends IUModule {
 									}									
 								}
 								List<AVPair> pairs = wiu.getAVPairs();
-								System.out.println("P "+pairs);
+								logger.debug("P "+pairs);
 								
 								Formula lexitem = new Formula(lexname, type);
-								System.out.println("+ "+rule+"\n+ "+lexitem.toRMRSString());
+								logger.debug("+ "+rule+"\n+ "+lexitem.toRMRSString());
 								newForm.forwardCombine(lexitem);
 							} else {
 								// the current rule is a syntactic one; get rule semantics from map.
 								Formula rulesem = semanticRules.get(rule);
-								System.out.println("+ "+rule+"\n+ "+rulesem.toRMRSString());
+								logger.debug("+ "+rule+"\n+ "+rulesem.toRMRSString());
 								newForm.forwardCombine(rulesem);
 							}
-							System.out.println("= "+newForm.toRMRSString());
+							logger.debug("= "+newForm.toRMRSString());
 							newForm.reduce();
 							//newForm.renumber(0);
-							System.out.println("= "+newForm.toRMRSString());
-							System.out.println(newForm.getNominalAssertions());
+							logger.debug("= "+newForm.toRMRSString());
+							logger.debug(newForm.getNominalAssertions());
 						}
 						FormulaIU newFIU = new FormulaIU(previousFIU, ca, newForm);
 						newEdits.add(new EditMessage<FormulaIU>(EditType.ADD, newFIU));
 						states.put(ca,newFIU);
 						if (!resolver.resolves(newForm)) {
-							System.err.println("Nothing resolved...");
-							// TODO: change the IU network if the formula (or its predicates) do not resolve
 							parser.degradeAnalysis(ca, MALUS_NO_REFERENCE_RESOLUTION);
-						} else {
-							System.err.println("Something resolved...");
 						}
 					} else {
 						//TODO: can this happen?

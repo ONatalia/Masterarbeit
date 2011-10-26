@@ -8,6 +8,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.irmrsc.simplepcfg.Grammar;
 import org.cocolab.inpro.irmrsc.simplepcfg.Production;
 import org.cocolab.inpro.irmrsc.simplepcfg.Symbol;
@@ -32,6 +33,8 @@ public class SITDBSParser {
 	private Grammar mGrammar;
 	private double mBaseBeamFactor;
 	
+	static Logger logger;
+
 	public SITDBSParser(Grammar grammar, double bbf) {
 		mGrammar = grammar;
 		mBaseBeamFactor = bbf;
@@ -56,7 +59,7 @@ public class SITDBSParser {
 			this.mBaseBeamFactor = p.mBaseBeamFactor;
 			this.mQueue = new PriorityQueue<CandidateAnalysis>();
 			for (CandidateAnalysis ca : p.mQueue) 
-				mQueue.add(new CandidateAnalysis(ca)); 
+				mQueue.add(new CandidateAnalysis(ca));
 		}
 	}
 
@@ -65,7 +68,7 @@ public class SITDBSParser {
 	}
 	
 	public int feed(Symbol nextToken) {
-		System.out.println("Feed parser: "+nextToken);
+		logger.debug("Feed parser: "+nextToken);
 		
 		// make a new queue for the results of parsing the current token
 		PriorityQueue<CandidateAnalysis> newQueue = new PriorityQueue<CandidateAnalysis>(2);
@@ -92,28 +95,28 @@ public class SITDBSParser {
 		while (true) {
 			if (currentQueue.size() >= maxCandidatesLimit) {
 				// max size reached; await next token
-				System.out.println(": max size reached");
+				logger.debug(": max size reached");
 				break;
 			}
 			CandidateAnalysis ca = currentQueue.poll();
 			if (ca == null) {
 				// no more candidate analysis on the queue; await next token
-				System.out.println(": no more ca on queue");
+				logger.debug(": no more ca on queue");
 				break;
 			}
 			if (! newQueue.isEmpty()) {
 				if (ca.getProbability() < (newQueue.peek().getProbability() * mBaseBeamFactor * newQueue.size())) {
 					// best derivation below threshold; await next token
-					System.out.println(": outside beam");
+					logger.debug(": outside beam");
 					break;
 				} else {
-					System.out.println(": "+ca.getProbability()+" >= ("+newQueue.peek().getProbability()+" * "+mBaseBeamFactor+" * "+newQueue.size()+").");
+					logger.debug(": "+ca.getProbability()+" >= ("+newQueue.peek().getProbability()+" * "+mBaseBeamFactor+" * "+newQueue.size()+").");
 				}
 			}
 			if (ca.isComplete()) {
 				// stack is empty i.e. no more material expected, although we have another token;
 				// drop this analysis and continue with next one
-				System.out.println(": completed too early");
+				logger.debug(": completed too early");
 				continue;
 			}
 			Symbol topSymbol = ca.getTopSymbol();
@@ -196,10 +199,10 @@ public class SITDBSParser {
 			cntDegradations++;
 			ca.degradeProbability(malus);
 			mQueue.add(ca);
-			System.out.println(" CA found, degraded and readded.");
+			logger.debug(" CA found, degraded and readded.");
 			return ca;
 		} else {
-			System.out.println(" CA not found!");
+			logger.debug(" CA not found!");
 			return null;
 		}
 	}
@@ -213,9 +216,13 @@ public class SITDBSParser {
 
 	public void info() {
 		for (CandidateAnalysis ca : mQueue) {
-			System.out.println(ca);
-			System.out.println(ca.printDerivation());
+			logger.debug(ca);
+			logger.debug(ca.printDerivation());
 		}
 	}
 	
+	public void setLogger(Logger l) {
+		logger = l;
+	}
+
 }

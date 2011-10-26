@@ -56,6 +56,7 @@ public class TagParser extends IUModule {
 		// initialize first parser
 		baseBeamFactor = ps.getDouble(PROP_BASE_BEAM_FACTOR);
 		SITDBSParser p = new SITDBSParser(g, baseBeamFactor);
+		p.setLogger(this.logger);
 		this.states.put(TagIU.FIRST_TAG_IU, p);
 	}
 	
@@ -111,7 +112,6 @@ public class TagParser extends IUModule {
 							CandidateAnalysisIU newCAIU = new CandidateAnalysisIU(sll, tag, ca);
 							analyses.add(newCAIU);
 							newEdits.add(new EditMessage<CandidateAnalysisIU>(EditType.ADD, newCAIU));
-							//System.out.println("Remaining analyses: "+remainingAnalyses);
 						}						
 					}
 					break;
@@ -129,7 +129,7 @@ public class TagParser extends IUModule {
 	}
 
 	public void degradeAnalysis(CandidateAnalysisIU caiu, double malus) {
-		System.err.println("! Degrade ca="+caiu.getCandidateAnalysis().toString()+" by "+malus+".");
+		logger.debug("! Degrade ca="+caiu.getCandidateAnalysis().toString()+" by "+malus+".");
 
 		double originalWeight = caiu.getCandidateAnalysis().getProbability();
 		double targetWeight = originalWeight * malus;
@@ -157,7 +157,7 @@ public class TagParser extends IUModule {
 			//System.out.println(analyses);
 			
 		} else {
-			System.err.println(" The CA could not be degraded.");
+			logger.debug(" The CA could not be degraded.");
 		}
 	}
 	
