@@ -64,6 +64,7 @@ public class RMRSComposer extends IUModule {
 	private final static double MALUS_SEMANTIC_MISMATCH = 0.7;
 	private final static double MALUS_NO_REFERENCE_RESOLUTION = 0.5;
 	
+	private static String logPrefix = "[C] ";
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -145,10 +146,10 @@ public class RMRSComposer extends IUModule {
 							previousFIU = (FormulaIU) states.get(previousCa);
 						}
 						List<String> lastDerive = ca.getCandidateAnalysis().getLastDerive();
-						logger.debug("-------");
+						logger.debug(logPrefix+"-------");
 						Formula newForm = new Formula(previousFIU.getFormula());
 						for (String rule : lastDerive) {
-							logger.debug("= "+newForm.toRMRSString());
+							logger.debug(logPrefix+"= "+newForm.toStringOneLine());
 							// go through all new syntactic rule applications
 							if (rule.startsWith("m(")) {
 								// the current rule is a lexical one; build lexical formula. 
@@ -165,22 +166,24 @@ public class RMRSComposer extends IUModule {
 									}									
 								}
 								List<AVPair> pairs = wiu.getAVPairs();
-								logger.debug("P "+pairs);
+								logger.debug(logPrefix+"P "+pairs);
 								
 								Formula lexitem = new Formula(lexname, type);
-								logger.debug("+ "+rule+"\n+ "+lexitem.toRMRSString());
+								logger.debug(logPrefix+"+ "+rule);
+								logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
 								newForm.forwardCombine(lexitem);
 							} else {
 								// the current rule is a syntactic one; get rule semantics from map.
 								Formula rulesem = semanticRules.get(rule);
-								logger.debug("+ "+rule+"\n+ "+rulesem.toRMRSString());
+								logger.debug(logPrefix+"+ "+rule);
+								logger.debug(logPrefix+"+ "+rulesem.toStringOneLine());
 								newForm.forwardCombine(rulesem);
 							}
-							logger.debug("= "+newForm.toRMRSString());
+							logger.debug(logPrefix+"= "+newForm.toStringOneLine());
 							newForm.reduce();
 							//newForm.renumber(0);
-							logger.debug("= "+newForm.toRMRSString());
-							logger.debug(newForm.getNominalAssertions());
+							logger.debug(logPrefix+"= "+newForm.toStringOneLine());
+							logger.debug(logPrefix+"> "+newForm.getNominalAssertions());
 						}
 						FormulaIU newFIU = new FormulaIU(previousFIU, ca, newForm);
 						newEdits.add(new EditMessage<FormulaIU>(EditType.ADD, newFIU));

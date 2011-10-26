@@ -23,7 +23,6 @@ public class SITDBSParser {
 	public static int cntExpansions = 0;
 	public static int cntDegradations = 0;
 	
-
 	public static final int maxCandidatesLimit = 1000;
 	public static final int maxDeletions = 2;
 	public static final int maxInsertion = 4;
@@ -33,6 +32,7 @@ public class SITDBSParser {
 	private Grammar mGrammar;
 	private double mBaseBeamFactor;
 	
+	static String logPrefix = "[P] ";
 	static Logger logger;
 
 	public SITDBSParser(Grammar grammar, double bbf) {
@@ -63,12 +63,17 @@ public class SITDBSParser {
 		}
 	}
 
-	public int feed(String nextToken) {
-		return this.feed(new Symbol(nextToken));
+	public void feed(String nextToken) {
+		this.feed(new Symbol(nextToken));
 	}
 	
-	public int feed(Symbol nextToken) {
-		logger.debug("Feed parser: "+nextToken);
+	public void feed(Symbol nextToken) {
+		logger.debug(logPrefix+"feed: "+nextToken);
+		
+		if (mQueue.size() < 1) {
+			// the queue is empty and no further token can be accepted
+			return;
+		}
 		
 		// make a new queue for the results of parsing the current token
 		PriorityQueue<CandidateAnalysis> newQueue = new PriorityQueue<CandidateAnalysis>(2);
@@ -87,36 +92,36 @@ public class SITDBSParser {
 				ca.consumeFiller(fillerRuleAndTagName);
 			}
 			mQueue = currentQueue;
-			return getNumberOfCompletableAnalyses();
+			return;
 		}
-		
 		
 		// begin parsing
 		while (true) {
 			if (currentQueue.size() >= maxCandidatesLimit) {
 				// max size reached; await next token
-				logger.debug(": max size reached");
+				logger.debug(logPrefix+": max size reached");
 				break;
 			}
 			CandidateAnalysis ca = currentQueue.poll();
 			if (ca == null) {
 				// no more candidate analysis on the queue; await next token
-				logger.debug(": no more ca on queue");
+				logger.debug(logPrefix+": no more ca on queue");
 				break;
 			}
 			if (! newQueue.isEmpty()) {
 				if (ca.getProbability() < (newQueue.peek().getProbability() * mBaseBeamFactor * newQueue.size())) {
 					// best derivation below threshold; await next token
-					logger.debug(": outside beam");
+					logger.debug(logPrefix+": outside beam");
 					break;
 				} else {
-					logger.debug(": "+ca.getProbability()+" >= ("+newQueue.peek().getProbability()+" * "+mBaseBeamFactor+" * "+newQueue.size()+").");
+					logger.debug(String.format(logPrefix+": %1$9.4g >= %2$9.4g (n=%3$d).", ca.getProbability(), (newQueue.peek().getProbability() * mBaseBeamFactor * newQueue.size()), newQueue.size()));
+					//logger.debug(logPrefix+": "+ca.getProbability()+" >= ("+newQueue.peek().getProbability()+" * "+mBaseBeamFactor+" * "+newQueue.size()+").");
 				}
 			}
 			if (ca.isComplete()) {
 				// stack is empty i.e. no more material expected, although we have another token;
 				// drop this analysis and continue with next one
-				logger.debug(": completed too early");
+				logger.debug(logPrefix+": completed too early");
 				continue;
 			}
 			Symbol topSymbol = ca.getTopSymbol();
@@ -141,9 +146,8 @@ public class SITDBSParser {
 				}
 			}
 		}
-		// make newQueue the new mQueue
+		// make newQueue the new mQueue and return the number of analyses in it
 		mQueue = newQueue;
-		return getNumberOfCompletableAnalyses();
 	}
 	
 	public int getNumberOfCompletableAnalyses () {
@@ -154,7 +158,7 @@ public class SITDBSParser {
 				cnt++;
 				continue;
 			}
-			// check if completable
+			// check if completable, i.e. all remaining symbols on the stack are eliminable
 			Deque<Symbol> stack = ca.getStack();
 			boolean caIsCompletable = true;
 			for (Symbol sym : stack) {
@@ -163,7 +167,9 @@ public class SITDBSParser {
 					break;
 				}
 			}
-			if (caIsCompletable) cnt++;
+			if (caIsCompletable) {
+				cnt++;
+			}
 		}
 		return cnt;
 	}
@@ -199,10 +205,10 @@ public class SITDBSParser {
 			cntDegradations++;
 			ca.degradeProbability(malus);
 			mQueue.add(ca);
-			logger.debug(" CA found, degraded and readded.");
+			logger.debug(logPrefix+" CA found, degraded and readded.");
 			return ca;
 		} else {
-			logger.debug(" CA not found!");
+			logger.debug(logPrefix+" CA not found!");
 			return null;
 		}
 	}
@@ -216,9 +222,16 @@ public class SITDBSParser {
 
 	public void info() {
 		for (CandidateAnalysis ca : mQueue) {
-			logger.debug(ca);
-			logger.debug(ca.printDerivation());
+			logger.debug(logPrefix+ca);
+			logger.debug(logPrefix+ca.printDerivation());
 		}
+	}
+	
+	public void status() {
+		logger.debug(logPrefix+"status: remains="+mQueue.size()
+				+" completable="+ getNumberOfCompletableAnalyses()
+				+" expansions="+cntExpansions
+				+" degradations="+cntDegradations);
 	}
 	
 	public void setLogger(Logger l) {

@@ -95,7 +95,7 @@ public class TagParser extends IUModule {
 					TagIU previousTag = (TagIU) tag.getSameLevelLink();
 					SITDBSParser newState = new SITDBSParser(this.states.get(previousTag));
 					if (newState != null){
-						int remainingAnalyses = newState.feed(tag.toPayLoad());
+						newState.feed(tag.toPayLoad());
 						this.states.put(tag,newState);
 						for (CandidateAnalysis ca : newState.getQueue()) {
 							CandidateAnalysisIU sll = CandidateAnalysisIU.FIRST_CA_IU;
@@ -112,13 +112,14 @@ public class TagParser extends IUModule {
 							CandidateAnalysisIU newCAIU = new CandidateAnalysisIU(sll, tag, ca);
 							analyses.add(newCAIU);
 							newEdits.add(new EditMessage<CandidateAnalysisIU>(EditType.ADD, newCAIU));
-						}						
+						}
+						newState.status();
 					}
 					break;
 				case COMMIT:
-					for (IU sem : tag.grounds()) {
-						if (sem instanceof CandidateAnalysisIU) {
-							newEdits.add(new EditMessage<CandidateAnalysisIU>(EditType.COMMIT, (CandidateAnalysisIU) sem));
+					for (IU iu : tag.grounds()) {
+						if (iu instanceof CandidateAnalysisIU) {
+							newEdits.add(new EditMessage<CandidateAnalysisIU>(EditType.COMMIT, (CandidateAnalysisIU) iu));
 						}
 					}
 					break;
@@ -129,7 +130,7 @@ public class TagParser extends IUModule {
 	}
 
 	public void degradeAnalysis(CandidateAnalysisIU caiu, double malus) {
-		logger.debug("! Degrade ca="+caiu.getCandidateAnalysis().toString()+" by "+malus+".");
+		logger.debug("[P] Degrade ca="+caiu.getCandidateAnalysis().toString()+" by "+malus+".");
 
 		double originalWeight = caiu.getCandidateAnalysis().getProbability();
 		double targetWeight = originalWeight * malus;
@@ -144,20 +145,15 @@ public class TagParser extends IUModule {
 			
 			// now modify the CA referenced in the CAIU.
 			if (caiu.getCandidateAnalysis().getProbability() == targetWeight) {
-				//System.out.println(" The CAIUs weight is already degraded.");
+				// do nothing
 			} else {
 				// it seems, this is never the case.
-				caiu.getCandidateAnalysis().degradeProbability(malus);
-				//System.out.println(" The CAIUs weight has been degraded.");
-				
-			}
-			
+				caiu.getCandidateAnalysis().degradeProbability(malus);				
+			}			
 			// now modify the CA referenced in the list.
 			// it likewise seems, this is not needed: the objects are all referenced
-			//System.out.println(analyses);
-			
 		} else {
-			logger.debug(" The CA could not be degraded.");
+			logger.fatal("[P] The CA could not be degraded.");
 		}
 	}
 	

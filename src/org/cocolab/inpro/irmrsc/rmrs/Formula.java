@@ -289,11 +289,19 @@ public class Formula extends VariableEnvironment
 //		}
 //		return sb.toString();
 	}
-		
+
+	public String toStringOneLine() {
+		return this.toString().replace("\\n", " ");
+	}
+	
+	public String toStringMultiLine() {
+		return this.toString().replace("\\n", "\n");
+	}
+	
 	public String toRMRSString() {
 		// i'm using \\n line feeds here for the dot notifier
 		StringBuilder s = new StringBuilder();
-		s.append("[ "+mHook+" \\n{ ");
+		s.append("[ "+mHook+"\\n{ ");
 		for (Hook h : mSlots)
 			s.append(h+" ");
 		s.append("}");
@@ -325,7 +333,6 @@ public class Formula extends VariableEnvironment
 	public List<SimpleAssertion> getUnscopedPredicateLogic() {
 		List<SimpleAssertion> l = new ArrayList<SimpleAssertion>();
 		// find all anchors ids
-		Set<Integer> anchorsIDs = new TreeSet<Integer>();
 		for (Variable v : mVariables.values()) {
 			if (v.getType() == Variable.Type.ANCHOR) {
 				int aid = v.getID();

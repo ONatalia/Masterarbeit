@@ -10,7 +10,6 @@ import java.util.Map;
 import org.cocolab.inpro.irmrsc.rmrs.Formula;
 import org.cocolab.inpro.irmrsc.rmrs.SemanticMacro;
 import org.cocolab.inpro.irmrsc.rmrs.Variable;
-import org.cocolab.inpro.irmrsc.rmrs.Variable.Type;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
