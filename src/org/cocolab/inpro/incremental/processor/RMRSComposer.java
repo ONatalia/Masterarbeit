@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.cocolab.inpro.domains.pentomino.nlu.PentoRMRSResolver;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.CandidateAnalysisIU;
 import org.cocolab.inpro.incremental.unit.EditMessage;
@@ -68,6 +69,7 @@ public class RMRSComposer extends IUModule {
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
+		PentoRMRSResolver.setLogger(logger);
 		try {
 			// load semantic macros
 			semMacrosFile = ps.getString(PROP_SEM_MACROS_FILE);
