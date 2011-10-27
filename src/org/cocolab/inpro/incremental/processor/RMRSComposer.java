@@ -217,11 +217,25 @@ public class RMRSComposer extends IUModule {
 	public interface Resolver extends Configurable {
 		/**
 		 * Called whenever a new FormulaIU is created to determine
-		 * if its relations match something in the world.
+		 * if its relations resolve something in the world.
 		 * @param f the formula
-		 * @return true of f's relations hold in the world, i.e. in the implementing class
+		 * @return true if f's predicates all resolve something in the world
 		 */
 		public boolean resolves(Formula f);
+		
+		
+		/**
+		 * Called whenever a new Formula is created to determine
+		 * what domain concepts it resolves in the world.
+		 * <br />
+		 * The map returns maps (Integer) predicate arguments to possible world objects.
+		 * <br />
+		 * This can be used to further validate the Formula.
+		 *  
+		 * @param f the formula
+		 * @return a map of Formula predicate arguments to lists of objects that the argument can stand for
+		 */
+		public Map<Integer, List<? extends Object>> resolvesObjects(Formula f);
 	}
 
 }
