@@ -51,6 +51,14 @@ public class IUNetworkToDOT extends PushBuffer {
 	/** Whether to turn dot output into images */
 	private boolean runDot;
 
+	/** Boolean for determining whether to scale output images quickly rather than smoothly*/
+	@S4Boolean(defaultValue = false)
+	/** Property for boolean for determining whether to scale output images quickly rather than smoothly */
+	public final static String PROP_FAST_SCALE = "useFastScaling";
+	/** Setting for scaling images smooth or fast */
+	private int scale = Image.SCALE_SMOOTH;
+
+	
 	/** Boolean for whether to show dot output images */
 	@S4Boolean(defaultValue = false)
 	/** Property for boolean for whether to show dot output images */
@@ -119,7 +127,9 @@ public class IUNetworkToDOT extends PushBuffer {
 					f.setVisible(true);
 				}
 			});
-
+			if (ps.getBoolean(PROP_FAST_SCALE)) {
+				this.scale = Image.SCALE_FAST; 
+			}
 		}
 		this.offset = System.currentTimeMillis();
 	}
@@ -162,7 +172,7 @@ public class IUNetworkToDOT extends PushBuffer {
 			printTail();
 			this.outStream.close();
 			long now = System.currentTimeMillis() - this.offset;
-			double r = 1.0 / (now-last)*1000;
+//			double r = 1.0 / (now-last)*1000;
 			last = now;
 			if (runDot)
 				runDot();
@@ -257,9 +267,9 @@ public class IUNetworkToDOT extends PushBuffer {
 						File imageFile = new File(this.out + "." + this.outputFormat);
 						if (imageFile.exists()) {
 							ImageIcon icon = new ImageIcon(imageFile.toString());
-							Image image = icon.getImage();
-							image = image.getScaledInstance(l.getWidth(), -1, Image.SCALE_SMOOTH);
-							image = image.getScaledInstance(-1, l.getHeight(), Image.SCALE_SMOOTH);
+							Image image = icon.getImage();							
+							image = image.getScaledInstance(l.getWidth(), -1, scale);
+							image = image.getScaledInstance(-1, l.getHeight(), scale);
 							icon.setImage(image);
 							l.setIcon(icon);
 						} else {
