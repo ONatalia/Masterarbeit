@@ -62,7 +62,7 @@ public class RMRSComposer extends IUModule {
 	private static FormulaIU firstUsefulFormulaIU;
 	
 	private final static double MALUS_SEMANTIC_MISMATCH = 0.7;
-	private final static double MALUS_NO_REFERENCE_RESOLUTION = 0.5;
+	private final static double MALUS_NO_REFERENCE_RESOLUTION = 1.0;
 	
 	private static String logPrefix = "[C] ";
 	

@@ -358,7 +358,7 @@ public class Formula extends VariableEnvironment
 								arg0 = r.getArgument();
 								break;
 							}
-							if (argrelname.equals("ARG1") || argrelname.equals("RSTR")) {
+							if (argrelname.equals("ARG1") || argrelname.equals("RSTR") || argrelname.equals("ARGN")) {
 								arg1 = r.getArgument();
 								break;
 							}
@@ -429,6 +429,7 @@ public class Formula extends VariableEnvironment
 						if (r.getName().equals("BV")) arg1 = r;
 						if (r.getName().equals("ARG1")) arg1 = r;
 						if (r.getName().equals("ARG2")) arg2 = r;
+						if (r.getName().equals("ARGN")) arg1 = r;
 						continue;
 					}
 				}
