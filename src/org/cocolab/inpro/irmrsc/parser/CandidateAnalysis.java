@@ -226,6 +226,10 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		this.remainingString = new ArrayList<String>(remainingString);
 	 */
 
+	public String toFinalString() {
+		return String.format("%1$12.8f",(100*mProbability)) + " " + mDerivation + "";
+	}
+	
 	public String toFullString() {
 		return "D=" + mDerivation + " "
 				+ "LD=" + mLastDerive + " "

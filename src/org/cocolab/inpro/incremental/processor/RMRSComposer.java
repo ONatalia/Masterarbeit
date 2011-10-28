@@ -152,26 +152,32 @@ public class RMRSComposer extends IUModule {
 							logger.debug(logPrefix+"= "+newForm.toStringOneLine());
 							// go through all new syntactic rule applications
 							if (rule.startsWith("m(")) {
-								// the current rule is a lexical one; build lexical formula. 
-								String tag = rule.substring(2, rule.length()-1);						
-								Variable.Type type = semanticTypesOfTags.get(tag);
-								String lexname = tag.toUpperCase(); // if no better information is there
-								// find the word/lemma
-								TagIU tiu = (TagIU) ca.groundedIn().get(0);
-								WordIU wiu = (WordIU) tiu.groundedIn().get(0);
-								if (wiu != null) {
-									List<String> l = wiu.getValues("lemma");
-									if (l.size() > 0) {
-										lexname = l.get(0);
-									}									
+								// parser match
+								String tag = rule.substring(2, rule.length()-1);
+								if (tag.equals("S!")) {
+									// this is the sentence end marker, signaling that nothing more is to come
+									// do not change the new formula iu
+								} else {
+									// the current rule is a lexical one; build lexical formula.						
+									Variable.Type type = semanticTypesOfTags.get(tag);
+									String lexname = tag.toUpperCase(); // fallback to this if no better information is there
+									// find the word/lemma
+									TagIU tiu = (TagIU) ca.groundedIn().get(0);
+									WordIU wiu = (WordIU) tiu.groundedIn().get(0);
+									if (wiu != null) {
+										List<String> l = wiu.getValues("lemma");
+										if (l.size() > 0) {
+											lexname = l.get(0);
+										}									
+									}
+									List<AVPair> pairs = wiu.getAVPairs();
+									logger.debug(logPrefix+"P "+pairs);
+									
+									Formula lexitem = new Formula(lexname, type);
+									logger.debug(logPrefix+"+ "+rule);
+									logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
+									newForm.forwardCombine(lexitem);
 								}
-								List<AVPair> pairs = wiu.getAVPairs();
-								logger.debug(logPrefix+"P "+pairs);
-								
-								Formula lexitem = new Formula(lexname, type);
-								logger.debug(logPrefix+"+ "+rule);
-								logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
-								newForm.forwardCombine(lexitem);
 							} else {
 								// the current rule is a syntactic one; get rule semantics from map.
 								Formula rulesem = semanticRules.get(rule);
@@ -185,11 +191,15 @@ public class RMRSComposer extends IUModule {
 							logger.debug(logPrefix+"= "+newForm.toStringOneLine());
 							logger.debug(logPrefix+"> "+newForm.getNominalAssertions());
 						}
+						// create the new formula iu and store it
 						FormulaIU newFIU = new FormulaIU(previousFIU, ca, newForm);
 						newEdits.add(new EditMessage<FormulaIU>(EditType.ADD, newFIU));
 						states.put(ca,newFIU);
-						if (!resolver.resolves(newForm)) {
-							parser.degradeAnalysis(ca, MALUS_NO_REFERENCE_RESOLUTION);
+						// if the analysis is not complete, try to resolve the formula, and degrade in case of failure
+						if (!ca.getCandidateAnalysis().isComplete()) {
+							if (!resolver.resolves(newForm)) {
+								parser.degradeAnalysis(ca, MALUS_NO_REFERENCE_RESOLUTION);
+							}
 						}
 					} else {
 						//TODO: can this happen?
@@ -199,6 +209,12 @@ public class RMRSComposer extends IUModule {
 					for (IU sem : ca.grounds()) {
 						if (sem instanceof FormulaIU) {
 							newEdits.add(new EditMessage<FormulaIU>(EditType.COMMIT, (FormulaIU) sem));
+							// print out full statistics for this sem if it is complete.
+							if (ca.getCandidateAnalysis().isComplete()) {
+								logger.debug("[Final] SYN "+ca.getCandidateAnalysis().toFinalString());
+								logger.debug("[Final] SEM "+((FormulaIU)sem).getFormula().toStringOneLine());
+								logger.debug("[Final] MRS "+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic());
+							}
 						}
 					}
 					break;

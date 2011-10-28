@@ -23,10 +23,12 @@ public class SITDBSParser {
 	public static int cntExpansions = 0;
 	public static int cntDegradations = 0;
 	
+	
 	public static final int maxCandidatesLimit = 1000;
 	public static final int maxDeletions = 2;
 	public static final int maxInsertion = 4;
 	public static final String fillerRuleAndTagName = "fill";
+	//public static final String EOSMarker = "</S>";
 
 	private PriorityQueue<CandidateAnalysis> mQueue;
 	private Grammar mGrammar;
@@ -216,6 +218,7 @@ public class SITDBSParser {
 	public void reset() {
 		mQueue = new PriorityQueue<CandidateAnalysis>(5);
 		Deque<Symbol> s = new ArrayDeque<Symbol>();
+		s.push(mGrammar.getEnd());
 		s.push(mGrammar.getStart());
 		mQueue.add(new CandidateAnalysis(s));
 	}

@@ -27,6 +27,7 @@ public class Grammar {
 	private Set<Symbol> mTerminals;
 	private Set<Symbol> mNonTerminals;
 	private Symbol mStart;
+	private Symbol mEnd;
 	private Map<String, Production> mProductions;
 	private Map<Symbol, ArrayList<String>> mExpandsRelation;
 	private Set<Symbol> mEliminable;
@@ -65,7 +66,14 @@ public class Grammar {
 		}
 	}
 	
+	public Symbol getEnd() {
+		return mEnd;
+	}
+	
 	public boolean isTerminalSymbol(Symbol sym) {
+//		if (sym.equals(mEnd)) {
+//			return true;
+//		}
 		return mTerminals.contains(sym);
 	}
 	
@@ -74,6 +82,9 @@ public class Grammar {
 	}
 	
 	public boolean isEliminable(Symbol sym) {
+		if (sym.equals(mEnd)) {
+			return true;
+		}
 		return mEliminable.contains(sym);
 	}
 	
@@ -94,6 +105,11 @@ public class Grammar {
 		// add start symbol
 		if (mStart != null) {
 			mNonTerminals.add(mStart);
+		}
+		// add end symbol
+		if (mEnd != null) {
+			mTerminals.add(mEnd);
+			mEliminable.add(mEnd);
 		}
 		// for each production, add LHSs to NonTerminals and RHSs to symbol
 		for (Map.Entry<String,Production> e : mProductions.entrySet()) {
@@ -132,9 +148,7 @@ public class Grammar {
 		// print productions
 		for (Production p : mProductions.values()) {
 			System.out.println(p);
-		}
-		
-			
+		}	
 	}
 	
 	private boolean hasProductionWithID(String id) {
@@ -150,6 +164,7 @@ public class Grammar {
 			Element root = doc.getRootElement();
 			if (root.getName() == "simplecfggrammar") {
 				mStart = new Symbol(root.getAttributeValue("start"));
+				mEnd = new Symbol(root.getAttributeValue("end"));
 				// read rules
 				for (Object child : root.getChildren()) {
 					String id   = ((Element)child).getAttributeValue("id");
@@ -182,6 +197,7 @@ public class Grammar {
 		} catch (JDOMException e) {
 			System.out.println("Could not prase grammar file '"+filename+"':\n"+e);
 		}
+		this.update();
 	}
 	
 }
