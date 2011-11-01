@@ -264,8 +264,7 @@ public class RMRSComposer extends IUModule {
 		 * @return true if f's predicates all resolve something in the world
 		 */
 		public boolean resolves(Formula f);
-		
-		
+
 		/**
 		 * Called whenever a new Formula is created to determine
 		 * what domain concepts it resolves in the world.
@@ -278,6 +277,12 @@ public class RMRSComposer extends IUModule {
 		 * @return a map of Formula predicate arguments to lists of objects that the argument can stand for
 		 */
 		public Map<Integer, List<? extends Object>> resolvesObjects(Formula f);
+
+		/**
+		 * A setter called to turn off/on domain actions.
+		 * @param action on or off
+		 */
+		public void setPerformDomainAction(boolean action);
 	}
 
 }
