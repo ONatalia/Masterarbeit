@@ -190,6 +190,25 @@ public class Formula extends VariableEnvironment
 		return true;
 	}
 	
+	// simply adding another formula without consuming a slot and equating variables
+	public void simpleAdd(Formula fo) {
+		Formula f = new Formula(fo);
+		f.renumber(this.getMaxID()+1);
+		for (Map.Entry<Integer, Variable> e : f.mVariables.entrySet()) {
+			if (this.mVariables.containsKey(e.getKey())) {
+				// this should not happen after a successful renumbering of f
+				System.out.println("Warning: Cannot merge variable assignments due to inconsistent mapping.");
+			} else {
+				this.mVariables.put(e.getKey(), e.getValue());
+			}
+		}
+		for (Relation r : f.mRels) this.mRels.add(r);
+		for (VariableIDPair p : f.mScons) this.mScons.add(p);
+		for (VariableIDPair p : f.mEqs) this.mEqs.add(p);
+		// TODO: what about the added formulas slots if it has any?
+		//       -> we will only add lexical formulas without slots
+	}
+	
 	public Set<Integer> getVariableIDs() {
 		Set<Integer> s = new TreeSet<Integer>();
 		// hook

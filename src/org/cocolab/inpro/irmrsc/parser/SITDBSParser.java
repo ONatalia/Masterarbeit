@@ -22,13 +22,23 @@ public class SITDBSParser {
 	// counters for evaluations statistics
 	public static int cntExpansions = 0;
 	public static int cntDegradations = 0;
+	public static int cntPrunes = 0;
 	
-	
+	// capacity limit
 	public static final int maxCandidatesLimit = 1000;
+	
+	// robustness
+	public static final boolean beRobust = true;
+	public static final int maxRepairs = 2;
+	public static final double repairMalus = 0.05;
+	public static final int maxInsertions = 2;
+	public static final double insertionMalus = 0.04;
 	public static final int maxDeletions = 2;
-	public static final int maxInsertion = 4;
+	public static final double deletionMalus = 0.01;
+
 	public static final String fillerRuleAndTagName = "fill";
-	//public static final String EOSMarker = "</S>";
+	public static final Symbol unknownTag = new Symbol("unknown");
+	public static final Symbol endOfUtteranceTag = new Symbol("S!");
 
 	private PriorityQueue<CandidateAnalysis> mQueue;
 	private Grammar mGrammar;
@@ -70,7 +80,7 @@ public class SITDBSParser {
 	}
 	
 	public void feed(Symbol nextToken) {
-		logger.debug(logPrefix+"feed: "+nextToken);
+		logger.info(logPrefix+"feed: "+nextToken);
 		
 		if (mQueue.size() < 1) {
 			// the queue is empty and no further token can be accepted
@@ -114,6 +124,7 @@ public class SITDBSParser {
 				if (ca.getProbability() < (newQueue.peek().getProbability() * mBaseBeamFactor * newQueue.size())) {
 					// best derivation below threshold; await next token
 					logger.debug(logPrefix+": outside beam");
+					cntPrunes++;
 					break;
 				} else {
 					logger.debug(String.format(logPrefix+": %1$9.4g >= %2$9.4g (n=%3$d).", ca.getProbability(), (newQueue.peek().getProbability() * mBaseBeamFactor * newQueue.size()), newQueue.size()));
@@ -132,10 +143,26 @@ public class SITDBSParser {
 				if (topSymbol.equals(nextToken)) {
 					newQueue.add(ca.match(nextToken));
 				} else {
-//					//TODO: else handle deletions by assuming underspec token and downrating the derivation
-//					if (ca.getNumberOfDeletions() < maxDeletions) {
-//						mQueue.add(ca.deletion(nextToken));
-//					}
+					// the next token is an unknown tag.
+					if (beRobust && (! ca.hasRobustOperationsLately()) && nextToken.equals(unknownTag) && (! topSymbol.equals(endOfUtteranceTag)) && (ca.getNumberOfRepairs() < maxRepairs)) {
+						// make a repair hypothesis where the unknown tag is the currently required one.
+						CandidateAnalysis newca = ca.repair(topSymbol);
+						newca.degradeProbability(repairMalus);
+						newQueue.add(newca);
+					}
+					if (beRobust && (! ca.hasRobustOperationsLately()) && (! topSymbol.equals(endOfUtteranceTag)) && (! nextToken.equals(endOfUtteranceTag)) && (ca.getNumberOfInsertions() < maxInsertions)) {
+						// make an insertion hypothesis, where the current symbol is just a simple insertion
+						CandidateAnalysis newca = ca.insert(nextToken);
+						newca.degradeProbability(insertionMalus);
+						newQueue.add(newca);
+					}
+					if (beRobust && (! ca.hasRobustOperationsLately()) && (! topSymbol.equals(endOfUtteranceTag)) && (ca.getNumberOfDeletions() < maxDeletions)) {
+						// make an deletion hypothesis, where the required tag is deleted and thus filled in underspecified
+						CandidateAnalysis newca = ca.deletion(topSymbol);
+						newca.degradeProbability(deletionMalus);
+						currentQueue.add(newca);
+					}
+
 				}
 			} else {
 				// find all expanding derivations and push them on the old Queue
@@ -148,6 +175,8 @@ public class SITDBSParser {
 				}
 			}
 		}
+		// store how many analyses will be pruned now
+		cntPrunes += currentQueue.size();
 		// make newQueue the new mQueue and return the number of analyses in it
 		mQueue = newQueue;
 	}
@@ -231,10 +260,11 @@ public class SITDBSParser {
 	}
 	
 	public void status() {
-		logger.debug(logPrefix+"status: remains="+mQueue.size()
+		logger.info(logPrefix+"status: remains="+mQueue.size()
 				+" completable="+ getNumberOfCompletableAnalyses()
 				+" expansions="+cntExpansions
-				+" degradations="+cntDegradations);
+				+" degradations="+cntDegradations
+				+" prunes="+cntPrunes);
 	}
 	
 	public void setLogger(Logger l) {

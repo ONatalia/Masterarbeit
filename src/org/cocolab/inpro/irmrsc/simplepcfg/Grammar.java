@@ -52,7 +52,7 @@ public class Grammar {
 	public void addProduction(String id, Production p) {
 		mProductions.put(id, p);
 		//TODO: warn if id != p.id 
-		this.update();
+		//this.update();
 	}
 
 	public Symbol getStart() {

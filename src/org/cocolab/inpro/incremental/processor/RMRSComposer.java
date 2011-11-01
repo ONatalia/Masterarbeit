@@ -62,7 +62,7 @@ public class RMRSComposer extends IUModule {
 	private static FormulaIU firstUsefulFormulaIU;
 	
 	private final static double MALUS_SEMANTIC_MISMATCH = 0.7;
-	private final static double MALUS_NO_REFERENCE_RESOLUTION = 1.0;
+	private final static double MALUS_NO_REFERENCE_RESOLUTION = 0.5;
 	
 	private static String logPrefix = "[C] ";
 	
@@ -170,14 +170,39 @@ public class RMRSComposer extends IUModule {
 											lexname = l.get(0);
 										}									
 									}
-									List<AVPair> pairs = wiu.getAVPairs();
-									logger.debug(logPrefix+"P "+pairs);
-									
+									logger.debug(logPrefix+"P "+wiu.getAVPairs());									
 									Formula lexitem = new Formula(lexname, type);
 									logger.debug(logPrefix+"+ "+rule);
 									logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
 									newForm.forwardCombine(lexitem);
 								}
+							} else if (rule.startsWith("r(") || rule.startsWith("d(")) {
+								String tag = rule.substring(2, rule.length()-1);
+								Variable.Type type = semanticTypesOfTags.get(tag);
+								String lexname = tag.toUpperCase();
+								Formula lexitem = new Formula(lexname, type);
+								logger.debug(logPrefix+"+ "+rule);
+								logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
+								newForm.forwardCombine(lexitem);
+							} else if (rule.startsWith("i(")) {
+								String tag = rule.substring(2, rule.length()-1);
+								Variable.Type type = Variable.Type.INDEX;
+								String lexname = tag.toUpperCase();
+								TagIU tiu = (TagIU) ca.groundedIn().get(0);
+								WordIU wiu = (WordIU) tiu.groundedIn().get(0);
+								try {
+									if (wiu != null) {
+										List<String> l = wiu.getValues("lemma");
+										if (l.size() > 0) {
+											lexname = l.get(0);
+										}									
+									}
+								} catch (NullPointerException e) {}
+								logger.debug(logPrefix+"P "+wiu.getAVPairs());									
+								Formula lexitem = new Formula(lexname, type);
+								logger.debug(logPrefix+"+ "+rule);
+								logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
+								newForm.simpleAdd(lexitem);
 							} else {
 								// the current rule is a syntactic one; get rule semantics from map.
 								Formula rulesem = semanticRules.get(rule);
@@ -211,9 +236,10 @@ public class RMRSComposer extends IUModule {
 							newEdits.add(new EditMessage<FormulaIU>(EditType.COMMIT, (FormulaIU) sem));
 							// print out full statistics for this sem if it is complete.
 							if (ca.getCandidateAnalysis().isComplete()) {
-								logger.debug("[Final] SYN "+ca.getCandidateAnalysis().toFinalString());
-								logger.debug("[Final] SEM "+((FormulaIU)sem).getFormula().toStringOneLine());
-								logger.debug("[Final] MRS "+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic());
+								parser.printStatus(ca);
+								logger.info("[Q] SYN "+ca.getCandidateAnalysis().toFinalString());
+								logger.info("[Q] SEM "+((FormulaIU)sem).getFormula().toStringOneLine());
+								logger.info("[Q] MRS "+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic());
 							}
 						}
 					}

@@ -49,7 +49,7 @@ public class TagParser extends IUModule {
 		Grammar g = new Grammar();
 		try {
 			g.loadXML(new URL(grammarFile));
-		startSymbol = g.getStart().getSymbol();
+			startSymbol = g.getStart().getSymbol();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}		
@@ -157,4 +157,10 @@ public class TagParser extends IUModule {
 		}
 	}
 	
+	// print the parser status for this caiu
+	public void printStatus (CandidateAnalysisIU caiu) {
+		// TODO add checks
+		TagIU tiu = (TagIU) caiu.groundedIn().get(0); // a CA should only be grounded in one tag
+		states.get(tiu).status();
+	}
 }

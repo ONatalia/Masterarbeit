@@ -97,22 +97,27 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		return ca;
 	}
 	
-	public CandidateAnalysis deletion(Symbol nextToken) {
-		Symbol deletionSymbol = new Symbol("("+nextToken.getSymbol()+")");
-		return match(deletionSymbol);
+	public CandidateAnalysis repair(Symbol requiredToken) {
+		String s = "r("+requiredToken.getSymbol()+")";
+		return match_intern(s);
+	}
+	
+	public CandidateAnalysis deletion(Symbol deletedToken) {
+		String s = "d("+deletedToken.getSymbol()+")";
+		return match_intern(s);
 	}
 	
 	public CandidateAnalysis match(Symbol nextToken) {
-		// obsolete test
-//		if (! (nextToken.equals(mStack.peek()))) {
-//			return null;
-//		}
-		// prepare derivation
 		String s = "m("+nextToken.getSymbol()+")";
+		return match_intern(s);
+	}
+	
+	private CandidateAnalysis match_intern(String deriveIdentifier) {
+		// prepare derivation
 		List<String> newDerivation =  new ArrayList<String>(mDerivation);
-		newDerivation.add(s);
+		newDerivation.add(deriveIdentifier);
 		List<String> newLastDerive =  new ArrayList<String>(mLastDerive);
-		newLastDerive.add(s);
+		newLastDerive.add(deriveIdentifier);
 		// prepare stack
 		Deque<Symbol> newStack = new ArrayDeque<Symbol>(mStack);
 		newStack.pop();
@@ -123,6 +128,19 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		List<String> newRemainingString = new ArrayList<String>(remainingString);
 		// build object
 		CandidateAnalysis ca = new CandidateAnalysis(newDerivation, newLastDerive, this.mAntecedent, newStack, newProbability, newFigureOfMerit, newRemainingString);
+		return ca;
+	}
+	
+	// similar to match, but the top stack symbol is not popped.
+	public CandidateAnalysis insert(Symbol insertedToken) {
+		String deriveIdentifier = "i("+insertedToken.getSymbol()+")";
+		List<String> newDerivation =  new ArrayList<String>(mDerivation);
+		newDerivation.add(deriveIdentifier);
+		List<String> newLastDerive =  new ArrayList<String>(mLastDerive);
+		newLastDerive.add(deriveIdentifier);
+		Deque<Symbol> newStack = new ArrayDeque<Symbol>(mStack);
+		List<String> newRemainingString = new ArrayList<String>(remainingString);
+		CandidateAnalysis ca = new CandidateAnalysis(newDerivation, newLastDerive, this.mAntecedent, newStack, mProbability, mFigureOfMerit, newRemainingString);
 		return ca;
 	}
 
@@ -185,10 +203,29 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		return mLastDerive;
 	}
 	
+	public boolean hasRobustOperationsLately() {
+		for (String rule : mLastDerive) {
+			if (rule.startsWith("r(") || rule.startsWith("d(") || rule.startsWith("i(")) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public int getNumberOfRepairs() {
+		int i = 0;
+		for (String rule : mDerivation) {
+			if (rule.startsWith("r(")) {
+				i++;
+			}
+		}
+		return i;
+	}
+	
 	public int getNumberOfInsertions() {
 		int i = 0;
 		for (String rule : mDerivation) {
-			if (rule.equals("+")) {
+			if (rule.startsWith("i(")) {
 				i++;
 			}
 		}
@@ -198,7 +235,7 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	public int getNumberOfDeletions() {
 		int i = 0;
 		for (String rule : mDerivation) {
-			if (rule.equals("()")) {
+			if (rule.startsWith("d(")) {
 				i++;
 			}
 		}
@@ -216,16 +253,6 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		return 0;
     }
 	
-	/*
-		this.mDerivation = new ArrayList<String>(mDerivation);
-		this.mLastDerive = new ArrayList<String>(mLastDerive);
-		this.mAntecedent = mAntecedent; // link not copy
-		this.mStack = new ArrayDeque<Symbol>(mStack);
-		this.mProbability = mProbability;
-		this.mFigureOfMerit = mFigureOfMerit;
-		this.remainingString = new ArrayList<String>(remainingString);
-	 */
-
 	public String toFinalString() {
 		return String.format("%1$12.8f",(100*mProbability)) + " " + mDerivation + "";
 	}
