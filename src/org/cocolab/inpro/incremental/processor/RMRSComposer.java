@@ -18,6 +18,7 @@ import org.cocolab.inpro.incremental.unit.FormulaIU;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.TagIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
+import org.cocolab.inpro.irmrsc.parser.CandidateAnalysis;
 import org.cocolab.inpro.irmrsc.rmrs.Formula;
 import org.cocolab.inpro.irmrsc.rmrs.SemanticMacro;
 import org.cocolab.inpro.irmrsc.rmrs.Variable;
@@ -28,6 +29,7 @@ import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Component;
+import edu.cmu.sphinx.util.props.S4Double;
 import edu.cmu.sphinx.util.props.S4String;
 
 
@@ -53,6 +55,10 @@ public class RMRSComposer extends IUModule {
 	public final static String PROP_TAG_LEXICON_FILE = "tagLexiconFile";
 	private String tagLexiconFile;
 	
+	@S4Double(defaultValue = 0.01)
+	public final static String PROP_MALUS_NO_REFERENCE = "malusNoReference";
+	private double malusNoReference;
+	
 	private Map<String,Formula> semanticMacrosLongname = new HashMap<String,Formula>();
 	private Map<String,Formula> semanticMacrosShortname = new HashMap<String,Formula>();
 	private Map<String,Formula> semanticRules  = new HashMap<String,Formula>();
@@ -60,16 +66,14 @@ public class RMRSComposer extends IUModule {
 	private Map<CandidateAnalysisIU,FormulaIU> states = new HashMap<CandidateAnalysisIU,FormulaIU>();
 
 	private static FormulaIU firstUsefulFormulaIU;
-	
 	private final static double MALUS_SEMANTIC_MISMATCH = 0.7;
-	private final static double MALUS_NO_REFERENCE_RESOLUTION = 0.5;
-	
 	private static String logPrefix = "[C] ";
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
+		malusNoReference = ps.getDouble(PROP_MALUS_NO_REFERENCE);
 		PentoRMRSResolver.setLogger(logger);
 		try {
 			// load semantic macros
@@ -222,8 +226,9 @@ public class RMRSComposer extends IUModule {
 						states.put(ca,newFIU);
 						// if the analysis is not complete, try to resolve the formula, and degrade in case of failure
 						if (!ca.getCandidateAnalysis().isComplete()) {
+							resolver.setPerformDomainAction(false); // don't show the resolved items now
 							if (!resolver.resolves(newForm)) {
-								parser.degradeAnalysis(ca, MALUS_NO_REFERENCE_RESOLUTION);
+								parser.degradeAnalysis(ca, malusNoReference);
 							}
 						}
 					} else {
@@ -237,15 +242,41 @@ public class RMRSComposer extends IUModule {
 							// print out full statistics for this sem if it is complete.
 							if (ca.getCandidateAnalysis().isComplete()) {
 								parser.printStatus(ca);
-								logger.info("[Q] SYN "+ca.getCandidateAnalysis().toFinalString());
-								logger.info("[Q] SEM "+((FormulaIU)sem).getFormula().toStringOneLine());
-								logger.info("[Q] MRS "+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic());
+								logger.warn("[Q] SYN "+ca.getCandidateAnalysis().toFinalString());
+								logger.warn("[Q] SEM "+((FormulaIU)sem).getFormula().toStringOneLine());
+								logger.warn("[Q] MRS "+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic());
+								logger.warn("[Q] ALL "+ca.getCandidateAnalysis().toFinalString()+"\t"+((FormulaIU)sem).getFormula().toStringOneLine()+"\t"+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic());
 							}
 						}
 					}
 					break;
 				default: logger.fatal("Found unimplemented EditType!");
 			}
+		}
+		// find the highest ranked ca and show its resolves
+		FormulaIU best = null;
+		double bestProb = 0;
+		int bestLexemCount = 0;
+		for (EditMessage<FormulaIU> em : newEdits) {
+			CandidateAnalysis ca = ((CandidateAnalysisIU) em.getIU().groundedIn().get(0)).getCandidateAnalysis();
+			int thisLexemCount = ca.getNumberOfMatches();
+			double thisProb = ca.getProbability();			 
+			if (thisProb > bestProb) {
+				bestProb = thisProb;
+				bestLexemCount = thisLexemCount;
+				best = em.getIU();			
+			} else if (thisProb == bestProb) {
+				if (thisLexemCount > bestLexemCount) {
+					bestProb = thisProb;
+					bestLexemCount = thisLexemCount;
+					best = em.getIU();	
+				}
+			}
+		}
+		if (best != null) {
+			resolver.setPerformDomainAction(true);
+			resolver.resolves(best.getFormula());
+			resolver.setPerformDomainAction(false);
 		}
 		this.rightBuffer.setBuffer(newEdits);
 	}

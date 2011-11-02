@@ -31,12 +31,19 @@ import edu.cmu.sphinx.util.props.S4Boolean;
 public class IUNetworkToDOT extends PushBuffer {
 
 	/** String for dot executable */
-	@S4String(defaultValue = "/usr/local/bin/dot")
+	@S4String(defaultValue = "/usr/bin/dot")
 	/** Property for string for dot executable */
 	public final static String PROP_DOT = "dot";
 	/** The dot executable */
 	private File dot;
-
+	
+	/** String for the temporary directory */
+	@S4String(defaultValue = "/tmp")
+	/** Property for string for the temporary directory */
+	public final static String PROP_TMP_DIR = "tmpDir";
+	/** The dot executable */
+	private String tmpDir;
+	
 	/** String, comma-separated, for what iu types to display */
 	@S4String(defaultValue = "")
 	/** Property for string for iu types to display <br/> Beware that the iumodule that you hook this into must have links to the types you specify here (sll or grin). */
@@ -97,6 +104,7 @@ public class IUNetworkToDOT extends PushBuffer {
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		dot = new File(ps.getString(PROP_DOT));
+		tmpDir = ps.getString(PROP_TMP_DIR);
 		runDot = ps.getBoolean(PROP_RUN_DOT);
 		outputFormat = ps.getString(PROP_OUTPUT_FORMAT);
 		display = ps.getBoolean(PROP_DISPLAY_OUTPUT);
@@ -140,7 +148,7 @@ public class IUNetworkToDOT extends PushBuffer {
 		if (edits != null && !edits.isEmpty()) {
 			this.nodeClusters.clear();
 			try {
-				out = new File("/tmp/out." + this.getNewFileID() + ".dot");
+				out = new File(tmpDir + "/out." + this.getNewFileID() + ".dot");
 				outStream = new PrintStream(out);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();

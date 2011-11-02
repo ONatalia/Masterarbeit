@@ -212,6 +212,16 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 		return false;
 	}
 	
+	public int getNumberOfMatches() {
+		int i = 0;
+		for (String rule : mDerivation) {
+			if (rule.startsWith("m(")) {
+				i++;
+			}
+		}
+		return i;
+	}
+	
 	public int getNumberOfRepairs() {
 		int i = 0;
 		for (String rule : mDerivation) {
@@ -254,7 +264,7 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
     }
 	
 	public String toFinalString() {
-		return String.format("%1$12.8f",(100*mProbability)) + " " + mDerivation + "";
+		return String.format("%1$16.12f",(100*mProbability)) + " " + mDerivation + "";
 	}
 	
 	public String toFullString() {

@@ -32,7 +32,7 @@ public class SITDBSParser {
 	public static final int maxRepairs = 2;
 	public static final double repairMalus = 0.05;
 	public static final int maxInsertions = 2;
-	public static final double insertionMalus = 0.04;
+	public static final double insertionMalus = 0.02;
 	public static final int maxDeletions = 2;
 	public static final double deletionMalus = 0.01;
 
