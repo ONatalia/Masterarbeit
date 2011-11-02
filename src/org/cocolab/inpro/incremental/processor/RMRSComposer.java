@@ -23,7 +23,6 @@ import org.cocolab.inpro.irmrsc.rmrs.Formula;
 import org.cocolab.inpro.irmrsc.rmrs.SemanticMacro;
 import org.cocolab.inpro.irmrsc.rmrs.Variable;
 import org.cocolab.inpro.irmrsc.util.RMRSLoader;
-import org.cocolab.inpro.nlu.AVPair;
 
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -68,6 +67,9 @@ public class RMRSComposer extends IUModule {
 	private static FormulaIU firstUsefulFormulaIU;
 	private final static double MALUS_SEMANTIC_MISMATCH = 0.7;
 	private static String logPrefix = "[C] ";
+
+	/** Gold representation, i.e. a string representation of a domain object that a composer/resolver should arrive at */
+	private String gold;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -241,11 +243,14 @@ public class RMRSComposer extends IUModule {
 							newEdits.add(new EditMessage<FormulaIU>(EditType.COMMIT, (FormulaIU) sem));
 							// print out full statistics for this sem if it is complete.
 							if (ca.getCandidateAnalysis().isComplete()) {
+								int resolution = resolver.resolvesObject(((FormulaIU)sem).getFormula(), gold);
 								parser.printStatus(ca);
 								logger.warn("[Q] SYN "+ca.getCandidateAnalysis().toFinalString());
 								logger.warn("[Q] SEM "+((FormulaIU)sem).getFormula().toStringOneLine());
 								logger.warn("[Q] MRS "+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic());
-								logger.warn("[Q] ALL "+ca.getCandidateAnalysis().toFinalString()+"\t"+((FormulaIU)sem).getFormula().toStringOneLine()+"\t"+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic());
+								logger.warn("[Q] RES "+resolution);
+								logger.warn("[Q] ALL "+ca.getCandidateAnalysis().toFinalString()+"\t"+((FormulaIU)sem).getFormula().toStringOneLine()+"\t"+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic()+"\t"+resolution);
+								
 							}
 						}
 					}
@@ -282,6 +287,14 @@ public class RMRSComposer extends IUModule {
 	}
 
 	/**
+	 * Sets the gold string rep in case one wants to evaluate if a composer/resolver did the right thing.
+	 * @param gold the new gold
+	 */
+	public void setGold(String gold) {
+		this.gold = gold;
+	}
+
+	/**
 	 * Interface to call whenever a Formula needs to check if its relations
 	 * resolve with something in the world.
 	 * @author okko
@@ -289,7 +302,7 @@ public class RMRSComposer extends IUModule {
 	 */
 	public interface Resolver extends Configurable {
 		/**
-		 * Called whenever a new FormulaIU is created to determine
+		 * A resolve method called whenever a new FormulaIU is created to determine
 		 * if its relations resolve something in the world.
 		 * @param f the formula
 		 * @return true if f's predicates all resolve something in the world
@@ -297,7 +310,7 @@ public class RMRSComposer extends IUModule {
 		public boolean resolves(Formula f);
 
 		/**
-		 * Called whenever a new Formula is created to determine
+		 * A resolve method called whenever a new Formula is created to determine
 		 * what domain concepts it resolves in the world.
 		 * <br />
 		 * The map returns maps (Integer) predicate arguments to possible world objects.
@@ -310,10 +323,20 @@ public class RMRSComposer extends IUModule {
 		public Map<Integer, List<? extends Object>> resolvesObjects(Formula f);
 
 		/**
+		 * A resolve method called to determine if a particular object, identified by a string argument, was among the domain objects that resolved (or indeed the only one that did) <br/>
+		 * Implementers need to make sure that comparison of the string representation and domain objects takes place.
+		 * @param f the formula
+		 * @param id a string representation of the object 
+		 * @return -1 if nothing resolved, 0 if id was among the resolved objects, 1 if only id was among the resolved objects
+		 */
+		public int resolvesObject(Formula f, String id);
+		
+		/**
 		 * A setter called to turn off/on domain actions.
 		 * @param action on or off
 		 */
 		public void setPerformDomainAction(boolean action);
+
 	}
 
 }
