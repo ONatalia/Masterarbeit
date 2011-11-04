@@ -67,15 +67,35 @@ public class RMRSComposer extends IUModule {
 	private static FormulaIU firstUsefulFormulaIU;
 	private final static double MALUS_SEMANTIC_MISMATCH = 0.7;
 	private static String logPrefix = "[C] ";
-
+	
+	@S4String(defaultValue = "")
+	public final static String PROP_GOLD = "gold";
 	/** Gold representation, i.e. a string representation of a domain object that a composer/resolver should arrive at */
 	private String gold;
+	private String goldaction;
+	
+	private static List<Integer> firstBestResolve;
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
+		firstBestResolve = new ArrayList<Integer>();
+		
 		super.newProperties(ps);
 		malusNoReference = ps.getDouble(PROP_MALUS_NO_REFERENCE);
+
+		// get gold string
+		String tmp = ps.getString(PROP_GOLD);
+		if (tmp.equals("")) {
+			gold=null;
+			goldaction=null;
+		} else {
+			String[] tmp2 = tmp.split(" ");
+			goldaction = tmp2[0];
+			gold = tmp2[1];
+		}
+		System.err.println("GOLD: "+goldaction+"\t"+gold);
+
 		PentoRMRSResolver.setLogger(logger);
 		try {
 			// load semantic macros
@@ -229,9 +249,22 @@ public class RMRSComposer extends IUModule {
 						// if the analysis is not complete, try to resolve the formula, and degrade in case of failure
 						if (!ca.getCandidateAnalysis().isComplete()) {
 							resolver.setPerformDomainAction(false); // don't show the resolved items now
-//							if (!resolver.resolves(newForm)) {
-//								parser.degradeAnalysis(ca, malusNoReference);
-//							}
+							int resolve = resolver.resolves(newForm);
+							System.err.println("RESOLVE="+resolve);
+							switch (resolve) {
+							case -1: 
+								System.err.println("DEGRADE");
+								parser.degradeAnalysis(ca, malusNoReference);
+								break;
+							case 0:
+								System.err.println("IGNORE");
+								break;
+							case 1:
+								System.err.println("ENCOURAGE");
+								break;
+							default :
+								break;
+							}
 						}
 					} else {
 						//TODO: can this happen?
@@ -243,7 +276,10 @@ public class RMRSComposer extends IUModule {
 							newEdits.add(new EditMessage<FormulaIU>(EditType.COMMIT, (FormulaIU) sem));
 							// print out full statistics for this sem if it is complete.
 							if (ca.getCandidateAnalysis().isComplete()) {
-								int resolution = resolver.resolvesObject(((FormulaIU)sem).getFormula(), gold);
+								int resolution = 2;
+								if (gold != null) {
+									resolution = resolver.resolvesObject(((FormulaIU)sem).getFormula(), gold);
+								}
 								parser.printStatus(ca);
 								logger.warn("[Q] SYN "+ca.getCandidateAnalysis().toFinalString());
 								logger.warn("[Q] SEM "+((FormulaIU)sem).getFormula().toStringOneLine());
@@ -283,6 +319,9 @@ public class RMRSComposer extends IUModule {
 			resolver.resolves(best.getFormula());
 			resolver.setPerformDomainAction(false);
 		}
+		// an dieser stelle inkrementell evaluieren, aber was ist, wenns kein ADD sondern was anderes war
+		
+		// finish
 		this.rightBuffer.setBuffer(newEdits);
 	}
 

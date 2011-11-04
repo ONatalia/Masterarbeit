@@ -23,6 +23,7 @@ public class SITDBSParser {
 	public static int cntExpansions = 0;
 	public static int cntDegradations = 0;
 	public static int cntPrunes = 0;
+	public static int cntDerivations = 0;
 	
 	// capacity limit
 	public static final int maxCandidatesLimit = 1000;
@@ -104,6 +105,8 @@ public class SITDBSParser {
 				ca.consumeFiller(fillerRuleAndTagName);
 			}
 			mQueue = currentQueue;
+			// store how many analyses survived
+			cntDerivations += mQueue.size();
 			return;
 		}
 		
@@ -179,6 +182,8 @@ public class SITDBSParser {
 		cntPrunes += currentQueue.size();
 		// make newQueue the new mQueue and return the number of analyses in it
 		mQueue = newQueue;
+		// store how many analyses survived
+		cntDerivations += mQueue.size();
 	}
 	
 	public int getNumberOfCompletableAnalyses () {
@@ -264,7 +269,8 @@ public class SITDBSParser {
 				+" completable="+ getNumberOfCompletableAnalyses()
 				+" expansions="+cntExpansions
 				+" degradations="+cntDegradations
-				+" prunes="+cntPrunes);
+				+" prunes="+cntPrunes
+				+" derivations="+cntDerivations);
 	}
 	
 	public void setLogger(Logger l) {
