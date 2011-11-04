@@ -5,9 +5,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 import org.cocolab.inpro.domains.pentomino.nlu.PentoRMRSResolver;
 import org.cocolab.inpro.incremental.IUModule;
@@ -27,8 +29,10 @@ import org.cocolab.inpro.irmrsc.util.RMRSLoader;
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.S4Boolean;
 import edu.cmu.sphinx.util.props.S4Component;
 import edu.cmu.sphinx.util.props.S4Double;
+import edu.cmu.sphinx.util.props.S4Integer;
 import edu.cmu.sphinx.util.props.S4String;
 
 
@@ -58,6 +62,16 @@ public class RMRSComposer extends IUModule {
 	public final static String PROP_MALUS_NO_REFERENCE = "malusNoReference";
 	private double malusNoReference;
 	
+	@S4Boolean(defaultValue = true)
+	public final static String PROP_REFERENCE_PRUNING = "referencePruning";
+	private boolean referencePruning;
+	
+	@S4String(defaultValue = "")
+	public final static String PROP_GOLD = "gold";
+	/** Gold representation, i.e. a string representation of a domain object that a composer/resolver should arrive at */
+	private String gold;
+	private String goldaction;
+
 	private Map<String,Formula> semanticMacrosLongname = new HashMap<String,Formula>();
 	private Map<String,Formula> semanticMacrosShortname = new HashMap<String,Formula>();
 	private Map<String,Formula> semanticRules  = new HashMap<String,Formula>();
@@ -65,26 +79,33 @@ public class RMRSComposer extends IUModule {
 	private Map<CandidateAnalysisIU,FormulaIU> states = new HashMap<CandidateAnalysisIU,FormulaIU>();
 
 	private static FormulaIU firstUsefulFormulaIU;
-	private final static double MALUS_SEMANTIC_MISMATCH = 0.7;
+	//private final static double MALUS_SEMANTIC_MISMATCH = 0.7;
 	private static String logPrefix = "[C] ";
 	
-	@S4String(defaultValue = "")
-	public final static String PROP_GOLD = "gold";
-	/** Gold representation, i.e. a string representation of a domain object that a composer/resolver should arrive at */
-	private String gold;
-	private String goldaction;
-	
-	private static List<Integer> firstBestResolve;
+	/** The history of compare-to-gold values of each incremental step with 1best evaluation*/
+	private static List<Integer> compareToGoldValueHistory1Best;
+	/** The history of compare-to-gold values of each incremental step with 5best evaluation*/
+	private static List<Integer> compareToGoldValueHistory5Best;
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public void newProperties(PropertySheet ps) throws PropertyException {
-		firstBestResolve = new ArrayList<Integer>();
-		
+	public void newProperties(PropertySheet ps) throws PropertyException {		
 		super.newProperties(ps);
+		PentoRMRSResolver.setLogger(logger);
+		
+		// initialize resolve value history
+		compareToGoldValueHistory1Best = new ArrayList<Integer>();
+		compareToGoldValueHistory5Best = new ArrayList<Integer>();
+		
+		// get no reference pruning malus
 		malusNoReference = ps.getDouble(PROP_MALUS_NO_REFERENCE);
-
-		// get gold string
+		logger.info("Setting malusNoReference to "+malusNoReference);
+		
+		// get setting no-reference pruning
+		referencePruning = ps.getBoolean(PROP_REFERENCE_PRUNING);
+		logger.info("Setting noReferencePruning to "+referencePruning);
+		
+		// get gold string and extract gold action and gold tile
 		String tmp = ps.getString(PROP_GOLD);
 		if (tmp.equals("")) {
 			gold=null;
@@ -94,9 +115,8 @@ public class RMRSComposer extends IUModule {
 			goldaction = tmp2[0];
 			gold = tmp2[1];
 		}
-		System.err.println("GOLD: "+goldaction+"\t"+gold);
-
-		PentoRMRSResolver.setLogger(logger);
+		logger.info("Setting gold semantics to action="+goldaction+" tile="+gold);
+		
 		try {
 			// load semantic macros
 			semMacrosFile = ps.getString(PROP_SEM_MACROS_FILE);
@@ -154,6 +174,7 @@ public class RMRSComposer extends IUModule {
 	protected void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		List<EditMessage<FormulaIU>> newEdits = new ArrayList<EditMessage<FormulaIU>>();
+		boolean iGotAdds = false;
 		for (EditMessage<? extends IU> edit : edits) {
 			CandidateAnalysisIU ca = (CandidateAnalysisIU) edit.getIU();
 			switch (edit.getType()) {
@@ -165,6 +186,7 @@ public class RMRSComposer extends IUModule {
 					}
 					break;
 				case ADD:
+					iGotAdds = true;
 					CandidateAnalysisIU previousCa = (CandidateAnalysisIU) ca.getSameLevelLink();
 					if (previousCa != null) {
 						FormulaIU previousFIU = firstUsefulFormulaIU;
@@ -246,24 +268,26 @@ public class RMRSComposer extends IUModule {
 						FormulaIU newFIU = new FormulaIU(previousFIU, ca, newForm);
 						newEdits.add(new EditMessage<FormulaIU>(EditType.ADD, newFIU));
 						states.put(ca,newFIU);
-						// if the analysis is not complete, try to resolve the formula, and degrade in case of failure
-						if (!ca.getCandidateAnalysis().isComplete()) {
-							resolver.setPerformDomainAction(false); // don't show the resolved items now
-							int resolve = resolver.resolves(newForm);
-							System.err.println("RESOLVE="+resolve);
-							switch (resolve) {
-							case -1: 
-								System.err.println("DEGRADE");
-								parser.degradeAnalysis(ca, malusNoReference);
-								break;
-							case 0:
-								System.err.println("IGNORE");
-								break;
-							case 1:
-								System.err.println("ENCOURAGE");
-								break;
-							default :
-								break;
+						
+						// if the analysis is not complete and no-ref-pruning is wanted: try to resolve the formula, and degrade in case of failure
+						if (referencePruning) {
+							if (!ca.getCandidateAnalysis().isComplete()) {
+								resolver.setPerformDomainAction(false); // don't show the resolved items now
+								int resolve = resolver.resolves(newForm);
+								switch (resolve) {
+								case -1: 
+									System.err.println("DEGRADE");
+									parser.degradeAnalysis(ca, malusNoReference);
+									break;
+								case 0:
+									System.err.println("IGNORE");
+									break;
+								case 1:
+									System.err.println("ENCOURAGE");
+									break;
+								default :
+									break;
+								}
 							}
 						}
 					} else {
@@ -285,7 +309,13 @@ public class RMRSComposer extends IUModule {
 								logger.warn("[Q] SEM "+((FormulaIU)sem).getFormula().toStringOneLine());
 								logger.warn("[Q] MRS "+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic());
 								logger.warn("[Q] RES "+resolution);
-								logger.warn("[Q] ALL "+ca.getCandidateAnalysis().toFinalString()+"\t"+((FormulaIU)sem).getFormula().toStringOneLine()+"\t"+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic()+"\t"+resolution);
+								logger.warn("[Q] HS1 "+compareToGoldValueHistory1Best);
+								double iscore1 = calculateIncrementalScore(compareToGoldValueHistory1Best);
+								logger.warn("[Q] IS1 "+iscore1);
+								logger.warn("[Q] HS5 "+compareToGoldValueHistory5Best);
+								double iscore5 = calculateIncrementalScore(compareToGoldValueHistory5Best);
+								logger.warn("[Q] IS5 "+iscore5);
+								logger.warn("[Q] ALL "+ca.getCandidateAnalysis().toFinalString()+"\t"+((FormulaIU)sem).getFormula().toStringOneLine()+"\t"+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic()+"\t"+resolution+"\t"+compareToGoldValueHistory1Best+"\t"+iscore1+"\t"+resolution+"\t"+compareToGoldValueHistory5Best+"\t"+iscore5);
 								
 							}
 						}
@@ -294,8 +324,9 @@ public class RMRSComposer extends IUModule {
 				default: logger.fatal("Found unimplemented EditType!");
 			}
 		}
+		
 		// find the highest ranked ca and show its resolves
-		FormulaIU best = null;
+		FormulaIU bestFoIU = null;
 		double bestProb = 0;
 		int bestLexemCount = 0;
 		for (EditMessage<FormulaIU> em : newEdits) {
@@ -305,26 +336,94 @@ public class RMRSComposer extends IUModule {
 			if (thisProb > bestProb) {
 				bestProb = thisProb;
 				bestLexemCount = thisLexemCount;
-				best = em.getIU();			
+				bestFoIU = em.getIU();			
 			} else if (thisProb == bestProb) {
 				if (thisLexemCount > bestLexemCount) {
 					bestProb = thisProb;
 					bestLexemCount = thisLexemCount;
-					best = em.getIU();	
+					bestFoIU = em.getIU();	
 				}
 			}
 		}
-		if (best != null) {
+		if (bestFoIU != null) {
 			resolver.setPerformDomainAction(true);
-			resolver.resolves(best.getFormula());
+			resolver.resolves(bestFoIU.getFormula());
 			resolver.setPerformDomainAction(false);
 		}
-		// an dieser stelle inkrementell evaluieren, aber was ist, wenns kein ADD sondern was anderes war
+		
+		// if we got ADDs, evaluate the new result according to one of the four evaluation methods.
+		if (iGotAdds && (gold != null)) {
+			// we compare the gold tile with the resolves set of ..
+			
+			// ## 1) the syntactic 1best candidate analysis
+			int cmpToGoldValue = -2; // default if no best ca is there.
+			if (bestFoIU != null) // we already have that from above
+				cmpToGoldValue = resolver.resolvesObject(bestFoIU.getFormula(), gold);
+			// add to history
+			compareToGoldValueHistory1Best.add(cmpToGoldValue);
+			System.err.println("[E1] cmp2gold history:"+compareToGoldValueHistory1Best);
+				
+			// ## 2) the best resolving analysis of the 5best CAs
+			// get all candidate analyses
+			PriorityQueue<CandidateAnalysisIU> allCaIUs = new PriorityQueue<CandidateAnalysisIU>(5, new CandidateAnalysisIUProbabilityComparator());
+			for (EditMessage<FormulaIU> em : newEdits) {
+				allCaIUs.add((CandidateAnalysisIU) em.getIU().groundedIn().get(0)); 
+			}
+			int cnt = 0;
+			
+			// get the five best and find the best resolving in it
+			bestFoIU = null;
+			while (cnt < 5 && (! allCaIUs.isEmpty())) {
+				CandidateAnalysisIU next = allCaIUs.poll();
+				//System.err.println("# consider 5best p="+next.getCandidateAnalysis().getProbability());
+				cnt++;
+				// resolves this formula:
+				FormulaIU nextFoIU = (FormulaIU) next.grounds().get(0);
+				int resolve = resolver.resolves(nextFoIU.getFormula());
+				if (resolve == 1) {
+					// we found a unique resolve: eval this
+					bestFoIU = nextFoIU;
+					break;
+				} else if (resolve == 0) {
+					// we found a set resolve: store this one, if it is the first one
+					if (bestFoIU == null) {
+						bestFoIU = nextFoIU;
+					}
+				} else {
+					// we found a none resolve: store this one, if it is the first one
+					if (bestFoIU == null) {
+						bestFoIU = nextFoIU;
+					}
+				}
+			}
+			// compare the best resolving one to gold
+			if (bestFoIU != null) {
+				cmpToGoldValue = resolver.resolvesObject(bestFoIU.getFormula(), gold);
+				compareToGoldValueHistory5Best.add(cmpToGoldValue);
+				System.err.println("[E5] cmp2gold history:"+compareToGoldValueHistory5Best);
+			} else {
+				System.err.println("FATAL EVALUATION ERROR!");
+			}
+		}
 		
 		// finish
 		this.rightBuffer.setBuffer(newEdits);
 	}
 
+	private double calculateIncrementalScore(List<Integer> history) {
+		double iscore = 0;
+		int m = history.size();
+		if (m != 0) {
+			for (int n=1; n<=m; n++) {
+				iscore += (1.0 * history.get(n-1) * n / m);
+			}
+		} else {
+			// empty histories
+			iscore = -999;
+		}
+		return iscore;
+	}
+	
 	/**
 	 * Sets the gold string rep in case one wants to evaluate if a composer/resolver did the right thing.
 	 * @param gold the new gold
@@ -377,6 +476,15 @@ public class RMRSComposer extends IUModule {
 		 */
 		public void setPerformDomainAction(boolean action);
 
+	}
+
+	private class CandidateAnalysisIUProbabilityComparator implements Comparator<CandidateAnalysisIU> {
+	    @Override
+	    public int compare(CandidateAnalysisIU x, CandidateAnalysisIU y) {
+	    	double px = x.getCandidateAnalysis().getProbability();
+	    	double py = y.getCandidateAnalysis().getProbability();
+	        return Double.compare(py, px);
+	    }
 	}
 
 }

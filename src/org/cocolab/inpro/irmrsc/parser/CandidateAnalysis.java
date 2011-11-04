@@ -264,7 +264,7 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
     }
 	
 	public String toFinalString() {
-		return String.format("%1$16.12f",(100*mProbability)) + " " + mDerivation + "";
+		return String.format("%1$20.20f",mProbability) + "\t" + mDerivation + "";
 	}
 	
 	public String toFullString() {
