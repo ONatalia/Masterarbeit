@@ -229,9 +229,9 @@ public class RMRSComposer extends IUModule {
 						// if the analysis is not complete, try to resolve the formula, and degrade in case of failure
 						if (!ca.getCandidateAnalysis().isComplete()) {
 							resolver.setPerformDomainAction(false); // don't show the resolved items now
-							if (!resolver.resolves(newForm)) {
-								parser.degradeAnalysis(ca, malusNoReference);
-							}
+//							if (!resolver.resolves(newForm)) {
+//								parser.degradeAnalysis(ca, malusNoReference);
+//							}
 						}
 					} else {
 						//TODO: can this happen?
@@ -301,13 +301,14 @@ public class RMRSComposer extends IUModule {
 	 *
 	 */
 	public interface Resolver extends Configurable {
+
 		/**
 		 * A resolve method called whenever a new FormulaIU is created to determine
 		 * if its relations resolve something in the world.
 		 * @param f the formula
-		 * @return true if f's predicates all resolve something in the world
+		 * @return -1 if nothing resolved for any predicate argument, 0 if many world objects resolve for all args, 1 for at least one arg only one world object resolves.
 		 */
-		public boolean resolves(Formula f);
+		public int resolves(Formula f);
 
 		/**
 		 * A resolve method called whenever a new Formula is created to determine
@@ -330,7 +331,7 @@ public class RMRSComposer extends IUModule {
 		 * @return -1 if nothing resolved, 0 if id was among the resolved objects, 1 if only id was among the resolved objects
 		 */
 		public int resolvesObject(Formula f, String id);
-		
+
 		/**
 		 * A setter called to turn off/on domain actions.
 		 * @param action on or off
