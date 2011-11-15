@@ -21,38 +21,57 @@ import org.cocolab.inpro.irmrsc.simplepcfg.Grammar;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.S4Boolean;
 import edu.cmu.sphinx.util.props.S4Double;
 import edu.cmu.sphinx.util.props.S4String;
 
+/**
+ * An IU processor wrapper around the SITDBSParser. For any incoming TagIU representing the
+ * next element in a string of part-of-speech tags, the processor outputs the possible partial
+ * parses in form of CandidateAnalysisIUs.
+ *
+ * @author andreas
+ */
 public class TagParser extends IUModule {
 
 	@S4String()
 	public final static String PROP_GRAMMAR = "grammarFile";
 	private String grammarFile;
 	
-	@S4Double()
+	@S4Double(defaultValue = 0.001)
 	public final static String PROP_BASE_BEAM_FACTOR = "baseBeamFactor";
 	private double baseBeamFactor;
 	
+	@S4Boolean(defaultValue = true)
+	public final static String PROP_BE_ROBUST = "beRobust";
+	private boolean beRobust;
+	
+	/** keeps track of all parsing states for a given TagIU **/
 	private Map<TagIU,SITDBSParser> states = new HashMap<TagIU,SITDBSParser>();
 	
-	/** keep track of all analyses (in order to be able to find the right IU for a given CA. */
+	/** keeps track of all analyses (in order to be able to find the right IU for a given CA). */
 	private List<CandidateAnalysisIU> analyses = new ArrayList<CandidateAnalysisIU>();
 	
-	public static String startSymbol;
+	//private String startSymbol; // was this used anywhere?
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
+		
+		// set Robustness
+		beRobust = ps.getBoolean(PROP_BE_ROBUST);
+		SITDBSParser.setRobust(beRobust);
+		
 		// load grammar
 		grammarFile = ps.getString(PROP_GRAMMAR);
 		Grammar g = new Grammar();
 		try {
 			g.loadXML(new URL(grammarFile));
-			startSymbol = g.getStart().getSymbol();
+			//startSymbol = g.getStart().getSymbol();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}		
+		
 		// initialize first parser
 		baseBeamFactor = ps.getDouble(PROP_BASE_BEAM_FACTOR);
 		SITDBSParser p = new SITDBSParser(g, baseBeamFactor);
@@ -60,13 +79,13 @@ public class TagParser extends IUModule {
 		this.states.put(TagIU.FIRST_TAG_IU, p);
 	}
 	
-	// finds all payload-string-equal IUs for a given CandidateAnalysis
+	/** finds all payload-string-equal IUs for a given CandidateAnalysis **/
 	private List<CandidateAnalysisIU> findIU(CandidateAnalysis ca) {
 		List<CandidateAnalysisIU> l = new ArrayList<CandidateAnalysisIU>(1);
 		Iterator<CandidateAnalysisIU> i = analyses.iterator();
 		while(i.hasNext()) {
 			CandidateAnalysisIU iu = i.next();
-			//TODO this is a hack: we compare the fullstring-representation of the CAs. a better alternative would be to
+			//TODO this is a hack: I compare the fullstring-representation of the CAs. a better alternative would be to
 			// properly implement equal-like functions for CA and all subobjects.
 			if(ca.toFullString().equals(iu.getCandidateAnalysis().toFullString())) {
 				l.add(iu);
@@ -129,6 +148,7 @@ public class TagParser extends IUModule {
 		this.rightBuffer.setBuffer(newEdits);
 	}
 
+	/** degrades the analysis encapsuled in the given CandidateAnalysisIU by the given malus **/
 	public void degradeAnalysis(CandidateAnalysisIU caiu, double malus) {
 		logger.debug("[P] Degrade ca="+caiu.getCandidateAnalysis().toString()+" by "+malus+".");
 
@@ -140,24 +160,22 @@ public class TagParser extends IUModule {
 		SITDBSParser parserStateToModify = this.states.get(tagiu);
 		CandidateAnalysis degradedCA = parserStateToModify.degradeAnalysis(caiu.getCandidateAnalysis(), malus);
 		
+		// if all java objects are referenced fine, these further checks should not be necessary
 		if(degradedCA != null) {
 			// the ca was found in the parser queue and degraded successfully.
-			
 			// now modify the CA referenced in the CAIU.
 			if (caiu.getCandidateAnalysis().getProbability() == targetWeight) {
 				// do nothing
 			} else {
 				// it seems, this is never the case.
 				caiu.getCandidateAnalysis().degradeProbability(malus);				
-			}			
-			// now modify the CA referenced in the list.
-			// it likewise seems, this is not needed: the objects are all referenced
+			}
 		} else {
 			logger.fatal("[P] The CA could not be degraded.");
 		}
 	}
 	
-	// print the parser status for this caiu
+	/** print the parser status for this CandidateAnalysisIU **/
 	public void printStatus (CandidateAnalysisIU caiu) {
 		// TODO add checks
 		TagIU tiu = (TagIU) caiu.groundedIn().get(0); // a CA should only be grounded in one tag

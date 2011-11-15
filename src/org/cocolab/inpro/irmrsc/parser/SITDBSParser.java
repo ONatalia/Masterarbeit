@@ -14,8 +14,11 @@ import org.cocolab.inpro.irmrsc.simplepcfg.Production;
 import org.cocolab.inpro.irmrsc.simplepcfg.Symbol;
 
 /**
+ * A simple robust incremental top down beam search parser.
+ * 
+ * Inspired by Brian Roark 2001 Ph.D. Thesis, Department of Cognitive and Linguistic Sciences, Brown University.
+ * 
  * @author andreas
- * Simple incremental top down beam search parser
  */
 public class SITDBSParser {
 	
@@ -26,23 +29,28 @@ public class SITDBSParser {
 	public static int cntDerivations = 0;
 	
 	// capacity limit
-	public static final int maxCandidatesLimit = 1000;
+	public static int maxCandidatesLimit = 1000;
 	
 	// robustness
-	public static final boolean beRobust = true;
-	public static final int maxRepairs = 2;
-	public static final double repairMalus = 0.05;
-	public static final int maxInsertions = 2;
-	public static final double insertionMalus = 0.02;
-	public static final int maxDeletions = 2;
-	public static final double deletionMalus = 0.01;
+	public static boolean beRobust = true;
+	public static int maxRepairs = 2;
+	public static double repairMalus = 0.05;
+	public static int maxInsertions = 2;
+	public static double insertionMalus = 0.02;
+	public static int maxDeletions = 2;
+	public static double deletionMalus = 0.01;
 
 	public static final String fillerRuleAndTagName = "fill";
 	public static final Symbol unknownTag = new Symbol("unknown");
 	public static final Symbol endOfUtteranceTag = new Symbol("S!");
 
+	/** the parser main internal data structure **/ 
 	private PriorityQueue<CandidateAnalysis> mQueue;
+	
+	/** the grammar use for parsing **/
 	private Grammar mGrammar;
+	
+	/** the base beam factor **/
 	private double mBaseBeamFactor;
 	
 	static String logPrefix = "[P] ";
@@ -66,6 +74,7 @@ public class SITDBSParser {
 		mQueue.add(ca);
 	}
 
+	/** copy constructor **/
 	public SITDBSParser(SITDBSParser p) {
 		if (p != null) {
 			this.mGrammar = p.mGrammar;
@@ -76,10 +85,12 @@ public class SITDBSParser {
 		}
 	}
 
+	/** feeds the parser with the next input token **/
 	public void feed(String nextToken) {
 		this.feed(new Symbol(nextToken));
 	}
 	
+	/** feeds the parser with the next input token **/
 	public void feed(Symbol nextToken) {
 		logger.info(logPrefix+"feed: "+nextToken);
 		
@@ -186,6 +197,9 @@ public class SITDBSParser {
 		cntDerivations += mQueue.size();
 	}
 	
+	
+	/** returns the number of analyses that are completable, i.e.
+	 * that have no symbols or only eliminable symbols on their stack **/
 	public int getNumberOfCompletableAnalyses () {
 		int cnt = 0;
 		for (CandidateAnalysis ca : mQueue) {
@@ -210,31 +224,34 @@ public class SITDBSParser {
 		return cnt;
 	}
 	
-	public boolean complete() {
-		for (CandidateAnalysis ca : mQueue) {
-			// check if already complete
-			if (ca.isComplete()) {
-				continue;
-			}
-			// check if completable
-			Deque<Symbol> stack = ca.getStack();
-			boolean caIsCompletable = true;
-			for (Symbol sym : stack) {
-				if (! mGrammar.isEliminable(sym)) {
-					caIsCompletable = false;
-					break;
-				}
-			}
-			// complete all completable
-			if (caIsCompletable) {}
-		}
-		return true;
-	}
+// obsolete code.
+//	public boolean complete() {
+//		for (CandidateAnalysis ca : mQueue) {
+//			// check if already complete
+//			if (ca.isComplete()) {
+//				continue;
+//			}
+//			// check if completable
+//			Deque<Symbol> stack = ca.getStack();
+//			boolean caIsCompletable = true;
+//			for (Symbol sym : stack) {
+//				if (! mGrammar.isEliminable(sym)) {
+//					caIsCompletable = false;
+//					break;
+//				}
+//			}
+//			// complete all completable
+//			if (caIsCompletable) {}
+//		}
+//		return true;
+//	}
 	
+	/** returns the parsers queue **/
 	public PriorityQueue<CandidateAnalysis> getQueue() {
 		return this.mQueue;
 	}
 	
+	/** degrades the probability of a given CandidateAnalysis by a given malus **/
 	public CandidateAnalysis degradeAnalysis (CandidateAnalysis ca, double malus) {
 		// remove the ca from the queue, degrade it and add it again.
 		if (this.mQueue.remove(ca)) {
@@ -249,6 +266,7 @@ public class SITDBSParser {
 		}
 	}
 
+	/** resets the parsers internal queue to initial state **/
 	public void reset() {
 		mQueue = new PriorityQueue<CandidateAnalysis>(5);
 		Deque<Symbol> s = new ArrayDeque<Symbol>();
@@ -257,6 +275,7 @@ public class SITDBSParser {
 		mQueue.add(new CandidateAnalysis(s));
 	}
 
+	/** prints all derivations in the queue, for debugging **/
 	public void info() {
 		for (CandidateAnalysis ca : mQueue) {
 			logger.debug(logPrefix+ca);
@@ -264,6 +283,7 @@ public class SITDBSParser {
 		}
 	}
 	
+	/** prints some useful information **/
 	public void status() {
 		logger.info(logPrefix+"status: remains="+mQueue.size()
 				+" completable="+ getNumberOfCompletableAnalyses()
@@ -277,4 +297,9 @@ public class SITDBSParser {
 		logger = l;
 	}
 
+	/** sets whether the parser is allowed to use robust operations or not **/
+	public static void setRobust(boolean v) {
+		beRobust = v;
+	}
+	
 }
