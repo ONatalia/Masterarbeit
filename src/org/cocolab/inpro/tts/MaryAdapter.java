@@ -26,16 +26,17 @@ import org.apache.log4j.Logger;
  */
 public abstract class MaryAdapter {
 
-	enum CompatibilityMode { MARY36EXTERNAL, MARY41EXTERNAL, MARY41INTERNAL;	
+	enum CompatibilityMode { MARY36EXTERNAL, MARY4EXTERNAL, MARY4INTERNAL;	
 		public static CompatibilityMode fromString(String mode) {
-			if ("4.1".equals(mode)) return MARY41EXTERNAL; 
-			if ("internal".equals(mode)) return MARY41INTERNAL;
-			return MARY36EXTERNAL;
+			if ("3".equals(mode)) return MARY36EXTERNAL;
+			if ("4".equals(mode)) return MARY4EXTERNAL; 
+			if ("internal".equals(mode)) return MARY4INTERNAL;
+			return MARY4INTERNAL;
 		}
-	};
+	}
 	
 	public static CompatibilityMode compatibilityMode = CompatibilityMode.fromString(
-								System.getProperty("mary.version", "3.6"));
+								System.getProperty("mary.version", "internal"));
 
     private static Logger logger = Logger.getLogger(MaryAdapter.class);
 
@@ -53,12 +54,12 @@ public abstract class MaryAdapter {
 			case MARY36EXTERNAL: 
 				maryAdapter = new MaryAdapter36();
 				break;
-			case MARY41EXTERNAL:
-				maryAdapter = new MaryAdapter41();
+			case MARY4EXTERNAL:
+				maryAdapter = new MaryAdapter4();
 				break;
-			case MARY41INTERNAL:
+			case MARY4INTERNAL:
 				try {
-					maryAdapter = new MaryAdapter41internal();
+					maryAdapter = new MaryAdapter4internal();
 				} catch (Exception e) {
 					logger.info("could not start MaryAdapter41internal");
 					e.printStackTrace();
@@ -93,7 +94,7 @@ public abstract class MaryAdapter {
 		return ais;
 	}
 	
-	private InputStream getInputStreamFromMary(String query, String inputType, String outputType) {
+	protected InputStream getInputStreamFromMary(String query, String inputType, String outputType) {
         String audioType = "";
         ByteArrayInputStream bais = null;
 		try {

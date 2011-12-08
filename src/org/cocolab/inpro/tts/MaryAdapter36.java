@@ -23,6 +23,7 @@ public class MaryAdapter36 extends MaryAdapter {
 		mc36 = new de.dfki.lt.mary.client.MaryClient(serverHost, serverPort);
 	}
 	
+	@Override
 	protected ByteArrayOutputStream process(String query, String inputType, String outputType, String audioType) throws UnknownHostException, IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
         String defaultVoiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);

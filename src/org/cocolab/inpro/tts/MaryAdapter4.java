@@ -8,7 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-public class MaryAdapter41 extends MaryAdapter {
+public class MaryAdapter4 extends MaryAdapter {
 
 	marytts.client.MaryClient mc41;
 
@@ -16,7 +16,7 @@ public class MaryAdapter41 extends MaryAdapter {
 	
 	/** private constructor, this class is a singleton 
 	 * @throws IOException */
-	MaryAdapter41() throws IOException {
+	MaryAdapter4() throws IOException {
         String serverHost = System.getProperty("mary.host", "localhost");
         int serverPort = Integer.getInteger("mary.port", 59125).intValue();
 		mc41 = marytts.client.MaryClient.getMaryClient(
@@ -24,6 +24,7 @@ public class MaryAdapter41 extends MaryAdapter {
 	           );
 	}
 	
+	@Override
 	protected ByteArrayOutputStream process(String query, String inputType, String outputType, String audioType) throws UnknownHostException, IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
         String defaultVoiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
