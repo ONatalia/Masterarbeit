@@ -62,7 +62,7 @@ public class SimpleMonitor implements RtpListener {
     	this(clp, new ConfigurationManager(clp.getConfigURL()));
     }
 
-    SimpleMonitor(MonitorCommandLineParser clp, ConfigurationManager cm) throws RtpException, IOException, PropertyException, InstantiationException {
+    public SimpleMonitor(MonitorCommandLineParser clp, ConfigurationManager cm) throws RtpException, IOException, PropertyException, InstantiationException {
 		this.clp = clp;
 		this.cm = cm;
 		logger.info("Setting up output stream...\n");
