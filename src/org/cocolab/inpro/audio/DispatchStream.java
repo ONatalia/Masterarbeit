@@ -63,7 +63,7 @@ public class DispatchStream extends InputStream implements Configurable {
 	 * Reads file names corresponding to utterances strings from a file
 	 * and adds them to a local map if they can be found.
 	 */
-	public void initializeTTSCache(String utteranceMapFile, String audioPath) {
+	public static void initializeTTSCache(String utteranceMapFile, String audioPath) {
 		try {
 			URL url = new URL(utteranceMapFile);
 			// workaround for relative local paths 
@@ -201,6 +201,7 @@ public class DispatchStream extends InputStream implements Configurable {
 	}
 	
 	protected void setStream(InputStream is) {
+		logger.debug("playing a new stream " + is);
 		synchronized(this) {
 			streamQueue.clear();
 			if (stream != null) {
@@ -257,6 +258,8 @@ public class DispatchStream extends InputStream implements Configurable {
 			}
 			if (bytesRead < len) { // if the stream could not provide enough bytes, then it's probably ended
 				if (sendSilence) { 
+					if (bytesRead < 0) 
+						bytesRead = 0;
 // for silence:
 					Arrays.fill(b, off + bytesRead, off + len, (byte) 0);
 // for low noise:
