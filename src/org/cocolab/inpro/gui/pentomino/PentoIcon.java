@@ -24,7 +24,7 @@ public class PentoIcon extends PentoTile implements Icon {
 	}
 	
 	public PentoIcon(int s, char name) {
-		this(s, Color.RED, name);
+		this(s, Color.GRAY, name);
 	}
 	
 	public PentoIcon(int s, Color c, char name) {

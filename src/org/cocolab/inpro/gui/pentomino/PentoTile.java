@@ -64,11 +64,11 @@ public class PentoTile extends Tile {
 		{{0, 0, 0, 0, 1}, {0, 1, 2, -1, -1}} // L
 	};
 	
-	public PentoTile(int s, Color c, int x0, int y0, char type) {
-		this(s, c, x0, y0, type, "", "");
+	public PentoTile(int scale, Color c, int x0, int y0, char type) {
+		this(scale, c, x0, y0, type, "", "");
 	}
 	
-	public PentoTile(int s, Color c, int x0, int y0, char type, String name, String label) {
+	public PentoTile(int scale, Color c, int x0, int y0, char type, String name, String label) {
 		if (!isValidTile(type)) 
 			throw new RuntimeException("Error in PentoTile: " + Character.toString(type) + " is not a valid type for a tile");
 		this.defVectors = getDefVectors(type);
@@ -77,7 +77,7 @@ public class PentoTile extends Tile {
 		this.type = type;
 		this.name = name;
 		this.label = label;
-		this.scale = s;
+		this.scale = scale;
 
 		this.defaultRefPoint = this.refPoint;
 		this.defaultColor = this.color;
@@ -94,7 +94,7 @@ public class PentoTile extends Tile {
 			 || c == 'T' || c == 'I' || c == 'L');
 	}
 	
-	int[][] getDefVectors(char name) {
+	static int[][] getDefVectors(char name) {
 		int[][] vector;
 		assert(isValidTile(name));
 		switch (name) {
@@ -154,6 +154,7 @@ public class PentoTile extends Tile {
 		setColor(defaultColor);
 	}
 
+	@Override
 	public boolean matchesPosition(java.awt.Point p) {
 		boolean s;
 		s = (boxes[0]).matchesPosition(p) || 
@@ -164,6 +165,7 @@ public class PentoTile extends Tile {
 		return s;
 	}
 
+	@Override
 	public void setPos(Point p) {
 		Point delta = (Point) p.clone();
 		delta.sub(refPoint);                  /* get change in Box coordinates */

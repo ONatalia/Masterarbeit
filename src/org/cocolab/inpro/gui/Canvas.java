@@ -1,5 +1,6 @@
 package org.cocolab.inpro.gui;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,7 +44,12 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	public boolean labelsVisible;
 	
 	public Canvas() {
+		this(new Dimension(800, 600));
+	}
+	
+	public Canvas(Dimension preferredSize) {
 		tiles = createTiles();
+		setPreferredSize(preferredSize);
 		showTiles = true;
 	}
 	
