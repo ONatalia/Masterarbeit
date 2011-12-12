@@ -184,8 +184,28 @@ public class RMRSComposer extends IUModule {
 						}
 					}
 					break;
+					
 				case ADD:
+					//******************************************************************
+					// A new candidate analysis has been added. Now, the following steps
+					// are taken to construct the corresponding semantic outcome:
+					//  1. Find the preceding syntactic IU and its semantic IU.
+					//  2. Get the latest derivational steps from the current syntactic IU
+					//     and iterate over them. For each step, produce a corresponding
+					//     semantic increment and add it to the current semantics. 
+					//     Derivational steps are [see CandidateAnalysis]:
+					//       a) normal match (add lexical semantics of the token)
+					//       b) robust match: repairs / deletions (add the token's default semantics)
+					//       c) robust match: insertions (add the token's default semantics without consuming a slot)
+					//       d) rule expansion (add rule semantics)
+					//  3. Add the output formula to the outgoing newEdits.
+					//  4. ReferencePruning (optional): resolve the output formula and
+					//     degrade the analysis of non-resolving formulas
+					//******************************************************************
+					
 					iGotAdds = true;
+					
+					// ## 1. find antecedent IUs
 					CandidateAnalysisIU previousCa = (CandidateAnalysisIU) ca.getSameLevelLink();
 					if (previousCa != null) {
 						FormulaIU previousFIU = firstUsefulFormulaIU;
@@ -195,11 +215,13 @@ public class RMRSComposer extends IUModule {
 						List<String> lastDerive = ca.getCandidateAnalysis().getLastDerive();
 						logger.debug(logPrefix+"-------");
 						Formula newForm = new Formula(previousFIU.getFormula());
+						
+						// ## 2. go through all new syntactic rule applications
 						for (String rule : lastDerive) {
 							logger.debug(logPrefix+"= "+newForm.toStringOneLine());
-							// go through all new syntactic rule applications
+							
+							// ## a) normal match (add lexical semantics of the token)
 							if (rule.startsWith("m(")) {
-								// parser match
 								String tag = rule.substring(2, rule.length()-1);
 								if (tag.equals("S!")) {
 									// this is the sentence end marker, signaling that nothing more is to come
@@ -223,6 +245,9 @@ public class RMRSComposer extends IUModule {
 									logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
 									newForm.forwardCombine(lexitem);
 								}
+								
+							// ## b) robust match: repairs / deletions (add the token's default semantics)
+							// TODO: why should repaired tokens only be shown by the repaired POStag and not by their lexical name? better discriminate between repairs and deletions
 							} else if (rule.startsWith("r(") || rule.startsWith("d(")) {
 								String tag = rule.substring(2, rule.length()-1);
 								Variable.Type type = semanticTypesOfTags.get(tag);
@@ -231,6 +256,8 @@ public class RMRSComposer extends IUModule {
 								logger.debug(logPrefix+"+ "+rule);
 								logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
 								newForm.forwardCombine(lexitem);
+																
+							// ## c) robust match: insertions (add the token's default semantics without consuming a slot)
 							} else if (rule.startsWith("i(")) {
 								String tag = rule.substring(2, rule.length()-1);
 								Variable.Type type = Variable.Type.INDEX;
@@ -250,25 +277,30 @@ public class RMRSComposer extends IUModule {
 								logger.debug(logPrefix+"+ "+rule);
 								logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
 								newForm.simpleAdd(lexitem);
+								
+							// ## d) rule expansion (add rule semantics)	
 							} else {
-								// the current rule is a syntactic one; get rule semantics from map.
 								Formula rulesem = semanticRules.get(rule);
 								logger.debug(logPrefix+"+ "+rule);
 								logger.debug(logPrefix+"+ "+rulesem.toStringOneLine());
 								newForm.forwardCombine(rulesem);
 							}
+
+							// reduce formula
 							logger.debug(logPrefix+"= "+newForm.toStringOneLine());
 							newForm.reduce();
 							//newForm.renumber(0);
 							logger.debug(logPrefix+"= "+newForm.toStringOneLine());
 							logger.debug(logPrefix+"> "+newForm.getNominalAssertions());
 						}
-						// create the new formula iu and store it
+						
+						// ## 3. Add the output formula to the outgoing newEdits.
 						FormulaIU newFIU = new FormulaIU(previousFIU, ca, newForm);
 						newEdits.add(new EditMessage<FormulaIU>(EditType.ADD, newFIU));
 						states.put(ca,newFIU);
 						
-						// if the analysis is not complete and no-ref-pruning is wanted: try to resolve the formula, and degrade in case of failure
+						// ## 4. ReferencePruning (optional): resolve the output formula and
+						//       degrade the analysis of non-resolving formulas
 						if (referencePruning) {
 							if (!ca.getCandidateAnalysis().isComplete()) {
 								resolver.setPerformDomainAction(false); // don't show the resolved items now
@@ -293,6 +325,7 @@ public class RMRSComposer extends IUModule {
 						//TODO: can this happen?
 					}
 					break;
+					
 				case COMMIT:
 					for (IU sem : ca.grounds()) {
 						if (sem instanceof FormulaIU) {
@@ -324,7 +357,7 @@ public class RMRSComposer extends IUModule {
 			}
 		}
 		
-		// find the highest ranked ca and show its resolves
+		// find the highest ranked analysis
 		FormulaIU bestFoIU = null;
 		double bestProb = 0;
 		int bestLexemCount = 0;
@@ -344,13 +377,14 @@ public class RMRSComposer extends IUModule {
 				}
 			}
 		}
+		// show the resolving objects of the highest ranked analysis in the gui
 		if (bestFoIU != null) {
 			resolver.setPerformDomainAction(true);
 			resolver.resolves(bestFoIU.getFormula());
 			resolver.setPerformDomainAction(false);
 		}
 		
-		// if we got ADDs, evaluate the new result according to one of the four evaluation methods.
+		// if we got ADDs, evaluate the new result according to one of our two evaluation methods.
 		if (iGotAdds && (gold != null)) {
 			// we compare the gold tile with the resolves set of ..
 			
