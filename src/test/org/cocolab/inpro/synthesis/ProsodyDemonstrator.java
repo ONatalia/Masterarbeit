@@ -20,50 +20,64 @@ import javax.swing.event.ChangeListener;
 import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 
-public class DurationDemonstrator extends PatternDemonstrator {
+public class ProsodyDemonstrator extends PatternDemonstrator {
 	
-	public DurationDemonstrator() {
+	public ProsodyDemonstrator() {
 		final JTextField textToSynthesize = new JTextField("Nimm bitte das Kreuz ganz oben links in der Ecke, lege es in den Fuß des Elefanten bevor Du ihn auf den Kopf drehst.");
 		this.add(textToSynthesize);
-		this.add(new JButton(new AbstractAction("", new ImageIcon(DurationDemonstrator.class.getResource("media-playback-start.png"))) {
+		this.add(new JButton(new AbstractAction("", new ImageIcon(ProsodyDemonstrator.class.getResource("media-playback-start.png"))) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				greatNewUtterance(textToSynthesize.getText());
 		        dispatcher.playStream(installment.getAudio(), true);
 			}
 		}));
-		BoundedRangeModel brm = new DefaultBoundedRangeModel(0, 0, -100, 100);
-		final JSlider slider = new JSlider(brm);
-		this.add(slider);
+		BoundedRangeModel tempoRange = new DefaultBoundedRangeModel(0, 0, -100, 100);
+		JSlider tempoSlider = new JSlider(tempoRange);
+		this.add(tempoSlider);
 		Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
 		labels.put(-100, new JLabel("0.5"));
 		labels.put(-50, new JLabel("0.7"));
 		labels.put(0, new JLabel("1.0"));
 		labels.put(50, new JLabel("1.4"));
 		labels.put(100, new JLabel("2.0"));
-		slider.setLabelTable(labels);
-		slider.setPaintLabels(true);
-		slider.setPaintTicks(true);
-		slider.setMajorTickSpacing(50);
-		slider.setMinorTickSpacing(25);
+		tempoSlider.setLabelTable(labels);
+		tempoSlider.setPaintLabels(true);
+		tempoSlider.setPaintTicks(true);
+		tempoSlider.setMajorTickSpacing(50);
+		tempoSlider.setMinorTickSpacing(25);
 		final JTextField sliderValue = new JTextField(4); 
 		sliderValue.setText("1.00");
 		this.add(sliderValue);
-		brm.addChangeListener(new ChangeListener() {
+		tempoRange.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				BoundedRangeModel brm = (BoundedRangeModel) e.getSource();
-			//	if (!brm.getValueIsAdjusting()) {
-					double factor = brm.getValue();
-					//System.err.print(value + " -> ");
-					factor /= 100; // normalize to [-1;+1]
-					factor = Math.exp(factor * Math.log(2));
-					//System.err.println(value);
-					for (SysSegmentIU seg : installment.getSegments()) {
-						seg.stretchFromOriginal(factor);
-					}
-					sliderValue.setText(String.format("%.2f", factor));
-			//	}
+				double factor = brm.getValue();
+				//System.err.print(value + " -> ");
+				factor /= 100; // normalize to [-1;+1]
+				factor = Math.exp(factor * Math.log(2));
+				//System.err.println(value);
+				for (SysSegmentIU seg : installment.getSegments()) {
+					seg.stretchFromOriginal(factor);
+				}
+				sliderValue.setText(String.format("%.2f", factor));
+			}
+		});
+		BoundedRangeModel pitchRange = new DefaultBoundedRangeModel(0, 0, -1200, 1200);
+		JSlider pitchSlider = new JSlider(pitchRange);
+		this.add(pitchSlider);
+		pitchSlider.setPaintTicks(true);
+		pitchSlider.setMajorTickSpacing(1200);
+		pitchSlider.setMinorTickSpacing(600);
+		pitchRange.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				BoundedRangeModel brm = (BoundedRangeModel) e.getSource();
+				double offset = brm.getValue();
+				for (SysSegmentIU seg : installment.getSegments()) {
+					seg.pitchShiftInCent = offset;
+				}
 			}
 		});
 	}
@@ -74,11 +88,16 @@ public class DurationDemonstrator extends PatternDemonstrator {
 		System.err.println("created a new installment: " + command);
 	}
 	
+	@Override
+	public String applicationName() {
+		return "Prosody Demonstrator";
+	}
+	
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				createAndShowGUI(new DurationDemonstrator());
+				createAndShowGUI(new ProsodyDemonstrator());
 			}
 		});
 	}

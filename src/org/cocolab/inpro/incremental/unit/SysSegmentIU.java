@@ -1,6 +1,5 @@
 package org.cocolab.inpro.incremental.unit;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -17,6 +16,7 @@ public class SysSegmentIU extends SegmentIU {
 	Label originalLabel;
 	List<PitchMark> pitchMarks;
 	List<FullPFeatureFrame> hmmSynthesisFeatures;
+	public double pitchShiftInCent = 0.0;
 	
 	public SysSegmentIU(Label l, List<PitchMark> pitchMarks) {
 		super(l);
@@ -67,8 +67,14 @@ public class SysSegmentIU extends SegmentIU {
 			return duration();
 	}
 	
-	public List<FullPFeatureFrame> getHMMSynthesisFrames() {
-		return Collections.unmodifiableList(hmmSynthesisFeatures);
+	public FullPFeatureFrame getHMMSynthesisFrame(int req) {
+		assert req < durationInSynFrames();
+		int dur = durationInSynFrames(); // the duration in frames (= the number of frames that should be there)
+		int fra = hmmSynthesisFeatures.size(); // the number of frames available
+		// just repeat/drop frames as necessary if the amount of frames available is not right
+		FullPFeatureFrame frame =  hmmSynthesisFeatures.get((int) (req * (fra / (double) dur)));
+		frame.shiftlf0Par(pitchShiftInCent);
+		return frame;
 	}
 	
 	/** 

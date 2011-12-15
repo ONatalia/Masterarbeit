@@ -47,17 +47,13 @@ public class IUBasedFullPStream extends FullPStream {
     		currIUFrameOffset += currIU.durationInSynFrames();
     		currIU = (SysSegmentIU) currIU.getNextSameLevelLink();
     	}
-		int dur = currIU.durationInSynFrames(); // the duration in frames (= the number of frames that should be there)
-		int fra = currIU.getHMMSynthesisFrames().size(); // the number of frames available
-		int req = currPosition - currIUFrameOffset; // the frame requested
-		// just repeat/drop frames as necessary if the amount of frames available is not right
+    	int iuLocalPosition = currPosition - currIUFrameOffset;
 		currPosition++;
-		return currIU.getHMMSynthesisFrames().get((int) (req * (fra / (double) dur)));
+    	return currIU.getHMMSynthesisFrame(iuLocalPosition);
     }
     
     @Override
 	public FullPFeatureFrame getFullFrame(int t) {
-//    	throw new RuntimeException("not implemented");
     	setNextFrame(t);
     	return getNextFrame();
     }

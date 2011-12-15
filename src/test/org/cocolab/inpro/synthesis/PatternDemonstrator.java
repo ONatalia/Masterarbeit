@@ -32,7 +32,7 @@ import edu.cmu.sphinx.util.props.ConfigurationManager;
  *
  */
 public abstract class PatternDemonstrator extends JPanel {
-
+	
 	/** a text field that displays the current value of {@link installment} */
 	JTextField generatedText;
 	/** the IU holding the incrementally synthesized installment */
@@ -113,13 +113,17 @@ public abstract class PatternDemonstrator extends JPanel {
 	/** this operation is called by a StartAction and should (re-)create {@link installment} */
 	public abstract void greatNewUtterance(String command);
 	
+	public String applicationName() {
+		return "Test Application";
+	}
+	
 	/** used to create GUI on the Swing event thread */
-	public static void createAndShowGUI(JPanel panel) {
+	public static void createAndShowGUI(PatternDemonstrator panel) {
 		/** startup mary */
 		MaryAdapter.getInstance();
 		/** disable global variance optimization */
 		//((HMMVoice) Voice.getVoice(MaryAdapter4internal.DEFAULT_VOICE)).getHMMData().setUseGV(false);
-		JFrame frame = new JFrame("Test Application");
+		JFrame frame = new JFrame(panel.applicationName());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// add our object
 		frame.setContentPane(panel);
