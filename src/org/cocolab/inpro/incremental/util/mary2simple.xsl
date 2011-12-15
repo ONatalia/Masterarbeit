@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- used internally by TTSUtil when converting MaryXML to IU representation --> 
 <xsl:stylesheet 
   version="1.0" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -26,8 +27,8 @@
    <xsl:element name="ph">
     <xsl:attribute name="d"><xsl:apply-templates select="@duration" /></xsl:attribute>
     <xsl:attribute name="p"><xsl:text>_</xsl:text></xsl:attribute>
-    <xsl:attribute name="end"><xsl:apply-templates select="preceding::mary:ph[1]/attribute::end" /></xsl:attribute>
-   </xsl:element>
+    <xsl:attribute name="end"><xsl:value-of select="preceding::mary:ph[1]/attribute::end + @duration * 0.001" /></xsl:attribute>
+   </xsl:element>	
   </xsl:element>
  </xsl:element>
 </xsl:template>

@@ -1,6 +1,5 @@
 package org.cocolab.inpro.incremental.util;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -26,6 +25,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.tts.MaryAdapter;
@@ -33,7 +33,7 @@ import org.cocolab.inpro.tts.PitchMark;
 
 public class TTSUtil {
 	
-	public static List<WordIU> wordIUsFromMaryXML(InputStream is) throws JAXBException, TransformerException {
+	public static List<WordIU> wordIUsFromMaryXML(InputStream is) throws JAXBException {
 		JAXBContext context = JAXBContext.newInstance(Paragraph.class);
 		JAXBResult result = new JAXBResult(context);
 		TransformerFactory tf = TransformerFactory.newInstance();
@@ -62,6 +62,7 @@ public class TTSUtil {
 		@XmlElement(name = "t")
 		private List<Word> words;
 
+		@Override
 		public String toString() {
 			return words.toString();
 		}
@@ -78,8 +79,12 @@ public class TTSUtil {
 		
 		public List<WordIU> getWordIUs() {
 			List<WordIU> wordIUs = new ArrayList<WordIU>(words.size());
+			WordIU prev = null;
 			for (Word word : words) {
-				wordIUs.add(word.toIU());
+				WordIU wordIU = word.toIU();
+				wordIU.connectSLL(prev);
+				wordIUs.add(wordIU);
+				prev = wordIU;
 			}
 			return wordIUs;
 		}
@@ -123,12 +128,15 @@ public class TTSUtil {
 		
 		public WordIU toIU() {
 			List<IU> segmentIUs = new ArrayList<IU>(segments.size());
+			IU prev = null;
 			for (Segment s : segments) {
-				segmentIUs.add(s.toIU());
+				IU sIU = s.toIU();
+				sIU.setSameLevelLink(prev);
+				segmentIUs.add(sIU);
+				prev = sIU;
 			}
 			return new WordIU(token, null, segmentIUs);
 		}
-		
 	}
 	
 	@XmlRootElement(name = "ph")
@@ -199,10 +207,12 @@ public class TTSUtil {
 		return sb;
 	}
 	
-	public static void main(String[] args) throws FileNotFoundException, JAXBException, TransformerException {
+	public static void main(String[] args) throws JAXBException, TransformerException {
 		MaryAdapter ma = MaryAdapter.getInstance();
 		//InputStream is = TTSUtil.class.getResourceAsStream("example.maryxml");
-		InputStream is = ma.text2maryxml("nordwind und sonne");
+		//InputStream is = ma.text2maryxml("nordwind und sonne");
+		String testUtterance = "Nimm bitte das rote Kreuz.";
+		InputStream is = ma.text2maryxml(testUtterance);
 
 		JAXBContext context = JAXBContext.newInstance(Paragraph.class);
 		JAXBResult result = new JAXBResult(context);
@@ -216,6 +226,7 @@ public class TTSUtil {
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 		marshaller.marshal(paragraph, System.out);
+		System.out.println((new SysInstallmentIU(testUtterance)).deepToString());
 	}
 	
 }
