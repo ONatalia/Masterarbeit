@@ -8,47 +8,47 @@ import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.util.TTSUtil;
 import org.cocolab.inpro.tts.MaryAdapter;
+import org.cocolab.inpro.tts.MaryAdapter4internal;
 import org.cocolab.inpro.tts.PitchMark;
+import org.cocolab.inpro.tts.hts.FullPStream;
 
 /**
- *
  * TODO: add support for canned audio (i.e. read from WAV and TextGrid, maybe even transparently)
- * TODO: cache previously synthesized audio
  * @author timo
  */
 public class SysInstallmentIU extends InstallmentIU {
 	
 	AudioInputStream synthesizedAudio;
 	
-	@SuppressWarnings("unchecked") // allow cast from List<WordIU> to List<IU>
+	@SuppressWarnings({ "rawtypes", "unchecked" }) // allow cast from List<WordIU> to List<IU>
 	public SysInstallmentIU(String tts) {
 		super(null, tts);
 		InputStream is = MaryAdapter.getInstance().text2maryxml(tts);
-		List<WordIU> words = Collections.<WordIU>emptyList();
 		try {
-			words = TTSUtil.wordIUsFromMaryXML(is);
+			groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is);
 		} catch (Exception e) {
 			e.printStackTrace();
+			groundedIn = (List) Collections.<WordIU>emptyList();
 		}
-		groundedIn = (List) words;
 	}
 	
-	@SuppressWarnings("unchecked") // allow cast from List<WordIU> to List<IU>
+	@SuppressWarnings({ "rawtypes", "unchecked" }) // allow cast from List<WordIU> to List<IU>
 	public SysInstallmentIU(String tts, List<WordIU> words) {
 		this(tts);
 		groundedIn = (List) words;
 	}
 	
-	@SuppressWarnings("unchecked") // allow cast from List<WordIU> to List<IU>
-	public SysInstallmentIU(List<WordIU> words) {
+	@SuppressWarnings({ "rawtypes", "unchecked" }) // allow cast from List<WordIU> to List<IU>
+	public SysInstallmentIU(List<? extends IU> words) {
 		super(null, "");
 		groundedIn = (List) words;
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void scaleDeepCopyAndStartAtZero(double scale) {
 		List<WordIU> newWords = new ArrayList<WordIU>();
 		WordIU prevWord = null;
@@ -69,10 +69,56 @@ public class SysInstallmentIU extends InstallmentIU {
 	}
 	
 	public void synthesize() {
-//		String mbrola = toMbrola();
-//		synthesizedAudio = MaryAdapter.getInstance().mbrola2audio(mbrola);
 		String maryXML = toMaryXML();
 		synthesizedAudio = MaryAdapter.getInstance().maryxml2audio(maryXML);
+	}
+	
+	/**
+	 * queries mary for the HMM parameter set for this utterance (based on getWords())
+	 */
+	public FullPStream generateFullPStream() {
+		String maryXML = toMaryXML();
+		assert MaryAdapter.getInstance() instanceof MaryAdapter4internal;
+		FullPStream pstream = ((MaryAdapter4internal) MaryAdapter.getInstance()).maryxml2hmmFeatures(maryXML);
+		return pstream;
+		//VocodingAudioStream vas = new VocodingAudioStream(pstream, null, false);
+	}
+	
+	public void addFeatureStreamToSegmentIUs() {
+		FullPStream stream = generateFullPStream();
+		List<SysSegmentIU> segments = getSegments();
+		// we keep the last segment separate to be able to change it's duration
+		//SysSegmentIU lastSegment = segments.get(segments.size() - 1);
+		int t = 0;
+		for (SysSegmentIU seg : segments) {
+			int frames = (int) ((seg.duration() * FullPStream.FRAMES_PER_SECOND) + 0.1);
+			seg.setHmmSynthesisFrames(stream.getFullFrames(t, frames));
+			t += frames;
+		//	System.err.println(seg.toLabelLine() + " gets " + frames + " frames.");
+		}
+		if (stream.hasNextFrame()) 
+			Logger.getLogger(SysInstallmentIU.class).warn("discarding some unclaimed frames, t=" + t + ", maxT=" + stream.getMaxT());
+		//assert !stream.hasFrame(t) : "there are some unclaimed frames left, t=" + t + ", maxT=" + stream.getMaxT();
+		//stream.getFullFrames(t, stream.getMaxT() - t);
+	}
+
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<SysSegmentIU> getSegments() {
+		List<SysSegmentIU> segments = new ArrayList<SysSegmentIU>();
+		for (WordIU word : getWords()) {
+			segments.addAll((List) word.getSegments());
+		}
+		return segments;
+	}
+	
+	public CharSequence toLabelLines() {
+		StringBuilder sb = new StringBuilder();
+		for (SysSegmentIU seg : getSegments()) {
+			sb.append(seg.toLabelLine());
+			sb.append("\n");
+		}
+		return sb;
 	}
 	
 	public AudioInputStream getAudio() {
@@ -200,9 +246,18 @@ public class SysInstallmentIU extends InstallmentIU {
 		return Collections.unmodifiableList(list.subList(list.size() - n, list.size()));
 	}
 	
-	@SuppressWarnings("unchecked") // allow cast of groundedIn to List<WordIU> 
+	public WordIU getInitialWord() {
+		return (WordIU) groundedIn.get(0);
+	}
+	
 	public List<WordIU> getWords() {
-		return (List<WordIU>) groundedIn();
+		List<WordIU> activeWords = new ArrayList<WordIU>();
+		WordIU word = getInitialWord();
+		while (word != null) {
+			activeWords.add(word);
+			word = (WordIU) word.getNextSameLevelLink();
+		}
+		return activeWords;
 	}
 	
 	@Override
