@@ -47,7 +47,7 @@ public class TextBasedFloorTracker extends AbstractFloorTracker {
 			List<? extends EditMessage<? extends IU>> edits) {
 		// TODO: check type of IUs (right now, we only expect WordIUs)
 		// TODO: not only react to WordIUs, but to more interesting stuff
-		mostRecentIUs = (IUList) ius;
+		mostRecentIUs = (IUList<WordIU>) ius;
 		if (isNotInInput() && ius.size() > 0) {
 			setSoT();
 		}	
@@ -77,7 +77,7 @@ public class TextBasedFloorTracker extends AbstractFloorTracker {
 	/** call this to (externally) assert that speech is over */
 	public void setEOT() {
 		assert internalState.equals(InternalState.IN_INPUT);
-		WordIU lastWord = (WordIU) mostRecentIUs.get(mostRecentIUs.size() - 1); 
+		WordIU lastWord = mostRecentIUs.get(mostRecentIUs.size() - 1); 
 		Signal signal;
 		if (lastWord.hasProsody()) {
 			signal = lastWord.pitchIsRising() ? Signal.EOT_RISING : Signal.EOT_FALLING;

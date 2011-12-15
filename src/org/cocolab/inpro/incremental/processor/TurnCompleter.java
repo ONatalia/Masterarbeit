@@ -183,7 +183,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	}
 
 	/** time spanned by all non-silent words */
-	private double getDurationWithoutPauses(List<WordIU> words) {
+	private static double getDurationWithoutPauses(List<WordIU> words) {
 		double dur = 0;
 		for (WordIU word : words) {
 			if (!word.isSilence())
@@ -293,7 +293,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	 * utility operations
 	 * * * * * * * * * * */
 	/** utility which unfortunately is not part of java.util. */
-	private <T> T lastElement(List<T> list) {
+	private static <T> T lastElement(List<T> list) {
 		return list.get(list.size() - 1);
 	}
 	
