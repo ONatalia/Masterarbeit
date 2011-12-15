@@ -2,6 +2,7 @@ package org.cocolab.inpro.incremental.unit;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -108,12 +109,11 @@ public abstract class IU implements Comparable<IU> {
 
 	public void setSameLevelLink(IU link) {
 		if (previousSameLevelLink != null) {
-			throw new RuntimeException("SLL may not be changed");
-		} else {
-			previousSameLevelLink = link;
-			if (link != null) {
-				link.addNextSameLevelLink(this);
-			}
+		//	throw new RuntimeException("SLL may not be changed");
+		}
+		previousSameLevelLink = link;
+		if (link != null) {
+			link.addNextSameLevelLink(this);
 		}
 	}
 	
@@ -127,12 +127,46 @@ public abstract class IU implements Comparable<IU> {
 		return previousSameLevelLink;
 	}
 
-	public List<IU> getNextSameLevelLink() {
-		return nextSameLevelLinks;
+	/** return the (possibly empty) list of next SLLs */
+	public List<IU> getNextSameLevelLinks() {
+		return nextSameLevelLinks != null ? nextSameLevelLinks : Collections.<IU>emptyList();
+	}
+	
+	public IU getNextSameLevelLink() {
+		return (nextSameLevelLinks != null && nextSameLevelLinks.size() > 0) ? nextSameLevelLinks.get(0) : null;
+	}
+	
+	public void setAsTopNextSameLevelLink(final String bestFollowerPayload) {
+		reorderNextSameLevelLink(new Comparator<IU>() {
+			@Override
+			public int compare(IU o1, IU o2) {
+				return Math.abs(o1.toPayLoad().compareTo(bestFollowerPayload)) - Math.abs(o2.toPayLoad().compareTo(bestFollowerPayload));
+			}
+		});
+	}
+	
+	public void reorderNextSameLevelLink(Comparator<IU> order) {
+		Collections.sort(nextSameLevelLinks, order);
+		if (groundedIn != null && groundedIn.size() > 0) {
+			IU lastGrounding = groundedIn.get(groundedIn.size() - 1);
+			lastGrounding.newGroundingNextSameLevelLinksOrder(nextSameLevelLinks);
+		}
+	}
+	
+	/** this is needed to (recursively) correct nextSameLevelLinks in groundedIn IUs */
+	private void newGroundingNextSameLevelLinksOrder(List<IU> aboveNextSameLevelLinks) {
+		nextSameLevelLinks.clear();
+		for (IU iu : aboveNextSameLevelLinks) {
+			nextSameLevelLinks.add(iu.groundedIn.get(0));
+		}
+		if (groundedIn != null && groundedIn.size() > 0) {
+			IU lastGrounding = groundedIn.get(groundedIn.size() - 1);
+			lastGrounding.newGroundingNextSameLevelLinksOrder(nextSameLevelLinks);
+		}
 	}
 
     public void connectSLL(IU link) {
-    	if (previousSameLevelLink == null) {
+    	//if (previousSameLevelLink == null) {
     		setSameLevelLink(link);
     		if (link != null && groundedIn != null) {
     			IU firstGrounding = groundedIn.get(0);
@@ -147,7 +181,7 @@ public abstract class IU implements Comparable<IU> {
     			}
     			firstGrounding.connectSLL(prevLast);
     		}
-    	}
+    	//}
 	}
 	
 	/**
@@ -282,7 +316,7 @@ public abstract class IU implements Comparable<IU> {
 			grounds = new ArrayList<IU>(1);
 		}
 		if (!grounds.contains(iu)) {
-			grounds.add((IU) iu);
+			grounds.add(iu);
 		}
 		iu.groundIn(this);
 	}
@@ -324,6 +358,7 @@ public abstract class IU implements Comparable<IU> {
 		return String.format(Locale.US,	"%.2f\t%.2f\t%s", startTime(), endTime(), toPayLoad());
 	}
 	
+	@Override
 	public String toString() {
 		return getID() + "," + toLabelLine(); // + "\n";
 	}
@@ -334,11 +369,19 @@ public abstract class IU implements Comparable<IU> {
 		sb.append(" with content ");
 		sb.append(this.toString());
 		sb.append("\n  Committed: " + this.isCommitted());
-		sb.append("\n  SLL: ");
+		sb.append("\n  pSLL: ");
 		if (previousSameLevelLink != null) {
-			sb.append(previousSameLevelLink.toString());
+			sb.append(previousSameLevelLink.id);
 		} else {
 			sb.append("none");
+		}
+		if (getNextSameLevelLink() != null) {
+			sb.append("\n  nSLL: [");
+			for (IU nsll : getNextSameLevelLinks()) {
+				sb.append(nsll.id);
+				sb.append(", ");
+			}
+			sb.append("]");
 		}
 		sb.append("\n  grounded in:\n  [");
 		if (groundedIn != null) {

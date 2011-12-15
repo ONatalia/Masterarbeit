@@ -10,7 +10,10 @@ import org.cocolab.inpro.annotation.Label;
 public class SegmentIU extends IU {
 	
 	public static final Set<String> VOWELS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			"2:", "9", "@", "@U", "6", "a", "a:", "aa:", "A:", "aa", "A", "ai", "aI", "au", "aU", "e", "e:", "ee", "E", "ee:", "E:", "ei", "eI", "i:", "i", "ii", "I", "o", "o:", "oo", "O", "oy", "OY", "u:", "u", "ui", "uI", "ui:", "uu", "U", "y:", "y", "yy", "Y")));
+			"2:", "9", "@", "@U", "6", "a", "a:", "aa:", "A:", "aa", "A", "ai", "aI", "au", "aU", "e", "e:", "ee", "E", "ee:", "E:", "ei", "eI", "i:", "i", "ii", "I", "o", "o:", "oo", "O", "oy", "OY", "u:", "u", "ui", "uI", "ui:", "uu", "U", "y:", "y", "yy", "Y"
+/*,// for english:
+			"{" // possibly more; just run without assertions for english :-) /**/
+			)));
 // for swedish:
 /*			"A", "`A", "'A", "'A:", "''A", "''A:", "Å", "Å:", "`Å:", "'Å", "'Å:", "''Å", "''Å:", "Ä", "`Ä", "`Ä:", "'Ä", "'Ä:", "''Ä", "''Ä:", "A:_1", "'Ä3", "Ä4", "'Ä4", "''Ä4", 
 			"E", "E:", "`E:", "'E", "'E:", "''E", "''E:", "E0", "'E0", 
