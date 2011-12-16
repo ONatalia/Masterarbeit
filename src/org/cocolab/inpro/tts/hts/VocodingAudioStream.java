@@ -55,10 +55,14 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import org.cocolab.inpro.tts.MaryAdapter4internal;
+
 import marytts.htsengine.HMMData;
+import marytts.htsengine.HMMVoice;
 import marytts.htsengine.HTSPStream;
 import marytts.htsengine.HTSParameterGeneration;
 import marytts.htsengine.HTSVocoder;
+import marytts.modules.synthesis.Voice;
 import marytts.util.data.BaseDoubleDataSource;
 
 /**
@@ -109,7 +113,6 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
     
     boolean doneVocoding = false;
     
-    
     public VocodingAudioStream(HTSParameterGeneration pdf2par, HMMData htsData, boolean immediateReturn) {
         this(pdf2par.getMcepPst(), pdf2par.getStrPst(), pdf2par.getMagPst(), pdf2par.getlf0Pst(), 
              pdf2par.getVoicedArray(), htsData, immediateReturn);
@@ -118,6 +121,10 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
     public VocodingAudioStream(HTSPStream mcepPst, HTSPStream strPst, HTSPStream magPst, HTSPStream lf0Pst,
             boolean[] voiced, HMMData htsData, boolean immediateReturn) {
     	this(new HTSFullPStream(mcepPst, strPst, magPst, lf0Pst, voiced), htsData, immediateReturn);
+    }
+    
+    public VocodingAudioStream(FullPStream pstream, boolean immediateReturn) {
+    	this(pstream, ((HMMVoice) Voice.getVoice(MaryAdapter4internal.DEFAULT_VOICE)).getHMMData(), immediateReturn);
     }
     
     public VocodingAudioStream(FullPStream pstream, HMMData htsData, boolean immediateReturn) {
@@ -239,7 +246,7 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
           /* f0 modification through the MARY audio effects */
           double f0 = 0.0;
           if(frame.isVoiced()){
-            f0 = f0Std * Math.exp(frame.getlf0Par()) + (1 - f0Std) * f0MeanOri + f0Shift;       
+            f0 = f0Std * Math.exp(frame.getlf0Par()) + (1 - f0Std) * f0MeanOri + f0Shift;
             f0 = Math.max(0.0, f0);
           }
            
@@ -258,9 +265,11 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
             }
           }
           
+
           /* f0 -> pitch , in original code here it is used p, so f0=p in the c code */
           if(f0 != 0.0)
              f0 = htsData.getRate() / f0;
+          // f0 now holds fundamental period instead of frequency  
           
           /* p1 is initialised in -1, so this will be done just for the first frame */
           if( p1 < 0 ) {  

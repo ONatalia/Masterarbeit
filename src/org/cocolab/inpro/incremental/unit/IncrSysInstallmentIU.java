@@ -4,15 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 
-import marytts.htsengine.HMMData;
-import marytts.htsengine.HMMVoice;
-import marytts.modules.synthesis.Voice;
-import marytts.util.data.audio.DDSAudioInputStream;
-
-import org.cocolab.inpro.tts.MaryAdapter4internal;
+import org.cocolab.inpro.audio.DDS16kAudioInputStream;
 import org.cocolab.inpro.tts.hts.FullPStream;
 import org.cocolab.inpro.tts.hts.IUBasedFullPStream;
 import org.cocolab.inpro.tts.hts.VocodingAudioStream;
@@ -70,22 +64,9 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
 	
 	@Override
 	public AudioInputStream getAudio() {
-        Voice voice = Voice.getVoice(MaryAdapter4internal.DEFAULT_VOICE);
-        HMMData hmmData =((HMMVoice) voice).getHMMData();
         boolean immediateReturn = true;
-		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), hmmData, immediateReturn);
-        float sampleRate = 16000.0F;  //8000,11025,16000,22050,44100
-        int sampleSizeInBits = 16;  //8,16
-        int channels = 1;     //1,2
-        boolean signed = true;    //true,false
-        boolean bigEndian = false;  //true,false
-        AudioFormat af = new AudioFormat(
-              sampleRate,
-              sampleSizeInBits,
-              channels,
-              signed,
-              bigEndian);
-        return new DDSAudioInputStream(vas, af);
+		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), immediateReturn);
+        return new DDS16kAudioInputStream(vas);
 	}
 	
 	public FullPStream getFullPStream() {

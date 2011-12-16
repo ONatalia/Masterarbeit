@@ -88,7 +88,6 @@ public class SysInstallmentIU extends InstallmentIU {
 		FullPStream stream = generateFullPStream();
 		List<SysSegmentIU> segments = getSegments();
 		// we keep the last segment separate to be able to change it's duration
-		//SysSegmentIU lastSegment = segments.get(segments.size() - 1);
 		int t = 0;
 		for (SysSegmentIU seg : segments) {
 			int frames = (int) ((seg.duration() * FullPStream.FRAMES_PER_SECOND) + 0.1);
@@ -98,8 +97,6 @@ public class SysInstallmentIU extends InstallmentIU {
 		}
 		if (stream.hasNextFrame()) 
 			Logger.getLogger(SysInstallmentIU.class).warn("discarding some unclaimed frames, t=" + t + ", maxT=" + stream.getMaxT());
-		//assert !stream.hasFrame(t) : "there are some unclaimed frames left, t=" + t + ", maxT=" + stream.getMaxT();
-		//stream.getFullFrames(t, stream.getMaxT() - t);
 	}
 
 

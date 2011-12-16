@@ -32,5 +32,9 @@ public class FullPFeatureFrame {
     	if (voiced)
     		lf0Par += pitchShiftInCent * PitchUtils.BY_CENT_CONST;
     }
+    
+    public void setlf0Par(double lf0) {
+    	lf0Par = lf0;
+    }
 
 }

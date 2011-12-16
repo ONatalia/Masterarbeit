@@ -180,7 +180,6 @@ public class DispatchStream extends InputStream implements Configurable {
 			addStream(audioStream);		
 	}
 	
-	
 	/* * Stream and Stream Queue handling * */
 	
 	protected void addStream(InputStream is) {
@@ -257,7 +256,7 @@ public class DispatchStream extends InputStream implements Configurable {
 				} else break;
 			}
 			if (bytesRead < len) { // if the stream could not provide enough bytes, then it's probably ended
-				if (sendSilence) { 
+				if (sendSilence && !inShutdown) { 
 					if (bytesRead < 0) 
 						bytesRead = 0;
 // for silence:
@@ -276,5 +275,11 @@ public class DispatchStream extends InputStream implements Configurable {
 		}
 		return bytesRead;
 	}
-
+	
+	private boolean inShutdown = false;
+	/** whether this dispatchStream has been requested to shut down */ 
+	public boolean inShutdown() { return inShutdown; }
+	/** waits for the current stream to finish and shuts down the dispatcher */
+	public void shutdown() { inShutdown = true; }
+	
 }

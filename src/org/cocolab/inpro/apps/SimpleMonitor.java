@@ -58,11 +58,11 @@ public class SimpleMonitor implements RtpListener {
     SourceDataLine line;
     FileOutputStream fileStream;
 
-    SimpleMonitor(MonitorCommandLineParser clp) throws RtpException, IOException, PropertyException, InstantiationException {
+    SimpleMonitor(MonitorCommandLineParser clp) throws RtpException, IOException, PropertyException {
     	this(clp, new ConfigurationManager(clp.getConfigURL()));
     }
 
-    public SimpleMonitor(MonitorCommandLineParser clp, ConfigurationManager cm) throws RtpException, IOException, PropertyException, InstantiationException {
+    public SimpleMonitor(MonitorCommandLineParser clp, ConfigurationManager cm) throws RtpException, IOException, PropertyException {
 		this.clp = clp;
 		this.cm = cm;
 		logger.info("Setting up output stream...\n");
@@ -193,7 +193,7 @@ public class SimpleMonitor implements RtpListener {
 	 * depending on how it is instructed via OAA
 	 * @return a Runnable that pipes its data to newData()
 	 */
-	Runnable createDispatcherSource(String name) throws IOException, PropertyException, InstantiationException {
+	Runnable createDispatcherSource(String name) throws PropertyException {
 		final DispatchStream ods = (DispatchStream) cm.lookup(name);
 		ods.initialize();
 		Runnable streamDrainer = new Runnable() {
@@ -210,12 +210,15 @@ public class SimpleMonitor implements RtpListener {
 					if (bytesRead > 0)
 						// no need to sleep, because the call to the microphone will already slow us down
 						newData(b, 0, bytesRead);
-					else // if there is no data, then we wait a little for data to become available (instead of looping like crazy)
+					else {// if there is no data, then we wait a little for data to become available (instead of looping like crazy)
+						if (bytesRead <= 0 && ods.inShutdown())
+							return;
 						try {
 							Thread.sleep(40);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
+					}
 				}
 			}
 		};	
@@ -233,6 +236,7 @@ public class SimpleMonitor implements RtpListener {
      * RtpListener interface (this is used in RTP input mode)
      ************************/
     
+	@Override
 	public void handleRtpPacketEvent(RtpPacketEvent arg0) {
 		RtpPacket rp = arg0.getRtpPacket();
 		byte[] bytes = rp.getPayload();
@@ -240,14 +244,17 @@ public class SimpleMonitor implements RtpListener {
 		newData(bytes, offset, bytes.length - offset);
 	}
 
+	@Override
 	public void handleRtpStatusEvent(RtpStatusEvent arg0) {
 		if (clp.verbose()) System.err.println(arg0);
 	}
 
+	@Override
 	public void handleRtpErrorEvent(RtpErrorEvent arg0) {
 		if (clp.verbose()) System.err.println(arg0);
 	}
 
+	@Override
 	public void handleRtpTimeoutEvent(RtpTimeoutEvent arg0) {
 		if (clp.verbose()) System.err.println(arg0);
 	}

@@ -89,13 +89,13 @@ public abstract class PatternDemonstrator extends JPanel {
 
 	protected PatternDemonstrator() {
 		MaryAdapter.getInstance();
-		setupDispatcher();
+		dispatcher = setupDispatcher();
 		generatedText  = new JTextField(30);
 		generatedText.setEditable(false);
 	}
 	
 	@SuppressWarnings("unused")
-	private void setupDispatcher() {
+	public static DispatchStream setupDispatcher() {
 		ConfigurationManager cm = new ConfigurationManager(SimplePatternDemonstrator.class.getResource("config.xml"));
 		MonitorCommandLineParser clp = new MonitorCommandLineParser(new String[] {
 				"-F", "file:/tmp/monitor.raw", "-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
@@ -107,7 +107,7 @@ public abstract class PatternDemonstrator extends JPanel {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		dispatcher = (DispatchStream) cm.lookup("dispatchStream");
+		return (DispatchStream) cm.lookup("dispatchStream");
 	}
 	
 	/** this operation is called by a StartAction and should (re-)create {@link installment} */
