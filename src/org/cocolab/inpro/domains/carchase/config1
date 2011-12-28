@@ -1,0 +1,5 @@
+--- !worldstart {target: !p {x: 250, y: 670}}
+--- !world {start: 10, duration: 3000, target: !p {x: 250, y: 430}}
+--- !TTS {start: 100, text: Das Auto fährt durch die A-Straße.} 
+--- !TTS {start: 1000, text: Das Auto fährt durch die B-Straße.}
+--- !shutdown {start: 10000}
