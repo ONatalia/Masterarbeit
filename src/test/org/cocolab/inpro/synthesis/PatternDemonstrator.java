@@ -13,14 +13,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.cocolab.inpro.apps.SimpleMonitor;
-import org.cocolab.inpro.apps.util.CommonCommandLineParser;
-import org.cocolab.inpro.apps.util.MonitorCommandLineParser;
 import org.cocolab.inpro.audio.DispatchStream;
 import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.tts.MaryAdapter;
-
-import edu.cmu.sphinx.util.props.ConfigurationManager;
 
 /**
  * implementing classes should<ol>
@@ -89,25 +85,9 @@ public abstract class PatternDemonstrator extends JPanel {
 
 	protected PatternDemonstrator() {
 		MaryAdapter.getInstance();
-		dispatcher = setupDispatcher();
+		dispatcher = SimpleMonitor.setupDispatcher();
 		generatedText  = new JTextField(30);
 		generatedText.setEditable(false);
-	}
-	
-	@SuppressWarnings("unused")
-	public static DispatchStream setupDispatcher() {
-		ConfigurationManager cm = new ConfigurationManager(SimplePatternDemonstrator.class.getResource("config.xml"));
-		MonitorCommandLineParser clp = new MonitorCommandLineParser(new String[] {
-				"-F", "file:/tmp/monitor.raw", "-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
-			});
-		clp.setInputMode(CommonCommandLineParser.DISPATCHER_OBJECT_INPUT);
-		try {
-			new SimpleMonitor(clp, cm);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-		return (DispatchStream) cm.lookup("dispatchStream");
 	}
 	
 	/** this operation is called by a StartAction and should (re-)create {@link installment} */

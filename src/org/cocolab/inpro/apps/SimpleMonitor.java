@@ -259,7 +259,21 @@ public class SimpleMonitor implements RtpListener {
 		if (clp.verbose()) System.err.println(arg0);
 	}
 	
-
+	@SuppressWarnings("unused")
+	public static DispatchStream setupDispatcher() {
+		ConfigurationManager cm = new ConfigurationManager(SimpleMonitor.class.getResource("config.xml"));
+		MonitorCommandLineParser clp = new MonitorCommandLineParser(new String[] {
+				"-F", "file:/tmp/monitor.raw", "-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
+			});
+		clp.setInputMode(CommonCommandLineParser.DISPATCHER_OBJECT_INPUT);
+		try {
+			new SimpleMonitor(clp, cm);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		return (DispatchStream) cm.lookup("dispatchStream");
+	}
 	
     /**
      * handle incoming data: copy to lineout and/or filebuffer
