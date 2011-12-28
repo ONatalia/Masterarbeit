@@ -81,7 +81,6 @@ public class SysInstallmentIU extends InstallmentIU {
 		assert MaryAdapter.getInstance() instanceof MaryAdapter4internal;
 		FullPStream pstream = ((MaryAdapter4internal) MaryAdapter.getInstance()).maryxml2hmmFeatures(maryXML);
 		return pstream;
-		//VocodingAudioStream vas = new VocodingAudioStream(pstream, null, false);
 	}
 	
 	public void addFeatureStreamToSegmentIUs() {

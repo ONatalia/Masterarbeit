@@ -36,5 +36,9 @@ public class FullPFeatureFrame {
     public void setlf0Par(double lf0) {
     	lf0Par = lf0;
     }
+    
+    public void setf0Par(double f0) {
+    	setlf0Par(Math.log(f0));
+    }
 
 }

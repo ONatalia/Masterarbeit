@@ -73,7 +73,8 @@ public class SysSegmentIU extends SegmentIU {
 		int fra = hmmSynthesisFeatures.size(); // the number of frames available
 		// just repeat/drop frames as necessary if the amount of frames available is not right
 		FullPFeatureFrame frame =  hmmSynthesisFeatures.get((int) (req * (fra / (double) dur)));
-		frame.shiftlf0Par(pitchShiftInCent);
+		if (frame != null)
+			frame.shiftlf0Par(pitchShiftInCent);
 		return frame;
 	}
 	

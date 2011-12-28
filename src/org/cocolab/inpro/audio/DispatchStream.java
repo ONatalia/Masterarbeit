@@ -183,6 +183,7 @@ public class DispatchStream extends InputStream implements Configurable {
 	/* * Stream and Stream Queue handling * */
 	
 	protected void addStream(InputStream is) {
+		logger.info("adding stream to queue: " + is);
 		synchronized(this) {
 			if (stream != null) {
 				if (streamQueue.isEmpty())
@@ -238,6 +239,7 @@ public class DispatchStream extends InputStream implements Configurable {
 		if (stream == null) {
 			setIsSilent();
 		} else {
+			logger.info("next stream to be played is " + stream);
 			setIsTalking();
 		}
 	}

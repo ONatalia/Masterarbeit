@@ -19,41 +19,48 @@ import org.cocolab.inpro.tts.hts.VocodingAudioStream;
  */
 public class IncrSysInstallmentIU extends SysInstallmentIU {
 
-	public IncrSysInstallmentIU(List<String> variants) {
-		super(variants.get(0));
+	public IncrSysInstallmentIU(String base) {
+		super(base);
 		System.err.println(toString());
 		this.addFeatureStreamToSegmentIUs();
+	}
+	
+	public IncrSysInstallmentIU(List<String> variants) {
+		this(variants.get(0));
 		for (int i = 1; i < variants.size(); i++) {
-			SysInstallmentIU varInst = new SysInstallmentIU(variants.get(i));
-			System.err.println(varInst.toString());
-			varInst.addFeatureStreamToSegmentIUs();
-			WordIU commonWord = getInitialWord();
-			// variant word
-			WordIU varWord = varInst.getInitialWord();
-			assert (commonWord.spellingEquals(varWord)) : "installment variants must all start with the same word!";
-			boolean hasVarWord = true;
-			while (hasVarWord) {
-				hasVarWord = false;
-				varWord = (WordIU) varWord.getNextSameLevelLink();
-				for (IU nextIU : commonWord.getNextSameLevelLinks()) {
-					WordIU nextWord = (WordIU) nextIU;
-					if (nextWord.spellingEquals(varWord)) {
-						hasVarWord = true;
-						commonWord = nextWord;
-						break; // next while loop
-					}
+			addAlternativeVariant(variants.get(i));
+		}
+	}
+	
+	public void addAlternativeVariant(String variant) {
+		SysInstallmentIU varInst = new SysInstallmentIU(variant);
+		System.err.println(varInst.toString());
+		varInst.addFeatureStreamToSegmentIUs();
+		WordIU commonWord = getInitialWord();
+		// variant word
+		WordIU varWord = varInst.getInitialWord();
+		assert (commonWord.spellingEquals(varWord)) : "installment variants must all start with the same word!";
+		boolean hasVarWord = true;
+		while (hasVarWord) {
+			hasVarWord = false;
+			varWord = (WordIU) varWord.getNextSameLevelLink();
+			for (IU nextIU : commonWord.getNextSameLevelLinks()) {
+				WordIU nextWord = (WordIU) nextIU;
+				if (nextWord.spellingEquals(varWord)) {
+					hasVarWord = true;
+					commonWord = nextWord;
+					break; // next while loop
 				}
 			}
-			
-			if (varWord != null) {
-				varWord.connectSLL(commonWord);
-//				varWord.getSameLevelLink().connectSLL(commonWord.getSameLevelLink());
-//				((WordIU) varWord.getSameLevelLink()).word = "grüne";
-				// now shift segment times for the variant to match that of the common root
-				SysSegmentIU firstVarSegment = (SysSegmentIU) varWord.getSegments().get(0);
-				SegmentIU lastCommonSegment = commonWord.getSegments().get(commonWord.getSegments().size() - 1);
-				firstVarSegment.shiftBy(lastCommonSegment.endTime() - firstVarSegment.startTime(), true);
-			}
+		}
+		if (varWord != null) {
+			varWord.connectSLL(commonWord);
+//			varWord.getSameLevelLink().connectSLL(commonWord.getSameLevelLink());
+//			((WordIU) varWord.getSameLevelLink()).word = "grüne";
+			// now shift segment times for the variant to match that of the common root
+			SysSegmentIU firstVarSegment = (SysSegmentIU) varWord.getSegments().get(0);
+			SegmentIU lastCommonSegment = commonWord.getSegments().get(commonWord.getSegments().size() - 1);
+			firstVarSegment.shiftBy(lastCommonSegment.endTime() - firstVarSegment.startTime(), true);
 		}
 	}
 	
