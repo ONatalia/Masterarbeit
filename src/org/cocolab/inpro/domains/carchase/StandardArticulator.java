@@ -10,10 +10,16 @@ public class StandardArticulator extends CarChaseExperimenter.Articulator {
 	public StandardArticulator(DispatchStream dispatcher) {
 		super(dispatcher);
 	}
+	
+	@Override
+	public void precompute(TTSAction action) {
+		action.appData = new IncrSysInstallmentIU(action.text);
+	}
 
 	@Override
 	public void say(TTSAction action) {
-		SysInstallmentIU inst = new IncrSysInstallmentIU(action.text);
+//		SysInstallmentIU inst = new IncrSysInstallmentIU(action.text);
+		SysInstallmentIU inst = (SysInstallmentIU) action.appData;
 		dispatcher.playStream(inst.getAudio(), false);
 	}
 	

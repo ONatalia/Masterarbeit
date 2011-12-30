@@ -21,8 +21,6 @@ import javax.swing.SwingUtilities;
 import org.cocolab.inpro.domains.carchase.CarChaseExperimenter.WorldAction;
 import org.cocolab.inpro.domains.carchase.CarChaseExperimenter.WorldStartAction;
 import org.pushingpixels.trident.Timeline;
-import org.pushingpixels.trident.Timeline.TimelineState;
-import org.pushingpixels.trident.callback.TimelineCallback;
 import org.pushingpixels.trident.swing.SwingRepaintTimeline;
 
 public class CarChaseViewer extends JPanel {
@@ -34,6 +32,7 @@ public class CarChaseViewer extends JPanel {
 	double carTargetAngle;
 	private static final double CAR_SCALE = 1f / 4.3f;
 	Timeline timeline;
+	Point targetPoint;
 	
 	public CarChaseViewer() {
 		try {
@@ -93,17 +92,24 @@ public class CarChaseViewer extends JPanel {
 	public Dimension getPreferredSize() {
 		return new Dimension(1024, 768);
 	}
-
-	public void execute(Point targetPosition, long duration) {
-		timeline = new SwingRepaintTimeline(this);
-		Point currentPosition = carPosition;
-		timeline.addPropertyToInterpolate("carPosition", currentPosition, targetPosition);
-		double targetAngle = Math.atan2(targetPosition.x - currentPosition.x, currentPosition.y - targetPosition.y);
-		timeline.addPropertyToInterpolate("carAngle", carAngle, targetAngle);
-		timeline.setDuration(duration);
-		timeline.playSkipping(10);
-	}
 	
+	public void precompute(WorldAction action) {
+		if (action instanceof WorldStartAction) {
+			targetPoint = action.target;
+			carPosition = new Point(action.target);
+		} else {
+			assert targetPoint != null;
+			Point startPoint = targetPoint; // the start position is the previous' target
+			targetPoint = action.target;
+			Timeline timeline = new SwingRepaintTimeline(this);
+			timeline.addPropertyToInterpolate("carPosition", startPoint, targetPoint);
+			double targetAngle = Math.atan2(targetPoint.x - startPoint.x, startPoint.y - targetPoint.y);
+			timeline.addPropertyToInterpolate("carAngle", carAngle, targetAngle);
+			timeline.setDuration(action.duration);
+			action.appData = timeline;
+		}
+	}
+
 	public void execute(WorldAction action) {
 		if (action instanceof WorldStartAction) {
 			carPosition = action.target;
@@ -111,18 +117,23 @@ public class CarChaseViewer extends JPanel {
 			if (timeline != null && !timeline.isDone()) {
 				timeline.end();
 			}
-			execute(action.target, action.duration);
+			if (action.appData == null) {
+				precompute(action);
+			}
+			assert action.appData instanceof Timeline;
+			this.timeline = (Timeline) action.appData;
+			timeline.playSkipping(10);
 		}
 	}
 
-	private static void playTimeline(CarChaseViewer viewer, Point targetPosition, long duration) throws InterruptedException {
-		viewer.execute(targetPosition, duration);
+	private static void playTimeline(CarChaseViewer viewer, Point targetPosition, int duration) throws InterruptedException {
+		viewer.execute(new WorldAction(0, targetPosition, duration));
 		while (!viewer.timeline.isDone()) { 
 			Thread.sleep(10);
 		}
 	}
 	
-	private static void playCurve(final CarChaseViewer viewer, final double radius, final double targetAngle, long duration) throws InterruptedException {
+/*	private static void playCurve(final CarChaseViewer viewer, final double radius, final double targetAngle, long duration) throws InterruptedException {
 		Timeline timeline = new SwingRepaintTimeline(viewer);
 		final double startAngle = viewer.carAngle;
 		timeline.addPropertyToInterpolate("carAngle", startAngle, targetAngle);
@@ -149,11 +160,8 @@ public class CarChaseViewer extends JPanel {
 		while (!timeline.isDone()) { 
 			Thread.sleep(10);
 		}
-	}
+	} */
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) throws InvocationTargetException, InterruptedException {
 		final CarChaseViewer panel = new CarChaseViewer();
 		SwingUtilities.invokeAndWait(new Runnable() {
@@ -169,6 +177,7 @@ public class CarChaseViewer extends JPanel {
 			}
 		});
 		panel.carPosition = new Point(250, 670);
+		panel.targetPoint = panel.carPosition;
 		playTimeline(panel, new Point(250, 430), 3000);
 //		playCurve(panel, 20, Math.PI / 2, 350);
 		playTimeline(panel, new Point(255, 415),  250);

@@ -1,5 +1,29 @@
---- !worldstart {target: !p {x: 250, y: 670}}
+# Breite Straße going north: x: 250
+# Breite Straße going south: x: 195
+# Dorfstraße going east: y: 405
+# Dorfstraße going west: y: 355
+# Tierparkallee going north: x: 710 
+# Tierparkallee going south: x: 660
+# Fliedergasse going east: y: 120
+# Fliedergasse going west: y: 80
+# Kirchstraße going north start point: 520/710
+# Kirchstraße going south end point: 470/710
+# Bahnhofstraße going north start point: 910/710
+# Bahnhofstraße going south end point: 850/710 
+
+# Kreisel center: 690/380
+
+# Dorfstraße going east enters Kreisel: 560/405
+# leaving Kreisel going east onto Dorfstraße: 815/405
+ 
+  
+--- !worldstart {target: !p {x: 250, y: 710}}
 --- !world {start: 10, duration: 3000, target: !p {x: 250, y: 430}}
 --- !TTS {start: 100, text: Das Auto fährt durch die A-Straße.} 
 --- !TTS {start: 1000, text: Das Auto fährt durch die B-Straße.}
 --- !shutdown {start: 10000}
+
+#		playTimeline(panel, new Point(255, 415),  250);
+#		playTimeline(panel, new Point(270, 405),   50);
+#		playTimeline(panel, new Point(280, 405),  250);
+#		playTimeline(panel, new Point(580, 405), 3000);
