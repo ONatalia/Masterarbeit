@@ -8,6 +8,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -30,7 +31,7 @@ import org.cocolab.inpro.tts.MaryAdapter;
 public abstract class PatternDemonstrator extends JPanel {
 	
 	/** a text field that displays the current value of {@link installment} */
-	JTextField generatedText;
+	JEditorPane generatedText;
 	/** the IU holding the incrementally synthesized installment */
 	IncrSysInstallmentIU installment;
 	DispatchStream dispatcher;
@@ -79,14 +80,15 @@ public abstract class PatternDemonstrator extends JPanel {
 			for (WordIU parent : parentNodes) {
 				parent.setAsTopNextSameLevelLink(ae.getActionCommand());
 			}
-			generatedText.setText(installment.toPayLoad());
+			generatedText.setText(installment.toMarkedUpString());
 		}
 	}
 
 	protected PatternDemonstrator() {
 		MaryAdapter.getInstance();
 		dispatcher = SimpleMonitor.setupDispatcher();
-		generatedText  = new JTextField(30);
+		generatedText  = new JEditorPane("text/html", "");
+		generatedText.setPreferredSize(new JTextField(30).getPreferredSize());
 		generatedText.setEditable(false);
 	}
 	

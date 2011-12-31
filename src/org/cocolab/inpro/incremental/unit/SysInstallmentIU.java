@@ -266,6 +266,24 @@ public class SysInstallmentIU extends InstallmentIU {
 		return sb.toString();
 	}
 	
+	public String toMarkedUpString() {
+		StringBuilder sb = new StringBuilder();
+		for (WordIU word : getWords()) {
+			if (word.isCompleted()) {
+				sb.append("<strong>");
+				sb.append(word.toPayLoad());
+				sb.append("</strong>");
+			} else if (word.isOngoing()) {
+				sb.append("<em>");
+				sb.append(word.toPayLoad());
+				sb.append("</em>");
+			} else
+				sb.append(word.toPayLoad());
+			sb.append(" ");
+		}
+		return sb.toString();
+	}
+	
 	public static void main(String[] args) {
 		SysInstallmentIU installment = new SysInstallmentIU("hallo welt");
 		installment.synthesize();

@@ -37,6 +37,9 @@ public abstract class IU implements Comparable<IU> {
 	private boolean committed = false;
 	private boolean revoked = false;
 	
+	/** types of temporal progress states the IU may be in */ 
+	public enum Progress { UPCOMING, ONGOING, COMPLETED}
+	
 	/**
 	 * call this, if you want to provide a sameLevelLink and a groundedIn list
 	 * and you want groundedIn to be deeply SLLed to the sameLevelLink's groundedIn-IUs  
@@ -349,7 +352,29 @@ public abstract class IU implements Comparable<IU> {
 			this.groundedIn.add(iu);
 			iu.ground(this);
 		}
-			
+	}
+	
+	public boolean isUpcoming()  { return Progress.UPCOMING.equals(getProgress()); }
+	public boolean isOngoing()   { return Progress.ONGOING.equals(getProgress()); }
+	public boolean isCompleted() { return Progress.COMPLETED.equals(getProgress()); }
+	
+	/** 
+	 * by default, an IU 
+	 *  - is complete if the last grounding unit is complete,
+	 *  - is upcoming if the first grounding unit is upcoming,
+	 *  - is ongoing if inbetween those two states
+	 *  - is null if there are no grounding units. 
+	 */
+	public Progress getProgress() {
+		if (groundedIn != null && groundedIn.size() > 0) {
+			if (groundedIn.get(0).isUpcoming())
+				return Progress.UPCOMING;
+			if (groundedIn.get(groundedIn.size() - 1).isCompleted())
+				return Progress.COMPLETED;
+			return Progress.ONGOING;
+		} else {
+			return null;
+		}
 	}
 	
 	public abstract String toPayLoad();

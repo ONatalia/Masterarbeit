@@ -17,6 +17,8 @@ public class SysSegmentIU extends SegmentIU {
 	List<PitchMark> pitchMarks;
 	List<FullPFeatureFrame> hmmSynthesisFeatures;
 	public double pitchShiftInCent = 0.0;
+	/** the state of delivery that this unit is in */
+	Progress progress = Progress.UPCOMING;
 	
 	public SysSegmentIU(Label l, List<PitchMark> pitchMarks) {
 		super(l);
@@ -68,6 +70,8 @@ public class SysSegmentIU extends SegmentIU {
 	}
 	
 	public FullPFeatureFrame getHMMSynthesisFrame(int req) {
+		assert req >= 0;
+		progress = Progress.ONGOING;
 		assert req < durationInSynFrames();
 		int dur = durationInSynFrames(); // the duration in frames (= the number of frames that should be there)
 		int fra = hmmSynthesisFeatures.size(); // the number of frames available
@@ -75,6 +79,8 @@ public class SysSegmentIU extends SegmentIU {
 		FullPFeatureFrame frame =  hmmSynthesisFeatures.get((int) (req * (fra / (double) dur)));
 		if (frame != null)
 			frame.shiftlf0Par(pitchShiftInCent);
+		if (req == dur - 1) // last frame
+			progress = Progress.COMPLETED;
 		return frame;
 	}
 	
@@ -124,10 +130,15 @@ public class SysSegmentIU extends SegmentIU {
 		}
 	}
 
+	@Override
+	public Progress getProgress() {
+		return progress;
+	}
+	
 	/** SysSegmentIUs may have a granularity finer than 10 ms (5ms) */
 	@Override
 	public String toLabelLine() {
 		return String.format(Locale.US,	"%.3f\t%.3f\t%s", startTime(), endTime(), toPayLoad());
 	}
-
+	
 }
