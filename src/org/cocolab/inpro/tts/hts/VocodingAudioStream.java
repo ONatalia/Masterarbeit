@@ -161,11 +161,16 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
         output = new ArrayBlockingQueue<Double>((int) dataLength); // we allow to store the complete output in the queue
         // start processing
         if (immediateReturn) {
-            new Thread(this).start();
+            new Thread(this, "VocodingAudioStream").start();
         } else {
             run();
         }
 	}
+    
+    @Override
+    public String toString() {
+    	return "vocoding audio stream fed by " + fullPStream.toString();
+    }
     
 	/** incrementally vocode and generate output */
     @Override

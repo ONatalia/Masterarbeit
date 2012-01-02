@@ -55,8 +55,11 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
 		}
 		if (varWord != null) {
 			varWord.connectSLL(commonWord);
-//			varWord.getSameLevelLink().connectSLL(commonWord.getSameLevelLink());
-//			((WordIU) varWord.getSameLevelLink()).word = "grüne";
+			WordIU groundingWord = varWord;
+			while (groundingWord != null) {
+				groundedIn.add(groundingWord);
+				groundingWord = (WordIU) groundingWord.getNextSameLevelLink();
+			}
 			// now shift segment times for the variant to match that of the common root
 			SysSegmentIU firstVarSegment = (SysSegmentIU) varWord.getSegments().get(0);
 			SegmentIU lastCommonSegment = commonWord.getSegments().get(commonWord.getSegments().size() - 1);

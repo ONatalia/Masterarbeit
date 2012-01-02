@@ -148,6 +148,15 @@ public abstract class IU implements Comparable<IU> {
 		});
 	}
 	
+	/** get the IU among the nextSLLs with the given payload */
+	public IU getAmongNextSameLevelLinks(final String bestFollowerPayload) {
+		for (IU iu : nextSameLevelLinks) {
+			if (bestFollowerPayload.equals(iu.toPayLoad()))
+				return iu;
+		}
+		return null;
+	}
+	
 	public void reorderNextSameLevelLink(Comparator<IU> order) {
 		Collections.sort(nextSameLevelLinks, order);
 		if (groundedIn != null && groundedIn.size() > 0) {
@@ -375,6 +384,19 @@ public abstract class IU implements Comparable<IU> {
 		} else {
 			return null;
 		}
+	}
+	
+	/** 
+	 * return the IU that is ongoing among the groundedIn links 
+	 * @return the first ongoing grounding IU (or null if none is ongoing)
+	 */
+	public IU getOngoingGroundedIU() {
+		assert isOngoing();
+		for (IU iu : groundedIn) {
+			if (iu.isOngoing())
+				return iu;
+		}
+		return null;
 	}
 	
 	public abstract String toPayLoad();

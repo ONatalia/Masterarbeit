@@ -20,10 +20,15 @@ public class SysSegmentIU extends SegmentIU {
 	/** the state of delivery that this unit is in */
 	Progress progress = Progress.UPCOMING;
 	
-	public SysSegmentIU(Label l, List<PitchMark> pitchMarks) {
+	public SysSegmentIU(Label l, List<PitchMark> pitchMarks, List<FullPFeatureFrame> featureFrames) {
 		super(l);
 		plannedLabel = new Label(l);
 		this.pitchMarks = pitchMarks;
+		this.hmmSynthesisFeatures = featureFrames;
+	}
+	
+	public SysSegmentIU(Label l, List<PitchMark> pitchMarks) {
+		this(l, pitchMarks, null);
 	}
 	
 	@Override

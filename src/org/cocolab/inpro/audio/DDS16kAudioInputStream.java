@@ -15,5 +15,10 @@ public class DDS16kAudioInputStream extends DDSAudioInputStream {
         boolean bigEndian = false;  //true,false */
 		super(source, new AudioFormat(16000.0F, 16, 1, true, false));
 	}
+	
+	@Override
+	public String toString() {
+		return "DDS16k: " + source.toString();
+	}
 
 }

@@ -32,7 +32,7 @@ public class SimplePatternDemonstrator extends PatternDemonstrator {
 
 	@Override
 	public void greatNewUtterance(String command) {
-		installment = new IncrSysInstallmentIU(Arrays.asList("Zur Kreuzigung bitte nach, ääh?", 
+		installment = new IncrSysInstallmentIU(Arrays.asList("Zur Kreuzigung bitte nach <hes>", 
 																	"Zur Kreuzigung bitte nach links.", 
 																	"Zur Kreuzigung bitte nach rechts."));
 		generatedText.setText("Zur Kreuzigung bitte nach ‹dir›");

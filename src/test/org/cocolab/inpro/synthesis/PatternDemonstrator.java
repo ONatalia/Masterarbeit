@@ -16,13 +16,15 @@ import javax.swing.JTextField;
 import org.cocolab.inpro.apps.SimpleMonitor;
 import org.cocolab.inpro.audio.DispatchStream;
 import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
+import org.cocolab.inpro.incremental.unit.SegmentIU;
+import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.tts.MaryAdapter;
 
 /**
  * implementing classes should<ol>
  * <li>call super() in their constructor
- * <li>place the JTextField {@link generatedText} somewhere
+ * <li>place the JEditorPane {@link generatedText} somewhere
  * <li>hook up {@link goAction} which starts synthesis
  * </ol>
  * @author timo
@@ -77,10 +79,30 @@ public abstract class PatternDemonstrator extends JPanel {
 		}
 		@Override
 		public void actionPerformed(ActionEvent ae) {
-			for (WordIU parent : parentNodes) {
-				parent.setAsTopNextSameLevelLink(ae.getActionCommand());
-			}
-			generatedText.setText(installment.toMarkedUpString());
+			if (!installment.isCompleted()) {
+				for (WordIU parent : parentNodes) {
+					if (!parent.isCompleted()) {
+						parent.setAsTopNextSameLevelLink(ae.getActionCommand());
+					} else {
+						System.err.println("trying to fix what I can");
+						WordIU currentWord = (WordIU) installment.getOngoingGroundedIU();
+						System.err.println("currently ongoing: " + currentWord);
+						WordIU wordToDeliver = (WordIU) parent.getAmongNextSameLevelLinks(ae.getActionCommand());
+						System.err.println("wordToDeliver: " + wordToDeliver);
+						if (wordToDeliver != currentWord) { // weird (but necessary) test
+							if (currentWord == null) return;
+							currentWord.addNextSameLevelLink(wordToDeliver);
+							SysSegmentIU firstVarSegment = (SysSegmentIU) wordToDeliver.getSegments().get(0);
+							SegmentIU lastCommonSegment = currentWord.getSegments().get(currentWord.getSegments().size() - 1);
+							firstVarSegment.shiftBy(lastCommonSegment.endTime() - firstVarSegment.startTime(), true);
+							lastCommonSegment.addNextSameLevelLink(firstVarSegment);
+							lastCommonSegment.setAsTopNextSameLevelLink(firstVarSegment.toPayLoad());
+						}
+					}
+				}
+				generatedText.setText(installment.toMarkedUpString());
+			} else 
+				System.err.println("too late");
 		}
 	}
 

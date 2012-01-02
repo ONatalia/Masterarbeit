@@ -143,6 +143,15 @@ public class WordIU extends IU {
 		return word;
 	}
 	
+	/** shift the start and end times of this (and possibly all following SysSegmentIUs */
+	public void shiftBy(double offset) {
+		for (SegmentIU segment : getSegments()) {
+			if (segment instanceof SysSegmentIU) {
+				((SysSegmentIU) segment).shiftBy(offset, false);
+			}
+		}
+	}
+	
 	public boolean isSilence() {
 		return isSilence;
 	}
@@ -233,7 +242,7 @@ public class WordIU extends IU {
 			sb.append("'/>\n");
 		} else { 
 			sb.append("<t>\n");
-			sb.append(toPayLoad());
+			sb.append(toPayLoad().replace("<", "&lt;").replace(">", "&lt;"));
 			sb.append("\n<syllable>\n");
 			for (SegmentIU seg : getSegments()) {
 				seg.appendMaryXML(sb);

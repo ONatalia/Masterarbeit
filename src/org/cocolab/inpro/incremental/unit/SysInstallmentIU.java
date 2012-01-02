@@ -14,6 +14,7 @@ import org.cocolab.inpro.incremental.util.TTSUtil;
 import org.cocolab.inpro.tts.MaryAdapter;
 import org.cocolab.inpro.tts.MaryAdapter4internal;
 import org.cocolab.inpro.tts.PitchMark;
+import org.cocolab.inpro.tts.hts.FullPFeatureFrame;
 import org.cocolab.inpro.tts.hts.FullPStream;
 
 /**
@@ -27,9 +28,28 @@ public class SysInstallmentIU extends InstallmentIU {
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // allow cast from List<WordIU> to List<IU>
 	public SysInstallmentIU(String tts) {
 		super(null, tts);
+		// handle <hes> marker at the end separately
+		boolean addFinalHesitation;
+		if (tts.endsWith(" <hes>")) {
+			addFinalHesitation = true;
+			tts = tts.replaceAll(" <hes>$", "");
+		} else 
+			addFinalHesitation = false;
 		InputStream is = MaryAdapter.getInstance().text2maryxml(tts);
 		try {
 			groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is);
+			if (addFinalHesitation) {
+				HesitationIU hes = new HesitationIU(null);
+				IU pred = groundedIn.get(groundedIn.size() - 1);
+				while (((WordIU) pred).isSilence) {
+					groundedIn.remove(pred);
+					pred = pred.getSameLevelLink();
+				}
+				hes.shiftBy(pred.endTime());
+				hes.connectSLL(pred);
+				pred.setAsTopNextSameLevelLink("<hes>");
+				groundedIn.add(hes);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			groundedIn = (List) Collections.<WordIU>emptyList();
@@ -54,14 +74,23 @@ public class SysInstallmentIU extends InstallmentIU {
 		WordIU prevWord = null;
 		double startTime = startTime();
 		for (WordIU w : getWords()) {
-			List<SegmentIU> newSegments = new ArrayList<SegmentIU>();
+			List<SysSegmentIU> newSegments = new ArrayList<SysSegmentIU>();
 			for (SegmentIU seg : w.getSegments()) {
 				// TODO: these will have to become SysSegementIUs when I add pitch-scaling!
 				newSegments.add(new SysSegmentIU(new Label(
 						(seg.l.getStart() - startTime) * scale, 
 						(seg.l.getEnd() - startTime) * scale, 
 						seg.l.getLabel()
-				), seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).pitchMarks : Collections.<PitchMark>emptyList()));
+				), seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).pitchMarks : Collections.<PitchMark>emptyList(),
+				   seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).hmmSynthesisFeatures : Collections.<FullPFeatureFrame>emptyList()));
+			}
+			// connect same-level-links
+			Iterator<SysSegmentIU> it = newSegments.iterator();
+			SysSegmentIU first = it.next();
+			while (it.hasNext()) {
+				SysSegmentIU next = it.next();
+				next.setSameLevelLink(first);
+				first = next;
 			}
 			newWords.add(new WordIU(w.word, prevWord, (List) newSegments));
 		}

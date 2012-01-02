@@ -239,7 +239,7 @@ public class DispatchStream extends InputStream implements Configurable {
 		if (stream == null) {
 			setIsSilent();
 		} else {
-			logger.info("next stream to be played is " + stream);
+			logger.info("next stream played is " + stream);
 			setIsTalking();
 		}
 	}
