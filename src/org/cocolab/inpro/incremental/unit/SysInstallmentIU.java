@@ -38,13 +38,15 @@ public class SysInstallmentIU extends InstallmentIU {
 		InputStream is = MaryAdapter.getInstance().text2maryxml(tts);
 		try {
 			groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is);
+			// remove utterance final silences
+			IU pred = groundedIn.get(groundedIn.size() - 1);
+			while (((WordIU) pred).isSilence) {
+				groundedIn.remove(pred);
+				pred.getSameLevelLink().removeAllNextSameLevelLinks(); // cut GRIN-NextSLLs
+				pred = pred.getSameLevelLink();
+			}
 			if (addFinalHesitation) {
 				HesitationIU hes = new HesitationIU(null);
-				IU pred = groundedIn.get(groundedIn.size() - 1);
-				while (((WordIU) pred).isSilence) {
-					groundedIn.remove(pred);
-					pred = pred.getSameLevelLink();
-				}
 				hes.shiftBy(pred.endTime());
 				hes.connectSLL(pred);
 				pred.setAsTopNextSameLevelLink("<hes>");
@@ -273,6 +275,11 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	public WordIU getInitialWord() {
 		return (WordIU) groundedIn.get(0);
+	}
+	
+	public WordIU getFinalWord() {
+		List<WordIU> words = getWords();
+		return words.get(words.size() - 1);
 	}
 	
 	public List<WordIU> getWords() {

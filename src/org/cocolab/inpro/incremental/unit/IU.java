@@ -135,6 +135,13 @@ public abstract class IU implements Comparable<IU> {
 		return nextSameLevelLinks != null ? nextSameLevelLinks : Collections.<IU>emptyList();
 	}
 	
+	/** recursively remove (in grounded IUs) all nextsamelevellinks */
+	public void removeAllNextSameLevelLinks() {
+		if (groundedIn != null && groundedIn.size() > 0) 
+			groundedIn.get(groundedIn.size() - 1).removeAllNextSameLevelLinks();
+		nextSameLevelLinks = null;
+	}
+	
 	public IU getNextSameLevelLink() {
 		return (nextSameLevelLinks != null && nextSameLevelLinks.size() > 0) ? nextSameLevelLinks.get(0) : null;
 	}
@@ -183,7 +190,7 @@ public abstract class IU implements Comparable<IU> {
     		if (link != null && groundedIn != null) {
     			IU firstGrounding = groundedIn.get(0);
     			IU prevLast;
-    			if (link.groundedIn != null && link.groundedIn != Collections.EMPTY_LIST) {
+    			if (link.groundedIn != null && link.groundedIn.size() > 0) {
     				prevLast = link.groundedIn.get(link.groundedIn.size() - 1);
     				if (prevLast.getClass() != firstGrounding.getClass()) {
     					throw new RuntimeException("I can only connect IUs of identical types!");

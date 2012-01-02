@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.audio.DDS16kAudioInputStream;
 import org.cocolab.inpro.tts.hts.FullPStream;
 import org.cocolab.inpro.tts.hts.IUBasedFullPStream;
@@ -19,6 +20,8 @@ import org.cocolab.inpro.tts.hts.VocodingAudioStream;
  */
 public class IncrSysInstallmentIU extends SysInstallmentIU {
 
+	private static Logger logger = Logger.getLogger(IncrSysInstallmentIU.class);
+	
 	public IncrSysInstallmentIU(String base) {
 		super(base);
 		System.err.println(toString());
@@ -65,6 +68,11 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
 			SegmentIU lastCommonSegment = commonWord.getSegments().get(commonWord.getSegments().size() - 1);
 			firstVarSegment.shiftBy(lastCommonSegment.endTime() - firstVarSegment.startTime(), true);
 		}
+	}
+	
+	public void appendContinuation(List<WordIU> words) {
+		words.get(0).connectSLL(getFinalWord());
+		groundedIn.addAll(words);
 	}
 	
 	public void reorderOptions(int wordIndex, final String newBestFollower) {

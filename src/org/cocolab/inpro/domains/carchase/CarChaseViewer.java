@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.domains.carchase.CarChaseExperimenter.WorldAction;
 import org.cocolab.inpro.domains.carchase.CarChaseExperimenter.WorldStartAction;
 import org.pushingpixels.trident.Timeline;
@@ -25,6 +26,8 @@ import org.pushingpixels.trident.swing.SwingRepaintTimeline;
 
 public class CarChaseViewer extends JPanel {
 
+	private static Logger logger = Logger.getLogger("CarChaseViewer");
+	
 	Image background;
 	Image car;
 	Point carPosition;
@@ -66,15 +69,18 @@ public class CarChaseViewer extends JPanel {
 	Point prevCarPosition;
 	private void paintPath(Graphics g) {
 		if (!carPosition.equals(prevCarPosition)) {
-			carPath.add(carPosition);
+			if (prevCarPosition != null)
+				carPath.add(carPosition);
 			prevCarPosition = carPosition;
 		}
-		Iterator<Point> it = carPath.iterator();
-		Point p1 = it.next();
-		while(it.hasNext()) {
-			Point p2 = it.next();
-			g.drawLine(p1.x, p1.y, p2.x, p2.y);
-			p1 = p2;
+		if (!carPath.isEmpty()) {
+			Iterator<Point> it = carPath.iterator();
+			Point p1 = it.next();
+			while(it.hasNext()) {
+				Point p2 = it.next();
+				g.drawLine(p1.x, p1.y, p2.x, p2.y);
+				p1 = p2;
+			}
 		}
 	}
 	
@@ -97,14 +103,17 @@ public class CarChaseViewer extends JPanel {
 		if (action instanceof WorldStartAction) {
 			targetPoint = action.target;
 			carPosition = new Point(action.target);
+			carAngle = carTargetAngle = ((WorldStartAction) action).angle;
 		} else {
 			assert targetPoint != null;
 			Point startPoint = targetPoint; // the start position is the previous' target
 			targetPoint = action.target;
 			Timeline timeline = new SwingRepaintTimeline(this);
 			timeline.addPropertyToInterpolate("carPosition", startPoint, targetPoint);
-			double targetAngle = Math.atan2(targetPoint.x - startPoint.x, startPoint.y - targetPoint.y);
-			timeline.addPropertyToInterpolate("carAngle", carAngle, targetAngle);
+			carAngle = carTargetAngle;
+			carTargetAngle = Math.atan2(targetPoint.x - startPoint.x, startPoint.y - targetPoint.y);
+			logger.info("action : " + action.toString() + " at speed (px/ms): " + (targetPoint.distance(startPoint) / action.duration));
+			timeline.addPropertyToInterpolate("carAngle", carAngle, carTargetAngle);
 			timeline.setDuration(action.duration);
 			action.appData = timeline;
 		}

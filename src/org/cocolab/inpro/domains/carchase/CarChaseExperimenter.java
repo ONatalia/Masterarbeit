@@ -26,7 +26,8 @@ public class CarChaseExperimenter {
 
 	CarChaseExperimenter() {
 		dispatcher = SimpleMonitor.setupDispatcher();
-		articulator = new StandardArticulator(dispatcher);
+//		articulator = new StandardArticulator(dispatcher);
+		articulator = new IncrementalArticulator(dispatcher);
 		setupGUI();
 	}
 
@@ -113,9 +114,21 @@ public class CarChaseExperimenter {
 //		);
 		Yaml yaml = new MyYaml();
 		List<Action> actions = new ArrayList<Action>();
+		WorldAction prevWorldAction = null;
 		for (Object a : yaml.loadAll(CarChaseViewer.class.getResourceAsStream("config1"))) {
 			assert a instanceof Action;
-			actions.add((Action) a);
+			Action action = (Action) a;
+			if (action instanceof WorldAction) {
+				if (action.start == -1) {
+					assert prevWorldAction != null;
+					action.start = prevWorldAction.getEnd();
+					logger.info("filling in start time for " + action);
+				} else {
+					assert prevWorldAction == null || action.start >= prevWorldAction.getEnd() : action.toString() + prevWorldAction.toString(); // the first disjunctor necessary for startup
+				}
+				prevWorldAction = (WorldAction) action;
+			}
+			actions.add(action);
 		}
 //		System.out.println(yaml.dumpAll(actionList.iterator()));
 		logger.info("pre-computing system utterances");
@@ -138,12 +151,22 @@ public class CarChaseExperimenter {
 	public static class ShutdownAction extends Action { 
 		public ShutdownAction(int t) { super(t); }
 		public ShutdownAction() {}
+		@Override
+		public String toString() {
+			return "ShutdownAction at " + start;
+		}
+	}
+	
+	public static class WorldStartAction extends WorldAction {
+		double angle;
+		public WorldStartAction() { setStart(0); }
+		public void setAngle(double d) { angle = d; }
 	}
 	
 	public static class WorldAction extends Action {
 		int duration; // in milliseconds
 		Point target;
-		public WorldAction() { super(0); }
+		public WorldAction() { super(-1); }
 		WorldAction(int t, Point p, int d) {
 			super(t);
 			target = p;
@@ -151,20 +174,18 @@ public class CarChaseExperimenter {
 		}
 		public int getDuration() { return duration; }
 		public void setDuration(int duration) { this.duration = duration; }
+		public int getEnd() { return start + duration; }
 		public void setTarget(Point p) { target = p; }
 		public Point getTarget() { return target; } 
 		@Override
 		public String toString() {
-			return "world: t=" + start + ", target " + target.toString();
+			return "world: t=" + start + ", duration: " + duration + ", target " + target.toString();
 		}
-	}
-	
-	public static class WorldStartAction extends WorldAction {
-		public WorldStartAction() { setStart(0); }
 	}
 	
 	public static class TTSAction extends Action {
 		String text; // in the simplest case: text to synthesize
+		Object cont; // possible continuation
 		public TTSAction() {}
 		TTSAction(int t, String content) {
 			super(t);
@@ -172,6 +193,7 @@ public class CarChaseExperimenter {
 		}
 		public String getText() { return text; }
 		public void setText(String t) { text = t; }
+		public void setTryCont(String t) { cont = t; }
 		@Override
 		public String toString() { return "TTS: t=" + start + ", " + text; }
 	}

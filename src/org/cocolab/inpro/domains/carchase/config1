@@ -17,10 +17,19 @@
 # leaving Kreisel going east onto Dorfstraße: 815/405
  
   
---- !worldstart {target: !p {x: 250, y: 710}}
+--- !worldstart {target: !p {x: 250, y: 730}, angle: 0}
 --- !world {start: 10, duration: 3000, target: !p {x: 250, y: 430}}
---- !TTS {start: 100, text: Das Auto fährt durch die A-Straße.} 
---- !TTS {start: 1000, text: Das Auto fährt durch die B-Straße.}
+--- !TTS {start: 15, text: Das Auto fährt durch die Geradestraße.} 
+#--- !world {start: 2810, duration: 200, target: !p {x: 245, y: 420}}
+--- !world {start: 3010, duration: 180, target: !p {x: 255, y: 415}}
+--- !world {duration: 180, target: !p {x: 270, y: 405}}
+--- !TTS {start: 3205, text: Das Auto biegt rechts ab., tryCont: und biegt rechts ab.} 
+--- !world {duration: 150, target: !p {x: 280, y: 405}}
+--- !world {start: 3520, duration: 3000, target: !p {x: 580, y: 405}}
+--- !TTS {start: 3525, text: Das Auto fährt durch die Dorfstraße., tryCont: in die Dorfstraße.} 
+
+#--- !TTS {start: 100, text: Das Auto fährt durch die A-Straße.} 
+#--- !TTS {start: 1000, text: Das Auto fährt durch die B-Straße.}
 --- !shutdown {start: 10000}
 
 #		playTimeline(panel, new Point(255, 415),  250);

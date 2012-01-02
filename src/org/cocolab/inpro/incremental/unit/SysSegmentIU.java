@@ -3,6 +3,7 @@ package org.cocolab.inpro.incremental.unit;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.util.ResultUtil;
 import org.cocolab.inpro.tts.PitchMark;
@@ -10,7 +11,9 @@ import org.cocolab.inpro.tts.hts.FullPFeatureFrame;
 import org.cocolab.inpro.tts.hts.FullPStream;
 
 public class SysSegmentIU extends SegmentIU {
-
+	
+	private static Logger logger = Logger.getLogger(SysSegmentIU.class);
+	
 	Label plannedLabel; // -> alternatively store "realizedLabel"
 	/** the label that was originally planned by TTS, before any stretching has been done */ 
 	Label originalLabel;
@@ -84,8 +87,11 @@ public class SysSegmentIU extends SegmentIU {
 		FullPFeatureFrame frame =  hmmSynthesisFeatures.get((int) (req * (fra / (double) dur)));
 		if (frame != null)
 			frame.shiftlf0Par(pitchShiftInCent);
-		if (req == dur - 1) // last frame
+		if (req == dur - 1) { // last frame 
 			progress = Progress.COMPLETED;
+//			logger.debug("completed " + deepToString());
+			logger.debug("completed " + toString());
+		}
 		return frame;
 	}
 	
