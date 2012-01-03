@@ -79,7 +79,7 @@ public class SysSegmentIU extends SegmentIU {
 	
 	public FullPFeatureFrame getHMMSynthesisFrame(int req) {
 		assert req >= 0;
-		progress = Progress.ONGOING;
+		setProgress(Progress.ONGOING);
 		assert req < durationInSynFrames();
 		int dur = durationInSynFrames(); // the duration in frames (= the number of frames that should be there)
 		int fra = hmmSynthesisFeatures.size(); // the number of frames available
@@ -88,11 +88,16 @@ public class SysSegmentIU extends SegmentIU {
 		if (frame != null)
 			frame.shiftlf0Par(pitchShiftInCent);
 		if (req == dur - 1) { // last frame 
-			progress = Progress.COMPLETED;
+			setProgress(Progress.COMPLETED);
 //			logger.debug("completed " + deepToString());
 			logger.debug("completed " + toString());
 		}
 		return frame;
+	}
+	
+	private void setProgress(Progress p) {
+		this.progress = p;
+		notifyListeners();
 	}
 	
 	/** 

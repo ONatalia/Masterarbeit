@@ -305,16 +305,17 @@ public class SysInstallmentIU extends InstallmentIU {
 	public String toMarkedUpString() {
 		StringBuilder sb = new StringBuilder();
 		for (WordIU word : getWords()) {
+			String payload = word.toPayLoad().replace(">", "&gt;").replace("<", "&lt;");
 			if (word.isCompleted()) {
 				sb.append("<strong>");
-				sb.append(word.toPayLoad());
+				sb.append(payload);
 				sb.append("</strong>");
 			} else if (word.isOngoing()) {
 				sb.append("<em>");
-				sb.append(word.toPayLoad());
+				sb.append(payload);
 				sb.append("</em>");
 			} else
-				sb.append(word.toPayLoad());
+				sb.append(payload);
 			sb.append(" ");
 		}
 		return sb.toString();

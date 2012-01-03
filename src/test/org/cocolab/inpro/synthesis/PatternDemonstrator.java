@@ -15,6 +15,9 @@ import javax.swing.JTextField;
 
 import org.cocolab.inpro.apps.SimpleMonitor;
 import org.cocolab.inpro.audio.DispatchStream;
+import org.cocolab.inpro.incremental.unit.IU.IUUpdateListener;
+import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.IU.Progress;
 import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.SegmentIU;
 import org.cocolab.inpro.incremental.unit.SysSegmentIU;
@@ -38,6 +41,18 @@ public abstract class PatternDemonstrator extends JPanel {
 	IncrSysInstallmentIU installment;
 	DispatchStream dispatcher;
 	
+	IUUpdateListener iuUpdateRepainter = new IUUpdateListener() {
+		Progress previousProgress;
+		@Override
+		public void update(IU updatedIU) {
+			Progress newProgress = updatedIU.getProgress();
+			if (newProgress != previousProgress) {
+				previousProgress = newProgress;
+				generatedText.setText(installment.toMarkedUpString());
+			}
+		}
+	};
+	
 	/** used to update installment actions before a new installment is played */
 	List<InstallmentAction> installmentActions = new ArrayList<InstallmentAction>();
 
@@ -57,7 +72,11 @@ public abstract class PatternDemonstrator extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 			//setEnabled(false);
-			greatNewUtterance(ae.getActionCommand()); 
+			greatNewUtterance(ae.getActionCommand());
+			for (IU word : installment.groundedIn()) {
+				word.updateOnGrinUpdates();
+				word.addUpdateListener(iuUpdateRepainter);
+			}
 			for (InstallmentAction ia : installmentActions) {
 				ia.setEnabled(true);
 				ia.updateParentNodes(installment);

@@ -502,5 +502,36 @@ public abstract class IU implements Comparable<IU> {
 	public int compareTo(IU other) {
 		return this.id - other.id;
 	}
+
+	List<IUUpdateListener> updateListeners;
+	public void addUpdateListener(IUUpdateListener listener) {
+		if (updateListeners == null)
+			updateListeners = new ArrayList<IUUpdateListener>();
+		updateListeners.add(listener);
+	}
+	
+	protected void notifyListeners() {
+		if (updateListeners != null)
+			for (IUUpdateListener listener : updateListeners) {
+				listener.update(this);
+			}
+	}
+	
+	/** registers an update listener with all groundedIn-IUs that call our own update listeners */
+	public void updateOnGrinUpdates() {
+		IUUpdateListener listener = new IUUpdateListener() {
+			@Override
+			public void update(IU updatedIU) {
+				notifyListeners();
+			}
+		};
+		for (IU iu : groundedIn()) {
+			iu.addUpdateListener(listener);
+		}
+	}
+	
+	public interface IUUpdateListener {
+		public void update(IU updatedIU);
+	}
 	
 }
