@@ -8,7 +8,7 @@ public class IUBasedFullPStream extends FullPStream {
     SysSegmentIU firstIU;
     SysSegmentIU currIU;
     int currIUFrameOffset;
-    
+    	
     public IUBasedFullPStream(IU firstIU) {
     	while (firstIU != null && !(firstIU instanceof SysSegmentIU)) {
     		firstIU = firstIU.groundedIn().get(0);
@@ -59,3 +59,27 @@ public class IUBasedFullPStream extends FullPStream {
     }
     
 }
+
+/*
+// alternative implementation without a global length measure:
+
+int iuLocalPosition;
+
+@Override
+public boolean hasNextFrame() {
+	return currIU != null && ((iuLocalPosition < currIU.durationInSynFrames()) 
+						     || currIU.getNextSameLevelLink() != null);
+}
+
+@Override
+public FullPFeatureFrame getNextFrame() {
+	synchronized (currIU) {
+    	iuLocalPosition++;
+    	if (iuLocalPosition >= currIU.durationInSynFrames()) {
+    		iuLocalPosition = 0;
+    		currIU = (SysSegmentIU) currIU.getNextSameLevelLink();
+    	}
+    	return currIU != null ? currIU.getHMMSynthesisFrame(iuLocalPosition) : null;
+	}
+}
+*/

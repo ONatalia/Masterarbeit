@@ -22,6 +22,8 @@ public class SysSegmentIU extends SegmentIU {
 	public double pitchShiftInCent = 0.0;
 	/** the state of delivery that this unit is in */
 	Progress progress = Progress.UPCOMING;
+	/** the number of frames that this segment has already been going on */
+	int realizedDurationInSynFrames = 0;
 	
 	public SysSegmentIU(Label l, List<PitchMark> pitchMarks, List<FullPFeatureFrame> featureFrames) {
 		super(l);
@@ -81,6 +83,7 @@ public class SysSegmentIU extends SegmentIU {
 		assert req >= 0;
 		setProgress(Progress.ONGOING);
 		assert req < durationInSynFrames();
+	//	req = Math.max(req, durationInSynFrames() - 1);
 		int dur = durationInSynFrames(); // the duration in frames (= the number of frames that should be there)
 		int fra = hmmSynthesisFeatures.size(); // the number of frames available
 		// just repeat/drop frames as necessary if the amount of frames available is not right
@@ -92,6 +95,7 @@ public class SysSegmentIU extends SegmentIU {
 //			logger.debug("completed " + deepToString());
 			logger.debug("completed " + toString());
 		}
+		realizedDurationInSynFrames++;
 		return frame;
 	}
 	
@@ -111,7 +115,6 @@ public class SysSegmentIU extends SegmentIU {
 		assert factor > 0f;
 		double newDuration = duration() * factor;
 		return setNewDuration(newDuration);
-		
 	}
 	
 	public double stretchFromOriginal(double factor) {
@@ -121,8 +124,9 @@ public class SysSegmentIU extends SegmentIU {
 	}
 	
 	/** @return the actual new duration (multiple of 5ms) */
-	public double setNewDuration(double d) {
-		assert d > 0;
+	public synchronized double setNewDuration(double d) {
+		assert d >= 0;
+		d = Math.max(d, realizedDurationInSynFrames / 200.f); 
 		if (originalLabel == null) 
 			originalLabel = this.l;
 		Label oldLabel = this.l;

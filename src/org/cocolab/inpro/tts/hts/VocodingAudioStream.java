@@ -109,7 +109,7 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
     private final ArrayBlockingQueue<Double> output;
 
     // TODO: think about how gain scaling can be incrementalized
-    private final static double fakeMax = 24000; //32768;
+    private double maxAmplitude = 24000; //32768;
     
     boolean doneVocoding = false;
     
@@ -464,11 +464,15 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
         return toPrimitive(output.toArray((Double[]) null));
     }
     
-    private final static double scale(double d) {
-        return d / fakeMax;
+    private final double scale(double d) {
+    	if (Math.abs(d) > maxAmplitude) {
+    		System.err.println("max amplitude!");
+    		maxAmplitude = Math.abs(d);
+    	}
+        return d / maxAmplitude;
     }
     
-    private static double[] toPrimitive(Double[] objArr) {
+    private double[] toPrimitive(Double[] objArr) {
         double[] primArr = new double[objArr.length];
         for (int i = 0; i < objArr.length; i++) {
             primArr[i] = scale(objArr[i].doubleValue());

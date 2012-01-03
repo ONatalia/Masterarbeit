@@ -28,6 +28,8 @@ public class CarChaseViewer extends JPanel {
 
 	private static Logger logger = Logger.getLogger("CarChaseViewer");
 	
+	private final boolean PAINT_PATH = false;
+	
 	Image background;
 	Image car;
 	Point carPosition;
@@ -60,7 +62,8 @@ public class CarChaseViewer extends JPanel {
 	public void paint(Graphics g) {
 		super.paint(g);
 		g.drawImage(background, 0, 0, null);
-		paintPath(g);
+		if (PAINT_PATH)
+			paintPath(g);
 		paintCar((Graphics2D) g);
 		g.fillOval(carPosition.x - 2, carPosition.y - 2, 4, 4);
 	}

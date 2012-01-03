@@ -2,6 +2,8 @@ package org.cocolab.inpro.domains.carchase;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -115,7 +117,7 @@ public class CarChaseExperimenter {
 		Yaml yaml = new MyYaml();
 		List<Action> actions = new ArrayList<Action>();
 		WorldAction prevWorldAction = null;
-		for (Object a : yaml.loadAll(CarChaseViewer.class.getResourceAsStream("config1"))) {
+		for (Object a : yaml.loadAll(CarChaseViewer.class.getResourceAsStream("config2"))) {
 			assert a instanceof Action;
 			Action action = (Action) a;
 			if (action instanceof WorldAction) {
@@ -130,6 +132,12 @@ public class CarChaseExperimenter {
 			}
 			actions.add(action);
 		}
+		Collections.sort(actions, new Comparator<Action>() {
+			@Override
+			public int compare(Action o1, Action o2) {
+				return o1.start - o2.start;
+			}
+		});
 //		System.out.println(yaml.dumpAll(actionList.iterator()));
 		logger.info("pre-computing system utterances");
 		exp.precompute(actions);
