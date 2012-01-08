@@ -28,13 +28,14 @@ public class CarChaseViewer extends JPanel {
 
 	private static Logger logger = Logger.getLogger("CarChaseViewer");
 	
-	private final boolean PAINT_PATH = false;
+	private final boolean PAINT_PATH = true;
 	
 	Image background;
 	Image car;
 	Point carPosition;
 	double carAngle;
 	double carTargetAngle;
+	boolean carIsReverseGear = false;
 	private static final double CAR_SCALE = 1f / 4.3f;
 	Timeline timeline;
 	Point targetPoint;
@@ -113,9 +114,19 @@ public class CarChaseViewer extends JPanel {
 			targetPoint = action.target;
 			Timeline timeline = new SwingRepaintTimeline(this);
 			timeline.addPropertyToInterpolate("carPosition", startPoint, targetPoint);
+//			carTargetAngle %= Math.PI;
 			carAngle = carTargetAngle;
-			carTargetAngle = Math.atan2(targetPoint.x - startPoint.x, startPoint.y - targetPoint.y);
+			carTargetAngle = action.isReverseGear() ? Math.atan2(startPoint.x - targetPoint.x, targetPoint.y - startPoint.y) :
+													Math.atan2(targetPoint.x - startPoint.x, startPoint.y - targetPoint.y);
+//			carTargetAngle %= Math.PI;
+			if (Math.abs(carTargetAngle - carAngle) >= Math.PI || Math.abs(carAngle - carTargetAngle) >= Math.PI) {
+				if (carTargetAngle < carAngle)
+					carTargetAngle += 2 * Math.PI;
+				else
+					carAngle += 2 * Math.PI;
+			}
 			logger.info("action : " + action.toString() + " at speed (px/ms): " + (targetPoint.distance(startPoint) / action.duration));
+			logger.debug("start angle: " + carAngle + " , target angle: " + carTargetAngle);
 			timeline.addPropertyToInterpolate("carAngle", carAngle, carTargetAngle);
 			timeline.setDuration(action.duration);
 			action.appData = timeline;
@@ -132,6 +143,7 @@ public class CarChaseViewer extends JPanel {
 			if (action.appData == null) {
 				precompute(action);
 			}
+			carIsReverseGear = action.isReverseGear();
 			assert action.appData instanceof Timeline;
 			this.timeline = (Timeline) action.appData;
 			timeline.playSkipping(10);

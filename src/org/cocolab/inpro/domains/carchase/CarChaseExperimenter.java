@@ -12,7 +12,6 @@ import javax.swing.SwingUtilities;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.apps.SimpleMonitor;
 import org.cocolab.inpro.audio.DispatchStream;
-import org.cocolab.inpro.tts.MaryAdapter;
 import org.yaml.snakeyaml.Yaml;
 
 public class CarChaseExperimenter {
@@ -101,7 +100,7 @@ public class CarChaseExperimenter {
 	}
 	
 	public static void main(String[] args) {
-		MaryAdapter.getInstance();
+		//MaryAdapter.getInstance();
 		CarChaseExperimenter exp = new CarChaseExperimenter();
 		/** startup mary */
 		logger.info("starting to initialize");
@@ -117,7 +116,7 @@ public class CarChaseExperimenter {
 		Yaml yaml = new MyYaml();
 		List<Action> actions = new ArrayList<Action>();
 		WorldAction prevWorldAction = null;
-		for (Object a : yaml.loadAll(CarChaseViewer.class.getResourceAsStream("config2"))) {
+		for (Object a : yaml.loadAll(CarChaseViewer.class.getResourceAsStream("config3"))) {
 			assert a instanceof Action;
 			Action action = (Action) a;
 			if (action instanceof WorldAction) {
@@ -174,6 +173,7 @@ public class CarChaseExperimenter {
 	public static class WorldAction extends Action {
 		int duration; // in milliseconds
 		Point target;
+		boolean reverseGear = false;
 		public WorldAction() { super(-1); }
 		WorldAction(int t, Point p, int d) {
 			super(t);
@@ -184,7 +184,9 @@ public class CarChaseExperimenter {
 		public void setDuration(int duration) { this.duration = duration; }
 		public int getEnd() { return start + duration; }
 		public void setTarget(Point p) { target = p; }
-		public Point getTarget() { return target; } 
+		public Point getTarget() { return target; }
+		public void setReverseGear(boolean b) { reverseGear = b; }
+		public boolean isReverseGear() { return reverseGear; }
 		@Override
 		public String toString() {
 			return "world: t=" + start + ", duration: " + duration + ", target " + target.toString();
