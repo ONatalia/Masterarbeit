@@ -1,0 +1,55 @@
+# itts: Das Fahrzeug fährt auf den Kreisel zu. Das Auto biegt rechts ein und in die Kirchstraße.
+# stnd: Das Fahrzeug fährt auf den Kreisel zu. Das Auto biegt rechts ein. Das Auto fährt in die Kirchstraße.
+--- !worldstart {target: !p {x: 250, y: 405}, angle: 1.5708}
+--- !world {start: 10, duration: 3100, target: !p {x: 560, y: 405}}
+--- !TTS {start: 20, text: "Das Fahrzeug fährt auf den Kreisel zuu."}
+--- !world {duration: 132, target: !p {x: 573, y: 407}}
+--- !world {duration: 108, target: !p {x: 583, y: 411}}
+--- !world {duration: 114, target: !p {x: 590, y: 420}}
+--- !world {duration: 152, target: !p {x: 596, y: 434}}
+--- !world {duration: 142, target: !p {x: 605, y: 445}}
+--- !TTS {start: 3120, text: Das Auto biegt rechts ein., tryCont: fährt nach rechts., optional: true}
+#--- !world {duration: 100, target: !p {x: , y: }}
+--- !world {duration: 114, target: !p {x: 608, y: 456}}
+--- !world {duration: 120, target: !p {x: 607, y: 468}}
+--- !world {duration: 139, target: !p {x: 600, y: 480}}
+#--- !world {duration: 425, target: !p {x: 635, y: 475}}
+#--- !world {duration: 425, target: !p {x: 675, y: 490}}
+#--- !world {duration: 350, target: !p {x: 710, y: 490}}
+--- !TTS {start: 4000, text: Das Auto fährt durch die Kirch-Straße., tryCont: und in die Kirch-Straße.}
+--- !world {duration: 2642, target: !p {x: 470, y: 710}}
+#--- !world {duration: 425, target: !p {x: 750, y: 475}}
+#--- !world {duration: 450, target: !p {x: 785, y: 445}}
+#--- !world {duration: 300, target: !p {x: 799, y: 419}}
+##--- !world {duration: 250, target: !p {x: 820, y: 405}} # Ausfahrt aus Kreisel an der Dorfstraße(Ost)
+#--- !world {duration: 400, target: !p {x: 805, y: 380}}
+#--- !world {duration: 300, target: !p {x: 805, y: 350}}
+#--- !world {start: 7100, duration: 200, target: !p {x: 800, y: 370}, reverseGear: true}
+#--- !world {duration: 100, target: !p {x: 790, y: 375}, reverseGear: true}
+#--- !world {duration: 300, target: !p {x: 760, y: 370}, reverseGear: true}
+#--- !world {start: 7900, duration: 400, target: !p {x: 805, y: 385}}
+#--- !world {duration: 500, target: !p {x: 855, y: 405}}
+#--- !world {duration: 100, target: !p {x: 865, y: 405}}
+#--- !world {duration: 1500, target: !p {x: 1015, y: 405}}
+
+#--- !world {duration: 2000, target: !p {x: 795, y: 375}}
+#--- !world {duration: 400, target: !p {x: 805, y: 380}}
+#--- !world {duration: 500, target: !p {x: 795, y: 330}}
+#--- !world {duration: 400, target: !p {x: 770, y: 300}}
+#--- !world {duration: 350, target: !p {x: 740, y: 280}}
+#--- !world {duration: 500, target: !p {x: 690, y: 270}}
+#--- !world {duration: 500, target: !p {x: 640, y: 280}}
+#--- !world {duration: 350, target: !p {x: 610, y: 300}}
+#--- !world {duration: 350, target: !p {x: 590, y: 330}}
+#--- !world {start: 10, duration: 300, target: !p {x: 585, y: 360}}
+#--- !world {duration: 380, target: !p {x: 585, y: 400}} # vor Ausfahrt aus Kreisel an der Dorfstraße(West)
+#--- !world {duration: 500, target: !p {x: 585, y: 410}} 
+#--- !world {duration: 1000, target: !p {x: 595, y: 390}, reverseGear: true}
+#--- !world {duration: 500, target: !p {x: 605, y: 385}, reverseGear: true}
+#--- !world {duration: 500, target: !p {x: 585, y: 390}}
+#--- !world {duration: 500, target: !p {x: 550, y: 375}}
+#--- !world {duration: 500, target: !p {x: 525, y: 360}}
+#--- !world {duration: 500, target: !p {x: 500, y: 355}}
+#--- !world {duration: 500, target: !p {x: 250, y: 355}}
+
+--- !shutdown {start: 20000}

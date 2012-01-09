@@ -1,0 +1,18 @@
+--- !worldstart {target: !p {x: 660, y: 80}, angle: -1.5708}
+--- !world {start: 10, duration: 3700, target: !p {x: 290, y: 80}}
+--- !TTS {start: 15, text: Der Verdächtige fährt langsam durch die Fliedergasse und biegt <hes>} # incremental
+#--- !TTS {start: 15, text: Der Verdächtige fährt langsam durch die Fliedergasse.} # non-incremental
+--- !TTS {start: 3760, text: Das Auto biegt rechts ab., tryCont: rechts ab., optional: true}
+--- !world {duration: 100, target: !p {x: 280, y: 79}}
+--- !world {duration: 54, target: !p {x: 275, y: 77}}
+--- !world {duration: 58, target: !p {x: 270, y: 74}}
+--- !world {duration: 58, target: !p {x: 265, y: 71}}
+--- !world {duration: 92, target: !p {x: 258, y: 65}}
+--- !world {duration: 58, target: !p {x: 255, y: 60}}
+--- !world {duration: 85, target: !p {x: 252, y: 52}}
+--- !world {duration: 82, target: !p {x: 250, y: 44}}
+--- !world {duration: 40, target: !p {x: 250, y: 40}}
+--- !world {duration: 2500, target: !p {x: 250, y: -210}}
+--- !TTS {start: 4350, text: Das Auto fährt durch die Breitestraße., tryCont: in die Breitestraße.}
+
+--- !shutdown {start: 15000}

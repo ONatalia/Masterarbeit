@@ -1,0 +1,23 @@
+# Breite Straße going north: x: 250
+# Breite Straße going south: x: 195
+# Dorfstraße going east: y: 405
+# Dorfstraße going west: y: 355
+# Tierparkallee going north: x: 710 
+# Tierparkallee going south: x: 660
+# Fliedergasse going east: y: 120
+# Fliedergasse going west: y: 80
+# Kirchstraße going north start point: 520/710
+# Kirchstraße going south end point: 470/710
+# Bahnhofstraße going north start point: 910/710
+# Bahnhofstraße going south end point: 850/710 
+
+# Kreisel center: 690/380
+
+# Dorfstraße going east enters Kreisel: 560/405
+# leaving Kreisel going east onto Dorfstraße: 815/405
+
+
+# scenario: going west on Fliedergasse and turning (either right or left)
+# default direction: going north 
+# going east: 90° → pi/2 = 1.5708
+# ??going west: -90°  → -pi/2 = -1.5708
