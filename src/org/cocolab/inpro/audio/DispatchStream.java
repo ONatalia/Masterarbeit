@@ -59,6 +59,10 @@ public class DispatchStream extends InputStream implements Configurable {
 	
 	public void initialize() {  }
 
+	public boolean isSpeaking() {
+		return stream != null;
+	}
+	
 	/**
 	 * Reads file names corresponding to utterances strings from a file
 	 * and adds them to a local map if they can be found.

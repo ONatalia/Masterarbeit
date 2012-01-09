@@ -24,6 +24,8 @@ public class CarChaseExperimenter {
 	JFrame frame;
 	
 	private static long globalTimeOffsetMS;
+	
+	private static final String CONFIGURATION = "configs/config3.1";
 
 	CarChaseExperimenter() {
 		dispatcher = SimpleMonitor.setupDispatcher();
@@ -100,23 +102,15 @@ public class CarChaseExperimenter {
 	}
 	
 	public static void main(String[] args) {
-		//MaryAdapter.getInstance();
 		CarChaseExperimenter exp = new CarChaseExperimenter();
 		/** startup mary */
 		logger.info("starting to initialize");
 		/** disable global variance optimization */
 		//((HMMVoice) Voice.getVoice(MaryAdapter4internal.DEFAULT_VOICE)).getHMMData().setUseGV(false);
-//		List<Action> actionList = Arrays.<Action>asList(
-//				//new WorldAction(10, new Point(250, 670), 0),
-//				new WorldAction(50, new Point(250, 430), 3000), 
-//				new TTSAction( 100, "Das Auto fährt durch die A-Straße."),
-//				new TTSAction(2000, "Das Auto fährt durch die B-Straße."),
-//				new ShutdownAction(10000)
-//		);
 		Yaml yaml = new MyYaml();
 		List<Action> actions = new ArrayList<Action>();
 		WorldAction prevWorldAction = null;
-		for (Object a : yaml.loadAll(CarChaseViewer.class.getResourceAsStream("config3"))) {
+		for (Object a : yaml.loadAll(CarChaseViewer.class.getResourceAsStream(CONFIGURATION))) {
 			assert a instanceof Action;
 			Action action = (Action) a;
 			if (action instanceof WorldAction) {
@@ -196,6 +190,7 @@ public class CarChaseExperimenter {
 	public static class TTSAction extends Action {
 		String text; // in the simplest case: text to synthesize
 		Object cont; // possible continuation
+		boolean optional; // whether this is just additional (less important) information
 		public TTSAction() {}
 		TTSAction(int t, String content) {
 			super(t);
@@ -204,6 +199,8 @@ public class CarChaseExperimenter {
 		public String getText() { return text; }
 		public void setText(String t) { text = t; }
 		public void setTryCont(String t) { cont = t; }
+		public void setOptional(boolean b) { optional = b; }
+		public boolean isOptional() { return optional; }
 		@Override
 		public String toString() { return "TTS: t=" + start + ", " + text; }
 	}

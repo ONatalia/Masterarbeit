@@ -21,7 +21,8 @@ public class StandardArticulator extends CarChaseExperimenter.Articulator {
 //		SysInstallmentIU inst = new IncrSysInstallmentIU(action.text);
 		SysInstallmentIU inst = (SysInstallmentIU) action.appData;
 		boolean skipQueue = true;
-		dispatcher.playStream(inst.getAudio(), skipQueue);
+		if (!dispatcher.isSpeaking() || !action.isOptional()) 
+			dispatcher.playStream(inst.getAudio(), skipQueue);
 	}
 	
 }
