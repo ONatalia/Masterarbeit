@@ -27,6 +27,7 @@ public abstract class CommonCommandLineParser {
 	URL audioURL;
 	int inputMode;
 	int outputMode;
+	boolean serverMode = false;
 	
 	public CommonCommandLineParser(String[] args) {
 		success = false;
