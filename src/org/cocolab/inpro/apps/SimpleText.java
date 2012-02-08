@@ -17,12 +17,19 @@ import javax.swing.text.BadLocationException;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.apache.xmlrpc.XmlRpcException;
+import org.apache.xmlrpc.server.PropertyHandlerMapping;
+import org.apache.xmlrpc.server.XmlRpcServer;
+import org.apache.xmlrpc.webserver.WebServer;
+import org.cocolab.inpro.apps.util.IUService;
+import org.cocolab.inpro.apps.util.ServiceContainer;
 import org.cocolab.inpro.apps.util.TextCommandLineParser;
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.listener.FrameAwarePushBuffer;
 import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
 import org.cocolab.inpro.incremental.processor.TextBasedFloorTracker;
 import org.cocolab.inpro.incremental.util.IUDocument;
+import org.cocolab.inpro.gui.pentomino.heatmap.HeatBoard;
 
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -146,7 +153,33 @@ public class SimpleText extends JPanel implements ActionListener {
     		// run non-interactively
     		runFromReader(clp.getReader(), hypListeners, textBasedFloorTracker);
     		System.exit(0); //
-    	} else { // run interactively
+    		
+    	} 
+    	else if (clp.isServerMode()) {
+    		logger.info("running server mode");
+    		WebServer web = new WebServer(9030);
+    		XmlRpcServer xml = web.getXmlRpcServer();
+    		
+    		PropertyHandlerMapping phm = new PropertyHandlerMapping();
+    		ServiceContainer.set(hypListeners, textBasedFloorTracker);
+    		ServiceContainer.cm(cm);
+    		try 
+    		{
+    			phm.addHandler("inpro", IUService.class);
+    			xml.setHandlerMapping(phm);
+    			web.start();
+    		} 
+    		catch (XmlRpcException e) 
+    		{
+    			e.printStackTrace();
+    		} 
+    		catch (IOException e)
+    		{
+    			e.printStackTrace();
+    		}    		
+    		
+    	}
+    	else { // run interactively
     		// add hypothesis viewer 
     		if (clp.matchesOutputMode(TextCommandLineParser.CURRHYP_OUTPUT)) {
     			hypListeners.add((PushBuffer) cm.lookup("hypViewer"));
@@ -154,7 +187,7 @@ public class SimpleText extends JPanel implements ActionListener {
     		logger.info("running in interactive mode");
     		SwingUtilities.invokeLater(new Runnable() {
 	            public void run() {
-	                createAndShowGUI(hypListeners, textBasedFloorTracker);
+	                createAndShowGUI(hypListeners, textBasedFloorTracker);	                
 	            }
 	        });
     	}
