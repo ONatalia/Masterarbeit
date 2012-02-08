@@ -10,6 +10,7 @@ import java.net.URL;
 public class TextCommandLineParser extends CommonCommandLineParser {
 
 	private Reader textReader;
+
 	
 	public TextCommandLineParser(String[] args) {
 		super(args);
@@ -30,6 +31,10 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 	
 	public Reader getReader() {
 		return textReader;
+	}
+	
+	public boolean isServerMode() {
+		return serverMode;
 	}
 	
 
@@ -73,6 +78,9 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 			} 
 			else if (args[i].equals("-C")) {
 				outputMode |= CURRHYP_OUTPUT;
+			}
+			else if (args[i].equals("-server")) {
+				serverMode = true;
 			}
 			else {
 				printUsage();
