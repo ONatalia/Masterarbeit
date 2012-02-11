@@ -60,8 +60,8 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 	 * then we generate the filtered output on the basis of the standard
 	 * output, which consists of two parts:  
 	 * </li><ul><li>
-	 *     handle incoming IUs, updating smoothingCounters for words of 
-	 *     still-valid words in the smoothingQueue and removing invalid ones and  
+	 *     handle incoming edits, updating smoothingCounters for edits of 
+	 *     still-valid edits in the smoothingQueue and removing invalid ones and  
 	 *     adding new ones for other words
 	 * </li><li>
 	 *     generate a new list of output IUs and edits by checking which 
@@ -77,7 +77,7 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 		// calculate would-be edits the standard way
 		basicDeltify(token);
 		if (!recoFinal) {
-			handleIncomingWordIUs(); 
+			handleIncomingIUEdits(); 
 			applySmoothingQueueToOutputWords();
 		}
 	}
@@ -90,7 +90,7 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 	 * update smoothing counters for words of still-valid words in the smoothing
 	 * queue, remove invalid ones, add new ones for new words
 	 */
-	protected void handleIncomingWordIUs() {
+	protected void handleIncomingIUEdits() {
 		Iterator<EditMessage<WordIU>> editsIter = wordEdits.iterator();
 		Iterator<SmoothingCounter> smoothIter = smoothingQueue.iterator();
 		EditMessage<WordIU> edit = compareToSmoothingQueueForMatchingWords(editsIter, smoothIter);

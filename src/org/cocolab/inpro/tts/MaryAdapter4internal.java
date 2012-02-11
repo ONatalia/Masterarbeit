@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.Locale;
 
 import javax.sound.sampled.AudioFileFormat;
@@ -15,6 +16,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 
 import org.apache.log4j.Logger;
+import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.cocolab.inpro.tts.hts.FullPStream;
 import org.cocolab.inpro.tts.hts.HTSFullPStream;
 import org.cocolab.inpro.tts.hts.InteractiveHTSEngine;
@@ -47,13 +49,15 @@ public class MaryAdapter4internal extends MaryAdapter {
         Mary.startup();
 	}
 	
-	public FullPStream maryxml2hmmFeatures(String maryxml) {
-		KeepingOneHTSParameterDataListener pdl = new KeepingOneHTSParameterDataListener(); 
+	public FullPStream maryxml2hmmFeatures(List<SysSegmentIU> segments, String maryxml) {
+		KeepingOneHTSParameterDataListener pdl = new KeepingOneHTSParameterDataListener();
 		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class); 
 	    ihtse.setParameterDataListener(pdl);	
+	    ihtse.setSegmentIUs(segments);
 	    ihtse.synthesizeAudio = false;
 	    maryxml2audio(maryxml); // after this call, htsData should be correctly set
 	    ihtse.synthesizeAudio = true;
+	    ihtse.setSegmentIUs(null);
 		return new HTSFullPStream(pdl.htsData);
 	}
 	

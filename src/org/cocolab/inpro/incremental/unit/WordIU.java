@@ -76,11 +76,11 @@ public class WordIU extends IU {
 		return values;
 	}
 	
-	@SuppressWarnings("unchecked") // the untyped list in the call to Collections.checkedList
+	@SuppressWarnings({ "unchecked", "rawtypes" }) // the untyped list in the call to Collections.checkedList
 	public List<SegmentIU> getSegments() {
 		List<IU> returnList;
 		if ((groundedIn == null) || groundedIn.size() == 0) {
-			returnList = Collections.emptyList();
+			returnList = Collections.<IU>emptyList();
 		} else if (groundedIn.get(0) instanceof SegmentIU) {
 			returnList = groundedIn;
 		} else if (groundedIn.get(0) instanceof SyllableIU) {
@@ -92,6 +92,18 @@ public class WordIU extends IU {
 			throw new RuntimeException("I don't know how to get segments from my groundedIn list");
 		}
 		return Collections.checkedList((List) returnList, SegmentIU.class);
+	}
+	
+	public SegmentIU getFirstSegment() {
+		return getSegments().get(0);
+	}
+	
+	public SegmentIU getLastSegment() {
+		List<SegmentIU> segments = getSegments();
+		if (segments.size() > 0)
+			return segments.get(segments.size() - 1);
+		else
+			return null;
 	}
 	
 	public void updateSegments(List<Label> newLabels) {

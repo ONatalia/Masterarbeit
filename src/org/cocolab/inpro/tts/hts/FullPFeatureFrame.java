@@ -1,5 +1,7 @@
 package org.cocolab.inpro.tts.hts;
 
+import java.util.Arrays;
+
 import org.cocolab.inpro.pitch.util.PitchUtils;
 
 public class FullPFeatureFrame {
@@ -39,6 +41,14 @@ public class FullPFeatureFrame {
     
     public void setf0Par(double f0) {
     	setlf0Par(Math.log(f0));
+    }
+    
+    @Override
+    public String toString() {
+    	return "mcep: " + Arrays.toString(mcepParVec) + 
+    		 ", mag: " + Arrays.toString(magParVec) + 
+    		 ", str: " + Arrays.toString(strParVec) + 
+        (voiced ? ", voiced with pitch " + Math.exp(lf0Par) + " Hz" : ", unvoiced");
     }
 
 }

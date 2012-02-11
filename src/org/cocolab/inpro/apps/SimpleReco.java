@@ -131,7 +131,7 @@ public class SimpleReco {
 				}
 			}
 		};
-		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
+		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook, "microphone shutdown hook"));
 	}
 	
 	VUMeterMonitor vumeter;

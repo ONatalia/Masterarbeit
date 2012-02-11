@@ -504,13 +504,13 @@ public abstract class IU implements Comparable<IU> {
 	}
 
 	List<IUUpdateListener> updateListeners;
-	public void addUpdateListener(IUUpdateListener listener) {
+	public synchronized void addUpdateListener(IUUpdateListener listener) {
 		if (updateListeners == null)
 			updateListeners = new ArrayList<IUUpdateListener>();
 		updateListeners.add(listener);
 	}
 	
-	protected void notifyListeners() {
+	protected synchronized void notifyListeners() {
 		if (updateListeners != null)
 			for (IUUpdateListener listener : updateListeners) {
 				listener.update(this);

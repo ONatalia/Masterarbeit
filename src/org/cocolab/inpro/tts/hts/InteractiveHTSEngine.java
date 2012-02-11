@@ -6,6 +6,7 @@ import java.util.List;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 
+import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.w3c.dom.Element;
 
 import marytts.datatypes.MaryData;
@@ -53,10 +54,6 @@ public class InteractiveHTSEngine extends HTSEngine {
         /* Generate sequence of speech parameter vectors, generate parameters out of sequence of pdf's */  
         pdf2par.htsMaximumLikelihoodParameterGeneration(um, hmmv.getHMMData(),"", false);
     
-        for (HTSParameterDataListener pdl : parameterDataListeners) {
-            pdl.newParameterData(d, pdf2par);
-        }
-
         AudioInputStream ais = null;
         if (synthesizeAudio) {
 	        /* Vocode speech waveform out of sequence of parameters */
@@ -89,10 +86,33 @@ public class InteractiveHTSEngine extends HTSEngine {
         // set the actualDurations in tokensAndBoundaries
         if(tokensAndBoundaries != null)
             setRealisedProsody(tokensAndBoundaries, um);
+
+        if (segments != null) {
+        	assert segments.size() <= um.getNumUttModel() : segments.size() + ">" + um.getNumUttModel();
+        	for (int i = 0; i < segments.size() && i < um.getNumUttModel(); i++) {
+        		double dur = um.getUttModel(i).getTotalDurMillisec() * 0.001;
+        		assert um.getUttModel(i).getPhoneName().equals(segments.get(i).toPayLoad()) : um.getUttModel(i).getPhoneName() + " ne " + segments; 
+        		SysSegmentIU seg = segments.get(i);
+        		if (seg.duration() != dur)
+        			logger.warn("changing duration of segment from " + seg.duration() + " to " + dur);
+        		seg.setNewDuration(dur);
+        	}
+        }
+        
+        for (HTSParameterDataListener pdl : parameterDataListeners) {
+            pdl.newParameterData(d, pdf2par);
+        }
+
         return output;
     }
     
-    public interface HTSParameterDataListener {
+    List<SysSegmentIU> segments;
+    
+	public void setSegmentIUs(List<SysSegmentIU> segments) {
+		this.segments = segments;
+	}
+
+	public interface HTSParameterDataListener {
         public void newParameterData(MaryData d, HTSParameterGeneration pdf2par);
     }
 }

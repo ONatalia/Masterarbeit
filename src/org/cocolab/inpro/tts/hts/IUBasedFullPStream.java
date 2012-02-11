@@ -37,8 +37,13 @@ public class IUBasedFullPStream extends FullPStream {
     
     @Override
     public boolean hasNextFrame() {
-    	return currIU != null && ((currPosition < currIUFrameOffset + currIU.durationInSynFrames()) 
+    	boolean returnValue = currIU != null && ((currPosition < currIUFrameOffset + currIU.durationInSynFrames()) 
     						     || currIU.getNextSameLevelLink() != null);
+    	if (!returnValue) {
+    		System.err.println("no more frames");
+    		System.err.println(currIU.deepToString());
+    	}
+    	return returnValue;
     }
     
     @Override

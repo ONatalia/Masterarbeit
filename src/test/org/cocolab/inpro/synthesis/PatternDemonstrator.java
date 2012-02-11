@@ -27,15 +27,15 @@ import org.cocolab.inpro.tts.MaryAdapter;
 /**
  * implementing classes should<ol>
  * <li>call super() in their constructor
- * <li>place the JEditorPane {@link generatedText} somewhere
- * <li>hook up {@link goAction} which starts synthesis
+ * <li>place the JEditorPane {@link PatternDemonstrator#generatedText} somewhere
+ * <li>hook up {@link PatternDemonstrator#goAction} which starts synthesis
  * </ol>
  * @author timo
  *
  */
 public abstract class PatternDemonstrator extends JPanel {
 	
-	/** a text field that displays the current value of {@link installment} */
+	/** a text field that displays the current value of {@link PatternDemonstrator#installment} */
 	JEditorPane generatedText;
 	/** the IU holding the incrementally synthesized installment */
 	IncrSysInstallmentIU installment;
@@ -133,7 +133,7 @@ public abstract class PatternDemonstrator extends JPanel {
 		generatedText.setEditable(false);
 	}
 	
-	/** this operation is called by a StartAction and should (re-)create {@link installment} */
+	/** this operation is called by a StartAction and should (re-)create {@link PatternDemonstrator#installment} */
 	public abstract void greatNewUtterance(String command);
 	
 	public String applicationName() {

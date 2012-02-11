@@ -183,7 +183,7 @@ public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 		
 		// kind of a re-implementation of SmoothingDeltifier#deltify(Token), but
 		// without the Token part, and instead directly supplying the inputWords 
-		wasd.handleIncomingWordIUs(); 
+		wasd.handleIncomingIUEdits(); 
 		wasd.applySmoothingQueueToOutputWords();
 
 		System.out.println("I expect the following for: " + inputWords);

@@ -8,8 +8,6 @@ import javax.sound.sampled.AudioInputStream;
 
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.audio.DDS16kAudioInputStream;
-import org.cocolab.inpro.tts.hts.FullPStream;
-import org.cocolab.inpro.tts.hts.IUBasedFullPStream;
 import org.cocolab.inpro.tts.hts.VocodingAudioStream;
 
 /**
@@ -24,7 +22,6 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
 	
 	public IncrSysInstallmentIU(String base) {
 		super(base);
-		System.err.println(toString());
 		this.addFeatureStreamToSegmentIUs();
 	}
 	
@@ -37,7 +34,6 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
 	
 	public void addAlternativeVariant(String variant) {
 		SysInstallmentIU varInst = new SysInstallmentIU(variant);
-		System.err.println(varInst.toString());
 		varInst.addFeatureStreamToSegmentIUs();
 		WordIU commonWord = getInitialWord();
 		// variant word
@@ -71,8 +67,21 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
 	}
 	
 	public void appendContinuation(List<WordIU> words) {
-		words.get(0).connectSLL(getFinalWord());
+		WordIU oldLastWord = getFinalWord();
+		WordIU newFirstWord = words.get(0);
+		newFirstWord.connectSLL(oldLastWord);
 		groundedIn.addAll(words);
+		// adapt pitch
+		SysSegmentIU oldLastSegment = (SysSegmentIU) oldLastWord.getLastSegment();
+		while (oldLastSegment != null && !oldLastSegment.isVoiced()) {
+			oldLastSegment = (SysSegmentIU) oldLastSegment.getSameLevelLink();
+		}
+		SysSegmentIU newFirstSegment = (SysSegmentIU) newFirstWord.getFirstSegment();
+		while (newFirstSegment != null && !newFirstSegment.isVoiced()) {
+			newFirstSegment = (SysSegmentIU) newFirstSegment.getNextSameLevelLink();
+		}
+		if (oldLastSegment != null && newFirstSegment != null)
+			oldLastSegment.attainPitch(newFirstSegment.getFirstVoicedlf0());
 	}
 	
 	public void reorderOptions(int wordIndex, final String newBestFollower) {
@@ -85,10 +94,6 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
         boolean immediateReturn = true;
 		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), immediateReturn);
         return new DDS16kAudioInputStream(vas);
-	}
-	
-	public FullPStream getFullPStream() {
-		return new IUBasedFullPStream(getWords().get(0));
 	}
 	
 	public List<WordIU> getWordsAtPos(int pos) {

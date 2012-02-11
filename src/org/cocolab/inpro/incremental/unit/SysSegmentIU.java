@@ -1,6 +1,8 @@
 package org.cocolab.inpro.incremental.unit;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
@@ -100,8 +102,13 @@ public class SysSegmentIU extends SegmentIU {
 	}
 	
 	private void setProgress(Progress p) {
-		this.progress = p;
-		notifyListeners();
+		if (p != this.progress) { 
+			this.progress = p;
+			notifyListeners();
+			if (p == Progress.COMPLETED && getNextSameLevelLink() != null) {
+				getNextSameLevelLink().notifyListeners();
+			}
+		}
 	}
 	
 	/** 
@@ -123,7 +130,31 @@ public class SysSegmentIU extends SegmentIU {
 		return setNewDuration(newDuration);
 	}
 	
-	/** @return the actual new duration (multiple of 5ms) */
+	/** 
+	 * change the synthesis frames' pitch curve to attain the given pitch in the final pitch
+	 * in a smooth manner
+	 * @param finalPitch the log pitch to be reached in the final synthesis frame 
+	 */
+	public void attainPitch(double finalPitch) {
+		ListIterator<FullPFeatureFrame> revFrames = hmmSynthesisFeatures.listIterator(hmmSynthesisFeatures.size());
+	//	finalPitch = Math.log(finalPitch);
+		double difference = finalPitch - revFrames.previous().getlf0Par();
+		double adjustmentPerFrame = difference / hmmSynthesisFeatures.size();
+		System.err.println("attaining pitch in " + toString() + " by " + difference);
+		revFrames.next();
+		// adjust frames in reverse order (in case this segment is already being synthesized)
+		for (; revFrames.hasPrevious(); ) {
+			FullPFeatureFrame frame = revFrames.previous(); 
+			frame.setlf0Par(frame.getlf0Par() - difference);
+			difference -= adjustmentPerFrame;
+		}
+	}
+	
+	/** 
+	 * set a new duration of this segment; if this segment is already ongoing, the 
+	 * resulting duration cannot be shortend to less than what has already been going on (obviously, we can't revert the past)  
+	 * @return the actual new duration (multiple of 5ms) 
+	 */
 	public synchronized double setNewDuration(double d) {
 		assert d >= 0;
 		d = Math.max(d, realizedDurationInSynFrames / 200.f); 
@@ -159,6 +190,21 @@ public class SysSegmentIU extends SegmentIU {
 	@Override
 	public String toLabelLine() {
 		return String.format(Locale.US,	"%.3f\t%.3f\t%s", startTime(), endTime(), toPayLoad());
+	}
+
+	public boolean isVoiced() {
+		return (hmmSynthesisFeatures != null && hmmSynthesisFeatures.size() > 0) ? hmmSynthesisFeatures.get(hmmSynthesisFeatures.size() / 2 - 1).isVoiced() : false;
+	}
+	
+	public double getFirstVoicedlf0() {
+		Iterator<FullPFeatureFrame> feats = hmmSynthesisFeatures.iterator();
+		while (feats.hasNext()) {
+			FullPFeatureFrame frame = feats.next();
+			if (frame.isVoiced()) {
+				return frame.getlf0Par();
+			}
+		}
+		return 0f;
 	}
 	
 }

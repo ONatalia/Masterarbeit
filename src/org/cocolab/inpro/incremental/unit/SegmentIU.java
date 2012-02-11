@@ -2,15 +2,63 @@ package org.cocolab.inpro.incremental.unit;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.cocolab.inpro.annotation.Label;
 
 public class SegmentIU extends IU {
 	
+	public enum SegmentType {
+		SILENCE, 
+		VOWEL, 
+		DIPHTHONG,
+		NASAL,
+		LIQUID, 
+		PLOSIVE,
+		FRICATIVE;
+	}
+	
+	public static final Map<String, SegmentType> TYPE_MAPPING;
+	static {
+		Map<String, SegmentType> types = new HashMap<String, SegmentType>();
+		for (String s : Label.SILENCE) {
+			types.put(s, SegmentType.SILENCE);
+		}
+		for (String v : Arrays.asList("2:", "9", "@", "6", 
+									  "a", "a:", "aa:", "A:", "aa", "A", 
+				                      "e", "e:", "ee", "E", "ee:", "E:",
+				                      "i:", "i", "ii", "I",
+				                      "o", "o:", "oo", "O", 
+				                      "u:", "u", "uu", "U",
+				                      "y:", "y", "yy", "YY")) {
+			types.put(v, SegmentType.VOWEL);
+		}
+		for (String d : Arrays.asList("aU", "ei", "eI", "oy", "OY", "ui", "uI")) { 
+			types.put(d, SegmentType.DIPHTHONG);
+		}
+		for (String n : Arrays.asList("m", "n", "nn", "N")) { 
+			types.put(n, SegmentType.NASAL);
+		}
+		for (String l : Arrays.asList("j", "l", "r", "rr", "R")) { 
+			types.put(l, SegmentType.LIQUID);
+		}
+		for (String p : Arrays.asList("b", "d", "g", "p", "t", "k", "?", "qq", "Q")) { 
+			types.put(p, SegmentType.PLOSIVE);
+		}
+		for (String f : Arrays.asList("f", "v", "s", "ss", "S", "z", "Z", "cc", "C", "x", "h", "ts", "tS", "pf")) { // also contains affricates
+			types.put(f, SegmentType.FRICATIVE);
+		}
+		TYPE_MAPPING = Collections.unmodifiableMap(types);
+	}
+	
 	public static final Set<String> VOWELS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			"2:", "9", "@", "@U", "6", "a", "a:", "aa:", "A:", "aa", "A", "ai", "aI", "au", "aU", "e", "e:", "ee", "E", "ee:", "E:", "ei", "eI", "i:", "i", "ii", "I", "o", "o:", "oo", "O", "oy", "OY", "u:", "u", "ui", "uI", "ui:", "uu", "U", "y:", "y", "yy", "Y"
+			"2:", "9", "@", "@U", "6", "a", "a:", "aa:", "A:", "aa", "A", "ai", "aI", "au", "aU", 
+			"e", "e:", "ee", "E", "ee:", "E:", "ei", "eI", 
+			"i:", "i", "ii", "I", "o", "o:", "oo", "O", "oy", "OY", "u:", "u", "ui", "uI", "ui:", "uu", "U", 
+			"y:", "y", "yy", "Y"
 /*,// for english:
 			"{" // possibly more; just run without assertions for english :-) /**/
 			)));
@@ -22,7 +70,9 @@ public class SegmentIU extends IU {
 			"U", "U:", "'U", "'U:", "''U", "''U:", "'Y", "'Y:", "''Y")));
 */
 	public static final Set<String> CONSONANTS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			"b", "cc", "C", "d", "f", "pf", "g", "h", "j", "k", "l", "m", "n", "nn", "N", "p", "qq", "?", "Q", "r", "rr", "R", "s", "ss", "S", "t", "ts", "tS", "v", "x", "z", "Z")));
+			"b", "cc", "C", "d", "f", "pf", "g", "h", "j", "k", "l", 
+			"m", "n", "nn", "N", "p", "qq", "?", "Q", "r", "rr", "R", 
+			"s", "ss", "S", "t", "ts", "tS", "v", "x", "z", "Z")));
 // for swedish:
 /*			"b", "B", "d", "D", 
 			"F", "g", "G", "H", 
@@ -101,6 +151,10 @@ public class SegmentIU extends IU {
 		return sb;
 	}
 
+	public SegmentType type() {
+		return TYPE_MAPPING.get(this.l.getLabel());
+	}
+	
 	public void appendMaryXML(StringBuilder sb) {
 		throw new UnsupportedOperationException("only SysSegmentIUs can be converted to MaryXML!");
 	}

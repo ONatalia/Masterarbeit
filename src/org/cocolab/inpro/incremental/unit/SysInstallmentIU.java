@@ -16,12 +16,15 @@ import org.cocolab.inpro.tts.MaryAdapter4internal;
 import org.cocolab.inpro.tts.PitchMark;
 import org.cocolab.inpro.tts.hts.FullPFeatureFrame;
 import org.cocolab.inpro.tts.hts.FullPStream;
+import org.cocolab.inpro.tts.hts.IUBasedFullPStream;
 
 /**
  * TODO: add support for canned audio (i.e. read from WAV and TextGrid, maybe even transparently)
  * @author timo
  */
 public class SysInstallmentIU extends InstallmentIU {
+	
+	Logger logger = Logger.getLogger(SysInstallmentIU.class);
 	
 	AudioInputStream synthesizedAudio;
 	
@@ -94,7 +97,9 @@ public class SysInstallmentIU extends InstallmentIU {
 				next.setSameLevelLink(first);
 				first = next;
 			}
-			newWords.add(new WordIU(w.word, prevWord, (List) newSegments));
+			WordIU newWord = new WordIU(w.word, prevWord, (List) newSegments);
+			newWords.add(newWord);
+			prevWord = newWord;
 		}
 		groundedIn = (List) newWords;
 	}
@@ -109,9 +114,15 @@ public class SysInstallmentIU extends InstallmentIU {
 	 */
 	public FullPStream generateFullPStream() {
 		String maryXML = toMaryXML();
+		logger.debug("generating pstream for " + maryXML);
 		assert MaryAdapter.getInstance() instanceof MaryAdapter4internal;
-		FullPStream pstream = ((MaryAdapter4internal) MaryAdapter.getInstance()).maryxml2hmmFeatures(maryXML);
+		FullPStream pstream = ((MaryAdapter4internal) MaryAdapter.getInstance()).maryxml2hmmFeatures(getSegments(), maryXML);
+		logger.debug("resulting pstream has maxT=" + pstream.getMaxT());
 		return pstream;
+	}
+	
+	public FullPStream getFullPStream() {
+		return new IUBasedFullPStream(getInitialWord());
 	}
 	
 	public void addFeatureStreamToSegmentIUs() {
@@ -125,8 +136,11 @@ public class SysInstallmentIU extends InstallmentIU {
 			t += frames;
 		//	System.err.println(seg.toLabelLine() + " gets " + frames + " frames.");
 		}
-		if (stream.hasNextFrame()) 
-			Logger.getLogger(SysInstallmentIU.class).warn("discarding some unclaimed frames, t=" + t + ", maxT=" + stream.getMaxT());
+		if (stream.hasNextFrame()) {
+			Logger l = Logger.getLogger(SysInstallmentIU.class);
+			l.warn("discarding some unclaimed frames, t=" + t + ", maxT=" + stream.getMaxT());
+			//assert t + 10 > stream.getMaxT() : "there are too many unassigned frames!";
+		}
 	}
 
 
@@ -321,9 +335,4 @@ public class SysInstallmentIU extends InstallmentIU {
 		return sb.toString();
 	}
 	
-	public static void main(String[] args) {
-		SysInstallmentIU installment = new SysInstallmentIU("hallo welt");
-		installment.synthesize();
-		sun.audio.AudioPlayer.player.start(installment.synthesizedAudio);
-	}
 }

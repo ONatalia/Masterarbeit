@@ -68,7 +68,7 @@ public abstract class IUModule extends PushBuffer {
 			List<? extends EditMessage<? extends IU>> edits);
 
 	@Override
-	public void hypChange(Collection<? extends IU> ius,
+	public synchronized void hypChange(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		leftBufferUpdate(ius, edits);
 		rightBuffer.notify(iulisteners);
