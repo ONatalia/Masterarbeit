@@ -1,5 +1,6 @@
 package org.cocolab.inpro.apps;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -262,8 +263,9 @@ public class SimpleMonitor implements RtpListener {
 	@SuppressWarnings("unused")
 	public static DispatchStream setupDispatcher() {
 		ConfigurationManager cm = new ConfigurationManager(SimpleMonitor.class.getResource("config.xml"));
+		final String tmpAudio = System.getProperty("java.io.tmpdir") + File.separator + "monitor.raw";
 		MonitorCommandLineParser clp = new MonitorCommandLineParser(new String[] {
-				"-F", "file:/tmp/monitor.raw", "-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
+				"-F", tmpAudio, "-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
 			});
 		clp.setInputMode(CommonCommandLineParser.DISPATCHER_OBJECT_INPUT);
 		try {
