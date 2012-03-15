@@ -263,7 +263,7 @@ public class SimpleMonitor implements RtpListener {
 	@SuppressWarnings("unused")
 	public static DispatchStream setupDispatcher() {
 		ConfigurationManager cm = new ConfigurationManager(SimpleMonitor.class.getResource("config.xml"));
-		final String tmpAudio = System.getProperty("java.io.tmpdir") + File.separator + "monitor.raw";
+		final String tmpAudio = "file:///" + System.getProperty("java.io.tmpdir") + "/" + "monitor.raw";
 		MonitorCommandLineParser clp = new MonitorCommandLineParser(new String[] {
 				"-F", tmpAudio, "-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
 			});
