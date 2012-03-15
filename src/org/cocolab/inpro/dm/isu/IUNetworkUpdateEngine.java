@@ -76,7 +76,6 @@ public class IUNetworkUpdateEngine extends AbstractUpdateEngine {
 
 	/**
 	 * Getter for the information state.
-	 * @return
 	 */
 	public IUNetworkInformationState getInformationState() {
 		return this.is;

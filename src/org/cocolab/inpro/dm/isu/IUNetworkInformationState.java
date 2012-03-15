@@ -141,7 +141,6 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * Getter for the next output to perform.
-	 * @return
 	 */
 	public List<EditMessage<DialogueActIU>> getNewEdits() {
 		List<EditMessage<DialogueActIU>> ret = new ArrayList<EditMessage<DialogueActIU>>();
@@ -217,7 +216,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
  	 * Moves the current contribution right to its next SLL contribution. 
-	 * @true if successful
+	 * @return true if successful
 	 */
 	@Override
 	public boolean moveCurrentContribRight() {
@@ -245,7 +244,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
 	 * Moves the current contribution up to its first grounding contribution. 
-	 * @true if successful
+	 * @return true if successful
 	 */
 	@Override
 	public boolean moveCurrentContribUp() {
@@ -271,7 +270,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
 	 * Attempts moving the current contrib to the left (SLL).
-	 * @true if successful
+	 * @return true if successful
 	 */
 	@Override
 	public boolean moveCurrentContribLeft() {
@@ -295,7 +294,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
 	 * Attempts moving the current contrib down to the first grounded-in contribution.
-	 * @true if successful
+	 * @return true if successful
 	 */
 	@Override
 	public boolean moveCurrentContribDown() {
@@ -317,7 +316,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 * An Effect method that updates the information state and returns true if successful.
 	 * Removes grin links between input and any contributions grounded in it.
 	 * Also re-grounds previous input.
-	 * @true if successful
+	 * @return true if successful
 	 */
 	@Override
 	public boolean unintegrateNextInput() {
@@ -402,7 +401,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 * Integrates the current contribution with the next input if possible.
 	 * Clears next input and integrated and visited contributions list to restart the
 	 * search with new input.
-	 * @true if successful
+	 * @return true if successful
 	 */
 	@Override
 	public boolean integrateNextInput() {
@@ -462,7 +461,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
 	 * Ground contributions grounded-in any last output in current 'yes' input.
-	 * @true if successful
+	 * @return true if successful
 	 */
 	@Override
 	public boolean integrateYesEllipsis() {
@@ -489,7 +488,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
 	 * Revokes last output and grin links to any contributions it grounds.
-	 * @true if successful
+	 * @return true if successful
 	 */
 	@Override
 	public boolean integrateNoEllipsis() { 
@@ -531,7 +530,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
-	 * @true if successful
+	 * @return true if successful
 	 */
 	@Override
 	public boolean clarifyNextInput() {
@@ -549,7 +548,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * An Effect method that updates the information state and returns true if successful.
-	 * @true if successful
+	 * @return true if successful
 	 */
 	@Override
 	public boolean requestMoreInfoAboutFocus() {
