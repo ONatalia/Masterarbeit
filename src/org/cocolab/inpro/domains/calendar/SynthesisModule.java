@@ -17,6 +17,8 @@ public class SynthesisModule extends IUModule {
 
 	DispatchStream speechDispatcher;
 //	DispatchStream noiseDispatcher;
+	
+	ArrayList<PhraseIU> upcomingPhrases;
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
@@ -24,36 +26,67 @@ public class SynthesisModule extends IUModule {
 		speechDispatcher = SimpleMonitor.setupDispatcher();
 	}
 	
+	public void run() {
+		while(true) {
+			boolean empty;
+			synchronized (upcomingPhrases) {
+				empty = upcomingPhrases.isEmpty();
+			}
+			if (!empty) {
+				PhraseIU iu;
+				synchronized (upcomingPhrases) {
+					iu = upcomingPhrases.remove(0);
+				}
+				System.out.println("iTTS: " + iu.toPayLoad() + " (" + iu.status + ")");
+				try { Thread.sleep(1000);} catch (InterruptedException e) {}
+				iu.notifyListeners();
+			}
+			try { Thread.sleep(1000);} catch (InterruptedException e) {}
+		}
+	}
+	
 	@Override
 	protected void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
+		
 		for (EditMessage<?> em : edits) {
+			PhraseIU iu = (PhraseIU) em.getIU();
 			switch (em.getType()) {
 			case ADD:
-				System.err.println("I should append " + em.getIU().toPayLoad() + " to what I'm saying.");
+				System.err.println("ADD " + iu.toPayLoad() + " (" + iu.status + ")");
+				synchronized (upcomingPhrases) {
+					upcomingPhrases.add(iu);
+				}
 				break;
 			case REVOKE:
-				System.err.println("I should NOT say " + em.getIU().toPayLoad());
+				System.err.println("   REVOKE " + iu.toPayLoad() + " (" + iu.status + ")");
+				synchronized (upcomingPhrases) {
+					upcomingPhrases.remove(iu);
+				}
 				break;
 			}
 		}
 	}
+	
+	public SynthesisModule() {
+		upcomingPhrases = new ArrayList<PhraseIU>();
+	}
 
 	/**
 	 * @param args
-	 */
+	 *
 	public static void main(String[] args) {
 		SynthesisModule sm = new SynthesisModule();
 		List<PhraseIU> phrases = new ArrayList<PhraseIU>();
-		phrases.add(new PhraseIU("Hallo Timo", PhraseIU.PhraseType.INITIAL));
+		phrases.add(new PhraseIU("Hallo Timo", PhraseIU.PhraseStatus.NORMAL));
 		sm.rightBuffer.setBuffer(phrases);
 		sm.rightBuffer.notify(sm);
-		phrases.add(new PhraseIU("Wie geht's?", PhraseIU.PhraseType.CONTINUATION));
+		phrases.add(new PhraseIU("Wie geht's?", PhraseIU.PhraseStatus.PROJECTED));
 		sm.rightBuffer.setBuffer(phrases);
 		sm.rightBuffer.notify(sm);
 		phrases.remove(1);
 		sm.rightBuffer.setBuffer(phrases);
 		sm.rightBuffer.notify(sm);		
-	}
+	}*/
 
 }
