@@ -45,10 +45,10 @@ public class SynthesisModule extends IUModule {
 	public static void main(String[] args) {
 		SynthesisModule sm = new SynthesisModule();
 		List<PhraseIU> phrases = new ArrayList<PhraseIU>();
-		phrases.add(new PhraseIU());
+		phrases.add(new PhraseIU("Hallo Timo", PhraseIU.PhraseType.INITIAL));
 		sm.rightBuffer.setBuffer(phrases);
 		sm.rightBuffer.notify(sm);
-		phrases.add(new PhraseIU());
+		phrases.add(new PhraseIU("Wie geht's?", PhraseIU.PhraseType.CONTINUATION));
 		sm.rightBuffer.setBuffer(phrases);
 		sm.rightBuffer.notify(sm);
 		phrases.remove(1);
