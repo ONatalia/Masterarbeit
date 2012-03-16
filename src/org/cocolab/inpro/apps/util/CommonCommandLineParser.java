@@ -11,6 +11,7 @@ public abstract class CommonCommandLineParser {
 	public static final int RTP_INPUT = 3;
 	public static final int OAA_DISPATCHER_INPUT = 4;
 	public static final int DISPATCHER_OBJECT_INPUT = 64;
+	public static final int DISPATCHER_OBJECT_2_INPUT = 128;
 	
 	public static final int NO_OUTPUT = 0;
 	public static final int OAA_OUTPUT = 1;

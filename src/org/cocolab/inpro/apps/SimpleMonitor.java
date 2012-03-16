@@ -1,6 +1,5 @@
 package org.cocolab.inpro.apps;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -86,6 +85,10 @@ public class SimpleMonitor implements RtpListener {
 			case CommonCommandLineParser.DISPATCHER_OBJECT_INPUT:
 				streamDrainer = createDispatcherSource("dispatchStream");
 				new Thread(streamDrainer, "dispatcher object source").start();
+			break;
+			case CommonCommandLineParser.DISPATCHER_OBJECT_2_INPUT:
+				streamDrainer = createDispatcherSource("dispatchStream2");
+				new Thread(streamDrainer, "dispatcher object source 2").start();
 			break;
 			case CommonCommandLineParser.MICROPHONE_INPUT:
 				streamDrainer = createMicrophoneSource();

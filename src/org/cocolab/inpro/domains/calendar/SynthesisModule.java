@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.cocolab.inpro.apps.SimpleMonitor;
+import org.cocolab.inpro.apps.util.CommonCommandLineParser;
+import org.cocolab.inpro.apps.util.MonitorCommandLineParser;
 import org.cocolab.inpro.audio.DispatchStream;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
@@ -14,43 +16,60 @@ import org.cocolab.inpro.incremental.unit.IU.Progress;
 import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
 import org.cocolab.inpro.tts.MaryAdapter;
 
+import edu.cmu.sphinx.util.props.ConfigurationManager;
+
 public class SynthesisModule extends IUModule {
 
 	DispatchStream speechDispatcher;
-//	DispatchStream noiseDispatcher;
+	DispatchStream noiseDispatcher;
 	
 	ArrayList<PhraseIU> upcomingPhrases;
 
 	public SynthesisModule() {
 		upcomingPhrases = new ArrayList<PhraseIU>();
+		noiseDispatcher = setupDispatcher2();
 		speechDispatcher = SimpleMonitor.setupDispatcher();
+
+		Thread t = new Thread() {
+			@Override
+			public void run() {
+				try {
+					System.out.println("sleeping for 5 seconds");
+					Thread.sleep(10000);
+					System.out.println("slept for 5 seconds");
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+				noiseDispatcher.playFile("file:/home/timo/uni/experimente/050_itts+inlg/audio/pinknoise.1750ms.wav", true);
+			}
+		};
+		t.start();
+		System.out.println("done setting up sleeper");
 		MaryAdapter.initializeMary(); // preload mary
 	}
 	
-	/* dummy TTS
-	public void run() {
-		while(true) {
-			boolean empty;
-			synchronized (upcomingPhrases) {
-				empty = upcomingPhrases.isEmpty();
-			}
-			if (!empty) {
-				PhraseIU iu;
-				synchronized (upcomingPhrases) {
-					iu = upcomingPhrases.remove(0);
-				}
-				System.out.println("iTTS: " + iu.toPayLoad() + " (" + iu.status + ")");
-				try { Thread.sleep(1000);} catch (InterruptedException e) {}
-				iu.notifyListeners();
-			}
-			try { Thread.sleep(1000);} catch (InterruptedException e) {}
+	/* wow, this is ugly. but oh well... */
+	public static DispatchStream setupDispatcher2() {
+		ConfigurationManager cm = new ConfigurationManager(SimpleMonitor.class.getResource("config.xml"));
+		MonitorCommandLineParser clp = new MonitorCommandLineParser(new String[] {
+				"-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
+			});
+		clp.setInputMode(CommonCommandLineParser.DISPATCHER_OBJECT_2_INPUT);
+		try {
+			new SimpleMonitor(clp, cm);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-	}*/
+		return (DispatchStream) cm.lookup("dispatchStream2");
+	}
 	
+
 	@Override
 	protected void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
-		
 		for (EditMessage<?> em : edits) {
 			final PhraseIU phraseIU = (PhraseIU) em.getIU();
 			switch (em.getType()) {
@@ -69,6 +88,7 @@ public class SynthesisModule extends IUModule {
 				System.err.println("ADD " + phraseIU.toPayLoad() + " (" + phraseIU.status + ")");
 				break;
 			case REVOKE:
+				System.out.println("   REVOKE " + phraseIU.toPayLoad() + " (" + phraseIU.status + ")");
 				System.err.println("   REVOKE " + phraseIU.toPayLoad() + " (" + phraseIU.status + ")");
 				break;
 			}

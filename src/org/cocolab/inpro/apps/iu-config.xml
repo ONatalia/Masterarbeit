@@ -146,3 +146,8 @@
     <component name="dispatchStream" type="org.cocolab.inpro.audio.DispatchStream">
         <property name="sendSilence" value="true"/>
     </component>
+
+    <component name="dispatchStream2" type="org.cocolab.inpro.audio.DispatchStream">
+        <property name="sendSilence" value="true"/>
+    </component>
+    
