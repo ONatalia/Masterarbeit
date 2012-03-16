@@ -9,9 +9,10 @@ import org.cocolab.inpro.audio.DispatchStream;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
-
-import edu.cmu.sphinx.util.props.PropertyException;
-import edu.cmu.sphinx.util.props.PropertySheet;
+import org.cocolab.inpro.incremental.unit.IU.IUUpdateListener;
+import org.cocolab.inpro.incremental.unit.IU.Progress;
+import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
+import org.cocolab.inpro.tts.MaryAdapter;
 
 public class SynthesisModule extends IUModule {
 
@@ -20,12 +21,13 @@ public class SynthesisModule extends IUModule {
 	
 	ArrayList<PhraseIU> upcomingPhrases;
 
-	@Override
-	public void newProperties(PropertySheet ps) throws PropertyException {
-		super.newProperties(ps);
+	public SynthesisModule() {
+		upcomingPhrases = new ArrayList<PhraseIU>();
 		speechDispatcher = SimpleMonitor.setupDispatcher();
+		MaryAdapter.initializeMary(); // preload mary
 	}
 	
+	/* dummy TTS
 	public void run() {
 		while(true) {
 			boolean empty;
@@ -43,35 +45,36 @@ public class SynthesisModule extends IUModule {
 			}
 			try { Thread.sleep(1000);} catch (InterruptedException e) {}
 		}
-	}
+	}*/
 	
 	@Override
 	protected void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		
 		for (EditMessage<?> em : edits) {
-			PhraseIU iu = (PhraseIU) em.getIU();
+			final PhraseIU phraseIU = (PhraseIU) em.getIU();
 			switch (em.getType()) {
 			case ADD:
-				System.err.println("ADD " + iu.toPayLoad() + " (" + iu.status + ")");
-				synchronized (upcomingPhrases) {
-					upcomingPhrases.add(iu);
-				}
+				IncrSysInstallmentIU instIU = new IncrSysInstallmentIU(phraseIU.toPayLoad());
+				instIU.getFinalWord().getLastSegment().addUpdateListener(new IUUpdateListener() {
+					@Override
+					public void update(IU updatedIU) {
+						if (updatedIU.isOngoing()) {
+							phraseIU.setProgress(Progress.COMPLETED);
+						}
+					}
+				});
+				speechDispatcher.playStream(instIU.getAudio(), false);
+				phraseIU.setProgress(Progress.ONGOING);
+				System.err.println("ADD " + phraseIU.toPayLoad() + " (" + phraseIU.status + ")");
 				break;
 			case REVOKE:
-				System.err.println("   REVOKE " + iu.toPayLoad() + " (" + iu.status + ")");
-				synchronized (upcomingPhrases) {
-					upcomingPhrases.remove(iu);
-				}
+				System.err.println("   REVOKE " + phraseIU.toPayLoad() + " (" + phraseIU.status + ")");
 				break;
 			}
 		}
 	}
 	
-	public SynthesisModule() {
-		upcomingPhrases = new ArrayList<PhraseIU>();
-	}
-
 	/**
 	 * @param args
 	 *

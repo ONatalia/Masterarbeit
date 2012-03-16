@@ -38,8 +38,8 @@ public class GenerationModule extends IUModule {
 		@Override
 		public synchronized void update(IU updatedIU) {
 			String projectedPhrase;
-			//System.out.println("update called");
-			//if (updatedIU.isCompleted()) { // should be isCompleted()
+			System.out.println("update called");
+			if (updatedIU.isCompleted()) { // should be isCompleted()
 				
 				if (AdaptionManager.getInstance().hasChanged()) {
 					phrases.remove(phrases.size() - 1);
@@ -69,25 +69,27 @@ public class GenerationModule extends IUModule {
 				}				
 				rightBuffer.setBuffer(phrases);
 				rightBuffer.notify(iulisteners);
-			//}
+			}
 		}
 	};
 		
+	/** only called on startup  */
 	public void generate() {
 		String phrase = nlg.generateNextPhrase();
 		System.out.println("   INITIAL: " + phrase);
 		PhraseIU piu = new PhraseIU(phrase, PhraseIU.PhraseStatus.NORMAL, PhraseIU.PhraseType.INITIAL);
-		piu.addUpdateListener(phraseUpdateListener);
 		phrases.add(piu);
 		
 		String projectedPhrase = nlg.simulateNextButOnePhrase();
 		System.out.println("   INITIAL PROJECTION: " + projectedPhrase);
 		PhraseIU ppiu = new PhraseIU(projectedPhrase, PhraseIU.PhraseStatus.PROJECTED);
-		//ppiu.addUpdateListener(phraseUpdateListener);
 		phrases.add(ppiu);
 		
 		rightBuffer.setBuffer(phrases);
 		rightBuffer.notify(iulisteners);
+		piu.addUpdateListener(phraseUpdateListener);
+		ppiu.addUpdateListener(phraseUpdateListener);
+		System.out.println("generate is done");
 	}
 	
 	
@@ -97,15 +99,9 @@ public class GenerationModule extends IUModule {
 	public static void main(String[] args) throws FileNotFoundException, ParseException {
 		SpudManager spudmanager = new SpudManager(
 				new CalendarKnowledgeInterface(),
-				"/Users/hendrik/Projects/JavaSPUD-bdosch-msc/src/scalendar/calendar.gs");
+				"src/org/cocolab/inpro/domains/calendar/calendar.gs");
 		GenerationModule gm = new GenerationModule(spudmanager);
 		final SynthesisModule sm = new SynthesisModule();
-		Thread t = new Thread() {
-			public void run() {
-				sm.run();
-			}
-		};
-		t.start();
 
 		gm.iulisteners = new ArrayList<PushBuffer>();
 		gm.iulisteners.add(sm);

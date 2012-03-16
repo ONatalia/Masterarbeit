@@ -10,6 +10,7 @@ public class EditMessage<IUType extends IU> {
 		this.iu = iu;
 	}
 	
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder(type.toString());
 		sb.append("(");

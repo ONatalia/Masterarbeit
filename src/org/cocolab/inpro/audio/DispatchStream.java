@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -28,7 +28,7 @@ import edu.cmu.sphinx.util.props.S4Boolean;
 import edu.cmu.sphinx.util.props.S4Component;
 
 /**
- * WARNING: there may be threading issues in this class
+ * WARNING: there ARE threading issues with this class
  * 
  * TODO: would it be nice to directly output SysInstallmentIUs? --> yes, indeed.
  * @author timo
@@ -49,7 +49,7 @@ public class DispatchStream extends InputStream implements Configurable {
 	private static Map<String, String> ttsCache = new HashMap<String, String>();
 
 	InputStream stream;
-	Queue<InputStream> streamQueue = new ArrayDeque<InputStream>();
+	Queue<InputStream> streamQueue = new ConcurrentLinkedQueue<InputStream>();
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
@@ -188,15 +188,15 @@ public class DispatchStream extends InputStream implements Configurable {
 	
 	protected void addStream(InputStream is) {
 		logger.info("adding stream to queue: " + is);
-		synchronized(this) {
+		//synchronized(this) {
 			if (stream != null) {
-				if (streamQueue.isEmpty())
+				//if (streamQueue.isEmpty())
 					streamQueue.add(is);
 			} else {
 				setIsTalking();
 				stream = is;
 			}
-		}
+		//}
 	}
 	
 	public void clearStream() {
