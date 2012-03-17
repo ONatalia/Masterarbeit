@@ -260,7 +260,7 @@ subject lr(st([cat: s],
 //** DetectedConflict
 
 intro lr(st([cat: s],
-		<lst(der),lst(termin)>),
+		<lst(dieser),lst(hochinteressante),lst(termin)>),
 		comp,
 		<>,
 		<cintro(E)>,

@@ -25,28 +25,28 @@ public class SynthesisModule extends IUModule {
 	
 	ArrayList<PhraseIU> upcomingPhrases;
 
+	IncrSysInstallmentIU currentInstallment;
+	
 	public SynthesisModule() {
 		upcomingPhrases = new ArrayList<PhraseIU>();
 		noiseDispatcher = setupDispatcher2();
 		speechDispatcher = SimpleMonitor.setupDispatcher();
-
+		// to be replaced by more realistic noise handling
 		Thread t = new Thread() {
 			@Override
 			public void run() {
 				try {
-					System.out.println("sleeping for 5 seconds");
-					Thread.sleep(10000);
-					System.out.println("slept for 5 seconds");
+					System.out.println("sleeping for 15 seconds");
+					Thread.sleep(15000);
+					System.out.println("slept for 15 seconds");
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					throw new RuntimeException(e);
 				}
-				noiseDispatcher.playFile("file:/home/timo/uni/experimente/050_itts+inlg/audio/pinknoise.1750ms.wav", true);
+			//	noiseDispatcher.playFile("file:/home/timo/uni/experimente/050_itts+inlg/audio/pinknoise.1750ms.wav", true);
 			}
 		};
 		t.start();
-		System.out.println("done setting up sleeper");
 		MaryAdapter.initializeMary(); // preload mary
 	}
 	
@@ -65,32 +65,43 @@ public class SynthesisModule extends IUModule {
 		}
 		return (DispatchStream) cm.lookup("dispatchStream2");
 	}
-	
 
 	@Override
 	protected void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		for (EditMessage<?> em : edits) {
 			final PhraseIU phraseIU = (PhraseIU) em.getIU();
+			System.out.println("   " + em.getType() + " " + phraseIU.toPayLoad() + " (" + phraseIU.status + "; " + phraseIU.type + ")");
+			
 			switch (em.getType()) {
 			case ADD:
-				IncrSysInstallmentIU instIU = new IncrSysInstallmentIU(phraseIU.toPayLoad());
-				instIU.getFinalWord().getLastSegment().addUpdateListener(new IUUpdateListener() {
-					@Override
-					public void update(IU updatedIU) {
-						if (updatedIU.isOngoing()) {
-							phraseIU.setProgress(Progress.COMPLETED);
-						}
-					}
-				});
-				speechDispatcher.playStream(instIU.getAudio(), false);
+				if (phraseIU.type == PhraseIU.PhraseType.UNDEFINED && currentInstallment.isOngoing()) {
+					String fullPhrase = currentInstallment.toPayLoad() + phraseIU.toPayLoad();
+					currentInstallment.addAlternativeVariant(fullPhrase);
+				} else { // start a new installment
+					currentInstallment = new IncrSysInstallmentIU(phraseIU.toPayLoad());
+					currentInstallment.getFinalWord()
+									  .getLastSegment()
+									  .addUpdateListener(new NotifyCompletedOnOngoing(phraseIU));
+					speechDispatcher.playStream(currentInstallment.getAudio(), false);
+				}
 				phraseIU.setProgress(Progress.ONGOING);
-				System.err.println("ADD " + phraseIU.toPayLoad() + " (" + phraseIU.status + ")");
 				break;
 			case REVOKE:
-				System.out.println("   REVOKE " + phraseIU.toPayLoad() + " (" + phraseIU.status + ")");
-				System.err.println("   REVOKE " + phraseIU.toPayLoad() + " (" + phraseIU.status + ")");
 				break;
+			}
+		}
+	}
+	
+	private class NotifyCompletedOnOngoing implements IUUpdateListener {
+		PhraseIU completed;
+		NotifyCompletedOnOngoing(PhraseIU notify) {
+			completed = notify;
+		}
+		@Override
+		public void update(IU updatedIU) {
+			if (updatedIU.isOngoing()) {
+				completed.setProgress(Progress.COMPLETED);
 			}
 		}
 	}

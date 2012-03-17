@@ -11,11 +11,17 @@ public class PhraseIU extends IU {
 	Progress progress = Progress.UPCOMING;
 	
 	public enum PhraseType {
-	    INITIAL, CONTINUATION, REPAIR, FINAL, UNDEFINED
+	    INITIAL, // the first phrase in the utterance
+	    CONTINUATION, // continues the previous phrase 
+	    REPAIR, // correction of the previous phrase
+	    FINAL, // last phrase of the utterance <-- this is not exclusive with e.g. continuation,initial,repair,
+	    	   // unlike the other types this describes the end of the phrase, not the beginning 
+	    UNDEFINED // dunno
 	}
 	
 	public enum PhraseStatus {
-	    NORMAL, PROJECTED
+	    NORMAL, // currently spoken/to be spoken next
+	    PROJECTED // the next phrase, just as context for the currently ongoing phrase 
 	}
 	
 	public PhraseIU(String phrase, PhraseStatus status) {
