@@ -10,6 +10,7 @@ import org.cocolab.inpro.apps.util.MonitorCommandLineParser;
 import org.cocolab.inpro.audio.DispatchStream;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
+import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IU.IUUpdateListener;
 import org.cocolab.inpro.incremental.unit.IU.Progress;
@@ -50,7 +51,7 @@ public class SynthesisModule extends IUModule {
 		MaryAdapter.initializeMary(); // preload mary
 	}
 	
-	/* wow, this is ugly. but oh well... */
+	/* wow, this is ugly. but oh well ... as long as it works */
 	public static DispatchStream setupDispatcher2() {
 		ConfigurationManager cm = new ConfigurationManager(SimpleMonitor.class.getResource("config.xml"));
 		MonitorCommandLineParser clp = new MonitorCommandLineParser(new String[] {
@@ -70,25 +71,32 @@ public class SynthesisModule extends IUModule {
 	protected void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		for (EditMessage<?> em : edits) {
-			final PhraseIU phraseIU = (PhraseIU) em.getIU();
-			System.out.println("   " + em.getType() + " " + phraseIU.toPayLoad() + " (" + phraseIU.status + "; " + phraseIU.type + ")");
-			
-			switch (em.getType()) {
-			case ADD:
-				if (phraseIU.type == PhraseIU.PhraseType.UNDEFINED && currentInstallment.isOngoing()) {
-					String fullPhrase = currentInstallment.toPayLoad() + phraseIU.toPayLoad();
-					currentInstallment.addAlternativeVariant(fullPhrase);
-				} else { // start a new installment
-					currentInstallment = new IncrSysInstallmentIU(phraseIU.toPayLoad());
-					currentInstallment.getFinalWord()
-									  .getLastSegment()
-									  .addUpdateListener(new NotifyCompletedOnOngoing(phraseIU));
-					speechDispatcher.playStream(currentInstallment.getAudio(), false);
+			if (em.getIU() instanceof PhraseIU) {
+				final PhraseIU phraseIU = (PhraseIU) em.getIU();
+				System.out.println("   " + em.getType() + " " + phraseIU.toPayLoad() + " (" + phraseIU.status + "; " + phraseIU.type + ")");
+				
+				switch (em.getType()) {
+				case ADD:
+					if (phraseIU.type == PhraseIU.PhraseType.UNDEFINED && currentInstallment.isOngoing()) {
+						String fullPhrase = currentInstallment.toPayLoad() + phraseIU.toPayLoad();
+						currentInstallment.addAlternativeVariant(fullPhrase);
+					} else { // start a new installment
+						currentInstallment = new IncrSysInstallmentIU(phraseIU.toPayLoad());
+						currentInstallment.getFinalWord()
+										  .getLastSegment()
+										  .addUpdateListener(new NotifyCompletedOnOngoing(phraseIU));
+						speechDispatcher.playStream(currentInstallment.getAudio(), false);
+					}
+					phraseIU.setProgress(Progress.ONGOING);
+					break;
+				case REVOKE:
+					break;
 				}
-				phraseIU.setProgress(Progress.ONGOING);
-				break;
-			case REVOKE:
-				break;
+			} else if (em.getIU() instanceof NoiseIU){
+				if (em.getType() == EditType.ADD) {
+				noiseDispatcher.playFile("file:/home/timo/uni/experimente/050_itts+inlg/audio/pinknoise.1750ms.wav", true);
+				// is it automatically set to committed?
+				// is playing done asynchronously?
 			}
 		}
 	}

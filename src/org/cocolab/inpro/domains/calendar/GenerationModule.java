@@ -42,6 +42,7 @@ public class GenerationModule extends IUModule {
 			if (updatedIU.isCompleted()) { // should be isCompleted()
 				
 				if (AdaptionManager.getInstance().hasChanged()) {
+					System.out.println("*************** CHANGE ****************");
 					phrases.remove(phrases.size() - 1);
 					String phrase = nlg.generateNextPhrase();
 					if (phrase != null) {
@@ -58,7 +59,7 @@ public class GenerationModule extends IUModule {
 					PhraseIU iu = phrases.get(phrases.size() - 1);
 					iu.status = PhraseIU.PhraseStatus.NORMAL;
 					iu.addUpdateListener(phraseUpdateListener);
-				}
+				} 	 
 				
 				if (projectedPhrase != null) {
 					PhraseIU ppiu = new PhraseIU(projectedPhrase, PhraseIU.PhraseStatus.PROJECTED);
@@ -76,12 +77,10 @@ public class GenerationModule extends IUModule {
 	/** only called on startup  */
 	public void generate() {
 		String phrase = nlg.generateNextPhrase();
-		System.out.println("   INITIAL: " + phrase);
 		PhraseIU piu = new PhraseIU(phrase, PhraseIU.PhraseStatus.NORMAL, PhraseIU.PhraseType.INITIAL);
 		phrases.add(piu);
 		
 		String projectedPhrase = nlg.simulateNextButOnePhrase();
-		System.out.println("   INITIAL PROJECTION: " + projectedPhrase);
 		PhraseIU ppiu = new PhraseIU(projectedPhrase, PhraseIU.PhraseStatus.PROJECTED);
 		phrases.add(ppiu);
 		
@@ -99,7 +98,8 @@ public class GenerationModule extends IUModule {
 	public static void main(String[] args) throws FileNotFoundException, ParseException {
 		SpudManager spudmanager = new SpudManager(
 				new CalendarKnowledgeInterface(),
-				"src/org/cocolab/inpro/domains/calendar/calendar.gs");
+				//"src/org/cocolab/inpro/domains/calendar/calendar.gs");
+				"/Users/hendrik/Projects/JavaSPUD-bdosch-msc/src/scalendar/calendar.gs");
 		GenerationModule gm = new GenerationModule(spudmanager);
 		final SynthesisModule sm = new SynthesisModule();
 
@@ -117,7 +117,7 @@ public class GenerationModule extends IUModule {
 		}
 		final CalendarEvent event0 = new CalendarEvent("besprechung mit stefan",
 				new GregorianCalendar(year, month, day, 16, 0),1);
-		final CalendarEvent event1 = new CalendarEvent("flug nach iisland",
+		final CalendarEvent event1 = new CalendarEvent("flug nach island",
 				new GregorianCalendar(year, month,day, 16, 0), 2);
 		final List<CalendarEvent> events=new LinkedList<CalendarEvent>();
 		events.add(event0);
