@@ -71,7 +71,7 @@ public class MaryAdapter4internal extends MaryAdapter {
 	
 	@Override
 	public InputStream text2maryxml(String text) {
-		return getInputStreamFromMary(text, "TEXT", "REALISED_ACOUSTPARAMS");
+		return getInputStreamFromMary(text, "TEXT", "ACOUSTPARAMS");
 	}	
 
 	@Override

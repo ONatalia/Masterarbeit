@@ -507,15 +507,22 @@ public abstract class IU implements Comparable<IU> {
 	/** this has no effect if listener is already in the list of updatelisteners*/
 	public synchronized void addUpdateListener(IUUpdateListener listener) {
 		if (updateListeners == null)
-			updateListeners = new ArrayList<IUUpdateListener>();
+			updateListeners = Collections.synchronizedList(new ArrayList<IUUpdateListener>());
 		if (!updateListeners.contains(listener))
 			updateListeners.add(listener);
 	}
 	
 	public synchronized void notifyListeners() {
 		if (updateListeners != null)
-			for (IUUpdateListener listener : updateListeners) {
-				listener.update(this);
+			for (final IUUpdateListener listener : updateListeners) {
+				final IU that = this;
+				// why not spawn a new thread per notification to avoid deadlocks? live long and prosper!
+				(new Thread() {
+					@Override
+					public void run() {
+						listener.update(that);
+					}
+				}).start();
 			}
 	}
 	

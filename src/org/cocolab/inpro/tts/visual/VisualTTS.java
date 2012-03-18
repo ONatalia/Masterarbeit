@@ -292,6 +292,7 @@ public class VisualTTS extends JPanel {
 	 * @param args are ignored
 	 */
 	public static void main(String[] args) {
+		System.setProperty("inpro.tts.voice", "de6");
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				createAndShowGUI();
