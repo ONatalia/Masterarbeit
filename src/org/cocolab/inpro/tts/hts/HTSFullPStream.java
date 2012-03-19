@@ -19,7 +19,7 @@ public class HTSFullPStream extends FullPStream {
         this.mcepPst = mcepPst;
         this.strPst = strPst;
         this.magPst = magPst != null ? magPst : new EmptyHTSPStream();
-        this.lf0Pst = lf0Pst;
+        this.lf0Pst = lf0Pst != null ? lf0Pst : new EmptyHTSPStream();
         this.voiced = voiced;
         lf0indices = new int[voiced.length];
         for (int t = 0, vi = 0; t < voiced.length; t++) {
@@ -82,12 +82,16 @@ public class HTSFullPStream extends FullPStream {
     	private double[] emptyParVec = new double[] {};
     	
 		public EmptyHTSPStream() {
-			super(0, 0, 0, 0);
+			super(0, 0, null, 0);
 		}
 		
 		@Override
 		public double[] getParVec(int t) {
 			return emptyParVec;
+		}
+		
+		public double getPar(int i, int j) {
+		    return 0;
 		}
     	
     }

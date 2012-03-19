@@ -5,6 +5,13 @@ import java.util.List;
 
 import marytts.htsengine.HTSPStream;
 
+/**
+ * A stream of all Parameter Features ordered by time necessary for the vocoder.
+ * i.e., the data that Mary/HTS stores in paramtypes->time ordering re-organized for time->paramtypes access,
+ * (with paramtypes conveniently wrapped in  FullPFeatureFrames)
+ * which, surprise!, allows for incremental production of parameter features.
+ * @author timo
+ */
 public abstract class FullPStream {
 	
 	public static int FRAMES_PER_SECOND = 200;

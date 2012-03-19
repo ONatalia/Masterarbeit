@@ -20,6 +20,7 @@ import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.cocolab.inpro.tts.hts.FullPStream;
 import org.cocolab.inpro.tts.hts.HTSFullPStream;
 import org.cocolab.inpro.tts.hts.InteractiveHTSEngine;
+import org.cocolab.inpro.tts.hts.PHTSParameterGeneration;
 
 import marytts.datatypes.MaryData;
 import marytts.datatypes.MaryDataType;
@@ -58,14 +59,14 @@ public class MaryAdapter4internal extends MaryAdapter {
 	    maryxml2audio(maryxml); // after this call, htsData should be correctly set
 	    ihtse.synthesizeAudio = true;
 	    ihtse.setSegmentIUs(null);
-		return new HTSFullPStream(pdl.htsData);
+	    return pdl.pstream;
 	}
 	
-	class KeepingOneHTSParameterDataListener implements InteractiveHTSEngine.HTSParameterDataListener {
-		HTSParameterGeneration htsData = null;
+	class KeepingOneHTSParameterDataListener implements InteractiveHTSEngine.FullPStreamListener {
+		FullPStream pstream = null;
 		@Override
-		public void newParameterData(MaryData d, HTSParameterGeneration pdf2par) {
-			htsData = pdf2par;
+		public void newParameterData(MaryData d, FullPStream pstream) {
+			this.pstream = pstream;
 		}		
 	}
 	
