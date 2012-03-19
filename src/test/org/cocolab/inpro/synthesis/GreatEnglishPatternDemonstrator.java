@@ -1,6 +1,7 @@
 package test.org.cocolab.inpro.synthesis;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -70,10 +71,26 @@ public class GreatEnglishPatternDemonstrator extends PatternDemonstrator {
 	}
 
 	ButtonGroup colorGroup = new ButtonGroup();
-	JToggleButton colorButton(Color c, String name) {
+	JToggleButton colorButton(final Color c, final String name) {
 		InstallmentAction ia = new InstallmentAction(name, COLOR_POSITION);
 		installmentActions.add(ia);
-		JToggleButton b = new JToggleButton(ia);
+		JToggleButton b = new JToggleButton(ia) {
+			@Override
+			public void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				if (this.isSelected()) {
+					int w = getWidth();
+					int h = getHeight();
+					g.setColor(c); // selected color
+					g.fillRect(3, 3, w - 6, h - 6);
+					g.setColor(Color.darkGray); // selected foreground color
+					g.drawString(name,
+							(w - g.getFontMetrics().stringWidth(name)) / 2 + 1,
+							(h + g.getFontMetrics().getAscent()) / 2 - 1);
+				}
+			}
+
+		};
 		colorGroup.add(b);
 		b.setBackground(c);
 		return b;
