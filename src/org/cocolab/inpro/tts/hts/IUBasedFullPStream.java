@@ -23,16 +23,9 @@ public class IUBasedFullPStream extends FullPStream {
 
     @Override
 	public int getMaxT() {
+    	// equivalent to 100 ms
         return 20;
     	//return getTrueLength();
-    }
-    
-    public int getTrueLength() {
-    	int t = 0;
-    	while (hasFrame(t)) {
-    		t++;
-    	}
-    	return t;
     }
     
     @Override

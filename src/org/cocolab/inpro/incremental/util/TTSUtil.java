@@ -23,6 +23,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
+import marytts.htsengine.HTSModel;
+
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
@@ -33,7 +35,7 @@ import org.cocolab.inpro.tts.PitchMark;
 
 public class TTSUtil {
 	
-	public static List<WordIU> wordIUsFromMaryXML(InputStream is) throws JAXBException {
+	public static List<WordIU> wordIUsFromMaryXML(InputStream is, List<HTSModel> hmms) throws JAXBException {
 		JAXBContext context = JAXBContext.newInstance(Paragraph.class);
 		JAXBResult result = new JAXBResult(context);
 		TransformerFactory tf = TransformerFactory.newInstance();
@@ -54,7 +56,7 @@ public class TTSUtil {
 			throw new RuntimeException(te);
 		}
 		Paragraph paragraph = (Paragraph) result.getResult(); //unmarshaller.unmarshal(is);
-		return paragraph.getWordIUs();
+		return paragraph.getWordIUs(hmms.iterator());
 	}
 	
 	@XmlRootElement(name = "s")
@@ -77,11 +79,11 @@ public class TTSUtil {
 			words = newWords;
 		}
 		
-		public List<WordIU> getWordIUs() {
+		public List<WordIU> getWordIUs(Iterator<HTSModel> hmmIterator) {
 			List<WordIU> wordIUs = new ArrayList<WordIU>(words.size());
 			WordIU prev = null;
 			for (Word word : words) {
-				WordIU wordIU = word.toIU();
+				WordIU wordIU = word.toIU(hmmIterator);
 				wordIU.connectSLL(prev);
 				wordIUs.add(wordIU);
 				prev = wordIU;
@@ -126,11 +128,11 @@ public class TTSUtil {
 			return "; " + token + "\n" + ((segments != null) ? segments.toString() : "");
 		}
 		
-		public WordIU toIU() {
+		public WordIU toIU(Iterator<HTSModel> hmmIterator) {
 			List<IU> segmentIUs = new ArrayList<IU>(segments.size());
 			IU prev = null;
 			for (Segment s : segments) {
-				IU sIU = s.toIU();
+				IU sIU = s.toIU(hmmIterator);
 				sIU.setSameLevelLink(prev);
 				segmentIUs.add(sIU);
 				prev = sIU;
@@ -191,9 +193,15 @@ public class TTSUtil {
 			return sb.toString();
 		}
 		
-		public SysSegmentIU toIU() {
+		public SysSegmentIU toIU(Iterator<HTSModel> hmmIterator) {
 			Label l = new Label(endTime - (duration / 1000.0), endTime, sampaLabel);
-			return new SysSegmentIU(l, pitchMarks);
+			SysSegmentIU segIU = new SysSegmentIU(l, pitchMarks);
+			if (hmmIterator != null && hmmIterator.hasNext()) {
+				HTSModel hmm = hmmIterator.next();
+				assert (sampaLabel.equals(hmm.getPhoneName())) : " oups, wrong segment alignment: " + sampaLabel + " != " + hmm.getPhoneName();
+				segIU.setHTSModel(hmm);
+			}
+			return segIU;
 		}
 	}
 	
@@ -228,5 +236,5 @@ public class TTSUtil {
 		marshaller.marshal(paragraph, System.out);
 		System.out.println((new SysInstallmentIU(testUtterance)).deepToString());
 	}
-	
+
 }

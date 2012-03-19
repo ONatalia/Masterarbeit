@@ -1,16 +1,20 @@
 package org.cocolab.inpro.incremental.unit;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 
+import marytts.htsengine.HTSModel;
+
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.util.ResultUtil;
+import org.cocolab.inpro.tts.MaryAdapter4internal;
 import org.cocolab.inpro.tts.PitchMark;
 import org.cocolab.inpro.tts.hts.FullPFeatureFrame;
 import org.cocolab.inpro.tts.hts.FullPStream;
+import org.cocolab.inpro.tts.hts.PHTSParameterGeneration;
 
 public class SysSegmentIU extends SegmentIU {
 	
@@ -20,12 +24,15 @@ public class SysSegmentIU extends SegmentIU {
 	/** the label that was originally planned by TTS, before any stretching has been done */ 
 	Label originalLabel;
 	List<PitchMark> pitchMarks;
+	HTSModel htsModel = null;
 	List<FullPFeatureFrame> hmmSynthesisFeatures;
 	public double pitchShiftInCent = 0.0;
 	/** the state of delivery that this unit is in */
 	Progress progress = Progress.UPCOMING;
 	/** the number of frames that this segment has already been going on */
 	int realizedDurationInSynFrames = 0;
+	
+	boolean awaitContinuation; // used to mark that a continuation will follow, even though no fSLL exists yet.
 	
 	public SysSegmentIU(Label l, List<PitchMark> pitchMarks, List<FullPFeatureFrame> featureFrames) {
 		super(l);
@@ -81,7 +88,56 @@ public class SysSegmentIU extends SegmentIU {
 			return duration();
 	}
 	
+	/** adds fSLL, and allows continuation of synthesis */
+	@Override
+	public synchronized void addNextSameLevelLink(IU iu) {
+		super.addNextSameLevelLink(iu);
+		awaitContinuation = false;
+		notifyAll();
+	}
+	
+	// awaits the awaitContinuation field to be cleared
+	private synchronized void awaitContinuation() {
+		while (awaitContinuation) {
+			try { wait(); } catch (InterruptedException e) {}
+		}		
+	}
+	
+	/** helper, append HMM if possible, return emission length */
+	private static int appendSllHtsModel(List<HTSModel> hmms, IU sll) {
+		int length = 0;
+		if (sll != null && sll instanceof SysSegmentIU) {
+			HTSModel hmm = ((SysSegmentIU) sll).htsModel;
+			hmms.add(hmm);
+			length = hmm.getTotalDur();
+		}
+		return length;
+	}
+	
+	private static PHTSParameterGeneration paramGen = null;
+
+	// synthesizes 
+	private void generateParameterFrames() {
+		assert this.htsModel != null;
+		List<HTSModel> localHMMs = new ArrayList<HTSModel>(3);
+		int start = appendSllHtsModel(localHMMs, getSameLevelLink()); 
+		localHMMs.add(htsModel);
+		int length = htsModel.getTotalDur();
+		awaitContinuation();
+		appendSllHtsModel(localHMMs, getNextSameLevelLink());
+		// make sure we have a paramGenerator
+		if (paramGen == null) { paramGen = MaryAdapter4internal.getNewParamGen(); }
+		FullPStream pstream = paramGen.buildFullPStreamFor(localHMMs);
+		hmmSynthesisFeatures = new ArrayList<FullPFeatureFrame>(length);
+		for (int i = start; i < start + length; i++) {
+			hmmSynthesisFeatures.add(pstream.getFullFrame(i));
+		}
+	}
+	
 	public FullPFeatureFrame getHMMSynthesisFrame(int req) {
+		if (hmmSynthesisFeatures == null) {
+			generateParameterFrames();
+		}
 		assert req >= 0;
 		setProgress(Progress.ONGOING);
 		assert req < durationInSynFrames();
@@ -193,18 +249,11 @@ public class SysSegmentIU extends SegmentIU {
 	}
 
 	public boolean isVoiced() {
-		return (hmmSynthesisFeatures != null && hmmSynthesisFeatures.size() > 0) ? hmmSynthesisFeatures.get(hmmSynthesisFeatures.size() / 2 - 1).isVoiced() : false;
+		return htsModel != null && htsModel.getVoiced(3); // just assume that a segment is voiced if its center state is voiced 
 	}
 	
-	public double getFirstVoicedlf0() {
-		Iterator<FullPFeatureFrame> feats = hmmSynthesisFeatures.iterator();
-		while (feats.hasNext()) {
-			FullPFeatureFrame frame = feats.next();
-			if (frame.isVoiced()) {
-				return frame.getlf0Par();
-			}
-		}
-		return 0f;
+	public void setHTSModel(HTSModel hmm) {
+		htsModel = hmm;
 	}
 	
 }

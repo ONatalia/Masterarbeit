@@ -32,10 +32,6 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
      * however, this interface is totaly non-incremental and will have to be replaced soon 
      * */
     public void phtsIncrementalParameterGeneration(HTSUttModel um) throws Exception {
-        // find out what types of streams we're dealing with:
-        Set<FeatureType> features = htsData.getFeatureSet();
-        // original code does not deal with durations, so I explicitly remove DUR to make sure that it's never there; this might in fact not be necessary
-        features.remove(FeatureType.DUR);
         // foreach phone triplet
         // we start at 1 and end at max-1, because we're talking triplets
         int numModels = um.getNumUttModel() - 2;
@@ -44,7 +40,7 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
         	HTSModel prev = um.getUttModel(i - 1);
         	HTSModel curr = um.getUttModel(i);
         	HTSModel next = um.getUttModel(i + 1);
-        	FullPStream pstream = buildFullPStreamFor(Arrays.asList(prev, curr, next), features);
+        	FullPStream pstream = buildFullPStreamFor(Arrays.asList(prev, curr, next));
             // copy center phone's data to output
         	// handle first HMM: also copy data for i-1 to output
         	int startFrame = (i == 1) ? 0 : prev.getTotalDur();
@@ -58,6 +54,14 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
         	hmms.add(um.getUttModel(i));
         }
         outputFeatureStream = buildFullPStreamFor(hmms, features, htsData); /**/
+    }
+    
+    public FullPStream buildFullPStreamFor(List<HTSModel> hmms) {
+        // find out what types of streams we're dealing with:
+        Set<FeatureType> features = htsData.getFeatureSet();
+        // original code does not deal with durations, so I explicitly remove DUR to make sure that it's never there; this might in fact not be necessary
+        features.remove(FeatureType.DUR);
+    	return buildFullPStreamFor(hmms, features);
     }
 
     /** 
@@ -73,6 +77,7 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
 			else
 				pStreamMap.put(type, calculateNormalStream(hmms, type));
 		}
+		Arrays.fill(voiced, false); // whisper is better than nothing
 		return new HTSFullPStream(pStreamMap.get(FeatureType.MCP), 
 								  pStreamMap.get(FeatureType.STR),
 								  pStreamMap.get(FeatureType.MAG),
@@ -127,7 +132,7 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
 			for (int state = 0; state < ms.getNumStates(); state++) {
 				// fill in data into pStream
 				if (hmm.getVoiced(state)) {
-				//	Arrays.fill(voiced, uttFrame, uttFrame + hmm.getDur(state), true);
+					Arrays.fill(voiced, uttFrame, uttFrame + hmm.getDur(state), true);
 					// handle boundaries between voiced/voiceless states
 					boolean boundary = !prevVoicing; // if the last state was voiceless and this one is voiced, we have a boundary  
 					for (int frame = 0; frame < hmm.getDur(state); frame++) {

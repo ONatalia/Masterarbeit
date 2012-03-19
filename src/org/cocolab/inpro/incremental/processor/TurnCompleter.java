@@ -258,7 +258,6 @@ public class TurnCompleter extends IUModule implements FrameAware {
 				if (holdingTime < OUTPUT_BUFFER_DELAY) {
 					logger.info("oups, I'm already starting late by " + holdingTime);
 				}
-				output.synthesize(); 
 				// TODO: actually play after the holding time is over
 				long duration = System.currentTimeMillis() - startTime; // in milliseconds
 				logger.info(output.getWords().get(0).toPayLoad() + " took " + duration + " milliseconds");

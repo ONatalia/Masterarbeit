@@ -21,7 +21,7 @@ public class HesitationIU extends WordIU implements IU.IUUpdateListener {
 		segs.get(0).stretch(4);
 		segs.get(1).stretch(8);
 		// that way we get many feature frames
-		protoHesitation.addFeatureStreamToSegmentIUs();
+		//protoHesitation.addFeatureStreamToSegmentIUs();
 		// shorten segments somewhat (we still have double the amount of frames to be able to lengthen the segment later on
 		for (IU seg : protoHesitation.getSegments()) {
 			((SysSegmentIU) seg).stretch(.5);
@@ -70,7 +70,7 @@ public class HesitationIU extends WordIU implements IU.IUUpdateListener {
 		hes = new HesitationIU(null);// HesitationIU(new SysSegmentIU(new Label(0.0, 0.1, "b"), Collections.<PitchMark>singletonList(new PitchMark("(0,100)"))));
 	//	dispatcher.playStream(new DDS16kAudioInputStream(new VocodingAudioStream(new IUBasedFullPStream(hes), true)), false);
 		IncrSysInstallmentIU installment = new IncrSysInstallmentIU("Am Ende der Straße <hes>");
-		installment.addFeatureStreamToSegmentIUs();
+		//installment.addFeatureStreamToSegmentIUs();
 		installment.appendContinuation((new IncrSysInstallmentIU("links")).getWords());
 		dispatcher.playStream(new DDS16kAudioInputStream(new VocodingAudioStream(new IUBasedFullPStream(installment), true)), false);
 		Thread.sleep(5000);

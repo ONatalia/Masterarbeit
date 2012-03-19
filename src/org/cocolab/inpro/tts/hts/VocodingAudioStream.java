@@ -221,16 +221,6 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
         double f0Shift = htsData.getF0Mean();
         double f0MeanOri = 0.0;
 
-//        int voicedFrames = 0;
-//        for(int t = 0; t < fullPStream.getMaxT(); t++) {
-//          FullPFeatureFrame frame = fullPStream.getFullFrame(t);
-//          if(frame.isVoiced()){  
-//            f0MeanOri = f0MeanOri + Math.exp(frame.getlf0Par());
-//            voicedFrames++;
-//          }
-//        }
-//        f0MeanOri = f0MeanOri / voicedFrames;
-     
         /* _______________________Synthesize speech waveforms_____________________ */
         /* generate Nperiod samples per mcepframe */
         int magSample = 1;

@@ -6,15 +6,11 @@ import java.util.List;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 
-import org.cocolab.inpro.incremental.unit.SysSegmentIU;
-import org.cocolab.inpro.tts.hts.util.SynthesisHeatMap;
-import org.cocolab.inpro.tts.hts.util.SynthesisHeatMapComparator;
 import org.w3c.dom.Element;
-
-import test.org.cocolab.inpro.synthesis.ITTSExperimenter;
 
 import marytts.datatypes.MaryData;
 import marytts.htsengine.HMMVoice;
+import marytts.htsengine.HTSModel;
 import marytts.htsengine.HTSParameterGeneration;
 import marytts.htsengine.HTSUttModel;
 import marytts.modules.HTSEngine;
@@ -26,18 +22,9 @@ import marytts.util.data.audio.DDSAudioInputStream;
 
 public class InteractiveHTSEngine extends HTSEngine {
 
-    final List<FullPStreamListener> parameterDataListeners = new ArrayList<FullPStreamListener>();
-    
-    public void registerParameterDataListener(FullPStreamListener pdl) {
-        parameterDataListeners.add(pdl);
-    }
-    
-    public void setParameterDataListener(FullPStreamListener pdl) {
-    	parameterDataListeners.clear();
-    	registerParameterDataListener(pdl);
-    }
-    
     public boolean synthesizeAudio = true; 
+    
+    public List<HTSModel> uttHMMs = null;
     
     @Override
     public MaryData process(MaryData d, List<Target> targetFeaturesList, List<Element> segmentsAndBoundaries, List<Element> tokensAndBoundaries)
@@ -52,22 +39,13 @@ public class InteractiveHTSEngine extends HTSEngine {
         /* Process label file of Mary context features and creates UttModel um */
         HTSUttModel um = processTargetList(targetFeaturesList, segmentsAndBoundaries, hmmv.getHMMData());
 
-        if (segments != null) {
-        	assert segments.size() <= um.getNumUttModel() : segments.size() + ">" + um.getNumUttModel();
-        	for (int i = 0; i < segments.size() && i < um.getNumUttModel(); i++) {
-        		double dur = um.getUttModel(i).getTotalDurMillisec() * 0.001;
-        		assert um.getUttModel(i).getPhoneName().equals(segments.get(i).toPayLoad()) : um.getUttModel(i).getPhoneName() + " ne " + segments; 
-        		SysSegmentIU seg = segments.get(i);
-        		if (seg.duration() != dur)
-        			logger.info("changing duration of segment from " + seg.duration() + " to " + dur);
-        		seg.setNewDuration(dur);
-        		// append Mary Target Data to syssegment:
-        		seg.setHTSModel(um.getUttModel(i));
-        	}
+        uttHMMs = new ArrayList<HTSModel>(um.getNumModel());
+        for (int i = 0; i < um.getNumModel(); i++) {
+        	uttHMMs.add(um.getUttModel(i));
         }
         
         // this can then later be done
-        /* Process UttModel */
+        /* Process UttModel * /
         PHTSParameterGeneration ipdf2par = new PHTSParameterGeneration(hmmv.getHMMData());
         // Generate sequence of speech parameter vectors, generate parameters out of sequence of pdf's  
         ipdf2par.phtsIncrementalParameterGeneration(um); /**/
@@ -117,22 +95,7 @@ public class InteractiveHTSEngine extends HTSEngine {
         if(tokensAndBoundaries != null)
             setRealisedProsody(tokensAndBoundaries, um);
 
-        for (FullPStreamListener pdl : parameterDataListeners) {
-        	if (ipdf2par instanceof PHTSParameterGeneration)
-        		pdl.newParameterData(d, ((PHTSParameterGeneration)ipdf2par).getFullPStream());
-        	else 
-        		pdl.newParameterData(d, new HTSFullPStream(ipdf2par));
-        }
         return output;
     }
     
-    List<SysSegmentIU> segments;
-    
-	public void setSegmentIUs(List<SysSegmentIU> segments) {
-		this.segments = segments;
-	}
-
-	public interface FullPStreamListener {
-        public void newParameterData(MaryData d, FullPStream pstream);
-    }
 }

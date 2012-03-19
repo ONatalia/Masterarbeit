@@ -10,13 +10,14 @@ import javax.sound.sampled.AudioInputStream;
 
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.Label;
+import org.cocolab.inpro.audio.DDS16kAudioInputStream;
 import org.cocolab.inpro.incremental.util.TTSUtil;
 import org.cocolab.inpro.tts.MaryAdapter;
-import org.cocolab.inpro.tts.MaryAdapter4internal;
 import org.cocolab.inpro.tts.PitchMark;
 import org.cocolab.inpro.tts.hts.FullPFeatureFrame;
 import org.cocolab.inpro.tts.hts.FullPStream;
 import org.cocolab.inpro.tts.hts.IUBasedFullPStream;
+import org.cocolab.inpro.tts.hts.VocodingAudioStream;
 
 /**
  * TODO: add support for canned audio (i.e. read from WAV and TextGrid, maybe even transparently)
@@ -25,8 +26,6 @@ import org.cocolab.inpro.tts.hts.IUBasedFullPStream;
 public class SysInstallmentIU extends InstallmentIU {
 	
 	Logger logger = Logger.getLogger(SysInstallmentIU.class);
-	
-	AudioInputStream synthesizedAudio;
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // allow cast from List<WordIU> to List<IU>
 	public SysInstallmentIU(String tts) {
@@ -38,9 +37,8 @@ public class SysInstallmentIU extends InstallmentIU {
 			tts = tts.replaceAll(" <hes>$", "");
 		} else 
 			addFinalHesitation = false;
-		InputStream is = MaryAdapter.getInstance().text2maryxml(tts);
 		try {
-			groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is);
+			groundedIn = MaryAdapter.getInstance().text2IUs(tts);
 			// remove utterance final silences
 			IU pred = groundedIn.get(groundedIn.size() - 1);
 			while (((WordIU) pred).isSilence) {
@@ -104,45 +102,12 @@ public class SysInstallmentIU extends InstallmentIU {
 		groundedIn = (List) newWords;
 	}
 	
-	public void synthesize() {
-		String maryXML = toMaryXML();
-		synthesizedAudio = MaryAdapter.getInstance().maryxml2audio(maryXML);
-	}
-	
 	/**
-	 * queries mary for the HMM parameter set for this utterance (based on getWords())
+	 * return the HMM parameter set for this utterance (based on getWords())
 	 */
-	public FullPStream generateFullPStream() {
-		String maryXML = toMaryXML();
-		logger.debug("generating pstream for " + maryXML);
-		assert MaryAdapter.getInstance() instanceof MaryAdapter4internal;
-		FullPStream pstream = ((MaryAdapter4internal) MaryAdapter.getInstance()).maryxml2hmmFeatures(getSegments(), maryXML);
-		logger.debug("resulting pstream has maxT=" + pstream.getMaxT());
-		return pstream;
-	}
-	
 	public FullPStream getFullPStream() {
 		return new IUBasedFullPStream(getInitialWord());
 	}
-	
-	public void addFeatureStreamToSegmentIUs() {
-		FullPStream stream = generateFullPStream();
-		List<SysSegmentIU> segments = getSegments();
-		// we keep the last segment separate to be able to change it's duration
-		int t = 0;
-		for (SysSegmentIU seg : segments) {
-			int frames = (int) ((seg.duration() * FullPStream.FRAMES_PER_SECOND) + 0.1);
-			seg.setHmmSynthesisFrames(stream.getFullFrames(t, frames));
-			t += frames;
-		//	System.err.println(seg.toLabelLine() + " gets " + frames + " frames.");
-		}
-		if (stream.hasNextFrame()) {
-			Logger l = Logger.getLogger(SysInstallmentIU.class);
-			l.warn("discarding some unclaimed frames, t=" + t + ", maxT=" + stream.getMaxT());
-			//assert t + 10 > stream.getMaxT() : "there are too many unassigned frames!";
-		}
-	}
-
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<SysSegmentIU> getSegments() {
@@ -163,7 +128,7 @@ public class SysInstallmentIU extends InstallmentIU {
 	}
 	
 	public AudioInputStream getAudio() {
-		return synthesizedAudio;
+		return new DDS16kAudioInputStream(new VocodingAudioStream(new IUBasedFullPStream(getInitialWord()), true));
 	}
 	
 	public String toMaryXML() {

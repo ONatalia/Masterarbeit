@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
 
-import org.apache.log4j.Logger;
 import org.cocolab.inpro.audio.DDS16kAudioInputStream;
 import org.cocolab.inpro.tts.hts.VocodingAudioStream;
 
@@ -18,11 +17,8 @@ import org.cocolab.inpro.tts.hts.VocodingAudioStream;
  */
 public class IncrSysInstallmentIU extends SysInstallmentIU {
 
-	private static Logger logger = Logger.getLogger(IncrSysInstallmentIU.class);
-	
 	public IncrSysInstallmentIU(String base) {
 		super(base);
-		this.addFeatureStreamToSegmentIUs();
 	}
 	
 	public IncrSysInstallmentIU(List<String> variants) {
@@ -34,7 +30,6 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
 	
 	public void addAlternativeVariant(String variant) {
 		SysInstallmentIU varInst = new SysInstallmentIU(variant);
-		varInst.addFeatureStreamToSegmentIUs();
 		WordIU commonWord = getInitialWord();
 		// variant word
 		WordIU varWord = varInst.getInitialWord();
@@ -61,7 +56,7 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
 			}
 			// now shift segment times for the variant to match that of the common root
 			SysSegmentIU firstVarSegment = (SysSegmentIU) varWord.getSegments().get(0);
-			SegmentIU lastCommonSegment = commonWord.getSegments().get(commonWord.getSegments().size() - 1);
+			SegmentIU lastCommonSegment = commonWord.getLastSegment();
 			firstVarSegment.shiftBy(lastCommonSegment.endTime() - firstVarSegment.startTime(), true);
 		}
 	}
@@ -71,6 +66,7 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
 		WordIU newFirstWord = words.get(0);
 		newFirstWord.connectSLL(oldLastWord);
 		groundedIn.addAll(words);
+/* TODO: pitch adaptation will have to be reworked
 		// adapt pitch
 		SysSegmentIU oldLastSegment = (SysSegmentIU) oldLastWord.getLastSegment();
 		while (oldLastSegment != null && !oldLastSegment.isVoiced()) {
@@ -80,8 +76,10 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
 		while (newFirstSegment != null && !newFirstSegment.isVoiced()) {
 			newFirstSegment = (SysSegmentIU) newFirstSegment.getNextSameLevelLink();
 		}
-		if (oldLastSegment != null && newFirstSegment != null)
-			oldLastSegment.attainPitch(newFirstSegment.getFirstVoicedlf0());
+		// attain previous IU's pitch for a smoother transition to the next
+		//if (oldLastSegment != null && newFirstSegment != null)
+		//	oldLastSegment.attainPitch(newFirstSegment.getFirstVoicedlf0());
+		 */
 	}
 	
 	public void reorderOptions(int wordIndex, final String newBestFollower) {

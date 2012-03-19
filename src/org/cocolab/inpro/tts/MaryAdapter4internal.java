@@ -14,17 +14,18 @@ import java.util.Locale;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
+import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
+import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.SysSegmentIU;
+import org.cocolab.inpro.incremental.util.TTSUtil;
 import org.cocolab.inpro.tts.hts.FullPStream;
-import org.cocolab.inpro.tts.hts.HTSFullPStream;
 import org.cocolab.inpro.tts.hts.InteractiveHTSEngine;
 import org.cocolab.inpro.tts.hts.PHTSParameterGeneration;
 
-import marytts.datatypes.MaryData;
 import marytts.datatypes.MaryDataType;
-import marytts.htsengine.HTSParameterGeneration;
+import marytts.htsengine.HMMVoice;
 import marytts.modules.ModuleRegistry;
 import marytts.modules.synthesis.Voice;
 import marytts.server.Mary;
@@ -50,30 +51,23 @@ public class MaryAdapter4internal extends MaryAdapter {
         Mary.startup();
 	}
 	
-	public FullPStream maryxml2hmmFeatures(List<SysSegmentIU> segments, String maryxml) {
-		KeepingOneHTSParameterDataListener pdl = new KeepingOneHTSParameterDataListener();
-		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class); 
-	    ihtse.setParameterDataListener(pdl);	
-	    ihtse.setSegmentIUs(segments);
-	    ihtse.synthesizeAudio = false;
-	    maryxml2audio(maryxml); // after this call, htsData should be correctly set
-	    ihtse.synthesizeAudio = true;
-	    ihtse.setSegmentIUs(null);
-	    return pdl.pstream;
-	}
-	
-	class KeepingOneHTSParameterDataListener implements InteractiveHTSEngine.FullPStreamListener {
-		FullPStream pstream = null;
-		@Override
-		public void newParameterData(MaryData d, FullPStream pstream) {
-			this.pstream = pstream;
-		}		
-	}
-	
 	@Override
-	public InputStream text2maryxml(String text) {
-		return getInputStreamFromMary(text, "TEXT", "ACOUSTPARAMS");
-	}	
+	public synchronized List<IU> text2IUs(String tts) throws JAXBException {
+		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class); 
+	    ihtse.synthesizeAudio = false;
+		InputStream is = text2maryxml(tts);
+	    ihtse.synthesizeAudio = true;
+		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, ihtse.uttHMMs);
+		// remove utterance final silences
+		return groundedIn;
+	}
+
+	public static PHTSParameterGeneration getNewParamGen() {
+        String defaultVoiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
+		Voice voice = Voice.getVoice(defaultVoiceName);
+		assert (voice instanceof HMMVoice);
+        return new PHTSParameterGeneration(((HMMVoice) voice).getHMMData());
+	}
 
 	@Override
 	protected ByteArrayOutputStream process(String query, String inputType, String outputType, String audioType) throws UnknownHostException, IOException {

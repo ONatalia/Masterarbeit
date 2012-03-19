@@ -7,11 +7,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
+import org.cocolab.inpro.incremental.unit.HesitationIU;
+import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.WordIU;
+import org.cocolab.inpro.incremental.util.TTSUtil;
 
 /**
  * our connection to mary; with support for versions 3.6 and 4.1
@@ -106,6 +112,13 @@ public abstract class MaryAdapter {
 		return bais;
 	}
 	
+	public List<IU> text2IUs(String tts) throws JAXBException {
+		InputStream is = text2maryxml(tts);
+		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, null);
+		// remove utterance final silences
+		return groundedIn;
+	}
+	
 	public AudioInputStream text2audio(String text) {
         return getAudioInputStreamFromMary(text, "TEXT");
 	}
@@ -115,7 +128,7 @@ public abstract class MaryAdapter {
 	}
 	
 	public InputStream text2maryxml(String text) {
-		return getInputStreamFromMary(text, "TEXT", "ACOUSTPARAMS");
+		return getInputStreamFromMary(text, "TEXT", "REALISED_ACOUSTPARAMS");
 	}
 	
 	public AudioInputStream mbrola2audio(String mbrola) {
