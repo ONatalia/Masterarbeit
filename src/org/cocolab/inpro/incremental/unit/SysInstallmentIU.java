@@ -1,6 +1,5 @@
 package org.cocolab.inpro.incremental.unit;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -11,7 +10,6 @@ import javax.sound.sampled.AudioInputStream;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.audio.DDS16kAudioInputStream;
-import org.cocolab.inpro.incremental.util.TTSUtil;
 import org.cocolab.inpro.tts.MaryAdapter;
 import org.cocolab.inpro.tts.PitchMark;
 import org.cocolab.inpro.tts.hts.FullPFeatureFrame;

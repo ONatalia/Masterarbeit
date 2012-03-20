@@ -212,7 +212,7 @@ public class SegmentModel {
 		l.addPitchMark(time, pitch);
 	}
 	
-	public void remove(SegmentBoundPitchMark pm) {
+	public static void remove(SegmentBoundPitchMark pm) {
 		if (pm != null) {
 			pm.owner.removePitchMark(pm);
 		}

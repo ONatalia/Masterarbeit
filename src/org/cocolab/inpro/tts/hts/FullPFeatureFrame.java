@@ -9,7 +9,7 @@ public class FullPFeatureFrame {
     private final double[] mcepParVec;
     private final double[] magParVec;
     private final double[] strParVec;
-    private final boolean voiced;
+    public final boolean voiced;
     private double lf0Par;
     
     public FullPFeatureFrame(double[] mcep, double[] mag, double[] str, boolean voiced, double lf0Par) {

@@ -96,6 +96,15 @@ public class SysSegmentIU extends SegmentIU {
 		notifyAll();
 	}
 	
+	/**
+	 * tell this segment that it will be followed by more input later on
+	 * @return whether a continuation is possible (i.e., the segment hasn't been completed yet
+	 */
+	public synchronized boolean setAwaitContinuation(boolean b) {
+		awaitContinuation = b;
+		return !isCompleted();
+	}
+	
 	// awaits the awaitContinuation field to be cleared
 	private synchronized void awaitContinuation() {
 		while (awaitContinuation) {
@@ -133,7 +142,7 @@ public class SysSegmentIU extends SegmentIU {
 		hmmSynthesisFeatures = new ArrayList<FullPFeatureFrame>(length);
 		for (int i = start; i < start + length; i++)
 			hmmSynthesisFeatures.add(pstream.getFullFrame(i));
-		assert htsModel.getNumVoiced() == pitchMarks.size();
+		//assert htsModel.getNumVoiced() == pitchMarks.size();
 	}
 	
 	public FullPFeatureFrame getHMMSynthesisFrame(int req) {
@@ -149,10 +158,16 @@ public class SysSegmentIU extends SegmentIU {
 		// just repeat/drop frames as necessary if the amount of frames available is not right
 		int frameNumber = (int) (req * (fra / (double) dur));
 		FullPFeatureFrame frame =  hmmSynthesisFeatures.get(frameNumber);
+		try { // übler hack!
 		if (frame != null && frame.isVoiced()) {
-			frameNumber = Math.min(frameNumber, pitchMarks.size() - 1); //FIXME: investigate why this is necessary
+			//FIXME: investigate why this is necessary
+			frameNumber = Math.max(0, Math.min(frameNumber, pitchMarks.size() - 1)); 
 			frame.setf0Par(pitchMarks.get(frameNumber).getPitch());
 			frame.shiftlf0Par(pitchShiftInCent);
+		} 
+		} catch (Exception e) {
+			// dann halt nicht!!
+			frame = new FullPFeatureFrame(frame.getMcepParVec(), frame.getMagParVec(), frame.getStrParVec(), false, 0);
 		}
 		if (req == dur - 1) { // last frame 
 			setProgress(Progress.COMPLETED);
@@ -261,5 +276,5 @@ public class SysSegmentIU extends SegmentIU {
 	public void setHTSModel(HTSModel hmm) {
 		htsModel = hmm;
 	}
-	
+
 }

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  */
 public class PitchMark {
 	final protected double position; // as a percentage
-	protected double pitch;
+	protected double pitch; // presumably in Hz
 
 	protected PitchMark(double position, double pitch) {
 		this.position = position;

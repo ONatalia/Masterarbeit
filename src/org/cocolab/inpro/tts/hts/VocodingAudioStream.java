@@ -436,6 +436,10 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
 
     @Override
     public int getData(double[] target, int targetPos, int length) {
+    	if (available() == 0) {
+    		try { Thread.sleep(2); // take it easy, buddy.
+			} catch (InterruptedException e) { e.printStackTrace();	}
+    	}
         int outputAmount = Math.min(available(), length);
         try {
             for (int i = 0; i < outputAmount; i++) {

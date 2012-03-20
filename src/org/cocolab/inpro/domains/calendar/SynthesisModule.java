@@ -4,24 +4,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.sound.sampled.AudioInputStream;
-
 import org.cocolab.inpro.apps.SimpleMonitor;
 import org.cocolab.inpro.apps.util.CommonCommandLineParser;
 import org.cocolab.inpro.apps.util.MonitorCommandLineParser;
-import org.cocolab.inpro.audio.DDS16kAudioInputStream;
 import org.cocolab.inpro.audio.DispatchStream;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.cocolab.inpro.incremental.unit.IU.IUUpdateListener;
 import org.cocolab.inpro.incremental.unit.IU.Progress;
 import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.tts.MaryAdapter;
-import org.cocolab.inpro.tts.hts.IUBasedFullPStream;
-import org.cocolab.inpro.tts.hts.VocodingAudioStream;
 
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 
@@ -67,22 +63,22 @@ public class SynthesisModule extends IUModule {
 				switch (em.getType()) {
 				case ADD:
 					if (currentInstallment != null && currentInstallment.isOngoing()) {
-						String fullPhrase = currentInstallment.toPayLoad() + phraseIU.toPayLoad();
 						WordIU choiceWord = currentInstallment.getFinalWord();
-						System.err.println("now trying: " + fullPhrase);
-						currentInstallment.addAlternativeVariant(fullPhrase);
-						currentInstallment.getFinalWord()
-										  .getLastSegment().getSameLevelLink().getSameLevelLink()
-										  .addUpdateListener(new NotifyCompletedOnOngoing(phraseIU));
-						if (!speechDispatcher.isSpeaking()) {
-							System.out.println("Rette was zu retten ist");
-							// dammit, synthesis was too slow
-							AudioInputStream continuation = 
-									new DDS16kAudioInputStream(
-										new VocodingAudioStream(
-										new IUBasedFullPStream(choiceWord.getNextSameLevelLink()), 
-									true));
-							speechDispatcher.playStream(continuation, true);
+						// mark the ongoing utterance as non-final, check whether there's still enough time
+						boolean canContinue = ((SysSegmentIU) choiceWord.getLastSegment()).setAwaitContinuation(true);
+						if (canContinue) {
+							String fullPhrase = currentInstallment.toPayLoad() + phraseIU.toPayLoad();
+							fullPhrase = fullPhrase.replaceAll(" <sil>", "");
+							currentInstallment.addAlternativeVariant(fullPhrase);
+							currentInstallment.getFinalWord()
+											  .getLastSegment().getSameLevelLink().getSameLevelLink()
+											  .addUpdateListener(new NotifyCompletedOnOngoing(phraseIU));
+						} else {
+							currentInstallment = new IncrSysInstallmentIU(phraseIU.toPayLoad());
+							currentInstallment.getFinalWord()
+											  .getLastSegment().getSameLevelLink().getSameLevelLink()
+											  .addUpdateListener(new NotifyCompletedOnOngoing(phraseIU));
+							speechDispatcher.playStream(currentInstallment.getAudio(), true);
 						}
 					} else { // start a new installment
 						currentInstallment = new IncrSysInstallmentIU(phraseIU.toPayLoad());

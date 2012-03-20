@@ -14,9 +14,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
-import org.cocolab.inpro.incremental.unit.HesitationIU;
 import org.cocolab.inpro.incremental.unit.IU;
-import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.incremental.util.TTSUtil;
 
 /**
@@ -114,6 +112,7 @@ public abstract class MaryAdapter {
 	
 	public List<IU> text2IUs(String tts) throws JAXBException {
 		InputStream is = text2maryxml(tts);
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, null);
 		// remove utterance final silences
 		return groundedIn;
