@@ -71,17 +71,19 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
 	private synchronized FullPStream buildFullPStreamFor(List<HTSModel> hmms, Set<FeatureType> features) {
 		HashMap<FeatureType, HTSPStream> pStreamMap = new HashMap<FeatureType, HTSPStream>();
 		for (FeatureType type : features) { // these could be submitted concurrently to an ExecutorService
-			if (type == FeatureType.LF0)
-				pStreamMap.put(type, calculateLF0Stream(hmms));
-				// calculateLF0Stream() also sets this.voiced[] to appropriate values
-			else
+			if (type == FeatureType.LF0) {
+				if (!htsData.getUseAcousticModels()) 
+					// FIXME: this is actually never called in our code, should be removed
+					pStreamMap.put(type, calculateLF0Stream(hmms));
+				else 
+					buildVoicingArray(hmms);
+			} else
 				pStreamMap.put(type, calculateNormalStream(hmms, type));
 		}
-		Arrays.fill(voiced, false); // whisper is better than nothing
 		return new HTSFullPStream(pStreamMap.get(FeatureType.MCP), 
 								  pStreamMap.get(FeatureType.STR),
 								  pStreamMap.get(FeatureType.MAG),
-								  null,//pStreamMap.get(FeatureType.LF0),
+								  pStreamMap.get(FeatureType.LF0),
 								  voiced);
 	}
 	
@@ -106,6 +108,24 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
 		boolean useGV = useGVperType(type);
 		pStream.mlpg(htsData, useGV);
 		return pStream;
+	}
+	
+	private void buildVoicingArray(List<HTSModel> hmms) {
+		CartTreeSet ms = htsData.getCartTreeSet();
+		int totalLength = 0;
+		for (HTSModel hmm : hmms) {
+			totalLength += hmm.getTotalDur();
+		}
+		voiced = new boolean[totalLength]; // automatically initialized to false
+		int uttFrame = 0; // count all frames
+		for (HTSModel hmm : hmms) {
+			for (int state = 0; state < ms.getNumStates(); state++) {
+				if (hmm.getVoiced(state))
+					Arrays.fill(voiced, uttFrame, uttFrame + hmm.getDur(state), true);
+				uttFrame += hmm.getDur(state);
+			}
+
+		}
 	}
 	
 	/** 

@@ -39,6 +39,7 @@ public class FullPFeatureFrame {
     	lf0Par = lf0;
     }
     
+    /** f0 in Hz */
     public void setf0Par(double f0) {
     	setlf0Par(Math.log(f0));
     }

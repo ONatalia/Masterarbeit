@@ -120,18 +120,20 @@ public class SysSegmentIU extends SegmentIU {
 	private void generateParameterFrames() {
 		assert this.htsModel != null;
 		List<HTSModel> localHMMs = new ArrayList<HTSModel>(3);
-		int start = appendSllHtsModel(localHMMs, getSameLevelLink()); 
+		int start = appendSllHtsModel(localHMMs, getSameLevelLink() != null ? getSameLevelLink().getSameLevelLink() : null); 
+		start += appendSllHtsModel(localHMMs, getSameLevelLink()); 
 		localHMMs.add(htsModel);
 		int length = htsModel.getTotalDur();
 		awaitContinuation();
 		appendSllHtsModel(localHMMs, getNextSameLevelLink());
+		appendSllHtsModel(localHMMs, getNextSameLevelLink() != null ? getNextSameLevelLink().getNextSameLevelLink() : null);
 		// make sure we have a paramGenerator
 		if (paramGen == null) { paramGen = MaryAdapter4internal.getNewParamGen(); }
 		FullPStream pstream = paramGen.buildFullPStreamFor(localHMMs);
 		hmmSynthesisFeatures = new ArrayList<FullPFeatureFrame>(length);
-		for (int i = start; i < start + length; i++) {
+		for (int i = start; i < start + length; i++)
 			hmmSynthesisFeatures.add(pstream.getFullFrame(i));
-		}
+		assert htsModel.getNumVoiced() == pitchMarks.size();
 	}
 	
 	public FullPFeatureFrame getHMMSynthesisFrame(int req) {
@@ -145,9 +147,13 @@ public class SysSegmentIU extends SegmentIU {
 		int dur = durationInSynFrames(); // the duration in frames (= the number of frames that should be there)
 		int fra = hmmSynthesisFeatures.size(); // the number of frames available
 		// just repeat/drop frames as necessary if the amount of frames available is not right
-		FullPFeatureFrame frame =  hmmSynthesisFeatures.get((int) (req * (fra / (double) dur)));
-		if (frame != null)
+		int frameNumber = (int) (req * (fra / (double) dur));
+		FullPFeatureFrame frame =  hmmSynthesisFeatures.get(frameNumber);
+		if (frame != null && frame.isVoiced()) {
+			frameNumber = Math.min(frameNumber, pitchMarks.size() - 1); //FIXME: investigate why this is necessary
+			frame.setf0Par(pitchMarks.get(frameNumber).getPitch());
 			frame.shiftlf0Par(pitchShiftInCent);
+		}
 		if (req == dur - 1) { // last frame 
 			setProgress(Progress.COMPLETED);
 //			logger.debug("completed " + deepToString());

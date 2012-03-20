@@ -21,11 +21,13 @@ public class HTSFullPStream extends FullPStream {
         this.magPst = magPst != null ? magPst : new EmptyHTSPStream();
         this.lf0Pst = lf0Pst != null ? lf0Pst : new EmptyHTSPStream();
         this.voiced = voiced;
-        lf0indices = new int[voiced.length];
-        for (int t = 0, vi = 0; t < voiced.length; t++) {
-            lf0indices[t] = vi;
-            if (voiced[t] && vi < lf0Pst.getT() - 1)
-                vi++;
+        if (voiced != null && lf0Pst != null) {
+	        lf0indices = new int[voiced.length];
+	        for (int t = 0, vi = 0; t < voiced.length; t++) {
+	            lf0indices[t] = vi;
+	            if (voiced[t] && vi < lf0Pst.getT() - 1)
+	                vi++;
+	        }
         }
     }
     
@@ -33,7 +35,11 @@ public class HTSFullPStream extends FullPStream {
 	public FullPFeatureFrame getFullFrame(int t) {
     	//assert t < getMaxT();
     	if (t < getMaxT()) {
-    		return new FullPFeatureFrame(mcepPst.getParVec(t), magPst.getParVec(t), strPst.getParVec(t), voiced[t], lf0Pst.getPar(lf0indices[t], 0));
+    		return new FullPFeatureFrame(mcepPst.getParVec(t), 
+    									 magPst.getParVec(t), 
+    									 strPst.getParVec(t), 
+    									 voiced != null ? voiced[t] : false, 
+    									 lf0indices != null ? lf0Pst.getPar(lf0indices[t], 0) : 0);
     	} else return null;
     }
     
