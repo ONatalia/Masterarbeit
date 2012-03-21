@@ -26,6 +26,9 @@ public class GenerationModule extends IUModule {
 
 	private SpudManager nlg;
 	private List<PhraseIU> phrases;
+	private int segmentToDisturb = -1;
+	
+	private NoiseThread noiseThread;
 	
 	public GenerationModule(SpudManager sm) {
 		this.nlg = sm;
@@ -39,8 +42,7 @@ public class GenerationModule extends IUModule {
 		public synchronized void update(IU updatedIU) {
 			String projectedPhrase;
 			System.out.println("update called");
-			if (updatedIU.isCompleted()) { // should be isCompleted()
-				
+			if (updatedIU == null || updatedIU.isCompleted()) { // should be isCompleted()
 				if (AdaptionManager.getInstance().hasChanged()) {
 					System.out.println("*************** CHANGE ****************");
 					phrases.remove(phrases.size() - 1);
@@ -92,14 +94,10 @@ public class GenerationModule extends IUModule {
 	}
 	
 	
-	
-	
-	
 	public static void main(String[] args) throws FileNotFoundException, ParseException {
 		SpudManager spudmanager = new SpudManager(
 				new CalendarKnowledgeInterface(),
-				//"src/org/cocolab/inpro/domains/calendar/calendar.gs");
-				"/Users/hendrik/Projects/JavaSPUD-bdosch-msc/src/scalendar/calendar.gs");
+				"src/org/cocolab/inpro/domains/calendar/calendar.gs");
 		GenerationModule gm = new GenerationModule(spudmanager);
 		final SynthesisModule sm = new SynthesisModule();
 
@@ -118,12 +116,18 @@ public class GenerationModule extends IUModule {
 		final CalendarEvent event0 = new CalendarEvent("besprechung mit stefan",
 				new GregorianCalendar(year, month, day, 16, 0),1);
 		final CalendarEvent event1 = new CalendarEvent("flug nach island",
-				new GregorianCalendar(year, month,day, 16, 0), 2);
+				new GregorianCalendar(year, month, day, 16, 0), 2);
 		final List<CalendarEvent> events=new LinkedList<CalendarEvent>();
 		events.add(event0);
 		events.add(event1);
 		gm.nlg.setUtteranceObject(new EventConflict(event0,event1));
+		//GenerateStimuli gs = new GenerateStimuli();
 		gm.generate();
+		NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), sm, gm.phraseUpdateListener);
+		nt.start();
+		//gm.nlg.clear();
+		//gm.nlg.setUtteranceObject(new EventConflict(event0,event1));
+		//gm.generate();
 	}
 	
 	

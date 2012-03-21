@@ -121,7 +121,7 @@ public class SynthesisModule extends IUModule {
 		noiseDispatcher.playFile(file, true);
 		// TODO: interrupt ongoing utterance 
 		// stop after ongoing word, 
-		//currentInstallment.stopAfterOngoingWord();
+		currentInstallment.stopAfterOngoingWord();
 		// (no need to keep reference to the ongoing utterance as we'll start a new one anyway)
 		currentInstallment = null; 
 	}
