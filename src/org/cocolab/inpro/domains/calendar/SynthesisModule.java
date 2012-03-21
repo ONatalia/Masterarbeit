@@ -15,16 +15,13 @@ import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.cocolab.inpro.incremental.unit.IU.IUUpdateListener;
 import org.cocolab.inpro.incremental.unit.IU.Progress;
-import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.tts.MaryAdapter;
 
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 
 /**
- * 
- * 
- * concurrency: 
+ * concurrency: playNoise() and update() are synchronized, so do not try to call them from the same thread 
  */
 
 public class SynthesisModule extends IUModule {
@@ -34,7 +31,7 @@ public class SynthesisModule extends IUModule {
 	
 	ArrayList<PhraseIU> upcomingPhrases;
 
-	IncrSysInstallmentIU currentInstallment;
+	PhraseBasedInstallmentIU currentInstallment;
 	
 	@SuppressWarnings("unused")
 	public SynthesisModule() {
@@ -43,6 +40,19 @@ public class SynthesisModule extends IUModule {
 		speechDispatcher = SimpleMonitor.setupDispatcher();
 		MaryAdapter.initializeMary(); // preload mary
 		new SysInstallmentIU("Ein Satz zum Aufwärmen der Optimierungsmethoden."); // preheat mary
+		final SynthesisModule that = this;
+/*		(new Thread() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				that.playNoise("file:/home/timo/uni/experimente/050_itts+inlg/audio/pinknoise.1000ms.wav");
+			}
+		}).start(); */
 	}
 	
 	/**
@@ -65,16 +75,18 @@ public class SynthesisModule extends IUModule {
 						String fullPhrase = currentInstallment.toPayLoad() + phraseIU.toPayLoad();
 						currentInstallment.addAlternativeVariant(fullPhrase);
 					} else {
-						currentInstallment = new IncrSysInstallmentIU(phraseIU.toPayLoad());
+						currentInstallment = new PhraseBasedInstallmentIU(phraseIU);
 						speechDispatcher.playStream(currentInstallment.getAudio(), true);
 					}
 				} else { // start a new installment
-					currentInstallment = new IncrSysInstallmentIU(phraseIU.toPayLoad());
+					currentInstallment = new PhraseBasedInstallmentIU(phraseIU);
 					speechDispatcher.playStream(currentInstallment.getAudio(), false);
 				}
 				appendNotification(currentInstallment, phraseIU);
 			case REVOKE:
 				// TODO
+				break;
+			default:
 				break;
 			}
 		}
@@ -107,8 +119,10 @@ public class SynthesisModule extends IUModule {
 	protected synchronized void playNoise(String file) {
 		noiseDispatcher.playFile(file, true);
 		// TODO: interrupt ongoing utterance 
-		// stop after ongoing word, (no need to keep reference to the ongoing utterance as we'll start a new one anyway
-		// should I call GenerationModule.update() or is the caller taking care of that?
+		// stop after ongoing word, 
+		currentInstallment.stopAfterOngoingWord();
+		// (no need to keep reference to the ongoing utterance as we'll start a new one anyway)
+		currentInstallment = null; 
 	}
 	
 	/* wow, this is ugly. but oh well ... as long as it works */

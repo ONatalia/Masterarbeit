@@ -9,6 +9,7 @@ public class PhraseIU extends IU {
 	PhraseStatus status;
 	/** the state of delivery that this unit is in */
 	Progress progress = Progress.UPCOMING;
+	PhraseBasedInstallmentIU containingInstallment;
 	
 	public enum PhraseType {
 	    INITIAL, // the first phrase in the utterance
@@ -48,5 +49,5 @@ public class PhraseIU extends IU {
 	
 	public Progress getProgress() {
 		return progress;
-	};
+	}
 }
