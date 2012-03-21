@@ -10,8 +10,8 @@ import org.cocolab.inpro.apps.util.MonitorCommandLineParser;
 import org.cocolab.inpro.audio.DispatchStream;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.EditMessage;
-import org.cocolab.inpro.incremental.unit.EditType;
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.cocolab.inpro.incremental.unit.IU.IUUpdateListener;
 import org.cocolab.inpro.incremental.unit.IU.Progress;
@@ -20,6 +20,12 @@ import org.cocolab.inpro.incremental.unit.WordIU;
 import org.cocolab.inpro.tts.MaryAdapter;
 
 import edu.cmu.sphinx.util.props.ConfigurationManager;
+
+/**
+ * 
+ * 
+ * concurrency: 
+ */
 
 public class SynthesisModule extends IUModule {
 
@@ -30,78 +36,57 @@ public class SynthesisModule extends IUModule {
 
 	IncrSysInstallmentIU currentInstallment;
 	
+	@SuppressWarnings("unused")
 	public SynthesisModule() {
 		upcomingPhrases = new ArrayList<PhraseIU>();
 		noiseDispatcher = setupDispatcher2();
 		speechDispatcher = SimpleMonitor.setupDispatcher();
-		// to be replaced by more realistic noise handling
-		Thread t = new Thread() {
-			@Override
-			public void run() {
-				try {
-					System.out.println("sleeping for 15 seconds");
-					Thread.sleep(15000);
-					System.out.println("slept for 15 seconds");
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				}
-			//	noiseDispatcher.playFile("file:/home/timo/uni/experimente/050_itts+inlg/audio/pinknoise.1750ms.wav", true);
-			}
-		};
-		t.start();
 		MaryAdapter.initializeMary(); // preload mary
+		new SysInstallmentIU("Ein Satz zum Aufwärmen der Optimierungsmethoden."); // preheat mary
 	}
 	
+	/**
+	 * please only send PhraseIUs, everything else will result in assertions failing
+	 */
 	@Override
-	protected void leftBufferUpdate(Collection<? extends IU> ius,
+	protected synchronized void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		for (EditMessage<?> em : edits) {
-			if (em.getIU() instanceof PhraseIU) {
-				final PhraseIU phraseIU = (PhraseIU) em.getIU();
-				System.out.println("   " + em.getType() + " " + phraseIU.toPayLoad() + " (" + phraseIU.status + "; " + phraseIU.type + ")");
-				switch (em.getType()) {
-				case ADD:
-					if (currentInstallment != null && currentInstallment.isOngoing()) {
-						WordIU choiceWord = currentInstallment.getFinalWord();
-						// mark the ongoing utterance as non-final, check whether there's still enough time
-						boolean canContinue = ((SysSegmentIU) choiceWord.getLastSegment()).setAwaitContinuation(true);
-						if (canContinue) {
-							String fullPhrase = currentInstallment.toPayLoad() + phraseIU.toPayLoad();
-							fullPhrase = fullPhrase.replaceAll(" <sil>", "");
-							currentInstallment.addAlternativeVariant(fullPhrase);
-							currentInstallment.getFinalWord()
-											  .getLastSegment().getSameLevelLink().getSameLevelLink()
-											  .addUpdateListener(new NotifyCompletedOnOngoing(phraseIU));
-						} else {
-							currentInstallment = new IncrSysInstallmentIU(phraseIU.toPayLoad());
-							currentInstallment.getFinalWord()
-											  .getLastSegment().getSameLevelLink().getSameLevelLink()
-											  .addUpdateListener(new NotifyCompletedOnOngoing(phraseIU));
-							speechDispatcher.playStream(currentInstallment.getAudio(), true);
-						}
-					} else { // start a new installment
+			assert em.getIU() instanceof PhraseIU;
+			final PhraseIU phraseIU = (PhraseIU) em.getIU();
+			System.out.println("   " + em.getType() + " " + phraseIU.toPayLoad() + " (" + phraseIU.status + "; " + phraseIU.type + ")");
+			switch (em.getType()) {
+			case ADD:
+				if (currentInstallment != null && currentInstallment.isOngoing()) {
+					WordIU choiceWord = currentInstallment.getFinalWord();
+					// mark the ongoing utterance as non-final, check whether there's still enough time
+					boolean canContinue = ((SysSegmentIU) choiceWord.getLastSegment()).setAwaitContinuation(true);
+					if (canContinue) {
+						String fullPhrase = currentInstallment.toPayLoad() + phraseIU.toPayLoad();
+						currentInstallment.addAlternativeVariant(fullPhrase);
+					} else {
 						currentInstallment = new IncrSysInstallmentIU(phraseIU.toPayLoad());
-						currentInstallment.getFinalWord()
-										  .getLastSegment().getSameLevelLink().getSameLevelLink()
-										  .addUpdateListener(new NotifyCompletedOnOngoing(phraseIU));
-						speechDispatcher.playStream(currentInstallment.getAudio(), false);
+						speechDispatcher.playStream(currentInstallment.getAudio(), true);
 					}
-				case REVOKE:
-					// TODO
-					break;
+				} else { // start a new installment
+					currentInstallment = new IncrSysInstallmentIU(phraseIU.toPayLoad());
+					speechDispatcher.playStream(currentInstallment.getAudio(), false);
 				}
-			} else if (em.getIU() instanceof NoiseIU) {
-				if (em.getType() == EditType.ADD) {
-					noiseDispatcher.playFile("file:/home/timo/uni/experimente/050_itts+inlg/audio/pinknoise.1750ms.wav", true);
-					// is it automatically set to committed? --> no.
-					// is playing done asynchronously? --> yes.
-				}
+				appendNotification(currentInstallment, phraseIU);
+			case REVOKE:
+				// TODO
+				break;
 			}
 		}
 	}
 	
-	class NotifyCompletedOnOngoing implements IUUpdateListener {
+	private static void appendNotification(SysInstallmentIU installment, PhraseIU phrase) {
+		installment.getFinalWord()
+					.getLastSegment().getSameLevelLink().getSameLevelLink()
+					.addUpdateListener(new NotifyCompletedOnOngoing(phrase));
+	}
+	
+	static class NotifyCompletedOnOngoing implements IUUpdateListener {
 		PhraseIU completed;
 		NotifyCompletedOnOngoing(PhraseIU notify) {
 			completed = notify;
@@ -112,6 +97,18 @@ public class SynthesisModule extends IUModule {
 				completed.setProgress(Progress.COMPLETED);
 			}
 		}
+	}
+	
+	protected synchronized boolean noisy() {
+		return noiseDispatcher.isSpeaking();
+	}
+	
+	/** any ongoing noise is replaced with this one */
+	protected synchronized void playNoise(String file) {
+		noiseDispatcher.playFile(file, true);
+		// TODO: interrupt ongoing utterance 
+		// stop after ongoing word, (no need to keep reference to the ongoing utterance as we'll start a new one anyway
+		// should I call GenerationModule.update() or is the caller taking care of that?
 	}
 	
 	/* wow, this is ugly. but oh well ... as long as it works */

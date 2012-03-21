@@ -29,6 +29,7 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
 	}
 	
 	public void addAlternativeVariant(String variant) {
+		variant = variant.replaceAll(" <sil>", ""); // it's nasty when there are silences pronounced as "kleiner als sil größer als"
 		SysInstallmentIU varInst = new SysInstallmentIU(variant);
 		WordIU commonWord = getInitialWord();
 		// variant word
