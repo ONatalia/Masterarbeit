@@ -4,11 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.sound.sampled.AudioInputStream;
-
-import org.cocolab.inpro.audio.DDS16kAudioInputStream;
-import org.cocolab.inpro.tts.hts.VocodingAudioStream;
-
 /**
  * multiple synthesis options are organized in a tree structure.
  * this is incredibly inefficient if you've got many options. the XX YY ZZ AA BB CC (with each a few options) results in plenty possible variants
@@ -86,13 +81,6 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
 	public void reorderOptions(int wordIndex, final String newBestFollower) {
 		WordIU word = getWords().get(wordIndex - 1);
 		word.setAsTopNextSameLevelLink(newBestFollower);
-	}
-	
-	@Override
-	public AudioInputStream getAudio() {
-        boolean immediateReturn = true;
-		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), immediateReturn);
-        return new DDS16kAudioInputStream(vas);
 	}
 	
 	public List<WordIU> getWordsAtPos(int pos) {

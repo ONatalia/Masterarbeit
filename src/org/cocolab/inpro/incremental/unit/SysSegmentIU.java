@@ -207,7 +207,7 @@ public class SysSegmentIU extends SegmentIU {
 		return setNewDuration(newDuration);
 	}
 	
-	/** 
+	/** TODO: must be reworked to use PitchMarks
 	 * change the synthesis frames' pitch curve to attain the given pitch in the final pitch
 	 * in a smooth manner
 	 * @param finalPitch the log pitch to be reached in the final synthesis frame 

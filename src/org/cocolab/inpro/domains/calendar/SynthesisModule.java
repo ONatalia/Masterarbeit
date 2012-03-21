@@ -40,6 +40,7 @@ public class SynthesisModule extends IUModule {
 		speechDispatcher = SimpleMonitor.setupDispatcher();
 		MaryAdapter.initializeMary(); // preload mary
 		new SysInstallmentIU("Ein Satz zum Aufwärmen der Optimierungsmethoden."); // preheat mary
+		// TODO: preheat HMM optimization and vocoding, hmpf.
 		final SynthesisModule that = this;
 /*		(new Thread() {
 			@Override
@@ -52,7 +53,7 @@ public class SynthesisModule extends IUModule {
 				}
 				that.playNoise("file:/home/timo/uni/experimente/050_itts+inlg/audio/pinknoise.1000ms.wav");
 			}
-		}).start(); */
+		}).start(); /**/
 	}
 	
 	/**
@@ -72,17 +73,17 @@ public class SynthesisModule extends IUModule {
 					// mark the ongoing utterance as non-final, check whether there's still enough time
 					boolean canContinue = ((SysSegmentIU) choiceWord.getLastSegment()).setAwaitContinuation(true);
 					if (canContinue) {
-						String fullPhrase = currentInstallment.toPayLoad() + phraseIU.toPayLoad();
-						currentInstallment.addAlternativeVariant(fullPhrase);
-					} else {
+						currentInstallment.appendPhrase(phraseIU);
+					} else { // 
 						currentInstallment = new PhraseBasedInstallmentIU(phraseIU);
-						speechDispatcher.playStream(currentInstallment.getAudio(), true);
 					}
 				} else { // start a new installment
 					currentInstallment = new PhraseBasedInstallmentIU(phraseIU);
-					speechDispatcher.playStream(currentInstallment.getAudio(), false);
 				}
 				appendNotification(currentInstallment, phraseIU);
+				if (!speechDispatcher.isSpeaking()) 
+					speechDispatcher.playInstallment(currentInstallment);
+				break;
 			case REVOKE:
 				// TODO
 				break;
@@ -120,7 +121,7 @@ public class SynthesisModule extends IUModule {
 		noiseDispatcher.playFile(file, true);
 		// TODO: interrupt ongoing utterance 
 		// stop after ongoing word, 
-		currentInstallment.stopAfterOngoingWord();
+		//currentInstallment.stopAfterOngoingWord();
 		// (no need to keep reference to the ongoing utterance as we'll start a new one anyway)
 		currentInstallment = null; 
 	}

@@ -126,7 +126,9 @@ public class SysInstallmentIU extends InstallmentIU {
 	}
 	
 	public AudioInputStream getAudio() {
-		return new DDS16kAudioInputStream(new VocodingAudioStream(new IUBasedFullPStream(getInitialWord()), true));
+        boolean immediateReturn = true;
+		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), immediateReturn);
+        return new DDS16kAudioInputStream(vas);
 	}
 	
 	public String toMaryXML() {

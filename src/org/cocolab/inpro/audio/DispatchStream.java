@@ -19,6 +19,7 @@ import javax.sound.sampled.AudioSystem;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.LabelledAudioStream;
 import org.cocolab.inpro.gui.util.SpeechStateVisualizer;
+import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
 import org.cocolab.inpro.tts.MaryAdapter;
 
 import edu.cmu.sphinx.util.props.Configurable;
@@ -182,6 +183,10 @@ public class DispatchStream extends InputStream implements Configurable {
 			setStream(audioStream);
 		else
 			addStream(audioStream);		
+	}
+	
+	public void playInstallment(SysInstallmentIU installment) {
+		playStream(installment.getAudio(), true);
 	}
 	
 	/* * Stream and Stream Queue handling * */
