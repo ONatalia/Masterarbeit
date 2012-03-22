@@ -60,7 +60,7 @@ public class PhraseBasedInstallmentIU extends IncrSysInstallmentIU {
 //		assert newWords.size() == groundedIn.size() + phrase.expectedWordCount(); // for some reason, this assertion breaks sometimes
 		WordIU firstNewWord = newWords.get(groundedIn.size());
 		WordIU lastOldWord = getFinalWord();
-		assert lastOldWord.payloadEquals(firstNewWord.getSameLevelLink());
+		//assert lastOldWord.payloadEquals(firstNewWord.getSameLevelLink());
 		SysSegmentIU newSeg = (SysSegmentIU) firstNewWord.getFirstSegment().getSameLevelLink();
 		firstNewWord.connectSLL(lastOldWord);
 		// back substitution just copy over the HTSModel from the new segments to the old segments (and be done with it)

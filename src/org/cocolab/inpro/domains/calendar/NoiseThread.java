@@ -14,7 +14,7 @@ public class NoiseThread extends Thread {
 	
 	private int delay = 1300;
 	private int noiseLength = 1000;
-	private int responsiveness = 150;
+	private int responsiveness = 50;
 	
 	public NoiseThread(AdaptionManager am, SynthesisModule sm, IUUpdateListener updateListener) {
 		this.am = am;
@@ -42,8 +42,8 @@ public class NoiseThread extends Thread {
 			Thread.sleep(noiseLength - responsiveness);
 		} catch (InterruptedException e) {e.printStackTrace();}
 		am.noGrounding();
-		am.setLevelOfUnderstanding(1);
-		am.setVerbosityFactor(4);
+		am.setLevelOfUnderstanding(5);
+		am.setVerbosityFactor(0);
 		updateListener.update(null);
 		}
 	}

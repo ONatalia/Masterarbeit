@@ -107,21 +107,11 @@ public class GenerationModule extends IUModule {
 		gm.iulisteners = new ArrayList<PushBuffer>();
 		gm.iulisteners.add(sm);
 		
-		int day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-		int month = Calendar.getInstance().get(Calendar.MONTH);
-		int year = Calendar.getInstance().get(Calendar.YEAR);
-		if (day > 25) {
-			day = 1; month += 1;
-			if (month == 12) {
-				month = 0; year += 1;
-			}
-		}
-		final List<CalendarEvent> events = new ArrayList<CalendarEvent>();
 		GenerateStimuli gs = new GenerateStimuli();
 
 		final CalendarEvent event2 = new CalendarEvent("Einkaufen auf dem Wochenmarkt", new GregorianCalendar(2012, 4, 14, 10, 0), 2);
 		final CalendarEvent event2changed = new CalendarEvent("Einkaufen auf dem Wochenmarkt", new GregorianCalendar(2012, 4, 14, 9, 30), 2);
-		final CalendarEvent event3 = new CalendarEvent("Zahnarzt", new GregorianCalendar(2012, 4, 14, 10, 30), 1);
+		final CalendarEvent event3 = new CalendarEvent("Augenarzt", new GregorianCalendar(2012, 4, 14, 10, 30), 1);
 // uncomment the following line for STIMULUS PAIR 1
 		//gm.nlg.setUtteranceObject(new EventConflict(event2, event3));
 // uncomment the following for STIMULUS PAIR 2
@@ -137,8 +127,8 @@ public class GenerationModule extends IUModule {
 // uncomment the following line for STIMULUS PAIR 4
 		//gm.nlg.setUtteranceObject(gs.createUpcomingEvents(event5, event5followup));
 
-		final CalendarEvent event6 = new CalendarEvent("Vorlesung Linguistik", new GregorianCalendar(2012, 4, 4, 10, 0), 2);
-		final CalendarEvent event6changed = new CalendarEvent("Vorlesung Linguistik", new GregorianCalendar(2012, 4, 6, 12, 0), 2);
+		final CalendarEvent event6 = new CalendarEvent("Vorlesung Linguistik", new GregorianCalendar(2012, 3, 4, 10, 0), 2);
+		final CalendarEvent event6changed = new CalendarEvent("Vorlesung Linguistik", new GregorianCalendar(2012, 3, 6, 12, 0), 2);
 // uncomment the following line for STIMULUS PAIR 5
 		//gm.nlg.setUtteranceObject(new MovedEvent(event6, event6changed));
 
@@ -147,28 +137,24 @@ public class GenerationModule extends IUModule {
 // uncomment the following line for STIMULUS PAIR 6
 		//gm.nlg.setUtteranceObject(new EventConflict(event7, event7conflict));
 
-		final CalendarEvent event8 = new CalendarEvent("Semesterstart.", new GregorianCalendar(2012, 4, 4, 8, 0), 12);
-		final CalendarEvent event8followup = new CalendarEvent("Westend Party.", new GregorianCalendar(2012, 4, 6, 21, 0), 3);
+		final CalendarEvent event8 = new CalendarEvent("Semesterstart", new GregorianCalendar(2012, 3, 4, 8, 0), 12);
+		final CalendarEvent event8followup = new CalendarEvent("Westend Party", new GregorianCalendar(2012, 3, 6, 21, 0), 3);
 // uncomment the following line for STIMULUS PAIR 7
 		//gm.nlg.setUtteranceObject(gs.createUpcomingEvents(event8, event8followup));
 
-		final CalendarEvent event9 = new CalendarEvent("Zug nach München.", new GregorianCalendar(2012, 11, 8, 13, 37), 5);
-		final CalendarEvent event9followup = new CalendarEvent("Tagungsbeginn.", new GregorianCalendar(2012, 11, 9, 9, 00), 1);
+		final CalendarEvent event9 = new CalendarEvent("Zug nach München", new GregorianCalendar(2012, 10, 8, 13, 37), 5);
+		final CalendarEvent event9followup = new CalendarEvent("Tagungsbeginn", new GregorianCalendar(2012, 10, 9, 9, 00), 1);
 // uncomment the following line for STIMULUS PAIR 8
 		//gm.nlg.setUtteranceObject(gs.createUpcomingEvents(event9, event9followup));
 		
-		final CalendarEvent event10 = new CalendarEvent("Besprechung mit Betreuer.", new GregorianCalendar(2012, 7, 27, 14,0), 1);
-		final CalendarEvent event10conflict = new CalendarEvent("Mensaführung.", new GregorianCalendar(2012, 7, 27, 13, 00), 3);
+		final CalendarEvent event10 = new CalendarEvent("Besprechung mit Betreuer", new GregorianCalendar(2012, 6, 27, 14,0), 1);
+		final CalendarEvent event10conflict = new CalendarEvent("Mensaführung", new GregorianCalendar(2012, 6, 27, 13, 00), 3);
 // uncomment the following line for STIMULUS PAIR 9
-		//gm.nlg.setUtteranceObject(new EventConflict(event10, event10conflict));
+		gm.nlg.setUtteranceObject(new EventConflict(event10, event10conflict));
 		
 		gm.generate();
 		NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), sm, gm.phraseUpdateListener);
-		nt.setTiming(1200);
 		nt.start();
-		//gm.nlg.clear();
-		//gm.nlg.setUtteranceObject(new EventConflict(event0,event1));
-		//gm.generate();
 	}
 	
 	

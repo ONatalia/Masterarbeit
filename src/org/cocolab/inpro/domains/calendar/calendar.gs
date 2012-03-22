@@ -290,14 +290,14 @@ intro lr(st([cat: s],
 		$ 1, § 2)
 		
 mid lr(st([cat: s],
-		<lst(wurde),lst(verschoben),lst(auf),lst(eine), lst(neue),lst(zeit)  >),
+		<lst(wurde),lst(verschoben),lst(auf),lst(eine),lst(neue),lst(zeit)  >),
 		comp,
 		<>,
 		<mmid(E)>,
 		$ 1, § 2)
 
 mid lr(st([cat: s],
-		<lst(ist),lst(nun),lst(signdp)>),
+		<lst(liegt),lst(nun)>),
 		comp,
 		<>,
 		<mmid(E)>,
