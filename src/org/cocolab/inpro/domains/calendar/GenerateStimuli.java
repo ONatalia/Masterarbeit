@@ -30,7 +30,7 @@ public class GenerateStimuli {
 	}
 	
 	private int randomIntBetween(int min, int max) {
-		assert(min > max);
+		assert(min < max);
 		min *= -1;
 		return random.nextInt(min + max) - min;
 	}

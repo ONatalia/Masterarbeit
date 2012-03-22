@@ -19,6 +19,7 @@ import scalendar.knowledgeobject.CalendarEvent;
 import scalendar.spud.CalendarKnowledgeInterface;
 import scalendar.spudmanager.SpudManager;
 import scalendar.uttereanceobject.EventConflict;
+import scalendar.uttereanceobject.MovedEvent;
 import edu.rutgers.nlp.asciispec.grammar.jj.ParseException;
 import edu.rutgers.nlp.spud.SPUD;
 
@@ -41,8 +42,7 @@ public class GenerationModule extends IUModule {
 		@Override
 		public synchronized void update(IU updatedIU) {
 			String projectedPhrase;
-			System.out.println("update called");
-			if (updatedIU == null || updatedIU.isCompleted()) { // should be isCompleted()
+			if (updatedIU == null || updatedIU.isCompleted()) {
 				if (AdaptionManager.getInstance().hasChanged()) {
 					System.out.println("*************** CHANGE ****************");
 					phrases.remove(phrases.size() - 1);
@@ -53,7 +53,11 @@ public class GenerationModule extends IUModule {
 						phrases.add(piu);
 					} else {
 						return;
-					}					
+					}
+					// change back to initial values - hack for SigDial Paper
+					AdaptionManager.getInstance().setLevelOfUnderstanding(3);
+					AdaptionManager.getInstance().setVerbosityFactor(0);
+					AdaptionManager.getInstance().hasChanged(); // we now it has, but sets flag to false again.
 					projectedPhrase = nlg.simulateNextButOnePhrase();	
 				} else {
 					projectedPhrase = nlg.takeSimulatedAndSimulateNextPhrase();
@@ -73,6 +77,7 @@ public class GenerationModule extends IUModule {
 				rightBuffer.setBuffer(phrases);
 				rightBuffer.notify(iulisteners);
 			}
+			System.out.println("Current update id: " + new Integer(nlg.getCurrentUpdateId()).toString());
 		}
 	};
 		
@@ -120,10 +125,13 @@ public class GenerationModule extends IUModule {
 		final List<CalendarEvent> events=new LinkedList<CalendarEvent>();
 		events.add(event0);
 		events.add(event1);
+		//gm.nlg.setUtteranceObject(new MovedEvent(event0,event1));
 		gm.nlg.setUtteranceObject(new EventConflict(event0,event1));
+		//gm.nlg.setUtteranceObject(new UpcomingEvents(events));
 		//GenerateStimuli gs = new GenerateStimuli();
 		gm.generate();
 		NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), sm, gm.phraseUpdateListener);
+		nt.setTiming(1200);
 		nt.start();
 		//gm.nlg.clear();
 		//gm.nlg.setUtteranceObject(new EventConflict(event0,event1));
