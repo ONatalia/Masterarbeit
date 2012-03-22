@@ -260,21 +260,21 @@ subject lr(st([cat: s],
 //** DetectedConflict
 
 intro lr(st([cat: s],
-		<lst(dieser),lst(hochinteressante),lst(termin)>),
+		<lst(der),lst(nächste),lst(termin)>),
 		comp,
 		<>,
 		<cintro(E)>,
 		$ 1, § 2)
 		
 mid lr(st([cat: s],
-		<lst(fuehrt), lst(zu), lst(einem),lst(konflikt),lst(mit),lst(dem),lst(termin),lst(signdp)>),
+		<lst(führt), lst(zu), lst(einem),lst(konflikt),lst(mit),lst(dem),lst(termin),lst(signdp)>),
 		comp,
 		<>,
 		<cmid(E)>,
 		$ 1, § 2)
 		
 mid lr(st([cat: s],
-		<lst(ueberschneidet),lst(sich),lst(mit),lst(dem),lst(termin),lst(signdp)>),
+		<lst(überschneidet),lst(sich),lst(mit),lst(dem),lst(termin),lst(signdp)>),
 		comp,
 		<>,
 		<cmid(E)>,
