@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.cocolab.inpro.incremental.IUModule;
@@ -20,6 +19,7 @@ import scalendar.spud.CalendarKnowledgeInterface;
 import scalendar.spudmanager.SpudManager;
 import scalendar.uttereanceobject.EventConflict;
 import scalendar.uttereanceobject.MovedEvent;
+import scalendar.uttereanceobject.UpcomingEvents;
 import edu.rutgers.nlp.asciispec.grammar.jj.ParseException;
 import edu.rutgers.nlp.spud.SPUD;
 
@@ -27,9 +27,6 @@ public class GenerationModule extends IUModule {
 
 	private SpudManager nlg;
 	private List<PhraseIU> phrases;
-	private int segmentToDisturb = -1;
-	
-	private NoiseThread noiseThread;
 	
 	public GenerationModule(SpudManager sm) {
 		this.nlg = sm;
@@ -99,6 +96,7 @@ public class GenerationModule extends IUModule {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	public static void main(String[] args) throws FileNotFoundException, ParseException {
 		SpudManager spudmanager = new SpudManager(
 				new CalendarKnowledgeInterface(),
@@ -118,17 +116,52 @@ public class GenerationModule extends IUModule {
 				month = 0; year += 1;
 			}
 		}
-		final CalendarEvent event0 = new CalendarEvent("besprechung mit stefan",
-				new GregorianCalendar(year, month, day, 16, 0),1);
-		final CalendarEvent event1 = new CalendarEvent("flug nach island",
-				new GregorianCalendar(year, month, day, 16, 0), 2);
-		final List<CalendarEvent> events=new LinkedList<CalendarEvent>();
-		events.add(event0);
-		events.add(event1);
-		//gm.nlg.setUtteranceObject(new MovedEvent(event0,event1));
-		gm.nlg.setUtteranceObject(new EventConflict(event0,event1));
-		//gm.nlg.setUtteranceObject(new UpcomingEvents(events));
-		//GenerateStimuli gs = new GenerateStimuli();
+		final List<CalendarEvent> events = new ArrayList<CalendarEvent>();
+		GenerateStimuli gs = new GenerateStimuli();
+
+		final CalendarEvent event2 = new CalendarEvent("Einkaufen auf dem Wochenmarkt", new GregorianCalendar(2012, 4, 14, 10, 0), 2);
+		final CalendarEvent event2changed = new CalendarEvent("Einkaufen auf dem Wochenmarkt", new GregorianCalendar(2012, 4, 14, 9, 30), 2);
+		final CalendarEvent event3 = new CalendarEvent("Zahnarzt", new GregorianCalendar(2012, 4, 14, 10, 30), 1);
+// uncomment the following line for STIMULUS PAIR 1
+		//gm.nlg.setUtteranceObject(new EventConflict(event2, event3));
+// uncomment the following for STIMULUS PAIR 2
+		//gm.nlg.setUtteranceObject(new MovedEvent(event2, event2changed));
+
+		final CalendarEvent event4 = new CalendarEvent("Austellungseröffnung", new GregorianCalendar(2012, 5, 20, 11, 00), 2);
+		final CalendarEvent event4followup = new CalendarEvent("Sekt und Kringel", new GregorianCalendar(2012, 5, 20, 13, 00), 1);
+// uncomment the following line for STIMULUS PAIR 3
+		//gm.nlg.setUtteranceObject(gs.createUpcomingEvents(event4, event4followup));
+
+		final CalendarEvent event5 = new CalendarEvent("Geschenk besorgen", new GregorianCalendar(2012, 3, 21, 17, 0), 1);
+		final CalendarEvent event5followup = new CalendarEvent("Spieleabend bei Hanne", new GregorianCalendar(2012, 3, 22, 15, 0), 3);
+// uncomment the following line for STIMULUS PAIR 4
+		//gm.nlg.setUtteranceObject(gs.createUpcomingEvents(event5, event5followup));
+
+		final CalendarEvent event6 = new CalendarEvent("Vorlesung Linguistik", new GregorianCalendar(2012, 4, 4, 10, 0), 2);
+		final CalendarEvent event6changed = new CalendarEvent("Vorlesung Linguistik", new GregorianCalendar(2012, 4, 6, 12, 0), 2);
+// uncomment the following line for STIMULUS PAIR 5
+		//gm.nlg.setUtteranceObject(new MovedEvent(event6, event6changed));
+
+		final CalendarEvent event7 = new CalendarEvent("Schwimmen gehen", new GregorianCalendar(2012, 6, 6, 15, 0), 2);
+		final CalendarEvent event7conflict = new CalendarEvent("Geburtstag Tante Ilse.", new GregorianCalendar(2012, 6, 6, 15, 0), 4);
+// uncomment the following line for STIMULUS PAIR 6
+		//gm.nlg.setUtteranceObject(new EventConflict(event7, event7conflict));
+
+		final CalendarEvent event8 = new CalendarEvent("Semesterstart.", new GregorianCalendar(2012, 4, 4, 8, 0), 12);
+		final CalendarEvent event8followup = new CalendarEvent("Westend Party.", new GregorianCalendar(2012, 4, 6, 21, 0), 3);
+// uncomment the following line for STIMULUS PAIR 7
+		//gm.nlg.setUtteranceObject(gs.createUpcomingEvents(event8, event8followup));
+
+		final CalendarEvent event9 = new CalendarEvent("Zug nach München.", new GregorianCalendar(2012, 11, 8, 13, 37), 5);
+		final CalendarEvent event9followup = new CalendarEvent("Tagungsbeginn.", new GregorianCalendar(2012, 11, 9, 9, 00), 1);
+// uncomment the following line for STIMULUS PAIR 8
+		//gm.nlg.setUtteranceObject(gs.createUpcomingEvents(event9, event9followup));
+		
+		final CalendarEvent event10 = new CalendarEvent("Besprechung mit Betreuer.", new GregorianCalendar(2012, 7, 27, 14,0), 1);
+		final CalendarEvent event10conflict = new CalendarEvent("Mensaführung.", new GregorianCalendar(2012, 7, 27, 13, 00), 3);
+// uncomment the following line for STIMULUS PAIR 9
+		//gm.nlg.setUtteranceObject(new EventConflict(event10, event10conflict));
+		
 		gm.generate();
 		NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), sm, gm.phraseUpdateListener);
 		nt.setTiming(1200);
