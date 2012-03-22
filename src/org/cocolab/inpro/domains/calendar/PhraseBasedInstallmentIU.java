@@ -1,11 +1,14 @@
 package org.cocolab.inpro.domains.calendar;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.SegmentIU;
+import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
+import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
 /** 
  * an InstallmentIU that loosely uses phrases to structure its output.
@@ -22,13 +25,56 @@ public class PhraseBasedInstallmentIU extends IncrSysInstallmentIU {
 		phrase.containingInstallment = this;
 	}
 
-	/** append this phrase at the end of the installment 
-	 * @param phraseIU */
+	/** append words for this phrase at the end of the installment */
 	public void appendPhrase(PhraseIU phraseIU) {
+		IU oldLastWord = getFinalWord(); // everything that follows this word via fSLL belongs to the new phrase
 		String fullPhrase = toPayLoad() + phraseIU.toPayLoad();
-		addAlternativeVariant(fullPhrase);
+		fullPhrase = fullPhrase.replaceAll(" <sil>", ""); // it's nasty when there are silences pronounced as "kleiner als sil größer als"
+//		addAlternativeVariant(fullPhrase);
+		appendContinuation(phraseIU);
+		phraseIU.containingInstallment = this;
+		List<IU> phraseWords = new ArrayList<IU>(phraseIU.expectedWordCount());
+		while (oldLastWord.getNextSameLevelLink() != null) {
+			IU w = oldLastWord.getNextSameLevelLink();
+			phraseWords.add(w);
+			oldLastWord = w;
+		}
+		phraseIU.groundIn(phraseWords);
+		groundedIn.addAll(phraseWords);
 	}
 	
+	/** append a continuation to the ongoing installment <pre>
+	// this works as follows: 
+	// * we have linguistic preprocessing generate a full IU structure for both the base words and the continuation
+	// * we then identify the words which are the continuation part of the full structure: 
+	// * we append the continuation part to the last utterance of the IU
+	// * we then move backwards in the lists of segments and copy over synthesis information to the old segments
+	// we call this last step "back-substitution"
+	 </pre>*/
+	private void appendContinuation(PhraseIU phrase) {
+		String fullPhrase = toPayLoad() + phrase.toPayLoad();
+		fullPhrase = fullPhrase.replaceAll(" <sil>", ""); // it's nasty when there are silences pronounced as "kleiner als sil größer als"
+		@SuppressWarnings("unchecked")
+		List<WordIU> newWords = (List<WordIU>) (new SysInstallmentIU(fullPhrase)).groundedIn();
+		assert newWords.size() >= groundedIn.size();
+//		assert newWords.size() == groundedIn.size() + phrase.expectedWordCount(); // for some reason, this assertion breaks sometimes
+		WordIU firstNewWord = newWords.get(groundedIn.size());
+		WordIU lastOldWord = getFinalWord();
+		assert lastOldWord.payloadEquals(firstNewWord.getSameLevelLink());
+		SysSegmentIU newSeg = (SysSegmentIU) firstNewWord.getFirstSegment().getSameLevelLink();
+		firstNewWord.connectSLL(lastOldWord);
+		// back substitution just copy over the HTSModel from the new segments to the old segments (and be done with it)
+		backsubstituteHTSModels(newSeg, (SysSegmentIU) lastOldWord.getLastSegment());
+	}
+	
+	private void backsubstituteHTSModels(SysSegmentIU newSeg,
+			SysSegmentIU oldSeg) {
+		if (newSeg != null && oldSeg != null && newSeg.payloadEquals(oldSeg) && oldSeg.isUpcoming()) {
+			oldSeg.copySynData(newSeg);
+			backsubstituteHTSModels((SysSegmentIU) newSeg.getSameLevelLink(), (SysSegmentIU) oldSeg.getSameLevelLink());
+		}
+	}
+
 	/** breaks the segment links between words so that synthesis stops after the currently ongoing word */
 	public void stopAfterOngoingWord() {
 		ListIterator<IU> groundIt = groundedIn.listIterator(groundedIn.size());
@@ -37,6 +83,10 @@ public class PhraseBasedInstallmentIU extends IncrSysInstallmentIU {
 			// break the segmentIU layer
 			SegmentIU seg = word.getLastSegment();
 			seg.removeAllNextSameLevelLinks();
+			// hack for long words:
+			if (word.getSegments().size() > 7) {
+				word.getSegments().get(5).removeAllNextSameLevelLinks();
+			}
 			if (seg.isCompleted()) 
 				break; // no need to go on, as this the past already
 		}

@@ -277,4 +277,11 @@ public class SysSegmentIU extends SegmentIU {
 		htsModel = hmm;
 	}
 
+	/** copy all data necessary for synthesis -- i.e. the htsModel and pitchmarks */
+	public void copySynData(SysSegmentIU newSeg) {
+		assert payloadEquals(newSeg);
+		this.htsModel = newSeg.htsModel;
+		this.pitchMarks = newSeg.pitchMarks;
+	}
+
 }

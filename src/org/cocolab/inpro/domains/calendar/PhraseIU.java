@@ -1,6 +1,9 @@
 package org.cocolab.inpro.domains.calendar;
 
+import java.util.List;
+
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.WordIU;
 
 public class PhraseIU extends IU {
 
@@ -38,6 +41,19 @@ public class PhraseIU extends IU {
 	@Override
 	public String toPayLoad() {
 		return phrase;
+	}
+	
+	/** the number of white-space delimited tokens in the payload */
+	public int expectedWordCount() {
+		String phrase = toPayLoad();
+		return phrase.split("\\s+").length;
+	}
+	
+	/** grounds in the list of wordIUs, which must have the expected number of elements */
+	@Override
+	public void groundIn(List<IU> ius) {
+		super.groundIn(ius);
+		assert (((WordIU) ius.get(0)).isSilence()) ? ius.size() == expectedWordCount() + 1 : ius.size() == expectedWordCount();
 	}
 
 	protected void setProgress(Progress p) {

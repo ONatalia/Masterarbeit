@@ -62,27 +62,28 @@ public class SynthesisModule extends IUModule {
 	@Override
 	protected synchronized void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
+		boolean startPlayInstallment = false;
 		for (EditMessage<?> em : edits) {
 			assert em.getIU() instanceof PhraseIU;
 			final PhraseIU phraseIU = (PhraseIU) em.getIU();
 			System.out.println("   " + em.getType() + " " + phraseIU.toPayLoad() + " (" + phraseIU.status + "; " + phraseIU.type + ")");
 			switch (em.getType()) {
 			case ADD:
-				if (currentInstallment != null && currentInstallment.isOngoing()) {
+				if (currentInstallment != null && !currentInstallment.isCompleted()) {
 					WordIU choiceWord = currentInstallment.getFinalWord();
 					// mark the ongoing utterance as non-final, check whether there's still enough time
 					boolean canContinue = ((SysSegmentIU) choiceWord.getLastSegment()).setAwaitContinuation(true);
 					if (canContinue) {
 						currentInstallment.appendPhrase(phraseIU);
 					} else { // 
-						currentInstallment = new PhraseBasedInstallmentIU(phraseIU);
+						currentInstallment = null;
 					}
-				} else { // start a new installment
+				} 
+				if (currentInstallment == null) { // start a new installment
 					currentInstallment = new PhraseBasedInstallmentIU(phraseIU);
+					startPlayInstallment = true;
 				}
 				appendNotification(currentInstallment, phraseIU);
-				if (!speechDispatcher.isSpeaking()) 
-					speechDispatcher.playInstallment(currentInstallment);
 				break;
 			case REVOKE:
 				// TODO
@@ -91,6 +92,8 @@ public class SynthesisModule extends IUModule {
 				break;
 			}
 		}
+		if (startPlayInstallment)
+			speechDispatcher.playInstallment(currentInstallment);
 	}
 	
 	private static void appendNotification(SysInstallmentIU installment, PhraseIU phrase) {

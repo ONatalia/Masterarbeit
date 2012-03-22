@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
+import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.Label;
@@ -25,7 +26,6 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	Logger logger = Logger.getLogger(SysInstallmentIU.class);
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" }) // allow cast from List<WordIU> to List<IU>
 	public SysInstallmentIU(String tts) {
 		super(null, tts);
 		// handle <hes> marker at the end separately
@@ -37,23 +37,23 @@ public class SysInstallmentIU extends InstallmentIU {
 			addFinalHesitation = false;
 		try {
 			groundedIn = MaryAdapter.getInstance().text2IUs(tts);
-			// remove utterance final silences
-			IU pred = groundedIn.get(groundedIn.size() - 1);
-			while (((WordIU) pred).isSilence) {
-				groundedIn.remove(pred);
-				pred.getSameLevelLink().removeAllNextSameLevelLinks(); // cut GRIN-NextSLLs
-				pred = pred.getSameLevelLink();
-			}
-			if (addFinalHesitation) {
-				HesitationIU hes = new HesitationIU(null);
-				hes.shiftBy(pred.endTime());
-				hes.connectSLL(pred);
-				pred.setAsTopNextSameLevelLink("<hes>");
-				groundedIn.add(hes);
-			}
-		} catch (Exception e) {
+		} catch (JAXBException e) {
 			e.printStackTrace();
-			groundedIn = (List) Collections.<WordIU>emptyList();
+			throw new RuntimeException(e);
+		}
+		// remove utterance final silences
+		IU pred = groundedIn.get(groundedIn.size() - 1);
+		while (((WordIU) pred).isSilence) {
+			groundedIn.remove(pred);
+			pred.getSameLevelLink().removeAllNextSameLevelLinks(); // cut GRIN-NextSLLs
+			pred = pred.getSameLevelLink();
+		}
+		if (addFinalHesitation) {
+			HesitationIU hes = new HesitationIU(null);
+			hes.shiftBy(pred.endTime());
+			hes.connectSLL(pred);
+			pred.setAsTopNextSameLevelLink("<hes>");
+			groundedIn.add(hes);
 		}
 	}
 	

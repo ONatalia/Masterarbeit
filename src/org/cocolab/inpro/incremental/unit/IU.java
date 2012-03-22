@@ -512,12 +512,13 @@ public abstract class IU implements Comparable<IU> {
 			updateListeners.add(listener);
 	}
 	
+	
 	public synchronized void notifyListeners() {
 		if (updateListeners != null)
 			for (final IUUpdateListener listener : updateListeners) {
 				final IU that = this;
 				// why not spawn a new thread per notification to avoid deadlocks? live long and prosper!
-				(new Thread() {
+				(new Thread(listener.getClass().toString()) {
 					@Override
 					public void run() {
 						listener.update(that);
