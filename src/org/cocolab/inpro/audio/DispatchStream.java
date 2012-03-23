@@ -315,5 +315,15 @@ public class DispatchStream extends InputStream implements Configurable {
 	public boolean inShutdown() { return inShutdown; }
 	/** waits for the current stream to finish and shuts down the dispatcher */
 	public void shutdown() { inShutdown = true; }
+
+	public void waitUntilDone() {
+		synchronized(this) {
+			while (isSpeaking()) {
+				try {
+					wait();	} catch (InterruptedException e) { e.printStackTrace();
+				}
+			}
+		}
+	}
 	
 }

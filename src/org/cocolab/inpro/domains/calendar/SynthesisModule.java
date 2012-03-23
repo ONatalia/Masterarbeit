@@ -41,8 +41,10 @@ public class SynthesisModule extends IUModule {
 		MaryAdapter.initializeMary(); // preload mary
 		new SysInstallmentIU("Ein Satz zum Aufwärmen der Optimierungsmethoden."); // preheat mary
 		// TODO: preheat HMM optimization and vocoding, hmpf.
-		final SynthesisModule that = this;
-/*		(new Thread() {
+		speechDispatcher.playInstallment(new SysInstallmentIU("Nächster Stimulus: "));
+		speechDispatcher.waitUntilDone();
+/*		final SynthesisModule that = this;
+		(new Thread() {
 			@Override
 			public void run() {
 				try {
@@ -136,13 +138,7 @@ public class SynthesisModule extends IUModule {
 		sleepy(300);
 		speechDispatcher.interruptPlayback();
 		// wait until noiseDispatcher is done
-		synchronized(noiseDispatcher) {
-			while (noiseDispatcher.isSpeaking()) {
-				try {
-					noiseDispatcher.wait();	} catch (InterruptedException e) { e.printStackTrace();
-				}
-			}
-		}
+		noiseDispatcher.waitUntilDone();
 		sleepy(100);
 		speechDispatcher.continuePlayback();
 	}
