@@ -41,7 +41,7 @@ public class SynthesisModule extends IUModule {
 		MaryAdapter.initializeMary(); // preload mary
 		new SysInstallmentIU("Ein Satz zum Aufwärmen der Optimierungsmethoden."); // preheat mary
 		// TODO: preheat HMM optimization and vocoding, hmpf.
-		speechDispatcher.playInstallment(new SysInstallmentIU("Nächster Stimulus: "));
+		speechDispatcher.playInstallment(new SysInstallmentIU("Neuer Stimulus: "));
 		speechDispatcher.waitUntilDone();
 /*		final SynthesisModule that = this;
 		(new Thread() {

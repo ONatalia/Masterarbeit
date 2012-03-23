@@ -52,7 +52,7 @@ public class GenerationModule extends IUModule {
 					}
 					// change back to initial values - hack for SigDial Paper
 					AdaptionManager.getInstance().setLevelOfUnderstanding(3);
-					AdaptionManager.getInstance().setVerbosityFactor(0);
+					AdaptionManager.getInstance().setVerbosityFactor(1);
 					AdaptionManager.getInstance().hasChanged(); // we now it has, but sets flag to false again.
 					projectedPhrase = nlg.simulateNextButOnePhrase();	
 				} else {
@@ -117,7 +117,7 @@ public class GenerationModule extends IUModule {
 		//gm.nlg.setUtteranceObject(new MovedEvent(event2, event2changed));
 
 		final CalendarEvent event4 = new CalendarEvent("Austellungseröffnung", new GregorianCalendar(2012, 5, 20, 11, 00), 2);
-		final CalendarEvent event4followup = new CalendarEvent("Sekt und Kringel", new GregorianCalendar(2012, 5, 20, 13, 00), 1);
+		final CalendarEvent event4followup = new CalendarEvent("Sekt und Kringel", new GregorianCalendar(2012, 5, 20, 12, 00), 1);
 // uncomment the following line for STIMULUS PAIR 3
 		//gm.nlg.setUtteranceObject(gs.createUpcomingEvents(event4, event4followup));
 
@@ -129,10 +129,10 @@ public class GenerationModule extends IUModule {
 		final CalendarEvent event6 = new CalendarEvent("Vorlesung Linguistik", new GregorianCalendar(2012, 3, 4, 10, 0), 2);
 		final CalendarEvent event6changed = new CalendarEvent("Vorlesung Linguistik", new GregorianCalendar(2012, 3, 6, 12, 0), 2);
 // uncomment the following line for STIMULUS PAIR 5
-		//gm.nlg.setUtteranceObject(new MovedEvent(event6, event6changed));
+		gm.nlg.setUtteranceObject(new MovedEvent(event6, event6changed));
 
-		final CalendarEvent event7 = new CalendarEvent("Schwimmen gehen", new GregorianCalendar(2012, 6, 6, 15, 0), 2);
-		final CalendarEvent event7conflict = new CalendarEvent("Geburtstag Tante Ilse.", new GregorianCalendar(2012, 6, 6, 15, 0), 4);
+		final CalendarEvent event7 = new CalendarEvent("Schwimmen gehen", new GregorianCalendar(2012, 6, 6, 14, 0), 2);
+		final CalendarEvent event7conflict = new CalendarEvent("Geburtstag Tante Ilse", new GregorianCalendar(2012, 6, 6, 15, 0), 4);
 // uncomment the following line for STIMULUS PAIR 6
 		//gm.nlg.setUtteranceObject(new EventConflict(event7, event7conflict));
 
@@ -149,7 +149,7 @@ public class GenerationModule extends IUModule {
 		final CalendarEvent event10 = new CalendarEvent("Besprechung mit Betreuer", new GregorianCalendar(2012, 6, 27, 14,0), 1);
 		final CalendarEvent event10conflict = new CalendarEvent("Mensaführung", new GregorianCalendar(2012, 6, 27, 13, 00), 3);
 // uncomment the following line for STIMULUS PAIR 9
-//		gm.nlg.setUtteranceObject(new EventConflict(event10, event10conflict));
+		//gm.nlg.setUtteranceObject(new EventConflict(event10, event10conflict));
 		
 		gm.generate();
 		NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), sm, gm.phraseUpdateListener);

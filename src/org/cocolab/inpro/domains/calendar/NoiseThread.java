@@ -35,14 +35,15 @@ public class NoiseThread extends Thread {
 	public void run() {
 		while (true) {
 			try {
-				Thread.sleep(randomIntBetween(2000, 7000));
+				Thread.sleep(randomIntBetween(2000, 5000));
 				System.out.println("BRRRRRRRRRRRRRRRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUMMMMMMMMMMMMMM!");
-//				String pathToFile = "file:///Users/hendrik/Desktop/iNLG_iSS/noise/pinknoise.";
-				String pathToFile = "file:/home/timo/uni/experimente/050_itts+inlg/noise/pinknoise.";
-				String fileSuffix = "ms.-6db.wav";
+				String pathToFile = "file:///Users/hendrik/Desktop/iNLG_iSS/noise/pinknoise.";
+				//String pathToFile = "file:/home/timo/uni/experimente/050_itts+inlg/noise/pinknoise.";
+				//String fileSuffix = "ms.-3db.wav";
+				String fileSuffix = "ms.wav";
 
 				// CONDITION A: totally ignore noise 
-				sm.playNoiseDeaf(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
+				/*sm.playNoiseDeaf(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
 				Thread.sleep(noiseLength - responsiveness); /**/
 
 				// CONDITION B: stop & continue audio stream
@@ -50,7 +51,7 @@ public class NoiseThread extends Thread {
 				Thread.sleep(noiseLength - responsiveness); /**/
 
 				// CONDITION C: stop after current word, regenerate & resynthesize
-				/*sm.playNoiseSmart(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
+				sm.playNoiseSmart(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
 				Thread.sleep(noiseLength - responsiveness);
 				am.noGrounding(); 
 				am.setLevelOfUnderstanding(5);
