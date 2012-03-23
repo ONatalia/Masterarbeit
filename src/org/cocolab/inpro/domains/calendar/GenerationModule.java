@@ -2,7 +2,6 @@ package org.cocolab.inpro.domains.calendar;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -111,9 +110,9 @@ public class GenerationModule extends IUModule {
 
 		final CalendarEvent event2 = new CalendarEvent("Einkaufen auf dem Wochenmarkt", new GregorianCalendar(2012, 4, 14, 10, 0), 2);
 		final CalendarEvent event2changed = new CalendarEvent("Einkaufen auf dem Wochenmarkt", new GregorianCalendar(2012, 4, 14, 9, 30), 2);
-		final CalendarEvent event3 = new CalendarEvent("Augenarzt", new GregorianCalendar(2012, 4, 14, 10, 30), 1);
+		final CalendarEvent event3 = new CalendarEvent("Zahn Arzt", new GregorianCalendar(2012, 4, 14, 10, 30), 1);
 // uncomment the following line for STIMULUS PAIR 1
-		//gm.nlg.setUtteranceObject(new EventConflict(event2, event3));
+		gm.nlg.setUtteranceObject(new EventConflict(event2, event3));
 // uncomment the following for STIMULUS PAIR 2
 		//gm.nlg.setUtteranceObject(new MovedEvent(event2, event2changed));
 
@@ -150,13 +149,13 @@ public class GenerationModule extends IUModule {
 		final CalendarEvent event10 = new CalendarEvent("Besprechung mit Betreuer", new GregorianCalendar(2012, 6, 27, 14,0), 1);
 		final CalendarEvent event10conflict = new CalendarEvent("Mensaführung", new GregorianCalendar(2012, 6, 27, 13, 00), 3);
 // uncomment the following line for STIMULUS PAIR 9
-		gm.nlg.setUtteranceObject(new EventConflict(event10, event10conflict));
+//		gm.nlg.setUtteranceObject(new EventConflict(event10, event10conflict));
 		
 		gm.generate();
 		NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), sm, gm.phraseUpdateListener);
 		nt.start();
 	}
-	
+
 	
 	@Override
 	protected void leftBufferUpdate(Collection<? extends IU> ius,

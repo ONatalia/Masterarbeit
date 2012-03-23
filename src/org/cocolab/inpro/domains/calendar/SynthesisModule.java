@@ -120,13 +120,44 @@ public class SynthesisModule extends IUModule {
 	}
 	
 	/** any ongoing noise is replaced with this one */
-	protected synchronized void playNoise(String file) {
+	protected synchronized void playNoiseSmart(String file) {
 		noiseDispatcher.playFile(file, true);
+		sleepy(300);
 		// TODO: interrupt ongoing utterance 
 		// stop after ongoing word, 
 		currentInstallment.stopAfterOngoingWord();
 		// (no need to keep reference to the ongoing utterance as we'll start a new one anyway)
-		currentInstallment = null; 
+		currentInstallment = null;
+	}
+
+	/** any ongoing noise is replaced with this one */
+	protected synchronized void playNoiseDumb(String file) {
+		noiseDispatcher.playFile(file, true);
+		sleepy(300);
+		speechDispatcher.interruptPlayback();
+		// wait until noiseDispatcher is done
+		synchronized(noiseDispatcher) {
+			while (noiseDispatcher.isSpeaking()) {
+				try {
+					noiseDispatcher.wait();	} catch (InterruptedException e) { e.printStackTrace();
+				}
+			}
+		}
+		sleepy(100);
+		speechDispatcher.continuePlayback();
+	}
+	
+	protected synchronized void playNoiseDeaf(String file) {
+		noiseDispatcher.playFile(file, true);
+	}
+
+	void sleepy(int ms) {
+		try {
+			Thread.sleep(ms);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/* wow, this is ugly. but oh well ... as long as it works */

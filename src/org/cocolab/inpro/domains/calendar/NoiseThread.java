@@ -17,6 +17,7 @@ public class NoiseThread extends Thread {
 	private int responsiveness = 50;
 	
 	public NoiseThread(AdaptionManager am, SynthesisModule sm, IUUpdateListener updateListener) {
+		super("Noise Thread");
 		this.am = am;
 		this.sm = sm;
 		this.updateListener = updateListener;
@@ -33,16 +34,30 @@ public class NoiseThread extends Thread {
 	
 	public void run() {
 		while (true) {
-		try {
-			Thread.sleep(randomGaussianIntBetween(3000, 7000, 4500, 2500));
-			System.out.println("BRRRRRRRRRRRRRRRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUMMMMMMMMMMMMMM!");
-			sm.playNoise("file:///Users/hendrik/Desktop/iNLG_iSS/pinknoise." + new Integer(noiseLength).toString() + "ms.wav");
-			Thread.sleep(noiseLength - responsiveness);
-		} catch (InterruptedException e) {e.printStackTrace();}
-		am.noGrounding();
-		am.setLevelOfUnderstanding(5);
-		am.setVerbosityFactor(0);
-		updateListener.update(null);
+			try {
+				Thread.sleep(randomIntBetween(2000, 7000));
+				System.out.println("BRRRRRRRRRRRRRRRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUMMMMMMMMMMMMMM!");
+//				String pathToFile = "file:///Users/hendrik/Desktop/iNLG_iSS/noise/pinknoise.";
+				String pathToFile = "file:/home/timo/uni/experimente/050_itts+inlg/noise/pinknoise.";
+				String fileSuffix = "ms.-6db.wav";
+
+				// CONDITION A: totally ignore noise 
+				sm.playNoiseDeaf(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
+				Thread.sleep(noiseLength - responsiveness); /**/
+
+				// CONDITION B: stop & continue audio stream
+				/*sm.playNoiseDumb(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
+				Thread.sleep(noiseLength - responsiveness); /**/
+
+				// CONDITION C: stop after current word, regenerate & resynthesize
+				/*sm.playNoiseSmart(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
+				Thread.sleep(noiseLength - responsiveness);
+				am.noGrounding(); 
+				am.setLevelOfUnderstanding(5);
+				am.setVerbosityFactor(0);
+				updateListener.update(null); /**/
+
+			} catch (InterruptedException e) {e.printStackTrace();}
 		}
 	}
 	

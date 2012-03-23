@@ -16,6 +16,7 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.LabelledAudioStream;
 import org.cocolab.inpro.gui.util.SpeechStateVisualizer;
@@ -111,11 +112,17 @@ public class DispatchStream extends InputStream implements Configurable {
 		if (ssv != null) {
 			this.ssv.systemTalking(true);			
 		}
+		synchronized(this) {
+			notifyAll();
+		}
 	}
 
 	protected void setIsSilent() {
 		if (ssv != null) {
 			this.ssv.systemTalking(false);
+		}
+		synchronized(this) {
+			notifyAll();
 		}
 	}
 	
@@ -225,11 +232,23 @@ public class DispatchStream extends InputStream implements Configurable {
 		}
 	}
 	
+	/** a flag to interrupt output; used by read() to determine whether it should send silence or data */
+	boolean isInterrupted = false;
+	public void interruptPlayback() {
+		isInterrupted = true;
+	}	
+	public void continuePlayback() {
+		isInterrupted = false;
+	}
+	
+
+	
 	/* * InputStream implementation * */
 	
 	@Override
 	public int read() throws IOException {
-		synchronized(this) {
+		throw new NotImplementedException();
+/*		synchronized(this) {
 			if (stream == null)  {
 				stream = streamQueue.poll();
 			}
@@ -240,7 +259,7 @@ public class DispatchStream extends InputStream implements Configurable {
 				returnValue = 0;
 			}
 			return returnValue;
-		}
+		} */
 	}
 	
 	private void nextStream() {
@@ -261,10 +280,14 @@ public class DispatchStream extends InputStream implements Configurable {
 				nextStream();
 			}
 			while (stream != null) {
-				bytesRead = stream.read(b, off, len);
-				if (bytesRead == -1) {
-					nextStream();
-				} else break;
+				if (isInterrupted) {
+					Arrays.fill(b, off, len, (byte) 0);
+				} else {
+					bytesRead = stream.read(b, off, len);
+					if (bytesRead == -1) {
+						nextStream();
+					} else break;
+				}
 			}
 			if (bytesRead < len) { // if the stream could not provide enough bytes, then it's probably ended
 				if (sendSilence && !inShutdown) { 
