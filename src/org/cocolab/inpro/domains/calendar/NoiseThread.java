@@ -32,11 +32,9 @@ public class NoiseThread extends Thread {
 	}
 	
 	public void run() {
-		int i = 0;
 		while (true) {
-			i++;
 		try {
-			Thread.sleep(randomIntBetween(2000, 7000));
+			Thread.sleep(randomGaussianIntBetween(3000, 7000, 4500, 2500));
 			System.out.println("BRRRRRRRRRRRRRRRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUMMMMMMMMMMMMMM!");
 			sm.playNoise("file:///Users/hendrik/Desktop/iNLG_iSS/pinknoise." + new Integer(noiseLength).toString() + "ms.wav");
 			Thread.sleep(noiseLength - responsiveness);
@@ -47,7 +45,15 @@ public class NoiseThread extends Thread {
 		updateListener.update(null);
 		}
 	}
-
+	
+	int randomGaussianIntBetween(int min, int max, int mean, int sd) {
+		assert(min < max);
+		double g;
+		do {
+			g = random.nextGaussian() * sd + mean;
+		} while (g < min || g > max);
+		return (int) Math.round(g);
+	}
 	
 	private int randomIntBetween(int min, int max) {
 		assert(min < max);
