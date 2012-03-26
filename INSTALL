@@ -18,77 +18,28 @@ distribution, but your milleage with this may vary.
 Dependencies:
 =============
 
-1. Sphinx4:
+all dependencies should be covered by the libraries in lib/;
+add them to your CLASSPATH / build path
 
-get it at http://sourceforge.net/project/showfiles.php?group_id=1904&package_id=117949
+1. MaryTTS:
+-----------
+For using Incremental Speech Synthesis, a version of 
+MaryTTS 4.x must be installed locally and you must set the
+mary.base property to point to Mary's location on disk such as 
+through using the following switch with Java:
+-Dmary.base=/home/timo/uni/projekte/itts/openmary-4.x-branch
 
-There are a few modifications between stock sphinx and the one we use.
-If you run into troubles, please look on our webpage to see whether you
-should use "our" sphinx4.jar . 
+You will then have to change the following in your Mary configuration:
+in MARY_BASE/conf/marybase.config replace the line
+        marytts.modules.HTSEngine \
+with
+        org.cocolab.inpro.tts.hts.InteractiveHTSEngine \
+in the definition of modules.classes.list .
+(You will still be able to use an existing Mary installation 
+as before if you add the path to InproTK to Mary's CLASSPATH.) 
 
-All you need is the library sphinx4.jar that you want to add 
-to your CLASSPATH.
-
-1a. German Acoustic Model:
-
-get it via ssh at helios:/home/timo/KCoRS_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
-and at it to your CLASSPATH. There may be more current models around and you may
-also want to look on www.voxforge.org for acoustic models
-
-KCoRS_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
-Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar
-
-Acoustic models for German may also be available from Voxforge. 
-See http://www.voxforge.org/home/downloads/ for details.
-
-copy the models you want/need and put them in /opt/java/
-
-2. OAA (2.3.2):
-
-get it at http://www.ai.sri.com/oaa/distribution/v2.3/2.3.2/
-
-You will definitely need the facilitator (in runtime/
-/facilitator/) and likely the debugger (in runtime/debug/ and
-runtime/debug_c/) to run the modules that require to talk
-via the OAA.
-
-Also, add the libraries in lib/jar to your CLASSPATH.
-( oaa2.jar and antlr-oaa.jar are the only needed ones from the 
-OAA-project. The other needed libraries may also be 
-installable via your package manager).
-
-3. Java Media Framework (2.1.1):
-
-JMF is no longer required for using InproTK
-
-4. weka (3.5.x)
-
-get it at http://www.cs.waikato.ac.nz/ml/weka/index_downloading.html
-
-Add weka.jar to your CLASSPATH.
-
-5. drej (1.2) 
-
-get it at http://www.gregdennis.com/drej/
-
-and add it to your CLASSPATH. It also requires vecmath.jar,
-available from https://java3d.dev.java.net/binary-builds.html,
-which must be added to your CLASSPATH as well.
-
-6. maryclient
-
-get it from http://mary.dfki.de/
-
-Currently, our code depends on both Mary 3.6's and Mary 4.0's maryclient.jar,
-as we are aiming to support both as TTS server and as the client/server
-protocol has changed between 3.6 and 4.0. However, you can change 
-org.cocolab.inpro.audio.MaryAdapter to get rid of the dependency on one or
-the other.
-
-7. some more libraries (dom4j, junit, log4j, vecmath, emory-backports, ...)
-
-These should be installable through your system's package manager 
-as they are fairly standard libraries.
-
-Some more libraries might be in the res/ or lib/ folders. 
-Adding them to your build path might (or might not) help.
+You should have Mary's bits1-hsmm voice installed.
+  
+Please note that the mary-common.jar that we provide in lib/ is 
+necessary as it contains some local changes not in the main 
+Mary codebase.
