@@ -15,11 +15,20 @@ public class NoiseThread extends Thread {
 	private int noiseLength = 1000;
 	private int responsiveness = 50;
 	
-	public NoiseThread(AdaptionManager am, SynthesisModule sm, IUUpdateListener updateListener) {
+	NoiseHandling noiseHandling;
+	
+	enum NoiseHandling { 
+		none, // condition A in SigDial paper: totally ignore noise
+		pauseStream, // condition B in SigDial paper: stop & continue audio stream
+		regenerate  // condition C in SigDial paper: stop after current word, regenerate & resynthesize
+	}
+	
+	public NoiseThread(AdaptionManager am, SynthesisModule sm, IUUpdateListener updateListener, NoiseHandling nh) {
 		super("Noise Thread");
 		this.am = am;
 		this.sm = sm;
 		this.updateListener = updateListener;
+		this.noiseHandling = nh;
 	}
 	
 	public void run() {
@@ -32,22 +41,24 @@ public class NoiseThread extends Thread {
 				//String fileSuffix = "ms.-3db.wav";
 				String fileSuffix = "ms.wav";
 
-				// CONDITION A: totally ignore noise 
-				/*sm.playNoiseDeaf(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
-				Thread.sleep(noiseLength - responsiveness); /**/
-
-				// CONDITION B: stop & continue audio stream
-				/*sm.playNoiseDumb(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
-				Thread.sleep(noiseLength - responsiveness); /**/
-
-				// CONDITION C: stop after current word, regenerate & resynthesize
-				sm.playNoiseSmart(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
-				Thread.sleep(noiseLength - responsiveness);
-				am.noGrounding(); 
-				am.setLevelOfUnderstanding(5);
-				am.setVerbosityFactor(0);
-				updateListener.update(null); /**/
-
+				switch (noiseHandling) {
+				case none: // CONDITION A
+					sm.playNoiseDeaf(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
+					Thread.sleep(noiseLength - responsiveness);
+					break;
+				case pauseStream: // CONDITION B
+					sm.playNoiseDumb(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
+					Thread.sleep(noiseLength - responsiveness);
+					break;
+				case regenerate: // CONDITION C
+					sm.playNoiseSmart(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
+					Thread.sleep(noiseLength - responsiveness);
+					am.noGrounding(); 
+					am.setLevelOfUnderstanding(5);
+					am.setVerbosityFactor(0);
+					updateListener.update(null);
+					break;
+				}
 			} catch (InterruptedException e) {e.printStackTrace();}
 		}
 	}

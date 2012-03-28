@@ -33,13 +33,12 @@ public class SynthesisModule extends IUModule {
 
 	PhraseBasedInstallmentIU currentInstallment;
 	
-	@SuppressWarnings("unused")
 	public SynthesisModule() {
 		upcomingPhrases = new ArrayList<PhraseIU>();
 		noiseDispatcher = setupDispatcher2();
 		speechDispatcher = SimpleMonitor.setupDispatcher();
 		MaryAdapter.initializeMary(); // preload mary
-		new SysInstallmentIU("Ein Satz zum Aufwärmen der Optimierungsmethoden."); // preheat mary
+		(new SysInstallmentIU("Ein Satz zum Aufwärmen der Optimierungsmethoden.")).toMbrola(); // preheat mary
 		// preheat HMM optimization and vocoding, hmpf.
 		speechDispatcher.playInstallment(new SysInstallmentIU("Neuer Stimulus:"));
 		speechDispatcher.waitUntilDone();

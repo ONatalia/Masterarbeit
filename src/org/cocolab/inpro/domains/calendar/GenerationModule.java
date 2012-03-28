@@ -7,6 +7,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.cocolab.inpro.domains.calendar.NoiseThread.NoiseHandling;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.unit.EditMessage;
@@ -106,7 +107,7 @@ public class GenerationModule extends IUModule {
 	
 	/** set the stimulus (between 1 and 9) */
 	public void setStimulus(int stimulus) {
-		assert stimulus < 0 && stimulus < 10;
+		assert stimulus > 0 && stimulus < 10;
 		switch (stimulus) {
 		case 1: // --> 6 phrases
 			final CalendarEvent event1 = new CalendarEvent("Einkaufen auf dem Wochenmarkt", new GregorianCalendar(2012, 4, 14, 10, 0), 2);
@@ -170,11 +171,12 @@ public class GenerationModule extends IUModule {
 		gm.iulisteners.add(sm);
 		
 
-		int stimulus = 1;
+		int stimulusID = 1;
 		// for detailed timing-measurements:
 		boolean measureTiming = false;
+		NoiseHandling noiseHandling = NoiseHandling.regenerate;
 		
-		gm.setStimulus(stimulus);
+		gm.setStimulus(stimulusID);
 		
 		Logger speedLogger = Logger.getLogger("speedlogger");
 		if (measureTiming) {
@@ -183,14 +185,14 @@ public class GenerationModule extends IUModule {
 			speedLogger.info(fullUtterance);
 			gm.nlg.clear();
 			// NEED TO RESET Stimulus here
-			gm.setStimulus(stimulus);
+			gm.setStimulus(stimulusID);
 			long start = System.currentTimeMillis();
 			fullUtterance = gm.nlg.generateCompleteUtteranceNonIncrementally();
 			long duration = System.currentTimeMillis() - start;
 			speedLogger.info("non-incremental NLG: " + duration);
 			gm.nlg.clear();
 			// and NEED TO RESET Stimulus here
-			gm.setStimulus(stimulus);
+			gm.setStimulus(stimulusID);
 			
 			fullUtterance = fullUtterance.replaceAll(" \\| ", " ");
 			speedLogger.info(fullUtterance);
@@ -212,7 +214,7 @@ public class GenerationModule extends IUModule {
 		gm.generate();
 		long duration = System.currentTimeMillis() - start;
 		speedLogger.info("full onset took: " + duration);
-		NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), sm, gm.phraseUpdateListener);
+		NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), sm, gm.phraseUpdateListener, noiseHandling);
 		nt.start();
 	}
 
