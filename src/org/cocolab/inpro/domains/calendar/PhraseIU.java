@@ -3,7 +3,6 @@ package org.cocolab.inpro.domains.calendar;
 import java.util.List;
 
 import org.cocolab.inpro.incremental.unit.IU;
-import org.cocolab.inpro.incremental.unit.WordIU;
 
 public class PhraseIU extends IU {
 

@@ -40,22 +40,9 @@ public class SynthesisModule extends IUModule {
 		speechDispatcher = SimpleMonitor.setupDispatcher();
 		MaryAdapter.initializeMary(); // preload mary
 		new SysInstallmentIU("Ein Satz zum Aufwärmen der Optimierungsmethoden."); // preheat mary
-		// TODO: preheat HMM optimization and vocoding, hmpf.
-		speechDispatcher.playInstallment(new SysInstallmentIU("Neuer Stimulus: "));
+		// preheat HMM optimization and vocoding, hmpf.
+		speechDispatcher.playInstallment(new SysInstallmentIU("Neuer Stimulus:"));
 		speechDispatcher.waitUntilDone();
-/*		final SynthesisModule that = this;
-		(new Thread() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				that.playNoise("file:/home/timo/uni/experimente/050_itts+inlg/audio/pinknoise.1000ms.wav");
-			}
-		}).start(); /**/
 	}
 	
 	/**
