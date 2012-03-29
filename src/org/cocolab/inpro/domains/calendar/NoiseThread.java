@@ -2,6 +2,7 @@ package org.cocolab.inpro.domains.calendar;
 
 import java.util.Random;
 
+import org.cocolab.inpro.domains.calendar.NoiseThread.NoiseHandling;
 import org.cocolab.inpro.incremental.unit.IU.IUUpdateListener;
 
 import scalendar.adaptionmanager.AdaptionManager;
@@ -20,7 +21,14 @@ public class NoiseThread extends Thread {
 	enum NoiseHandling { 
 		none, // condition A in SigDial paper: totally ignore noise
 		pauseStream, // condition B in SigDial paper: stop & continue audio stream
-		regenerate  // condition C in SigDial paper: stop after current word, regenerate & resynthesize
+		regenerate; // condition C in SigDial paper: stop after current word, regenerate & resynthesize
+
+		public static NoiseHandling parseParam(String param) {
+			if (param.equals("conditionA")) return none;
+			if (param.equals("conditionB")) return pauseStream;
+			if (param.equals("conditionC")) return regenerate;
+			throw new RuntimeException("illegal parameter for noise handling");
+		}
 	}
 	
 	public NoiseThread(AdaptionManager am, SynthesisModule sm, IUUpdateListener updateListener, NoiseHandling nh) {

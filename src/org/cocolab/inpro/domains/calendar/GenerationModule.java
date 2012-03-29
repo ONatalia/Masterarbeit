@@ -56,7 +56,7 @@ public class GenerationModule extends IUModule {
 					// change back to initial values - hack for SigDial Paper
 					AdaptionManager.getInstance().setLevelOfUnderstanding(3);
 					AdaptionManager.getInstance().setVerbosityFactor(1);
-					AdaptionManager.getInstance().hasChanged(); // we now it has, but sets flag to false again.
+					AdaptionManager.getInstance().hasChanged(); // we know it has, but sets flag to false again.
 					projectedPhrase = nlg.simulateNextButOnePhrase();	
 				} else {
 					projectedPhrase = nlg.takeSimulatedAndSimulateNextPhrase();
@@ -161,20 +161,42 @@ public class GenerationModule extends IUModule {
 	
 	
 	public static void main(String[] args) throws FileNotFoundException, ParseException {
+		int stimulusID = 1;
+		// for detailed timing-measurements:
+		boolean measureTiming = false;
+		boolean playNoise = true;
+		NoiseHandling noiseHandling = NoiseHandling.regenerate;
+		String knowledgeFile = "src/org/cocolab/inpro/domains/calendar/calendar.gs";
+
+		// handle command line arguments if there are any
+		if (args.length > 0) {
+			try {
+				stimulusID = Integer.parseInt(args[0]);
+				knowledgeFile = args[1];
+				measureTiming = Boolean.parseBoolean(args[2]);
+				playNoise = Boolean.parseBoolean(args[3]);
+				if (playNoise) {
+					noiseHandling = NoiseHandling.parseParam(args[4]);
+				}
+			} catch (Exception e) {
+				System.err.println("Command-line arguments (if any are given) must be:");
+				System.err.println("1. stimulus ID (a number between 1 and 9)");
+				System.err.println("2. location of the knowledge file (full path to calendar.gs)");
+				System.err.println("3. whether to give detailed timing measurements (true/false)");
+				System.err.println("4. whether to play noise (true/false)");
+				System.err.println("5. the noise handling strategy (conditionA/conditionB/conditionC)");
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
+		
 		SpudManager spudmanager = new SpudManager(
-				new CalendarKnowledgeInterface(),
-				"src/org/cocolab/inpro/domains/calendar/calendar.gs");
+				new CalendarKnowledgeInterface(), knowledgeFile);
 		GenerationModule gm = new GenerationModule(spudmanager);
 		final SynthesisModule sm = new SynthesisModule();
 
 		gm.iulisteners = new ArrayList<PushBuffer>();
 		gm.iulisteners.add(sm);
-		
-
-		int stimulusID = 1;
-		// for detailed timing-measurements:
-		boolean measureTiming = false;
-		NoiseHandling noiseHandling = NoiseHandling.regenerate;
 		
 		gm.setStimulus(stimulusID);
 		
@@ -214,8 +236,20 @@ public class GenerationModule extends IUModule {
 		gm.generate();
 		long duration = System.currentTimeMillis() - start;
 		speedLogger.info("full onset took: " + duration);
-		NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), sm, gm.phraseUpdateListener, noiseHandling);
-		nt.start();
+		if (playNoise) {
+			NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), sm, gm.phraseUpdateListener, noiseHandling);
+			nt.start();
+		}
+		
+		// dirty hack to force shutdown (should rather have a way to tear down AudioDispatchers in a sane way
+		// something like dispatchStream.setTimeout(60000); // should shutdown the stream after a minute of no output 
+		try {
+			Thread.sleep(60000); // sleep for a minute
+			System.exit(0);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 	}
 
 	
