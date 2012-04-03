@@ -92,7 +92,7 @@ public class SITDBSParser {
 	
 	/** feeds the parser with the next input token **/
 	public void feed(Symbol nextToken) {
-		logger.info(logPrefix+"feed: "+nextToken);
+		//logger.info(logPrefix+"feed: "+nextToken);
 		
 		if (mQueue.size() < 1) {
 			// the queue is empty and no further token can be accepted
@@ -125,30 +125,30 @@ public class SITDBSParser {
 		while (true) {
 			if (currentQueue.size() >= maxCandidatesLimit) {
 				// max size reached; await next token
-				logger.debug(logPrefix+": max size reached");
+				//logger.debug(logPrefix+": max size reached");
 				break;
 			}
 			CandidateAnalysis ca = currentQueue.poll();
 			if (ca == null) {
 				// no more candidate analysis on the queue; await next token
-				logger.debug(logPrefix+": no more ca on queue");
+				//logger.debug(logPrefix+": no more ca on queue");
 				break;
 			}
 			if (! newQueue.isEmpty()) {
 				if (ca.getProbability() < (newQueue.peek().getProbability() * mBaseBeamFactor * newQueue.size())) {
 					// best derivation below threshold; await next token
-					logger.debug(logPrefix+": outside beam");
+					//logger.debug(logPrefix+": outside beam");
 					cntPrunes++;
 					break;
 				} else {
-					logger.debug(String.format(logPrefix+": %1$9.4g >= %2$9.4g (n=%3$d).", ca.getProbability(), (newQueue.peek().getProbability() * mBaseBeamFactor * newQueue.size()), newQueue.size()));
+					//logger.debug(String.format(logPrefix+": %1$9.4g >= %2$9.4g (n=%3$d).", ca.getProbability(), (newQueue.peek().getProbability() * mBaseBeamFactor * newQueue.size()), newQueue.size()));
 					//logger.debug(logPrefix+": "+ca.getProbability()+" >= ("+newQueue.peek().getProbability()+" * "+mBaseBeamFactor+" * "+newQueue.size()+").");
 				}
 			}
 			if (ca.isComplete()) {
 				// stack is empty i.e. no more material expected, although we have another token;
 				// drop this analysis and continue with next one
-				logger.debug(logPrefix+": completed too early");
+				//logger.debug(logPrefix+": completed too early");
 				continue;
 			}
 			Symbol topSymbol = ca.getTopSymbol();
@@ -258,10 +258,10 @@ public class SITDBSParser {
 			cntDegradations++;
 			ca.degradeProbability(malus);
 			mQueue.add(ca);
-			logger.debug(logPrefix+" CA found, degraded and readded.");
+			//logger.debug(logPrefix+" CA found, degraded and readded.");
 			return ca;
 		} else {
-			logger.debug(logPrefix+" CA not found!");
+			//logger.debug(logPrefix+" CA not found!");
 			return null;
 		}
 	}

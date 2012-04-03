@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import org.cocolab.inpro.alchemy.util.INLUContainer;
 import org.cocolab.inpro.domains.pentomino.nlu.PentoRMRSResolver;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.unit.CandidateAnalysisIU;
@@ -213,12 +214,12 @@ public class RMRSComposer extends IUModule {
 							previousFIU = (FormulaIU) states.get(previousCa);
 						}
 						List<String> lastDerive = ca.getCandidateAnalysis().getLastDerive();
-						logger.debug(logPrefix+"-------");
+						//logger.debug(logPrefix+"-------");
 						Formula newForm = new Formula(previousFIU.getFormula());
 						
 						// ## 2. go through all new syntactic rule applications
 						for (String rule : lastDerive) {
-							logger.debug(logPrefix+"= "+newForm.toStringOneLine());
+							//logger.debug(logPrefix+"= "+newForm.toStringOneLine());
 							
 							// ## a) normal match (add lexical semantics of the token)
 							if (rule.startsWith("m(")) {
@@ -239,10 +240,10 @@ public class RMRSComposer extends IUModule {
 											lexname = l.get(0);
 										}									
 									}
-									logger.debug(logPrefix+"P "+wiu.getAVPairs());									
+									//logger.debug(logPrefix+"P "+wiu.getAVPairs());									
 									Formula lexitem = new Formula(lexname, type);
-									logger.debug(logPrefix+"+ "+rule);
-									logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
+									//logger.debug(logPrefix+"+ "+rule);
+									//logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
 									newForm.forwardCombine(lexitem);
 								}
 								
@@ -253,8 +254,8 @@ public class RMRSComposer extends IUModule {
 								Variable.Type type = semanticTypesOfTags.get(tag);
 								String lexname = tag.toUpperCase();
 								Formula lexitem = new Formula(lexname, type);
-								logger.debug(logPrefix+"+ "+rule);
-								logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
+								//logger.debug(logPrefix+"+ "+rule);
+								//logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
 								newForm.forwardCombine(lexitem);
 																
 							// ## c) robust match: insertions (add the token's default semantics without consuming a slot)
@@ -272,26 +273,26 @@ public class RMRSComposer extends IUModule {
 										}									
 									}
 								} catch (NullPointerException e) {}
-								logger.debug(logPrefix+"P "+wiu.getAVPairs());									
+								//logger.debug(logPrefix+"P "+wiu.getAVPairs());									
 								Formula lexitem = new Formula(lexname, type);
-								logger.debug(logPrefix+"+ "+rule);
-								logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
+								//logger.debug(logPrefix+"+ "+rule);
+								//logger.debug(logPrefix+"+ "+lexitem.toStringOneLine());
 								newForm.simpleAdd(lexitem);
 								
 							// ## d) rule expansion (add rule semantics)	
 							} else {
 								Formula rulesem = semanticRules.get(rule);
-								logger.debug(logPrefix+"+ "+rule);
-								logger.debug(logPrefix+"+ "+rulesem.toStringOneLine());
+								//logger.debug(logPrefix+"+ "+rule);
+								//logger.debug(logPrefix+"+ "+rulesem.toStringOneLine());
 								newForm.forwardCombine(rulesem);
 							}
 
 							// reduce formula
-							logger.debug(logPrefix+"= "+newForm.toStringOneLine());
+							//logger.debug(logPrefix+"= "+newForm.toStringOneLine());
 							newForm.reduce();
 							//newForm.renumber(0);
-							logger.debug(logPrefix+"= "+newForm.toStringOneLine());
-							logger.debug(logPrefix+"> "+newForm.getNominalAssertions());
+							//logger.debug(logPrefix+"= "+newForm.toStringOneLine());
+							//logger.debug(logPrefix+"> "+newForm.getNominalAssertions());
 						}
 						
 						// ## 3. Add the output formula to the outgoing newEdits.
@@ -301,20 +302,21 @@ public class RMRSComposer extends IUModule {
 						
 						// ## 4. ReferencePruning (optional): resolve the output formula and
 						//       degrade the analysis of non-resolving formulas
+						referencePruning = INLUContainer.referencePruning;
 						if (referencePruning) {
 							if (!ca.getCandidateAnalysis().isComplete()) {
 								resolver.setPerformDomainAction(false); // don't show the resolved items now
 								int resolve = resolver.resolves(newForm);
 								switch (resolve) {
 								case -1: 
-									System.err.println("DEGRADE");
+									//System.err.println("DEGRADE");
 									parser.degradeAnalysis(ca, malusNoReference);
 									break;
 								case 0:
-									System.err.println("IGNORE");
+									//System.err.println("IGNORE");
 									break;
 								case 1:
-									System.err.println("ENCOURAGE");
+									//System.err.println("ENCOURAGE");
 									break;
 								default :
 									break;
@@ -336,18 +338,18 @@ public class RMRSComposer extends IUModule {
 								if (gold != null) {
 									resolution = resolver.resolvesObject(((FormulaIU)sem).getFormula(), gold);
 								}
-								parser.printStatus(ca);
-								logger.warn("[Q] SYN "+ca.getCandidateAnalysis().toFinalString());
-								logger.warn("[Q] SEM "+((FormulaIU)sem).getFormula().toStringOneLine());
-								logger.warn("[Q] MRS "+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic());
-								logger.warn("[Q] RES "+resolution);
-								logger.warn("[Q] HS1 "+compareToGoldValueHistory1Best);
+								//parser.printStatus(ca);
+								//logger.warn("[Q] SYN "+ca.getCandidateAnalysis().toFinalString());
+								//logger.warn("[Q] SEM "+((FormulaIU)sem).getFormula().toStringOneLine());
+								//logger.warn("[Q] MRS "+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic());
+								//logger.warn("[Q] RES "+resolution);
+								//logger.warn("[Q] HS1 "+compareToGoldValueHistory1Best);
 								double iscore1 = calculateIncrementalScore(compareToGoldValueHistory1Best);
-								logger.warn("[Q] IS1 "+iscore1);
-								logger.warn("[Q] HS5 "+compareToGoldValueHistory5Best);
+								//logger.warn("[Q] IS1 "+iscore1);
+								//logger.warn("[Q] HS5 "+compareToGoldValueHistory5Best);
 								double iscore5 = calculateIncrementalScore(compareToGoldValueHistory5Best);
-								logger.warn("[Q] IS5 "+iscore5);
-								logger.warn("[Q] ALL "+ca.getCandidateAnalysis().toFinalString()+"\t"+((FormulaIU)sem).getFormula().toStringOneLine()+"\t"+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic()+"\t"+resolution+"\t"+compareToGoldValueHistory1Best+"\t"+iscore1+"\t"+resolution+"\t"+compareToGoldValueHistory5Best+"\t"+iscore5);
+								//logger.warn("[Q] IS5 "+iscore5);
+								//logger.warn("[Q] ALL "+ca.getCandidateAnalysis().toFinalString()+"\t"+((FormulaIU)sem).getFormula().toStringOneLine()+"\t"+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic()+"\t"+resolution+"\t"+compareToGoldValueHistory1Best+"\t"+iscore1+"\t"+resolution+"\t"+compareToGoldValueHistory5Best+"\t"+iscore5);
 								
 							}
 						}

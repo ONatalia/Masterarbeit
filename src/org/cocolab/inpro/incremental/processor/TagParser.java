@@ -132,7 +132,7 @@ public class TagParser extends IUModule {
 							analyses.add(newCAIU);
 							newEdits.add(new EditMessage<CandidateAnalysisIU>(EditType.ADD, newCAIU));
 						}
-						newState.status();
+						//newState.status();
 					}
 					break;
 				case COMMIT:
@@ -150,7 +150,7 @@ public class TagParser extends IUModule {
 
 	/** degrades the analysis encapsuled in the given CandidateAnalysisIU by the given malus **/
 	public void degradeAnalysis(CandidateAnalysisIU caiu, double malus) {
-		logger.debug("[P] Degrade ca="+caiu.getCandidateAnalysis().toString()+" by "+malus+".");
+		//logger.debug("[P] Degrade ca="+caiu.getCandidateAnalysis().toString()+" by "+malus+".");
 
 		double originalWeight = caiu.getCandidateAnalysis().getProbability();
 		double targetWeight = originalWeight * malus;
@@ -171,7 +171,7 @@ public class TagParser extends IUModule {
 				caiu.getCandidateAnalysis().degradeProbability(malus);				
 			}
 		} else {
-			logger.fatal("[P] The CA could not be degraded.");
+			//logger.fatal("[P] The CA could not be degraded.");
 		}
 	}
 	
