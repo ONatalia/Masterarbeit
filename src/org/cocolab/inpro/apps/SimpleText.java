@@ -25,6 +25,7 @@ import org.cocolab.inpro.apps.util.IUService;
 import org.cocolab.inpro.apps.util.ServiceContainer;
 import org.cocolab.inpro.apps.util.TextCommandLineParser;
 import org.cocolab.inpro.incremental.PushBuffer;
+import org.cocolab.inpro.incremental.eyetracker.CurrentEyeTrackingPoint;
 import org.cocolab.inpro.incremental.listener.FrameAwarePushBuffer;
 import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
 import org.cocolab.inpro.incremental.processor.TextBasedFloorTracker;
@@ -71,8 +72,14 @@ public class SimpleText extends JPanel implements ActionListener {
 	@S4Component(type = CurrentASRHypothesis.class)
 	public final static String PROP_CURRENT_HYPOTHESIS = "currentASRHypothesis";
 	
+	@S4Component(type = CurrentEyeTrackingPoint.class)
+	public final static String PROP_CURRENT_EYETRACKING = "currentEyeTrackingPoint";		
+	
 	@S4ComponentList(type = FrameAwarePushBuffer.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = CurrentASRHypothesis.PROP_HYP_CHANGE_LISTENERS;
+	
+	@S4ComponentList(type = FrameAwarePushBuffer.class)
+	public final static String PROP_HYP_CHANGE_LISTENERS_EYE = CurrentEyeTrackingPoint.PROP_HYP_CHANGE_LISTENERS;		
 
 	@S4Component(type = TextBasedFloorTracker.class)
 	public final static String PROP_FLOOR_MANAGER = "textBasedFloorTracker";
@@ -148,6 +155,11 @@ public class SimpleText extends JPanel implements ActionListener {
     	PropertySheet ps = cm.getPropertySheet(PROP_CURRENT_HYPOTHESIS);
     	final TextBasedFloorTracker textBasedFloorTracker = (TextBasedFloorTracker) cm.lookup(PROP_FLOOR_MANAGER);
     	final List<PushBuffer> hypListeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
+    	
+    	//To add another input method, I need to get the PropertySheet from another module, the hypListeners, and ignite them
+    	PropertySheet psEye = cm.getPropertySheet(PROP_CURRENT_EYETRACKING);
+    	final List<PushBuffer> hypListenersEye = psEye.getComponentList(PROP_HYP_CHANGE_LISTENERS_EYE, PushBuffer.class);
+    	
     	if (clp.hasTextFromReader()) { // if we already know the text:
     		logger.info("running in non-interactive mode");
     		// run non-interactively
@@ -161,7 +173,7 @@ public class SimpleText extends JPanel implements ActionListener {
     		XmlRpcServer xml = web.getXmlRpcServer();
     		
     		PropertyHandlerMapping phm = new PropertyHandlerMapping();
-    		ServiceContainer.set(hypListeners, textBasedFloorTracker);
+    		ServiceContainer.set(hypListeners, hypListenersEye, textBasedFloorTracker);
     		ServiceContainer.cm(cm);
     		try 
     		{

@@ -519,5 +519,11 @@ public class RMRSComposer extends IUModule {
 	        return Double.compare(py, px);
 	    }
 	}
+	
+	public Resolver getResolver() {
+		
+		return this.resolver;
+		
+	}	
 
 }
