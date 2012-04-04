@@ -305,6 +305,7 @@ public class SimpleMonitor implements RtpListener {
 	/*******************
 	 * main
 	 *******************/
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
     	MonitorCommandLineParser clp = new MonitorCommandLineParser(args);
     	if (!clp.parsedSuccessfully()) { System.exit(1); }

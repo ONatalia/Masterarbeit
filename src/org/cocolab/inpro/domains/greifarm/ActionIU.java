@@ -25,9 +25,8 @@ public class ActionIU extends IU {
 		super(null, null);
 	}
 	
-	@SuppressWarnings("unchecked")
 	ActionIU(ActionIU sll, List<? extends IU> groundingWords, ActionType type, ActionStrength strengthModifier) {
-		super(sll, (List<IU>) groundingWords);
+		super(sll, groundingWords);
 		// we'll get this from the predecessor, it's only required for StartActionIU
 		this.type = type;
 		// an action may actually depend on the previous action:
@@ -91,6 +90,7 @@ public class ActionIU extends IU {
 			break;
 		case STOP: // on re-execution, stopping means to go back to where we originally stopped 
 			logger.info("re-executing stop with distance to goal: " + distanceToGoal);
+			//$FALL-THROUGH$
 		default: greifarm.moveTo(goalPosition);
 		}
 		

@@ -2,7 +2,6 @@ package org.cocolab.inpro.domains.calendar;
 
 import java.util.Random;
 
-import org.cocolab.inpro.domains.calendar.NoiseThread.NoiseHandling;
 import org.cocolab.inpro.incremental.unit.IU.IUUpdateListener;
 
 import scalendar.adaptionmanager.AdaptionManager;

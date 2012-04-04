@@ -241,6 +241,7 @@ public class GreifarmExperiment implements DropListener {
 	/**
 	 * @param args ignores all arguments
 	 */
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		PropertyConfigurator.configure(GreifarmExperiment.class.getResource("log4j.properties"));
     	ConfigurationManager cm = new ConfigurationManager(GreifarmExperiment.class.getResource("greifarmconfig.xml"));

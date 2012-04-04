@@ -214,7 +214,7 @@ public class SegmentPanel extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			SegmentBoundPitchMark pm = getPitchMarkAtPosition(popupPoint);
-			segmentModel.remove(pm);
+			SegmentModel.remove(pm);
 			callSynthesis();
 		}
 	};

@@ -48,10 +48,10 @@ public class MetaData extends JDialog implements ActionListener {
 	private static String noSelection = new String("--");
 
 	JTextField pseudonym;
-	ComboBoxModel gender; 
-	ComboBoxModel age;
-	ComboBoxModel region;
-	ComboBoxModel microphone;
+	ComboBoxModel<String> gender; 
+	ComboBoxModel<String> age;
+	ComboBoxModel<String> region;
+	ComboBoxModel<String> microphone;
 
 	/**
 	 * Create a new meta data dialogue. 
@@ -108,13 +108,13 @@ public class MetaData extends JDialog implements ActionListener {
 	 * @return the model of the combo box, from which the currently displayed
 	 * option can be inferred
 	 */
-	private ComboBoxModel addComboBoxWithDefault(String label, String[] choices, GridBagConstraints gbs) {
+	private ComboBoxModel<String> addComboBoxWithDefault(String label, String[] choices, GridBagConstraints gbs) {
 		gbs.gridx = 1;
 		gbs.gridy++;
 		add(new JLabel(label, JLabel.TRAILING), gbs);
-		JComboBox choice = new JComboBox(choices);
+		JComboBox<String> choice = new JComboBox<String>(choices);
 		choice.insertItemAt(noSelection, 0);
-		ComboBoxModel model = choice.getModel(); 
+		ComboBoxModel<String> model = choice.getModel(); 
 		model.setSelectedItem(noSelection);
 		gbs.gridx = 2;
 		add(choice, gbs);

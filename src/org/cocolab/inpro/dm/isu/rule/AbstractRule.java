@@ -42,6 +42,7 @@ public abstract class AbstractRule {
 	 */
 	public abstract interface Effects {}
 	
+	@Override
 	public String toString() {
 		return this.getClass().getSimpleName().toString();
 	}

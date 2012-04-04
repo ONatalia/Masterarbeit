@@ -18,6 +18,7 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 		super(args);
 	}
 
+	@Override
 	void printUsage() {
 		System.err.println("simple sphinx RTP monitor for the inpro project");
 		System.err.println("usage: java org.cocolab.inpro.apps.SimpleMonitor");
@@ -128,6 +129,7 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 		return dataMode == SPHINX_DATA;
 	}
 	
+	@Override
 	public boolean matchesOutputMode(int mode) {
 		return (outputMode & mode) == mode;
 	}

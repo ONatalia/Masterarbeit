@@ -155,6 +155,7 @@ public class SegmentIU extends IU {
 		return TYPE_MAPPING.get(this.l.getLabel());
 	}
 	
+	@SuppressWarnings("unused") 
 	public void appendMaryXML(StringBuilder sb) {
 		throw new UnsupportedOperationException("only SysSegmentIUs can be converted to MaryXML!");
 	}

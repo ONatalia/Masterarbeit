@@ -47,6 +47,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	
 	protected boolean ignoreErrors;
 	
+	@Override
 	void printUsage() {
 		System.err.println("simple sphinx recognizer for the inpro project");
 		System.err.println("usage: java org.cocolab.inpro.apps.SimpleReco");
@@ -87,6 +88,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	 * additionally warns if configuration makes no sense
 	 * @return true for valid combinations of configuration options
 	 */
+	@Override
 	boolean checkConfiguration() {
 		boolean success = false;
 		// check for necessary requirements
@@ -105,6 +107,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		return success;
 	}
 	
+	@Override
 	void parse(String[] args) throws MalformedURLException {
 		recoMode = REGULAR_RECO;
 		for (int i = 0; i < args.length; i++) {

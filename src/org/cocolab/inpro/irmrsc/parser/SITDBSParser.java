@@ -244,9 +244,9 @@ public class SITDBSParser {
 //		return true;
 //	}
 	
-	/** returns the parsers queue **/
+	/** returns the parsers queue (or an empty queue if it's null) */
 	public PriorityQueue<CandidateAnalysis> getQueue() {
-		return this.mQueue;
+		return mQueue != null ? mQueue : new PriorityQueue<CandidateAnalysis>(1);
 	}
 	
 	/** degrades the probability of a given CandidateAnalysis by a given malus **/

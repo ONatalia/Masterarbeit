@@ -42,19 +42,19 @@ public class SimpleReco {
 	private final ConfigurationManager cm;
 	private final Recognizer recognizer;
 	
-	public SimpleReco() throws PropertyException, IOException, InstantiationException, UnsupportedAudioFileException {
+	public SimpleReco() throws PropertyException, IOException, UnsupportedAudioFileException {
 		this(new RecoCommandLineParser());
 	}
 	
-	public SimpleReco(ConfigurationManager cm) throws PropertyException, IOException, InstantiationException, UnsupportedAudioFileException {
+	public SimpleReco(ConfigurationManager cm) throws PropertyException, IOException, UnsupportedAudioFileException {
 		this(cm, new RecoCommandLineParser());
 	}
 	
-	public SimpleReco(RecoCommandLineParser clp) throws PropertyException, IOException, InstantiationException, UnsupportedAudioFileException {
+	public SimpleReco(RecoCommandLineParser clp) throws PropertyException, IOException, UnsupportedAudioFileException {
 		this(new ConfigurationManager(clp.getConfigURL()), clp);
 	}
 	
-	public SimpleReco(ConfigurationManager cm, RecoCommandLineParser clp) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException {
+	public SimpleReco(ConfigurationManager cm, RecoCommandLineParser clp) throws IOException, PropertyException, UnsupportedAudioFileException {
 		this.clp = clp;
 		this.cm = cm;
     	setupDeltifier();
@@ -170,7 +170,7 @@ public class SimpleReco {
 		}
 	}
 	
-	protected void setupSource() throws InstantiationException, PropertyException, UnsupportedAudioFileException, IOException {
+	protected void setupSource() throws PropertyException, UnsupportedAudioFileException, IOException {
     	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
 		switch (clp.getInputMode()) {
 			case RecoCommandLineParser.MICROPHONE_INPUT:
@@ -269,7 +269,7 @@ public class SimpleReco {
     	}
 	}
 
-	private void setupMonitors() throws InstantiationException, PropertyException {
+	private void setupMonitors() throws PropertyException {
 		ResultListener resultlistener = (ResultListener) cm.lookup("currentASRHypothesis");
 		recognizer.addResultListener(resultlistener);
 		CurrentASRHypothesis casrh = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
@@ -341,7 +341,7 @@ public class SimpleReco {
 		return recognizer;
 	}
 	
-	public static void main(String[] args) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException {
+	public static void main(String[] args) throws IOException, PropertyException, UnsupportedAudioFileException {
 		PropertyConfigurator.configure("log4j.properties");
     	RecoCommandLineParser clp = new RecoCommandLineParser(args);
     	if (!clp.parsedSuccessfully()) { 

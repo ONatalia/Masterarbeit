@@ -84,7 +84,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 		this.currentContrib = this.root;
 		this.focus = this.root;
 		// Generate request output about next focus.
-		this.nextOutput = new DialogueActIU((IU) DialogueActIU.FIRST_DA_IU, this.root, new RequestDialogueAct());
+		this.nextOutput = new DialogueActIU(DialogueActIU.FIRST_DA_IU, this.root, new RequestDialogueAct());
 		this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
 	}
 	
@@ -379,10 +379,10 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 						this.nextOutput = new DialogueActIU(this.nextOutput, iu, new UndoDialogueAct());
 						this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.ADD, this.nextOutput));
 					} else {
-						this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.REVOKE, (DialogueActIU) daiu));
+						this.outputEdits.add(new EditMessage<DialogueActIU>(EditType.REVOKE, daiu));
 						if (this.nextOutput != null)
 							this.nextOutput = (DialogueActIU) this.nextOutput.getSameLevelLink();
-						unground.add((DialogueActIU) daiu);							
+						unground.add(daiu);							
 					}
 				}
 				// and remove grin links to contributions (because the edit message created here may not be applied in time).
@@ -751,6 +751,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 * Builds and returns a String representation of the IS.
 	 * @return string the String representation
 	 */
+	@Override
 	public String toString() {
 		String ret;
 		ret  = "-INFORMATION STATE------\n";

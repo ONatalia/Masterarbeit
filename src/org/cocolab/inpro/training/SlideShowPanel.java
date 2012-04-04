@@ -167,9 +167,9 @@ public class SlideShowPanel extends JPanel implements ActionListener {
 	 * @param ssx simple object representing the XML structure read by JAXB  
 	 */
 	private void setXML(SlideShowXML ssx) {
-		this.description = ssx.description;
-		images = new ArrayList<SlideIcon>();
 		if (ssx != null) {
+			this.description = ssx.description;
+			images = new ArrayList<SlideIcon>();
 			for (SlideXML sx : ssx.slides) {
 				try {
 					SlideIcon ii = new SlideIcon(ssx.root + sx.url, sx.description);

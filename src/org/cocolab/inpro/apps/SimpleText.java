@@ -30,7 +30,6 @@ import org.cocolab.inpro.incremental.listener.FrameAwarePushBuffer;
 import org.cocolab.inpro.incremental.processor.CurrentASRHypothesis;
 import org.cocolab.inpro.incremental.processor.TextBasedFloorTracker;
 import org.cocolab.inpro.incremental.util.IUDocument;
-import org.cocolab.inpro.gui.pentomino.heatmap.HeatBoard;
 
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertySheet;

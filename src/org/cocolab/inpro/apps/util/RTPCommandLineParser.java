@@ -13,6 +13,7 @@ public class RTPCommandLineParser extends CommonCommandLineParser {
 		super(args);
 	}
 	
+	@Override
 	void printUsage() {
 		System.err.println("simple RTP tool for the inpro project");
 		System.err.println("usage: java org.cocolab.inpro.apps.SimpleRTP");
@@ -30,6 +31,7 @@ public class RTPCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -lp port       optional local port (default: 41000)");
 	}
 	
+	@Override
 	boolean checkConfiguration() {
 		boolean success = false;
 		if (localPort == 0) { localPort = 42000; } // set default in case nothing else was set
@@ -47,6 +49,7 @@ public class RTPCommandLineParser extends CommonCommandLineParser {
 		return success;
 	}
 	
+	@Override
 	void parse(String[] args) throws MalformedURLException {
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-h")) {
