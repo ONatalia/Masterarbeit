@@ -63,9 +63,7 @@ public class SITDBSParser {
 	}
 	
 	public SITDBSParser(Grammar grammar) {
-		mGrammar = grammar;
-		mBaseBeamFactor = 0.001;
-		reset();
+		this(grammar, 0.001);
 	}
 	
 	public SITDBSParser(Grammar g, double bbf, CandidateAnalysis startCA) {
@@ -94,7 +92,7 @@ public class SITDBSParser {
 	public void feed(Symbol nextToken) {
 		//logger.info(logPrefix+"feed: "+nextToken);
 		
-		if (mQueue.size() < 1) {
+		if (mQueue == null || mQueue.size() < 1) {
 			// the queue is empty and no further token can be accepted
 			return;
 		}
