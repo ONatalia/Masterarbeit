@@ -61,6 +61,7 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
         Set<FeatureType> features = htsData.getFeatureSet();
         // original code does not deal with durations, so I explicitly remove DUR to make sure that it's never there; this might in fact not be necessary
         features.remove(FeatureType.DUR);
+        //assert !features.contains(FeatureType.LF0);
     	return buildFullPStreamFor(hmms, features);
     }
 
@@ -72,11 +73,7 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
 		HashMap<FeatureType, HTSPStream> pStreamMap = new HashMap<FeatureType, HTSPStream>();
 		for (FeatureType type : features) { // these could be submitted concurrently to an ExecutorService
 			if (type == FeatureType.LF0) {
-				if (!htsData.getUseAcousticModels()) 
-					// FIXME: this is actually never called in our code, should be removed
-					pStreamMap.put(type, calculateLF0Stream(hmms));
-				else 
-					buildVoicingArray(hmms);
+				pStreamMap.put(type, calculateLF0Stream(hmms));
 			} else
 				pStreamMap.put(type, calculateNormalStream(hmms, type));
 		}
@@ -108,24 +105,6 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
 		boolean useGV = useGVperType(type);
 		pStream.mlpg(htsData, useGV);
 		return pStream;
-	}
-	
-	private void buildVoicingArray(List<HTSModel> hmms) {
-		CartTreeSet ms = htsData.getCartTreeSet();
-		int totalLength = 0;
-		for (HTSModel hmm : hmms) {
-			totalLength += hmm.getTotalDur();
-		}
-		voiced = new boolean[totalLength]; // automatically initialized to false
-		int uttFrame = 0; // count all frames
-		for (HTSModel hmm : hmms) {
-			for (int state = 0; state < ms.getNumStates(); state++) {
-				if (hmm.getVoiced(state))
-					Arrays.fill(voiced, uttFrame, uttFrame + hmm.getDur(state), true);
-				uttFrame += hmm.getDur(state);
-			}
-
-		}
 	}
 	
 	/** 
@@ -162,6 +141,7 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
 							pStream.setIvseq(state, 0, finv(hmm.getLf0Variance(state, 0)));
 							for (int k = 1; k < ms.getLf0Stream(); k++)
 								pStream.setIvseq(lf0Frame, k, 0.0);
+							boundary = false; // clear flag: we've set the boundary
 						} else {
 							pStream.setVseq(lf0Frame, hmm.getLf0Variance(state));
 						}
@@ -172,10 +152,29 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
 				prevVoicing = hmm.getVoiced(state);
 			}
 		}
-		// fill in data into pStream
+		boolean useGV = useGVperType(FeatureType.LF0);
+		pStream.mlpg(htsData, useGV);
 		return pStream;
 	}
 
+/*	private void buildVoicingArray(List<HTSModel> hmms) {
+		CartTreeSet ms = htsData.getCartTreeSet();
+		int totalLength = 0;
+		for (HTSModel hmm : hmms) {
+			totalLength += hmm.getTotalDur();
+		}
+		voiced = new boolean[totalLength]; // automatically initialized to false
+		int uttFrame = 0; // count all frames
+		for (HTSModel hmm : hmms) {
+			for (int state = 0; state < ms.getNumStates(); state++) {
+				if (hmm.getVoiced(state))
+					Arrays.fill(voiced, uttFrame, uttFrame + hmm.getDur(state), true);
+				uttFrame += hmm.getDur(state);
+			}
+
+		}
+	} */
+	
 	private boolean useGVperType(FeatureType type) {
 		switch (type) {
 		case STR: return htsData.getUseGV() && htsData.getPdfStrGVFile() != null;

@@ -7,11 +7,14 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.cocolab.inpro.apps.SimpleMonitor;
+import org.cocolab.inpro.audio.DispatchStream;
 import org.cocolab.inpro.domains.calendar.NoiseThread.NoiseHandling;
 import org.cocolab.inpro.incremental.IUModule;
 import org.cocolab.inpro.incremental.PushBuffer;
 import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.IU.IUUpdateListener;
 import org.cocolab.inpro.tts.MaryAdapter;
 import org.cocolab.inpro.tts.hts.InteractiveHTSEngine;
@@ -71,7 +74,9 @@ public class GenerationModule extends IUModule {
 					ppiu.addUpdateListener(phraseUpdateListener);
 					phrases.add(ppiu);
 				} else {
-					phrases.get(phrases.size() - 1).type = PhraseIU.PhraseType.FINAL;
+					PhraseIU finalPhrase = phrases.get(phrases.size() - 1);
+					// set phrase to final, this also removes any vocoder locks
+					finalPhrase.setFinal();
 				}				
 				rightBuffer.setBuffer(phrases);
 				rightBuffer.notify(iulisteners);
@@ -100,7 +105,9 @@ public class GenerationModule extends IUModule {
 		
 		rightBuffer.setBuffer(phrases);
 		rightBuffer.notify(iulisteners);
-		piu.addUpdateListener(phraseUpdateListener);
+		if (System.getProperty("proso.cond.onephraseahead", "true").equals("true")) {
+			piu.addUpdateListener(phraseUpdateListener);
+		}
 		ppiu.addUpdateListener(phraseUpdateListener);
 		System.out.println("generate is done");
 	}
@@ -116,7 +123,8 @@ public class GenerationModule extends IUModule {
 			break;
 		case 2: // --> 6 phrases
 			final CalendarEvent event2 = new CalendarEvent("Einkaufen auf dem Wochenmarkt", new GregorianCalendar(2012, 4, 14, 10, 0), 2);
-			final CalendarEvent event2changed = new CalendarEvent("Einkaufen auf dem Wochenmarkt", new GregorianCalendar(2012, 4, 14, 9, 30), 2);
+			// synthesis doesn't like the one-word phrase "äh" which is inserted for moved events on the same day
+			final CalendarEvent event2changed = new CalendarEvent("Einkaufen auf dem Wochenmarkt", new GregorianCalendar(2012, 4, 16, 9, 30), 2);
 			nlg.setUtteranceObject(new MovedEvent(event2, event2changed));
 			break;
 		case 3: // --> 7 phrases
@@ -193,12 +201,28 @@ public class GenerationModule extends IUModule {
 		SpudManager spudmanager = new SpudManager(
 				new CalendarKnowledgeInterface(), knowledgeFile);
 		GenerationModule gm = new GenerationModule(spudmanager);
+
+		gm.setStimulus(stimulusID);
+		
+		// output the non-incremental control condition
+		if (System.getProperty("proso.cond.control", "false").equals("true")) {
+			String fullUtterance = gm.nlg.generateCompleteUtteranceNonIncrementally();
+			fullUtterance = fullUtterance.replaceAll(":", ""); // get rid of colons, which mess up pitch optimization
+			fullUtterance = fullUtterance.replaceAll(" \\| ", " ");
+			System.out.println(";; " + fullUtterance);
+			SysInstallmentIU nonincremental = new SysInstallmentIU(fullUtterance);
+			System.out.print(nonincremental.toMbrola());
+			System.out.println("#");
+			DispatchStream speechDispatcher = SimpleMonitor.setupDispatcher();
+			speechDispatcher.playInstallment(nonincremental);
+			speechDispatcher.waitUntilDone();
+			System.exit(0);
+		}
+		
 		final SynthesisModule sm = new SynthesisModule();
 
 		gm.iulisteners = new ArrayList<PushBuffer>();
 		gm.iulisteners.add(sm);
-		
-		gm.setStimulus(stimulusID);
 		
 		Logger speedLogger = Logger.getLogger("speedlogger");
 		if (measureTiming) {
@@ -244,11 +268,9 @@ public class GenerationModule extends IUModule {
 		// dirty hack to force shutdown (should rather have a way to tear down AudioDispatchers in a sane way
 		// something like dispatchStream.setTimeout(60000); // should shutdown the stream after a minute of no output 
 		try {
-			Thread.sleep(60000); // sleep for a minute
+			Thread.sleep(30000); // sleep for half a minute
 			System.exit(0);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} 
 	}
 

@@ -3,6 +3,9 @@ package org.cocolab.inpro.domains.calendar;
 import java.util.List;
 
 import org.cocolab.inpro.incremental.unit.IU;
+import org.cocolab.inpro.incremental.unit.SegmentIU;
+import org.cocolab.inpro.incremental.unit.SysSegmentIU;
+import org.cocolab.inpro.incremental.unit.WordIU;
 
 public class PhraseIU extends IU {
 
@@ -65,5 +68,16 @@ public class PhraseIU extends IU {
 	
 	public Progress getProgress() {
 		return progress;
+	}
+
+	public void setFinal() {
+		type = PhraseIU.PhraseType.FINAL;
+		WordIU lastWord = (WordIU) groundedIn().get(groundedIn.size() - 1);
+		if (lastWord != null) {
+			for (SegmentIU seg : lastWord.getSegments()) {
+				// clear any locks that might block the vocoder from finishing the final phrase
+				((SysSegmentIU) seg).setAwaitContinuation(false);			
+			}
+		}
 	}
 }

@@ -52,4 +52,8 @@ public class FullPFeatureFrame {
         (voiced ? ", voiced with pitch " + Math.exp(lf0Par) + " Hz" : ", unvoiced");
     }
 
+	public String toPitchString() {
+		return (voiced ? ", voiced with pitch " + Math.exp(lf0Par) + " Hz" : ", unvoiced");
+	}
+
 }

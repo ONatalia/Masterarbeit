@@ -38,8 +38,7 @@ public class SynthesisModule extends IUModule {
 		noiseDispatcher = setupDispatcher2();
 		speechDispatcher = SimpleMonitor.setupDispatcher();
 		MaryAdapter.initializeMary(); // preload mary
-		(new SysInstallmentIU("Ein Satz zum Aufwärmen der Optimierungsmethoden.")).toMbrola(); // preheat mary
-		// preheat HMM optimization and vocoding, hmpf.
+		// preheat mary symbolic processing, HMM optimization and vocoding
 		speechDispatcher.playInstallment(new SysInstallmentIU("Neuer Stimulus:"));
 		speechDispatcher.waitUntilDone();
 	}
@@ -84,13 +83,38 @@ public class SynthesisModule extends IUModule {
 			speechDispatcher.playInstallment(currentInstallment);
 	}
 	
-	private static void appendNotification(SysInstallmentIU installment, PhraseIU phrase) {
-		installment.getFinalWord()
-					.getLastSegment().getSameLevelLink().getSameLevelLink()
+	private void appendNotification(SysInstallmentIU installment, PhraseIU phrase) {
+		String updateposition = System.getProperty("proso.cond.updateposition", "end");
+		if (updateposition.equals("end")) 
+			installment.getFinalWord()
+					.getLastSegment().getSameLevelLink()
 					.addUpdateListener(new NotifyCompletedOnOngoing(phrase));
+		else if (updateposition.equals("-1word"))
+			((WordIU) installment.getFinalWord().getSameLevelLink())
+			.getLastSegment().getSameLevelLink()
+			.addUpdateListener(new NotifyCompletedOnOngoing(phrase));
+		else {
+			int req;
+			if (updateposition.equals("+1word"))
+				req = 0;
+			else if (updateposition.equals("+2word"))
+				req = 1;
+			else if (updateposition.equals("+3word"))
+				req = 2;
+			else
+				throw new RuntimeException("proso.cond.updateposition was set to the invalid value " + updateposition);
+				
+			if (phrase.groundedIn().size() <= req) {
+				logger.warn("cannot update on " + req + ", will update on " + (phrase.groundedIn().size() - 1) + " instead");
+				req = phrase.groundedIn().size() - 1;
+			}
+			((WordIU) phrase.groundedIn().get(req))
+			.getLastSegment().getSameLevelLink()
+			.addUpdateListener(new NotifyCompletedOnOngoing(phrase));
+		}
 	}
 	
-	static class NotifyCompletedOnOngoing implements IUUpdateListener {
+	class NotifyCompletedOnOngoing implements IUUpdateListener {
 		PhraseIU completed;
 		NotifyCompletedOnOngoing(PhraseIU notify) {
 			completed = notify;
@@ -98,6 +122,9 @@ public class SynthesisModule extends IUModule {
 		@Override
 		public void update(IU updatedIU) {
 			if (updatedIU.isOngoing()) {
+				// block vocoding from finishing synthesis before our completion is available
+				if (!completed.type.equals(PhraseIU.PhraseType.FINAL))
+					((SysSegmentIU) currentInstallment.getFinalWord().getLastSegment()).setAwaitContinuation(true);
 				completed.setProgress(Progress.COMPLETED);
 			}
 		}

@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
  * a PitchMark
  */
 public class PitchMark {
-	final protected double position; // as a percentage
+	protected double position; // as a percentage
 	protected double pitch; // presumably in Hz
 
 	protected PitchMark(double position, double pitch) {
@@ -40,6 +40,11 @@ public class PitchMark {
 	/** returns the time of this pitch mark given the label's boundaries */
 	public int getTime(int startTime, int duration) {
 		return (int) (startTime + position * duration);
+	}
+	
+	/** really be careful not to mess up the linear ordering of pitchmarks in a list of pms! */ 
+	public void setRelativePosition(double timepos) {
+		this.position = timepos;
 	}
 	
 	public int getPitch() {

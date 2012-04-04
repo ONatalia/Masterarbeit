@@ -1,6 +1,7 @@
 package org.cocolab.inpro.incremental.unit;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -172,9 +173,12 @@ public class SysSegmentIU extends SegmentIU {
 		if (req == dur - 1) { // last frame 
 			setProgress(Progress.COMPLETED);
 //			logger.debug("completed " + deepToString());
-			logger.debug("completed " + toString());
+			logger.debug("completed " + toMbrolaLine());
 		}
 		realizedDurationInSynFrames++;
+		// check whether we've been requested to wait for our continuation
+		if (realizedDurationInSynFrames == durationInSynFrames())
+			awaitContinuation();
 		return frame;
 	}
 	
@@ -273,15 +277,46 @@ public class SysSegmentIU extends SegmentIU {
 		return htsModel != null && htsModel.getVoiced(3); // just assume that a segment is voiced if its center state is voiced 
 	}
 	
+	/* the bug with a pitchmark landing in the wrong frame is triggered by
+	 * 		SysInstallmentIU preheat = new SysInstallmentIU("der nächste termin am Montag den 14. Mai 10 bis 12 uhr betreff Einkaufen auf dem Wochenmarkt überschneidet sich mit dem termin:");
+	 * in "überschneidet" y: will get one voiced frame to few, b wil get one too many
+	 */
 	public void setHTSModel(HTSModel hmm) {
+		// FIXME: dirty hack, we should also check voicing for silence
+		// FIXME: hmm.getNumVoiced() == pitchMarks.size() should always be the case!
+		if (pitchMarks != null && !hmm.getPhoneName().equals("_") && hmm.getNumVoiced() == pitchMarks.size()) { 
+			// check consistency of PMs and voicing information in the model
+			// FIXME: this is weird, very seldomly there are more pitch marks than hmm states
+			// assert hmm.getNumVoiced() == pitchMarks.size();
+			assert hmm.getNumVoiced() <= pitchMarks.size() : hmm.getNumVoiced() + " != " + pitchMarks.size(); // check that there are enough pms, for now
+			// re-position PMs to reflect positions of voiced frames in the model
+			Iterator<PitchMark> pitchIt = pitchMarks.iterator();
+			int frameTotal = hmm.getTotalDur();
+			for (int frame = 0; frame < frameTotal; frame++) {
+				if (hmm.getFrameVoicing(frame)) {
+					assert pitchIt.hasNext() : "there should still be a PM left, something is wrong with getFrameVoicing, getTotalDur or the like";
+					PitchMark pm = pitchIt.next();
+					pm.setRelativePosition((0.0 + frame) / frameTotal);
+				}
+			}
+			// FIXME: should work if the above (hmm.getNumVoiced() == pitchMarks.size()) would work
+			// assert !pitchIt.hasNext() : "there shouldn't be any Pitchmarks left over, the foor loop above is broken";
+			// let's just delete spurious PMs to get rid of them
+			while (pitchIt.hasNext()) {
+				pitchIt.next();
+				pitchIt.remove();
+				logger.debug("removing spurious PM in segment " + toPayLoad());
+			}
+		}
 		htsModel = hmm;
 	}
 
 	/** copy all data necessary for synthesis -- i.e. the htsModel and pitchmarks */
 	public void copySynData(SysSegmentIU newSeg) {
 		assert payloadEquals(newSeg);
-		this.htsModel = newSeg.htsModel;
+		this.l = newSeg.l;
 		this.pitchMarks = newSeg.pitchMarks;
+		setHTSModel(newSeg.htsModel);
 	}
 
 }

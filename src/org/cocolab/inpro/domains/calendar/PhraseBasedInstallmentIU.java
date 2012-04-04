@@ -52,13 +52,18 @@ public class PhraseBasedInstallmentIU extends IncrSysInstallmentIU {
 	// we call this last step "back-substitution"
 	 </pre>*/
 	private void appendContinuation(PhraseIU phrase) {
-		String fullPhrase = toPayLoad() + phrase.toPayLoad();
-		fullPhrase = fullPhrase.replaceAll(" <sil>", ""); // it's nasty when there are silences pronounced as "kleiner als sil größer als"
-		@SuppressWarnings("unchecked")
-		List<WordIU> newWords = (List<WordIU>) (new SysInstallmentIU(fullPhrase)).groundedIn();
-		assert newWords.size() >= groundedIn.size();
-//		assert newWords.size() == groundedIn.size() + phrase.expectedWordCount(); // for some reason, this assertion breaks sometimes
-		WordIU firstNewWord = newWords.get(groundedIn.size());
+		WordIU firstNewWord = null;
+		if (System.getProperty("proso.cond.connect", "true").equals("true")) {
+			String fullPhrase = toPayLoad() + phrase.toPayLoad();
+			fullPhrase = fullPhrase.replaceAll(" <sil>", ""); // it's nasty when there are silences pronounced as "kleiner als sil größer als"
+			@SuppressWarnings("unchecked")
+			List<WordIU> newWords = (List<WordIU>) (new SysInstallmentIU(fullPhrase)).groundedIn();
+			assert newWords.size() >= groundedIn.size();
+//			assert newWords.size() == groundedIn.size() + phrase.expectedWordCount(); // for some reason, this assertion breaks sometimes
+			firstNewWord = newWords.get(groundedIn.size());
+		} else {
+			firstNewWord = (WordIU) (new SysInstallmentIU(phrase.toPayLoad())).groundedIn().get(0);
+		}
 		WordIU lastOldWord = getFinalWord();
 		//assert lastOldWord.payloadEquals(firstNewWord.getSameLevelLink());
 		SysSegmentIU newSeg = (SysSegmentIU) firstNewWord.getFirstSegment().getSameLevelLink();

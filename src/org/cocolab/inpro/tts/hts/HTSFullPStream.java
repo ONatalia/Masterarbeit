@@ -23,10 +23,11 @@ public class HTSFullPStream extends FullPStream {
         this.voiced = voiced;
         if (voiced != null && lf0Pst != null) {
 	        lf0indices = new int[voiced.length];
-	        for (int t = 0, vi = 0; t < voiced.length; t++) {
-	            lf0indices[t] = vi;
-	            if (voiced[t] && vi < lf0Pst.getT() - 1)
+	        for (int t = 0, vi = -1; t < voiced.length; t++) {
+	            if (voiced[t]) // && vi < lf0Pst.getT() - 1) # this check shouldn't be necessary at all!
 	                vi++;
+	            lf0indices[t] = vi;
+	            assert vi <= lf0Pst.getT();
 	        }
         }
     }
@@ -39,7 +40,7 @@ public class HTSFullPStream extends FullPStream {
     									 magPst.getParVec(t), 
     									 strPst.getParVec(t), 
     									 voiced != null ? voiced[t] : false, 
-    									 lf0indices != null ? lf0Pst.getPar(lf0indices[t], 0) : 0);
+    									 (lf0indices != null && lf0indices[t] >= 0) ? lf0Pst.getPar(lf0indices[t], 0) : 0);
     	} else return null;
     }
     
