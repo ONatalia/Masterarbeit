@@ -74,13 +74,12 @@ public class SITDBSParser {
 
 	/** copy constructor **/
 	public SITDBSParser(SITDBSParser p) {
-		if (p != null) {
-			this.mGrammar = p.mGrammar;
-			this.mBaseBeamFactor = p.mBaseBeamFactor;
-			this.mQueue = new PriorityQueue<CandidateAnalysis>();
-			for (CandidateAnalysis ca : p.mQueue) 
-				mQueue.add(new CandidateAnalysis(ca));
-		}
+		assert p != null;
+		this.mGrammar = p.mGrammar;
+		this.mBaseBeamFactor = p.mBaseBeamFactor;
+		this.mQueue = new PriorityQueue<CandidateAnalysis>();
+		for (CandidateAnalysis ca : p.mQueue) 
+			mQueue.add(new CandidateAnalysis(ca));
 	}
 
 	/** feeds the parser with the next input token **/

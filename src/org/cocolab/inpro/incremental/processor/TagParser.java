@@ -112,6 +112,7 @@ public class TagParser extends IUModule {
 				case ADD:
 					// TODO: ein besseres erstes element setzen
 					TagIU previousTag = (TagIU) tag.getSameLevelLink();
+					assert previousTag != null;
 					SITDBSParser newState = new SITDBSParser(this.states.get(previousTag));
 					if (newState != null){
 						newState.feed(tag.toPayLoad());

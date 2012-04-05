@@ -34,5 +34,10 @@ public class TagIU extends IU {
 	public String toPayLoad() {
 		return tag;
 	}
+	
+	@Override
+	public IU getSameLevelLink() {
+		return super.getSameLevelLink() == null ? FIRST_TAG_IU : super.getSameLevelLink();
+	}
 
 }
