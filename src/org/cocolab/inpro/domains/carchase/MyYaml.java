@@ -46,7 +46,7 @@ public class MyYaml extends Yaml {
 	
 	public static void main(String[] args) {
 		Yaml yaml = new MyYaml();
-		System.out.println(yaml.dumpAll(yaml.loadAll(MyYaml.class.getResourceAsStream("config1")).iterator()));
+		System.out.println(yaml.dumpAll(yaml.loadAll(MyYaml.class.getResourceAsStream("configs/config1")).iterator()));
 	}
 
 }

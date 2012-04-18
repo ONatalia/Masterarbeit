@@ -266,7 +266,7 @@
     <component name="ngram" type="edu.cmu.sphinx.linguist.language.ngram.SimpleNGramModel">
         <property name="dictionary" value="dictionary"/>
         <property name="logMath" value="logMath"/>
-        <property name="location" value="file:///home/timo/inpro/experimente/014_greifarm/lm/Greifarm_Woz.cleaned.lm"/>
+        <property name="location" value="file:///home/timo/uni/experimente/014_greifarm/lm/Greifarm_Woz.cleaned.lm"/>
         <property name="maxDepth" value="3"/>
         <property name="unigramWeight" value=".7"/>
     </component>
@@ -276,8 +276,8 @@
     <!-- The Dictionary configuration                            -->
     <!-- ******************************************************** -->
     <component name="dictionary" type="org.cocolab.inpro.sphinx.linguist.dictionary.SyllableAwareFullDictionary">
-        <property name="dictionaryPath" value="file:///home/timo/inpro/experimente/014_greifarm/confs/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab.lex"/>
-        <property name="fillerPath" value="file:///home/timo/inpro/experimente/014_greifarm/confs/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab.filler"/>
+        <property name="dictionaryPath" value="file:///home/timo/uni/experimente/014_greifarm/confs/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab.lex"/>
+        <property name="fillerPath" value="file:///home/timo/uni/experimente/014_greifarm/confs/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab.filler"/>
         <property name="addSilEndingPronunciation" value="false"/>
         <property name="unitManager" value="unitManager"/>
     </component>
@@ -294,7 +294,7 @@
     <component name="sphinx3Loader" type="edu.cmu.sphinx.linguist.acoustic.tiedstate.Sphinx3Loader">
         <property name="logMath" value="logMath"/>
         <property name="unitManager" value="unitManager"/>
-        <property name="location" value="file:///home/timo/inpro/experimente/014_greifarm/confs/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz"/>
+        <property name="location" value="file:///home/timo/uni/experimente/014_greifarm/confs/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz"/>
 		<property name="modelDefinition" value="etc/Cocolab_noGreifarm.2000.mdef"/>
 		<property name="dataLocation" value="cd_cont_2000_8/"/>
     </component>
