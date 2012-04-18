@@ -55,6 +55,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import org.apache.log4j.Logger;
 import org.cocolab.inpro.tts.MaryAdapter4internal;
 
 import marytts.htsengine.HMMData;
@@ -112,6 +113,8 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
     private double maxAmplitude = 24000; //32768;
     
     boolean doneVocoding = false;
+    
+    boolean firstDelivery = true;
     
     public VocodingAudioStream(HTSParameterGeneration pdf2par, HMMData htsData, boolean immediateReturn) {
         this(pdf2par.getMcepPst(), pdf2par.getStrPst(), pdf2par.getMagPst(), pdf2par.getlf0Pst(), 
@@ -450,28 +453,19 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        if (firstDelivery) {
+        	Logger.getLogger("speedlogger").info("first samples");
+        	firstDelivery = false;
+        }
         return outputAmount;
     }
 
-    @Override
-    public double[] getAllData() {
-        return toPrimitive(output.toArray((Double[]) null));
-    }
-    
     private final double scale(double d) {
     	if (Math.abs(d) > maxAmplitude) {
     		System.err.println("max amplitude!");
     		maxAmplitude = Math.abs(d);
     	}
         return d / maxAmplitude;
-    }
-    
-    private double[] toPrimitive(Double[] objArr) {
-        double[] primArr = new double[objArr.length];
-        for (int i = 0; i < objArr.length; i++) {
-            primArr[i] = scale(objArr[i].doubleValue());
-        }
-        return primArr;
     }
     
 }

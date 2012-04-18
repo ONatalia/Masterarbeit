@@ -24,6 +24,8 @@ public class InteractiveHTSEngine extends HTSEngine {
 
     public boolean synthesizeAudio = true; 
     
+    public static boolean returnIncrementalAudioStream = false;
+    
     public List<HTSModel> uttHMMs = null;
     
     @Override
@@ -66,7 +68,7 @@ public class InteractiveHTSEngine extends HTSEngine {
 //            ITTSExperimenter.visualize("Non-Incremental", new SynthesisHeatMap(new HTSFullPStream(pdf2par)));
 //            ITTSExperimenter.visualize("Difference", new SynthesisHeatMapComparator(ipdf2par.getFullPStream(), new HTSFullPStream(pdf2par)));
 	        /* Vocode speech waveform out of sequence of parameters */
-	        DoubleDataSource dds = new VocodingAudioStream(pdf2par, hmmv.getHMMData(), false);
+	        DoubleDataSource dds = new VocodingAudioStream(pdf2par, hmmv.getHMMData(), returnIncrementalAudioStream);
 	        float sampleRate = 16000.0F;  //8000,11025,16000,22050,44100
 	        int sampleSizeInBits = 16;  //8,16
 	        int channels = 1;     //1,2
@@ -90,11 +92,10 @@ public class InteractiveHTSEngine extends HTSEngine {
 	        }     
 	        output.appendAudio(ais);
         }	       
-
         // set the actualDurations in tokensAndBoundaries
         if(tokensAndBoundaries != null)
             setRealisedProsody(tokensAndBoundaries, um);
-
+        
         return output;
     }
     
