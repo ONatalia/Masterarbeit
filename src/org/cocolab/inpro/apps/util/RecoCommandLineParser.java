@@ -28,7 +28,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	int recoMode;
 	
 	public int rtpPort;
-	int incrementalMode = DEFAULT_DELTIFIER;
+	int incrementalMode;
 	int incrementalModifier;
 	String referenceText;
 	String referenceFile;
@@ -110,6 +110,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	@Override
 	void parse(String[] args) throws MalformedURLException {
 		recoMode = REGULAR_RECO;
+		incrementalMode = DEFAULT_DELTIFIER;
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-h")) {
 				printUsage();

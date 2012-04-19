@@ -281,7 +281,7 @@ public class SimpleReco {
 			casrh.addListener(ted);
 		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
-			cm.lookup("labelWriter");
+			casrh.addListener((PushBuffer) cm.lookup("labelWriter2"));
 		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.CURRHYP_OUTPUT)) {
 			casrh.addListener((PushBuffer) cm.lookup("hypViewer"));
