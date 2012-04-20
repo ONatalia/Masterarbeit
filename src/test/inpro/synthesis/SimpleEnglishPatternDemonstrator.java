@@ -1,4 +1,4 @@
-package test.org.cocolab.inpro.synthesis;
+package test.inpro.synthesis;
 
 import java.awt.Component;
 import java.util.Arrays;

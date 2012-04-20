@@ -1,7 +1,6 @@
-package test.org.cocolab.inpro.synthesis;
+package test.inpro.synthesis;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -39,7 +38,7 @@ import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
  * 
  * @author timo
  */
-public class GreatEnglishPatternDemonstrator extends PatternDemonstrator {
+public class GreatPatternDemonstrator extends PatternDemonstrator {
 	
 	public static final int COLOR_POSITION = 2;
 	public static final int PIECE_POSITION = 3;
@@ -71,26 +70,10 @@ public class GreatEnglishPatternDemonstrator extends PatternDemonstrator {
 	}
 
 	ButtonGroup colorGroup = new ButtonGroup();
-	JToggleButton colorButton(final Color c, final String name) {
+	JToggleButton colorButton(Color c, String name) {
 		InstallmentAction ia = new InstallmentAction(name, COLOR_POSITION);
 		installmentActions.add(ia);
-		JToggleButton b = new JToggleButton(ia) {
-			@Override
-			public void paintComponent(Graphics g) {
-				super.paintComponent(g);
-				if (this.isSelected()) {
-					int w = getWidth();
-					int h = getHeight();
-					g.setColor(c); // selected color
-					g.fillRect(3, 3, w - 6, h - 6);
-					g.setColor(Color.darkGray); // selected foreground color
-					g.drawString(name,
-							(w - g.getFontMetrics().stringWidth(name)) / 2 + 1,
-							(h + g.getFontMetrics().getAscent()) / 2 - 1);
-				}
-			}
-
-		};
+		JToggleButton b = new JToggleButton(ia);
 		colorGroup.add(b);
 		b.setBackground(c);
 		return b;
@@ -106,7 +89,7 @@ public class GreatEnglishPatternDemonstrator extends PatternDemonstrator {
 		return b;
 	}
 		
-	GreatEnglishPatternDemonstrator() {
+	GreatPatternDemonstrator() {
 		super();
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -118,9 +101,9 @@ public class GreatEnglishPatternDemonstrator extends PatternDemonstrator {
 		gbc.gridwidth = 1;
 		gbc.gridy++;
 		gbc.gridx = 2;
-		add(actionButton(new ImmediateStartAction("take", new ImageIcon(Canvas.class.getResource("dragging.png")))), gbc);
+		add(actionButton(new ImmediateStartAction("Nimm", new ImageIcon(Canvas.class.getResource("dragging.png")))), gbc);
 		gbc.gridx++;
-		add(actionButton(new ImmediateStartAction("delete", new ImageIcon(GameCanvas.class.getResource("cross.png")))), gbc);
+		add(actionButton(new ImmediateStartAction("Lösche", new ImageIcon(GameCanvas.class.getResource("cross.png")))), gbc);
 		gbc.gridy++;
 		gbc.gridx = 1;
 		/* add(new JButton(new AbstractAction("reset") {
@@ -130,11 +113,11 @@ public class GreatEnglishPatternDemonstrator extends PatternDemonstrator {
 			}
 		}), gbc); */
 		gbc.gridx++;
-		add(colorButton(Color.RED, "red"), gbc);
+		add(colorButton(Color.RED, "rote"), gbc);
 		gbc.gridx++;
-		add(colorButton(Color.BLUE, "blue"), gbc);
+		add(colorButton(Color.BLUE, "blaue"), gbc);
 		gbc.gridx++;
-		add(colorButton(Color.GREEN, "green"), gbc);
+		add(colorButton(Color.GREEN, "grüne"), gbc);
 		gbc.gridy++;
 		gbc.gridx = 1;
 		/* add(new JButton(new AbstractAction("reset") {
@@ -144,11 +127,11 @@ public class GreatEnglishPatternDemonstrator extends PatternDemonstrator {
 			}
 		}), gbc); */
 		gbc.gridx++;
-		add(pieceButton('X', "cross"), gbc);
+		add(pieceButton('X', "Kreuz"), gbc);
 		gbc.gridx++;
 		add(pieceButton('T', "T"), gbc);
 		gbc.gridx++;
-		add(pieceButton('I', "long piece"), gbc);
+		add(pieceButton('I', "gerade Teil"), gbc);
 	}
 	
 	
@@ -161,21 +144,21 @@ public class GreatEnglishPatternDemonstrator extends PatternDemonstrator {
 	@Override
 	public void greatNewUtterance(String command) {
 		installment = new IncrSysInstallmentIU(Arrays.asList(
-				"please " + command + " the, uh?", 
-				"please " + command + " the red, uh?", 
-				"please " + command + " the red cross",
-				"please " + command + " the red T",
-				"please " + command + " the red long piece",
-				"please " + command + " the green, uh?",
-				"please " + command + " the green cross",
-				"please " + command + " the green T",
-				"please " + command + " the green long piece",
-				"please " + command + " the blue, uh?",
-				"please " + command + " the blue cross",
-				"please " + command + " the blue T",
-				"please " + command + " the blue long piece"
+				command + " bitte das, äh?", 
+				command + " bitte das rote, äh?", 
+				command + " bitte das rote Kreuz",
+				command + " bitte das rote T",
+				command + " bitte das rote gerade Teil",
+				command + " bitte das grüne, äh?",
+				command + " bitte das grüne Kreuz",
+				command + " bitte das grüne T",
+				command + " bitte das grüne gerade Teil",
+				command + " bitte das blaue, äh?",
+				command + " bitte das blaue Kreuz",
+				command + " bitte das blaue T",
+				command + " bitte das blaue gerade Teil"
 				));
-		generatedText.setText("please " + command + " the ‹color› ‹piece›");
+		generatedText.setText(command + " bitte das ‹color› ‹piece›");
 	}
 
 	/**
@@ -184,12 +167,10 @@ public class GreatEnglishPatternDemonstrator extends PatternDemonstrator {
 	 */
 	public static void main(String args[]) {
 	//	PropertyConfigurator.configure("log4j.properties");
-		System.setProperty("inpro.tts.voice", "cmu-slt-hsmm");
-		System.setProperty("inpro.tts.language", "en-US");
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				createAndShowGUI(new GreatEnglishPatternDemonstrator());
+				createAndShowGUI(new GreatPatternDemonstrator());
 			}
 		});
 	}

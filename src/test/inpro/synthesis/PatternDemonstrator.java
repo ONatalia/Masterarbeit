@@ -1,4 +1,4 @@
-package test.org.cocolab.inpro.synthesis;
+package test.inpro.synthesis;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import org.cocolab.inpro.tts.MaryAdapter;
 public abstract class PatternDemonstrator extends JPanel {
 	
 	/** a text field that displays the current value of {@link PatternDemonstrator#installment} */
-	JEditorPane generatedText;
+	final JEditorPane generatedText;
 	/** the IU holding the incrementally synthesized installment */
 	IncrSysInstallmentIU installment;
 	DispatchStream dispatcher;
@@ -48,7 +48,9 @@ public abstract class PatternDemonstrator extends JPanel {
 			Progress newProgress = updatedIU.getProgress();
 			if (newProgress != previousProgress) {
 				previousProgress = newProgress;
-				generatedText.setText(installment.toMarkedUpString());
+				synchronized(generatedText) {
+					generatedText.setText(installment.toMarkedUpString());
+				}
 			}
 		}
 	};

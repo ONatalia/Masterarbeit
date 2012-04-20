@@ -1,4 +1,4 @@
-package test.org.cocolab.inpro.synthesis;
+package test.inpro.synthesis;
 
 import java.awt.event.ActionEvent;
 import java.util.Collections;
@@ -26,6 +26,7 @@ public class ProsodyDemonstrator extends PatternDemonstrator {
 	public ProsodyDemonstrator() {
 		generatedText.setPreferredSize(new JTextField(52).getPreferredSize());
 		//generatedText.setText("Press the play button to synthesize this utterance."); 
+		generatedText.setEditable(true);
 		generatedText.setText("Nimm bitte das Kreuz ganz oben links in der Ecke, lege es in den Fuß des Elefanten bevor Du ihn auf den Kopf drehst.");
 
 		this.add(generatedText);
