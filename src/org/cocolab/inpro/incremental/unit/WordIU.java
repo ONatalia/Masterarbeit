@@ -178,7 +178,7 @@ public class WordIU extends IU {
 	}
 
 	public boolean hasProsody() {
-		return (bd != null && startTime() != Double.NaN && endTime() != Double.NaN && !isSilence());
+		return (bd != null && !Double.isNaN(startTime()) && !Double.isNaN(endTime()) && !isSilence());
 	}
 
 	/**

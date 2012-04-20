@@ -35,6 +35,7 @@ public class ThreadingFrontendBuffer extends BaseDataProcessor implements Runnab
 
 	private void start() {
 		drainer = new Thread(this, "threading frontend buffer");
+		drainer.setDaemon(true);
 		drainer.start();
 	}
 	

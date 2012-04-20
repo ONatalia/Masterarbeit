@@ -33,9 +33,6 @@ public class Label {
 						 params.get(2));
 	}
 
-	public Label(String l) {
-		this(Double.NaN, Double.NaN, l);
-	}
 	/** construct a label from given start and end times, with the given label text */ 
 	public Label(double s, double e, String l) {
 		start = s;
@@ -43,7 +40,11 @@ public class Label {
 		label = l;
 	}
 
-	/** copy constructor */
+	/** construct a label with start and end set to NaN */
+	public Label(String l) {
+		this(Double.NaN, Double.NaN, l);
+	}
+	/** construct a label from another label */
 	public Label(Label l) {
 		this(l.getStart(), l.getEnd(), l.getLabel());
 	}

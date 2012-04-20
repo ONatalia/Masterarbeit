@@ -78,7 +78,7 @@ public class ArgumentStruct {
 		} else if (this.isTransitive() && as.isTransitive()) {
 			return (this.arg1.equals(as.arg1));
 		}
-		return (this.arg1 == as.arg1 && this.arg2.equals(as.arg2));
+		return (this.arg1.equals(as.arg1) && this.arg2.equals(as.arg2));
 	}
 
 	/**

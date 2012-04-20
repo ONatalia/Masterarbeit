@@ -18,9 +18,7 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.unit.IU;
-import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.cocolab.inpro.incremental.util.TTSUtil;
-import org.cocolab.inpro.tts.hts.FullPStream;
 import org.cocolab.inpro.tts.hts.InteractiveHTSEngine;
 import org.cocolab.inpro.tts.hts.PHTSParameterGeneration;
 
@@ -48,7 +46,7 @@ public class MaryAdapter4internal extends MaryAdapter {
 	// startup-code mostly copied from marytts.server.Mary
 	private static void startupInternalMary() throws Exception {
         MaryProperties.readProperties();
-        Mary.startup();
+        Mary.startup(false);
 	}
 	
 	@Override
@@ -57,6 +55,7 @@ public class MaryAdapter4internal extends MaryAdapter {
 	    ihtse.synthesizeAudio = false;
 		InputStream is = text2maryxml(tts);
 	    ihtse.synthesizeAudio = true;
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, ihtse.uttHMMs);
 		// remove utterance final silences
 		return groundedIn;
@@ -78,12 +77,12 @@ public class MaryAdapter4internal extends MaryAdapter {
         Locale mLocale = MaryUtils.string2locale(System.getProperty("inpro.tts.language", "de"));
         Voice voice = Voice.getVoice(defaultVoiceName);
         AudioFormat audioFormat = voice.dbAudioFormat();
-        logger.info("audioFormat is " + audioFormat);
+        logger.debug("audioFormat is " + audioFormat);
         AudioFileFormat.Type audioFileFormatType = //MaryAudioUtils.getAudioFileFormatType(audioType);
         						AudioFileFormat.Type.WAVE;
-        logger.info("audioFileFormatType is " + audioFileFormatType);
+        logger.debug("audioFileFormatType is " + audioFileFormatType);
         AudioFileFormat audioFileFormat = new AudioFileFormat(audioFileFormatType, audioFormat, AudioSystem.NOT_SPECIFIED);
-        logger.info("audioFileFormat is " + audioFileFormat);
+        logger.debug("audioFileFormat is " + audioFileFormat);
         Request request = new Request(mInputType, mOutputType, mLocale, voice, 
         							  (String) null, (String) null, 
         							  // the following true ↓ is experimental (switches on streaming) which doesn't do anything it appears
@@ -93,8 +92,8 @@ public class MaryAdapter4internal extends MaryAdapter {
 	        request.process();
 	        request.writeOutputData(baos);
         } catch (Exception e) {
-        	e.printStackTrace();
-        	throw new RuntimeException(e);
+        	//e.printStackTrace();
+        	//throw new RuntimeException(e);
         }
         return baos;
 	}
