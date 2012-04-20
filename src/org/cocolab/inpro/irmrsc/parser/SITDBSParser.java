@@ -66,12 +66,6 @@ public class SITDBSParser {
 		this(grammar, 0.001);
 	}
 	
-	public SITDBSParser(Grammar g, double bbf, CandidateAnalysis startCA) {
-		mQueue = new PriorityQueue<CandidateAnalysis>();
-		CandidateAnalysis ca = new CandidateAnalysis(startCA);
-		mQueue.add(ca);
-	}
-
 	/** copy constructor **/
 	public SITDBSParser(SITDBSParser p) {
 		assert p != null;
@@ -249,18 +243,11 @@ public class SITDBSParser {
 	}
 	
 	/** degrades the probability of a given CandidateAnalysis by a given malus **/
-	public CandidateAnalysis degradeAnalysis (CandidateAnalysis ca, double malus) {
-		// remove the ca from the queue, degrade it and add it again.
-		if (this.mQueue.remove(ca)) {
-			cntDegradations++;
-			ca.degradeProbability(malus);
-			mQueue.add(ca);
-			//logger.debug(logPrefix+" CA found, degraded and readded.");
-			return ca;
-		} else {
-			//logger.debug(logPrefix+" CA not found!");
-			return null;
-		}
+	public void degradeAnalysis(CandidateAnalysis ca, double malus) {
+		assert (this.mQueue.remove(ca));
+		cntDegradations++;
+		ca.degradeProbability(malus);
+		mQueue.add(ca);
 	}
 
 	/** resets the parsers internal queue to initial state **/

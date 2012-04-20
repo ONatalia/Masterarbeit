@@ -151,33 +151,14 @@ public class TagParser extends IUModule {
 
 	/** degrades the analysis encapsuled in the given CandidateAnalysisIU by the given malus **/
 	public void degradeAnalysis(CandidateAnalysisIU caiu, double malus) {
-		//logger.debug("[P] Degrade ca="+caiu.getCandidateAnalysis().toString()+" by "+malus+".");
-
-		double originalWeight = caiu.getCandidateAnalysis().getProbability();
-		double targetWeight = originalWeight * malus;
-
 		// find the parser state containing this candidate analysis and modify its weight
 		TagIU tagiu = (TagIU) caiu.groundedIn().get(0);
 		SITDBSParser parserStateToModify = this.states.get(tagiu);
-		CandidateAnalysis degradedCA = parserStateToModify.degradeAnalysis(caiu.getCandidateAnalysis(), malus);
-		
-		// if all java objects are referenced fine, these further checks should not be necessary
-		if(degradedCA != null) {
-			// the ca was found in the parser queue and degraded successfully.
-			// now modify the CA referenced in the CAIU.
-			if (caiu.getCandidateAnalysis().getProbability() == targetWeight) {
-				// do nothing
-			} else {
-				// it seems, this is never the case.
-				caiu.getCandidateAnalysis().degradeProbability(malus);				
-			}
-		} else {
-			//logger.fatal("[P] The CA could not be degraded.");
-		}
+		parserStateToModify.degradeAnalysis(caiu.getCandidateAnalysis(), malus);
 	}
 	
 	/** print the parser status for this CandidateAnalysisIU **/
-	public void printStatus (CandidateAnalysisIU caiu) {
+	public void printStatus(CandidateAnalysisIU caiu) {
 		// TODO add checks
 		TagIU tiu = (TagIU) caiu.groundedIn().get(0); // a CA should only be grounded in one tag
 		states.get(tiu).status();
