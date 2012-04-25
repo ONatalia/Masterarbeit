@@ -1,4 +1,4 @@
-package test.inpro.synthesis;
+package demo.inpro.synthesis;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.SegmentIU;
 import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
-import org.cocolab.inpro.tts.MaryAdapter;
+import org.cocolab.inpro.synthesis.MaryAdapter;
 
 /**
  * implementing classes should<ol>

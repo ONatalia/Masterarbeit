@@ -1,4 +1,4 @@
-package test.inpro.synthesis;
+package demo.inpro.synthesis;
 
 import java.awt.event.ActionEvent;
 import java.util.Collections;
