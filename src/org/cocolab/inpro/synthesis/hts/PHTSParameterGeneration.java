@@ -1,4 +1,4 @@
-package org.cocolab.inpro.tts.hts;
+package org.cocolab.inpro.synthesis.hts;
 
 import java.util.Arrays;
 import java.util.HashMap;

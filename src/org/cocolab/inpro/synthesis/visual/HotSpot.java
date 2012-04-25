@@ -1,4 +1,4 @@
-package org.cocolab.inpro.tts.visual;
+package org.cocolab.inpro.synthesis.visual;
 
 import java.awt.Point;
 

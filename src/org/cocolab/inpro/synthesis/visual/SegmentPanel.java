@@ -1,4 +1,4 @@
-package org.cocolab.inpro.tts.visual;
+package org.cocolab.inpro.synthesis.visual;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -23,10 +23,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
-import org.cocolab.inpro.tts.SegmentModel;
-import org.cocolab.inpro.tts.SegmentModel.SegmentBoundPitchMark;
-import org.cocolab.inpro.tts.SegmentModel.PitchRange;
-import org.cocolab.inpro.tts.SegmentModel.Segment;
+import org.cocolab.inpro.synthesis.SegmentModel;
+import org.cocolab.inpro.synthesis.SegmentModel.PitchRange;
+import org.cocolab.inpro.synthesis.SegmentModel.Segment;
+import org.cocolab.inpro.synthesis.SegmentModel.SegmentBoundPitchMark;
 
 
 /**

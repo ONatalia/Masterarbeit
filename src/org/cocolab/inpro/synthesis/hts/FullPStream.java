@@ -1,4 +1,4 @@
-package org.cocolab.inpro.tts.hts;
+package org.cocolab.inpro.synthesis.hts;
 
 import java.util.ArrayList;
 import java.util.List;

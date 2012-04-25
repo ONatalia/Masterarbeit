@@ -1,4 +1,4 @@
-package org.cocolab.inpro.tts;
+package org.cocolab.inpro.synthesis;
 /**
  * (C) Timo Baumann, 2010, 2011, portions copyright 2000-2006 DFKI GmbH.
  * released under the terms of the GNU LGPL version >= 3
@@ -19,8 +19,8 @@ import javax.xml.bind.JAXBException;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.util.TTSUtil;
-import org.cocolab.inpro.tts.hts.InteractiveHTSEngine;
-import org.cocolab.inpro.tts.hts.PHTSParameterGeneration;
+import org.cocolab.inpro.synthesis.hts.InteractiveHTSEngine;
+import org.cocolab.inpro.synthesis.hts.PHTSParameterGeneration;
 
 import marytts.datatypes.MaryDataType;
 import marytts.htsengine.HMMVoice;

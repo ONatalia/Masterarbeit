@@ -49,14 +49,14 @@
 *                                                                   
 */
 
-package org.cocolab.inpro.tts.hts;
+package org.cocolab.inpro.synthesis.hts;
 
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import org.apache.log4j.Logger;
-import org.cocolab.inpro.tts.MaryAdapter4internal;
+import org.cocolab.inpro.synthesis.MaryAdapter4internal;
 
 import marytts.htsengine.HMMData;
 import marytts.htsengine.HMMVoice;

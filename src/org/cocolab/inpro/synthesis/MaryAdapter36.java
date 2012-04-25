@@ -1,4 +1,4 @@
-package org.cocolab.inpro.tts;
+package org.cocolab.inpro.synthesis;
 /**
  * (C) Timo Baumann, 2010, portions copyright 2000-2006 DFKI GmbH.
  * released under the terms of the GNU LGPL version >= 3

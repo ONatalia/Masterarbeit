@@ -1,4 +1,4 @@
-package org.cocolab.inpro.tts;
+package org.cocolab.inpro.synthesis;
 
 import java.io.BufferedReader;
 import java.io.File;

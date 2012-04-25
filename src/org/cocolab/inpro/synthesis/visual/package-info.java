@@ -41,4 +41,4 @@ corrected, prosody can be improved, etc.
 @author Timo Baumann
 @version 0.9
  */
-package org.cocolab.inpro.tts.visual;
+package org.cocolab.inpro.synthesis.visual;

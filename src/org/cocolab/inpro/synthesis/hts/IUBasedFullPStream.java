@@ -1,4 +1,4 @@
-package org.cocolab.inpro.tts.hts;
+package org.cocolab.inpro.synthesis.hts;
 
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.SysSegmentIU;

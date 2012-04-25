@@ -1,4 +1,4 @@
-package org.cocolab.inpro.tts.visual;
+package org.cocolab.inpro.synthesis.visual;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -31,8 +31,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.cocolab.inpro.tts.MaryAdapter;
-import org.cocolab.inpro.tts.SegmentModel;
+import org.cocolab.inpro.synthesis.MaryAdapter;
+import org.cocolab.inpro.synthesis.SegmentModel;
 
 /**
  * A GUI to manipulate (improve, mimic, parody) Mary TTS.
