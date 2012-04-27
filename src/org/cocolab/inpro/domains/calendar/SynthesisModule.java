@@ -16,7 +16,7 @@ import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.cocolab.inpro.incremental.unit.IU.IUUpdateListener;
 import org.cocolab.inpro.incremental.unit.IU.Progress;
 import org.cocolab.inpro.incremental.unit.WordIU;
-import org.cocolab.inpro.tts.MaryAdapter;
+import org.cocolab.inpro.synthesis.MaryAdapter;
 
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 

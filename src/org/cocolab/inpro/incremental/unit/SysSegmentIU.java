@@ -11,11 +11,11 @@ import marytts.htsengine.HTSModel;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.incremental.util.ResultUtil;
-import org.cocolab.inpro.tts.MaryAdapter4internal;
-import org.cocolab.inpro.tts.PitchMark;
-import org.cocolab.inpro.tts.hts.FullPFeatureFrame;
-import org.cocolab.inpro.tts.hts.FullPStream;
-import org.cocolab.inpro.tts.hts.PHTSParameterGeneration;
+import org.cocolab.inpro.synthesis.MaryAdapter4internal;
+import org.cocolab.inpro.synthesis.PitchMark;
+import org.cocolab.inpro.synthesis.hts.FullPFeatureFrame;
+import org.cocolab.inpro.synthesis.hts.FullPStream;
+import org.cocolab.inpro.synthesis.hts.PHTSParameterGeneration;
 
 public class SysSegmentIU extends SegmentIU {
 	

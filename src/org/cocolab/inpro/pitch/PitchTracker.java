@@ -329,7 +329,7 @@ public class PitchTracker extends BaseDataProcessor {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			while (br.ready()) {
 				String line = br.readLine();
-				if (!line.matches("^#")) { // allow comments in pitch file
+				if (line != null && !line.matches("^#")) { // allow comments in pitch file
 					referencePitch.add(new Double(line));
 				}
 			}

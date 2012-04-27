@@ -16,8 +16,8 @@ import org.cocolab.inpro.incremental.unit.EditMessage;
 import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.IU.IUUpdateListener;
-import org.cocolab.inpro.tts.MaryAdapter;
-import org.cocolab.inpro.tts.hts.InteractiveHTSEngine;
+import org.cocolab.inpro.synthesis.MaryAdapter;
+import org.cocolab.inpro.synthesis.hts.InteractiveHTSEngine;
 
 import scalendar.adaptionmanager.AdaptionManager;
 import scalendar.knowledgeobject.CalendarEvent;

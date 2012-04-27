@@ -23,8 +23,14 @@ public class EditMessage<IUType extends IU> {
 	 * equality for EditMessages is defined by the contained IUs being equal
 	 * and the EditType being the same
 	 */
-	public boolean equals(EditMessage<? extends IU> edit) {
-		return (this.type == edit.type) && (this.iu.equals(edit.iu));
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof EditMessage) {
+			@SuppressWarnings("unchecked")
+			EditMessage<? extends IU> edit = (EditMessage<? extends IU>) o;
+			return (this.type == edit.type) && (this.iu.equals(edit.iu));
+		} else 
+			return false;
 	}
 
 	public IUType getIU() {
@@ -33,6 +39,11 @@ public class EditMessage<IUType extends IU> {
 	
 	public EditType getType() {
 		return type;
+	}
+
+	@Override
+	public int hashCode() {
+		return type.hashCode() + iu.hashCode();
 	}
 	
 }

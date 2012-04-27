@@ -5,9 +5,9 @@ import java.util.List;
 import org.cocolab.inpro.apps.SimpleMonitor;
 import org.cocolab.inpro.audio.DDS16kAudioInputStream;
 import org.cocolab.inpro.audio.DispatchStream;
-import org.cocolab.inpro.tts.MaryAdapter;
-import org.cocolab.inpro.tts.hts.IUBasedFullPStream;
-import org.cocolab.inpro.tts.hts.VocodingAudioStream;
+import org.cocolab.inpro.synthesis.MaryAdapter;
+import org.cocolab.inpro.synthesis.hts.IUBasedFullPStream;
+import org.cocolab.inpro.synthesis.hts.VocodingAudioStream;
 
 public class HesitationIU extends WordIU implements IU.IUUpdateListener {
 	

@@ -30,8 +30,8 @@ import org.cocolab.inpro.incremental.unit.IU;
 import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
 import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 import org.cocolab.inpro.incremental.unit.WordIU;
-import org.cocolab.inpro.tts.MaryAdapter;
-import org.cocolab.inpro.tts.PitchMark;
+import org.cocolab.inpro.synthesis.MaryAdapter;
+import org.cocolab.inpro.synthesis.PitchMark;
 
 public class TTSUtil {
 	

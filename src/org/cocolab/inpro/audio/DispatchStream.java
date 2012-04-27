@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.LabelledAudioStream;
 import org.cocolab.inpro.gui.util.SpeechStateVisualizer;
 import org.cocolab.inpro.incremental.unit.SysInstallmentIU;
-import org.cocolab.inpro.tts.MaryAdapter;
+import org.cocolab.inpro.synthesis.MaryAdapter;
 
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -46,13 +46,14 @@ public class DispatchStream extends InputStream implements Configurable {
 	@S4Boolean(defaultValue = false)
 	public final static String PROP_SEND_SILENCE = "sendSilence";
 	private boolean sendSilence;
-
+	
 	/** A map of tts strings and corresponding audio files. */
 	private static Map<String, String> ttsCache = new HashMap<String, String>();
 
 	InputStream stream;
 	Queue<InputStream> streamQueue = new ConcurrentLinkedQueue<InputStream>();
 	
+
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		sendSilence(ps.getBoolean(PROP_SEND_SILENCE));
@@ -314,7 +315,6 @@ public class DispatchStream extends InputStream implements Configurable {
 	/** whether this dispatchStream has been requested to shut down */ 
 	public boolean inShutdown() { return inShutdown; }
 	/** waits for the current stream to finish and shuts down the dispatcher */
-	public void shutdown() { inShutdown = true; }
 
 	public void waitUntilDone() {
 		synchronized(this) {

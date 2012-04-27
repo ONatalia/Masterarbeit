@@ -20,9 +20,6 @@ import org.cocolab.inpro.gui.pentomino.PentoIcon;
 import org.cocolab.inpro.gui.pentomino.january.GameCanvas;
 import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
 
-import demo.inpro.synthesis.PatternDemonstrator.InstallmentAction;
-import demo.inpro.synthesis.PatternDemonstrator.StartAction;
-
 
 /**
  * this prototype will allow the user to generate utterances like

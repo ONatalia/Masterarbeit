@@ -11,12 +11,12 @@ import javax.xml.bind.JAXBException;
 import org.apache.log4j.Logger;
 import org.cocolab.inpro.annotation.Label;
 import org.cocolab.inpro.audio.DDS16kAudioInputStream;
-import org.cocolab.inpro.tts.MaryAdapter;
-import org.cocolab.inpro.tts.PitchMark;
-import org.cocolab.inpro.tts.hts.FullPFeatureFrame;
-import org.cocolab.inpro.tts.hts.FullPStream;
-import org.cocolab.inpro.tts.hts.IUBasedFullPStream;
-import org.cocolab.inpro.tts.hts.VocodingAudioStream;
+import org.cocolab.inpro.synthesis.MaryAdapter;
+import org.cocolab.inpro.synthesis.PitchMark;
+import org.cocolab.inpro.synthesis.hts.FullPFeatureFrame;
+import org.cocolab.inpro.synthesis.hts.FullPStream;
+import org.cocolab.inpro.synthesis.hts.IUBasedFullPStream;
+import org.cocolab.inpro.synthesis.hts.VocodingAudioStream;
 
 /**
  * TODO: add support for canned audio (i.e. read from WAV and TextGrid, maybe even transparently)

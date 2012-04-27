@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/** static helper function used to parse Praat TextGrid files */
 public class AnnotationUtil {
 
 	static List<String> interpret(List<String> lines, List<Pattern> patterns) throws IOException {
