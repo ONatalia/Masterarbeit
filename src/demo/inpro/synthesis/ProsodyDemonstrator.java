@@ -1,5 +1,9 @@
 package demo.inpro.synthesis;
 
+import inpro.incremental.unit.IU;
+import inpro.incremental.unit.IncrSysInstallmentIU;
+import inpro.incremental.unit.SysSegmentIU;
+
 import java.awt.event.ActionEvent;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -17,9 +21,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.cocolab.inpro.incremental.unit.IU;
-import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
-import org.cocolab.inpro.incremental.unit.SysSegmentIU;
 
 public class ProsodyDemonstrator extends PatternDemonstrator {
 	

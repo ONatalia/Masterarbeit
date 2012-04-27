@@ -1,5 +1,10 @@
 package demo.inpro.synthesis;
 
+import inpro.gui.Canvas;
+import inpro.gui.pentomino.PentoIcon;
+import inpro.gui.pentomino.january.GameCanvas;
+import inpro.incremental.unit.IncrSysInstallmentIU;
+
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -14,10 +19,6 @@ import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
-import org.cocolab.inpro.gui.Canvas;
-import org.cocolab.inpro.gui.pentomino.PentoIcon;
-import org.cocolab.inpro.gui.pentomino.january.GameCanvas;
-import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
 
 
 /**

@@ -17,7 +17,7 @@ useful scripts and stuff.
 
 1. Applications
 
-All generic applications reside in the org.cocolab.inpro.apps package.
+All generic applications reside in the inpro.apps package.
 This directory is also where the default configuration files
 are stored. The configuration file used can be changed in all
 applications described below with the commandline switch "-c".

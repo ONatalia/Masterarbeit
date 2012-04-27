@@ -1,5 +1,16 @@
 package demo.inpro.synthesis;
 
+import inpro.apps.SimpleMonitor;
+import inpro.audio.DispatchStream;
+import inpro.incremental.unit.IU;
+import inpro.incremental.unit.IncrSysInstallmentIU;
+import inpro.incremental.unit.SegmentIU;
+import inpro.incremental.unit.SysSegmentIU;
+import inpro.incremental.unit.WordIU;
+import inpro.incremental.unit.IU.IUUpdateListener;
+import inpro.incremental.unit.IU.Progress;
+import inpro.synthesis.MaryAdapter;
+
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,16 +24,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.cocolab.inpro.apps.SimpleMonitor;
-import org.cocolab.inpro.audio.DispatchStream;
-import org.cocolab.inpro.incremental.unit.IU.IUUpdateListener;
-import org.cocolab.inpro.incremental.unit.IU;
-import org.cocolab.inpro.incremental.unit.IU.Progress;
-import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
-import org.cocolab.inpro.incremental.unit.SegmentIU;
-import org.cocolab.inpro.incremental.unit.SysSegmentIU;
-import org.cocolab.inpro.incremental.unit.WordIU;
-import org.cocolab.inpro.synthesis.MaryAdapter;
 
 /**
  * implementing classes should<ol>

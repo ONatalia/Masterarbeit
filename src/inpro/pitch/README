@@ -1,0 +1,114 @@
+_____________________________________________________________
+  _                                         _           _   
+ (_)_ __  _ __  _ __ ___    _ __  _ __ ___ (_) ___  ___| |_ 
+ | | '_ \| '_ \| '__/ _ \  | '_ \| '__/ _ \| |/ _ \/ __| __|
+ | | | | | |_) | | | (_) | | |_) | | | (_) | |  __/ (__| |_ 
+ |_|_| |_| .__/|_|  \___/  | .__/|_|  \___// |\___|\___|\__|
+         |_|               |_|           |__/               
+_____________________________________________________________
+
+(c) 2007, 2008, 2009 inpro project, Timo Baumann, Gabriel Skantze
+funded by DFG Emmy-Noether programme
+
+please feel free to contact timo@ling.uni-potsdam.de 
+for any questions and comments. 
+see bottom of this page for license and citation information.
+
+_________________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+Pitch-Tracking with the Sphinx-4 FrontEnd
+_________________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+This package contains pitch tracking code that can be 
+integrated into the Sphinx-4 [1] FrontEnd or used as a 
+stand-alone pitch tracker.
+
+The algorithm implemented closely follows the first three 
+steps of the YIN algorithm [2], but differs in the fourth
+step: YIN implements complete DP, while we use a configurable
+look-ahead allowing incremental processing at the cost of
+imperfect dynamic programming results. Our testing shows
+that a look-ahead of only a few frames (< 20) allows for
+similar results as complete optimization.
+
+Also, PitchTracker.java contains several unused functions
+that can be used to vary the candidate extraction and 
+selection. We believe the current setting should give the
+best possible results.
+
+The current implementation is hard-wired to 16000 Hz audio.
+Extensions to other frequencies should be straight-forward 
+and code contributions regarding this (as well as to all  
+other aspects of the code) are very welcome.
+
+____________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+Using as a Stand-Alone Pitch-Tracker
+____________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+Using the distribution, just run
+
+java -jar PitchTracker.jar summkurz.wav
+
+of course, you may use any other 16kHz audio file
+other than the provided summkurz.wav
+
+Pitch is output in Hz for every 10 ms of audio.
+
+_______________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+Pitch-Tracking in the Sphinx-4 FrontEnd
+_______________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+Add the pitch tracker as a DataProcessor somewhere near 
+the beginning of the FrontEnd pipeline (when Data objects 
+are already chunked to 10ms and are still audio samples).
+See config.xml for an example.
+
+Pitch and voicing information will be output as part of
+PitchedDoubleData (see PitchedDoubleData.java). This 
+PitchedDoubleData could either be used in a later 
+processor to calculate non-standard ASR features (which
+I have not tried), or passed on to some other component. 
+
+This can be accomplished by implementing the Listener
+interface in 
+inpro.pitch.notifer.SignalFeatureListener,
+plugging in the SignalFeatureExtractor into the pipeline
+below the PitchTracker and registering your listener 
+with the SignalFeatureExtractor. 
+
+This unfortunate procedure is necessary, as there is 
+no way of passing PitchedDoubleData completely through
+the recognition process as preceding Data objects are 
+discarded by later frontend modules.
+
+_______________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+License and Citation in Scientific Work
+_______________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+This is free and open source software, released under the
+General Public License 3. Please see the file COPYING for details.
+
+The license sets the requirements for using this software.
+The requirements in this section are not legally binding; 
+however, they represent things that the author would appreciate: 
+If you write a paper based on work that uses this software, 
+please include a citation to one of our papers, and send a copy 
+of your paper. If you create a derivative work based on a this 
+software, tell me about it and let me know how I can get a 
+copy, and include this request if it’s appropriate.
+
+See the file CITING for references to our papers that describe
+this software. Feel free to cite the paper that seems more 
+appropriate.
+
+_______________________________________
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+[1]: 
+cmusphinx.sourceforge.net/sphinx4/
+[2]: 
+de Cheveigné and Kawahara (2002).
+YIN, a fundamental frequency estimator for speech and music.
+The Journal of the Acoustical Society of America, volume 111

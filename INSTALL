@@ -33,7 +33,7 @@ You will then have to change the following in your Mary configuration:
 in MARY_BASE/conf/marybase.config replace the line
         marytts.modules.HTSEngine \
 with
-        org.cocolab.inpro.tts.hts.InteractiveHTSEngine \
+        inpro.synthesis.hts.InteractiveHTSEngine \
 in the definition of modules.classes.list .
 (You will still be able to use an existing Mary installation 
 as before if you add the path to InproTK to Mary's CLASSPATH.) 

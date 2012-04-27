@@ -1,5 +1,7 @@
 package demo.inpro.synthesis;
 
+import inpro.incremental.unit.IncrSysInstallmentIU;
+
 import java.awt.Component;
 import java.util.Arrays;
 
@@ -8,7 +10,6 @@ import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
-import org.cocolab.inpro.incremental.unit.IncrSysInstallmentIU;
 
 public class SimplePatternDemonstrator extends PatternDemonstrator {
 
