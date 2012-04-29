@@ -35,6 +35,7 @@ import marytts.util.MaryUtils;
 public class MaryAdapter4internal extends MaryAdapter {
 
 	public static final String DEFAULT_VOICE = System.getProperty("mary.voice", "bits1-hsmm");
+	public static final boolean MARY_AUTOLOAD_JARS = System.getProperty("mary.autoload.jars", "true").equals("true");
 	
     private static Logger logger = Logger.getLogger(MaryAdapter4internal.class);
     
@@ -47,7 +48,7 @@ public class MaryAdapter4internal extends MaryAdapter {
 	// startup-code mostly copied from marytts.server.Mary
 	private static void startupInternalMary() throws Exception {
         MaryProperties.readProperties();
-        Mary.startup(false);
+        Mary.startup(MARY_AUTOLOAD_JARS);
 	}
 	
 	@Override
