@@ -274,9 +274,10 @@ public class SimpleReco {
 		ResultListener resultlistener = (ResultListener) cm.lookup("currentASRHypothesis");
 		recognizer.addResultListener(resultlistener);
 		CurrentASRHypothesis casrh = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
-		if (clp.matchesOutputMode(RecoCommandLineParser.OAA_OUTPUT)) {
-			cm.lookup("newWordNotifierAgent");
-		}
+//		// we don't support OAA output anymore
+//		if (clp.matchesOutputMode(RecoCommandLineParser.OAA_OUTPUT)) {
+//			cm.lookup("newWordNotifierAgent");
+//		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.TED_OUTPUT)) {
 			PushBuffer ted = (PushBuffer) cm.lookup("tedNotifier");
 			casrh.addListener(ted);

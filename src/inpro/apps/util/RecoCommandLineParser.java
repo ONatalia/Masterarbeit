@@ -64,7 +64,6 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 //		System.err.println("    -D configname  use the named dialogue manager (see documentation)");
 		System.err.println("output selection:");
 		System.err.println("    -O             output dialogue system responses");
-		System.err.println("    -A             send add/revokeWord messages via OAA");
 		System.err.println("    -T             send incremental hypotheses to TEDview");
 		System.err.println("    -L             incremental output using LabelWriter");
 		System.err.println("incrementality options:");
@@ -149,9 +148,6 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				inputMode = FILE_INPUT;
 				i++;
 				audioURL = new URL(args[i]);
-			}
-			else if (args[i].equals("-A")) {
-				outputMode |= OAA_OUTPUT;
 			}
 			else if (args[i].equals("-T")) {
 				outputMode |= TED_OUTPUT;

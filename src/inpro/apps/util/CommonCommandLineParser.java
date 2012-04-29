@@ -14,7 +14,7 @@ public abstract class CommonCommandLineParser {
 	public static final int DISPATCHER_OBJECT_2_INPUT = 128;
 	
 	public static final int NO_OUTPUT = 0;
-	public static final int OAA_OUTPUT = 1;
+	//public static final int OAA_OUTPUT = 1; // we don't support OAA output anymore
 	public static final int TED_OUTPUT = 2;
 	public static final int LABEL_OUTPUT = 4;
 	public static final int SPEAKER_OUTPUT = 8;
