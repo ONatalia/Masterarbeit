@@ -4,12 +4,11 @@ import inpro.incremental.unit.IU.IUUpdateListener;
 
 import java.util.Random;
 
-
 import scalendar.adaptionmanager.AdaptionManager;
 
 public class NoiseThread extends Thread {
 	private Random random = new Random(); 
-	private SynthesisModule sm;
+	private NoisySynthesisModule sm;
 	private IUUpdateListener updateListener;
 	private AdaptionManager am;
 	
@@ -31,7 +30,7 @@ public class NoiseThread extends Thread {
 		}
 	}
 	
-	public NoiseThread(AdaptionManager am, SynthesisModule sm, IUUpdateListener updateListener, NoiseHandling nh) {
+	public NoiseThread(AdaptionManager am, NoisySynthesisModule sm, IUUpdateListener updateListener, NoiseHandling nh) {
 		super("Noise Thread");
 		this.am = am;
 		this.sm = sm;

@@ -1,11 +1,5 @@
-package inpro.domains.calendar;
+package inpro.incremental.unit;
 
-import inpro.incremental.unit.IU;
-import inpro.incremental.unit.IncrSysInstallmentIU;
-import inpro.incremental.unit.SegmentIU;
-import inpro.incremental.unit.SysInstallmentIU;
-import inpro.incremental.unit.SysSegmentIU;
-import inpro.incremental.unit.WordIU;
 
 import java.util.ArrayList;
 import java.util.List;

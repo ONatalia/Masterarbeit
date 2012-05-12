@@ -1,9 +1,5 @@
-package inpro.domains.calendar;
+package inpro.incremental.unit;
 
-import inpro.incremental.unit.IU;
-import inpro.incremental.unit.SegmentIU;
-import inpro.incremental.unit.SysSegmentIU;
-import inpro.incremental.unit.WordIU;
 
 import java.util.List;
 
@@ -11,8 +7,8 @@ import java.util.List;
 public class PhraseIU extends IU {
 
 	final String phrase;
-	PhraseType type;
-	PhraseStatus status;
+	private PhraseType type;
+	private PhraseStatus status;
 	/** the state of delivery that this unit is in */
 	Progress progress = Progress.UPCOMING;
 	PhraseBasedInstallmentIU containingInstallment;
@@ -31,13 +27,17 @@ public class PhraseIU extends IU {
 	    PROJECTED // the next phrase, just as context for the currently ongoing phrase 
 	}
 	
+	public PhraseIU(WordIU word) {
+		this(word.toPayLoad(), PhraseStatus.NORMAL);
+	}
+	
 	public PhraseIU(String phrase, PhraseStatus status) {
 		this(phrase, status, PhraseType.UNDEFINED);
 	}
 	
 	public PhraseIU(String phrase, PhraseStatus status, PhraseType type) {
 		this.phrase = phrase;
-		this.status = status;
+		this.setStatus(status);
 		this.type = type;
 	}
 	
@@ -60,7 +60,7 @@ public class PhraseIU extends IU {
 		//assert (((WordIU) ius.get(0)).isSilence()) ? ius.size() == expectedWordCount() + 1 : ius.size() == expectedWordCount();
 	}
 
-	protected void setProgress(Progress p) {
+	public void setProgress(Progress p) {
 		if (p != this.progress) { 
 			this.progress = p;
 			notifyListeners();
@@ -72,7 +72,7 @@ public class PhraseIU extends IU {
 	}
 
 	public void setFinal() {
-		type = PhraseIU.PhraseType.FINAL;
+		this.type = PhraseIU.PhraseType.FINAL;
 		WordIU lastWord = (WordIU) groundedIn().get(groundedIn.size() - 1);
 		if (lastWord != null) {
 			for (SegmentIU seg : lastWord.getSegments()) {
@@ -80,5 +80,17 @@ public class PhraseIU extends IU {
 				((SysSegmentIU) seg).setAwaitContinuation(false);			
 			}
 		}
+	}
+
+	public PhraseStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(PhraseStatus status) {
+		this.status = status;
+	}
+
+	public PhraseType getType() {
+		return type;
 	}
 }

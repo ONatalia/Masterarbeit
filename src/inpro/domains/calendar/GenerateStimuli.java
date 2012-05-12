@@ -139,7 +139,7 @@ public class GenerateStimuli {
 	public static void main(String[] args)  throws FileNotFoundException, ParseException {
 		SpudManager spudmanager = new SpudManager(
 				new CalendarKnowledgeInterface(),
-				"src/org/cocolab/inpro/domains/calendar/calendar.gs");
+				"src/inpro/domains/calendar/calendar.gs");
 		//UtteranceObject uo = GenerateStimuli.createMovedEvent(gs.createRandomEvent("Austellung: China: Stadt, Land, Fluss", 2));
 		//UtteranceObject uo = GenerateStimuli.createEventConflict(gs.createRandomEvent("Austellung: China: Stadt, Land, Fluss", 2), "Spazierengehen");
 		UtteranceObject uo = GenerateStimuli.createUpcomingEvents(

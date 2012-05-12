@@ -7,6 +7,7 @@ import inpro.incremental.IUModule;
 import inpro.incremental.PushBuffer;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
+import inpro.incremental.unit.PhraseIU;
 import inpro.incremental.unit.SysInstallmentIU;
 import inpro.incremental.unit.IU.IUUpdateListener;
 import inpro.synthesis.MaryAdapter;
@@ -66,7 +67,7 @@ public class GenerationModule extends IUModule {
 					projectedPhrase = nlg.takeSimulatedAndSimulateNextPhrase();
 					// give prev. IU normal status
 					PhraseIU iu = phrases.get(phrases.size() - 1);
-					iu.status = PhraseIU.PhraseStatus.NORMAL;
+					iu.setStatus(PhraseIU.PhraseStatus.NORMAL);
 					iu.addUpdateListener(phraseUpdateListener);
 				} 	 
 				
@@ -220,7 +221,7 @@ public class GenerationModule extends IUModule {
 			System.exit(0);
 		}
 		
-		final SynthesisModule sm = new SynthesisModule();
+		final NoisySynthesisModule sm = new NoisySynthesisModule();
 
 		gm.iulisteners = new ArrayList<PushBuffer>();
 		gm.iulisteners.add(sm);
