@@ -214,7 +214,6 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 		
 		public void updateWordTimings(WordIU otherWord) {
 			this.edit.getIU().updateTimings(otherWord);
-			throw new RuntimeException("not implemented yet");
 		}
 
 		protected SmoothingCounter(EditMessage<WordIU> edit, int count) {
