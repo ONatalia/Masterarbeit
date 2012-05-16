@@ -7,6 +7,7 @@ import inpro.incremental.unit.IUList;
 import inpro.incremental.unit.SegmentIU;
 import inpro.incremental.unit.WordIU;
 import inpro.incremental.util.ResultUtil;
+import inpro.incremental.util.TimeUtil;
 import inpro.incremental.util.WordUtil;
 
 import java.util.ArrayList;
@@ -46,9 +47,9 @@ import edu.cmu.sphinx.util.props.PropertySheet;
  */
 public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeeper, SignalListener {
 
-	final IUList<WordIU> wordIUs = new IUList<WordIU>();
+	protected final IUList<WordIU> wordIUs = new IUList<WordIU>();
 	
-	final List<EditMessage<WordIU>> wordEdits = new ArrayList<EditMessage<WordIU>>();
+	protected final List<EditMessage<WordIU>> wordEdits = new ArrayList<EditMessage<WordIU>>();
 	
 	private static final Logger logger = Logger.getLogger(ASRWordDeltifier.class);
 	
@@ -171,7 +172,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		ListIterator<Token> newIt = newTokens.listIterator();
 		ListIterator<WordIU> wordIt = wordIUs.listIterator();
 		// TODO: what are these for?
-		double segmentStartTime = currentOffset * ResultUtil.FRAME_TO_SECOND_FACTOR;
+		double segmentStartTime = currentOffset * TimeUtil.FRAME_TO_SECOND_FACTOR;
 		double segmentEndTime = 0.0;
 		List<SegmentIU> emptyList = Collections.<SegmentIU>emptyList(); // needed to initialize prevSegmentIt with an empty non-null iterator
 		Iterator<SegmentIU> currSegmentIt = emptyList.iterator();
@@ -299,10 +300,10 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 			if ((t.getSearchState() instanceof WordSearchState) 
 			 && (newIt.hasNext()) 
 			) {
-				segmentEndTime = (newIt.next().getFrameNumber()+ currentOffset) * ResultUtil.FRAME_TO_SECOND_FACTOR;
+				segmentEndTime = (newIt.next().getFrameNumber()+ currentOffset) * TimeUtil.FRAME_TO_SECOND_FACTOR;
 				newIt.previous();
 			} else {
-				segmentEndTime = (t.getFrameNumber() + currentOffset) * ResultUtil.FRAME_TO_SECOND_FACTOR;
+				segmentEndTime = (t.getFrameNumber() + currentOffset) * TimeUtil.FRAME_TO_SECOND_FACTOR;
 			}
 			newIt.previous();
 		} else
@@ -354,7 +355,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	
 	/** the time that has passed in the IU world; no restarts between recognitions */
 	public synchronized double getCurrentTime() {
-		return getCurrentFrame() * ResultUtil.FRAME_TO_SECOND_FACTOR;
+		return getCurrentFrame() * TimeUtil.FRAME_TO_SECOND_FACTOR;
 	}
 
 	@Override

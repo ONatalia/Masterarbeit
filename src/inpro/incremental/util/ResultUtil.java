@@ -12,13 +12,7 @@ import edu.cmu.sphinx.linguist.flat.PronunciationState;
 import edu.cmu.sphinx.linguist.flat.SentenceHMMState;
 import edu.cmu.sphinx.linguist.lextree.LexTreeLinguist;
 
-public class ResultUtil {
-	
-	/** a frame lasts 0.01 seconds (= 10 milliseconds) */
-	public static double FRAME_TO_SECOND_FACTOR = 0.01;
-	/** a second lasts 1000 milliseconds */
-	public static double SECOND_TO_MILLISECOND_FACTOR = 1000.0;
-	
+public class ResultUtil {	
 	/**
 	 * return a list of word and/or unit tokens extracted from a linked token list
 	 * 

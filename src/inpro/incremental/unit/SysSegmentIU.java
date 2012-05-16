@@ -1,7 +1,7 @@
 package inpro.incremental.unit;
 
 import inpro.annotation.Label;
-import inpro.incremental.util.ResultUtil;
+import inpro.incremental.util.TimeUtil;
 import inpro.synthesis.MaryAdapter4internal;
 import inpro.synthesis.PitchMark;
 import inpro.synthesis.hts.FullPFeatureFrame;
@@ -61,7 +61,7 @@ public class SysSegmentIU extends SegmentIU {
 	@Override
 	public void appendMaryXML(StringBuilder sb) {
 		sb.append("<ph d='");
-		sb.append((int) (l.getDuration() * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
+		sb.append((int) (l.getDuration() * TimeUtil.SECOND_TO_MILLISECOND_FACTOR));
 		sb.append("' end='");
 		sb.append(l.getEnd());
 		sb.append("' f0='");
@@ -80,7 +80,7 @@ public class SysSegmentIU extends SegmentIU {
 	
 	/**	the duration of this segment in multiples of 5 ms */
 	public int durationInSynFrames() {
-		return (int) Math.round(duration() * FullPStream.FRAMES_PER_SECOND);
+		return (int) Math.round(duration() * FullPStream.FRAMES_PER_SECOND * 3);
 	}
 	
 	public double originalDuration() {
@@ -253,14 +253,8 @@ public class SysSegmentIU extends SegmentIU {
 	
 	/** shift the start and end times of this (and possibly all following SysSegmentIUs */
 	public void shiftBy(double offset, boolean recurse) {
-		Label l = this.l;
-		this.l = new Label(l.getStart() + offset, l.getEnd() + offset, l.getLabel());
+		super.shiftBy(offset, recurse);
 		this.plannedLabel = this.l;
-		if (recurse) {
-			for (IU nSll : getNextSameLevelLinks()) {
-				((SysSegmentIU) nSll).shiftBy(offset, recurse);
-			}
-		}
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 package inpro.incremental.evaluation;
 
 import inpro.incremental.unit.WordIU;
-import inpro.incremental.util.ResultUtil;
+import inpro.incremental.util.TimeUtil;
 
 import java.util.LinkedList;
 import java.util.Locale;
@@ -71,7 +71,7 @@ public class CompletionEvaluator extends BasicEvaluator {
 		/** in seconds */
 		@SuppressWarnings("unused")
 		private double logicalTimeUntilOnset() {
-			return onset - (frameCount * ResultUtil.FRAME_TO_SECOND_FACTOR);
+			return onset - (frameCount * TimeUtil.FRAME_TO_SECOND_FACTOR);
 		}
 		
 		@SuppressWarnings("unused")
@@ -80,7 +80,7 @@ public class CompletionEvaluator extends BasicEvaluator {
 		}
 		
 		private double logicalTimeOfDecision() {
-			return ((double) frameCount) * ResultUtil.FRAME_TO_SECOND_FACTOR;
+			return frameCount * TimeUtil.FRAME_TO_SECOND_FACTOR;
 		}
 		
 		private double estimatedOnsetTime() {

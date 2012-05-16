@@ -2,7 +2,7 @@ package inpro.incremental.listener;
 
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
-import inpro.incremental.util.ResultUtil;
+import inpro.incremental.util.TimeUtil;
 
 import java.util.Collection;
 import java.util.List;
@@ -12,9 +12,9 @@ public class ConsoleNotifier extends FrameAwarePushBuffer {
 
 	@Override
 	public void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
-		if (edits.size() > 0) {
+		if (!edits.isEmpty()) {
 			System.out.print("\nThe Hypothesis has changed at time: ");
-			System.out.println(currentFrame * ResultUtil.FRAME_TO_SECOND_FACTOR);
+			System.out.println(currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
 			System.out.println("Edits since last hypothesis:");
 			for (EditMessage<? extends IU> edit : edits) {
 				System.out.println(edit.toString());

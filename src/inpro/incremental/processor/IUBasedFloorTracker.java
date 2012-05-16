@@ -4,7 +4,7 @@ import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.WordIU;
-import inpro.incremental.util.ResultUtil;
+import inpro.incremental.util.TimeUtil;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -226,7 +226,7 @@ public class IUBasedFloorTracker extends AbstractFloorTracker {
 		
 		@Override
 		public void run() {
-			int timeoutStart = (int) (endingWord.endTime() * ((int) ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
+			int timeoutStart = (int) (endingWord.endTime() * ((int) TimeUtil.SECOND_TO_MILLISECOND_FACTOR));
 			int timeout = getTime() - timeoutStart + risingTimeout;
 			sleepSafely(timeout);
 			if (shouldDie())

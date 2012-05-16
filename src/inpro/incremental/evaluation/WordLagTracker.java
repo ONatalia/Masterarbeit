@@ -3,7 +3,7 @@ package inpro.incremental.evaluation;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.WordIU;
-import inpro.incremental.util.ResultUtil;
+import inpro.incremental.util.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +30,7 @@ public class WordLagTracker extends BasicEvaluator {
 			List<? extends EditMessage<? extends IU>> edits) {
     	for (IU iu : ius) {
     		if (!wordLagsForAllWords.containsKey(iu) && iu instanceof WordIU) {
-    			long delay = iu.getCreationTime() - ((long) (iu.endTime() * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
+    			long delay = iu.getCreationTime() - ((long) (iu.endTime() * TimeUtil.SECOND_TO_MILLISECOND_FACTOR));
     			wordLagsForAllWords.put((WordIU) iu, delay);
     		}
     	}

@@ -34,14 +34,14 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 
     @S4Integer(defaultValue = 0)
 	public final static String PROP_SMOOTHING = "smoothing";
-	int smoothing;
+	protected int smoothing;
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		smoothing = ps.getInt(PROP_SMOOTHING);
 	}
 	
-	List<SmoothingCounter> smoothingQueue = new ArrayList<SmoothingCounter>();
+	protected List<SmoothingCounter> smoothingQueue = new ArrayList<SmoothingCounter>();
 	
 	private IUList<WordIU> prevWordIUs;
 	
@@ -196,19 +196,19 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 	 * @param edit ignored in this implementation
 	 * @return smoothing factor for this edit; constant in this implementation 
 	 */
-	protected int getSmoothingFactor(EditMessage<WordIU> edit) {
+	protected int getSmoothingFactor(@SuppressWarnings("unused") EditMessage<WordIU> edit) {
 		return smoothing;
 	}
 
 	/**
 	 * stores the maturity for a given edit message
 	 */
-	protected class SmoothingCounter {
+	public class SmoothingCounter {
 		EditMessage<WordIU> edit;
 		int count;
 		int countStart;
 		
-		SmoothingCounter(EditMessage<WordIU> edit) {
+		public SmoothingCounter(EditMessage<WordIU> edit) {
 			this(edit, getSmoothingFactor(edit));
 		}
 		
@@ -216,7 +216,7 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 			this.edit.getIU().updateTimings(otherWord);
 		}
 
-		protected SmoothingCounter(EditMessage<WordIU> edit, int count) {
+		public SmoothingCounter(EditMessage<WordIU> edit, int count) {
 			this.edit = edit;
 			this.countStart = count;
 			this.count = countStart;
@@ -230,6 +230,18 @@ public class SmoothingDeltifier extends ASRWordDeltifier {
 			return 
 			    this.edit.getType().equals(edit.getType()) 
 			 && this.edit.getIU().pronunciationEquals(edit.getIU());
+		}
+		
+		public EditMessage<WordIU> getEdit() {
+			return edit;
+		}
+		
+		public int getCount() {
+			return count;
+		}
+		
+		public int getCountStart() {
+			return countStart;
 		}
 	}
 

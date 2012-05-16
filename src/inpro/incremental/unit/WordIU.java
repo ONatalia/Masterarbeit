@@ -2,7 +2,7 @@ package inpro.incremental.unit;
 
 import inpro.annotation.Label;
 import inpro.features.TimeShiftingAnalysis;
-import inpro.incremental.util.ResultUtil;
+import inpro.incremental.util.TimeUtil;
 import inpro.nlu.AVPair;
 
 import java.util.ArrayList;
@@ -205,7 +205,7 @@ public class WordIU extends IU {
 		ProsodicFeatures() {
 			tsa = new TimeShiftingAnalysis();
 			for (double time = startTime(); time < endTime(); time += 0.01) {
-				int frame = (int) Math.floor(time * ResultUtil.SECOND_TO_MILLISECOND_FACTOR + 0.5);
+				int frame = (int) Math.floor(time * TimeUtil.SECOND_TO_MILLISECOND_FACTOR + 0.5);
 				double pitch = bd.getPitchInCent(time);
 				if (!Double.isNaN(pitch))
 					tsa.add(frame, pitch);
@@ -220,7 +220,7 @@ public class WordIU extends IU {
 
 	@Override
 	public String toPayLoad() {
-		return word;
+		return getWord();
 	}
 	
 	/** 
@@ -328,7 +328,7 @@ public class WordIU extends IU {
 		return ((double) p[n]) / a.size();
 	}
 	
-	/** used internally in getWER */
+	/** three-way minimum used internally in getWER */
 	private static final int min(int a, int b, int c) {
 		return Math.min(Math.min(a, b), c);
 	}

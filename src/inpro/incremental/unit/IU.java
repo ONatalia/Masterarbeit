@@ -1,7 +1,7 @@
 package inpro.incremental.unit;
 
 import inpro.incremental.BaseDataKeeper;
-import inpro.incremental.util.ResultUtil;
+import inpro.incremental.util.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,12 +21,12 @@ public abstract class IU implements Comparable<IU> {
 		public String toPayLoad() {
 			return "The very first IU";
 		}
-	}; 
+	};
 	private static int IU_idCounter = 0;
 	private final int id;
 
 	protected IU previousSameLevelLink;
-	protected List<IU> nextSameLevelLinks;
+	protected IUList<IU> nextSameLevelLinks;
 	
 	protected List<IU> groundedIn;
 	protected List<IU> grounds; 
@@ -123,7 +123,7 @@ public abstract class IU implements Comparable<IU> {
 	
 	public void addNextSameLevelLink(IU iu) {
 		if (nextSameLevelLinks == null)
-			nextSameLevelLinks = new ArrayList<IU>();
+			nextSameLevelLinks = new IUList<IU>();
 		nextSameLevelLinks.add(iu);
 	}
 
@@ -138,7 +138,7 @@ public abstract class IU implements Comparable<IU> {
 	
 	/** recursively remove (in grounded IUs) all nextsamelevellinks */
 	public void removeAllNextSameLevelLinks() {
-		if (groundedIn != null && groundedIn.size() > 0) 
+		if (groundedIn != null && !groundedIn.isEmpty()) 
 			groundedIn.get(groundedIn.size() - 1).removeAllNextSameLevelLinks();
 		nextSameLevelLinks = null;
 	}
@@ -167,7 +167,7 @@ public abstract class IU implements Comparable<IU> {
 	
 	public void reorderNextSameLevelLink(Comparator<IU> order) {
 		Collections.sort(nextSameLevelLinks, order);
-		if (groundedIn != null && groundedIn.size() > 0) {
+		if (groundedIn != null && !groundedIn.isEmpty()) {
 			IU lastGrounding = groundedIn.get(groundedIn.size() - 1);
 			lastGrounding.newGroundingNextSameLevelLinksOrder(nextSameLevelLinks);
 		}
@@ -179,7 +179,7 @@ public abstract class IU implements Comparable<IU> {
 		for (IU iu : aboveNextSameLevelLinks) {
 			nextSameLevelLinks.add(iu.groundedIn.get(0));
 		}
-		if (groundedIn != null && groundedIn.size() > 0) {
+		if (groundedIn != null && !groundedIn.isEmpty()) {
 			IU lastGrounding = groundedIn.get(groundedIn.size() - 1);
 			lastGrounding.newGroundingNextSameLevelLinksOrder(nextSameLevelLinks);
 		}
@@ -191,7 +191,7 @@ public abstract class IU implements Comparable<IU> {
     		if (link != null && groundedIn != null) {
     			IU firstGrounding = groundedIn.get(0);
     			IU prevLast;
-    			if (link.groundedIn != null && link.groundedIn.size() > 0) {
+    			if (link.groundedIn != null && !link.groundedIn.isEmpty()) {
     				prevLast = link.groundedIn.get(link.groundedIn.size() - 1);
     				if (prevLast.getClass() != firstGrounding.getClass()) {
     					throw new RuntimeException("I can only connect IUs of identical types!");
@@ -209,7 +209,7 @@ public abstract class IU implements Comparable<IU> {
 	 * @return NaN if time is unavailable, a time (in seconds) otherwise
 	 */
 	public double startTime() {
-		if ((groundedIn != null) && (groundedIn.size() > 0)) {
+		if ((groundedIn != null) && !groundedIn.isEmpty()) {
 			return groundedIn.get(0).startTime();
 		} else {
 			return Double.NaN;
@@ -221,7 +221,7 @@ public abstract class IU implements Comparable<IU> {
 	 * @return NaN if time is unavailable, a time (in seconds) otherwise
 	 */
 	public double endTime() {
-		if ((groundedIn != null) && (groundedIn.size() > 0)) {
+		if ((groundedIn != null) && !groundedIn.isEmpty()) {
 			double time = 0;
 			for (IU iu : this.groundedIn()) {
 				if (!Double.isNaN(iu.endTime())) {
@@ -254,8 +254,8 @@ public abstract class IU implements Comparable<IU> {
 	/**
 	 * two IUs are equal if their IDs are the same
 	 */
-	public boolean equals(IU iu) {
-		return (this.id == iu.id); 
+	public boolean equals(Object iu) {
+		return (iu instanceof IU && this.id == ((IU) iu).id); 
 	}
 	
 	/**
@@ -383,7 +383,7 @@ public abstract class IU implements Comparable<IU> {
 	 *  - is null if there are no grounding units. 
 	 */
 	public Progress getProgress() {
-		if (groundedIn != null && groundedIn.size() > 0) {
+		if (groundedIn != null && !groundedIn.isEmpty()) {
 			if (groundedIn.get(0).isUpcoming())
 				return Progress.UPCOMING;
 			if (groundedIn.get(groundedIn.size() - 1).isCompleted())
@@ -459,9 +459,9 @@ public abstract class IU implements Comparable<IU> {
 		if (Double.isNaN(duration))
 			duration = 0.0;
 		StringBuilder sb = new StringBuilder("<event time='");
-		sb.append(Math.round(startTime * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
+		sb.append(Math.round(startTime * TimeUtil.SECOND_TO_MILLISECOND_FACTOR));
 		sb.append("' duration='");
-		sb.append(Math.round(duration * ResultUtil.SECOND_TO_MILLISECOND_FACTOR));
+		sb.append(Math.round(duration * TimeUtil.SECOND_TO_MILLISECOND_FACTOR));
 		sb.append("'><iu id='");
 		int id = this.getID();
 		sb.append(id);
@@ -544,5 +544,5 @@ public abstract class IU implements Comparable<IU> {
 	public interface IUUpdateListener {
 		public void update(IU updatedIU);
 	}
-	
+
 }
