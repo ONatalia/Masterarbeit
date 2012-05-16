@@ -5,12 +5,13 @@ import java.net.URL;
 
 public class RTPCommandLineParser extends CommonCommandLineParser {
 
-	String destinationAddress = "";
+	String destinationAddress;
 	int destPort;
 	int localPort;
 	
 	public RTPCommandLineParser(String[] args) {
 		super(args);
+		destinationAddress = "";
 	}
 	
 	@Override

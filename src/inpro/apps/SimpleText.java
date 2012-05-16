@@ -1,7 +1,5 @@
 package inpro.apps;
 
-import inpro.apps.util.IUService;
-import inpro.apps.util.ServiceContainer;
 import inpro.apps.util.TextCommandLineParser;
 import inpro.incremental.PushBuffer;
 import inpro.incremental.eyetracker.CurrentEyeTrackingPoint;
@@ -27,10 +25,6 @@ import javax.swing.text.BadLocationException;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.apache.xmlrpc.XmlRpcException;
-import org.apache.xmlrpc.server.PropertyHandlerMapping;
-import org.apache.xmlrpc.server.XmlRpcServer;
-import org.apache.xmlrpc.webserver.WebServer;
 
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -156,10 +150,6 @@ public class SimpleText extends JPanel implements ActionListener {
     	final TextBasedFloorTracker textBasedFloorTracker = (TextBasedFloorTracker) cm.lookup(PROP_FLOOR_MANAGER);
     	final List<PushBuffer> hypListeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
     	
-    	//To add another input method, I need to get the PropertySheet from another module, the hypListeners, and ignite them
-    	PropertySheet psEye = cm.getPropertySheet(PROP_CURRENT_EYETRACKING);
-    	final List<PushBuffer> hypListenersEye = psEye.getComponentList(PROP_HYP_CHANGE_LISTENERS_EYE, PushBuffer.class);
-    	
     	if (clp.hasTextFromReader()) { // if we already know the text:
     		logger.info("running in non-interactive mode");
     		// run non-interactively
@@ -167,30 +157,6 @@ public class SimpleText extends JPanel implements ActionListener {
     		System.exit(0); //
     		
     	} 
-    	else if (clp.isServerMode()) {
-    		logger.info("running server mode");
-    		WebServer web = new WebServer(9030);
-    		XmlRpcServer xml = web.getXmlRpcServer();
-    		
-    		PropertyHandlerMapping phm = new PropertyHandlerMapping();
-    		ServiceContainer.set(hypListeners, hypListenersEye, textBasedFloorTracker);
-    		ServiceContainer.cm(cm);
-    		try 
-    		{
-    			phm.addHandler("inpro", IUService.class);
-    			xml.setHandlerMapping(phm);
-    			web.start();
-    		} 
-    		catch (XmlRpcException e) 
-    		{
-    			e.printStackTrace();
-    		} 
-    		catch (IOException e)
-    		{
-    			e.printStackTrace();
-    		}    		
-    		
-    	}
     	else { // run interactively
     		// add hypothesis viewer 
     		if (clp.matchesOutputMode(TextCommandLineParser.CURRHYP_OUTPUT)) {

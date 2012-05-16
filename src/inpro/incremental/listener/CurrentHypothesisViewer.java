@@ -3,7 +3,6 @@ package inpro.incremental.listener;
 import inpro.incremental.PushBuffer;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
-import inpro.incremental.unit.WordIU;
 
 import java.awt.Font;
 import java.util.Collection;
@@ -60,8 +59,7 @@ public class CurrentHypothesisViewer extends PushBuffer {
 		if (updateResults) {
 			StringBuilder sb = new StringBuilder();
 			for (IU iu : ius) {
-				assert (iu instanceof WordIU);
-				sb.append(((WordIU) iu).getWord());
+				sb.append(iu.toPayLoad());
 				sb.append(" ");
 			}
 			final String text = sb.toString();

@@ -8,7 +8,6 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -29,6 +28,10 @@ import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4String;
 import edu.cmu.sphinx.util.props.S4Boolean;
 
+/**
+ * A viewer for IU networks that calls graphviz for laying out the graph
+ * @author Okko Buss
+ */
 public class IUNetworkToDOT extends PushBuffer {
 
 	/** String for dot executable */
@@ -90,15 +93,10 @@ public class IUNetworkToDOT extends PushBuffer {
 	/** List of lists of nodes to cluster */
 	private List<List<IU>> nodeClusters = new ArrayList<List<IU>>();
 	/** Frame for display of output */
-	JFrame f = new JFrame("IU Network");;
+	JFrame f = new JFrame("IU Network");
 	/** Label for display of output */
 	JLabel l;
 	
-	/** Offset of time for when the first dot file was written. */
-	private long offset;
-	/** Time for when the last dot file was written. */
-	private long last;
-
 	/**
 	 * Sets up the dot listener
 	 */
@@ -140,7 +138,6 @@ public class IUNetworkToDOT extends PushBuffer {
 				this.scale = Image.SCALE_FAST; 
 			}
 		}
-		this.offset = System.currentTimeMillis();
 	}
 
 	@Override
@@ -180,12 +177,8 @@ public class IUNetworkToDOT extends PushBuffer {
 			}
 			printTail();
 			this.outStream.close();
-			long now = System.currentTimeMillis() - this.offset;
-//			double r = 1.0 / (now-last)*1000;
-			last = now;
 			if (runDot)
 				runDot();
-//			System.err.println("BATCH: /Users/okko/Desktop/Resources/ffmpeg -r " + r + " -f image2 -i '" + out.toString() + ".png' " + out.toString() + ".mov");
 		}
 	}
 	
@@ -287,9 +280,7 @@ public class IUNetworkToDOT extends PushBuffer {
 							this.display = false;
 						}
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			} else {

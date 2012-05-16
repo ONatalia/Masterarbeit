@@ -21,10 +21,9 @@ public abstract class BasicEvaluator extends PushBuffer {
 		checkForCommits(edits);
 	}
 	
-	@SuppressWarnings("unchecked")
 	protected void checkForCommits(List<? extends EditMessage<? extends IU>> edits) {
 		boolean committedFlag = false;
-		for (EditMessage edit : edits) {
+		for (EditMessage<?> edit : edits) {
 			if (edit.getType().isCommit()) {
 				WordIU word = (WordIU) edit.getIU();
 				committedWords.add(word);

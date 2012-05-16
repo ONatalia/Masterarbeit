@@ -70,6 +70,7 @@ public class WozInterface extends JFrame {
 	/**
 	 * @param args
 	 */
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		PropertyConfigurator.configure("log4j.properties");
 		try {

@@ -203,16 +203,4 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
 		}
 	}
 	
-	/**
-	 * generate an IUList of words from a string
-	 * @param words separated by whitespace
-	 */
-	public static IUList<WordIU> listFromWordString(String words) {
-		IUList<WordIU> wordList = new IUList<WordIU>();
-		for (String token : words.split("\\s")) {
-			wordList.add(new WordIU(token, null, null));
-		}
-		return wordList;
-	}
- 	
 }

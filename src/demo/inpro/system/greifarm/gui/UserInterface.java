@@ -79,6 +79,7 @@ public class UserInterface extends AgentImpl {
 	/**
 	 * @param args
 	 */
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		try {
 			new UserInterface();

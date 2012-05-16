@@ -6,8 +6,6 @@ import inpro.incremental.listener.InstallmentHistoryViewer;
 import inpro.incremental.processor.AbstractDialogueManager;
 import inpro.incremental.processor.AbstractFloorTracker;
 import inpro.incremental.processor.IUBasedFloorTracker;
-import inpro.incremental.processor.AbstractFloorTracker.Listener;
-import inpro.incremental.processor.AbstractFloorTracker.Signal;
 import inpro.incremental.unit.DialogueActIU;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;

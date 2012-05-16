@@ -66,7 +66,7 @@ public class TEDviewNotifier extends IUModule implements FrameAware {
 	}
 
 	@Override
-	public void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
+	public synchronized void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
 		if (tedAdapter.isConnected() && (edits.size() > 0) && (ius.size() > 0)) {
 	    	StringBuilder sbIUs = new StringBuilder();
 	    	sbIUs.append("<event time='");

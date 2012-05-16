@@ -104,7 +104,7 @@ public class RMRSLoader {
 	
 //	public static void main (String [] args) {
 //		try {
-//			List<SemanticMacro> l = loadMacros(new URL("file:/home/andreas/workspace/Inpro/src/org/cocolab/inpro/domains/pentomino/resources/irmrsc-semmacros.xml"));
+//			List<SemanticMacro> l = loadMacros(new URL("file:/home/andreas/workspace/Inpro/src/inpro/domains/pentomino/resources/irmrsc-semmacros.xml"));
 //			Map<String,Formula> macrosLongname = new HashMap<String,Formula>();
 //			Map<String,Formula> macrosShortname = new HashMap<String,Formula>();
 //			for (Map.Entry<String, Formula> e : m.entrySet()) {
@@ -114,7 +114,7 @@ public class RMRSLoader {
 //			}
 //
 //			
-//			Map<String,String> rules = loadRules(new URL("file:/home/andreas/workspace/Inpro/src/org/cocolab/inpro/domains/pentomino/resources/irmrsc-semrules.xml"));
+//			Map<String,String> rules = loadRules(new URL("file:/home/andreas/workspace/Inpro/src/inpro/domains/pentomino/resources/irmrsc-semrules.xml"));
 //			System.out.println(rules);
 //			for (Map.Entry<String, String> e : rules.entrySet()) {
 //				String[] name = e.getValue().split("##");

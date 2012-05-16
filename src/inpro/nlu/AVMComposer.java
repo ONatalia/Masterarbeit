@@ -297,7 +297,6 @@ public class AVMComposer {
 		}
 		System.out.println();
 		System.out.println("Done! Continue composing by entering any AVPair (e.g. ord:1). Enter 'exit' to stop or 'new' to restart'");
-		composer = new AVMComposer();
 		interactiveTest();
 	}
 	

@@ -61,6 +61,7 @@ public class InstallmentHistoryViewer extends PushBuffer {
 		htmlPane.setText(html.toString()); // setText is threadsafe
 	}
 	
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		new InstallmentHistoryViewer();
 	}

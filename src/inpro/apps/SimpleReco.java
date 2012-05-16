@@ -270,6 +270,7 @@ public class SimpleReco {
     	}
 	}
 
+	@SuppressWarnings("unused")
 	private void setupMonitors() throws PropertyException {
 		ResultListener resultlistener = (ResultListener) cm.lookup("currentASRHypothesis");
 		recognizer.addResultListener(resultlistener);
