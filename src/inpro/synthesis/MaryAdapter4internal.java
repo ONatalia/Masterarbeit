@@ -73,11 +73,12 @@ public class MaryAdapter4internal extends MaryAdapter {
 	@Override
 	protected ByteArrayOutputStream process(String query, String inputType, String outputType, String audioType) throws UnknownHostException, IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        String defaultVoiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
+        String voiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
         MaryDataType mInputType = MaryDataType.get(inputType);
         MaryDataType mOutputType = MaryDataType.get(outputType);
         Locale mLocale = MaryUtils.string2locale(System.getProperty("inpro.tts.language", "de"));
-        Voice voice = Voice.getVoice(defaultVoiceName);
+        Voice voice = Voice.getVoice(voiceName);
+        assert voice != null : "Cannot find the Mary voice " + voiceName;
         AudioFormat audioFormat = voice.dbAudioFormat();
         logger.debug("audioFormat is " + audioFormat);
         AudioFileFormat.Type audioFileFormatType = //MaryAudioUtils.getAudioFileFormatType(audioType);

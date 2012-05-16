@@ -47,6 +47,10 @@ public class PitchMark {
 		this.position = timepos;
 	}
 	
+	public double getPosition() {
+		return this.position;
+	}
+	
 	public int getPitch() {
 		return (int) pitch;
 	}
