@@ -7,6 +7,12 @@ import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DataProcessingException;
 
+/**
+ * A frontend processor that splits off (parts of) frontend processing into separate threads.
+ * Put this processor as the last element of your frontend pipeline, in order to put the whole 
+ * frontend into its separate thread. Your mileage on performance improvements may vary.
+ * @author timo
+ */
 public class ThreadingFrontendBuffer extends BaseDataProcessor implements Runnable {
 
 	private static int queueCapacity = 5;

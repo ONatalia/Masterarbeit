@@ -20,7 +20,6 @@ import edu.cmu.sphinx.util.props.S4Component;
  * @author timo
  *
  */
-
 public class NoSearch implements SearchManager {
 
 	@S4Component(type = FrontEnd.class)

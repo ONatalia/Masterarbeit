@@ -22,10 +22,10 @@ import gov.nist.jrtp.RtpSession;
 import gov.nist.jrtp.RtpStatusEvent;
 import gov.nist.jrtp.RtpTimeoutEvent;
 
-/*
+/**
  * our new implementation of an RTP reader using NIST JRtp , deprecates RTPDataSource
+ * @author timo
  */
-
 public class RtpRecvProcessor extends BaseDataProcessor {
 
 	@S4Integer(defaultValue = 42000)

@@ -1,4 +1,4 @@
-package inpro.sphinx.frontend;
+package work.inpro.sphinx.frontend;
 
 import inpro.incremental.unit.IU;
 

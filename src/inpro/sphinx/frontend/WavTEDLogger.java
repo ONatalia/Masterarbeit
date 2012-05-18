@@ -14,6 +14,12 @@ import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Integer;
 import edu.cmu.sphinx.util.props.S4String;
 
+/**
+ * Tells TEDview about audio that has passed by.
+ * A processor that captures all audio passing by into a temporary audio file 
+ * and notifies TEDview about adding this audio to the given track.
+ * @author timo
+ */
 public class WavTEDLogger extends WavWriter {
     @S4Integer(defaultValue = 2000)
     public final static String PROP_TED_PORT = "tedPort";

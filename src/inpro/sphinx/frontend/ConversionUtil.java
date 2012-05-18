@@ -5,6 +5,10 @@ import java.nio.DoubleBuffer;
 
 import edu.cmu.sphinx.frontend.DoubleData;
 
+/**
+ * encapsulates conversion of DoubleData objects to a stream of bytes and back
+ * @author timo
+ */
 public class ConversionUtil {
 	
 	public static int SPHINX_RTP_HEADER_LENGTH = 20;
@@ -38,8 +42,7 @@ public class ConversionUtil {
 		int sampleRate = bb.getInt();
 		double[] da = new double[(ba.length - 20) / 2];
 		for (int i = 0; i < da.length; i++) {
-			short s = bb.getShort();
-			da[i] = (double) s; 
+			da[i] = bb.getShort();
 		}
 		return new DoubleData(da, sampleRate, collectTime, firstSampleNumber);
 	}

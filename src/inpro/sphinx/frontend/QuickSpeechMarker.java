@@ -99,7 +99,7 @@ public class QuickSpeechMarker extends BaseDataProcessor {
     private int currentSilence; // both measured in milliseconds
     private int currentSpeech;
     
-    private enum State { IN_SPEECH, NON_SPEECH, DATA_END };
+    private enum State { IN_SPEECH, NON_SPEECH, DATA_END }
     
     State state;
 
@@ -196,6 +196,8 @@ public class QuickSpeechMarker extends BaseDataProcessor {
 				break;
 			case NON_SPEECH:
 				handleNewFrameNonSpeech(scd);
+				break;
+			case DATA_END:
 				break;
 			}
     	} else if (d instanceof DataEndSignal) {

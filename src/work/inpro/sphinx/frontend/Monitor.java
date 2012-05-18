@@ -1,4 +1,4 @@
-package inpro.sphinx.frontend;
+package work.inpro.sphinx.frontend;
 
 import inpro.audio.AudioUtils;
 
@@ -23,6 +23,10 @@ import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Boolean;
 
+/**
+ * a processor that can be inserted into a Sphinx frontend that plays back the audio received onto the speakers
+ * @author timo
+ */
 public class Monitor extends BaseDataProcessor {
 
 	@S4Boolean(defaultValue = false)
@@ -93,9 +97,6 @@ public class Monitor extends BaseDataProcessor {
    		line.write(bValues, 0, bValues.length);
     }
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) throws UnsupportedAudioFileException, IOException {
 		URL audioURL = new URL("file:/home/timo/inpro/inpro/res/DE_1234.wav");
 		AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);

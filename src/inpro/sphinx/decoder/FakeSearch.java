@@ -43,9 +43,7 @@ import edu.cmu.sphinx.util.props.S4String;
  * and calls event listeners and monitors as needed
  * 
  * @author timo
- *
  */
-
 public class FakeSearch extends NoSearch {
 
 	private static final Logger logger = Logger.getLogger(FakeSearch.class);
