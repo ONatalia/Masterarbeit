@@ -93,7 +93,7 @@
         </propertylist>
     </component>
     
-	<component name="greifarmActor" type="inpro.domains.greifarm.GreifarmActor">
+	<component name="greifarmActor" type="demo.inpro.system.greifarm.GreifarmActor">
         <propertylist name="hypChangeListeners">
     		<item>tedNotifier</item>
 <!--            <item>consoleNotifier</item> -->
@@ -109,20 +109,15 @@
     <component name="smoothing" type="inpro.incremental.deltifier.SmoothingDeltifier">
         <property name="smoothing" value="5"/>
     </component>
-    <component name="adaptivesmoothing" type="inpro.incremental.deltifier.WordAdaptiveSmoothingDeltifier">
+    <component name="adaptivesmoothing" type="demo.inpro.system.greifarm.WordAdaptiveSmoothingDeltifier">
         <property name="smoothing" value="5"/>
     </component>
     <component name="nonIncr" type="inpro.incremental.deltifier.NonIncrementalDeltifier"/>
 
     <component name="consoleNotifier" type="inpro.incremental.listener.ConsoleNotifier"/>
-    <component name="oaaNotifier" type="inpro.incremental.listener.OAANotifier"/>
     <component name="tedNotifier" type="inpro.incremental.listener.TEDviewNotifier"/>
     <component name="labelWriter2" type="inpro.incremental.listener.LabelWriter"/>
     <component name="hypViewer" type="inpro.incremental.listener.CurrentHypothesisViewer"/>
-
-	<component name="floorManager" type="inpro.incremental.processor.FloorManager">
-		<propertylist name="listeners"/>
-	</component>
 
     <component name="threadingListener" type="inpro.sphinx.instrumentation.ThreadingListener">
         <property name="recognizer" value="${recognizer}"/>
@@ -438,10 +433,6 @@
         <property name="fileBaseName" value=""/>
         <property name="nBest" value="10"/>
         <property name="fixedLag" value="0"/>
-    </component>
-
-    <component name="newWordNotifierAgent" type="inpro.sphinx.instrumentation.NewWordNotifierAgent">
-        <property name="recognizer" value="${recognizer}"/>
     </component>
 
     <component name="memoryTracker" type="edu.cmu.sphinx.instrumentation.MemoryTracker">

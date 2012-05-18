@@ -200,17 +200,10 @@
         <property name="fixedLag" value="0"/>
     </component>
 
-    <component name="newWordNotifierAgent" type="inpro.sphinx.instrumentation.NewWordNotifierAgent">
-        <property name="recognizer" value="${recognizer}"/>
-    </component>
+
 
     <component name="memoryTracker" type="edu.cmu.sphinx.instrumentation.MemoryTracker">
         <property name="recognizer" value="${recognizer}"/>
-    </component>
-
-    <component name="confiDancer" type="inpro.sphinx.instrumentation.ConfiDancer">
-        <property name="recognizer" value="${recognizer}"/>
-        <property name="confidenceScorer" value="confidenceScorer"/>
     </component>
 
     <component name="speedTracker" type="edu.cmu.sphinx.instrumentation.SpeedTracker">

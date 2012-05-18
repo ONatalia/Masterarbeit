@@ -40,7 +40,7 @@
     <property name="speechTrailer" value="200"/>
     <property name="threshold" value="15"/>
 
-	<component name="style" type="inpro.domains.echo.Style" />
+	<component name="style" type="demo.inpro.domains.system.echodm.Style" />
 
     <!-- ******************************************************** -->
     <!-- The recognizer configuration                             -->
@@ -399,7 +399,7 @@
         </propertylist>
     </component>
 
-    <component name="echoDialogueManager" type="inpro.incremental.processor.EchoDialogueManager">
+    <component name="echoDialogueManager" type="demo.inpro.system.echodm.dm.EchoDialogueManager">
         <property name="echo" value="true" />
         <property name="dispatchStream" value="dispatchStream" />
         <property name="floorTracker" value="iuBasedFloorTracker" />
@@ -426,7 +426,7 @@
     </component>
     <component name="none" type="inpro.incremental.deltifier.ASRWordDeltifier"/>
     <component name="nonIncr" type="inpro.incremental.deltifier.NonIncrementalDeltifier"/>
-    <component name="wasd" type="inpro.incremental.deltifier.WordAdaptiveSmoothingDeltifier">
+    <component name="wasd" type="demo.inpro.system.greifarm.WordAdaptiveSmoothingDeltifier">
         <property name="safeWord" value="no" />
         <property name="urgentWord" value="take" />
     </component>
