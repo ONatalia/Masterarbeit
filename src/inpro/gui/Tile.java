@@ -55,6 +55,7 @@ public abstract class Tile implements Resetable {
 		unselect();
 	}
 	
+	@SuppressWarnings("unused")
 	public void doCommand(String command) {
 		throw new RuntimeException("Illegal command for tile manipulation");
 	}

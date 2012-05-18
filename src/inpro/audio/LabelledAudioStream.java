@@ -1,6 +1,7 @@
-package inpro.annotation;
+package inpro.audio;
 
-import inpro.audio.AudioUtils;
+import inpro.annotation.Label;
+import inpro.annotation.LabelFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

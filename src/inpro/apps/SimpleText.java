@@ -2,7 +2,6 @@ package inpro.apps;
 
 import inpro.apps.util.TextCommandLineParser;
 import inpro.incremental.PushBuffer;
-import inpro.incremental.eyetracker.CurrentEyeTrackingPoint;
 import inpro.incremental.listener.FrameAwarePushBuffer;
 import inpro.incremental.processor.CurrentASRHypothesis;
 import inpro.incremental.processor.TextBasedFloorTracker;
@@ -66,14 +65,14 @@ public class SimpleText extends JPanel implements ActionListener {
 	@S4Component(type = CurrentASRHypothesis.class)
 	public final static String PROP_CURRENT_HYPOTHESIS = "currentASRHypothesis";
 	
-	@S4Component(type = CurrentEyeTrackingPoint.class)
-	public final static String PROP_CURRENT_EYETRACKING = "currentEyeTrackingPoint";		
-	
 	@S4ComponentList(type = FrameAwarePushBuffer.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = CurrentASRHypothesis.PROP_HYP_CHANGE_LISTENERS;
 	
-	@S4ComponentList(type = FrameAwarePushBuffer.class)
-	public final static String PROP_HYP_CHANGE_LISTENERS_EYE = CurrentEyeTrackingPoint.PROP_HYP_CHANGE_LISTENERS;		
+//	@S4Component(type = CurrentEyeTrackingPoint.class)
+//	public final static String PROP_CURRENT_EYETRACKING = "currentEyeTrackingPoint";		
+//	
+//	@S4ComponentList(type = FrameAwarePushBuffer.class)
+//	public final static String PROP_HYP_CHANGE_LISTENERS_EYE = CurrentEyeTrackingPoint.PROP_HYP_CHANGE_LISTENERS;		
 
 	@S4Component(type = TextBasedFloorTracker.class)
 	public final static String PROP_FLOOR_MANAGER = "textBasedFloorTracker";

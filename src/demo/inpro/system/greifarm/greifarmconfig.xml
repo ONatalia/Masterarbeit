@@ -85,7 +85,6 @@
     		<item>tedNotifier</item>
     		<item>greifarmActor</item>
 <!--
-            <item>semanticResolver</item>
             <item>consoleNotifier</item>
             <item>labelWriter2</item>
     		<item>oaaNotifier</item>

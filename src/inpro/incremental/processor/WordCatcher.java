@@ -20,8 +20,8 @@ import edu.cmu.sphinx.util.props.S4ComponentList;
 import edu.cmu.sphinx.util.props.S4String;
 
 /**
- * @author das
- *
+ * A dummy module that expects WordIUs and beeps upon the reception of a specific word.
+ * @author das, timo
  */
 public class WordCatcher extends PushBuffer {
 	// Pushbuffer stuff

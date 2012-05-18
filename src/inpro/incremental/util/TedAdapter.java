@@ -1,6 +1,3 @@
-/**
- * 
- */
 package inpro.incremental.util;
 
 import java.io.IOException;
@@ -9,6 +6,10 @@ import java.net.Socket;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Output given messages to a running TEDview instance.
+ * @author timo
+ */
 public class TedAdapter {
 	private Socket tedSocket;
     private PrintWriter tedWriter;
@@ -21,7 +22,7 @@ public class TedAdapter {
 			tedWriter = new PrintWriter(tedSocket.getOutputStream());
 			connected = true;
 		} catch (IOException e) {
-			Logger.getLogger(TedAdapter.class).warn("Cannot connect to TEDview. I will not retry.");
+			Logger.getLogger(TedAdapter.class).info("Cannot connect to TEDview. I will not retry.");
 			connected = false;
 		}
 	}

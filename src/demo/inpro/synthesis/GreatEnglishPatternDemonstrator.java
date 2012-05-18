@@ -2,7 +2,6 @@ package demo.inpro.synthesis;
 
 import inpro.gui.Canvas;
 import inpro.gui.pentomino.PentoIcon;
-import inpro.gui.pentomino.january.GameCanvas;
 import inpro.incremental.unit.IncrSysInstallmentIU;
 
 import java.awt.Color;
@@ -19,6 +18,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+
 
 
 
@@ -122,7 +122,7 @@ public class GreatEnglishPatternDemonstrator extends PatternDemonstrator {
 		gbc.gridx = 2;
 		add(actionButton(new ImmediateStartAction("take", new ImageIcon(Canvas.class.getResource("dragging.png")))), gbc);
 		gbc.gridx++;
-		add(actionButton(new ImmediateStartAction("delete", new ImageIcon(GameCanvas.class.getResource("cross.png")))), gbc);
+		add(actionButton(new ImmediateStartAction("delete", new ImageIcon(Canvas.class.getResource("cross.png")))), gbc);
 		gbc.gridy++;
 		gbc.gridx = 1;
 		/* add(new JButton(new AbstractAction("reset") {

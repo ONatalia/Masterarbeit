@@ -38,9 +38,6 @@
         </propertylist>
     </component>
     
-    <component name="firstpasser" type="inpro.sphinx.frontend.DataPasser"/>
-    <component name="secondpasser" type="inpro.sphinx.frontend.DataPasser"/>
- 
     <component name="microphone" type="edu.cmu.sphinx.frontend.util.Microphone">
         <property name="closeBetweenUtterances" value="false"/>
         <property name="bufferSize" value="960" /> <!-- 30ms -->

@@ -1,4 +1,4 @@
-package inpro.incremental;
+package inpro.incremental.basedata;
 
 import weka.core.Instance;
 

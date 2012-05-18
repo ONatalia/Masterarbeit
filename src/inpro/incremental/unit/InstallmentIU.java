@@ -10,7 +10,6 @@ import java.util.List;
  * - for system installments a reference to the corresponding dialogueAct
  *   is kept and the spoken text is stored in the variable @see{tts}.
  * @author timo
- *
  */
 public class InstallmentIU extends IU {
 
@@ -24,7 +23,7 @@ public class InstallmentIU extends IU {
 	boolean systemProduced; // true: system utterance, false: user utterance
 
 	/**
-	 * The first InstalmentIUs
+	 * The first InstallmentIUs
 	 */
 	public static final InstallmentIU FIRST_USER_INSTALLMENT_IU = new InstallmentIU(DialogueActIU.FIRST_DA_IU, null);
 	public static final InstallmentIU FIRST_SYSTEM_INSTALLMENT_IU = new InstallmentIU(Collections.<WordIU>emptyList());

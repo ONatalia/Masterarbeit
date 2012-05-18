@@ -2,7 +2,6 @@ package demo.inpro.synthesis;
 
 import inpro.gui.Canvas;
 import inpro.gui.pentomino.PentoIcon;
-import inpro.gui.pentomino.january.GameCanvas;
 import inpro.incremental.unit.IncrSysInstallmentIU;
 
 import java.awt.Color;
@@ -105,7 +104,7 @@ public class GreatPatternDemonstrator extends PatternDemonstrator {
 		gbc.gridx = 2;
 		add(actionButton(new ImmediateStartAction("Nimm", new ImageIcon(Canvas.class.getResource("dragging.png")))), gbc);
 		gbc.gridx++;
-		add(actionButton(new ImmediateStartAction("Lösche", new ImageIcon(GameCanvas.class.getResource("cross.png")))), gbc);
+		add(actionButton(new ImmediateStartAction("Lösche", new ImageIcon(Canvas.class.getResource("cross.png")))), gbc);
 		gbc.gridy++;
 		gbc.gridx = 1;
 		/* add(new JButton(new AbstractAction("reset") {

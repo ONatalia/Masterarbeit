@@ -2,7 +2,6 @@ package inpro.apps;
 
 import inpro.apps.util.RTPCommandLineParser;
 import inpro.audio.AudioUtils;
-import inpro.audio.OAADispatchStream;
 import inpro.sphinx.frontend.ConversionUtil;
 
 import java.io.IOException;
@@ -13,8 +12,6 @@ import java.net.UnknownHostException;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
-
-
 
 import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DataProcessingException;
@@ -61,13 +58,6 @@ public class SimpleRTP {
 	            dp = sds;
 			break;
 			case RTPCommandLineParser.OAA_DISPATCHER_INPUT:
-				// TODO: check whether this functions properly
-				sds = (StreamDataSource) cm.lookup("streamDataSource");
-				sds.initialize();
-				OAADispatchStream oaads = (OAADispatchStream) cm.lookup("oaaDispatchStream");
-				oaads.initialize();
-				sds.setInputStream(oaads, "oaaDispatchStream");
-				dp = sds;
 			break;
 		}
 		return dp;

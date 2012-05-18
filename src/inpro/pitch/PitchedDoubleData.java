@@ -94,7 +94,7 @@ public class PitchedDoubleData extends DoubleData {
             double sample = samples[i];
             sumOfSquares += sample * sample;
         }
-        return  Math.sqrt((double)sumOfSquares/samples.length);
+        return  Math.sqrt(sumOfSquares/samples.length);
     }
 
 	public double getPower() {

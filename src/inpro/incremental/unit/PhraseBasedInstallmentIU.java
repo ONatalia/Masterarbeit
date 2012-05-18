@@ -17,24 +17,24 @@ public class PhraseBasedInstallmentIU extends IncrSysInstallmentIU {
 		// todo: think about a new method in PhraseIU that gets us more specifically tuned text for synthesis depending on phraseTypes
 		super(phrase.toPayLoad());
 		phrase.groundIn(new ArrayList<IU>(groundedIn));
-		phrase.containingInstallment = this;
+		phrase.ground(this);
 	}
 
 	/** append words for this phrase at the end of the installment */
-	public void appendPhrase(PhraseIU phraseIU) {
+	public void appendPhrase(PhraseIU phrase) {
 		IU oldLastWord = getFinalWord(); // everything that follows this word via fSLL belongs to the new phrase
-		String fullPhrase = toPayLoad() + phraseIU.toPayLoad();
+		String fullPhrase = toPayLoad() + phrase.toPayLoad();
 		fullPhrase = fullPhrase.replaceAll(" <sil>", ""); // it's nasty when there are silences pronounced as "kleiner als sil größer als"
 //		addAlternativeVariant(fullPhrase);
-		appendContinuation(phraseIU);
-		phraseIU.containingInstallment = this;
-		List<IU> phraseWords = new ArrayList<IU>(phraseIU.expectedWordCount());
+		appendContinuation(phrase);
+		phrase.ground(this);
+		List<IU> phraseWords = new ArrayList<IU>(phrase.expectedWordCount());
 		while (oldLastWord.getNextSameLevelLink() != null) {
 			IU w = oldLastWord.getNextSameLevelLink();
 			phraseWords.add(w);
 			oldLastWord = w;
 		}
-		phraseIU.groundIn(phraseWords);
+		phrase.groundIn(phraseWords);
 		groundedIn.addAll(phraseWords);
 	}
 	

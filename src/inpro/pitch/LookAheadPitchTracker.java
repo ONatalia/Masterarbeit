@@ -43,6 +43,9 @@ import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Integer;
 
+/** 
+ * A pitch tracker that uses lookahead and dynamic programming to determine pitch tracks.
+ */
 public class LookAheadPitchTracker extends PitchTracker implements Resetable {
 
 	@S4Integer(defaultValue = 0)

@@ -1,6 +1,5 @@
 package inpro.incremental.unit;
 
-import inpro.incremental.BaseDataKeeper;
 import inpro.incremental.util.TimeUtil;
 
 import java.util.ArrayList;
@@ -30,8 +29,6 @@ public abstract class IU implements Comparable<IU> {
 	
 	protected List<IU> groundedIn;
 	protected List<IU> grounds; 
-	
-	protected static BaseDataKeeper bd = null;
 	
 	protected long creationTime;
 	
@@ -104,11 +101,6 @@ public abstract class IU implements Comparable<IU> {
 	 */
 	public final int getID() {
 		return id;
-	}
-
-	public static void setBaseData(BaseDataKeeper bd) {
-		assert (IU.bd == null) : "You're trying to re-set basedata. This may be a bug.";
-		IU.bd = bd;
 	}
 
 	public void setSameLevelLink(IU link) {
@@ -258,6 +250,12 @@ public abstract class IU implements Comparable<IU> {
 		return (iu instanceof IU && this.id == ((IU) iu).id); 
 	}
 	
+	/** IDs make for ideal hash codes */
+	@Override
+	public int hashCode() {
+		return this.id;
+	}
+
 	/**
 	 * compares IUs based on their payload (i.e., ignoring differing IDs)
 	 * equals() implies payloadEquals(), but not the other way around

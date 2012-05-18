@@ -1,7 +1,6 @@
 package inpro.incremental.basedata;
 
 import inpro.features.EOTFeatureAggregator;
-import inpro.incremental.BaseDataKeeper;
 import inpro.pitch.PitchedDoubleData;
 import inpro.pitch.notifier.SignalFeatureListener;
 
@@ -83,7 +82,7 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable, Signal
 
 	@Override
 	public double getPitchInCent(double time) {
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		TimedData<PitchedDoubleData> td = pitchedData.floor(new TimedData(time));
 		if (td != null) {
 			PitchedDoubleData pdd = td.value;
@@ -100,7 +99,7 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable, Signal
 	
 	@Override
 	public double getVoicing(double time) {
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		TimedData<PitchedDoubleData> td = pitchedData.floor(new TimedData(time));
 		if (td != null) {
 			PitchedDoubleData pdd = td.value;
@@ -121,13 +120,11 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable, Signal
 
     private double revisedBCurveCorrectedRMS(DoubleData d) {
     	double rms = 0.0d;
-    	if (d instanceof DoubleData) {
-    		double[] samples = d.getValues();
-    		assert samples.length <= 160;
-    		double[] samplesF = Arrays.copyOf(samples, samples.length); 
-	    	rbcFilter.process(samplesF);
-	    	rms = PitchedDoubleData.signalPower(samplesF);
-    	}
+   		double[] samples = d.getValues();
+   		assert samples.length <= 160;
+   		double[] samplesF = Arrays.copyOf(samples, samples.length); 
+    	rbcFilter.process(samplesF);
+    	rms = PitchedDoubleData.signalPower(samplesF);
         rms = Math.max(rms, 0);
     	return rms;
     }
@@ -159,7 +156,7 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable, Signal
 		if (loudnessData.size() == 0) {
 			makeLoudness(1, 0);
 		}
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		TimedData<Double> td = loudnessData.floor(new TimedData(time + 0.01));
 		if (td != null) {
 			return td.value.doubleValue();
@@ -173,7 +170,7 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable, Signal
 	private double specTiltRSquared;
 	private void computeSpectralTilt(double time) {
 		if (time == specTiltTime) return;
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		TimedData<DoubleData> td = melData.floor(new TimedData(time));
 		// let's hope that nobody messed with melData. Then we should find the interesting range 
 		// (130-~4000) in the first 32 coefficients. to keep things simple, we just do a linear regression
@@ -200,9 +197,9 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable, Signal
 			sumYY += y[i] * y[i];
 			sumTY += i * y[i];
 		}
-		double sumSqDevT = sumTT - sumT * sumT / (double) n;
-		double sumSqDevTY = sumTY - sumT * sumY / (double) n;
-		double sumSqDevY = sumYY - sumY * sumY / (double) n;
+		double sumSqDevT = sumTT - sumT * sumT / n;
+		double sumSqDevTY = sumTY - sumT * sumY / n;
+		double sumSqDevY = sumYY - sumY * sumY / n;
 		specTiltSlope = sumSqDevTY / sumSqDevT;
 		double denom = sumSqDevT * sumSqDevY;
 		specTiltRSquared = (denom != 0.0) ? (sumSqDevTY * sumSqDevTY / denom) : 1.0;
@@ -249,6 +246,10 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable, Signal
 		public int compare(TimedData<?> o1, TimedData<?> o2) {
 			return o1.frame - o2.frame;
 		}
+	}
+
+	public static BaseData getInstance() {
+		return null;
 	}
 
 }

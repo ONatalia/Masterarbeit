@@ -1,6 +1,5 @@
 package inpro.gui.pentomino;
 
-import inpro.domains.pentomino.Posture;
 import inpro.gui.Point;
 import inpro.gui.Tile;
 
@@ -37,11 +36,12 @@ public class PentoTile extends Tile {
 	
 	private static final int BOX_COUNT = 5; // number of boxes making up the piece
 	private Box[]   boxes = new Box[BOX_COUNT];
-	private int[][] defVectors = new int[2][BOX_COUNT];
+	protected int[][] defVectors = new int[2][BOX_COUNT];
 	
 	private TargetPattern myGrid;
 	
 	/** the kind of pentomino tile this object represents */
+	@SuppressWarnings("unused")
 	private char type;
 	
 	/**
@@ -95,7 +95,7 @@ public class PentoTile extends Tile {
 			 || c == 'T' || c == 'I' || c == 'L');
 	}
 	
-	static int[][] getDefVectors(char name) {
+	protected static int[][] getDefVectors(char name) {
 		int[][] vector;
 		assert(isValidTile(name));
 		switch (name) {
@@ -122,7 +122,7 @@ public class PentoTile extends Tile {
 		return returnVector;
 	}
 
-	private void generate() {
+	protected void generate() {
 		Point p = new Point(0, 0);
 		Point clipLRCorner =
 			new Point(this.refPoint);
@@ -233,17 +233,6 @@ public class PentoTile extends Tile {
 		}
 	}
 	
-	public void setPosture(Posture posture) {
-		this.defVectors = getDefVectors(type);
-		if (posture.isMirrored()) {
-			hFlip();
-		}
-		for (int i = 0; i < posture.quarterRotations(); i++) {
-			cwRotate();
-		}
-		this.generate();
-	}
-
 	public void doCommand(String command) {
 		if (command.equals(VERTICAL_FLIP_COMMAND))
 			vFlip();

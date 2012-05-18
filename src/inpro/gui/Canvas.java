@@ -222,6 +222,7 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 	/*
 	 * release an active tile at screen coordinates x,y
 	 */
+	@SuppressWarnings("unused")
 	public void tileRelease(int x, int y) {
 		if (draggingTile != null) {
 			activeTile = draggingTile;

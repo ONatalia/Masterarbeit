@@ -84,7 +84,7 @@ public class CompletionHypothesisListener extends IUModule implements AbstractFl
 					discardDisplayed = false;
 					processedNoWords.add((WordIU) iu);						
 				} else if (noWords.contains(((WordIU) iu).getWord())) {
-					if (!processedNoWords.contains((WordIU) iu)) {
+					if (!processedNoWords.contains(iu)) {
 						confirmDisplayed = false;
 						discardDisplayed = true;
 						processedNoWords.add((WordIU) iu);							

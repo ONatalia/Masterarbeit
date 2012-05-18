@@ -11,7 +11,6 @@ public class RTPCommandLineParser extends CommonCommandLineParser {
 	
 	public RTPCommandLineParser(String[] args) {
 		super(args);
-		destinationAddress = "";
 	}
 	
 	@Override
@@ -36,7 +35,7 @@ public class RTPCommandLineParser extends CommonCommandLineParser {
 	boolean checkConfiguration() {
 		boolean success = false;
 		if (localPort == 0) { localPort = 42000; } // set default in case nothing else was set
-		if (("".equals(destinationAddress)) || (destPort == 0)) {
+		if ((destPort == 0) || ("".equals(destinationAddress))) {
 			printUsage();
 			System.err.println("parameters for IP and port are mandatory!");
 		}
@@ -52,6 +51,7 @@ public class RTPCommandLineParser extends CommonCommandLineParser {
 	
 	@Override
 	void parse(String[] args) throws MalformedURLException {
+		destinationAddress = "";
 		for (int i = 0; i < args.length; i++) {
 			if (args[i].equals("-h")) {
 				printUsage();

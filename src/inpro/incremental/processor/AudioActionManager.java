@@ -70,7 +70,7 @@ public class AudioActionManager extends IUModule implements AbstractFloorTracker
 		utteranceMapFile = ps.getString(PROP_UTTERANCE_MAP);
 		if (utteranceMapFile != null) {
 			this.logger.info("Loading utterances from: " + utteranceMapFile);
-			audioDispatcher.initializeTTSCache(utteranceMapFile, audioPath);
+			DispatchStream.initializeTTSCache(utteranceMapFile, audioPath);
 		} else {
 			logger.info("Not loading utterance files.");
 		}

@@ -18,21 +18,6 @@ public class Label {
 	private final double end; // in seconds
 	private final String label;
 	
-	private static List<Pattern> tgPatterns = Arrays.asList( 
-		Pattern.compile("^\\s*xmin = (\\d*(\\.\\d+)?)\\s*$"), 
-		Pattern.compile("^\\s*xmax = (\\d*(\\.\\d+)?)\\s*$"), 
-		Pattern.compile("^\\s*text = \"(.*)\"\\s*$") 
-	); 
-	
-	/** factory for labels from textgrid lines */
-	static Label newFromTextGridLines(List<String> lines) throws IOException {
-		assert lines.size() == 3;
-		List<String> params = AnnotationUtil.interpret(lines, tgPatterns);
-		return new Label(Double.parseDouble(params.get(0)), 
-						 Double.parseDouble(params.get(1)), 
-						 params.get(2));
-	}
-
 	/** construct a label from given start and end times, with the given label text */ 
 	public Label(double s, double e, String l) {
 		start = s;
@@ -92,12 +77,18 @@ public class Label {
 		return sb;
 	}
 
-	public static void main(String[] args) throws IOException {
-		Label l = newFromTextGridLines(Arrays.asList(
-				"        xmin = 0.910000", 
-				"        xmax = 1.970000", 
-				"        text = \"Quader\""));
-		System.out.println(l.toString());
-	}
-
+	private static List<Pattern> tgPatterns = Arrays.asList( 
+			Pattern.compile("^\\s*xmin = (\\d*(\\.\\d+)?)\\s*$"), 
+			Pattern.compile("^\\s*xmax = (\\d*(\\.\\d+)?)\\s*$"), 
+			Pattern.compile("^\\s*text = \"(.*)\"\\s*$") 
+		); 
+		
+		/** factory for labels from textgrid lines */
+		static Label newFromTextGridLines(List<String> lines) throws IOException {
+			assert lines.size() == 3;
+			List<String> params = AnnotationUtil.interpret(lines, tgPatterns);
+			return new Label(Double.parseDouble(params.get(0)), 
+							 Double.parseDouble(params.get(1)), 
+							 params.get(2));
+		}
 }

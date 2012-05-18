@@ -142,7 +142,7 @@ public class TimeShiftingAnalysis implements Resetable {
 			// while we're there, also compute some other measures
 			mean = (sumX / n);
 			stddev = Math.sqrt((sumXX / n) - mean * mean);
-			meanDifference = accumulatedDifferences / ((double) (n - 1));
+			meanDifference = accumulatedDifferences / (n - 1.0);
 			mse = ((sumSqDevX) - (sumSqDevT) * (slope * slope)) / (n*n);
 			range = (maxDP != null) ? (maxDP.x - minDP.x) : 0;
 			// int timeSpanned = dataPoints.getFirst().t - dataPoints.getLast().t;

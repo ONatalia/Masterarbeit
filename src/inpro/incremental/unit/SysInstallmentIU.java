@@ -19,6 +19,8 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
 
+import work.inpro.incremental.unit.HesitationIU;
+
 /**
  * TODO: add support for canned audio (i.e. read from WAV and TextGrid, maybe even transparently)
  * @author timo

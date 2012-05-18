@@ -279,9 +279,6 @@
         </propertylist>
     </component>
     
-    <component name="firstpasser" type="inpro.sphinx.frontend.DataPasser"/>
-    <component name="secondpasser" type="inpro.sphinx.frontend.DataPasser"/>
- 
     <component name="microphone" type="edu.cmu.sphinx.frontend.util.Microphone">
         <property name="closeBetweenUtterances" value="false"/>
         <property name="bufferSize" value="960"/>        <!-- 30ms -->
@@ -402,6 +399,11 @@
         </propertylist>
     </component>
     
+<<<<<<< .mine
+    <component name="contributions" type="work.inpro.system.echo.dm.NumbersContribIU">
+    
+=======
+>>>>>>> .r2796
     <component name="numbersDialogueManager" type="inpro.incremental.processor.IUNetworkDialogueManager">
         <!--  <property name="actionManager" value="${actionManager}"/> -->
         <property name="dispatchStream" value="dispatchStream"/>

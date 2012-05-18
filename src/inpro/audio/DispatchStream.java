@@ -1,6 +1,5 @@
 package inpro.audio;
 
-import inpro.annotation.LabelledAudioStream;
 import inpro.gui.util.SpeechStateVisualizer;
 import inpro.incremental.unit.SysInstallmentIU;
 import inpro.synthesis.MaryAdapter;

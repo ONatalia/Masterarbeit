@@ -2,6 +2,7 @@ package inpro.incremental.unit;
 
 import inpro.annotation.Label;
 import inpro.features.TimeShiftingAnalysis;
+import inpro.incremental.basedata.BaseData;
 import inpro.incremental.util.TimeUtil;
 import inpro.nlu.AVPair;
 
@@ -159,9 +160,7 @@ public class WordIU extends IU {
 	/** shift the start and end times of this (and possibly all following SysSegmentIUs */
 	public void shiftBy(double offset) {
 		for (SegmentIU segment : getSegments()) {
-			if (segment instanceof SysSegmentIU) {
-				((SysSegmentIU) segment).shiftBy(offset, false);
-			}
+			segment.shiftBy(offset, false);
 		}
 	}
 	
@@ -179,7 +178,7 @@ public class WordIU extends IU {
 	}
 
 	public boolean hasProsody() {
-		return (bd != null && !Double.isNaN(startTime()) && !Double.isNaN(endTime()) && !isSilence());
+		return (BaseData.getInstance() != null && !Double.isNaN(startTime()) && !Double.isNaN(endTime()) && !isSilence());
 	}
 
 	/**
@@ -206,7 +205,7 @@ public class WordIU extends IU {
 			tsa = new TimeShiftingAnalysis();
 			for (double time = startTime(); time < endTime(); time += 0.01) {
 				int frame = (int) Math.floor(time * TimeUtil.SECOND_TO_MILLISECOND_FACTOR + 0.5);
-				double pitch = bd.getPitchInCent(time);
+				double pitch = BaseData.getInstance().getPitchInCent(time);
 				if (!Double.isNaN(pitch))
 					tsa.add(frame, pitch);
 			}

@@ -342,7 +342,7 @@ public class PitchTracker extends BaseDataProcessor {
 		return referencePitch;
 	}
 	
-	public static void functionalTest(String[] args, ConfigurationManager cm) throws IOException, PropertyException, InstantiationException, UnsupportedAudioFileException, DataProcessingException {
+	public static void functionalTest(String[] args, ConfigurationManager cm) throws PropertyException, DataProcessingException {
 		// read reference pitch (if available)
 		final Queue<Double> referencePitch = (args.length > 1) 
     		  ? getReferencePitch(args[1]) : new ArrayDeque<Double>();
