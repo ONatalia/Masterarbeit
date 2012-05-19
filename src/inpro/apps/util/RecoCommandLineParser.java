@@ -1,6 +1,5 @@
 package inpro.apps.util;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class RecoCommandLineParser extends CommonCommandLineParser {
@@ -107,93 +106,102 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	}
 	
 	@Override
-	void parse(String[] args) throws MalformedURLException {
+	void parse(String[] args) throws IllegalArgumentException {
 		recoMode = REGULAR_RECO;
 		incrementalMode = DEFAULT_DELTIFIER;
 		for (int i = 0; i < args.length; i++) {
-			if (args[i].equals("-h")) {
+			try {
+				if (args[i].equals("-h")) {
+					printUsage();
+					System.exit(0);
+					return;
+				}
+				else if (args[i].equals("-c")) {
+					i++;
+					configURL = new URL(args[i]);
+				}
+				else if (args[i].equals("-v")) {
+					verbose = true;
+				}
+				else if (args[i].equals("-f")) {
+					ignoreErrors = true;
+				}
+				else if (args[i].equals("-fa")) {
+					i++; 
+					recoMode = FORCED_ALIGNER_RECO;
+					referenceText = args[i];
+				}
+				else if (args[i].equals("-tg")) {
+					i++;
+					recoMode = FAKE_RECO;
+					referenceText = args[i];
+				}
+				else if (args[i].equals("-M")) { 
+					inputMode = MICROPHONE_INPUT;
+				}
+				else if (args[i].equals("-R")) {
+					inputMode = RTP_INPUT;
+					i++;
+					rtpPort = Integer.parseInt(args[i]);
+				}
+				else if (args[i].equals("-F")) {
+					inputMode = FILE_INPUT;
+					i++;
+					audioURL = new URL(args[i]);
+				}
+				else if (args[i].equals("-T")) {
+					outputMode |= TED_OUTPUT;
+				}
+				else if (args[i].equals("-L")) {
+					outputMode |= LABEL_OUTPUT;
+				}
+				else if (args[i].equals("-C")) {
+					outputMode |= CURRHYP_OUTPUT;
+				} 
+				else if (args[i].equals("-O")) {
+					outputMode |= DISPATCHER_OBJECT_OUTPUT;
+				}
+				else if (args[i].equals("-N")) {
+					incrementalMode = NON_INCREMENTAL;
+				}
+				else if (args[i].equals("-In")) {
+					incrementalMode = INCREMENTAL;
+				}
+				else if (args[i].equals("-Is")) {
+					incrementalMode = SMOOTHED_INCREMENTAL;
+					i++;
+					incrementalModifier = Integer.parseInt(args[i]);
+				}
+				else if (args[i].equals("-If")) {
+					incrementalMode = FIXEDLAG_INCREMENTAL;
+					i++;
+					incrementalModifier = Integer.parseInt(args[i]);
+				}
+				else if (args[i].equals("-lm")) {
+					recoMode = SLM_RECO;
+					i++;
+					languageModelURL = new URL(args[i]);
+				} 
+				else if (args[i].equals("-gr")) {
+					recoMode = GRAMMAR_RECO;
+					i++;
+					languageModelURL = new URL(args[i]);
+				} 
+				else if (args[i].equals("-rt")) {
+					dataThrottle = true;
+				}
+				else {
+					throw new IllegalArgumentException(args[i]);
+				}
+			} catch (Exception e) {
 				printUsage();
-				System.exit(0);
-				return;
-			}
-			else if (args[i].equals("-c")) {
-				i++;
-				configURL = new URL(args[i]);
-			}
-			else if (args[i].equals("-v")) {
-				verbose = true;
-			}
-			else if (args[i].equals("-f")) {
-				ignoreErrors = true;
-			}
-			else if (args[i].equals("-fa")) {
-				i++; 
-				recoMode = FORCED_ALIGNER_RECO;
-				referenceText = args[i];
-			}
-			else if (args[i].equals("-tg")) {
-				i++;
-				recoMode = FAKE_RECO;
-				referenceText = args[i];
-			}
-			else if (args[i].equals("-M")) { 
-				inputMode = MICROPHONE_INPUT;
-			}
-			else if (args[i].equals("-R")) {
-				inputMode = RTP_INPUT;
-				i++;
-				rtpPort = Integer.parseInt(args[i]);
-			}
-			else if (args[i].equals("-F")) {
-				inputMode = FILE_INPUT;
-				i++;
-				audioURL = new URL(args[i]);
-			}
-			else if (args[i].equals("-T")) {
-				outputMode |= TED_OUTPUT;
-			}
-			else if (args[i].equals("-L")) {
-				outputMode |= LABEL_OUTPUT;
-			}
-			else if (args[i].equals("-C")) {
-				outputMode |= CURRHYP_OUTPUT;
-			} 
-			else if (args[i].equals("-O")) {
-				outputMode |= DISPATCHER_OBJECT_OUTPUT;
-			}
-			else if (args[i].equals("-N")) {
-				incrementalMode = NON_INCREMENTAL;
-			}
-			else if (args[i].equals("-In")) {
-				incrementalMode = INCREMENTAL;
-			}
-			else if (args[i].equals("-Is")) {
-				incrementalMode = SMOOTHED_INCREMENTAL;
-				i++;
-				incrementalModifier = Integer.parseInt(args[i]);
-			}
-			else if (args[i].equals("-If")) {
-				incrementalMode = FIXEDLAG_INCREMENTAL;
-				i++;
-				incrementalModifier = Integer.parseInt(args[i]);
-			}
-			else if (args[i].equals("-lm")) {
-				recoMode = SLM_RECO;
-				i++;
-				languageModelURL = new URL(args[i]);
-			} 
-			else if (args[i].equals("-gr")) {
-				recoMode = GRAMMAR_RECO;
-				i++;
-				languageModelURL = new URL(args[i]);
-			} 
-			else if (args[i].equals("-rt")) {
-				dataThrottle = true;
-			}
-			else {
-				printUsage();
-				System.err.println("Illegal argument: " + args[i]);
-				throw new IllegalArgumentException(args[i]);
+				if (i < args.length) {
+					System.err.println("Illegal argument: " + args[i]);
+					//throw new IllegalArgumentException(args[i]);
+				} else {
+					System.err.println("Something was wrong with the program arguments.");
+				}
+				System.exit(1);
 			}
 		}
 	}

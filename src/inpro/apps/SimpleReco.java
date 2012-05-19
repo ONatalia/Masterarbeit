@@ -182,7 +182,7 @@ public class SimpleReco {
 				// find component with name RTPDataSource, 
 				// set the component's property recvPort
 				// to the property clp.rtpPort (which is a string)
-				cm.getPropertySheet("RTPDataSource").setString("recvPort", "" + clp.rtpPort);
+				cm.getPropertySheet("RTPDataSource").setInt("recvPort", clp.rtpPort);
 				rtp.initialize();
 				FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
 				endpoint.setPredecessor(rtp);
