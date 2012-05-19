@@ -41,8 +41,7 @@ public class PentoTile extends Tile {
 	private TargetPattern myGrid;
 	
 	/** the kind of pentomino tile this object represents */
-	@SuppressWarnings("unused")
-	private char type;
+	protected char type;
 	
 	/**
 	 * the outermost array contains for each kind of pentomino tile (12)
@@ -111,7 +110,7 @@ public class PentoTile extends Tile {
 			case 'T': vector = TILE_BITMAPS[9]; break; 
 			case 'I': vector = TILE_BITMAPS[10]; break; 
 			case 'L': vector = TILE_BITMAPS[11]; break; 
-			default: throw new RuntimeException("ahduschaisse");
+			default: throw new RuntimeException("unknown type of pento piece: " + name);
 		}
 		int[][] returnVector = new int[2][5];
 		for (int i = 0; i < 2; i++) {
