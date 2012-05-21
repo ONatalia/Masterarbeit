@@ -1,7 +1,6 @@
 package inpro.audio;
 
 import inpro.gui.util.SpeechStateVisualizer;
-import inpro.incremental.unit.SysInstallmentIU;
 import inpro.synthesis.MaryAdapter;
 
 import java.io.BufferedReader;
@@ -186,15 +185,15 @@ public class DispatchStream extends InputStream implements Configurable {
 			addStream(new SilenceStream(ms));		
 	}
 	
+	public void playStream(InputStream audioStream) {
+		playStream(audioStream, true);
+	}
+	
 	public void playStream(InputStream audioStream, boolean skipQueue) {
 		if (skipQueue)
 			setStream(audioStream);
 		else
 			addStream(audioStream);		
-	}
-	
-	public void playInstallment(SysInstallmentIU installment) {
-		playStream(installment.getAudio(), true);
 	}
 	
 	/* * Stream and Stream Queue handling * */

@@ -1,4 +1,4 @@
-package work.inpro.sphinx.frontend;
+package inpro.sphinx.frontend;
 
 import inpro.audio.AudioUtils;
 

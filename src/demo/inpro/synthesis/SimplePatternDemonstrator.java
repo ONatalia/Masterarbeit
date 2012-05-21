@@ -1,6 +1,5 @@
 package demo.inpro.synthesis;
 
-import inpro.incremental.unit.IncrSysInstallmentIU;
 
 import java.awt.Component;
 import java.util.Arrays;
@@ -33,7 +32,7 @@ public class SimplePatternDemonstrator extends PatternDemonstrator {
 
 	@Override
 	public void greatNewUtterance(String command) {
-		installment = new IncrSysInstallmentIU(Arrays.asList("Zur Kreuzigung bitte nach <hes>", 
+		installment = new TreeStructuredInstallmentIU(Arrays.asList("Zur Kreuzigung bitte nach hm, ich weiß es nicht.", 
 																	"Zur Kreuzigung bitte nach links.", 
 																	"Zur Kreuzigung bitte nach rechts."));
 		generatedText.setText("Zur Kreuzigung bitte nach ‹dir›");

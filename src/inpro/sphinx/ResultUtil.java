@@ -1,4 +1,4 @@
-package inpro.incremental.util;
+package inpro.sphinx;
 
 import java.util.ArrayList;
 import java.util.Collections;

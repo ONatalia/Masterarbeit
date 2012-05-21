@@ -118,7 +118,7 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 
 	/**
 	 * Setter method for the IS's next input to process.
-	 * @param word the next word input to process.
+	 * @param sem the next semantic input to process.
 	 */
 	public void setNextInput(SemIU sem) {
 		this.nextInput = sem;

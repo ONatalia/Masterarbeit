@@ -3,7 +3,7 @@ package inpro.incremental.evaluation;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.WordIU;
-import inpro.incremental.util.TimeUtil;
+import inpro.util.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;

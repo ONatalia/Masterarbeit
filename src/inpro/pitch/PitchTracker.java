@@ -315,7 +315,7 @@ public class PitchTracker extends BaseDataProcessor {
 		//System.err.println("Setting minLag to " + minLag);
 		signalBuffer = new double[maxLag * 2 + 2];
 		Arrays.fill(signalBuffer, 0);
-		int queueSize = ((int) (maxLag / 160)) + 1; // should be 1 for freq_low > 100Hz, 2 for f_l > 50Hz, ...
+		int queueSize = (maxLag / 160) + 1; // should be 1 for freq_low > 100Hz, 2 for f_l > 50Hz, ...
 		pitchAssignmentQueue = new ArrayBlockingQueue<PitchedDoubleData>(queueSize, false);
 		listeners = ps.getComponentList(PROP_LISTENERS, SignalFeatureListener.class);
 	}

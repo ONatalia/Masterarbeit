@@ -115,26 +115,23 @@ public class TagParser extends IUModule {
 					TagIU previousTag = (TagIU) tag.getSameLevelLink();
 					assert previousTag != null;
 					SITDBSParser newState = new SITDBSParser(this.states.get(previousTag));
-					if (newState != null){
-						newState.feed(tag.toPayLoad());
-						this.states.put(tag,newState);
-						for (CandidateAnalysis ca : newState.getQueue()) {
-							CandidateAnalysisIU sll = CandidateAnalysisIU.FIRST_CA_IU;
-							CandidateAnalysis ante = ca.getAntecedent();
-							if (ante != null) {
-								List<CandidateAnalysisIU> potentialAntecedents = findIU(ante);
-								for (CandidateAnalysisIU potentialAnte : potentialAntecedents) {
-									if (potentialAnte != null && potentialAnte.groundedIn().contains(previousTag)) {
-										sll = potentialAnte;
-										break;
-									} 
-								}
+					newState.feed(tag.toPayLoad());
+					this.states.put(tag,newState);
+					for (CandidateAnalysis ca : newState.getQueue()) {
+						CandidateAnalysisIU sll = CandidateAnalysisIU.FIRST_CA_IU;
+						CandidateAnalysis ante = ca.getAntecedent();
+						if (ante != null) {
+							List<CandidateAnalysisIU> potentialAntecedents = findIU(ante);
+							for (CandidateAnalysisIU potentialAnte : potentialAntecedents) {
+								if (potentialAnte != null && potentialAnte.groundedIn().contains(previousTag)) {
+									sll = potentialAnte;
+									break;
+								} 
 							}
-							CandidateAnalysisIU newCAIU = new CandidateAnalysisIU(sll, tag, ca);
-							analyses.add(newCAIU);
-							newEdits.add(new EditMessage<CandidateAnalysisIU>(EditType.ADD, newCAIU));
 						}
-						//newState.status();
+						CandidateAnalysisIU newCAIU = new CandidateAnalysisIU(sll, tag, ca);
+						analyses.add(newCAIU);
+						newEdits.add(new EditMessage<CandidateAnalysisIU>(EditType.ADD, newCAIU));
 					}
 					break;
 				case COMMIT:

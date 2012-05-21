@@ -2,7 +2,6 @@ package demo.inpro.synthesis;
 
 import inpro.gui.Canvas;
 import inpro.gui.pentomino.PentoIcon;
-import inpro.incremental.unit.IncrSysInstallmentIU;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -144,7 +143,7 @@ public class GreatPatternDemonstrator extends PatternDemonstrator {
 	 */
 	@Override
 	public void greatNewUtterance(String command) {
-		installment = new IncrSysInstallmentIU(Arrays.asList(
+		installment = new TreeStructuredInstallmentIU(Arrays.asList(
 				command + " bitte das, äh?", 
 				command + " bitte das rote, äh?", 
 				command + " bitte das rote Kreuz",

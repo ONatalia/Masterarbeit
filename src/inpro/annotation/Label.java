@@ -1,5 +1,7 @@
 package inpro.annotation;
 
+import inpro.util.TimeUtil;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,7 +75,7 @@ public class Label {
 		StringBuilder sb = new StringBuilder();
 		sb.append(label);
 		sb.append(" ");
-		sb.append((int) ((end - start) * 1000));
+		sb.append((int) ((end - start) * TimeUtil.SECOND_TO_MILLISECOND_FACTOR));
 		return sb;
 	}
 

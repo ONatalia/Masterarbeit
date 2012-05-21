@@ -1,6 +1,5 @@
 package demo.inpro.synthesis;
 
-import inpro.incremental.unit.IncrSysInstallmentIU;
 
 import java.awt.Component;
 import java.util.Arrays;
@@ -33,7 +32,7 @@ public class SimpleEnglishPatternDemonstrator extends PatternDemonstrator {
 
 	@Override
 	public void greatNewUtterance(String command) {
-		installment = new IncrSysInstallmentIU(Arrays.asList("The car then turns <hes>", 
+		installment = new TreeStructuredInstallmentIU(Arrays.asList("The car then turns hm, I don't know", 
 																	"The car then turns left.", 
 																	"The car then turns right."));
 		generatedText.setText("The car then turns ‹dir›");

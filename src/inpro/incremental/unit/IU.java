@@ -1,6 +1,6 @@
 package inpro.incremental.unit;
 
-import inpro.incremental.util.TimeUtil;
+import inpro.util.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -3,15 +3,13 @@ package done.inpro.system.completion;
 import inpro.audio.DispatchStream;
 import inpro.incremental.FrameAware;
 import inpro.incremental.IUModule;
-import inpro.incremental.evaluation.CompletionEvaluator;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.IUList;
 import inpro.incremental.unit.SysInstallmentIU;
 import inpro.incremental.unit.WordIU;
-import inpro.incremental.unit.SysInstallmentIU.FuzzyMatchResult;
-import inpro.incremental.util.TimeUtil;
+import inpro.util.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +17,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+
+import done.inpro.system.completion.CompletionInstallmentIU.FuzzyMatchResult;
 
 
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -42,7 +42,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	/** in seconds, very rough estimate */
 	private static double OUTPUT_BUFFER_DELAY = 0.050;
 	
-	private SysInstallmentIU fullInstallment;
+	private CompletionInstallmentIU fullInstallment;
 	
 	/** history of words that have previously been recognized */
 	private IUList<WordIU> committedWords;
@@ -58,7 +58,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		String fullUtterance = ps.getString(PROP_FULL_UTTERANCE);
-		fullInstallment = new SysInstallmentIU(fullUtterance);
+		fullInstallment = new CompletionInstallmentIU(fullUtterance);
 		committedWords = new IUList<WordIU>();
 		
 		compAdapters = new ArrayList<CompletionAdapter>();
@@ -96,7 +96,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 				}
 			}
 			logger.info("new installment " + wordsSoFar.toString());
-			fullInstallment = new SysInstallmentIU(wordsSoFar.toString());
+			fullInstallment = new CompletionInstallmentIU(wordsSoFar.toString());
 			fmatch = fullInstallment.fuzzyMatching(fullInput, 0.2, 2);
 			if (fmatch.matches() && shouldFire()) {
 				doComplete();
@@ -267,7 +267,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 					logger.info("oups, after synthesis I'm late by " + holdingTime);
 				} else {
 					try {
-						Thread.sleep((long) ((holdingTime - OUTPUT_BUFFER_DELAY) * 1000));
+						Thread.sleep((long) ((holdingTime - OUTPUT_BUFFER_DELAY) * TimeUtil.SECOND_TO_MILLISECOND_FACTOR));
 					} catch (InterruptedException e) {
 						logger.info("interrupted while sleeping.");
 					}

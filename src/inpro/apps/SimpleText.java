@@ -2,10 +2,10 @@ package inpro.apps;
 
 import inpro.apps.util.TextCommandLineParser;
 import inpro.incremental.PushBuffer;
-import inpro.incremental.listener.FrameAwarePushBuffer;
-import inpro.incremental.processor.CurrentASRHypothesis;
 import inpro.incremental.processor.TextBasedFloorTracker;
-import inpro.incremental.util.IUDocument;
+import inpro.incremental.sink.FrameAwarePushBuffer;
+import inpro.incremental.source.CurrentASRHypothesis;
+import inpro.incremental.source.IUDocument;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;

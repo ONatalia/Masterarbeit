@@ -6,9 +6,9 @@ import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IUList;
 import inpro.incremental.unit.SegmentIU;
 import inpro.incremental.unit.WordIU;
-import inpro.incremental.util.ResultUtil;
-import inpro.incremental.util.TimeUtil;
 import inpro.incremental.util.WordUtil;
+import inpro.sphinx.ResultUtil;
+import inpro.util.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;

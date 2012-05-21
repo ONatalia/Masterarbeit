@@ -11,8 +11,8 @@ public class NoisySynthesisModule extends SynthesisModule {
 
 	protected DispatchStream noiseDispatcher;
 
-	public NoisySynthesisModule() {
-		super();
+	public NoisySynthesisModule(DispatchStream speechDispatcher) {
+		super(speechDispatcher);
 		noiseDispatcher = setupDispatcher2();
 	}
 	

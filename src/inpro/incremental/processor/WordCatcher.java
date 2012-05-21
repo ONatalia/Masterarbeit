@@ -60,7 +60,7 @@ public class WordCatcher extends PushBuffer {
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		listeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
-		wordToCatch = (String) ps.getString(PROP_WORD_TO_CATCH);
+		wordToCatch = ps.getString(PROP_WORD_TO_CATCH);
 	}
 
 }

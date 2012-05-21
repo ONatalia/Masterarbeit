@@ -1,8 +1,6 @@
 package done.inpro.system.carchase;
 
 import inpro.audio.DispatchStream;
-import inpro.incremental.unit.IncrSysInstallmentIU;
-import inpro.incremental.unit.SysInstallmentIU;
 
 import org.apache.log4j.Logger;
 
@@ -12,7 +10,7 @@ public class IncrementalArticulator extends StandardArticulator {
 
 	private static Logger logger = Logger.getLogger("IncrementalArticulator");
 	
-	IncrSysInstallmentIU installment;
+	HesitatingSynthesisIU installment;
 	
 	public IncrementalArticulator(DispatchStream dispatcher) {
 		super(dispatcher);
@@ -22,7 +20,7 @@ public class IncrementalArticulator extends StandardArticulator {
 	public void precompute(TTSAction action) {
 		super.precompute(action);
 		if (action.cont != null) {
-			action.cont = new IncrSysInstallmentIU((String) action.cont);
+			action.cont = new HesitatingSynthesisIU((String) action.cont);
 		}
 	}
 
@@ -30,12 +28,12 @@ public class IncrementalArticulator extends StandardArticulator {
 	public void say(TTSAction action) {
 		logger.info(action.text);
 		if (installment == null || installment.isCompleted()) {
-			installment = (IncrSysInstallmentIU) action.appData;
+			installment = (HesitatingSynthesisIU) action.appData;
 			dispatcher.playStream(installment.getAudio(), false);
 		} else { // installment is still in progress
 			// inspect the word that is being uttered
 			logger.info("trying to append continuation : " + action.cont);
-			installment.appendContinuation(((SysInstallmentIU) action.cont).getWords());
+			installment.appendContinuation(((HesitatingSynthesisIU) action.cont).getWords());
 		}
 	}
 

@@ -217,12 +217,13 @@ public class GenerationModule extends IUModule {
 			System.out.print(nonincremental.toMbrola());
 			System.out.println("#");
 			DispatchStream speechDispatcher = SimpleMonitor.setupDispatcher();
-			speechDispatcher.playInstallment(nonincremental);
+			speechDispatcher.playStream(nonincremental.getAudio(), true);
 			speechDispatcher.waitUntilDone();
 			System.exit(0);
 		}
 		
-		final NoisySynthesisModule sm = new NoisySynthesisModule();
+		final DispatchStream speechDispatcher = SimpleMonitor.setupDispatcher();
+		final NoisySynthesisModule sm = new NoisySynthesisModule(speechDispatcher);
 
 		gm.iulisteners = new ArrayList<PushBuffer>();
 		gm.iulisteners.add(sm);

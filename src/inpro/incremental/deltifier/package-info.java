@@ -14,7 +14,7 @@ _____________________________________________________________
 </pre>
 
 These modules are pluggable into 
-{@link inpro.incremental.processor.CurrentASRHypothesis},
+{@link inpro.incremental.source.CurrentASRHypothesis},
 our starting point into the IU world. 
 They convert Sphinx' {@link edu.cmu.sphinx.result.Result} objects
 (which always contain the complete result up to the current

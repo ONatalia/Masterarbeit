@@ -1,7 +1,8 @@
-package inpro.incremental.evaluation;
+package done.inpro.system.completion;
 
+import inpro.incremental.evaluation.BasicEvaluator;
 import inpro.incremental.unit.WordIU;
-import inpro.incremental.util.TimeUtil;
+import inpro.util.TimeUtil;
 
 import java.util.LinkedList;
 import java.util.Locale;

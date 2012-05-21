@@ -1,8 +1,8 @@
-package inpro.incremental.listener;
+package inpro.incremental.sink;
 
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
-import inpro.incremental.util.TimeUtil;
+import inpro.util.TimeUtil;
 
 import java.util.Collection;
 import java.util.List;

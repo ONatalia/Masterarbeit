@@ -1,6 +1,7 @@
-package work.inpro.sphinx.frontend;
+package inpro.sphinx.frontend;
 
 import inpro.incremental.unit.IU;
+import inpro.util.TimeUtil;
 
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
@@ -12,7 +13,8 @@ import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Double;
 
 /**
- * a data processor that throttles the data flow
+ * a data processor that throttles the data flow and re-aligns 
+ * microphone and IU world startup times
  */
 public class DataThrottle extends BaseDataProcessor {
 
@@ -24,8 +26,6 @@ public class DataThrottle extends BaseDataProcessor {
 	private double speed = 1.0;
 	
     /*
-     * (non-Javadoc)
-     * 
      * @see edu.cmu.sphinx.util.props.Configurable#newProperties(edu.cmu.sphinx.util.props.PropertySheet)
      */
     public void newProperties(PropertySheet ps) throws PropertyException {
@@ -52,7 +52,7 @@ public class DataThrottle extends BaseDataProcessor {
 	        	DoubleData ddinput = (DoubleData) input;
 	        	
 	        	long audioTime = (long) (((double) (ddinput.getFirstSampleNumber() + ddinput.getValues().length)) 
-	        							/ ddinput.getSampleRate() * 1000.0);
+	        							/ ddinput.getSampleRate() * TimeUtil.SECOND_TO_MILLISECOND_FACTOR);
 	        	long realTime = (long) ((System.currentTimeMillis() - startTime) * speed);
 	        	
 	            long waitTime = audioTime - realTime;

@@ -69,8 +69,8 @@ public class AVM {
 		for (String attribute : avmStructure.keySet()) {
 			if (avmStructure.get(attribute).equals("String")) {						// String attribute
 				attributes.put(attribute, null);
-			} else if (((String) avmStructure.get(attribute)).startsWith("(")) {	// AVM List attribute
-				String[] tokens = ((String) avmStructure.get(attribute)).replaceAll("[\\(\\)]", "").split(",");
+			} else if (avmStructure.get(attribute).startsWith("(")) {	// AVM List attribute
+				String[] tokens = avmStructure.get(attribute).replaceAll("[\\(\\)]", "").split(",");
 				String childType = tokens[0];
 				int num = Integer.parseInt(tokens[1]);
 				boolean monotonic = false;
@@ -83,7 +83,7 @@ public class AVM {
 				attributes.put(attribute, list);
 			} else {																// AVM attribute
 				ArrayList<AVM> list = new ArrayList<AVM>(1);
-				list.add(new AVM((String) avmStructure.get(attribute), avmStructures));
+				list.add(new AVM(avmStructure.get(attribute), avmStructures));
 				attributes.put(attribute, list);
 			}
 		}
@@ -217,9 +217,9 @@ public class AVM {
 				return true;
 			} else if (value instanceof String) {
 				if (this.attributes.get(attribute) == null) {
-					this.attributes.put(attribute, (String) value);
+					this.attributes.put(attribute, value);
 					return true;
-				} else if (this.attributes.get(attribute).equals((String) value)) {
+				} else if (this.attributes.get(attribute).equals(value)) {
 					if (!this.monotonic) {
 						return true;					
 					}
@@ -352,10 +352,8 @@ public class AVM {
 	public boolean isEmpty() {
 		for (String attribute : this.attributes.keySet()) {
 			Object value = attributes.get(attribute);
-			if (value instanceof String) {
-				if (value != null) {
-					return false;
-				}
+			if (value != null && value instanceof String) {
+				return false;
 			} else if (value instanceof AVM) {
 				if (!((AVM) value).isEmpty()) {
 					return false;
@@ -378,19 +376,16 @@ public class AVM {
 	 */
 	@SuppressWarnings("unchecked")
 	public String toString() {
-		// FIXME: much more efficient to use StringBuilder instead of += for Strings
 		StringBuilder sb = new StringBuilder("[");
 		sb.append(this.type);
 		sb.append(" ");
 		for (String attribute : this.attributes.keySet()) {
 			Object value = attributes.get(attribute);
-			if (value instanceof String) {
-				if (value != null) {
-					sb.append(attribute);
-					sb.append(":");
-					sb.append(value);
-					sb.append(" ");
-				}
+			if (value != null && value instanceof String) {
+				sb.append(attribute);
+				sb.append(":");
+				sb.append(value);
+				sb.append(" ");
 			} else if (value instanceof AVM) {
 				if (!((AVM) value).isEmpty()) {
 					sb.append(attribute);

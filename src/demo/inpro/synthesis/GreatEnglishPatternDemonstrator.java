@@ -2,7 +2,6 @@ package demo.inpro.synthesis;
 
 import inpro.gui.Canvas;
 import inpro.gui.pentomino.PentoIcon;
-import inpro.incremental.unit.IncrSysInstallmentIU;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -162,7 +161,7 @@ public class GreatEnglishPatternDemonstrator extends PatternDemonstrator {
 	 */
 	@Override
 	public void greatNewUtterance(String command) {
-		installment = new IncrSysInstallmentIU(Arrays.asList(
+		installment = new TreeStructuredInstallmentIU(Arrays.asList(
 				"please " + command + " the, uh?", 
 				"please " + command + " the red, uh?", 
 				"please " + command + " the red cross",

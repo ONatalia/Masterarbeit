@@ -1,8 +1,9 @@
 package inpro.nlu;
 
 /**
- * A simple attribute-value pair. Attributes are always strings,
- * values can be any object.
+ * A simple attribute-value pair. 
+ * Attributes are always strings, values can be any object.
+ * 
  * @author okko
  */
 public class AVPair {
@@ -93,8 +94,7 @@ public class AVPair {
 		String val = this.getValue().toString();
 		if (att == null)
 			att = "null";
-		if (val == null)
-			val = null;
+		// else: val is already null.
 		return att + " : " + val; 
 	}
 	

@@ -3,7 +3,12 @@ package inpro.incremental.unit;
 
 import java.util.List;
 
-
+/** 
+ * an IU that binds several WordIUs together to form a phrase.
+ * phrases are a convenient level for synthesis output if they contain words in 
+ * units that roughly correspond to prosodic phrases
+ * @author timo
+ */
 public class PhraseIU extends IU {
 
 	final String phrase;

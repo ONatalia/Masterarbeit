@@ -1,6 +1,5 @@
 package inpro.incremental.processor;
 
-import inpro.apps.SimpleMonitor;
 import inpro.audio.DispatchStream;
 import inpro.incremental.IUModule;
 import inpro.incremental.unit.EditMessage;
@@ -18,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.NotImplementedException;
+
 /**
  * concurrency: playNoise() and update() are synchronized, so do not try to call them from the same thread 
  */
@@ -30,12 +31,12 @@ public class SynthesisModule extends IUModule {
 
 	protected PhraseBasedInstallmentIU currentInstallment;
 	
-	public SynthesisModule() {
+	public SynthesisModule(DispatchStream speechDispatcher) {
+		this.speechDispatcher = speechDispatcher;
 		upcomingPhrases = new ArrayList<PhraseIU>();
-		speechDispatcher = SimpleMonitor.setupDispatcher();
 		MaryAdapter.initializeMary(); // preload mary
 		// preheat mary symbolic processing, HMM optimization and vocoding
-		speechDispatcher.playInstallment(new SysInstallmentIU("Neuer Stimulus:"));
+		speechDispatcher.playStream(new SysInstallmentIU("Neuer Stimulus:").getAudio());
 		speechDispatcher.waitUntilDone();
 	}
 	
@@ -73,14 +74,13 @@ public class SynthesisModule extends IUModule {
 				appendNotification(currentInstallment, phraseIU);
 				break;
 			case REVOKE:
-				// TODO
-				break;
+				throw new NotImplementedException("phrases cannot yet be revoked from synthesis; check for our next release");
 			default:
 				break;
 			}
 		}
 		if (startPlayInstallment)
-			speechDispatcher.playInstallment(currentInstallment);
+			speechDispatcher.playStream(currentInstallment.getAudio());
 	}
 	
 	private void appendNotification(SysInstallmentIU installment, PhraseIU phrase) {

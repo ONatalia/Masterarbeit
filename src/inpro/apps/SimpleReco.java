@@ -4,7 +4,7 @@ import inpro.apps.util.MonitorCommandLineParser;
 import inpro.apps.util.RecoCommandLineParser;
 import inpro.audio.AudioUtils;
 import inpro.incremental.PushBuffer;
-import inpro.incremental.processor.CurrentASRHypothesis;
+import inpro.incremental.source.CurrentASRHypothesis;
 import inpro.incremental.unit.IU;
 import inpro.sphinx.frontend.RtpRecvProcessor;
 

@@ -1,6 +1,6 @@
 package inpro.incremental.deltifier;
 
-import inpro.incremental.util.ResultUtil;
+import inpro.sphinx.ResultUtil;
 
 import java.util.List;
 import java.util.ListIterator;

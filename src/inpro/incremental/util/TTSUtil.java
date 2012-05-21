@@ -2,11 +2,10 @@ package inpro.incremental.util;
 
 import inpro.annotation.Label;
 import inpro.incremental.unit.IU;
-import inpro.incremental.unit.SysInstallmentIU;
 import inpro.incremental.unit.SysSegmentIU;
 import inpro.incremental.unit.WordIU;
-import inpro.synthesis.MaryAdapter;
 import inpro.synthesis.PitchMark;
+import inpro.util.TimeUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -195,7 +194,7 @@ public class TTSUtil {
 		}
 		
 		public SysSegmentIU toIU(Iterator<HTSModel> hmmIterator) {
-			Label l = new Label(endTime - (duration / 1000.0), endTime, sampaLabel);
+			Label l = new Label(endTime - (duration / TimeUtil.SECOND_TO_MILLISECOND_FACTOR), endTime, sampaLabel);
 			SysSegmentIU segIU = new SysSegmentIU(l, pitchMarks);
 			if (hmmIterator != null && hmmIterator.hasNext()) {
 				HTSModel hmm = hmmIterator.next();
@@ -216,26 +215,26 @@ public class TTSUtil {
 		return sb;
 	}
 	
-	public static void main(String[] args) throws JAXBException, TransformerException {
-		MaryAdapter ma = MaryAdapter.getInstance();
-		//InputStream is = TTSUtil.class.getResourceAsStream("example.maryxml");
-		//InputStream is = ma.text2maryxml("nordwind und sonne");
-		String testUtterance = "Nimm bitte das rote Kreuz.";
-		InputStream is = ma.text2maryxml(testUtterance);
-
-		JAXBContext context = JAXBContext.newInstance(Paragraph.class);
-		JAXBResult result = new JAXBResult(context);
-		TransformerFactory tf = TransformerFactory.newInstance();
-		Transformer t = tf.newTransformer(new StreamSource(TTSUtil.class.getResourceAsStream("mary2simple.xsl")));
-		t.transform(new StreamSource(is), result);
-		
-		Paragraph paragraph = (Paragraph) result.getResult(); //unmarshaller.unmarshal(is);
-		System.err.println(paragraph.toString());
-		Marshaller marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-		marshaller.marshal(paragraph, System.out);
-		System.out.println((new SysInstallmentIU(testUtterance)).deepToString());
-	}
+//	public static void main(String[] args) throws JAXBException, TransformerException {
+//		MaryAdapter ma = MaryAdapter.getInstance();
+//		//InputStream is = TTSUtil.class.getResourceAsStream("example.maryxml");
+//		//InputStream is = ma.text2maryxml("nordwind und sonne");
+//		String testUtterance = "Nimm bitte das rote Kreuz.";
+//		InputStream is = ma.text2maryxml(testUtterance);
+//
+//		JAXBContext context = JAXBContext.newInstance(Paragraph.class);
+//		JAXBResult result = new JAXBResult(context);
+//		TransformerFactory tf = TransformerFactory.newInstance();
+//		Transformer t = tf.newTransformer(new StreamSource(TTSUtil.class.getResourceAsStream("mary2simple.xsl")));
+//		t.transform(new StreamSource(is), result);
+//		
+//		Paragraph paragraph = (Paragraph) result.getResult(); //unmarshaller.unmarshal(is);
+//		System.err.println(paragraph.toString());
+//		Marshaller marshaller = context.createMarshaller();
+//		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+//		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+//		marshaller.marshal(paragraph, System.out);
+//		System.out.println((new SysInstallmentIU(testUtterance)).deepToString());
+//	}
 
 }

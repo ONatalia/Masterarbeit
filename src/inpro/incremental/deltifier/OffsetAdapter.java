@@ -1,6 +1,6 @@
 package inpro.incremental.deltifier;
 
-import inpro.incremental.processor.CurrentASRHypothesis;
+import inpro.incremental.source.CurrentASRHypothesis;
 
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;

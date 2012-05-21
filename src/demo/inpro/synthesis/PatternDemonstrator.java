@@ -3,7 +3,6 @@ package demo.inpro.synthesis;
 import inpro.apps.SimpleMonitor;
 import inpro.audio.DispatchStream;
 import inpro.incremental.unit.IU;
-import inpro.incremental.unit.IncrSysInstallmentIU;
 import inpro.incremental.unit.SegmentIU;
 import inpro.incremental.unit.SysSegmentIU;
 import inpro.incremental.unit.WordIU;
@@ -39,7 +38,7 @@ public abstract class PatternDemonstrator extends JPanel {
 	/** a text field that displays the current value of {@link PatternDemonstrator#installment} */
 	final JEditorPane generatedText;
 	/** the IU holding the incrementally synthesized installment */
-	IncrSysInstallmentIU installment;
+	TreeStructuredInstallmentIU installment;
 	DispatchStream dispatcher;
 	
 	IUUpdateListener iuUpdateRepainter = new IUUpdateListener() {
@@ -95,7 +94,7 @@ public abstract class PatternDemonstrator extends JPanel {
 			super(name);
 			posInUtt = pos;
 		}
-		void updateParentNodes(IncrSysInstallmentIU installment) {
+		void updateParentNodes(TreeStructuredInstallmentIU installment) {
 			parentNodes.clear();
 			parentNodes.addAll(installment.getWordsAtPos(posInUtt));
 		}

@@ -23,7 +23,7 @@ import sun.audio.AudioStream;
 
 import inpro.apps.SimpleReco;
 import inpro.gui.util.SpeechStateVisualizer;
-import inpro.incremental.listener.CurrentHypothesisViewer;
+import inpro.incremental.sink.CurrentHypothesisViewer;
 import inpro.sphinx.frontend.WavTEDLogger;
 
 import java.awt.Color;

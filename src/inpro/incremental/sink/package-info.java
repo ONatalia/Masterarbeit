@@ -5,4 +5,4 @@
  * (e.g. on the terminal or graphically), 
  * but do not put IUs onto their own right buffers.
  */
-package inpro.incremental.listener;
+package inpro.incremental.sink;

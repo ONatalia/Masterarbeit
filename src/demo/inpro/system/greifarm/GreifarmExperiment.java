@@ -3,7 +3,7 @@ package demo.inpro.system.greifarm;
 import inpro.apps.SimpleReco;
 import inpro.gui.util.SpeechStateVisualizer;
 import inpro.incremental.deltifier.ASRWordDeltifier;
-import inpro.incremental.processor.CurrentASRHypothesis;
+import inpro.incremental.source.CurrentASRHypothesis;
 
 import java.io.PrintStream;
 import java.util.ArrayList;

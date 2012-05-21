@@ -24,6 +24,8 @@ import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Integer;
 
+import inpro.util.TimeUtil;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -362,7 +364,7 @@ public class QuickSpeechMarker extends BaseDataProcessor {
      */
     public int getAudioTime(SpeechClassifiedData audio) {
         return (int)
-                (audio.getValues().length * 1000.0f / audio.getSampleRate());
+                (audio.getValues().length * TimeUtil.SECOND_TO_MILLISECOND_FACTOR / audio.getSampleRate());
     }
     
     public boolean inSpeech() {

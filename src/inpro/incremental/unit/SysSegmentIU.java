@@ -1,12 +1,12 @@
 package inpro.incremental.unit;
 
 import inpro.annotation.Label;
-import inpro.incremental.util.TimeUtil;
 import inpro.synthesis.MaryAdapter4internal;
 import inpro.synthesis.PitchMark;
 import inpro.synthesis.hts.FullPFeatureFrame;
 import inpro.synthesis.hts.FullPStream;
 import inpro.synthesis.hts.PHTSParameterGeneration;
+import inpro.util.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -80,7 +80,7 @@ public class SysSegmentIU extends SegmentIU {
 	
 	/**	the duration of this segment in multiples of 5 ms */
 	public int durationInSynFrames() {
-		return (int) Math.round(duration() * FullPStream.FRAMES_PER_SECOND * 3);
+		return (int) Math.round(duration() * FullPStream.FRAMES_PER_SECOND);
 	}
 	
 	public double originalDuration() {

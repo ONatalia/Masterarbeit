@@ -1,4 +1,4 @@
-package inpro.incremental.util;
+package inpro.util;
 
 public class TimeUtil {
 	/** a frame lasts 0.01 seconds (= 10 milliseconds) */

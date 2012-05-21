@@ -70,7 +70,7 @@ public class SyllableAwareFullDictionary extends FullDictionary {
             	}
             }
             Unit[] unitsArray = units.toArray(new Unit[units.size()]);
-            List<Pronunciation> pronunciations = (List<Pronunciation>) dictionary.get(word);
+            List<Pronunciation> pronunciations = dictionary.get(word);
             if (pronunciations == null) {
                 pronunciations = new ArrayList<Pronunciation>();
             }

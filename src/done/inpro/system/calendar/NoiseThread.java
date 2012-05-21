@@ -12,8 +12,8 @@ public class NoiseThread extends Thread {
 	private IUUpdateListener updateListener;
 	private AdaptionManager am;
 	
-	private int noiseLength = 1000;
-	private int responsiveness = 50;
+	private int noiseLength = 1000; // in milliseconds
+	private int responsiveness = 50; // in milliseconds
 	
 	NoiseHandling noiseHandling;
 	

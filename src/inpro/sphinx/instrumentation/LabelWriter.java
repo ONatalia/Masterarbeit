@@ -10,7 +10,7 @@
  */
 package inpro.sphinx.instrumentation;
 
-import inpro.incremental.util.ResultUtil;
+import inpro.sphinx.ResultUtil;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;

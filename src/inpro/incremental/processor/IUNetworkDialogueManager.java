@@ -73,7 +73,7 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 
 	/**
 	 * Updates the IS with ADDed or REVOKEd WordIUs.
-	 * Calls {@link updateAll()} to update listeners.
+	 * Calls {@link #updateAll()} to update listeners.
 	 */
 	@Override
 	public void leftBufferUpdate(Collection<? extends IU> ius,
@@ -114,7 +114,7 @@ public class IUNetworkDialogueManager extends AbstractDialogueManager implements
 	
 	/**
 	 * Update state listeners and right buffer, then call
-	 * {@link super.postUpdate()} to release locks. 
+	 * {@link AbstractDialogueManager#postUpdate()} to release locks. 
 	 */
 	protected void updateAll() {
 		this.updateStateListeners();

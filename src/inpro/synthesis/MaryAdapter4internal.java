@@ -52,11 +52,18 @@ public class MaryAdapter4internal extends MaryAdapter {
 	}
 	
 	@Override
-	public synchronized List<IU> text2IUs(String tts) throws JAXBException {
+	public InputStream text2maryxml(String text) {
 		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class); 
 	    ihtse.synthesizeAudio = false;
-		InputStream is = text2maryxml(tts);
+		InputStream is = getInputStreamFromMary(text, "TEXT", "REALISED_ACOUSTPARAMS");
 	    ihtse.synthesizeAudio = true;
+		return is;
+	}
+
+	@Override
+	public synchronized List<IU> text2IUs(String tts) throws JAXBException {
+		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class); 
+		InputStream is = text2maryxml(tts);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, ihtse.uttHMMs);
 		// remove utterance final silences

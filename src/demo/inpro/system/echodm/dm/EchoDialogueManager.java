@@ -2,10 +2,10 @@ package demo.inpro.system.echodm.dm;
 
 import inpro.audio.DispatchStream;
 import inpro.dm.acts.InformDialogueAct;
-import inpro.incremental.listener.InstallmentHistoryViewer;
 import inpro.incremental.processor.AbstractDialogueManager;
 import inpro.incremental.processor.AbstractFloorTracker;
 import inpro.incremental.processor.IUBasedFloorTracker;
+import inpro.incremental.sink.InstallmentHistoryViewer;
 import inpro.incremental.unit.DialogueActIU;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
@@ -111,7 +111,7 @@ public class EchoDialogueManager extends AbstractDialogueManager implements Abst
 	/** 
 	 * Convenience method that tracks system installments and dialogue acts
 	 * and produces audio output.
-	 * @param the system utterance
+	 * @param systemUtterance the system utterance
 	 */
 	private void reply(String systemUtterance) {
 		List<IU> grin = new ArrayList<IU>(this.currentInstallment);

@@ -5,6 +5,8 @@
  * which is contained in this package, along with a main class 
  * (GreifarmExperiment) which starts up the greifarm and allows to test 
  * different ASR smoothing conditions.
+ * 
+ * @author Timo Baumann
  */
 package demo.inpro.system.greifarm;
 

@@ -23,12 +23,6 @@ public class InstallmentIU extends IU {
 	boolean systemProduced; // true: system utterance, false: user utterance
 
 	/**
-	 * The first InstallmentIUs
-	 */
-	public static final InstallmentIU FIRST_USER_INSTALLMENT_IU = new InstallmentIU(DialogueActIU.FIRST_DA_IU, null);
-	public static final InstallmentIU FIRST_SYSTEM_INSTALLMENT_IU = new InstallmentIU(Collections.<WordIU>emptyList());
-	
-	/**
 	 * Constructor for an installment produced by the user, grounded
 	 * in a list of spoken words.
 	 * @param currentInstallment the list of wordIUs grounding this installment
@@ -45,7 +39,7 @@ public class InstallmentIU extends IU {
 	 * @param dialogueAct the dialogue act grounding this installment
 	 * @param tts the spoken string
 	 */
-	public InstallmentIU(DialogueActIU dialogueAct, String tts) {
+	public InstallmentIU(IU dialogueAct, String tts) {
 		super(dialogueAct != null ? Collections.<IU>singletonList(dialogueAct) : Collections.<IU>emptyList());
 		this.systemProduced = true;
 		this.tts = tts;

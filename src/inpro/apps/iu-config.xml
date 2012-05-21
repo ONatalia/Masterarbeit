@@ -24,26 +24,12 @@
            <item>iuNetworkViewer</item>
            <item>consoleNotifier</item>
            <item>oaaNotifier</item>
+           <item>iSS</item>
 -->
         </propertylist>
     </component>
-
-    <component name="semanticComposer" type="inpro.incremental.processor.SemanticComposer">
-        <property name="semanticsMapping" value="org/cocolab/inpro/domains/pentomino/resources/PentoAVMapping" />
-        <property name="structureFile" value="org/cocolab/inpro/domains/pentomino/resources/PentoAVMStructure" />
-        <property name="chunkMarkers" value="in die,field;in der,tile" />
-        <propertylist name="hypChangeListeners">
-              <item>semanticResolver</item>
-        </propertylist>
-     </component>
-
-    <component name="semanticResolver" type="inpro.incremental.processor.SemanticResolver">
-        <property name="structureFile" value="org/cocolab/inpro/domains/pentomino/resources/PentoAVMStructure" />
-        <property name="composer" value="semanticComposer"/>
-        <propertylist name="hypChangeListeners">
-                <item>qudDialogueManager</item>
-        </propertylist>
-     </component>
+    
+    <component name="iSS" type="inpro.incremental.processor.SynthesisModule" />
 
     <component name="iuBasedFloorTracker" type="inpro.incremental.processor.IUBasedFloorTracker">
         <property name="useProsody" value="true" />
@@ -59,15 +45,6 @@
         </propertylist>
     </component>
 
-    <component name="qudDialogueManager" type="inpro.incremental.processor.QUDDialogueManager">
-        <property name="nlu" value="${semanticResolver}"/>
-        <property name="actionManager" value="pentoActionManager"/>
-        <property name="dispatchStream" value="dispatchStream"/>
-        <propertylist name="hypChangeListeners">
-            <item>pentoActionManager</item>
-        </propertylist>
-    </component>
-    
     <component name="echoDialogueManager" type="inpro.incremental.processor.EchoDialogueManager">
         <property name="actionManager" value="audioActionManager"/>
         <property name="floorTracker" value="iuBasedFloorTracker"/>
@@ -77,25 +54,6 @@
         </propertylist>
     </component>
     
-    <component name="turnCompleter" type="inpro.incremental.processor.TurnCompleter">
-		<property name="dispatchStream" value="dispatchStream" />
-    </component>
-
-    <component name="pentoActionManager" type="inpro.incremental.processor.PentoActionManager">
-        <property name="dispatchStream" value="dispatchStream"/>
-        <propertylist name="amListeners">
-            <item>qudDialogueManager</item>
-        </propertylist>
-    </component>
-    
-    <component name="audioActionManager" type="inpro.incremental.processor.AudioActionManager">
-        <property name="dispatchStream" value="dispatchStream"/>
-        <property name="floorTracker" value="iuBasedFloorTracker"/>
-        <propertylist name="amListeners">
-            <item>echoDialogueManager</item>
-        </propertylist>
-    </component>
-
     <component name="baseData" type="inpro.incremental.basedata.BaseData">
     	<property name="eotFeatureAggregator" value="eotFeatureAggregator" />
     </component>
@@ -110,15 +68,9 @@
 
     <component name="none" type="inpro.incremental.deltifier.ASRWordDeltifier"/>
     <component name="nonIncr" type="inpro.incremental.deltifier.NonIncrementalDeltifier"/>
-    <component name="wasd" type="inpro.incremental.deltifier.WordAdaptiveSmoothingDeltifier">
-        <property name="safeWord" value="no" />
-        <property name="urgentWord" value="take" />
-    </component>
-
     <component name="fixedLag" type="inpro.incremental.deltifier.FixedLagDeltifier">
         <property name="fixedLag" value="${deltifierParam}"/>
     </component>
-
     <component name="smoothing" type="inpro.incremental.deltifier.SmoothingDeltifier">
         <property name="smoothing" value="${deltifierParam}"/>
     </component>

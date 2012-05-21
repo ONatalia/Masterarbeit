@@ -1,4 +1,4 @@
-package inpro.incremental.listener;
+package inpro.incremental.sink;
 
 import inpro.incremental.FrameAware;
 import inpro.incremental.IUModule;

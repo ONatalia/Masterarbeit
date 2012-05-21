@@ -1,22 +1,30 @@
-package inpro.incremental.unit;
+package demo.inpro.synthesis;
+
+import inpro.incremental.unit.IU;
+import inpro.incremental.unit.SegmentIU;
+import inpro.incremental.unit.SysInstallmentIU;
+import inpro.incremental.unit.SysSegmentIU;
+import inpro.incremental.unit.WordIU;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * multiple synthesis options are organized in a tree structure.
- * this is incredibly inefficient if you've got many options. the XX YY ZZ AA BB CC (with each a few options) results in plenty possible variants
- * at the same time, this doesn't even allow for lengthening/speed changes
+ * multiple synthesis paths organized in a tree structure.
+ * this is incredibly inefficient if you've got many options. 
+ * the XX YY ZZ AA BB CC (with each a few options) results in plenty possible variants
+ * at the same time, this doesn't even allow for lengthening/speed changes.
+ * However, it allows for zero-latency switching between hypotheses.  
  * @author timo
  */
-public class IncrSysInstallmentIU extends SysInstallmentIU {
+public class TreeStructuredInstallmentIU extends SysInstallmentIU {
 
-	public IncrSysInstallmentIU(String base) {
+	public TreeStructuredInstallmentIU(String base) {
 		super(base);
 	}
 	
-	public IncrSysInstallmentIU(List<String> variants) {
+	public TreeStructuredInstallmentIU(List<String> variants) {
 		this(variants.get(0));
 		for (int i = 1; i < variants.size(); i++) {
 			addAlternativeVariant(variants.get(i));
@@ -55,32 +63,6 @@ public class IncrSysInstallmentIU extends SysInstallmentIU {
 			SegmentIU lastCommonSegment = commonWord.getLastSegment();
 			firstVarSegment.shiftBy(lastCommonSegment.endTime() - firstVarSegment.startTime(), true);
 		}
-	}
-	
-	public void appendContinuation(List<WordIU> words) {
-		WordIU oldLastWord = getFinalWord();
-		WordIU newFirstWord = words.get(0);
-		newFirstWord.connectSLL(oldLastWord);
-		groundedIn.addAll(words);
-/* TODO: pitch adaptation will have to be reworked
-		// adapt pitch
-		SysSegmentIU oldLastSegment = (SysSegmentIU) oldLastWord.getLastSegment();
-		while (oldLastSegment != null && !oldLastSegment.isVoiced()) {
-			oldLastSegment = (SysSegmentIU) oldLastSegment.getSameLevelLink();
-		}
-		SysSegmentIU newFirstSegment = (SysSegmentIU) newFirstWord.getFirstSegment();
-		while (newFirstSegment != null && !newFirstSegment.isVoiced()) {
-			newFirstSegment = (SysSegmentIU) newFirstSegment.getNextSameLevelLink();
-		}
-		// attain previous IU's pitch for a smoother transition to the next
-		//if (oldLastSegment != null && newFirstSegment != null)
-		//	oldLastSegment.attainPitch(newFirstSegment.getFirstVoicedlf0());
-		 */
-	}
-	
-	public void reorderOptions(int wordIndex, final String newBestFollower) {
-		WordIU word = getWords().get(wordIndex - 1);
-		word.setAsTopNextSameLevelLink(newBestFollower);
 	}
 	
 	public List<WordIU> getWordsAtPos(int pos) {

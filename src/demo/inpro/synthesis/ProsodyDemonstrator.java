@@ -1,7 +1,6 @@
 package demo.inpro.synthesis;
 
 import inpro.incremental.unit.IU;
-import inpro.incremental.unit.IncrSysInstallmentIU;
 import inpro.incremental.unit.SysSegmentIU;
 
 import java.awt.event.ActionEvent;
@@ -104,7 +103,7 @@ public class ProsodyDemonstrator extends PatternDemonstrator {
 	
 	@Override
 	public void greatNewUtterance(String command) {
-		installment = new IncrSysInstallmentIU(Collections.<String>singletonList(command));
+		installment = new TreeStructuredInstallmentIU(Collections.<String>singletonList(command));
 		for (IU word : installment.groundedIn()) {
 			word.updateOnGrinUpdates();
 			word.addUpdateListener(iuUpdateRepainter);

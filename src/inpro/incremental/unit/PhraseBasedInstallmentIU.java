@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.ListIterator;
 
 /** 
- * an InstallmentIU that loosely uses phrases to structure its output.
+ * an synthesizable InstallmentIU that uses phrases to structure its output.
  * phrases can be added even when the utterance is already being produced
- * (currently, phrases cannot be "revoked" from the installment as that's not necessary in our task)
+ * (currently, phrases cannot be "revoked" from the installment as that wasn't necessary in our tasks yet)
  * @author timo
  */
-public class PhraseBasedInstallmentIU extends IncrSysInstallmentIU {
+public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 	/** create a phrase from  */
 	public PhraseBasedInstallmentIU(PhraseIU phrase) {
 		// todo: think about a new method in PhraseIU that gets us more specifically tuned text for synthesis depending on phraseTypes
@@ -67,15 +67,20 @@ public class PhraseBasedInstallmentIU extends IncrSysInstallmentIU {
 		backsubstituteHTSModels(newSeg, (SysSegmentIU) lastOldWord.getLastSegment());
 	}
 	
-	private void backsubstituteHTSModels(SysSegmentIU newSeg,
-			SysSegmentIU oldSeg) {
+	/**
+	 * recursively walk backwards on the segment layer, replacing older segments with newer segments.
+	 * Segments that have been generated more recently are potentially of better quality and should be used 
+	 * to replace old segments (which have been generated with other or less context) wherever possible
+	 * (i.e., if their synthesis hasn't started yet). 
+	 */
+	private void backsubstituteHTSModels(SysSegmentIU newSeg, SysSegmentIU oldSeg) {
 		if (newSeg != null && oldSeg != null && newSeg.payloadEquals(oldSeg) && oldSeg.isUpcoming()) {
 			oldSeg.copySynData(newSeg);
 			backsubstituteHTSModels((SysSegmentIU) newSeg.getSameLevelLink(), (SysSegmentIU) oldSeg.getSameLevelLink());
 		}
 	}
 
-	/** breaks the segment links between words so that synthesis stops after the currently ongoing word */
+	/** breaks the segment links between words so that crawling synthesis stops after the currently ongoing word */
 	public void stopAfterOngoingWord() {
 		ListIterator<IU> groundIt = groundedIn.listIterator(groundedIn.size());
 		for (; groundIt.hasPrevious(); ) {
@@ -83,7 +88,7 @@ public class PhraseBasedInstallmentIU extends IncrSysInstallmentIU {
 			// break the segmentIU layer
 			SegmentIU seg = word.getLastSegment();
 			seg.removeAllNextSameLevelLinks();
-			// hack for long words:
+			// hack for long words: also stop in the middle of word
 			if (word.getSegments().size() > 7) {
 				word.getSegments().get(5).removeAllNextSameLevelLinks();
 			}

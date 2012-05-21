@@ -110,7 +110,7 @@ public class ProsodyMonitor extends JPanel implements SignalFeatureListener {
 		}
 		
 		int toScreenCoordinate(double d) {
-			return HEIGHT - (int) (d * ((double) HEIGHT) / (max - min));
+			return HEIGHT - (int) (d * HEIGHT / (max - min));
 		}
 	}
 	

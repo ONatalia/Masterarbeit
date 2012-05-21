@@ -3,8 +3,8 @@ package inpro.incremental.unit;
 import inpro.annotation.Label;
 import inpro.features.TimeShiftingAnalysis;
 import inpro.incremental.basedata.BaseData;
-import inpro.incremental.util.TimeUtil;
 import inpro.nlu.AVPair;
+import inpro.util.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
