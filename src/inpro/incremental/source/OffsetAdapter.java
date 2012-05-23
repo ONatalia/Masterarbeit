@@ -1,6 +1,6 @@
-package inpro.incremental.deltifier;
+package inpro.incremental.source;
 
-import inpro.incremental.source.CurrentASRHypothesis;
+import inpro.incremental.deltifier.ASRWordDeltifier;
 
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
