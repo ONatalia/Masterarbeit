@@ -1,6 +1,6 @@
 package inpro.synthesis.hts;
 
-import inpro.pitch.util.PitchUtils;
+import inpro.pitch.PitchUtils;
 
 import java.util.Arrays;
 

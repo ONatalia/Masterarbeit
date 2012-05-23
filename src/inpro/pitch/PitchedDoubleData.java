@@ -17,7 +17,6 @@
  */
 package inpro.pitch;
 
-import inpro.pitch.util.PitchUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,12 +69,20 @@ public class PitchedDoubleData extends DoubleData {
 		deferred = false;
 	}
 	
+	public void setVoiced(boolean v) {
+		this.voiced = v;
+	}
+	
 	public boolean isVoiced() {
 		return voiced;
 	}
 	
 	public double getVoicing() {
 		return voicing;
+	}
+	
+	public void setPitchHz(double hz) {
+		this.pitchHz = hz;
 	}
 	
 	public double getPitchHz() {

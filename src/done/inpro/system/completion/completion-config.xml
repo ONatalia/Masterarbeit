@@ -347,7 +347,7 @@
         </propertylist>
     </component>
 
-   <component name="hypCompleter" type="inpro.incremental.processor.CompletionHypothesisListener">
+   <component name="hypCompleter" type="done.inpro.system.completion.CompletionHypothesisListener">
    </component>
 
     <component name="iuBasedFloorTracker" type="inpro.incremental.processor.IUBasedFloorTracker">

@@ -15,10 +15,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-package inpro.pitch;
+package inpro.pitch.util;
 
-import inpro.pitch.util.PitchOptimizer;
-import inpro.pitch.util.PitchUtils;
+import inpro.pitch.PitchTracker;
+import inpro.pitch.PitchUtils;
+import inpro.pitch.PitchedDoubleData;
 
 import java.io.File;
 import java.io.IOException;
@@ -105,8 +106,8 @@ public class LookAheadPitchTracker extends PitchTracker implements Resetable {
 		Data data = localQueue.poll();	
 		if (data instanceof PitchedDoubleData) {
 			PitchedDoubleData pddata = (PitchedDoubleData) data;
-			pddata.voiced = voicingList.get(currListPos);
-			pddata.pitchHz = PitchUtils.centToHz(pitchList.get(currListPos));
+			pddata.setVoiced(voicingList.get(currListPos));
+			pddata.setPitchHz(PitchUtils.centToHz(pitchList.get(currListPos)));
 			currListPos++;
 			framesInQueue--;
 		}

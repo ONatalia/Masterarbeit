@@ -2,6 +2,7 @@ package inpro.incremental.unit;
 
 import inpro.annotation.Label;
 import inpro.audio.DDS16kAudioInputStream;
+import inpro.synthesis.MaryAdapter4internal;
 import inpro.synthesis.PitchMark;
 import inpro.synthesis.hts.FullPFeatureFrame;
 import inpro.synthesis.hts.FullPStream;
@@ -14,6 +15,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
+
+import marytts.htsengine.HMMVoice;
+import marytts.modules.synthesis.Voice;
 
 import org.apache.log4j.Logger;
 
@@ -99,7 +103,7 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	public AudioInputStream getAudio() {
         boolean immediateReturn = true;
-		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), immediateReturn);
+		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), ((HMMVoice) Voice.getVoice(MaryAdapter4internal.DEFAULT_VOICE)).getHMMData(), immediateReturn);
         return new DDS16kAudioInputStream(vas);
 	}
 	

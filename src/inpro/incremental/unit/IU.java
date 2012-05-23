@@ -12,9 +12,6 @@ import java.util.Locale;
 
 public abstract class IU implements Comparable<IU> {
 	
-	public static long startupTime;
-	static { startupTime = System.currentTimeMillis(); }
-	
 	public static final IU FIRST_IU = new IU() {
 		@Override
 		public String toPayLoad() {
@@ -84,7 +81,7 @@ public abstract class IU implements Comparable<IU> {
 	 */
 	public IU() {
 		this.id = IU.getNewID();
-		this.creationTime = System.currentTimeMillis() - startupTime;
+		this.creationTime = System.currentTimeMillis() - TimeUtil.startupTime;
 	}
 	
 	/**
@@ -490,7 +487,7 @@ public abstract class IU implements Comparable<IU> {
 	}
 	
 	public long getAge() {
-		return System.currentTimeMillis() - startupTime - creationTime;
+		return System.currentTimeMillis() - TimeUtil.startupTime - creationTime;
 	}
 	
 	/**

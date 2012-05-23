@@ -5,8 +5,8 @@ import inpro.apps.util.RecoCommandLineParser;
 import inpro.audio.AudioUtils;
 import inpro.incremental.PushBuffer;
 import inpro.incremental.source.CurrentASRHypothesis;
-import inpro.incremental.unit.IU;
 import inpro.sphinx.frontend.RtpRecvProcessor;
+import inpro.util.TimeUtil;
 
 import java.io.IOException;
 import java.net.URL;
@@ -71,7 +71,7 @@ public class SimpleReco {
     	setupMonitors();
     	allocateRecognizer();
     	logger.info("Configuration has finished");
-    	IU.startupTime = System.currentTimeMillis();
+    	TimeUtil.startupTime = System.currentTimeMillis();
 	}
 	
 	private void setupDeltifier() {

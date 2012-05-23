@@ -1,6 +1,5 @@
 package inpro.sphinx.frontend;
 
-import inpro.incremental.unit.IU;
 import inpro.util.TimeUtil;
 
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
@@ -43,9 +42,9 @@ public class DataThrottle extends BaseDataProcessor {
         	startTime = ((DataStartSignal) input).getTime();
         	System.out.println("it is now " + currentTime);
         	System.out.println("microphone started at " + startTime);
-        	System.out.println("IU world started at " + IU.startupTime);
-        	System.out.println("shifting IU world by " + (IU.startupTime - startTime) + " ms");
-        	IU.startupTime = startTime;
+        	System.out.println("IU world started at " + TimeUtil.startupTime);
+        	System.out.println("shifting IU world by " + (TimeUtil.startupTime - startTime) + " ms");
+        	TimeUtil.startupTime = startTime;
         } else {
             // everything except signals are delayed
 	        if ((input instanceof DoubleData)) {

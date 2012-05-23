@@ -6,4 +6,7 @@ public class TimeUtil {
 	/** a second lasts 1000 milliseconds */
 	public static double SECOND_TO_MILLISECOND_FACTOR = 1000.0;
 
+	public static long startupTime;
+	static { startupTime = System.currentTimeMillis(); }
+
 }

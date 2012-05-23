@@ -17,7 +17,6 @@
  */
 package inpro.pitch;
 
-import inpro.pitch.util.PitchUtils;
 
 public class PitchCandidate {
 	

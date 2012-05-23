@@ -51,8 +51,6 @@
 
 package inpro.synthesis.hts;
 
-import inpro.synthesis.MaryAdapter4internal;
-
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -60,11 +58,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.log4j.Logger;
 
 import marytts.htsengine.HMMData;
-import marytts.htsengine.HMMVoice;
 import marytts.htsengine.HTSPStream;
 import marytts.htsengine.HTSParameterGeneration;
 import marytts.htsengine.HTSVocoder;
-import marytts.modules.synthesis.Voice;
 import marytts.util.data.BaseDoubleDataSource;
 
 /**
@@ -125,10 +121,6 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
     public VocodingAudioStream(HTSPStream mcepPst, HTSPStream strPst, HTSPStream magPst, HTSPStream lf0Pst,
             boolean[] voiced, HMMData htsData, boolean immediateReturn) {
     	this(new HTSFullPStream(mcepPst, strPst, magPst, lf0Pst, voiced), htsData, immediateReturn);
-    }
-    
-    public VocodingAudioStream(FullPStream pstream, boolean immediateReturn) {
-    	this(pstream, ((HMMVoice) Voice.getVoice(MaryAdapter4internal.DEFAULT_VOICE)).getHMMData(), immediateReturn);
     }
     
     public VocodingAudioStream(FullPStream pstream, HMMData htsData, boolean immediateReturn) {

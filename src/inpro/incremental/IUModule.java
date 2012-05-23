@@ -4,6 +4,7 @@ import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.IUList;
 import inpro.incremental.util.TedAdapter;
+import inpro.util.TimeUtil;
 
 import java.util.Collection;
 import java.util.List;
@@ -78,7 +79,7 @@ public abstract class IUModule extends PushBuffer {
 	/* * * utility methods * * */
 	
 	public int getTime() {
-		return (int) (System.currentTimeMillis() - IU.startupTime);
+		return (int) (System.currentTimeMillis() - TimeUtil.startupTime);
 	}
 	
 	public void logToTedView(String message) {

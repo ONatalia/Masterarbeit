@@ -16,7 +16,7 @@
 
  */
 
-package inpro.pitch.util;
+package inpro.pitch;
 
 public class PitchUtils {
 
