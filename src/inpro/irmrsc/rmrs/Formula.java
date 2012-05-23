@@ -64,12 +64,6 @@ public class Formula extends VariableEnvironment
 	}
 	
 	
-	// this is a hack: the constructor signature arbitrarily marks,
-	public Formula (String startSymbol) {
-		this();
-		
-	}
-	
 	// make a simple new formula for a lexical object
 	public Formula (String lexname, Variable.Type semtype) {
 		this();

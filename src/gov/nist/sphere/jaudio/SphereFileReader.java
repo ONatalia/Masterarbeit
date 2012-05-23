@@ -99,7 +99,7 @@ public class SphereFileReader extends AudioFileReader {
         int channelCount = header.getChannelCount();
         int resolution = header.getSampleNBytes() * 8;
         boolean isBigEndian = header.isDataBigEndian();
-        format = new AudioFormat(encoding, (float) sampleRate, resolution,
+        format = new AudioFormat(encoding, sampleRate, resolution,
                 channelCount, channelCount * header.getSampleNBytes(), sampleRate, isBigEndian);
       } catch (SphereException e) {
     	e.printStackTrace();

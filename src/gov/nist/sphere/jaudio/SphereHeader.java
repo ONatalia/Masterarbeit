@@ -223,7 +223,7 @@ public class SphereHeader {
   }
 
   protected SphereHeaderItem get(String name) {
-    return (SphereHeaderItem) items.get(name);
+    return items.get(name);
   }
 
 }

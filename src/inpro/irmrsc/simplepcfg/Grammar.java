@@ -114,8 +114,8 @@ public class Grammar {
 		}
 		// for each production, add LHSs to NonTerminals and RHSs to symbol
 		for (Map.Entry<String,Production> e : mProductions.entrySet()) {
-			String id = (String) e.getKey();
-			Production p = (Production) e.getValue();
+			String id = e.getKey();
+			Production p = e.getValue();
 			Symbol LHS = p.getLHS();
 			if (mExpandsRelation.keySet().contains(LHS)) {
 				mExpandsRelation.get(LHS).add(id);
