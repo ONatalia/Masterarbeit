@@ -6,6 +6,7 @@ import inpro.apps.util.CommonCommandLineParser;
 import inpro.apps.util.MonitorCommandLineParser;
 import inpro.audio.DispatchStream;
 import inpro.incremental.processor.SynthesisModule;
+import inpro.incremental.unit.SysInstallmentIU;
 
 public class NoisySynthesisModule extends SynthesisModule {
 
@@ -14,6 +15,9 @@ public class NoisySynthesisModule extends SynthesisModule {
 	public NoisySynthesisModule(DispatchStream speechDispatcher) {
 		super(speechDispatcher);
 		noiseDispatcher = setupDispatcher2();
+		// preheat mary symbolic processing, HMM optimization and vocoding
+		speechDispatcher.playStream(new SysInstallmentIU("Neuer Stimulus:").getAudio());
+		speechDispatcher.waitUntilDone();
 	}
 	
 	protected synchronized boolean noisy() {

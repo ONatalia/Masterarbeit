@@ -35,9 +35,6 @@ public class SynthesisModule extends IUModule {
 		this.speechDispatcher = speechDispatcher;
 		upcomingPhrases = new ArrayList<PhraseIU>();
 		MaryAdapter.initializeMary(); // preload mary
-		// preheat mary symbolic processing, HMM optimization and vocoding
-		speechDispatcher.playStream(new SysInstallmentIU("Neuer Stimulus:").getAudio());
-		speechDispatcher.waitUntilDone();
 	}
 	
 	/**
@@ -114,6 +111,7 @@ public class SynthesisModule extends IUModule {
 		}
 	}
 	
+	/** notifies the given PhraseIU when the IU this is listening to is completed */
 	class NotifyCompletedOnOngoing implements IUUpdateListener {
 		PhraseIU completed;
 		NotifyCompletedOnOngoing(PhraseIU notify) {

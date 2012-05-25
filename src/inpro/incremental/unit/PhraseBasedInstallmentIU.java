@@ -17,7 +17,7 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 		// todo: think about a new method in PhraseIU that gets us more specifically tuned text for synthesis depending on phraseTypes
 		super(phrase.toPayLoad());
 		phrase.groundIn(new ArrayList<IU>(groundedIn));
-		phrase.ground(this);
+		
 	}
 
 	/** append words for this phrase at the end of the installment */
@@ -27,7 +27,6 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 		fullPhrase = fullPhrase.replaceAll(" <sil>", ""); // it's nasty when there are silences pronounced as "kleiner als sil größer als"
 //		addAlternativeVariant(fullPhrase);
 		appendContinuation(phrase);
-		phrase.ground(this);
 		List<IU> phraseWords = new ArrayList<IU>(phrase.expectedWordCount());
 		while (oldLastWord.getNextSameLevelLink() != null) {
 			IU w = oldLastWord.getNextSameLevelLink();
@@ -54,7 +53,7 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 			@SuppressWarnings("unchecked")
 			List<WordIU> newWords = (List<WordIU>) (new SysInstallmentIU(fullPhrase)).groundedIn();
 			assert newWords.size() >= groundedIn.size();
-//			assert newWords.size() == groundedIn.size() + phrase.expectedWordCount(); // for some reason, this assertion breaks sometimes
+//			assert newWords.size() == groundedIn.size() + phrase.expectedWordCount(); // for some reason, this assertion breaks sometimes -> nasty stuff going on with pauses
 			firstNewWord = newWords.get(groundedIn.size());
 		} else {
 			firstNewWord = (WordIU) (new SysInstallmentIU(phrase.toPayLoad())).groundedIn().get(0);

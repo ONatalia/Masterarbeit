@@ -80,7 +80,7 @@ public class GenerationModule extends IUModule {
 					PhraseIU finalPhrase = phrases.get(phrases.size() - 1);
 					// set phrase to final, this also removes any vocoder locks
 					finalPhrase.setFinal();
-				}				
+				}
 				rightBuffer.setBuffer(phrases);
 				rightBuffer.notify(iulisteners);
 			}
@@ -177,7 +177,7 @@ public class GenerationModule extends IUModule {
 		boolean measureTiming = false;
 		boolean playNoise = true;
 		NoiseHandling noiseHandling = NoiseHandling.regenerate;
-		String knowledgeFile = "src/org/cocolab/inpro/domains/calendar/calendar.gs";
+		String knowledgeFile = "done/inpro/system/calendar/calendar.gs";
 
 		// handle command line arguments if there are any
 		if (args.length > 0) {
