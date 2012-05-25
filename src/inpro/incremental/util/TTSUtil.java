@@ -14,9 +14,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -26,7 +26,6 @@ import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.util.JAXBResult;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
@@ -35,16 +34,18 @@ import marytts.htsengine.HTSModel;
 
 public class TTSUtil {
 	
-	public static List<WordIU> wordIUsFromMaryXML(InputStream is, List<HTSModel> hmms) throws JAXBException {
-		JAXBContext context = JAXBContext.newInstance(Paragraph.class);
-		JAXBResult result = new JAXBResult(context);
-		TransformerFactory tf = TransformerFactory.newInstance();
-		Transformer t;
-		is.mark(Integer.MAX_VALUE);
+	public static List<WordIU> wordIUsFromMaryXML(InputStream is, List<HTSModel> hmms) {
+		Paragraph paragraph ;
 		try {
+			JAXBContext context = JAXBContext.newInstance(Paragraph.class);
+			JAXBResult result = new JAXBResult(context);
+			TransformerFactory tf = TransformerFactory.newInstance();
+			Transformer t;
+			is.mark(Integer.MAX_VALUE);
 			t = tf.newTransformer(new StreamSource(TTSUtil.class.getResourceAsStream("mary2simple.xsl")));
 			t.transform(new StreamSource(is), result);
-		} catch (TransformerException te) {
+			paragraph = (Paragraph) result.getResult(); //unmarshaller.unmarshal(is);
+		} catch (Exception te) {
 			try {
 				is.reset();
 			} catch (IOException e) {
@@ -55,8 +56,19 @@ public class TTSUtil {
 			te.printStackTrace();
 			throw new RuntimeException(te);
 		}
-		Paragraph paragraph = (Paragraph) result.getResult(); //unmarshaller.unmarshal(is);
-		return paragraph.getWordIUs(hmms.iterator());
+		List<WordIU> words =  paragraph.getWordIUs(hmms.iterator());
+		// remove utterance final silences
+		ListIterator<WordIU> fromEnd = words.listIterator(words.size());
+		while (fromEnd.hasPrevious()) {
+			WordIU last = fromEnd.previous();
+			if (last.isSilence()) {
+				fromEnd.remove();
+			} else {
+				break;
+			}
+		}
+		fromEnd.next().removeAllNextSameLevelLinks();
+		return words;
 	}
 	
 	@XmlRootElement(name = "s")

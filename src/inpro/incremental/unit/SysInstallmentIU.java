@@ -2,6 +2,7 @@ package inpro.incremental.unit;
 
 import inpro.annotation.Label;
 import inpro.audio.DDS16kAudioInputStream;
+import inpro.synthesis.MaryAdapter;
 import inpro.synthesis.MaryAdapter4internal;
 import inpro.synthesis.PitchMark;
 import inpro.synthesis.hts.FullPFeatureFrame;
@@ -22,7 +23,7 @@ import marytts.modules.synthesis.Voice;
 import org.apache.log4j.Logger;
 
 /**
- * TODO: add support for canned audio (i.e. read from WAV and TextGrid, maybe even transparently)
+ * an installment that supports incremental synthesis
  * @author timo
  */
 public class SysInstallmentIU extends InstallmentIU {
@@ -31,6 +32,7 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	public SysInstallmentIU(String tts) {
 		super(null, tts);
+		groundedIn = MaryAdapter.getInstance().text2IUs(tts);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // allow cast from List<WordIU> to List<IU>

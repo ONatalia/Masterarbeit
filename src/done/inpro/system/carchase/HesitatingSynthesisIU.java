@@ -2,8 +2,6 @@ package done.inpro.system.carchase;
 
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
-
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.SegmentIU;
 import inpro.incremental.unit.SysInstallmentIU;
@@ -22,12 +20,7 @@ public class HesitatingSynthesisIU extends SysInstallmentIU {
 			tts = tts.replaceAll(" <hes>$", "");
 		} else 
 			addFinalHesitation = false;
-		try {
-			groundedIn = MaryAdapter.getInstance().text2IUs(tts);
-		} catch (JAXBException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+		groundedIn = MaryAdapter.getInstance().text2IUs(tts);
 		// remove utterance final silences
 		IU pred = groundedIn.get(groundedIn.size() - 1);
 		while (((WordIU) pred).isSilence()) {

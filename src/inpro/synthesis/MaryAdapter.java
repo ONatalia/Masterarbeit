@@ -10,11 +10,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.xml.bind.JAXBException;
+
+import marytts.htsengine.HTSModel;
 
 import org.apache.log4j.Logger;
 
@@ -111,11 +113,10 @@ public abstract class MaryAdapter {
 		return bais;
 	}
 	
-	public List<IU> text2IUs(String tts) throws JAXBException {
+	public List<IU> text2IUs(String tts) {
 		InputStream is = text2maryxml(tts);
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, null);
-		// remove utterance final silences
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, Collections.<HTSModel>emptyList());
 		return groundedIn;
 	}
 	

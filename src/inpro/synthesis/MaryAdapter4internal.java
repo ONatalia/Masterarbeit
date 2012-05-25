@@ -19,7 +19,6 @@ import java.util.Locale;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
-import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
 
@@ -61,12 +60,11 @@ public class MaryAdapter4internal extends MaryAdapter {
 	}
 
 	@Override
-	public synchronized List<IU> text2IUs(String tts) throws JAXBException {
+	public synchronized List<IU> text2IUs(String tts) {
 		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class); 
 		InputStream is = text2maryxml(tts);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, ihtse.uttHMMs);
-		// remove utterance final silences
 		return groundedIn;
 	}
 
