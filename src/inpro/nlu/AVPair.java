@@ -103,7 +103,11 @@ public class AVPair {
 	 * @param avp the AVPair to compare to
 	 * @return true if they have the same attribute and value, else false
 	 */
-	public boolean equals(AVPair avp) {
+	public boolean equals(Object o) {
+		assert o instanceof AVPair;
+		if (!(o instanceof AVPair))
+			return false;
+		AVPair avp = (AVPair) o;
 		if (avp == null)
 			return false;
 		if (this.value == null && avp.getValue() == null)

@@ -194,8 +194,8 @@ public class ContribIU extends IU {
 		return contribution.toString();
 	}
 	
-	public boolean equals(ContribIU iu) {
-		return this.contribution.equals(iu.contribution);
+	public boolean equals(Object iu) {
+		return iu instanceof ContribIU && this.contribution.equals(((ContribIU) iu).contribution);
 	}
 
 }

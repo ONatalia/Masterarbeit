@@ -95,7 +95,11 @@ public class AVM {
 	 * @param avm - an AVM to compare this AVM with.
 	 * @return true if they are the same.
 	 */
-	public boolean equals(AVM avm) {
+	public boolean equals(Object o) {
+		assert o instanceof AVM;
+		if (!(o instanceof AVM))
+			return false;
+		AVM avm = (AVM) o;
 		if (this == avm) {
 			return true;
 		} else if ((this.type != avm.type) || !avm.type.equals(this.type)) {

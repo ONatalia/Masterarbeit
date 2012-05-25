@@ -23,11 +23,12 @@ public class TagIU extends IU {
 		this.tag = tag;
 	}
 
-	public boolean equals(TagIU iu) {
-		/**
-		 * IUs are same if their tags are the same
-		 */
-		return this.tag == iu.tag;
+	/**
+	 * TagIUs are same if their tags are the same
+	 */
+	@Override
+	public boolean equals(Object iu) {
+		return iu instanceof TagIU && this.tag.equals(((TagIU) iu).tag);
 	}
 	
 	@Override
