@@ -72,13 +72,19 @@ public class ArgumentStruct {
 	 * @param as the argument structure to compare against
 	 * @return true if they have the same arguments, false if not.
 	 */
-	public boolean equals(ArgumentStruct as) {
-		if (this.isIntransitive() && as.isIntransitive()) {
-			return true;
-		} else if (this.isTransitive() && as.isTransitive()) {
-			return (this.arg1.equals(as.arg1));
+	public boolean equals(Object o) {
+		assert o instanceof ArgumentStruct;
+		if (!(o instanceof ArgumentStruct)) {
+			return false;
+		} else {
+			ArgumentStruct as = (ArgumentStruct) o;
+			if (this.isIntransitive() && as.isIntransitive()) {
+				return true;
+			} else if (this.isTransitive() && as.isTransitive()) {
+				return (this.arg1.equals(as.arg1));
+			}
+			return (this.arg1.equals(as.arg1) && this.arg2.equals(as.arg2));
 		}
-		return (this.arg1.equals(as.arg1) && this.arg2.equals(as.arg2));
 	}
 
 	/**
