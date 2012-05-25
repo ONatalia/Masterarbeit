@@ -1,7 +1,5 @@
 package inpro.irmrsc.rmrs;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -14,10 +12,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 
 //TODO: make xml output for every rmrs object
 //TODO: add sorts to variables
@@ -532,29 +527,29 @@ public class Formula extends VariableEnvironment
 		update();
 	}
 	
-	public static void main (String[]args) {
-		SAXBuilder builder = new SAXBuilder();	
-		try {
-			Document doc = builder.build(new File("/home/andreas/workspace/ISem/data/rmrs.xml"));
-			Element root = doc.getRootElement();
-			if (root.getName() == "rmrsincrement") {
-				Formula f = new Formula();
-				f.parseXML(root);
-				System.out.println(f+""+f.mVariables+"\n");
-				Formula g = new Formula(f);
-				System.out.println(g+""+g.mVariables+"\n");
-				f.forwardCombine(g);
-				System.out.println(f+""+f.mVariables+"\n");
-				//System.out.println(g+""+g.mVariables+"\n");
-				f.reduce();
-				System.out.println(f+""+f.mVariables+"\n");
-				System.out.println(f.isReduced());
-			}
-		} catch (IOException e) {
-			System.out.println(e);
-		} catch (JDOMException e) {
-			System.out.println(e);
-		}
-	}
+//	public static void main (String[]args) {
+//		SAXBuilder builder = new SAXBuilder();	
+//		try {
+//			Document doc = builder.build(new File("/home/andreas/workspace/ISem/data/rmrs.xml"));
+//			Element root = doc.getRootElement();
+//			if (root.getName() == "rmrsincrement") {
+//				Formula f = new Formula();
+//				f.parseXML(root);
+//				System.out.println(f+""+f.mVariables+"\n");
+//				Formula g = new Formula(f);
+//				System.out.println(g+""+g.mVariables+"\n");
+//				f.forwardCombine(g);
+//				System.out.println(f+""+f.mVariables+"\n");
+//				//System.out.println(g+""+g.mVariables+"\n");
+//				f.reduce();
+//				System.out.println(f+""+f.mVariables+"\n");
+//				System.out.println(f.isReduced());
+//			}
+//		} catch (IOException e) {
+//			System.out.println(e);
+//		} catch (JDOMException e) {
+//			System.out.println(e);
+//		}
+//	}
 	
 }
