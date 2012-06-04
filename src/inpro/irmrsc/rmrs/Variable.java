@@ -4,6 +4,10 @@ import org.jdom.Element;
 
 /* Mutable class */
 
+/**
+ * A variable of a {@link Type} with an integer ID.
+ * @author Andreas Peldszus
+ */
 public class Variable {
 	
 	public static enum Type { LABEL, ANCHOR, HOLE, INDEX, INDIVIDUAL, EVENT, UNDERSPEC; }
@@ -85,7 +89,10 @@ public class Variable {
 		return t+mID;
 	}
 	
-	// initializes a variable object from XML element variabel definition <vdef>
+	/**
+	 * initializes a variable object from XML element variabel definition <pre><vdef></pre>
+	 * @param e the element 
+	 */
 	public void parseXML(Element e) {
 		// id
 		mID = Integer.parseInt(e.getAttributeValue("id"));

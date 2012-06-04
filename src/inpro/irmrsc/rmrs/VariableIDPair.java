@@ -3,6 +3,10 @@ package inpro.irmrsc.rmrs;
 import java.util.Set;
 import java.util.TreeSet;
 
+/**
+ * A pair of two variable IDs. Used to represent relations betweens variable IDs like e.g. scope constraints and variable equations in {@link Formula}s.
+ * @author Andreas Peldszus
+ */
 public class VariableIDPair implements VariableIDsInterpretable {
 	
 	private int mLeft;
@@ -43,7 +47,5 @@ public class VariableIDPair implements VariableIDsInterpretable {
 	public String toString() {
 		return "[#v" + mLeft + ", #v" + mRight + "]";
 	}
-
-
 	
 }

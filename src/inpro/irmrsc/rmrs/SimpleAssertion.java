@@ -8,9 +8,8 @@ import java.util.TreeSet;
 /**
  * A simple representation of logical predicates.
  * The arguments are given as integers, representing untyped
- * variables, the predicate name is a String.
- * @author andreas
- *
+ * variables, the predicate name is a string.
+ * @author Andreas Peldszus
  */
 public class SimpleAssertion implements VariableIDsInterpretable {
 

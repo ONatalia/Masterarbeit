@@ -3,6 +3,10 @@ package inpro.irmrsc.rmrs;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A mapping from integer IDs to {@link Variable} objects.
+ * @author Andreas Peldszus
+ */
 public abstract class VariableEnvironment {
 
 	// holds all variable objects in this expression
@@ -28,7 +32,9 @@ public abstract class VariableEnvironment {
 		}
 	}
 	
-	// returns the maximal variable index in this expression
+	/**
+	 * @return the maximal variable index in this expression
+	 */
 	public int getMaxID() {
 		int i = 0; //TODO: implicitly assuming that id are always positive
 		for (Integer k : mVariables.keySet()) {
@@ -40,6 +46,8 @@ public abstract class VariableEnvironment {
 		return i;
 	}
 	
-	// updates the list of variables in this expression 
+	/**
+	 * updates the list of variables in this expression 
+	 */
 	public abstract void update();
 }
