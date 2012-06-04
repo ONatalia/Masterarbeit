@@ -2,7 +2,6 @@ package demo.inpro.system.greifarm;
 
 import inpro.incremental.IUModule;
 import inpro.incremental.unit.EditMessage;
-import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.WordIU;
 import inpro.nlu.AVPairMappingUtil;
@@ -92,7 +91,7 @@ public class GreifarmActor extends IUModule {
 						ActionIU previousAction = performedActions.peekLast();
 						if (!(previousAction instanceof ActionIU.StartActionIU)) {
 							performedActions.pollLast();
-							previousAction.update(EditType.REVOKE);
+							previousAction.revoke();
 							unusedWords.addAll((List<WordIU>) previousAction.groundedIn());
 						} else {
 							logger.warn("something's wrong: " + performedActions + previousAction + unusedWords);
@@ -146,7 +145,7 @@ public class GreifarmActor extends IUModule {
 	public void processorReset() {
 		unusedWords.clear();
 		for (ActionIU aiu : performedActions) {
-			aiu.update(EditType.COMMIT);
+			aiu.commit();
 		}
 		performedActions.clear();
 		performedActions.add(new ActionIU.StartActionIU(greifarmController));

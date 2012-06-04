@@ -33,7 +33,7 @@ public abstract class IU implements Comparable<IU> {
 	private boolean revoked = false;
 	
 	/** types of temporal progress states the IU may be in */ 
-	public enum Progress { UPCOMING, ONGOING, COMPLETED}
+	public enum Progress { UPCOMING, ONGOING, COMPLETED }
 	
 	/**
 	 * call this, if you want to provide a sameLevelLink and a groundedIn list
@@ -230,19 +230,15 @@ public abstract class IU implements Comparable<IU> {
 		return endTime() - startTime();
 	}
 		
-	@SuppressWarnings("unchecked")
 	public List<? extends IU> groundedIn() {
-		return groundedIn != null ? groundedIn : Collections.EMPTY_LIST;
+		return groundedIn != null ? groundedIn : Collections.<IU>emptyList();
 	}
 	
-	@SuppressWarnings("unchecked")
 	public List<? extends IU> grounds() {
-		return grounds != null ? grounds : Collections.EMPTY_LIST;
+		return grounds != null ? grounds : Collections.<IU>emptyList();
 	}
 
-	/**
-	 * two IUs are equal if their IDs are the same
-	 */
+	/** two IUs are equal if their IDs are the same */
 	public boolean equals(Object iu) {
 		return (iu instanceof IU && this.id == ((IU) iu).id); 
 	}
@@ -273,6 +269,10 @@ public abstract class IU implements Comparable<IU> {
 	 */
 	public void commit() {
 		this.committed = true;
+		for (IU iu : groundedIn()) {
+			iu.commit();
+		}
+		notifyListeners();
 	}
 	
 	/**
@@ -287,42 +287,10 @@ public abstract class IU implements Comparable<IU> {
 	 */
 	public void revoke() {
 		this.revoked = true;
-	}
-	
-	/**
-	 * this is used to notify an IU that it's status has changed
-	 * for example, in the abstract model, an IU might want to notify
-	 * the grounded-in IUs, that it is now commited, and hence the
-	 * grounded-in IUs have to become commited, too 
-	 * 
-	 * by convention, the ADD EditType does not result in an update, 
-	 * as adding an IU should coincide with the IU's construction
-	 * 
-	 * also, we don't notify on REVOKE (this is done by Java's Garbage
-	 * Collector and can be accessed through the finalize() method), 
-	 * leaving (for now) only the COMMIT EditType to actually result
-	 * in an update. in future, more edits (such as GROUNDED_IN_UPDATED,
-	 * ASSERTnn and so on) will result in calls to this method
-	 * 
-	 * @param edit
-	 */
-	public void update(EditType edit) {
-		switch (edit) {
-			case COMMIT: // commit what you're grounding
-				this.commit();
-				for (IU iu : groundedIn()) {
-					iu.update(edit);
-				}
-				break;
-			case REVOKE: // revoke what is grounded in you
-				this.revoke();
-				if (grounds != null)
-					for (IU iu : grounds) {
-						iu.update(edit);
-					}
-				break;
-			case ADD: // nothing to do, whoever adds us should set us up correctly
+		for (IU iu : grounds()) {
+			iu.revoke();
 		}
+		notifyListeners();
 	}
 	
 	public void ground(IU iu) {
@@ -523,6 +491,10 @@ public abstract class IU implements Comparable<IU> {
 			}
 	}
 	
+	public interface IUUpdateListener {
+		public void update(IU updatedIU);
+	}
+
 	/** registers an update listener with all groundedIn-IUs that call our own update listeners */
 	public void updateOnGrinUpdates() {
 		IUUpdateListener listener = new IUUpdateListener() {
@@ -536,8 +508,18 @@ public abstract class IU implements Comparable<IU> {
 		}
 	}
 	
-	public interface IUUpdateListener {
-		public void update(IU updatedIU);
+/*	public void commitRecursively() {
+		IUUpdateListener listener = new IUUpdateListener() {
+			@Override 
+			public void update(IU updatedIU) {
+				if (updatedIU.isCommitted())
+			}
+		}
+		this.commit();
 	}
-
+	
+	public void revokeRecursively() {
+		
+	} */
+	
 }

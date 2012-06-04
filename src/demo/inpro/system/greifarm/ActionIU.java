@@ -1,6 +1,5 @@
 package demo.inpro.system.greifarm;
 
-import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
 
 import java.util.List;
@@ -40,7 +39,7 @@ public class ActionIU extends IU {
 			// if sll="weiter", and this="rechts", we must make sure that it's not part of "links. weiter rechts"
 			// if that is the case, we have to revert the action associated with "weiter" and 
 			if (sll.realizedDirection() != type) {  
-				sll.update(EditType.REVOKE);
+				sll.revoke();
 				this.actionStrength = strengthModifier;
 			} else {
 				this.actionStrength = ActionStrength.NONE;
@@ -138,37 +137,35 @@ public class ActionIU extends IU {
 	}
 	
 	@Override
-	public void update(EditType edit) {
-		switch (edit) {
-		case REVOKE:
-			logger.debug("reverted: " + toString());
-			switch (type) {
-			case DROP: 
-				logger.info("I cannot revert dropping. Sorry for that..."); 
-				break;
-			case LEFT: // reverting any of the move actions means going back to where we started from
-			case RIGHT:
-			case CONTINUE:
-			case REVERSE:
-			case STOP: // reverting a stop action means going back to what we previously wanted
-				logger.info("reverting stop with distance to goal: " + distanceToGoal);
-				if (predecessor() != null) // && !predecessor().precedesPause)
-					predecessor().reexecute(); 
-				break;
-			default: 
-				// TODO/FIXME: revocation of other actions are ignored for now
-			}
+	public void revoke() {
+		super.revoke();
+		logger.debug("reverted: " + toString());
+		switch (type) {
+		case DROP: 
+			logger.info("I cannot revert dropping. Sorry for that..."); 
 			break;
-		case COMMIT:
-			if (type.equals(ActionType.STOP) && distanceToGoal != Integer.MAX_VALUE) {
-				logger.info("committing a stop with distance " + distanceToGoal);
-			}
+		case LEFT: // reverting any of the move actions means going back to where we started from
+		case RIGHT:
+		case CONTINUE:
+		case REVERSE:
+		case STOP: // reverting a stop action means going back to what we previously wanted
+			logger.info("reverting stop with distance to goal: " + distanceToGoal);
+			if (predecessor() != null) // && !predecessor().precedesPause)
+				predecessor().reexecute(); 
 			break;
-		default:
-			logger.debug("ignoring edit " + edit);				
+		default: 
+			// revocation of other actions are ignored for now
 		}
 	}
-
+	
+	@Override
+	public void commit() {
+		super.commit();
+		if (type.equals(ActionType.STOP) && distanceToGoal != Integer.MAX_VALUE) {
+			logger.info("committing a stop with distance " + distanceToGoal);
+		}
+	}
+	
 	protected static class StartActionIU extends ActionIU {
 
 		StartActionIU(GreifarmController greifarm) {

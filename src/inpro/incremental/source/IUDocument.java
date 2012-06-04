@@ -81,7 +81,8 @@ public class IUDocument extends PlainDocument {
 		// add commit messages
 		for (TextualWordIU iu : wordIUs) {
 			edits.add(new EditMessage<TextualWordIU>(EditType.COMMIT, iu));
-			iu.update(EditType.COMMIT);
+			iu.commit();
+//			iu.update(EditType.COMMIT);
 		}
 		// notify
 		notifyListeners();

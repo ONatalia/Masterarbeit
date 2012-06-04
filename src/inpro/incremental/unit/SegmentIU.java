@@ -119,9 +119,9 @@ public class SegmentIU extends IU {
 		return VOWELS.contains(l.getLabel());
 	}
 	
+/* this code is helpful for prosodic feature extraction * /
 	@Override
 	public void update(EditType edit) {
-/* this code is helpful for prosodic feature extraction * /
 		if (edit == EditType.COMMIT) {
 			double time = startTime() + 1 * ResultUtil.FRAME_TO_SECOND_FACTOR;
 			for (; time <= endTime() + 0.00001; time += 1 * ResultUtil.FRAME_TO_SECOND_FACTOR) { 
@@ -137,8 +137,8 @@ public class SegmentIU extends IU {
 				                  isVowel() ? 'V' : isSilence() ? 'S' : 'C');
 			}
 		}
-/**/
 	}
+/**/
 
 	@Override
 	public String toPayLoad() {

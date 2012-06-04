@@ -136,7 +136,8 @@ public class CurrentASRHypothesis implements Configurable, ResultListener, Monit
 		List<EditMessage<WordIU>> edits = new ArrayList<EditMessage<WordIU>>(ius.size());
 		for (WordIU iu : ius) {
 			edits.add(new EditMessage<WordIU>(EditType.COMMIT, iu));
-			iu.update(EditType.COMMIT);
+			iu.commit();
+//			iu.update(EditType.COMMIT);
 		}
 		for (PushBuffer listener : listeners) {
 			listener.hypChange(ius, edits);

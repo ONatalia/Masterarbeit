@@ -75,7 +75,7 @@
     <!-- ******************************************************** -->
     <!-- The incremental processing configuration                 -->
     <!-- ******************************************************** -->
-    <component name="currentASRHypothesis" type="inpro.incremental.processor.CurrentASRHypothesis">
+    <component name="currentASRHypothesis" type="inpro.incremental.source.CurrentASRHypothesis">
         <property name="recognizer" value="recognizer"/>
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
@@ -113,10 +113,10 @@
     </component>
     <component name="nonIncr" type="inpro.incremental.deltifier.NonIncrementalDeltifier"/>
 
-    <component name="consoleNotifier" type="inpro.incremental.listener.ConsoleNotifier"/>
-    <component name="tedNotifier" type="inpro.incremental.listener.TEDviewNotifier"/>
-    <component name="labelWriter2" type="inpro.incremental.listener.LabelWriter"/>
-    <component name="hypViewer" type="inpro.incremental.listener.CurrentHypothesisViewer"/>
+    <component name="consoleNotifier" type="inpro.incremental.sink.ConsoleNotifier"/>
+    <component name="tedNotifier" type="inpro.incremental.sink.TEDviewNotifier"/>
+    <component name="labelWriter2" type="inpro.incremental.sink.LabelWriter"/>
+    <component name="hypViewer" type="inpro.incremental.sink.CurrentHypothesisViewer"/>
 
     <component name="threadingListener" type="inpro.sphinx.instrumentation.ThreadingListener">
         <property name="recognizer" value="${recognizer}"/>
@@ -302,17 +302,12 @@
 
     <component name="endpointing" type="edu.cmu.sphinx.frontend.FrontEnd">
         <propertylist name="pipeline">
-<!--
-            <item>sessionWavWriter</item> 
--->
             <item>speechClassifier</item>
             <item>speechStateVisualizer</item>
             <item>speechMarker</item>
             <item>nonSpeechDataFilter</item>
             <item>utteranceWavWriter</item>
             <item>timePasser</item>
-<!--
--->
         </propertylist>
     </component>
 
@@ -341,22 +336,11 @@
         <property name="signedData" value="true"/>
     </component>
  
-    <component name="RTPDataSource" type="inpro.sphinx.frontend.RtpRecvProcessor"/>
-
     <component name="oaaDispatchStream" type="inpro.audio.OAADispatchStream">
         <property name="agentName" value="dispatchStream"/>
         <property name="goalPrefix" value="x"/>
         <property name="sendSilence" value="false"/>
     </component>
-
-    <component name="sessionWavWriter" type="inpro.sphinx.frontend.WavTEDLogger">
-        <property name="tedTrack" value="audio"/>
-        <property name="outFilePattern" value="/tmp/session."/>
-    </component>
-
-	<component name="dataThrottle" type="inpro.sphinx.frontend.DataThrottle">
-		<property name="speed" value="1.0"/>
-	</component>
 
     <component name="speechClassifier" type="edu.cmu.sphinx.frontend.endpoint.SpeechClassifier">
         <property name="threshold" value="${threshold}"/>
