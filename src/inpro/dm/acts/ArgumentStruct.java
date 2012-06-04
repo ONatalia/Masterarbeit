@@ -86,6 +86,16 @@ public class ArgumentStruct {
 			return (this.arg1.equals(as.arg1) && this.arg2.equals(as.arg2));
 		}
 	}
+	
+	@Override
+	public int hashCode() {
+		if (this.isIntransitive())
+			return 0;
+		if (this.isTransitive())
+			return arg1.hashCode();
+		return arg1.hashCode() * 71 + 73 * arg2.hashCode(); 
+	}
+
 
 	/**
 	 * Getter for this structure's first argument

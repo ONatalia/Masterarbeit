@@ -11,7 +11,7 @@ public class AVPair {
 	/**
 	 * Attribute and values
 	 */
-	private String attribute;
+	private final String attribute;
 	private Object value;
 	// TODO: restrict to only specific object types
 
@@ -108,12 +108,17 @@ public class AVPair {
 		if (!(o instanceof AVPair))
 			return false;
 		AVPair avp = (AVPair) o;
-		if (avp == null)
-			return false;
-		if (this.value == null && avp.getValue() == null)
+		if (this.value == null || avp.getValue() == null)
 			return (this.attribute.equals(avp.getAttribute()));		
 		return (this.attribute.equals(avp.attribute) &&
 				this.value.equals(avp.value));
+	}
+	
+	@Override
+	public int hashCode() {
+		if (this.value == null)
+			return this.attribute.hashCode();
+		return this.attribute.hashCode() * 73 + this.value.hashCode() * 71;
 	}
 	
 	/**

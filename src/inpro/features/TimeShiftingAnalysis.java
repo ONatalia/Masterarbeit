@@ -82,6 +82,7 @@ public class TimeShiftingAnalysis implements Resetable {
 	}
 	
 	protected void doRegression() {
+		assert !dataPoints.isEmpty();
 		if (dirty) {
 			dirty = false;
 			// sums of t and x

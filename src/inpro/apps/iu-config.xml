@@ -7,7 +7,7 @@
     <!-- ******************************************************** -->
     <!-- The incremental processing configuration                 -->
     <!-- ******************************************************** -->
-    <component name="currentASRHypothesis" type="inpro.incremental.processor.CurrentASRHypothesis">
+    <component name="currentASRHypothesis" type="inpro.incremental.source.CurrentASRHypothesis">
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
@@ -75,13 +75,12 @@
         <property name="smoothing" value="${deltifierParam}"/>
     </component>
 
-    <component name="outputForSimpleText" type="inpro.incremental.listener.OutputForSimpleText"/>
-    <component name="consoleNotifier" type="inpro.incremental.listener.ConsoleNotifier"/>
-    <component name="oaaNotifier" type="inpro.incremental.listener.OAANotifier"/>
-    <component name="tedNotifier" type="inpro.incremental.listener.TEDviewNotifier"/>
-    <component name="labelWriter2" type="inpro.incremental.listener.LabelWriter"/>
-    <component name="hypViewer" type="inpro.incremental.listener.CurrentHypothesisViewer"/>
-    <component name="iuNetworkViewer" type="inpro.incremental.listener.IUNetworkViewer"/>
+    <component name="outputForSimpleText" type="inpro.incremental.sink.OutputForSimpleText"/>
+    <component name="consoleNotifier" type="inpro.incremental.sink.ConsoleNotifier"/>
+    <component name="tedNotifier" type="inpro.incremental.sink.TEDviewNotifier"/>
+    <component name="labelWriter2" type="inpro.incremental.sink.LabelWriter"/>
+    <component name="hypViewer" type="inpro.incremental.sink.CurrentHypothesisViewer"/>
+    <component name="iuNetworkViewer" type="inpro.incremental.sink.IUNetworkViewer"/>
 
     <component name="oaaDispatchStream" type="inpro.audio.OAADispatchStream">
         <!-- this is an OAA agent name, it has nothing to do with the identically named component below -->
