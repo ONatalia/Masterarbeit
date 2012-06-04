@@ -1,7 +1,6 @@
-package work.inpro.incremental.processor;
+package inpro.incremental.processor;
 
 import inpro.incremental.IUModule;
-import inpro.incremental.processor.TagParser;
 import inpro.incremental.unit.CandidateAnalysisIU;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
@@ -446,7 +445,7 @@ public class RMRSComposer extends IUModule {
 		this.rightBuffer.setBuffer(newEdits);
 	}
 
-	private double calculateIncrementalScore(List<Integer> history) {
+/*	private double calculateIncrementalScore(List<Integer> history) {
 		double iscore = 0;
 		int m = history.size();
 		if (m != 0) {
@@ -458,7 +457,7 @@ public class RMRSComposer extends IUModule {
 			iscore = -999;
 		}
 		return iscore;
-	}
+	} */
 	
 	/**
 	 * Sets the gold string rep in case one wants to evaluate if a composer/resolver did the right thing.

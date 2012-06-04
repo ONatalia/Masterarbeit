@@ -19,7 +19,7 @@ import org.jdom.Element;
 
 public class Formula extends VariableEnvironment
 					 implements VariableIDsInterpretable {
-		
+	
 	// Hook
 	private Hook mHook;
 
@@ -36,7 +36,7 @@ public class Formula extends VariableEnvironment
 	private List<VariableIDPair> mEqs;
 	
 	// cp constr.
-	public Formula (Formula f) {
+	public Formula(Formula f) {
 		// deep copy vars, not only copying collections
 		super(f);
 		mHook = new Hook(f.mHook);		
@@ -50,7 +50,7 @@ public class Formula extends VariableEnvironment
 		for (VariableIDPair p : f.mEqs) mEqs.add(new VariableIDPair(p));
 	}
 	
-	public Formula () {
+	public Formula() {
 		super();
 		mSlots = new ArrayDeque<Hook>();
 		mRels = new ArrayList<Relation>();
@@ -58,9 +58,8 @@ public class Formula extends VariableEnvironment
 		mEqs = new ArrayList<VariableIDPair>();		
 	}
 	
-	
 	// make a simple new formula for a lexical object
-	public Formula (String lexname, Variable.Type semtype) {
+	public Formula(String lexname, Variable.Type semtype) {
 		this();
 		// make variable ids
 		int l=0, a=1, i=2;
