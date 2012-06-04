@@ -19,19 +19,14 @@ import org.jdom.Element;
 public class Formula extends VariableEnvironment
 					 implements VariableIDsInterpretable {
 	
-	// Hook
 	private Hook mHook;
-
-	// Slots
 	private Deque<Hook> mSlots;
-
-	// Relations
 	private List<Relation> mRels;
 	
-	// Scope Constraints
+	/** Scope Constraints */
 	private List<VariableIDPair> mScons;
 	
-	// Variable Equalities
+	/** Variable Equalities */
 	private List<VariableIDPair> mEqs;
 	
 	// cp constr.
@@ -272,12 +267,6 @@ public class Formula extends VariableEnvironment
 	@Override
 	public String toString() {
 		return this.toRMRSString();
-//		List<SimpleAssertion> l = this.getUnscopedPredicateLogic();
-//		StringBuilder sb = new StringBuilder();
-//		for (SimpleAssertion sa : l) {
-//			sb.append(sa.toString()+"\\n");
-//		}
-//		return sb.toString();
 	}
 
 	public String toStringOneLine() {
@@ -508,30 +497,5 @@ public class Formula extends VariableEnvironment
 		}
 		update();
 	}
-	
-//	public static void main (String[]args) {
-//		SAXBuilder builder = new SAXBuilder();	
-//		try {
-//			Document doc = builder.build(new File("/home/andreas/workspace/ISem/data/rmrs.xml"));
-//			Element root = doc.getRootElement();
-//			if (root.getName() == "rmrsincrement") {
-//				Formula f = new Formula();
-//				f.parseXML(root);
-//				System.out.println(f+""+f.mVariables+"\n");
-//				Formula g = new Formula(f);
-//				System.out.println(g+""+g.mVariables+"\n");
-//				f.forwardCombine(g);
-//				System.out.println(f+""+f.mVariables+"\n");
-//				//System.out.println(g+""+g.mVariables+"\n");
-//				f.reduce();
-//				System.out.println(f+""+f.mVariables+"\n");
-//				System.out.println(f.isReduced());
-//			}
-//		} catch (IOException e) {
-//			System.out.println(e);
-//		} catch (JDOMException e) {
-//			System.out.println(e);
-//		}
-//	}
 	
 }
