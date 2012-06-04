@@ -40,6 +40,10 @@ public class Variable {
 	public Type getType() {
 		return mType;
 	}
+	
+	public boolean isSpecifiedIndexVariable() {
+		return getType().equals(Type.EVENT) || getType().equals(Type.EVENT);
+	}
 
 	public void setID(int ID) {
 		this.mID = ID;

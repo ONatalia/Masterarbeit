@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 import org.jdom.Element;
 
 //TODO: make xml output for every rmrs object
-//TODO: add sorts to variables
 
 public class Formula extends VariableEnvironment
 					 implements VariableIDsInterpretable {
@@ -58,7 +57,7 @@ public class Formula extends VariableEnvironment
 		mEqs = new ArrayList<VariableIDPair>();		
 	}
 	
-	// make a simple new formula for a lexical object
+	/** make a simple new formula for a lexical object */
 	public Formula(String lexname, Variable.Type semtype) {
 		this();
 		// make variable ids
@@ -81,8 +80,8 @@ public class Formula extends VariableEnvironment
 		}
 	}
 	
-	// applies all variable equalities
-	public void reduce () {
+	/** applies all variable equalities */
+	public void reduce() {
 		// iterate all variable equalities
 		int m = mEqs.size();
 		for (int i = 0; i < m ; i++) {
@@ -96,36 +95,20 @@ public class Formula extends VariableEnvironment
 				this.mVariables.remove(oldID);
 				this.replaceVariableID(oldID, newID);
 			} else {
-				// check type hierarchy: indexes can be specified to x or e.
+				// check type hierarchy: indexes can be specified to individuals or events
 				int oldID = reduce.getID();
 				int newID = reduceTo.getID();
-				if (reduceTo.getType() == Variable.Type.INDEX) {
-					switch(reduce.getType()) {
-					case EVENT:
-						reduceTo.setType(Variable.Type.EVENT);
-						this.mVariables.remove(oldID);
-						this.replaceVariableID(oldID, newID);
-						break;
-					case INDIVIDUAL:
-						reduceTo.setType(Variable.Type.INDIVIDUAL);
-						this.mVariables.remove(oldID);
-						this.replaceVariableID(oldID, newID);
-						break;
-					}
+				if (reduceTo.getType() == Variable.Type.INDEX && reduce.isSpecifiedIndexVariable()) {
+					reduceTo.setType(reduce.getType());
+					this.mVariables.remove(oldID);
+					this.replaceVariableID(oldID, newID);
 				}
-				if (reduce.getType() == Variable.Type.INDEX){
+				if (reduce.getType() == Variable.Type.INDEX && reduceTo.isSpecifiedIndexVariable()){
 					// no need to replace reduceTo type, but replace ids.
-					switch(reduceTo.getType()) {
-					case EVENT:
-					case INDIVIDUAL:
-						this.mVariables.remove(oldID);
-						this.replaceVariableID(oldID, newID);
-						break;
-					}
+					this.mVariables.remove(oldID);
+					this.replaceVariableID(oldID, newID);
 				}
-				
-				// cnt mismatches, reduce gracefully
-				// TODO:
+				// TODO: cnt mismatches, reduce gracefully
 			}
 		}
 	}
