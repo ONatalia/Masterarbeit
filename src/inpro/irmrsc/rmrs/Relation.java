@@ -5,6 +5,16 @@ import java.util.TreeSet;
 
 import org.jdom.Element;
 
+/**
+ * A relation in a RMRS {@link Formula}.
+ * <p />
+ * All relations have an anchor variable, as well as a relation name and a
+ * type. Lexical relations (representing lexemes) and nonlexical relations
+ * (introduced by the grammar) also have a label and usually have an argument.
+ * Argument relations (expressing predicate argument structure) have no label
+ * but always an argument.
+ * @author Andreas Peldszus
+ */
 public class Relation implements VariableIDsInterpretable {
 	
 	public static enum Type { LEXICAL, NONLEXICAL, ARGREL; }
@@ -41,7 +51,7 @@ public class Relation implements VariableIDsInterpretable {
 		this.mAnchor = r.getAnchor();
 		this.mArgument = r.getArgument();
 		this.mArgumentGiven = r.hasArgument();
-		this.mName = r.getName();
+		this.mName = new String(r.getName());
 		this.mType = r.getType();
 	}
 	

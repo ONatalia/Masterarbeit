@@ -1,5 +1,11 @@
-package inpro.irmrsc.rmrs;
+package inpro.irmrsc.util;
 
+import inpro.irmrsc.rmrs.Formula;
+
+/**
+ * A semantic macro is a RMRS {@link Formula} identified by a short name or a long name. 
+ * @author Andreas Peldszus
+ */
 public class SemanticMacro {
 
 	private String shortName;
@@ -20,34 +26,19 @@ public class SemanticMacro {
 		formula = f;
 	}
 
-	/**
-	 * @return the shortName
-	 */
 	public String getShortName() {
 		return shortName;
 	}
 
-	/**
-	 * @return the longName
-	 */
 	public String getLongName() {
 		return longName;
 	}
 
-	/**
-	 * @return the formula
-	 */
 	public Formula getFormula() {
 		return formula;
 	}
 
-	/**
-	 * @param formula the formula to set
-	 */
 	public void setFormula(Formula formula) {
 		this.formula = formula;
 	}
-	
-	
-	
 }

@@ -10,9 +10,9 @@ import inpro.incremental.unit.TagIU;
 import inpro.incremental.unit.WordIU;
 import inpro.irmrsc.parser.CandidateAnalysis;
 import inpro.irmrsc.rmrs.Formula;
-import inpro.irmrsc.rmrs.SemanticMacro;
 import inpro.irmrsc.rmrs.Variable;
 import inpro.irmrsc.util.RMRSLoader;
+import inpro.irmrsc.util.SemanticMacro;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -81,9 +81,9 @@ public class RMRSComposer extends IUModule {
 	private static FormulaIU firstUsefulFormulaIU;
 	//private final static double MALUS_SEMANTIC_MISMATCH = 0.7;
 	
-	/** The history of compare-to-gold values of each incremental step with 1best evaluation*/
+	/** The history of compare-to-gold values of each incremental step with 1best evaluation */
 	private static List<Integer> compareToGoldValueHistory1Best;
-	/** The history of compare-to-gold values of each incremental step with 5best evaluation*/
+	/** The history of compare-to-gold values of each incremental step with 5best evaluation */
 	private static List<Integer> compareToGoldValueHistory5Best;
 	
 	@SuppressWarnings("unchecked")

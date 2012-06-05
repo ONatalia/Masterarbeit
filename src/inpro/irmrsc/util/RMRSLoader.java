@@ -1,7 +1,6 @@
 package inpro.irmrsc.util;
 
 import inpro.irmrsc.rmrs.Formula;
-import inpro.irmrsc.rmrs.SemanticMacro;
 import inpro.irmrsc.rmrs.Variable;
 
 import java.io.IOException;
@@ -16,14 +15,24 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
+/**
+ * A helper class to load the semantic macros, the mapping from syntactic rules
+ * to semantic macros and the POS-tag lexicon.
+ * @author Andreas Peldszus
+ */
 public class RMRSLoader {
 	
+	/**
+	 * Loads a xml specification of semantic macros from a given url.
+	 * @param url the specified url of the xml to load
+	 * @return the list of semantic macros
+	 */
 	@SuppressWarnings("unchecked")
-	public static List<SemanticMacro> loadMacros (URL fileURL) {
+	public static List<SemanticMacro> loadMacros (URL url) {
 		List<SemanticMacro> l = new ArrayList<SemanticMacro>();
 		SAXBuilder builder = new SAXBuilder();	
 		try {
-			Document doc = builder.build(fileURL.openStream());
+			Document doc = builder.build(url.openStream());
 			Element root = doc.getRootElement();
 			if (root.getName() == "semmacros") {
 				List<Element> macros = root.getChildren("defmacro");
@@ -43,14 +52,19 @@ public class RMRSLoader {
 		}
 		return l;
 	}
-	
-	// read the mapping syntactic rule id <-> semantic macro longname
+
+	/**
+	 * Loads a xml specification of the mapping between syntactic rules IDs
+	 * and semantic macro longnames. 
+	 * @param url the specified url of the xml to load
+	 * @return the mapping
+	 */
 	@SuppressWarnings("unchecked")
-	public static Map<String,String> loadRules (URL fileURL) {
+	public static Map<String,String> loadRules (URL url) {
 		Map<String,String> map = new HashMap<String,String>();
 		SAXBuilder builder = new SAXBuilder();	
 		try {
-			Document doc = builder.build(fileURL.openStream());
+			Document doc = builder.build(url.openStream());
 			Element root = doc.getRootElement();
 			if (root.getName() == "semrules") {
 				List<Element> rules = root.getChildren("defrule");
@@ -68,12 +82,19 @@ public class RMRSLoader {
 		return map;
 	}
 	
+	/**
+	 * Loads a xml specification of the mapping between POS-tags and the
+	 * basic semantic types that lexical predicate formulas of words with
+	 * this tags receive.
+	 * @param url the specified url of the xml to load
+	 * @return the mapping from POS-tags as Strings to {@link Variable.Type}s
+	 */
 	@SuppressWarnings("unchecked")
-	public static Map<String,Variable.Type> loadTagLexicon (URL fileURL) {
+	public static Map<String,Variable.Type> loadTagLexicon (URL url) {
 		Map<String,Variable.Type> map = new HashMap<String,Variable.Type>();
 		SAXBuilder builder = new SAXBuilder();	
 		try {
-			Document doc = builder.build(fileURL.openStream());
+			Document doc = builder.build(url.openStream());
 			Element root = doc.getRootElement();
 			if (root.getName() == "taglexicon") {
 				List<Element> entries = root.getChildren("map");
@@ -89,7 +110,7 @@ public class RMRSLoader {
 						case '_' : mType = null; break;
 						}
 					} else {
-						System.out.println("Warning: No specific semantic type given for tag"+tag+".");
+						System.out.println("Warning: No specific semantic type given for tag "+tag+".");
 					}
 					map.put(tag, mType);
 				}
@@ -102,41 +123,4 @@ public class RMRSLoader {
 		return map;
 	}
 	
-//	public static void main (String [] args) {
-//		try {
-//			List<SemanticMacro> l = loadMacros(new URL("file:/home/andreas/workspace/Inpro/src/inpro/domains/pentomino/resources/irmrsc-semmacros.xml"));
-//			Map<String,Formula> macrosLongname = new HashMap<String,Formula>();
-//			Map<String,Formula> macrosShortname = new HashMap<String,Formula>();
-//			for (Map.Entry<String, Formula> e : m.entrySet()) {
-//				String[] name = e.getKey().split("##");
-//				if (! name[0].equals("null")) macrosShortname.put(name[0], e.getValue());
-//				if (! name[1].equals("null")) macrosLongname.put(name[0], e.getValue());
-//			}
-//
-//			
-//			Map<String,String> rules = loadRules(new URL("file:/home/andreas/workspace/Inpro/src/inpro/domains/pentomino/resources/irmrsc-semrules.xml"));
-//			System.out.println(rules);
-//			for (Map.Entry<String, String> e : rules.entrySet()) {
-//				String[] name = e.getValue().split("##");
-//				System.out.println(Arrays.asList(name));
-//				if (name[0].equals("null")) {
-//					if (! macrosShortname.containsKey(name[1])) {
-//						System.out.println("BAD");
-//					} else {
-//						System.out.println("good");
-//					}
-//				
-//				} else {
-//					if (! macrosLongname.containsKey(name[0])) {
-//						System.out.println("BAD");
-//					} else {
-//						System.out.println("Good");
-//					}
-//				}
-//			}
-//		} catch (MalformedURLException e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	
 }

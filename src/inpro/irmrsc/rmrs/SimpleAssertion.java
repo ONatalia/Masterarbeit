@@ -17,52 +17,23 @@ public class SimpleAssertion implements VariableIDsInterpretable {
 	private String predicateName;
 	private List<Integer> arguments;
 	
-	/**
-	 * @param predicateName
-	 * @param arguments
-	 */
 	public SimpleAssertion(String predicateName, List<Integer> arguments) {
 		this.predicateName = predicateName;
 		this.arguments = arguments;
 	}
 	
-	/**
-	 * @param predicateName
-	 * @param arguments
-	 */
-	public SimpleAssertion(String predicateName, int[] arguments) {
-		this.predicateName = predicateName;
-		this.arguments = new ArrayList<Integer>(arguments.length);
-		for (int i : arguments) {
-			this.arguments.add(i);
-		}
-	}
-	
-	/**
-	 * @return the predicateName
-	 */
 	public String getPredicateName() {
 		return predicateName;
 	}
-	
-	/**
-	 * @return the arguments
-	 */
+
 	public List<Integer> getArguments() {
 		return arguments;
 	}
 	
-	/**
-	 * @return the number of arguments
-	 */
 	public int getNumberOfArguments() {
 		return arguments.size();
 	}
 	
-	/**
-	 * Gets the type of assertions (transtivive with one, ditransitive with two or intransitive with 0 arguments)
-	 * @return the Type
-	 */
 	public Type getType() {
 		if (this.getNumberOfArguments() == 2) {
 			return Type.DITRANSITIVE;
@@ -72,9 +43,6 @@ public class SimpleAssertion implements VariableIDsInterpretable {
 		return Type.INTRANSITIVE;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
