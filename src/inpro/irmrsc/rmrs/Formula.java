@@ -14,8 +14,14 @@ import java.util.regex.Pattern;
 
 import org.jdom.Element;
 
-//TODO: make xml output for every rmrs object
-
+/**
+ * A RMRS formula, consisting of a hook, a stack of slots and a bag of relations,
+ * scope constraints and variable equalities.
+ * <p/>
+ * RMRS formulas are usually built by by creating new ones from lexical predicate names
+ * or by loading them from xml-specifications. They can be combined with other formulas.
+ * @author Andreas Peldszus
+ */
 public class Formula extends VariableEnvironment
 					 implements VariableIDsInterpretable {
 	
@@ -29,7 +35,6 @@ public class Formula extends VariableEnvironment
 	/** Variable Equalities */
 	private List<VariableIDPair> mEqs;
 	
-	// cp constr.
 	public Formula(Formula f) {
 		// deep copy vars, not only copying collections
 		super(f);
@@ -44,6 +49,7 @@ public class Formula extends VariableEnvironment
 		for (VariableIDPair p : f.mEqs) mEqs.add(new VariableIDPair(p));
 	}
 	
+	/** default constructor, only used for xml loading */
 	public Formula() {
 		super();
 		mSlots = new ArrayDeque<Hook>();
@@ -75,7 +81,9 @@ public class Formula extends VariableEnvironment
 		}
 	}
 	
-	/** applies all variable equalities */
+	/** applies all variable equalities by replacing the corresponding variable IDs.
+	 * <p/>
+	 * Type-underspecified variables that are equated with type-specified variables may be specified in this process.*/
 	public void reduce() {
 		// iterate all variable equalities
 		int m = mEqs.size();
@@ -116,14 +124,21 @@ public class Formula extends VariableEnvironment
 		return mSlots.isEmpty();
 	}
 	
-	// implemented as mutation. if fc fails use another method to build
-	// gracefully degraded results.
+	/** combines the given formula with this formula in a 'forward function composition' manner.
+	 * <p/>
+	 * The top slot of this formula is consumed by the argument formula. The argument formula
+	 * content is added to this formula. Variable of the consumed slot and the argument formula's
+	 * hook are equated. Variable equations may be reduced by {@link #reduce()} afterwards.
+	 * <p/>
+	 * This combination is implemented as mutation. The argument formula is not changed. */
 	public boolean forwardCombine(Formula fo) {
+		// TODO: If forward combination fails, return false and use another (yet not implemented)
+		//       method to build gracefully degraded results.
+		
 		// copy argument formula so that it is not changed by renumbering
 		Formula f = new Formula(fo);
-		// renumber f
+		// renumber it starting from an ID higher than the highest of this formula
 		f.renumber(this.getMaxID()+1);
-//		System.out.println("N "+f.toRMRSString());
 		
 		// join variable assignments
 		for (Map.Entry<Integer, Variable> e : f.mVariables.entrySet()) {
@@ -156,7 +171,7 @@ public class Formula extends VariableEnvironment
 		return true;
 	}
 	
-	// simply adding another formula without consuming a slot and equating variables
+	/** simply adds another formula to this formula without consuming a slot and equating variables */
 	public void simpleAdd(Formula fo) {
 		Formula f = new Formula(fo);
 		f.renumber(this.getMaxID()+1);
@@ -175,6 +190,7 @@ public class Formula extends VariableEnvironment
 		//       -> we will only add lexical formulas without slots
 	}
 	
+	@Override
 	public Set<Integer> getVariableIDs() {
 		Set<Integer> s = new TreeSet<Integer>();
 		// hook
@@ -189,8 +205,23 @@ public class Formula extends VariableEnvironment
 		for (VariableIDPair p : mEqs) s.addAll(p.getVariableIDs());
 		return s;
 	}
+
+	@Override
+	public void replaceVariableID(int oldID, int newID) {
+		// hook
+		mHook.replaceVariableID(oldID, newID);
+		// slots
+		for (Hook h : mSlots) h.replaceVariableID(oldID, newID);
+		// rels
+		for (Relation r : mRels) r.replaceVariableID(oldID, newID);
+		// scons
+		for (VariableIDPair p : mScons) p.replaceVariableID(oldID, newID);
+		// eqs
+		for (VariableIDPair p : mEqs) p.replaceVariableID(oldID, newID);
+	}
 	
-	public void update() {
+	/** warns if variable IDs in this expression are not defined in the underlying {@link VariableEnvironment}. */
+	public void checkVariableEnvironmentConsistency() {
 		Set<Integer> s = this.getVariableIDs();
 		// check for undefined variables
 		for (Integer i : s) {
@@ -201,28 +232,8 @@ public class Formula extends VariableEnvironment
 		}
 		// ... is there more to do here?
 	}
-
-	public void replaceVariableID(int oldID, int newID) {
-		//hook
-		mHook.replaceVariableID(oldID, newID);
-		//slots
-		for (Hook h : mSlots) h.replaceVariableID(oldID, newID);
-		//rels
-		for (Relation r : mRels) r.replaceVariableID(oldID, newID);
-		//scons
-		for (VariableIDPair p : mScons) p.replaceVariableID(oldID, newID);
-		//eqs
-		for (VariableIDPair p : mEqs) p.replaceVariableID(oldID, newID);
-	}
 	
-	// reassigns new indices for all variables in this expression 
-	// starting from 0
-	public void renumber() {
-		this.renumber(0);
-	}
-	
-	// reassigns new indices for all variables in this expression 
-	// starting from StartIndex
+	/** reassigns new IDs for all variables in this expression starting from StartIndex */
 	public void renumber(int StartIndex) {
 		int myMaxID = this.getMaxID();
 		if (StartIndex <= myMaxID) {
@@ -231,8 +242,13 @@ public class Formula extends VariableEnvironment
 		this.rerenumber(StartIndex);
 	}
 	
-	// if startindex is smaller than the max index in this formula, bad things will happen.
+	/** reassigns new IDs for all variables in this expression starting from 0 */
+	public void renumber() {
+		this.renumber(0);
+	}
+	
 	private void rerenumber(int StartIndex) {
+		// if startindex is smaller than the max index in this formula, bad things will happen.
 		int cntNewID = StartIndex;
 		Map<Integer,Integer> oldToNewIDs = new HashMap<Integer,Integer>();
 		HashMap<Integer,Variable> newVariables = new HashMap<Integer,Variable>(this.mVariables);
@@ -308,7 +324,8 @@ public class Formula extends VariableEnvironment
 		return sb.toString();
 	}
 	
-
+	/** a first, unfinished implementation to extract unscoped predicate logic statements
+	 *  of this rmrs, i.e. to get rid of the predicate-argument factorisation */
 	public List<SimpleAssertion> getUnscopedPredicateLogic() {
 		List<SimpleAssertion> l = new ArrayList<SimpleAssertion>();
 		// find all anchors ids
@@ -377,7 +394,8 @@ public class Formula extends VariableEnvironment
 	}
 	
 	
-	// not yet fully working
+	/** @return a list of predicate logic statements involving all individual variables
+	 * in the formula, but not necessarily the other variables */
 	public List<SimpleAssertion> getNominalAssertions() {
 		List<SimpleAssertion> l = new ArrayList<SimpleAssertion>();
 		// find all individual variables and look where they occur
@@ -435,7 +453,10 @@ public class Formula extends VariableEnvironment
 		return l;
 	}
 	
-	// initializes this object from XML element: <rmrsincrement>
+	/**
+	 * initializes this rmrs formula object from XML element variable definition {@code <rmrsincrement>}
+	 * @param e the element 
+	 */
 	@SuppressWarnings("unchecked")
 	public void parseXML(Element e) {
 		List<Element> children = e.getChildren();
@@ -495,7 +516,7 @@ public class Formula extends VariableEnvironment
 				}
 			}
 		}
-		update();
+		checkVariableEnvironmentConsistency();
 	}
 	
 }

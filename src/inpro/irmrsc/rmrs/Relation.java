@@ -45,6 +45,7 @@ public class Relation implements VariableIDsInterpretable {
 		this.mType = r.getType();
 	}
 	
+	/** default constructor, only used for xml loading */
 	public Relation() {
 		super();
 	}
@@ -86,6 +87,7 @@ public class Relation implements VariableIDsInterpretable {
 		return (mAnchor == variableID);
 	}
 
+	@Override
 	public Set<Integer> getVariableIDs() {
 		Set<Integer> l = new TreeSet<Integer>();
 		// Argument relations have no label
@@ -99,15 +101,17 @@ public class Relation implements VariableIDsInterpretable {
 		return l;
 	}
 
+	@Override
 	public void replaceVariableID(int oldID, int newID) {
 		if (mLabel    == oldID) mLabel    = newID;
 		if (mAnchor   == oldID) mAnchor   = newID;
 		if (mArgument == oldID) mArgument = newID;
 	}
 	
-	// Warning: Types are not correctly shown.
 	@Override
 	public String toString() {
+		// This does not generate the correct type prefix, because this depends on the
+		// variable environment. Thus all variables are prefixed with a '#v'.
 		String s = "";
 		switch (mType) {
 			case LEXICAL:
@@ -127,7 +131,10 @@ public class Relation implements VariableIDsInterpretable {
 		return s;
 	}
 
-	// initializes this object from XML element: <rel>
+	/**
+	 * initializes this relation object from XML element variable definition {@code <rel>}
+	 * @param e the element 
+	 */
 	public void parseXML(Element e) {
 		mName = e.getAttributeValue("name");
 		String typeString = e.getAttributeValue("type");

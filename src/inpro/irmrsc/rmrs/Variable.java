@@ -90,7 +90,7 @@ public class Variable {
 	}
 	
 	/**
-	 * initializes a variable object from XML element variabel definition <pre><vdef></pre>
+	 * initializes this variable object from XML element variable definition {@code <vdef>}
 	 * @param e the element 
 	 */
 	public void parseXML(Element e) {

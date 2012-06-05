@@ -20,9 +20,12 @@ import org.jdom.input.*;
 //   i am not sure whether this is actually useful or rather harmful.
 // - rule probabilities can still be arbitrary. at some time this should be
 //   consistently and mathematically grounded? .. but why should the grammar check?
-// - allow adding a bunch of productions and updating only once in the end.
 // - compute leftcorner set to reduce search space
 
+/** 
+ * A simple probabilistic context-free grammar.
+ * @author Andreas Peldszus
+ */
 public class Grammar {
 
 	private Set<Symbol> mTerminals;
@@ -38,18 +41,17 @@ public class Grammar {
 		this.update();
 	}
 
-	public void addProduction(String id, Symbol LHS, Symbol[] RHS, double Prob) {
-		ArrayList<Symbol> rhslist = new ArrayList<Symbol>();
-		for (Symbol sym : RHS) rhslist.add(sym);
-		Production p = new Production(id, LHS, rhslist, Prob);
-		this.addProduction(id, p);
-	}
-	
-	public void addProduction(String id, Symbol LHS, ArrayList<Symbol> RHS, double Prob) {
+	/**
+	 * builds a new production and adds it to the grammar. Make sure to {@link #update()} before using an altered grammar.
+	 */
+	public void addProduction(String id, Symbol LHS, List<Symbol> RHS, double Prob) {
 		Production p = new Production(id, LHS, RHS, Prob);
 		this.addProduction(id, p);
 	}
 	
+	/**
+	 * adds a new production to the grammar. Make sure to {@link #update()} before using an altered grammar.
+	 */
 	public void addProduction(String id, Production p) {
 		mProductions.put(id, p);
 		//TODO: warn if id != p.id 
@@ -72,9 +74,6 @@ public class Grammar {
 	}
 	
 	public boolean isTerminalSymbol(Symbol sym) {
-//		if (sym.equals(mEnd)) {
-//			return true;
-//		}
 		return mTerminals.contains(sym);
 	}
 	
@@ -89,6 +88,9 @@ public class Grammar {
 		return mEliminable.contains(sym);
 	}
 	
+	/**
+	 * @return a list of IDs of {@link Production}s expanding the specified symbol
+	 */
 	public List<String> getProductionsExpandingSymbol(Symbol sym) {
 		return mExpandsRelation.get(sym);
 	}
@@ -97,6 +99,12 @@ public class Grammar {
 		return mProductions.get(id);
 	}
 	
+	/**
+	 * recomputes the symbols sets (terminal, nonterminal, and eliminable symbols) and
+	 * the expand-relation. This is necessary after the grammar was altered, as e.g. by
+	 * adding a new production. Using an altered but not yet updated grammar will result
+	 * in unexpected behaviour.
+	 */
 	public void update() {
 		TreeSet<Symbol> symbols = new TreeSet<Symbol>(); 
 		mTerminals = new TreeSet<Symbol>();
@@ -156,6 +164,10 @@ public class Grammar {
 		return mProductions.keySet().contains(id);
 	}
 	
+	/**
+	 * loads a grammar from a xml specification provided at the url
+	 * @param url the specified url of the xml to load
+	 */
 	@SuppressWarnings("unchecked")
 	public void loadXML(URL url) {
 		String filename = url.toString();

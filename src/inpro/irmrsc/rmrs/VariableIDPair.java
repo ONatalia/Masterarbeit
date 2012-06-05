@@ -4,7 +4,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * A pair of two variable IDs. Used to represent relations betweens variable IDs like e.g. scope constraints and variable equations in {@link Formula}s.
+ * A pair of two variable IDs. Used to represent relations between variable
+ * IDs like e.g. scope constraints and variable equations in {@link Formula}s.
  * @author Andreas Peldszus
  */
 public class VariableIDPair implements VariableIDsInterpretable {

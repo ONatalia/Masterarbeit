@@ -5,7 +5,11 @@ import java.util.TreeSet;
 
 import org.jdom.Element;
 
-
+/** 
+ * A hook, i.e. the main logical index, of a RMRS {@link Formula}
+ * consisting of a label, an anchor and an index-variable. 
+ * @author Andreas Peldszus
+ */
 public class Hook implements VariableIDsInterpretable {
 
 	private int mLabel;
@@ -23,7 +27,7 @@ public class Hook implements VariableIDsInterpretable {
 		this(h.getLabel(), h.getAnchor(), h.getIndex());
 	}
 	
-	// only for xml loading
+	/** default constructor, only used for xml loading */
 	public Hook() {
 		super();
 	}
@@ -40,6 +44,7 @@ public class Hook implements VariableIDsInterpretable {
 		return mIndex;
 	}
 
+	@Override
 	public Set<Integer> getVariableIDs() {
 	 Set<Integer> l = new TreeSet<Integer>();
 	 l.add(mLabel);
@@ -48,20 +53,24 @@ public class Hook implements VariableIDsInterpretable {
 	 return l;
 	}
 	
+	@Override
 	public void replaceVariableID(int oldID, int newID) {
 		if (mLabel  == oldID) mLabel  = newID;
 		if (mAnchor == oldID) mAnchor = newID;
 		if (mIndex  == oldID) mIndex  = newID;
 	}
-	
-	// This does not show the correct type, because this depends on the
-	// VarID evaluation environment.
+
 	@Override
 	public String toString() {
+		// This does not generate the correct type prefix, because this depends on the
+		// variable environment. Thus all variables are prefixed with a '#v'.
 		return "[#v" + mLabel + ":#v" + mAnchor + ":#v" + mIndex + "]";
 	}
 	
-	// initializes this object from XML element: <hook>
+	/**
+	 * initializes this hook object from XML element variable definition {@code <hook>}
+	 * @param e the element 
+	 */
 	public void parseXML(Element e) {
 		mLabel  = Integer.parseInt(e.getAttributeValue("l"));
 		mAnchor = Integer.parseInt(e.getAttributeValue("a"));

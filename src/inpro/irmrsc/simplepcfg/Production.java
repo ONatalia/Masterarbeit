@@ -3,6 +3,12 @@ package inpro.irmrsc.simplepcfg;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A weighted production rule of a {@link Grammar} expanding a lefthandside
+ * {@link Symbol} into a list of righthandside symbols. Each production should
+ * have an ID unique in the grammar.
+ * @author Andreas Peldszus
+ */
 public class Production {
 
 	private String mID;
@@ -19,58 +25,42 @@ public class Production {
 		this.mProbability = mProbability;
 	}
 
-	/**
-	 * @return the mID
-	 */
+	/** @return the production ID */
 	public String getID() {
 		return mID;
 	}
 
-	/**
-	 * @return the mLHS
-	 */
+	/** @return the lefthandside symbol */
 	public Symbol getLHS() {
 		return mLHS;
 	}
 
-	/**
-	 * @param mLHS the mLHS to set
-	 */
-	public void setLHS(Symbol mLHS) {
-		this.mLHS = mLHS;
+	/** @param lhs the lefthandside symbol to set */
+	public void setLHS(Symbol lhs) {
+		this.mLHS = lhs;
 	}
 
-	/**
-	 * @return the mRHS
-	 */
+	/** @return the list of righthandside symbols */
 	public List<Symbol> getRHS() {
 		return mRHS;
 	}
 
-	/**
-	 * @param mRHS the mRHS to set
-	 */
-	public void setRHS(List<Symbol> mRHS) {
-		this.mRHS = new ArrayList<Symbol>(mRHS);
+	/** @param rhs the list of righthandside symbols */
+	public void setRHS(List<Symbol> rhs) {
+		this.mRHS = new ArrayList<Symbol>(rhs);
 	}
 
-	/**
-	 * @return the mProbability
-	 */
+	/** @return the probability of the production */
 	public double getProbability() {
 		return mProbability;
 	}
 
-	/**
-	 * @param mProbability the mProbability to set
+	/** @param probability the probability to set
 	 */
-	public void setProbability(double mProbability) {
-		this.mProbability = mProbability;
+	public void setProbability(double probability) {
+		this.mProbability = probability;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		String s = "[" + mID + ": " + mLHS + " --> " + mProbability + " ";

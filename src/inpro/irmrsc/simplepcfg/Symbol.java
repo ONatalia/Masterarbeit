@@ -1,5 +1,9 @@
 package inpro.irmrsc.simplepcfg;
 
+/**
+ * A symbol used in the {@link Production}s of a {@link Grammar}
+ * @author Andreas Peldszus
+ */
 public class Symbol implements Comparable<Symbol> {
 
 	private String mSymbol;
@@ -31,9 +35,6 @@ public class Symbol implements Comparable<Symbol> {
 		return mSymbol.hashCode();
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return mSymbol;
