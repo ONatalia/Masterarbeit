@@ -45,7 +45,7 @@
         </propertylist>
     </component>
 
-    <component name="echoDialogueManager" type="inpro.incremental.processor.EchoDialogueManager">
+    <component name="echoDialogueManager" type="demo.inpro.system.echodm.dm.EchoDialogueManager">
         <property name="actionManager" value="audioActionManager"/>
         <property name="floorTracker" value="iuBasedFloorTracker"/>
         <property name="dispatchStream" value="dispatchStream" />
@@ -80,16 +80,16 @@
     <component name="tedNotifier" type="inpro.incremental.sink.TEDviewNotifier"/>
     <component name="labelWriter2" type="inpro.incremental.sink.LabelWriter"/>
     <component name="hypViewer" type="inpro.incremental.sink.CurrentHypothesisViewer"/>
-    <component name="iuNetworkViewer" type="inpro.incremental.sink.IUNetworkViewer"/>
+<!--    <component name="iuNetworkViewer" type="inpro.incremental.sink.IUNetworkViewer"/> -->
 
-    <component name="oaaDispatchStream" type="inpro.audio.OAADispatchStream">
+    <component name="oaaDispatchStream" type="work.inpro.audio.OAADispatchStream">
         <!-- this is an OAA agent name, it has nothing to do with the identically named component below -->
         <property name="agentName" value="dispatchStream"/>
         <property name="goalPrefix" value="x"/>
         <property name="sendSilence" value="false"/>
     </component>
     
-    <component name="dotNotifier" type="inpro.incremental.listener.IUNetworkToDOT">
+    <component name="dotNotifier" type="inpro.incremental.sink.IUNetworkToDOT">
         <property name="runDot" value="true" />
         <property name="outputFormat" value="png" />
     </component>

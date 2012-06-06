@@ -84,7 +84,7 @@
         <property name="captureUtterances" value="true"/>
     </component>
 
-	<component name="timePasser" type="inpro.incremental.deltifier.OffsetAdapter">
+	<component name="timePasser" type="inpro.incremental.source.OffsetAdapter">
 		<property name="casrh" value="currentASRHypothesis"/>
 	</component>
 
