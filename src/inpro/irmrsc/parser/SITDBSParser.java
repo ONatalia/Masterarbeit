@@ -1,6 +1,3 @@
-/**
- * 
- */
 package inpro.irmrsc.parser;
 
 import inpro.irmrsc.simplepcfg.Grammar;
@@ -15,36 +12,84 @@ import java.util.PriorityQueue;
 import org.apache.log4j.Logger;
 
 /**
- * A simple robust incremental top down beam search parser.
- * 
+ * A Simple (robust) Incremental Top Down Beam Search Parser.
+ * <p />
+ * The parser is fed incrementally with new input tokens. Its candidate analyses are stored in a priority queue,
+ * serving the most probable first. The parser searches top down for analyses and moves those successfully matching
+ * the current input token in a new queue. The parser continues to search for further analyses until a probability
+ * threshold is reached, dynamically determined by the base beam factor the current size of the new queue and the
+ * highest probability in the new queue. All remaining analyses are pruned.
+ * <p />
+ * Additionally, if robust parsing is activated, three robust operations allow to entertain hypotheses about deletions,
+ * insertions and repairs of input token. Robust operations are restricted in many ways: Only one is allowed to occur
+ * between two real input tokens. Each operation induces a probability malus. Finally there is a limit of robust operations
+ * per sentence.
+ * <p />
  * Inspired by Brian Roark 2001 Ph.D. Thesis, Department of Cognitive and Linguistic Sciences, Brown University.
  * 
- * @author andreas
+ * @author Andreas Peldszus
  */
 public class SITDBSParser {
 	
+	static String logPrefix = "[P] ";
+	static Logger logger;
+	
 	// counters for evaluations statistics
+	
+	/** a counter to keep track of the number of expansions */
 	public static int cntExpansions = 0;
+	
+	/** a counter to keep track of the number of externally degraded analyses (see {@link #degradeAnalysis(CandidateAnalysis, double)}). */
 	public static int cntDegradations = 0;
+	
+	/** a counter to keep track of the number of prunes analyses, i.e. of those that fell out of the beam */
 	public static int cntPrunes = 0;
+	
+	/** a counter to keep track of the number of derivations that survived a parsing step, i.e. of those that did not fell out of the beam */
 	public static int cntDerivations = 0;
 	
-	// capacity limit
-	public static int maxCandidatesLimit = 1000;
 	
-	// robustness
+	// robustness settings
+	
+	/** allow or disallow the parser to use robust operations */
 	public static boolean beRobust = true;
+	
+	/** the maximum number of repair hypotheses allowed per sentence */
 	public static int maxRepairs = 2;
+	
+	/** the probability malus a derivations receives for each repair hypothesis */
 	public static double repairMalus = 0.05;
+	
+	/** the maximum number of insertion hypotheses allowed per sentence */
 	public static int maxInsertions = 2;
+	
+	/** the probability malus a derivations receives for each repair insertion */
 	public static double insertionMalus = 0.02;
+	
+	/** the maximum number of deletion hypotheses allowed per sentence */
 	public static int maxDeletions = 2;
+	
+	/** the probability malus a derivations receives for each repair deletion */
 	public static double deletionMalus = 0.01;
+	
+	
+	// general settings
+	
+	/** the maximum number of candidate analysis allowed in the parsers queue */
+	public static int maxCandidatesLimit = 1000;
 
+	/** the name of the POS-tag and the (parser internal) syntactic rule for fillers */
 	public static final String fillerRuleAndTagName = "fill";
+	
+	/** the name of the POS-tag for unknown tags */
 	public static final Symbol unknownTag = new Symbol("unknown");
+	
+	/** the name of the POS-tag marking the end of utterance */
 	public static final Symbol endOfUtteranceTag = new Symbol("S!");
 
+	
+	// members
+	
 	/** the parser main internal data structure **/ 
 	private PriorityQueue<CandidateAnalysis> mQueue;
 	
@@ -54,8 +99,6 @@ public class SITDBSParser {
 	/** the base beam factor **/
 	private double mBaseBeamFactor;
 	
-	static String logPrefix = "[P] ";
-	static Logger logger;
 
 	public SITDBSParser(Grammar grammar, double bbf) {
 		mGrammar = grammar;
@@ -172,7 +215,7 @@ public class SITDBSParser {
 				}
 			} else {
 				// find all expanding derivations and push them on the old Queue
-				List<String> relevantProductions = mGrammar.getProductionsExpandingSymbol(topSymbol); //TODO: here: think about how add insertions support
+				List<String> relevantProductions = mGrammar.getProductionsExpandingSymbol(topSymbol);
 				// TODO: use left corner relation here: relrule = g.getLCsatisfyingProdExpSym(topSym, nextToken)
 				for (String id : relevantProductions) {
 					cntExpansions++;
@@ -215,28 +258,6 @@ public class SITDBSParser {
 		}
 		return cnt;
 	}
-	
-// obsolete code.
-//	public boolean complete() {
-//		for (CandidateAnalysis ca : mQueue) {
-//			// check if already complete
-//			if (ca.isComplete()) {
-//				continue;
-//			}
-//			// check if completable
-//			Deque<Symbol> stack = ca.getStack();
-//			boolean caIsCompletable = true;
-//			for (Symbol sym : stack) {
-//				if (! mGrammar.isEliminable(sym)) {
-//					caIsCompletable = false;
-//					break;
-//				}
-//			}
-//			// complete all completable
-//			if (caIsCompletable) {}
-//		}
-//		return true;
-//	}
 	
 	/** returns the parsers queue (or an empty queue if it's null) */
 	public PriorityQueue<CandidateAnalysis> getQueue() {
