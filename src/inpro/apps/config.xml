@@ -2,6 +2,7 @@
 <!DOCTYPE config[
   <!ENTITY iuconfig SYSTEM "inpro/apps/iu-config.xml">
   <!ENTITY sphinx SYSTEM "inpro/apps/sphinx.xml">
+  <!ENTITY sphinxlang SYSTEM "inpro/apps/sphinx-de.xml">
   <!ENTITY frontend SYSTEM "inpro/apps/frontend.xml">
 ]>
 <!--
@@ -15,6 +16,7 @@
 <config>
 
 	&sphinx;
+	&sphinxlang;
 	&frontend;
     &iuconfig;
 
