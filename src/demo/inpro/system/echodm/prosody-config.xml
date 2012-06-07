@@ -40,7 +40,7 @@
     <property name="speechTrailer" value="200"/>
     <property name="threshold" value="15"/>
 
-	<component name="style" type="demo.inpro.domains.system.echodm.Style" />
+	<component name="style" type="demo.inpro.system.echodm.Style" />
 
     <!-- ******************************************************** -->
     <!-- The recognizer configuration                             -->
@@ -321,7 +321,7 @@
         <property name="captureUtterances" value="true"/>
     </component>
 
-   <component name="timePasser" type="inpro.incremental.deltifier.OffsetAdapter">
+   <component name="timePasser" type="inpro.incremental.source.OffsetAdapter">
       <property name="casrh" value="currentASRHypothesis"/>
    </component>
 
@@ -367,7 +367,7 @@
     <!-- The incremental processing configuration                 -->
     <!-- ******************************************************** -->
     
-    <component name="currentASRHypothesis" type="inpro.incremental.processor.CurrentASRHypothesis">
+    <component name="currentASRHypothesis" type="inpro.incremental.source.CurrentASRHypothesis">
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
@@ -423,19 +423,15 @@
     </component>
     <component name="none" type="inpro.incremental.deltifier.ASRWordDeltifier"/>
     <component name="nonIncr" type="inpro.incremental.deltifier.NonIncrementalDeltifier"/>
-    <component name="wasd" type="demo.inpro.system.greifarm.WordAdaptiveSmoothingDeltifier">
-        <property name="safeWord" value="no" />
-        <property name="urgentWord" value="take" />
-    </component>
     <component name="fixedLag" type="inpro.incremental.deltifier.FixedLagDeltifier">
         <property name="fixedLag" value="${deltifierParam}"/>
     </component>
     <component name="smoothing" type="inpro.incremental.deltifier.SmoothingDeltifier">
         <property name="smoothing" value="${deltifierParam}"/>
     </component>
-    <component name="consoleNotifier" type="inpro.incremental.listener.ConsoleNotifier"/>
-    <component name="tedNotifier" type="inpro.incremental.listener.TEDviewNotifier"/>
-    <component name="hypViewer" type="inpro.incremental.listener.CurrentHypothesisViewer"/>
+    <component name="consoleNotifier" type="inpro.incremental.sink.ConsoleNotifier"/>
+    <component name="tedNotifier" type="inpro.incremental.sink.TEDviewNotifier"/>
+    <component name="hypViewer" type="inpro.incremental.sink.CurrentHypothesisViewer"/>
     <component name="dispatchStream" type="inpro.audio.DispatchStream">
         <property name="sendSilence" value="true"/>
         <property name="speechStateVisualizer" value="speechStateVisualizer"/>
