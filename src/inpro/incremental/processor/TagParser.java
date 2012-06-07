@@ -27,11 +27,10 @@ import edu.cmu.sphinx.util.props.S4Double;
 import edu.cmu.sphinx.util.props.S4String;
 
 /**
- * An IU processor wrapper around the SITDBSParser. For any incoming TagIU representing the
+ * An IU processor wrapper around the {@link SITDBSParser}. For any incoming {@link TagIU} representing the
  * next element in a string of part-of-speech tags, the processor outputs the possible partial
- * parses in form of CandidateAnalysisIUs.
- *
- * @author andreas
+ * parses in form of {@link CandidateAnalysisIU}s.
+ * @author Andreas Peldszus
  */
 public class TagParser extends IUModule {
 
@@ -110,8 +109,9 @@ public class TagParser extends IUModule {
 						}
 					}
 					break;
+					
 				case ADD:
-					// TODO: ein besseres erstes element setzen
+					// TODO: find a better root element
 					TagIU previousTag = (TagIU) tag.getSameLevelLink();
 					assert previousTag != null;
 					SITDBSParser newState = new SITDBSParser(this.states.get(previousTag));
@@ -134,6 +134,7 @@ public class TagParser extends IUModule {
 						newEdits.add(new EditMessage<CandidateAnalysisIU>(EditType.ADD, newCAIU));
 					}
 					break;
+					
 				case COMMIT:
 					for (IU iu : tag.grounds()) {
 						if (iu instanceof CandidateAnalysisIU) {

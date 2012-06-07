@@ -24,11 +24,11 @@ import edu.cmu.sphinx.util.props.S4String;
 /**
  * An incremental processor that produces {@link TagIU}s from {@link WordIU}s.<br />
  * Determines a word's tags from a list of associated {@link AVPair}s and adds one TagIU for each.<br />
- * @author okko, andreas
- *
+ * @author okko, Andreas Peldszus
  */
 public class Tagger extends IUModule {
 
+	/** the tag that is given to words that have no associated tag defined */
 	public final static String NO_TAG_TAG = "unknown";
 	
 	@S4String(defaultValue = "res/PentoAVMapping")
@@ -60,16 +60,20 @@ public class Tagger extends IUModule {
 						}
 					}
 					break;
+					
 				case ADD:
 					if (newWord.getAVPairs() != null) {
 						// TODO: bundle tag value + other tag-relevant AVPs.
 						for (AVPair tagPair : newWord.getAVPairs()) {
+							// a word can receive more than one tag
 							if (tagPair.getAttribute().equals("tag")) {
+								// the word did receive some tag, all good.
 								List<? extends IU> antecedents = newWord.getSameLevelLink().grounds();
 								if (antecedents.size() < 1) {
+									// this seems to be the first word: link its tag to initial tag iu
 									newEdits.add(new EditMessage<TagIU>(EditType.ADD, new TagIU(TagIU.FIRST_TAG_IU, Collections.singletonList(newWord), (String) tagPair.getValue())));
 								} else {
-									// add a new TagIU for each antecedent
+									// this is a follow up: add a new TagIU for each antecedent
 									for (IU a : antecedents) {
 										newEdits.add(new EditMessage<TagIU>(EditType.ADD, new TagIU((TagIU) a, Collections.singletonList(newWord), (String) tagPair.getValue())));
 									}
@@ -77,14 +81,26 @@ public class Tagger extends IUModule {
 							}
 						}
 					} else {
-						// the word did not recieve a tag; be robust
-						TagIU sll = TagIU.FIRST_TAG_IU;
-						if (newWord.getSameLevelLink().grounds().size() > 0) {
-							sll = (TagIU) newWord.getSameLevelLink().grounds().get(0);
+						// the word did not receive a tag; be robust
+						List<? extends IU> antecedents = newWord.getSameLevelLink().grounds();
+						if (antecedents.size() < 1) {
+							// this seems to be the first word: link its tag to initial tag iu
+							newEdits.add(new EditMessage<TagIU>(EditType.ADD, new TagIU(TagIU.FIRST_TAG_IU, Collections.singletonList(newWord), NO_TAG_TAG)));
+						} else {
+							// this is a follow up: add a new TagIU for each antecedent
+							for (IU a : antecedents) {
+								newEdits.add(new EditMessage<TagIU>(EditType.ADD, new TagIU((TagIU) a, Collections.singletonList(newWord), NO_TAG_TAG)));
+							}
 						}
-						newEdits.add(new EditMessage<TagIU>(EditType.ADD, new TagIU(sll, Collections.singletonList(newWord), NO_TAG_TAG)));
+//						/* unknown words can equally occur after ambiguous words, which was not covered by the old code. */ 
+//						TagIU sll = TagIU.FIRST_TAG_IU;
+//						if (newWord.getSameLevelLink().grounds().size() > 0) {
+//							sll = (TagIU) newWord.getSameLevelLink().grounds().get(0);
+//						}
+//						newEdits.add(new EditMessage<TagIU>(EditType.ADD, new TagIU(sll, Collections.singletonList(newWord), NO_TAG_TAG)));
 					}
 					break;
+					
 				case COMMIT:
 					for (IU sem : newWord.grounds()) {
 						if (sem instanceof TagIU) {

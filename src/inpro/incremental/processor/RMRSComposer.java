@@ -35,56 +35,105 @@ import edu.cmu.sphinx.util.props.S4Component;
 import edu.cmu.sphinx.util.props.S4Double;
 import edu.cmu.sphinx.util.props.S4String;
 
+//TODO: This class contains still a lot of evaluation specific code. Needs a clean up.
 
+/**
+ * An incremental processor that applies to a semantic representation all updates 
+ * corresponding to the syntactic operations of the last incremental step. This
+ * implements an incremental rule-to-rule syntax-semantic-interface.
+ * <p />
+ * For each parsing action in the last processing steps of a given syntactic derivation
+ * (i.e. a {@link CandidateAnalysisIU}), the associated semantic actions are applied
+ * to the corresponding semantic representation (i.e. a {@link FormulaIU}).<br/>
+ * The semantic actions, mapping from syntactic rule to semantic action and the basic
+ * semantic representation of lexemes are defined in separate xml files.
+ * <p />
+ * Additionally the composer can call a {@link Resolver} to test whether the
+ * semantic representations successfully refer to objects in the world (specified by a 
+ * world setting). It then could provide feedback to the parser by requesting him to
+ * degrade those syntactic derivations that do not successfully refer. We call this
+ * strategy 'reference pruning', which can be turned on and off. Besides, if no resolver
+ * is provided, the processor runs in a pure 'semantic combination only'-mode.
+ * <p />
+ * (This class contains still a lot of evaluation specific code. Needs a clean up.)
+ * @author Andreas Peldszus
+ */
 public class RMRSComposer extends IUModule {
-
+	
+	// resources
+	
 	@S4String()
 	public final static String PROP_SEM_MACROS_FILE = "semMacrosFile";
 	private String semMacrosFile;
-
+	/** a register of semantic macros identified by their long name (as defined in {@link #PROP_SEM_MACROS_FILE}) */
+	private Map<String,Formula> semanticMacrosLongname = new HashMap<String,Formula>();
+	/** a register of semantic macros identified by their short name (as defined in {@link #PROP_SEM_MACROS_FILE}) */
+	private Map<String,Formula> semanticMacrosShortname = new HashMap<String,Formula>();
+	
 	@S4String()
 	public final static String PROP_SEM_RULES_FILE = "semRulesFile";
 	private String semRulesFile;
-
-	@S4Component(type = Resolver.class, mandatory = false)
-	public final static String PROP_RESOLVER = "resolver";
-	private Resolver resolver;
-	
-	@S4Component(type = TagParser.class)
-	public static final String PROP_PARSER = "parser";
-	protected TagParser parser;
+	/** maps syntactic rule names to semantic macros (as defined in the {@link #PROP_SEM_RULES_FILE}) */
+	private Map<String,Formula> semanticRules  = new HashMap<String,Formula>();
 	
 	@S4String()
 	public final static String PROP_TAG_LEXICON_FILE = "tagLexiconFile";
 	private String tagLexiconFile;
+	/** maps POS-tags to variable type (as defined in the {@link #PROP_TAG_LEXICON_FILE}) */
+	private Map<String,Variable.Type> semanticTypesOfTags = new HashMap<String,Variable.Type>();
 	
-	@S4Double(defaultValue = 0.01)
-	public final static String PROP_MALUS_NO_REFERENCE = "malusNoReference";
-	private double malusNoReference;
+	
+	// reference resolution
+	
+	@S4Component(type = Resolver.class, mandatory = false)
+	public final static String PROP_RESOLVER = "resolver";
+	/** The resolver to be used. If resolver==null no resolution will be done. */
+	private Resolver resolver;
+	
+	
+	// reference pruning 
 	
 	@S4Boolean(defaultValue = true)
 	public final static String PROP_REFERENCE_PRUNING = "referencePruning";
+	/** whether or not the parser should be requested to degrade non-referring analyses */
 	private boolean referencePruning;
+	
+	@S4Double(defaultValue = 0.01)
+	public final static String PROP_MALUS_NO_REFERENCE = "malusNoReference";
+	/** the malus that is sent to the parser to degrade non-referring analyses by */
+	private double malusNoReference;
+	
+	@S4Component(type = TagParser.class)
+	public static final String PROP_PARSER = "parser";
+	/** Reference to the syntactic processor providing the derivations. Required in the
+	 *  reference pruning setting to request the degradation of derivations, and also 
+	 *  required for evaluation to request parser statistics. */
+	protected TagParser parser;
+	
+	
+	// evaluation specific
 	
 	@S4String(defaultValue = "")
 	public final static String PROP_GOLD = "gold";
 	/** Gold representation, i.e. a string representation of a domain object that a composer/resolver should arrive at */
 	private String gold;
+	/** Gold representation, i.e. a string representation of a domain action that a composer/resolver should arrive at */
 	private String goldaction;
-
-	private Map<String,Formula> semanticMacrosLongname = new HashMap<String,Formula>();
-	private Map<String,Formula> semanticMacrosShortname = new HashMap<String,Formula>();
-	private Map<String,Formula> semanticRules  = new HashMap<String,Formula>();
-	private Map<String,Variable.Type> semanticTypesOfTags = new HashMap<String,Variable.Type>();
-	private Map<CandidateAnalysisIU,FormulaIU> states = new HashMap<CandidateAnalysisIU,FormulaIU>();
-
-	private static FormulaIU firstUsefulFormulaIU;
-	//private final static double MALUS_SEMANTIC_MISMATCH = 0.7;
-	
 	/** The history of compare-to-gold values of each incremental step with 1best evaluation */
 	private static List<Integer> compareToGoldValueHistory1Best;
 	/** The history of compare-to-gold values of each incremental step with 5best evaluation */
 	private static List<Integer> compareToGoldValueHistory5Best;
+
+	
+	// ... and most importantly
+	
+	/** The composers internal storage: maps syntactic derivations to semantic representations. */
+	private Map<CandidateAnalysisIU,FormulaIU> states = new HashMap<CandidateAnalysisIU,FormulaIU>();
+
+	/** the semantic representation to start with */
+	private static FormulaIU firstUsefulFormulaIU;	
+
+	
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -160,7 +209,11 @@ public class RMRSComposer extends IUModule {
 			
 			// Set up the resolver
 			this.resolver = (Resolver) ps.getComponent(PROP_RESOLVER);
-			logger.info("Set up resolver: " + this.resolver.toString());		
+			if (this.resolver == null) {
+				logger.info("Not using a resolver.");
+			} else {
+				logger.info("Set up resolver: " + this.resolver.toString());
+			}
 			
 			// Set up the parser
 			this.parser = (TagParser) ps.getComponent(PROP_PARSER);
@@ -220,6 +273,7 @@ public class RMRSComposer extends IUModule {
 						// ## 2. go through all new syntactic rule applications
 						for (String rule : lastDerive) {
 							//logger.debug(logPrefix+"= "+newForm.toStringOneLine());
+							System.err.println("[C] = "+newForm.toStringOneLine());
 							
 							// ## a) normal match (add lexical semantics of the token)
 							if (rule.startsWith("m(")) {
@@ -303,7 +357,7 @@ public class RMRSComposer extends IUModule {
 						// ## 4. ReferencePruning (optional): resolve the output formula and
 						//       degrade the analysis of non-resolving formulas
 						referencePruning = false; // INLUContainer.referencePruning;
-						if (referencePruning) {
+						if (referencePruning && resolver != null) {
 							if (!ca.getCandidateAnalysis().isComplete()) {
 								resolver.setPerformDomainAction(false); // don't show the resolved items now
 								int resolve = resolver.resolves(newForm);
@@ -338,7 +392,7 @@ public class RMRSComposer extends IUModule {
 //								if (gold != null) {
 //									resolution = resolver.resolvesObject(((FormulaIU)sem).getFormula(), gold);
 //								}
-								//parser.printStatus(ca);
+								parser.printStatus(ca);
 								//logger.warn("[Q] SYN "+ca.getCandidateAnalysis().toFinalString());
 								//logger.warn("[Q] SEM "+((FormulaIU)sem).getFormula().toStringOneLine());
 								//logger.warn("[Q] MRS "+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic());
@@ -359,85 +413,87 @@ public class RMRSComposer extends IUModule {
 			}
 		}
 		
-		// find the highest ranked analysis
-		FormulaIU bestFoIU = null;
-		double bestProb = 0;
-		int bestLexemCount = 0;
-		for (EditMessage<FormulaIU> em : newEdits) {
-			CandidateAnalysis ca = ((CandidateAnalysisIU) em.getIU().groundedIn().get(0)).getCandidateAnalysis();
-			int thisLexemCount = ca.getNumberOfMatches();
-			double thisProb = ca.getProbability();			 
-			if (thisProb > bestProb) {
-				bestProb = thisProb;
-				bestLexemCount = thisLexemCount;
-				bestFoIU = em.getIU();			
-			} else if (thisProb == bestProb) {
-				if (thisLexemCount > bestLexemCount) {
+		if (resolver != null) {
+			// find the highest ranked analysis
+			FormulaIU bestFoIU = null;
+			double bestProb = 0;
+			int bestLexemCount = 0;
+			for (EditMessage<FormulaIU> em : newEdits) {
+				CandidateAnalysis ca = ((CandidateAnalysisIU) em.getIU().groundedIn().get(0)).getCandidateAnalysis();
+				int thisLexemCount = ca.getNumberOfMatches();
+				double thisProb = ca.getProbability();			 
+				if (thisProb > bestProb) {
 					bestProb = thisProb;
 					bestLexemCount = thisLexemCount;
-					bestFoIU = em.getIU();	
-				}
-			}
-		}
-		// show the resolving objects of the highest ranked analysis in the gui
-		if (bestFoIU != null) {
-			resolver.setPerformDomainAction(true);
-			resolver.resolves(bestFoIU.getFormula());
-			resolver.setPerformDomainAction(false);
-		}
-		
-		// if we got ADDs, evaluate the new result according to one of our two evaluation methods.
-		if (iGotAdds && (gold != null)) {
-			// we compare the gold tile with the resolves set of ..
-			
-			// ## 1) the syntactic 1best candidate analysis
-			int cmpToGoldValue = -2; // default if no best ca is there.
-			if (bestFoIU != null) // we already have that from above
-				cmpToGoldValue = resolver.resolvesObject(bestFoIU.getFormula(), gold);
-			// add to history
-			compareToGoldValueHistory1Best.add(cmpToGoldValue);
-			System.err.println("[E1] cmp2gold history:"+compareToGoldValueHistory1Best);
-				
-			// ## 2) the best resolving analysis of the 5best CAs
-			// get all candidate analyses
-			PriorityQueue<CandidateAnalysisIU> allCaIUs = new PriorityQueue<CandidateAnalysisIU>(5, new CandidateAnalysisIUProbabilityComparator());
-			for (EditMessage<FormulaIU> em : newEdits) {
-				allCaIUs.add((CandidateAnalysisIU) em.getIU().groundedIn().get(0)); 
-			}
-			int cnt = 0;
-			
-			// get the five best and find the best resolving in it
-			bestFoIU = null;
-			while (cnt < 5 && (! allCaIUs.isEmpty())) {
-				CandidateAnalysisIU next = allCaIUs.poll();
-				//System.err.println("# consider 5best p="+next.getCandidateAnalysis().getProbability());
-				cnt++;
-				// resolves this formula:
-				FormulaIU nextFoIU = (FormulaIU) next.grounds().get(0);
-				int resolve = resolver.resolves(nextFoIU.getFormula());
-				if (resolve == 1) {
-					// we found a unique resolve: eval this
-					bestFoIU = nextFoIU;
-					break;
-				} else if (resolve == 0) {
-					// we found a set resolve: store this one, if it is the first one
-					if (bestFoIU == null) {
-						bestFoIU = nextFoIU;
-					}
-				} else {
-					// we found a none resolve: store this one, if it is the first one
-					if (bestFoIU == null) {
-						bestFoIU = nextFoIU;
+					bestFoIU = em.getIU();			
+				} else if (thisProb == bestProb) {
+					if (thisLexemCount > bestLexemCount) {
+						bestProb = thisProb;
+						bestLexemCount = thisLexemCount;
+						bestFoIU = em.getIU();	
 					}
 				}
 			}
-			// compare the best resolving one to gold
+			// show the resolving objects of the highest ranked analysis in the gui
 			if (bestFoIU != null) {
-				cmpToGoldValue = resolver.resolvesObject(bestFoIU.getFormula(), gold);
-				compareToGoldValueHistory5Best.add(cmpToGoldValue);
-				System.err.println("[E5] cmp2gold history:"+compareToGoldValueHistory5Best);
-			} else {
-				System.err.println("FATAL EVALUATION ERROR!");
+				resolver.setPerformDomainAction(true);
+				resolver.resolves(bestFoIU.getFormula());
+				resolver.setPerformDomainAction(false);
+			}
+			
+			// if we got ADDs, evaluate the new result according to one of our two evaluation methods.
+			if (iGotAdds && (gold != null)) {
+				// we compare the gold tile with the resolves set of ..
+				
+				// ## 1) the syntactic 1best candidate analysis
+				int cmpToGoldValue = -2; // default if no best ca is there.
+				if (bestFoIU != null) // we already have that from above
+					cmpToGoldValue = resolver.resolvesObject(bestFoIU.getFormula(), gold);
+				// add to history
+				compareToGoldValueHistory1Best.add(cmpToGoldValue);
+				System.err.println("[E1] cmp2gold history:"+compareToGoldValueHistory1Best);
+					
+				// ## 2) the best resolving analysis of the 5best CAs
+				// get all candidate analyses
+				PriorityQueue<CandidateAnalysisIU> allCaIUs = new PriorityQueue<CandidateAnalysisIU>(5, new CandidateAnalysisIUProbabilityComparator());
+				for (EditMessage<FormulaIU> em : newEdits) {
+					allCaIUs.add((CandidateAnalysisIU) em.getIU().groundedIn().get(0)); 
+				}
+				int cnt = 0;
+				
+				// get the five best and find the best resolving in it
+				bestFoIU = null;
+				while (cnt < 5 && (! allCaIUs.isEmpty())) {
+					CandidateAnalysisIU next = allCaIUs.poll();
+					//System.err.println("# consider 5best p="+next.getCandidateAnalysis().getProbability());
+					cnt++;
+					// resolves this formula:
+					FormulaIU nextFoIU = (FormulaIU) next.grounds().get(0);
+					int resolve = resolver.resolves(nextFoIU.getFormula());
+					if (resolve == 1) {
+						// we found a unique resolve: eval this
+						bestFoIU = nextFoIU;
+						break;
+					} else if (resolve == 0) {
+						// we found a set resolve: store this one, if it is the first one
+						if (bestFoIU == null) {
+							bestFoIU = nextFoIU;
+						}
+					} else {
+						// we found a none resolve: store this one, if it is the first one
+						if (bestFoIU == null) {
+							bestFoIU = nextFoIU;
+						}
+					}
+				}
+				// compare the best resolving one to gold
+				if (bestFoIU != null) {
+					cmpToGoldValue = resolver.resolvesObject(bestFoIU.getFormula(), gold);
+					compareToGoldValueHistory5Best.add(cmpToGoldValue);
+					System.err.println("[E5] cmp2gold history:"+compareToGoldValueHistory5Best);
+				} else {
+					System.err.println("FATAL EVALUATION ERROR!");
+				}
 			}
 		}
 		

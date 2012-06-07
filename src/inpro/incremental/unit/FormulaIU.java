@@ -5,7 +5,11 @@ import inpro.irmrsc.rmrs.Formula;
 import java.util.Collections;
 import java.util.List;
 
-
+/**
+ * An IU for RMRS semantic representations. The IU simply wraps around the
+ * structure defined in {@link Formula}.
+ * @author Andreas Peldszus
+ */
 public class FormulaIU extends IU {
 	
 	private Formula formula;

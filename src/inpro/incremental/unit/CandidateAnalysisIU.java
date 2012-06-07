@@ -1,11 +1,16 @@
 package inpro.incremental.unit;
 
 import inpro.irmrsc.parser.CandidateAnalysis;
+import inpro.irmrsc.rmrs.Formula;
 
 import java.util.Collections;
 import java.util.List;
 
-
+/**
+ * An IU representing a syntactic derivation. The IU simply wraps around the
+ * structure defined in {@link CandidateAnalysis}.
+ * @author Andreas Peldszus
+ */
 public class CandidateAnalysisIU extends IU {
 
 	private CandidateAnalysis candidateAnalysis;
