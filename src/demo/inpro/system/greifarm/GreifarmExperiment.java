@@ -73,14 +73,14 @@ public class GreifarmExperiment implements DropListener {
 		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook, "shutdown thread"));
 	}
 	
-	private class RecoRunner implements Runnable {
+	private static class RecoRunner implements Runnable {
 
 		private Recognizer recognizer;
 		private boolean inRecoMode;
 		
 		RecoRunner(Recognizer recognizer) {
 			this.recognizer = recognizer;
-			inRecoMode = false;
+			setInRecoMode(false);
 		}
 		
 		public synchronized void setInRecoMode(boolean inRecoMode) {
@@ -88,7 +88,7 @@ public class GreifarmExperiment implements DropListener {
 		}
 		
 		@Override
-		public void run() {
+		public synchronized void run() {
     		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
     		while(true) {
     			if (inRecoMode) {
@@ -219,23 +219,14 @@ public class GreifarmExperiment implements DropListener {
 	}
 
 	private static class Score {
-		static int nextIndex = 0;
 		int time;
 		int score;
 		int combinedScore;
-		@SuppressWarnings("unused")
-		int index;
 		Score(int time, int score, int combinedScore) {
 			this.time = time;
 			this.score = score;
 			this.combinedScore = combinedScore;
-			index = nextIndex();
 		}
-		private int nextIndex() {
-			return nextIndex++;
-		}
-		
-		
 	}
 
 

@@ -3,12 +3,8 @@ package demo.inpro.system.greifarm;
 import inpro.incremental.deltifier.SmoothingDeltifier;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
-import inpro.incremental.unit.IUList;
-import inpro.incremental.unit.TextualWordIU;
 import inpro.incremental.unit.WordIU;
-import inpro.nlu.AVPairMappingUtil;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -143,7 +139,7 @@ public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 		}
 	}
 
-	/** only for testing */
+	/* * only for testing * /
 	public static void main(String[] args) {
 		try {
 			WordIU.setAVPairs(AVPairMappingUtil.readAVPairs("res/GreifarmAVMapping"));
@@ -194,7 +190,7 @@ public class WordAdaptiveSmoothingDeltifier extends SmoothingDeltifier {
 		System.out.println("I got the following edits: " + wasd.getWordEdits());
 		System.out.println("I got the following IUs: " + wasd.getWordIUs());
 		
-	}
+	} */
 	
 	@Override
 	public String toString() {

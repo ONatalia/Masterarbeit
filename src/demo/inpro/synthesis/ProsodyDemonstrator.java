@@ -27,7 +27,7 @@ public class ProsodyDemonstrator extends PatternDemonstrator {
 		generatedText.setPreferredSize(new JTextField(52).getPreferredSize());
 		//generatedText.setText("Press the play button to synthesize this utterance."); 
 		generatedText.setEditable(true);
-		generatedText.setText("Nimm bitte das Kreuz ganz oben links in der Ecke, lege es in den Fuß des Elefanten bevor Du ihn auf den Kopf drehst.");
+		generatedText.setText("Nimm bitte das Kreuz ganz oben links in der Ecke, lege es in den Fuss des Elefanten bevor Du ihn auf den Kopf drehst.");
 
 		this.add(generatedText);
 		this.add(new JButton(new AbstractAction("", new ImageIcon(ProsodyDemonstrator.class.getResource("media-playback-start.png"))) {

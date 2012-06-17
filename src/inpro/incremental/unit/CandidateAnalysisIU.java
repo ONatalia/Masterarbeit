@@ -1,7 +1,6 @@
 package inpro.incremental.unit;
 
 import inpro.irmrsc.parser.CandidateAnalysis;
-import inpro.irmrsc.rmrs.Formula;
 
 import java.util.Collections;
 import java.util.List;

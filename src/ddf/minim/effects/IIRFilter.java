@@ -82,7 +82,7 @@ public abstract class IIRFilter {
    * used.
    * 
    */
-  final void initArrays()
+  final synchronized void initArrays()
   {
     int memSize = (a.length >= b.length) ? a.length : b.length;
     inLeft = new double[memSize];

@@ -754,19 +754,20 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	 */
 	@Override
 	public String toString() {
-		String ret;
-		ret  = "-INFORMATION STATE------\n";
-		ret += "  Contributions:\n";
+		StringBuilder sb = new StringBuilder("-INFORMATION STATE------\n  Contributions:\n");
 		for (ContribIU iu : this.contributions) {
-			ret += "\t" + iu.toString() + "\n";
-			ret += "\tGrounded-in Input:\n";
+			sb.append("\t");
+			sb.append(iu.toString());
+			sb.append("\n\tGrounded-in Input:\n");
 			for (IU sem : iu.groundedIn()) {
 				if (sem instanceof SemIU) {
-					ret += "\t\t" + sem.toString() + "\n";
+					sb.append("\t\t");
+					sb.append(sem.toString());
+					sb.append("\n");
 				}
 			}
 		}
-		return ret;
+		return sb.toString();
 	}
 	
 }

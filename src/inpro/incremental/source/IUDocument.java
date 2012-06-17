@@ -136,13 +136,13 @@ public class IUDocument extends PlainDocument {
 			 * finally, add the (possibly changed characters) to the superclass's data handling
 			 */
 			char[] chars = str.toCharArray();
-			String outStr = "";
+			StringBuilder outStr = new StringBuilder();
 			for (char ch : chars) {
 				if (Character.isWhitespace(ch)) {
 					if (currentWord.length() > 0) {
 						addCurrentWord();
 						notifyListeners();
-						outStr += " "; // add a space, no matter what whitespace was added
+						outStr.append(" "); // add a space, no matter what whitespace was added
 					} else {
 						//logger.debug("ignoring additional whitespace");
 					}
@@ -150,11 +150,11 @@ public class IUDocument extends PlainDocument {
 					//logger.debug("appending to currentWord");
 					currentWord += ch;
 					//logger.debug("now it's " + currentWord);
-					outStr += ch;
+					outStr.append(ch);
 				}
 				
 			}
-			super.insertString(offs, outStr, a);
+			super.insertString(offs, outStr.toString(), a);
 		}
 		notifyListeners();
 	}

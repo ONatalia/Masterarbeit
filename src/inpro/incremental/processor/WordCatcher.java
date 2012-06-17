@@ -27,7 +27,6 @@ public class WordCatcher extends PushBuffer {
 	// Pushbuffer stuff
 	@S4ComponentList(type = PushBuffer.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
-	List<PushBuffer> listeners;
 	
 	@S4String()
 	public final static String PROP_WORD_TO_CATCH = "word";
@@ -59,7 +58,6 @@ public class WordCatcher extends PushBuffer {
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
-		listeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
 		wordToCatch = ps.getString(PROP_WORD_TO_CATCH);
 	}
 

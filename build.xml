@@ -6,9 +6,10 @@
               as the first entry and export the buildfile again. -->
 <project basedir="." default="build" name="Inpro">
     <property environment="env"/>
-    <property name="ECLIPSE_HOME" value="../../../../../usr/lib/eclipse"/>
     <property name="workspace_loc:Inpro/bin" value="bin"/>
     <property name="workspace_loc:Inpro" value="."/>
+    <property name="maryBase" value="../itts/openmary-4.x-branch"/>
+    <property name="build_files" value=""/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.6"/>
     <property name="source" value="1.6"/>
@@ -46,6 +47,7 @@
         <pathelement location="lib/common-for-convenience/log4j-1.2.15.jar"/>
         <pathelement location="lib/common-for-convenience/jdom1-1.1.1.jar"/>
         <pathelement location="lib/scalendar.jar"/>
+        <pathelement location="lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
         <pathelement location="lib/oaa2/backport-util-concurrent.jar"/>
         <pathelement location="lib/xmlrpc/xmlrpc-client-3.1.3.jar"/>
         <pathelement location="lib/xmlrpc/xmlrpc-common-3.1.3.jar"/>
@@ -55,6 +57,7 @@
         <mkdir dir="bin"/>
         <copy includeemptydirs="false" todir="bin">
             <fileset dir="src">
+                <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
                 <exclude name="done/inpro/system/calendar/**"/>
             </fileset>
@@ -75,88 +78,94 @@
         </javac>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
-    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
-        <copy todir="${ant.library.dir}">
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </copy>
-        <unzip dest="${ant.library.dir}">
-            <patternset includes="jdtCompilerAdapter.jar"/>
-            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-        </unzip>
-    </target>
-    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
-        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
-        <antcall target="build"/>
-    </target>
-    <target name="SimpleReco">
+    <target name="Demo_SimpleRecoFromFile">
         <java classname="inpro.apps.SimpleReco" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-            <jvmarg line="-ea&#10;-Dmary.version=3&#10;-Dmary.host=bramaputra.ling.uni-potsdam.de&#10;-Dmary.port=59125"/>
-            <arg line="-c file:/tmp/prosody-config.xml -M -O -Is 7"/>
+            <arg line="-F file:../res/DE_1234.wav -O -Is 7 -C -L"/>
             <classpath refid="Inpro.classpath"/>
         </java>
     </target>
-    <target name="GenerationModule">
+    <target name="Extra_DataCollector">
+        <java classname="extra.inpro.training.DataCollector" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Demo_EchoDM">
+        <java classname="inpro.apps.SimpleReco" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <jvmarg line="-Dmary.version=3 -Dmary.host=bramaputra.ling.uni-potsdam.de -Dmary.port=59125"/>
+            <arg line="-M -O -Is 7 -C -c file:demo/inpro/system/echodm/prosody-config.xml"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Done_Completion">
+        <java classname="inpro.apps.SimpleReco" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <jvmarg line="-ea -Dmary.version=internal -Dmary.base=${maryBase}"/>
+            <arg line="-c file:src/done/inpro/system/completion/completion-config.xml -O -C -F file:../res/TOBEDONE.wav"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Done_GenerationModule">
         <java classname="done.inpro.system.calendar.GenerationModule" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-            <jvmarg line="-Dmary.base=/home/timo/uni/projekte/itts/openmary-4.x-branch/ -ea&#10;-Dproso.cond.onephraseahead=false&#10;-Dproso.cond.updateposition=+1word&#10;-Dproso.cond.connect=true"/>
+            <jvmarg line="-Dmary.base=${maryBase} -ea -Dproso.cond.onephraseahead=false -Dproso.cond.updateposition=+1word -Dproso.cond.connect=true"/>
             <arg line="2 done/inpro/system/calendar/calendar.gs true false false conditionA"/>
             <classpath refid="Inpro.classpath"/>
         </java>
     </target>
-    <target name="Completion">
-        <java classname="inpro.apps.SimpleReco" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-            <jvmarg line="-ea -Dmary.version=internal"/>
-            <arg line="-c file:src/done/inpro/system/completion/completion-config.xml -O -C -F"/>
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-    <target name="GreatEnglishPatternDemonstrator">
-        <java classname="demo.inpro.synthesis.GreatEnglishPatternDemonstrator" failonerror="true" fork="yes">
-            <jvmarg line="-Dmary.base=/home/timo/uni/projekte/itts/openmary-4.x-branch/"/>
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-    <target name="GreifarmExperiment">
-        <java classname="demo.inpro.system.greifarm.GreifarmExperiment" failonerror="true" fork="yes">
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-    <target name="SimpleMonitor">
-        <java classname="inpro.apps.SimpleMonitor" failonerror="true" fork="yes">
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-    <target name="GreatPatternDemonstrator">
+    <target name="Demo_GreatPatternDemonstrator">
         <java classname="demo.inpro.synthesis.GreatPatternDemonstrator" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
-            <jvmarg line="-ea -Dmary.base=/home/timo/uni/projekte/itts/openmary-4.x-branch/"/>
+            <jvmarg line="-ea -Dmary.base=${maryBase}"/>
             <classpath refid="Inpro.classpath"/>
         </java>
     </target>
-    <target name="DataCollector">
-        <java classname="extra.inpro.training.DataCollector" failonerror="true" fork="yes">
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-    <target name="ProsodyDemonstrator">
-        <java classname="demo.inpro.synthesis.ProsodyDemonstrator" failonerror="true" fork="yes">
-            <jvmarg line="-Dmary.base=/home/timo/uni/projekte/itts/openmary-4.x-branch/ -ea"/>
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-    <target name="VisualTTS">
-        <java classname="extra.inpro.synthesis.visual.VisualTTS" failonerror="true" fork="yes">
-            <jvmarg line="-ea -Dmary.base=/home/timo/uni/projekte/itts/openmary-4.x-branch/"/>
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-    <target name="CarChaseExperimenter">
+    <target name="Done_CarChaseExperimenter">
         <java classname="done.inpro.system.carchase.CarChaseExperimenter" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-            <jvmarg line="-Dmary.base=/home/timo/uni/projekte/itts/openmary-4.x-branch/ -ea"/>
+            <jvmarg line="-Dmary.base=${maryBase} -ea"/>
             <classpath refid="Inpro.classpath"/>
         </java>
     </target>
-    <target name="SimpleText">
+    <target name="Done_GreifarmExperiment">
+        <java classname="demo.inpro.system.greifarm.GreifarmExperiment" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Demo_ProsodyDemonstrator">
+        <java classname="demo.inpro.synthesis.ProsodyDemonstrator" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
+            <jvmarg line="-Dmary.base=${maryBase} -ea"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Apps_SimpleText">
         <java classname="inpro.apps.SimpleText" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-            <jvmarg line="-Dmary.base=/home/timo/uni/projekte/itts/openmary-4.x-branch/ -ea"/>
+            <arg line="-C"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Apps_SimpleRecoFromMicrophone">
+        <java classname="inpro.apps.SimpleReco" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <arg line="-M -O -Is 7 -C"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Apps_EN_SimpleRecoFromMicrophone">
+        <java classname="inpro.apps.SimpleReco" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <arg line="-M -O -Is 7 -C -c file:inpro/apps/config-en.xml"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Demo_EN_GreatPatternDemonstrator">
+        <java classname="demo.inpro.synthesis.GreatEnglishPatternDemonstrator" dir="${build_files}${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
+            <jvmarg line="-Dmary.base=${maryBase}"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Extra_VisualTTS">
+        <java classname="extra.inpro.synthesis.visual.VisualTTS" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <jvmarg line="-ea -Dmary.version=3 -Dmary.host=bramaputra.ling.uni-potsdam.de -Dmary.port=59125"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Demo_SimpleTextSynthesis">
+        <java classname="inpro.apps.SimpleText" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <jvmarg line="-ea -Dmary.base=${maryBase}"/>
             <arg line="-C"/>
             <classpath refid="Inpro.classpath"/>
         </java>

@@ -45,7 +45,7 @@ public class MetaData extends JDialog implements ActionListener {
 		"Laptop-Mikro", "Webcam-Mikro", "Studio-Mikro", "anderes Mikro"
 	};
 	/** this option is added to the string arrays above by addComboBoxWithDefault() */
-	private static String noSelection = new String("--");
+	private static String noSelection = "--";
 
 	JTextField pseudonym;
 	ComboBoxModel<String> gender; 

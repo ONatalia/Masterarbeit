@@ -30,7 +30,6 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	int incrementalMode;
 	int incrementalModifier;
 	String referenceText;
-	String referenceFile;
 	
 	/* stores location of a grammar or SLM */ 
 	URL languageModelURL; 

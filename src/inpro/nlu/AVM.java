@@ -432,22 +432,20 @@ public class AVM {
 	 * @return Long string representation of the AVM
 	 */
 	public String toLongString() {
-		String str = new String();
-		str += "[";
-		str += this.type;
+		StringBuilder str = new StringBuilder("[");
+		str.append(this.type);
 		if (this.monotonic)
-			str +=  "(m)";
-		str += " ";
+			str.append("(m)");
+		str.append(" ");
 		for (String attribute : this.attributes.keySet()) {
 			Object value = attributes.get(attribute);
-			if (value == null) {
-				str += attribute + ":null ";
-			} else {
-				str += attribute + ":" + value.toString() + " ";
-			}
+			str.append(attribute);
+			str.append(":");
+			str.append(value != null ? value.toString() : "null");
+			str.append(" ");
 		}
-		str += "]";
-		return str;
+		str.append("]");
+		return str.toString();
 	}
 
 	/**
@@ -456,34 +454,42 @@ public class AVM {
 	 */
 	@SuppressWarnings("unchecked")
 	public String toPrettyString() {
-		String str = new String();
+		StringBuilder str = new StringBuilder();
 		if (!this.isEmpty()) {
-			str += "[ type:" + this.type + "\n";
+			str.append("[ type:");
+			str.append(this.type);
+			str.append("\n");
 			for (String attribute : this.attributes.keySet()) {
 				Object value = attributes.get(attribute);
 				if (value instanceof String && !((String) value).isEmpty()) {
-					str += attribute + ":" + value.toString() + "\n";
+					str.append(attribute);
+					str.append(":");
+					str.append(value.toString());
+					str.append("\n");
 				} else if (value instanceof AVM && !((AVM) value).isEmpty()) {
-					str += attribute + ":" + ((AVM) value).toPrettyString();
+					str.append(attribute);
+					str.append(":");
+					str.append(((AVM) value).toPrettyString());
 				} else if (value instanceof ArrayList && !((ArrayList<AVM>) value).isEmpty()) {
 					boolean printList = false;
-					String substr = "";
+					StringBuilder substr = new StringBuilder();
 					for (AVM avm : ((ArrayList<AVM>) value)) {
 						if (!avm.isEmpty()) {
 							printList = true;
-							substr += avm.toPrettyString();
+							substr.append(avm.toPrettyString());
 						}
 					}
 					if (printList) {
-						str += attribute + ": [\n";
-						str += substr;
-						str += "]\n";						
+						str.append(attribute);
+						str.append(": [\n");
+						str.append(substr);
+						str.append("]\n");
 					}
 				}
 			}
-			str += "]";
+			str.append("]");
 		}
-		return str;
+		return str.toString();
 	}
 
 }

@@ -13,11 +13,14 @@ import inpro.incremental.unit.IU.IUUpdateListener;
 import inpro.incremental.unit.IU.Progress;
 import inpro.synthesis.MaryAdapter;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
+
+import edu.cmu.sphinx.util.props.PropertyException;
+import edu.cmu.sphinx.util.props.PropertySheet;
+import edu.cmu.sphinx.util.props.S4Component;
 
 /**
  * concurrency: playNoise() and update() are synchronized, so do not try to call them from the same thread 
@@ -25,16 +28,27 @@ import org.apache.commons.lang.NotImplementedException;
 
 public class SynthesisModule extends IUModule {
 
+	@S4Component(type = DispatchStream.class)
+	public final static String PROP_DISPATCHER = "dispatcher";
+	
+	
 	protected DispatchStream speechDispatcher;
 	
-	ArrayList<PhraseIU> upcomingPhrases;
-
 	protected PhraseBasedInstallmentIU currentInstallment;
+	
+	public SynthesisModule() {
+		this(null);
+	}
 	
 	public SynthesisModule(DispatchStream speechDispatcher) {
 		this.speechDispatcher = speechDispatcher;
-		upcomingPhrases = new ArrayList<PhraseIU>();
 		MaryAdapter.initializeMary(); // preload mary
+	}
+	
+	@Override
+	public void newProperties(PropertySheet ps) throws PropertyException {
+		super.newProperties(ps);
+		speechDispatcher = (DispatchStream) ps.getComponent(PROP_DISPATCHER);
 	}
 	
 	/**

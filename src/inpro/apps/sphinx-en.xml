@@ -16,7 +16,7 @@
         <property name="dictionary" value="dictionary"/>
         <property name="logMath" value="logMath"/>
         <!-- this can be changed with the -lm switch in SimpleReco -->
-        <property name="location" value="file:/CHANGE/THIS/path/to/your/language/model.lm/in/sphinx-en.xml/!/"/>
+        <property name="location" value="file:/CHANGE/THIS/path/to/your/language/model.lm/in/sphinx-en.xml/ or use the -lm switch!"/>
         <property name="maxDepth" value="3"/>
         <property name="unigramWeight" value=".7"/>
     </component>

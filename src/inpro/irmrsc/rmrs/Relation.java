@@ -51,7 +51,7 @@ public class Relation implements VariableIDsInterpretable {
 		this.mAnchor = r.getAnchor();
 		this.mArgument = r.getArgument();
 		this.mArgumentGiven = r.hasArgument();
-		this.mName = new String(r.getName());
+		this.mName = r.getName();
 		this.mType = r.getType();
 	}
 	

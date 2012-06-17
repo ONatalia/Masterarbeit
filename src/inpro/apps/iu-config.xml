@@ -29,7 +29,9 @@
         </propertylist>
     </component>
     
-    <component name="iSS" type="inpro.incremental.processor.SynthesisModule" />
+    <component name="iSS" type="inpro.incremental.processor.SynthesisModule">
+    	<property name="dispatcher" value="dispatchStream" />
+    </component>
 
     <component name="iuBasedFloorTracker" type="inpro.incremental.processor.IUBasedFloorTracker">
         <property name="useProsody" value="true" />
