@@ -2,40 +2,56 @@ package test.unit.inpro.annotation;
 
 
 import static org.junit.Assert.*;
-import inpro.annotation.Label;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import inpro.annotation.Label;
 
 import org.junit.Test;
 
 public class LabelUnitTest {
+	
+	private String testString ="biff", 
+			testStringSilence="<s>";
+	private double start = 0.5, end = 1.5;
 
 	@Test
 	public void testLabelDoubleDoubleString() {
-		Label label = new Label(0.5, 1.5, "biff");
-		assertEquals(label.getLabel(), "biff");
-		assertTrue(label.getStart() == 0.5);
-		assertTrue(label.getEnd() == 1.5);
-		assertTrue(label.getDuration() == 1.0);
-		assertEquals(label.toString(), "0.5	1.5	biff");
-		assertEquals(label.toMbrola().toString(), "biff 1000");
+		Label label = new Label(start, end, testString);
+		assertEquals(label.getLabel(), testString);
+		assertTrue(label.getStart() == start);
+		assertTrue(label.getEnd() == end);
+		assertTrue(label.getDuration() == end-start);
+		assertEquals(label.toString(), start+"\t"+end+"\t"+testString);
+		assertEquals(label.toMbrola().toString(), testString+" "+(int)((end-start)*1000));
+		assertFalse(label.isSilence());
 	}
-
+	
 	@Test
 	public void testLabelString() {
-		Label label = new Label("<s>");
-		assertEquals(label.getLabel(), "<s>");
+		Label label = new Label(testStringSilence);
+		assertEquals(label.getLabel(), testStringSilence);
 		assertTrue(Double.isNaN(label.getDuration()));
+		assertTrue(Double.isNaN(label.getStart()));
+		assertTrue(Double.isNaN(label.getEnd()));
 		assertTrue(label.isSilence());
 	}
 
 	@Test
 	public void testLabelLabel() {
-		Label label2 = new Label(0.5, 1.5, "biff");		
+		Label label2 = new Label(start, end, testString);		
 		Label label = new Label(label2);
-		assertEquals(label.getLabel(), "biff");
-		assertTrue(label.getStart() == 0.5);
-		assertTrue(label.getEnd() == 1.5);
-		assertTrue(label.getDuration() == 1.0);		
+		assertEquals(label.getLabel(), testString);
+		assertTrue(label.getStart() == start);
+		assertTrue(label.getEnd() == end);
+		assertTrue(label.getDuration() == end-start);
+		assertEquals(label.getLabel(),label2.getLabel());
 	}
-
 }
+
+
