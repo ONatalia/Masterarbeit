@@ -48,12 +48,12 @@ import edu.cmu.sphinx.util.props.S4String;
  * The semantic actions, mapping from syntactic rule to semantic action and the basic
  * semantic representation of lexemes are defined in separate xml files.
  * <p />
- * Additionally the composer can call a {@link Resolver} to test whether the
- * semantic representations successfully refer to objects in the world (specified by a 
- * world setting). It then could provide feedback to the parser by requesting him to
- * degrade those syntactic derivations that do not successfully refer. We call this
- * strategy 'reference pruning', which can be turned on and off. Besides, if no resolver
- * is provided, the processor runs in a pure 'semantic combination only'-mode.
+ * If {@link resolveReferences} is set accordingly, the composer can call a
+ * {@link Resolver} to test whether the semantic representations successfully refer to 
+ * objects in the world (specified by a world setting). If {@link referencePruning},
+ * too, is set accordingly, the composer will provide feedback to the parser by requesting
+ * him to degrade those syntactic derivations that do not successfully refer. If both are
+ * set to false, the processor runs in a pure 'semantic combination only'-mode.
  * <p />
  * (This class contains still a lot of evaluation specific code. Needs a clean up.)
  * @author Andreas Peldszus
@@ -85,15 +85,20 @@ public class RMRSComposer extends IUModule {
 	
 	// reference resolution
 	
+	@S4Boolean(defaultValue = false)
+	public final static String PROP_RESOLVE_REFERENCES = "resolveReferences";
+	/** whether or not the composer should use a resolver to resolve references */
+	private boolean resolveReferences;
+	
 	@S4Component(type = Resolver.class, mandatory = false)
 	public final static String PROP_RESOLVER = "resolver";
-	/** The resolver to be used. If resolver==null no resolution will be done. */
+	/** The resolver to be used if {@link resolveReferences} is true. */
 	private Resolver resolver;
 	
 	
 	// reference pruning 
 	
-	@S4Boolean(defaultValue = true)
+	@S4Boolean(defaultValue = false)
 	public final static String PROP_REFERENCE_PRUNING = "referencePruning";
 	/** whether or not the parser should be requested to degrade non-referring analyses */
 	private boolean referencePruning;
@@ -112,6 +117,11 @@ public class RMRSComposer extends IUModule {
 	
 	
 	// evaluation specific
+	
+	@S4Boolean(defaultValue = false)
+	public final static String PROP_EVALUATE = "evaluate";
+	/** whether or not the composer should evaluate, i.e. compare its (resolution) output with a gold representation */
+	private boolean evaluate;
 	
 	@S4String(defaultValue = "")
 	public final static String PROP_GOLD = "gold";
@@ -142,19 +152,46 @@ public class RMRSComposer extends IUModule {
 		// TODO: this is weird 
 		//PentoRMRSResolver.setLogger(logger);
 		
-		// initialize resolve value history
-		compareToGoldValueHistory1Best = new ArrayList<Integer>();
-		compareToGoldValueHistory5Best = new ArrayList<Integer>();
+		// set up whether to resolve references
+		resolveReferences = ps.getBoolean(PROP_RESOLVE_REFERENCES);
+		logger.info("Setting resolveReferences to "+resolveReferences);
 		
-		// get no reference pruning malus
+		// set up the resolver
+		this.resolver = (Resolver) ps.getComponent(PROP_RESOLVER);
+		if (this.resolver == null) {
+			if (resolveReferences) {
+				logger.warn("Not using a resolver. Changing resolveReferences to false.");
+				resolveReferences = false;
+			} else {
+				logger.info("Not using a resolver.");
+			}	
+		} else {
+			logger.info("Set up resolver: " + this.resolver.toString());
+		}
+		
+		// set up whether to do reference pruning
+		referencePruning = ps.getBoolean(PROP_REFERENCE_PRUNING);
+		if (referencePruning && (! resolveReferences)) {
+			logger.warn("Setting referencePruning to "+referencePruning+" because resolveReferences is false.");
+			referencePruning = false;
+		} else {
+			logger.info("Setting referencePruning to "+referencePruning);
+		}
+		
+		// set up the reference pruning malus
 		malusNoReference = ps.getDouble(PROP_MALUS_NO_REFERENCE);
 		logger.info("Setting malusNoReference to "+malusNoReference);
 		
-		// get setting no-reference pruning
-		referencePruning = ps.getBoolean(PROP_REFERENCE_PRUNING);
-		logger.info("Setting noReferencePruning to "+referencePruning);
+		// set up whether to evaluate
+		evaluate = ps.getBoolean(PROP_EVALUATE);
+		if (evaluate && (! resolveReferences)) {
+			logger.warn("Setting evaluate to "+evaluate+" because resolveReferences is false.");
+			evaluate = false;
+		} else {
+			logger.info("Setting evaluate to "+evaluate);
+		}
 		
-		// get gold string and extract gold action and gold tile
+		// set up evaluation gold string and extract gold action and gold tile
 		String tmp = ps.getString(PROP_GOLD);
 		if (tmp.equals("")) {
 			gold=null;
@@ -165,6 +202,10 @@ public class RMRSComposer extends IUModule {
 			gold = tmp2[1];
 		}
 		logger.info("Setting gold semantics to action="+goldaction+" tile="+gold);
+		
+		// initialize resolve value history for evaluation
+		compareToGoldValueHistory1Best = new ArrayList<Integer>();
+		compareToGoldValueHistory5Best = new ArrayList<Integer>();
 		
 		try {
 			// load semantic macros
@@ -206,16 +247,8 @@ public class RMRSComposer extends IUModule {
 			// initialize first formula iu
 			firstUsefulFormulaIU = new FormulaIU(FormulaIU.FIRST_FORMULA_IU, Collections.EMPTY_LIST, semanticMacrosLongname.get("init"));
 			this.states.put(CandidateAnalysisIU.FIRST_CA_IU,firstUsefulFormulaIU);
-			
-			// Set up the resolver
-			this.resolver = (Resolver) ps.getComponent(PROP_RESOLVER);
-			if (this.resolver == null) {
-				logger.info("Not using a resolver.");
-			} else {
-				logger.info("Set up resolver: " + this.resolver.toString());
-			}
-			
-			// Set up the parser
+				
+			// set up the parser
 			this.parser = (TagParser) ps.getComponent(PROP_PARSER);
 			
 		} catch (MalformedURLException e1) {
@@ -356,8 +389,8 @@ public class RMRSComposer extends IUModule {
 						
 						// ## 4. ReferencePruning (optional): resolve the output formula and
 						//       degrade the analysis of non-resolving formulas
-						referencePruning = false; // INLUContainer.referencePruning;
-						if (referencePruning && resolver != null) {
+
+						if (referencePruning && resolveReferences) {
 							if (!ca.getCandidateAnalysis().isComplete()) {
 								resolver.setPerformDomainAction(false); // don't show the resolved items now
 								int resolve = resolver.resolves(newForm);
@@ -388,23 +421,28 @@ public class RMRSComposer extends IUModule {
 							newEdits.add(new EditMessage<FormulaIU>(EditType.COMMIT, (FormulaIU) sem));
 							// print out full statistics for this sem if it is complete.
 							if (ca.getCandidateAnalysis().isComplete()) {
-//								int resolution = 2;
-//								if (gold != null) {
-//									resolution = resolver.resolvesObject(((FormulaIU)sem).getFormula(), gold);
-//								}
-								parser.printStatus(ca);
-								//logger.warn("[Q] SYN "+ca.getCandidateAnalysis().toFinalString());
-								//logger.warn("[Q] SEM "+((FormulaIU)sem).getFormula().toStringOneLine());
-								//logger.warn("[Q] MRS "+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic());
-								//logger.warn("[Q] RES "+resolution);
-								//logger.warn("[Q] HS1 "+compareToGoldValueHistory1Best);
-								//double iscore1 = calculateIncrementalScore(compareToGoldValueHistory1Best);
-								//logger.warn("[Q] IS1 "+iscore1);
-								//logger.warn("[Q] HS5 "+compareToGoldValueHistory5Best);
-								//double iscore5 = calculateIncrementalScore(compareToGoldValueHistory5Best);
-								//logger.warn("[Q] IS5 "+iscore5);
-								//logger.warn("[Q] ALL "+ca.getCandidateAnalysis().toFinalString()+"\t"+((FormulaIU)sem).getFormula().toStringOneLine()+"\t"+((FormulaIU)sem).getFormula().getUnscopedPredicateLogic()+"\t"+resolution+"\t"+compareToGoldValueHistory1Best+"\t"+iscore1+"\t"+resolution+"\t"+compareToGoldValueHistory5Best+"\t"+iscore5);
-								
+								if (resolveReferences && evaluate) {
+									int resolution = 2;
+									if (gold != null) {
+										resolution = resolver.resolvesObject(((FormulaIU)sem).getFormula(), gold);
+									}
+									String syn = ca.getCandidateAnalysis().toFinalString();
+									String rmrs = ((FormulaIU)sem).getFormula().toStringOneLine();
+									String mrs = ((FormulaIU)sem).getFormula().getUnscopedPredicateLogic().toString();
+									double iscore1 = calculateIncrementalScore(compareToGoldValueHistory1Best);
+									double iscore5 = calculateIncrementalScore(compareToGoldValueHistory5Best);
+									logger.warn("[Q] SYN "+syn);
+									logger.warn("[Q] SEM "+rmrs);
+									logger.warn("[Q] MRS "+mrs);
+									logger.warn("[Q] RES "+resolution);
+									logger.warn("[Q] HS1 "+compareToGoldValueHistory1Best);
+									logger.warn("[Q] IS1 "+iscore1);
+									logger.warn("[Q] HS5 "+compareToGoldValueHistory5Best);
+									logger.warn("[Q] IS5 "+iscore5);
+									logger.warn("[Q] ALL "+syn+"\t"+rmrs+"\t"+mrs+"\t"+resolution+"\t"+compareToGoldValueHistory1Best+"\t"+iscore1+"\t"+resolution+"\t"+compareToGoldValueHistory5Best+"\t"+iscore5);
+								} else {
+									parser.printStatus(ca);
+								}
 							}
 						}
 					}
@@ -413,7 +451,7 @@ public class RMRSComposer extends IUModule {
 			}
 		}
 		
-		if (resolver != null) {
+		if (resolveReferences) {
 			// find the highest ranked analysis
 			FormulaIU bestFoIU = null;
 			double bestProb = 0;
@@ -442,7 +480,7 @@ public class RMRSComposer extends IUModule {
 			}
 			
 			// if we got ADDs, evaluate the new result according to one of our two evaluation methods.
-			if (iGotAdds && (gold != null)) {
+			if (iGotAdds && evaluate && (gold != null)) {
 				// we compare the gold tile with the resolves set of ..
 				
 				// ## 1) the syntactic 1best candidate analysis
@@ -492,7 +530,7 @@ public class RMRSComposer extends IUModule {
 					compareToGoldValueHistory5Best.add(cmpToGoldValue);
 					System.err.println("[E5] cmp2gold history:"+compareToGoldValueHistory5Best);
 				} else {
-					System.err.println("FATAL EVALUATION ERROR!");
+					System.err.println("Fatal evaluation error: Couldn't find the best formula IU!");
 				}
 			}
 		}
@@ -501,7 +539,7 @@ public class RMRSComposer extends IUModule {
 		this.rightBuffer.setBuffer(newEdits);
 	}
 
-/*	private double calculateIncrementalScore(List<Integer> history) {
+	private double calculateIncrementalScore(List<Integer> history) {
 		double iscore = 0;
 		int m = history.size();
 		if (m != 0) {
@@ -513,7 +551,7 @@ public class RMRSComposer extends IUModule {
 			iscore = -999;
 		}
 		return iscore;
-	} */
+	}
 	
 	/**
 	 * Sets the gold string rep in case one wants to evaluate if a composer/resolver did the right thing.

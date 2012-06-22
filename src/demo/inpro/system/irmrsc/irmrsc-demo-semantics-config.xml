@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config[
+  <!ENTITY sphinx SYSTEM "src/inpro/apps/sphinx.xml">
+  <!ENTITY sphinxlang SYSTEM "src/inpro/apps/sphinx-de.xml">
+  <!ENTITY frontend SYSTEM "src/inpro/apps/frontend.xml">
+]>
+<!--
+   Sphinx-4 Configuration file
+-->
+
+
+<!-- ******************************************************** -->
+<!--  incremental configuration file                          -->
+<!-- ******************************************************** -->
+<config>
+
+	&sphinx;
+	&sphinxlang;
+	&frontend;
+
+	<!--property name="logLevel" value="FINE"/-->
+
+
+	<!-- ### INPUT ### -->
+   
+	<component name="textBasedFloorTracker" type="inpro.incremental.processor.TextBasedFloorTracker" />
+   
+    <property name="deltifier" value="none" />
+    <property name="baseData" value="baseData" />
+
+    <component name="currentASRHypothesis" type="inpro.incremental.source.CurrentASRHypothesis">
+        <property name="frontend" value="${frontend}" />
+        <property name="asrFilter" value="${deltifier}" />
+        <property name="baseData" value="${baseData}" />
+        <propertylist name="hypChangeListeners">
+			<item>tagger</item>
+        </propertylist>
+    </component>
+     
+   
+   
+	<!-- ### POS TAGGER ### -->
+	
+	<property name="lookupTags" value="file:src/demo/inpro/system/irmrsc/lookup.tags" />
+
+    <component name="tagger" type="inpro.incremental.processor.Tagger">
+        <property name="lookupTags" value="${lookupTags}" />
+        <propertylist name="hypChangeListeners">
+			<item>parser</item>
+        </propertylist>
+    </component>
+
+
+
+	<!-- ### PARSER ### -->
+
+	<property name="grammarFile" value="file:src/demo/inpro/system/irmrsc/irmrsc-grammar.xml" />
+	<property name="baseBeamFactor" value="0.01" />
+	<property name="beRobust" value="false" />
+
+    <component name="parser" type="inpro.incremental.processor.TagParser">
+    	<property name="grammarFile" value="${grammarFile}" />
+    	<property name="baseBeamFactor" value="${baseBeamFactor}" />
+    	<property name="beRobust" value="${beRobust}" />
+    	<propertylist name="hypChangeListeners">
+			<item>rmrsComposer</item>
+        </propertylist>
+    </component>
+
+
+
+	<!-- ### RMRS COMPOSER ### -->
+	
+	<property name="resolveReferences" value="false" />
+	<property name="referencePruning" value="false" />
+	<property name="malusNoReference" value="0.01" />
+    <property name="evaluate" value="false" />
+    <property name="semMacrosFile" value="file:src/demo/inpro/system/irmrsc/irmrsc-semmacros.xml" />
+   	<property name="semRulesFile" value="file:src/demo/inpro/system/irmrsc/irmrsc-semrules.xml" />
+   	<property name="tagLexiconFile" value="file:src/demo/inpro/system/irmrsc/irmrsc-taglexicon.xml" />
+
+    <component name="rmrsComposer" type="inpro.incremental.processor.RMRSComposer">
+    	<property name="parser" value="parser" />
+    	<property name="resolveReferences" value="${resolveReferences}" />
+    	<property name="referencePruning" value="${referencePruning}" />
+    	<property name="malusNoReference" value="${malusNoReference}" />
+    	<property name="evaluate" value="${evaluate}" />
+    	<property name="semMacrosFile" value="${semMacrosFile}" />
+    	<property name="semRulesFile" value="${semRulesFile}" />
+    	<property name="tagLexiconFile" value="${tagLexiconFile}" />
+        <propertylist name="hypChangeListeners"> 
+    		<item>dotNotifier</item> 
+        </propertylist> 
+    </component>
+
+
+
+	<!-- ### IU NETWORK DISPLAY ### -->
+
+    <property name="runDot" value="true" />
+    <property name="tmpDir" value="/tmp" />
+	<property name="display" value="true" />
+	<property name="useFastScaling" value="false" />
+	<property name="iuTypes" value="" /> <!-- empty = show all -->
+
+    <component name="dotNotifier" type="inpro.incremental.sink.IUNetworkToDOT">
+        <property name="runDot" value="${runDot}" />
+        <property name="tmpDir" value="${tmpDir}" />
+        <property name="display" value="${display}" />
+        <property name="useFastScaling" value="${useFastScaling}" />
+        <property name="iuTypes" value="${iuTypes}" />
+    </component>
+
+</config>

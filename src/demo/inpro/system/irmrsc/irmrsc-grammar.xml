@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	This file defines the probabilistic context-free grammar.
+	Each rule should have a unique identifier and rule probability.
+	The first symbol of a rule is the single lefthandside symbol,
+	while all following symbols constitute the righthandside of the rule.
+-->
+<simplecfggrammar start="S*" end="S!">
+	<rule id="s*/frag" prob="0.05">
+		<syntax>
+			<sym>S*</sym><sym>Frag</sym>
+		</syntax>
+	</rule>   
+	<rule id="s*/kon,s" prob="0.05">
+		<syntax>
+			<sym>S*</sym><sym>kon</sym><sym>S</sym>
+		</syntax>
+	</rule>
+	<rule id="s*/s,kon,s*" prob="0.2">
+		<syntax>
+			<sym>S*</sym><sym>S</sym><sym>kon</sym><sym>S*</sym>
+		</syntax>
+	</rule>
+	<rule id="s*/s" prob="0.7">
+		<syntax>
+			<sym>S*</sym><sym>S</sym>
+		</syntax>
+	</rule>
+	<rule id="s/vp" prob="1.0">
+		<syntax>
+			<sym>S</sym><sym>VP</sym>
+		</syntax>
+	</rule>
+<!-- 
+	<rule id="s/np-vp" prob="0.2">
+		<syntax>
+			<sym>S</sym><sym>NP</sym><sym>VP</sym>
+		</syntax>
+	</rule>
+ -->
+	<rule id="vp/v-v1" prob="0.7">
+		<syntax>
+			<sym>VP</sym><sym>v</sym><sym>V1</sym>
+		</syntax>
+	</rule>
+	<rule id="vp/v1-v" prob="0.3">
+		<syntax>
+			<sym>VP</sym><sym>V1</sym><sym>v</sym>
+		</syntax>
+	</rule>
+	<rule id="v1/np-vz" prob="1.0">
+		<syntax>
+			<sym>V1</sym><sym>NP</sym><sym>VZ</sym>
+		</syntax>
+	</rule>
+	<rule id="vz/pp-vz" prob="0.2">
+		<syntax>
+			<sym>VZ</sym><sym>PP</sym><sym>VZ</sym>
+		</syntax>
+	</rule>
+	<rule id="vz/advp-vz" prob="0.2">
+		<syntax>
+			<sym>VZ</sym><sym>AdvP</sym><sym>VZ</sym>
+		</syntax>
+	</rule>
+	<rule id="vz/eps" prob="0.6">
+		<syntax>
+			<sym>VZ</sym>
+		</syntax>
+	</rule>
+	<rule id="np/pper" prob="0.45">
+		<syntax>
+			<sym>NP</sym><sym>pper</sym>
+		</syntax>
+	</rule>
+	<rule id="np/det-n1" prob="0.45">
+		<syntax>
+			<sym>NP</sym><sym>det</sym><sym>N1</sym>
+		</syntax>
+	</rule>
+	<rule id="np/pp-np" prob="0.05"> <!-- vorgezogenene PPs: in der Mitte das gelbe Teil -->
+		<syntax>
+			<sym>NP</sym><sym>PP</sym><sym>NP</sym>
+		</syntax>
+	</rule>
+	<rule id="np/adv-np" prob="0.05"> <!-- vorgezogenene Adverbien: oben links das gelbe Teil -->
+		<syntax>
+			<sym>NP</sym><sym>AdvP</sym><sym>NP</sym>
+		</syntax>
+	</rule>
+	<rule id="n1/adjp-n1" prob="0.6">
+		<syntax>
+			<sym>N1</sym><sym>AdjP</sym><sym>N1</sym>
+		</syntax>
+	</rule>
+	<rule id="n1/nn-nz" prob="0.3">
+		<syntax>
+			<sym>N1</sym><sym>nn</sym><sym>NZ</sym>
+		</syntax>
+	</rule>
+	<rule id="n1/nadj-nz" prob="0.1"> <!-- ein substantiviertes adjektiv -->
+		<syntax>
+			<sym>N1</sym><sym>NAdj</sym><sym>NZ</sym>
+		</syntax>
+	</rule>
+	<rule id="nz/pp-nz" prob="0.3">
+		<syntax>
+			<sym>NZ</sym><sym>PP</sym><sym>NZ</sym>
+		</syntax>
+	</rule>
+	<rule id="nz/advp-nz" prob="0.3">
+		<syntax>
+			<sym>NZ</sym><sym>AdvP</sym><sym>NZ</sym>
+		</syntax>
+	</rule>
+	<rule id="nz/np-nz" prob="0.1"> <!-- NP appositionen: das kreuz das blaue oben links -->
+		<syntax>
+			<sym>NZ</sym><sym>NP</sym><sym>NZ</sym>
+		</syntax>
+	</rule>
+	<rule id="nz/eps" prob="0.3">
+		<syntax>
+			<sym>NZ</sym>
+		</syntax>
+	</rule>
+	<rule id="pp/appr-np" prob="0.9">
+		<syntax>
+			<sym>PP</sym><sym>appr</sym><sym>NP</sym>
+		</syntax>
+	</rule>
+	<rule id="pp/apprart-n1" prob="0.1">
+		<syntax>
+			<sym>PP</sym><sym>apprart</sym><sym>N1</sym>
+		</syntax>
+	</rule>
+	<rule id="advp/adv" prob="1.0">
+		<syntax>
+			<sym>AdvP</sym><sym>adv</sym>
+		</syntax>
+	</rule>	
+	<rule id="adjp/adja" prob="1.0">
+		<syntax>
+			<sym>AdjP</sym><sym>adja</sym>
+		</syntax>
+	</rule>
+		<rule id="nadj/adja" prob="1.0">
+		<syntax>
+			<sym>NAdj</sym><sym>adja</sym>
+		</syntax>
+	</rule>
+	<rule id="frag/np" prob="0.7">
+		<syntax>
+			<sym>Frag</sym><sym>NP</sym>
+		</syntax>
+	</rule>	
+	<rule id="frag/pp@vp" prob="0.10">
+		<syntax>
+			<sym>Frag</sym><sym>PP</sym>
+		</syntax> 
+	</rule>
+ 	<rule id="frag/pp@np" prob="0.20">
+		<syntax>
+			<sym>Frag</sym><sym>PP</sym>
+		</syntax>
+	</rule>
+</simplecfggrammar>

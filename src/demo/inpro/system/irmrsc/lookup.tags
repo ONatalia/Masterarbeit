@@ -1,0 +1,240 @@
+#############################################################################
+# This file is the POS-tagger lexicon.
+#
+# It has one entry per line with two tab-separated fields first the word
+# token, then a comma-separated structure defining both the associated POS-
+# tag as well as the lemma.
+#############################################################################
+#
+# VERBEN
+#
+nimm	tag:v, lemma:nehmen
+nehme	tag:v, lemma:nehmen
+nehmen	tag:v, lemma:nehmen
+wähle	tag:v, lemma:nehmen
+wählen	tag:v, lemma:nehmen
+markiere	tag:v, lemma:nehmen
+markieren	tag:v, lemma:nehmen
+lösch	tag:v, lemma:löschen
+lösche	tag:v, lemma:löschen
+löschen	tag:v, lemma:löschen
+leg	tag:v, lemma:legen
+lege	tag:v, lemma:legen
+legen	tag:v, lemma:legen
+beweg	tag:v, lemma:legen
+bewege	tag:v, lemma:legen
+bewegen	tag:v, lemma:legen
+verschieb	tag:v, lemma:legen
+verschiebe	tag:v, lemma:legen
+verschieben	tag:v, lemma:legen
+setz	tag:v, lemma:legen
+setze	tag:v, lemma:legen
+setzen	tag:v, lemma:legen
+pack	tag:v, lemma:legen
+packe	tag:v, lemma:legen
+packen	tag:v, lemma:legen
+ablegen	tag:v, lemma:legen
+füg	tag:v, lemma:legen
+füge	tag:v, lemma:legen
+einfügen	tag:v, lemma:legen
+tu	tag:v, lemma:legen
+tue	tag:v, lemma:legen
+tun	tag:v, lemma:legen
+dreh	tag:v, lemma:drehen
+drehe	tag:v, lemma:drehen
+drehen	tag:v, lemma:drehen
+rotier	tag:v, lemma:drehen
+rotiere	tag:v, lemma:drehen
+rotieren	tag:v, lemma:drehen
+spiegel	tag:v, lemma:spiegeln
+spiegle	tag:v, lemma:spiegeln
+spiegele	tag:v, lemma:spiegeln
+spiegeln	tag:v, lemma:spiegeln
+#
+# ARTIKEL
+#
+der	tag:det, lemma:def
+die	tag:det, lemma:def
+das	tag:det, lemma:def
+den	tag:det, lemma:def
+dem	tag:det, lemma:def
+dieser	tag:det, lemma:def
+diese	tag:det, lemma:def
+diesen	tag:det, lemma:def
+dieses	tag:det, lemma:def
+#
+# PRONOMEN
+# (nur nom und akk)
+# 
+er	tag:pper, lemma:pper
+sie	tag:pper, lemma:pper
+es	tag:pper, lemma:pper
+ihn	tag:pper, lemma:pper
+ihr	tag:pper, lemma:pper
+ihm	tag:pper, lemma:pper
+#
+# ADJEKTIVE
+#
+rote	tag:adja, lemma:rot
+roten	tag:adja, lemma:rot
+gelbe	tag:adja, lemma:gelb
+gelben	tag:adja, lemma:gelb
+grüne	tag:adja, lemma:grün
+grünen	tag:adja, lemma:grün
+blaue	tag:adja, lemma:blau
+blauen	tag:adja, lemma:blau
+graue	tag:adja, lemma:grau
+grauen	tag:adja, lemma:grau
+linke	tag:adja, lemma:links
+linken	tag:adja, lemma:links
+linkes	tag:adja, lemma:links
+linkeste	tag:adja, lemma:links
+linkesten	tag:adja, lemma:links
+rechte	tag:adja, lemma:rechts
+rechten	tag:adja, lemma:rechts
+rechtes	tag:adja, lemma:rechts
+rechteste	tag:adja, lemma:rechts
+rechtesten	tag:adja, lemma:rechts
+mittlere	tag:adja, lemma:mitte
+mittleren	tag:adja, lemma:mitte
+mittleres	tag:adja, lemma:mitte
+obere	tag:adja, lemma:oben
+oberen	tag:adja, lemma:oben
+oberste	tag:adja, lemma:oben
+obersten	tag:adja, lemma:oben
+untere	tag:adja, lemma:unten
+unteren	tag:adja, lemma:unten
+unterste	tag:adja, lemma:oben
+untersten	tag:adja, lemma:oben
+erste	tag:adja, lemma:erste
+ersten	tag:adja, lemma:erste
+zweite	tag:adja, lemma:zweite
+zweiten	tag:adja, lemma:zweite
+dritte	tag:adja, lemma:dritte
+dritten	tag:adja, lemma:dritte
+letzte	tag:adja, lemma:dritte
+letzten	tag:adja, lemma:dritte
+#
+# NOMEN
+#
+teil	tag:nn, lemma:teil
+ding	tag:nn, lemma:teil
+objekt	tag:nn, lemma:teil
+feld	tag:nn, lemma:feld
+kästchen	tag:nn, lemma:feld
+ecke	tag:nn, lemma:ecke
+zeile	tag:nn, lemma:zeile
+# reihen = zeilen oder spalten?
+reihe	tag:nn, lemma:zeile
+spalte	tag:nn, lemma:spalte
+position	tag:nn, lemma:spalte
+seite	tag:nn, lemma:spalte
+uhrzeigersinn	tag:nn, lemma:uhrzeigersinn
+#mitte	tag:nn, lemma:mitte #see adv
+# TEILNAMEN
+$y	tag:nn, lemma:krücke
+krücke	tag:nn, lemma:krücke
+$u	tag:nn, lemma:brücke
+brücke	tag:nn, lemma:brücke
+$v	tag:nn, lemma:winkel
+winkel	tag:nn, lemma:winkel
+dreieck	tag:nn, lemma:winkel
+$f	tag:nn, lemma:pistole
+pistole	tag:nn, lemma:pistole
+kreuz	tag:nn, lemma:kreuz
+plus	tag:nn, lemma:kreuz
+$t	tag:nn, lemma:mast
+mast	tag:nn, lemma:mast
+balken	tag:nn, lemma:balken
+eins	tag:nn, lemma:balken
+$l	tag:nn, lemma:sieben
+sieben	tag:nn, lemma:sieben
+$z	tag:nn, lemma:schlange
+schlange	tag:nn, lemma:schlange
+gewehr	tag:nn, lemma:gewehr
+bajonett	tag:nn, lemma:gewehr
+$w	tag:nn, lemma:treppe
+treppe	tag:nn, lemma:treppe
+handy	tag:nn, lemma:handy
+hand	tag:nn, lemma:handy
+matrix	tag:nn, lemma:spielfeld
+spielfeld	tag:nn, lemma:spielfeld
+spielfeldes	tag:nn, lemma:spielfeld
+quadrat	tag:nn, lemma:spielfeld
+quadrates	tag:nn, lemma:spielfeld
+#
+# ADVERBIEN
+#
+oben	tag:adv, lemma:oben
+unten	tag:adv, lemma:unten
+links	tag:adv, lemma:links
+rechts	tag:adv, lemma:rechts
+mitte	tag:adv, tag:nn, lemma:mitte
+vertikal	tag:adv, lemma:vertikal
+horizontal	tag:adv, lemma:horizontal
+einmal	tag:adv, lemma:einmal
+zweimal	tag:adv, lemma:zweimal
+nochmal	tag:adv, lemma:nochmal
+#
+# SONSTIGES
+#
+aus	tag:appr, lemma:aus
+auf	tag:appr, lemma:auf
+in	tag:appr, lemma:in
+neben	tag:appr, lemma:neben
+gegen	tag:appr, lemma:gegen
+über	tag:appr, lemma:über
+unter	tag:appr, lemma:unter
+ausm	tag:apprart, lemma:aus
+aufs	tag:apprart, lemma:auf
+ins	tag:apprart, lemma:in
+im	tag:apprart, lemma:in
+# Konnektor
+und	tag:kon, lemma:und
+# TODO:
+herum	tag:ptkvz, lemma:herum
+ab	tag:ptkvz, lemma:ab
+hin	tag:ptkvz, lemma:hin
+#
+# FILLER & SKIPWORDS
+#
+ah	tag:fill
+aha	tag:fill
+äh	tag:fill
+ähm	tag:fill
+eh	tag:fill
+ehm	tag:fill
+oh	tag:fill
+öhm	tag:fill
+hm	tag:fill
+mhm	tag:fill
+ach	tag:fill
+achso	tag:fill
+bitte	tag:fill
+dann	tag:fill
+nun	tag:fill
+noch	tag:fill
+jetzt	tag:fill
+ganz	tag:fill
+moment	tag:fill
+#
+# FEEDBACK
+#
+okay	tag:fill
+ok	tag:fill
+gut	tag:fill
+ja	tag:fill
+genau	tag:fill
+richtig	tag:fill
+nein	tag:fill
+ne	tag:fill
+nee	tag:fill
+falsch	tag:fill
+stop	tag:fill
+stopp	tag:fill
+abbrechen	tag:fill
+halt	tag:fill
+#
+# END OF SENTENCE MARKER
+#
+</S>	tag:S!
