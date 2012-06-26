@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<setting sizex="3.0" sizey="7.0">
+    <environment>
+        <grid id="top" rows="5" columns="5" posx="0.0" posy="0.0" border="true">
+            <field row="0" column="0" id="top.0-0" label=""/>
+            <field row="1" column="0" id="top.0-1" label=""/>
+            <field row="2" column="0" id="top.0-2" label=""/>
+            <field row="3" column="0" id="top.0-3" label=""/>
+            <field row="4" column="0" id="top.0-4" label=""/>
+            <field row="0" column="1" id="top.1-0" label=""/>
+            <field row="1" column="1" id="top.1-1" label=""/>
+            <field row="2" column="1" id="top.1-2" label=""/>
+            <field row="3" column="1" id="top.1-3" label=""/>
+            <field row="4" column="1" id="top.1-4" label=""/>
+            <field row="0" column="2" id="top.2-0" label=""/>
+            <field row="1" column="2" id="top.2-1" label=""/>
+            <field row="2" column="2" id="top.2-2" label=""/>
+            <field row="3" column="2" id="top.2-3" label=""/>
+            <field row="4" column="2" id="top.2-4" label=""/>
+            <field row="0" column="3" id="top.3-0" label=""/>
+            <field row="1" column="3" id="top.3-1" label=""/>
+            <field row="2" column="3" id="top.3-2" label=""/>
+            <field row="3" column="3" id="top.3-3" label=""/>
+            <field row="4" column="3" id="top.3-4" label=""/>
+            <field row="0" column="4" id="top.4-0" label=""/>
+            <field row="1" column="4" id="top.4-1" label=""/>
+            <field row="2" column="4" id="top.4-2" label=""/>
+            <field row="3" column="4" id="top.4-3" label=""/>
+            <field row="4" column="4" id="top.4-4" label=""/>
+        </grid>
+    </environment>
+    <objects>
+        <piece type="N" id="tile-0" label="" color="red">
+            <posture rotation="0" isMirrored="false"/>
+            <start-field>top.2-1</start-field>
+            <goal select="false" delete="false">
+                <posture rotation="0" isMirrored="false"/>
+            </goal>
+        </piece>
+        <piece type="X" id="tile-1" label="" color="blue">
+            <posture rotation="0" isMirrored="false"/>
+            <start-field>top.2-0</start-field>
+            <goal select="false" delete="false">
+                <posture rotation="0" isMirrored="false"/>
+            </goal>
+        </piece>
+        <piece type="U" id="tile-2" label="" color="red">
+            <posture rotation="0" isMirrored="false"/>
+            <start-field>top.3-2</start-field>
+            <goal select="false" delete="false">
+                <posture rotation="0" isMirrored="false"/>
+            </goal>
+        </piece>
+        <piece type="X" id="tile-3" label="" color="red">
+            <posture rotation="0" isMirrored="false"/>
+            <start-field>top.0-0</start-field>
+            <goal select="false" delete="false">
+                <posture rotation="0" isMirrored="false"/>
+            </goal>
+        </piece>
+        <piece type="F" id="tile-4" label="" color="blue">
+            <posture rotation="0" isMirrored="false"/>
+            <start-field>top.2-4</start-field>
+            <goal select="false" delete="false">
+                <posture rotation="0" isMirrored="false"/>
+            </goal>
+        </piece>
+        <piece type="U" id="tile-5" label="" color="blue">
+            <posture rotation="0" isMirrored="false"/>
+            <start-field>top.4-3</start-field>
+            <goal select="false" delete="false">
+                <posture rotation="0" isMirrored="false"/>
+            </goal>
+        </piece>
+        <piece type="L" id="tile-6" label="" color="blue">
+            <posture rotation="0" isMirrored="false"/>
+            <start-field>top.1-0</start-field>
+            <goal select="false" delete="false">
+                <posture rotation="0" isMirrored="false"/>
+            </goal>
+        </piece>
+        <cursor state="NEUTRAL" x="2.0" y="3.5"/>
+    </objects>
+    <history/>
+</setting>
