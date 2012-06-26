@@ -6,17 +6,11 @@ import inpro.incremental.processor.TextBasedFloorTracker;
 import inpro.incremental.source.CurrentASRHypothesis;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
-
-import javax.swing.JFrame;
-import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.apache.xmlrpc.server.PropertyHandlerMapping;
 
 import work.inpro.gui.pentomino.january.GameCanvas;
 import work.inpro.system.pentomino.Setting;
@@ -52,7 +46,6 @@ public class PentoDemo {
 	static TextBasedFloorTracker textBasedFloorTracker;
 	static GameCanvas gameCanvas;
 	static Setting setting;
-	private static JFrame gameFrame = new JFrame();
 	
 	public static void main (String[] args) {
 		
@@ -62,11 +55,7 @@ public class PentoDemo {
 	    	ps = cm.getPropertySheet(PROP_CURRENT_HYPOTHESIS);
 	    	textBasedFloorTracker = (TextBasedFloorTracker) cm.lookup(PROP_FLOOR_MANAGER);
 	    	final List<PushBuffer> hypListeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
-	    	PropertyHandlerMapping phm = new PropertyHandlerMapping();
 			SimpleText.createAndShowGUI(hypListeners, textBasedFloorTracker);
-			
-			
-			
 		} 
 		catch (PropertyException e) {
 			e.printStackTrace();

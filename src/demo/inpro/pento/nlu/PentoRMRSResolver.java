@@ -79,6 +79,7 @@ public class PentoRMRSResolver implements Resolver {
 		skipList.add("löschen");
 		skipList.add("drehen");
 		skipList.add("spiegeln");
+		skipList.add("addressee");
 		mappedAttributeLemmata.put("rot","red");
 		mappedAttributeLemmata.put("gelb","yellow");
 		mappedAttributeLemmata.put("grün","green");
@@ -133,8 +134,9 @@ public class PentoRMRSResolver implements Resolver {
 		for (SimpleAssertion sa : transitives) {
 			List<PentoObject> newMatches = new ArrayList<PentoObject>();
 			for (PentoObject po : (List<PentoObject>) matches.get(sa.getArguments().get(0))) {
-				if (transitivePredicateResolvesObject(po, sa.getPredicateName()))
+				if (transitivePredicateResolvesObject(po, sa.getPredicateName())) {
 					newMatches.add(po);
+				}
 			}
 			matches.put(sa.getArguments().get(0), newMatches);
 		}
@@ -162,6 +164,7 @@ public class PentoRMRSResolver implements Resolver {
 					piece.setSelect(false);
 					for (PentoObject po : (List<PentoObject>) matches.get(id)) {
 						if (po instanceof Piece) {
+							System.out.println(po);
 							((Piece) po).setSelect(true);
 						}
 					}					
@@ -359,6 +362,7 @@ public class PentoRMRSResolver implements Resolver {
 			throws JAXBException, InstantiationException, IllegalAccessException {
 		gameFrame.setContentPane(c);
         gameFrame.pack();
+		gameFrame.setSize(setting.getGrids().get(0).getNumColumns()*115, setting.getGrids().get(0).getNumRows()*120);
 		gameFrame.setVisible(true);
 	}
 	

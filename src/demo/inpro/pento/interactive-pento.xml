@@ -29,7 +29,7 @@
       <!-- for dotViewer -->
     <property name="display" value="true" />
     <property name="tmpDir" value="/tmp" />
-    <property name="runDot" value="true" />
+    <property name="runDot" value="false" />
     <property name="domain" value="domain" />
       <!--  for Tagger -->
     <property name="lookupTags" value="file:src/demo/inpro/system/irmrsc/lookup.tags" />
@@ -117,8 +117,9 @@
     	<property name="semMacrosFile" value="${semMacrosFile}" />
     	<property name="semRulesFile" value="${semRulesFile}"/>
     	<property name="tagLexiconFile" value="${tagLexiconFile}"/>
+    	<property name="resolveReferences" value="true"/>
         <propertylist name="hypChangeListeners">
-           <item>dotNotifier</item> 
+         <!--    <item>dotNotifier</item> --> 
         </propertylist>
      </component>
 
