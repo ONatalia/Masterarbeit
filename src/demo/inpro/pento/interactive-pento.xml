@@ -1,4 +1,25 @@
 
+
+<!DOCTYPE config[
+  <!ENTITY sphinx SYSTEM "src/inpro/apps/sphinx.xml">
+  <!ENTITY sphinxlang SYSTEM "src/inpro/apps/sphinx-de.xml">
+  <!ENTITY frontend SYSTEM "src/inpro/apps/frontend.xml">
+]>
+<!--
+   Sphinx-4 Configuration file
+-->
+
+
+<!-- ******************************************************** -->
+<!--  incremental configuration file                          -->
+<!-- ******************************************************** -->
+<config>
+
+	&sphinx;
+	&sphinxlang;
+	&frontend;
+
+
     <property name="deltifier" value="none"/>
     <property name="deltifierParam" value="0"/>
     <property name="baseData" value="baseData"/>
@@ -11,16 +32,16 @@
     <property name="runDot" value="true" />
     <property name="domain" value="domain" />
       <!--  for Tagger -->
-    <property name="lookupTags" value="file:src/demo/inpro/pento/resource/lookup.tags" />
+    <property name="lookupTags" value="file:src/demo/inpro/system/irmrsc/lookup.tags" />
       <!--  for TagParser -->
-    <property name="grammarFile" value="file:src/demo/inpro/pento/resource/irmrsc-grammar.xml" />
+    <property name="grammarFile" value="file:src/demo/inpro/system/irmrsc/irmrsc-grammar.xml" />
       <!--  for RMRSComposer -->
     <property name="referencePruning" value="true"/>
     <property name="malusNoReference" value="0.01"/>
     <property name="gold" value="delete tile-1"/>
-    <property name="semMacrosFile" value="file:src/demo/inpro/pento/resource/irmrsc-semmacros.xml" />
-   	<property name="semRulesFile" value="file:src/demo/inpro/pento/resource/irmrsc-semrules.xml" />
-   	<property name="tagLexiconFile" value="file:src/demo/inpro/pento/resource/irmrsc-taglexicon.xml" />    
+    <property name="semMacrosFile" value="file:src/demo/inpro/system/irmrsc/irmrsc-semmacros.xml" />
+   	<property name="semRulesFile" value="file:src/demo/inpro/system/irmrsc/irmrsc-semrules.xml" />
+   	<property name="tagLexiconFile" value="file:src/demo/inpro/system/irmrsc/irmrsc-taglexicon.xml" />    
 
     <!-- ******************************************************** -->
     <!-- The incremental processing configuration                 -->
@@ -157,4 +178,6 @@
     <component name="dispatchStream2" type="inpro.audio.DispatchStream">
         <property name="sendSilence" value="true"/>
     </component>
+</config>
+    
     

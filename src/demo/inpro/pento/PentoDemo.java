@@ -58,13 +58,12 @@ public class PentoDemo {
 		
 		try {
 			BasicConfigurator.configure();
-			cm = new ConfigurationManager(new File("src/demo/inpro/pento/config.xml").toURI().toURL());
+			cm = new ConfigurationManager(new File("src/demo/inpro/pento/interactive-pento.xml").toURI().toURL());
 	    	ps = cm.getPropertySheet(PROP_CURRENT_HYPOTHESIS);
 	    	textBasedFloorTracker = (TextBasedFloorTracker) cm.lookup(PROP_FLOOR_MANAGER);
 	    	final List<PushBuffer> hypListeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
 	    	PropertyHandlerMapping phm = new PropertyHandlerMapping();
 			SimpleText.createAndShowGUI(hypListeners, textBasedFloorTracker);
-			
 			
 			
 			
