@@ -16,8 +16,6 @@ import inpro.synthesis.MaryAdapter;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
-
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Component;
@@ -52,7 +50,7 @@ public class SynthesisModule extends IUModule {
 	}
 	
 	/**
-	 * please only send PhraseIUs, everything else will result in assertions failing
+	 * please only send PhraseIUs or WordIUs; everything else will result in assertions failing
 	 */
 	@Override
 	protected synchronized void leftBufferUpdate(Collection<? extends IU> ius,
@@ -65,7 +63,7 @@ public class SynthesisModule extends IUModule {
 			} else {
 				phraseIU = new PhraseIU((WordIU) em.getIU());
 			}
-			System.out.println("   " + em.getType() + " " + phraseIU.toPayLoad() + " (" + phraseIU.getStatus() + "; " + phraseIU.getType() + ")");
+			System.out.println("   " + em.getType() + " " + phraseIU.toPayLoad() + " (" + phraseIU.getType() + ")");
 			switch (em.getType()) {
 			case ADD:
 				if (currentInstallment != null && !currentInstallment.isCompleted()) {
@@ -85,13 +83,16 @@ public class SynthesisModule extends IUModule {
 				appendNotification(currentInstallment, phraseIU);
 				break;
 			case REVOKE:
-				throw new NotImplementedException("phrases cannot yet be revoked from synthesis; check for our next release");
+				//throw new NotImplementedException("phrases cannot yet be revoked from synthesis; check for our next release");
+				// silently ignore revokes for now
 			default:
 				break;
 			}
 		}
-		if (startPlayInstallment)
+		if (startPlayInstallment) {
 			speechDispatcher.playStream(currentInstallment.getAudio());
+		}
+		rightBuffer.setBuffer(currentInstallment.getWords());
 	}
 	
 	private void appendNotification(SysInstallmentIU installment, PhraseIU phrase) {
@@ -135,8 +136,11 @@ public class SynthesisModule extends IUModule {
 		public void update(IU updatedIU) {
 			if (updatedIU.isOngoing()) {
 				// block vocoding from finishing synthesis before our completion is available
-				if (!completed.getType().equals(PhraseIU.PhraseType.FINAL))
-					((SysSegmentIU) currentInstallment.getFinalWord().getLastSegment()).setAwaitContinuation(true);
+				if (!completed.getType().equals(PhraseIU.PhraseType.FINAL)) {
+					SysSegmentIU seg = (SysSegmentIU) currentInstallment.getFinalWord().getLastSegment();  
+					if (seg != null) 
+						seg.setAwaitContinuation(true);
+				}
 				completed.setProgress(Progress.COMPLETED);
 			}
 		}

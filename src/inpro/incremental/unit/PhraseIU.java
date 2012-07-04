@@ -13,7 +13,6 @@ public class PhraseIU extends IU {
 
 	final String phrase;
 	private PhraseType type;
-	private PhraseStatus status;
 	/** the state of delivery that this unit is in */
 	Progress progress = Progress.UPCOMING;
 	
@@ -26,22 +25,16 @@ public class PhraseIU extends IU {
 	    UNDEFINED // dunno
 	}
 	
-	public enum PhraseStatus {
-	    NORMAL, // currently spoken/to be spoken next
-	    PROJECTED // the next phrase, just as context for the currently ongoing phrase 
-	}
-	
 	public PhraseIU(WordIU word) {
-		this(word.toPayLoad(), PhraseStatus.NORMAL);
+		this(word.toPayLoad());
 	}
 	
-	public PhraseIU(String phrase, PhraseStatus status) {
-		this(phrase, status, PhraseType.UNDEFINED);
+	public PhraseIU(String phrase) {
+		this(phrase, PhraseType.UNDEFINED);
 	}
 	
-	public PhraseIU(String phrase, PhraseStatus status, PhraseType type) {
+	public PhraseIU(String phrase, PhraseType type) {
 		this.phrase = phrase;
-		this.setStatus(status);
 		this.type = type;
 	}
 	
@@ -78,21 +71,16 @@ public class PhraseIU extends IU {
 
 	public void setFinal() {
 		this.type = PhraseIU.PhraseType.FINAL;
-		WordIU lastWord = (WordIU) groundedIn().get(groundedIn.size() - 1);
+		WordIU lastWord = null;
+		if (groundedIn != null) {
+			lastWord = (WordIU) groundedIn.get(groundedIn.size() - 1);
+		}
 		if (lastWord != null) {
 			for (SegmentIU seg : lastWord.getSegments()) {
 				// clear any locks that might block the vocoder from finishing the final phrase
 				((SysSegmentIU) seg).setAwaitContinuation(false);			
 			}
 		}
-	}
-
-	public PhraseStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(PhraseStatus status) {
-		this.status = status;
 	}
 
 	public PhraseType getType() {

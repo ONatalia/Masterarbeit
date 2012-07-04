@@ -1,6 +1,5 @@
 package done.inpro.system.calendar;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -13,7 +12,6 @@ import scalendar.spudmanager.UtteranceObject;
 import scalendar.uttereanceobject.EventConflict;
 import scalendar.uttereanceobject.MovedEvent;
 import scalendar.uttereanceobject.UpcomingEvents;
-import edu.rutgers.nlp.asciispec.grammar.jj.ParseException;
 
 public class GenerateStimuli {
 	
@@ -136,7 +134,7 @@ public class GenerateStimuli {
 		return new UpcomingEvents(l);
 	}
 
-	public static void main(String[] args)  throws FileNotFoundException, ParseException {
+	public static void main(String[] args)  throws Exception {
 		SpudManager spudmanager = new SpudManager(
 				new CalendarKnowledgeInterface(),
 				"src/inpro/domains/calendar/calendar.gs");

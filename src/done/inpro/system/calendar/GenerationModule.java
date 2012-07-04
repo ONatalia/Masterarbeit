@@ -12,7 +12,6 @@ import inpro.incremental.unit.IU.IUUpdateListener;
 import inpro.synthesis.MaryAdapter;
 import inpro.synthesis.hts.InteractiveHTSEngine;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.GregorianCalendar;
@@ -28,7 +27,6 @@ import scalendar.spud.CalendarKnowledgeInterface;
 import scalendar.spudmanager.SpudManager;
 import scalendar.uttereanceobject.EventConflict;
 import scalendar.uttereanceobject.MovedEvent;
-import edu.rutgers.nlp.asciispec.grammar.jj.ParseException;
 import edu.rutgers.nlp.spud.SPUD;
 
 public class GenerationModule extends IUModule {
@@ -53,7 +51,7 @@ public class GenerationModule extends IUModule {
 					phrases.remove(phrases.size() - 1);
 					String phrase = nlg.generateNextPhrase();
 					if (phrase != null) {
-						PhraseIU piu = new PhraseIU(phrase, PhraseIU.PhraseStatus.NORMAL); // add type: continuation or repair?
+						PhraseIU piu = new PhraseIU(phrase); // add type: continuation or repair?
 						piu.addUpdateListener(phraseUpdateListener);
 						phrases.add(piu);
 					} else {
@@ -68,12 +66,11 @@ public class GenerationModule extends IUModule {
 					projectedPhrase = nlg.takeSimulatedAndSimulateNextPhrase();
 					// give prev. IU normal status
 					PhraseIU iu = phrases.get(phrases.size() - 1);
-					iu.setStatus(PhraseIU.PhraseStatus.NORMAL);
 					iu.addUpdateListener(phraseUpdateListener);
 				} 	 
 				
 				if (projectedPhrase != null) {
-					PhraseIU ppiu = new PhraseIU(projectedPhrase, PhraseIU.PhraseStatus.PROJECTED);
+					PhraseIU ppiu = new PhraseIU(projectedPhrase);
 					ppiu.addUpdateListener(phraseUpdateListener);
 					phrases.add(ppiu);
 				} else {
@@ -95,11 +92,11 @@ public class GenerationModule extends IUModule {
 		long start = System.currentTimeMillis();
 		
 		String phrase = nlg.generateNextPhrase();
-		PhraseIU piu = new PhraseIU(phrase, PhraseIU.PhraseStatus.NORMAL, PhraseIU.PhraseType.INITIAL);
+		PhraseIU piu = new PhraseIU(phrase, PhraseIU.PhraseType.INITIAL);
 		phrases.add(piu);
 		
 		String projectedPhrase = nlg.simulateNextButOnePhrase();
-		PhraseIU ppiu = new PhraseIU(projectedPhrase, PhraseIU.PhraseStatus.PROJECTED);
+		PhraseIU ppiu = new PhraseIU(projectedPhrase);
 		phrases.add(ppiu);
 		
 		// for timing-measurements:
@@ -171,7 +168,7 @@ public class GenerationModule extends IUModule {
 	}
 	
 	
-	public static void main(String[] args) throws FileNotFoundException, ParseException {
+	public static void main(String[] args) throws Exception {
 		int stimulusID = 1;
 		// for detailed timing-measurements:
 		boolean measureTiming = false;
