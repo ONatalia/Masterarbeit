@@ -35,7 +35,8 @@
 
 <xsl:template match="mary:ph">
  <xsl:element name="ph">
-  <xsl:attribute name="d"><xsl:apply-templates select="@d" /></xsl:attribute>
+    <!-- the rounding is necessary because Mary sometimes outputs doubles instead of ints for duration (e.g. "54.0" instead of "54") -->
+    <xsl:attribute name="d"><xsl:value-of select="round(number(@d))" /></xsl:attribute>
   <xsl:attribute name="end"><xsl:apply-templates select="@end" /></xsl:attribute>
   <xsl:attribute name="f0"><xsl:apply-templates select="@f0" /></xsl:attribute>
   <xsl:attribute name="p"><xsl:apply-templates select="@p" /></xsl:attribute>
