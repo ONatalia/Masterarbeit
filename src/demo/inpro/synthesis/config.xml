@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config[
+  <!ENTITY iuconfig SYSTEM "demo/inpro/synthesis/iu-config.xml">
+  <!ENTITY sphinx SYSTEM "inpro/apps/sphinx.xml">
+  <!ENTITY sphinxlang SYSTEM "inpro/apps/sphinx-de.xml">
+  <!ENTITY frontend SYSTEM "inpro/apps/frontend.xml">
+]>
+<!--
+   Sphinx-4 Configuration file
+-->
+
+
+<!-- ******************************************************** -->
+<!--  incremental configuration file                          -->
+<!-- ******************************************************** -->
 <config>
-    <component name="dispatchStream" type="inpro.audio.DispatchStream">
-        <property name="sendSilence" value="true"/>
-    </component>
+
+	&sphinx;
+	&sphinxlang;
+	&frontend;
+    &iuconfig;
+
+<!--property name="logLevel" value="FINE"/-->
+
 </config>

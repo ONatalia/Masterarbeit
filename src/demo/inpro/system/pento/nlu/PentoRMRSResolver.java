@@ -1,8 +1,4 @@
-package demo.inpro.pento.nlu;
-
-
-
-
+package demo.inpro.system.pento.nlu;
 
 import inpro.incremental.processor.RMRSComposer.Resolver;
 import inpro.irmrsc.rmrs.Formula;
@@ -19,8 +15,6 @@ import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.xml.bind.JAXBException;
-
-import org.apache.log4j.Logger;
 
 import work.inpro.gui.pentomino.january.GameCanvas;
 import work.inpro.system.pentomino.Column;
@@ -57,13 +51,11 @@ public class PentoRMRSResolver implements Resolver {
 	private boolean showSetting;
 
 	private boolean updateSetting = true; // Change to suppress changes to the GUI
- 	private static Logger logger;
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		showSetting = ps.getBoolean(PROP_SHOW_SETTING);
 		try {
-			logger = Logger.getLogger(this.getClass());
 			setting = Setting.createFromXML(new URL(ps.getString(PROP_SETTING_XML)).openStream());
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -347,27 +339,15 @@ public class PentoRMRSResolver implements Resolver {
 		}
 	}
 	
-	/**
-	 * Sets up game canvas from XML file name.
-	 * @param settingXML the XML file to use for setting the canvas.
-	 */
-	public void drawScene(String settingXML) {
-		this.drawScene();
-	}
-	
 	/** 
 	 * Resets GUI 
 	 */
-	protected static void resetGUI(Setting setting, String frameName, GameCanvas c) 
-			throws JAXBException, InstantiationException, IllegalAccessException {
+	protected static void resetGUI(Setting setting, String frameName, GameCanvas c) {
+		gameFrame.setName(frameName);
 		gameFrame.setContentPane(c);
         gameFrame.pack();
 		gameFrame.setSize(setting.getGrids().get(0).getNumColumns()*115, setting.getGrids().get(0).getNumRows()*120);
 		gameFrame.setVisible(true);
 	}
 	
-	public static void setLogger(Logger l) {
-		logger = l;
-	}
-
 }

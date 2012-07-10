@@ -1,7 +1,6 @@
 package demo.inpro.system.echodm;
 
 import inpro.apps.SimpleReco;
-import inpro.apps.util.CommonCommandLineParser;
 import inpro.apps.util.RecoCommandLineParser;
 
 import java.io.IOException;
@@ -9,7 +8,6 @@ import java.net.URL;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import edu.cmu.sphinx.util.props.ConfigurationManager;
@@ -17,8 +15,6 @@ import edu.cmu.sphinx.util.props.PropertyException;
 
 
 public class EchoDemo {
-	
-	private static final Logger logger = Logger.getLogger(EchoDemo.class);
 	
 	static ConfigurationManager cm;
 	

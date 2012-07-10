@@ -1,0 +1,1232 @@
+#############################################################################
+## Copyright (c) 1996, Carnegie Mellon University, Cambridge University,
+## Ronald Rosenfeld and Philip Clarkson
+## Version 3, Copyright (c) 2006, Carnegie Mellon University 
+## Contributors includes Wen Xu, Ananlada Chotimongkol, 
+## David Huggins-Daines, Arthur Chan and Alan Black 
+#############################################################################
+=============================================================================
+===============  This file was produced by the CMU-Cambridge  ===============
+===============     Statistical Language Modeling Toolkit     ===============
+=============================================================================
+This is a 3-gram language model, based on a vocabulary of 119 words,
+  which begins "'ch", "'n", "'nen"...
+This is an OPEN-vocabulary model (type 1)
+  (OOVs were mapped to UNK, which is treated as any other vocabulary word)
+Good-Turing discounting was applied.
+1-gram frequency of frequency : 50 
+2-gram frequency of frequency : 222 57 33 14 9 10 5 
+3-gram frequency of frequency : 444 98 33 23 13 10 8 
+1-gram discounting ratios : 0.96 
+2-gram discounting ratios : 0.39 0.83 0.46 0.75 
+3-gram discounting ratios : 0.41 0.48 0.93 0.69 0.92 0.93 0.40 
+This file is in the ARPA-standard format introduced by Doug Paul.
+
+p(wd3|wd1,wd2)= if(trigram exists)           p_3(wd1,wd2,wd3)
+                else if(bigram w1,w2 exists) bo_wt_2(w1,w2)*p(wd3|wd2)
+                else                         p(wd3|w2)
+
+p(wd2|wd1)= if(bigram exists) p_2(wd1,wd2)
+            else              bo_wt_1(wd1)*p_1(wd2)
+
+All probs and back-off weights (bo_wt) are given in log10 form.
+
+Data formats:
+
+Beginning of data mark: \data\
+ngram 1=nr            # number of 1-grams
+ngram 2=nr            # number of 2-grams
+ngram 3=nr            # number of 3-grams
+
+\1-grams:
+p_1     wd_1 bo_wt_1
+\2-grams:
+p_2     wd_1 wd_2 bo_wt_2
+\3-grams:
+p_3     wd_1 wd_2 wd_3 
+
+end of data mark: \end\
+
+\data\
+ngram 1=119
+ngram 2=386
+ngram 3=666
+
+\1-grams:
+-3.2146 'ch	-0.2140
+-1.8965 'n	-0.7680
+-2.8965 'nen	-0.1965
+-3.2146 'rück	-0.1058
+-3.2146 's	-0.2126
+-0.6547 </s>	-2.5441
+-98.9997 <s>	-0.1858
+-2.8965 Bildschirms	-0.2115
+-3.2146 Drittel	-0.2140
+-3.2146 Lück	-0.1738
+-2.8965 Millimeter	-0.0528
+-3.2146 Mist	-0.1058
+-2.8965 Mitte	-0.7819
+-2.5955 Müll	-0.7387
+-2.8965 Rand	-0.0528
+-3.2146 Schütte	-0.1738
+-3.2146 Strecke	-0.1058
+-1.8551 Stück	-0.5071
+-2.0514 Stückchen	-0.3997
+-3.2146 Zentimeter	-0.1738
+-2.8965 abwärts	-0.6737
+-3.2146 ach	-0.2143
+-3.2146 ah	-0.2121
+-2.8965 also	-0.1708
+-3.2146 auf	-0.2137
+-2.8965 bis	-0.2137
+-3.2146 bis'sch	-0.2034
+-3.2146 biss'l	-0.1470
+-3.2146 biss'n	-0.1470
+-1.5348 bisschen	-0.2884
+-2.1976 bitte	-0.3507
+-3.2146 daneben	-0.1653
+-3.2146 danke	-0.2034
+-2.7204 das	-0.2126
+-2.5955 den	-0.6073
+-2.8965 der	-0.2129
+-2.8965 des	-0.7819
+-2.8965 deutlich	-0.7716
+-2.8965 die	-0.7819
+-1.7204 ein	-0.6594
+-3.2146 eine	-0.2143
+-3.2146 einfach	-0.2042
+-2.7204 einmal	-0.4601
+-2.2433 einwerfen	-0.3225
+-2.2945 etwas	-0.1358
+-3.2146 fahren	-0.1058
+-1.6294 fallen	-1.4540
+-3.2146 falsch	-0.1470
+-3.2146 funktioniert	-0.2126
+-3.2146 gan	-0.2096
+-2.1976 ganz	-0.3540
+-2.7204 geh	-0.1678
+-2.4986 geht	-0.1733
+-2.7204 genau	-0.2000
+-3.2146 großes	-0.2084
+-3.2146 größer	-0.1058
+-3.2146 größeres	-0.2084
+-2.5955 halt	-0.2710
+-3.2146 he	-0.1058
+-2.4986 hm	-0.0727
+-3.2146 ich	-0.2034
+-3.2146 ihn	-0.2143
+-2.8965 in	-0.7819
+-2.4986 ja	-0.1464
+-2.1562 jetzt	-0.2623
+-3.2146 joa	-0.1738
+-2.3525 klein	-1.0574
+-3.2146 kleine	-0.2143
+-3.2146 kleineres	-0.2017
+-1.9423 kleines	-0.8810
+-2.4986 lass	-0.2326
+-1.6791 lassen	-0.5329
+-3.2146 linken	-0.2140
+-0.8415 links	-0.8050
+-3.2146 los	-0.1058
+-1.8965 loslassen	-1.2337
+-1.9423 mehr	-0.8103
+-3.2146 mein	-0.2096
+-2.5955 na	-0.3608
+-1.0483 nach	-1.3557
+-2.3525 nich	-0.6351
+-3.2146 nja	-0.2143
+-2.8965 no	-0.7774
+-1.4652 noch	-0.9906
+-2.2945 nochmal	-0.1600
+-2.8965 oben	-0.6737
+-3.2146 oder	-0.1738
+-2.8965 oh	-0.2020
+-2.1562 okay	-0.0372
+-3.2146 rech	-0.2034
+-3.2146 rechten	-0.2140
+-0.9697 rechts	-0.5036
+-3.2146 reicht	-0.2126
+-3.2146 ret	-0.1994
+-1.8753 runter	-0.4287
+-2.8965 sage	-0.6737
+-3.2146 sehr	-0.2129
+-2.5955 so	-0.3144
+-2.4986 stark	-0.2801
+-1.5955 stopp	-0.4007
+-3.2146 uhm	-0.2132
+-3.2146 un	-0.2042
+-1.8753 und	-0.8526
+-2.8965 unten	-0.1023
+-2.7204 viel	-0.2529
+-3.2146 vier	-0.2143
+-2.8965 warm	-0.1464
+-2.4194 weit	0.0005
+-1.6065 weiter	-0.6818
+-2.3525 wenig	-0.8624
+-3.2146 wieder	-0.1058
+-3.2146 windiges	-0.2017
+-3.2146 zu	-0.2129
+-2.8965 zum	-0.2140
+-2.7204 zurück	-0.1048
+-2.7204 zwei	-0.2135
+-3.2146 zweimal	-0.2134
+-2.2945 äh	-0.1494
+-3.2146 ähm	-0.1738
+
+\2-grams:
+-0.4091 'ch oben 0.5536
+-1.1657 'n Stück 0.3012
+-1.7102 'n biss'l -0.0142
+-0.1871 'n bisschen 0.2669
+-1.0783 'n kleines 0.3719
+-1.7102 'n mehr 0.4244
+-0.7102 'nen bisschen -0.2000
+-0.7102 'nen kleines 0.4244
+-0.4091 'rück </s> 2.3153
+-0.4091 's nich 0.3153
+-0.0012 </s> <s> 0.0570
+-2.9557 <s> 'ch -0.0142
+-2.3238 <s> 'n 0.1746
+-2.9557 <s> 'nen -0.1346
+-1.5051 <s> </s> 1.5027
+-2.9557 <s> Mist -0.0142
+-2.9557 <s> Schütte -0.0142
+-1.5923 <s> Stückchen -0.1221
+-2.3238 <s> also -0.0142
+-2.9557 <s> bis -0.1346
+-1.3161 <s> bisschen -0.7422
+-2.9557 <s> bitte 0.0722
+-2.3238 <s> das -0.0981
+-2.0673 <s> den 0.1001
+-2.9557 <s> der -0.1346
+-1.7684 <s> ein 0.0676
+-2.3238 <s> einmal 0.0719
+-2.9557 <s> einwerfen -0.1397
+-2.3238 <s> etwas -0.0474
+-2.0673 <s> fallen 0.4579
+-1.7684 <s> ganz 0.0997
+-2.4112 <s> geht -0.0753
+-2.3238 <s> halt -0.1346
+-2.4112 <s> hm 0.0636
+-2.9557 <s> ja -0.1935
+-1.8476 <s> jetzt -0.0641
+-2.9557 <s> joa -0.0142
+-2.0673 <s> kleines 0.1449
+-2.9557 <s> lass -0.1935
+-0.9131 <s> links -0.1672
+-1.2243 <s> loslassen 0.0202
+-2.9557 <s> mein -0.0142
+-2.3238 <s> na -0.1346
+-0.8476 <s> nach -0.2513
+-2.9557 <s> nich -0.2039
+-1.1663 <s> noch 0.7745
+-1.7684 <s> nochmal 0.1769
+-2.9557 <s> oder -0.0142
+-1.8476 <s> okay -0.1353
+-1.0694 <s> rechts -0.1887
+-1.7684 <s> runter 0.1071
+-2.9557 <s> sehr -0.0142
+-2.4112 <s> stark 0.1426
+-1.2041 <s> stopp -0.3497
+-2.9557 <s> uhm -0.0142
+-2.9557 <s> un -0.0142
+-1.5923 <s> und 0.5121
+-2.4112 <s> viel -0.8626
+-2.9557 <s> vier -0.0142
+-1.4004 <s> weiter -0.1989
+-2.9557 <s> windiges -0.0142
+-2.9557 <s> zu -0.0142
+-2.9557 <s> zurück -0.1683
+-2.3238 <s> zwei -0.0981
+-2.9557 <s> zweimal -0.0142
+-1.7684 <s> äh 0.0327
+-0.7102 Bildschirms bitte -0.2115
+-0.7102 Bildschirms nja -0.0142
+-0.4091 Drittel der -0.1346
+-0.4091 Lück nach 0.1009
+-0.7102 Millimeter </s> 2.3153
+-0.7102 Millimeter nach 0.1009
+-0.4091 Mist </s> 2.3153
+-0.0783 Mitte des 0.5011
+-0.3794 Müll bitte 0.0197
+-0.3794 Müll nach 1.0173
+-0.7102 Rand </s> 2.3153
+-0.7102 Rand nach 0.1009
+-0.4091 Schütte nach 0.1009
+-0.4091 Strecke </s> 2.3153
+-1.7515 Stück 'rück -0.0142
+-0.6435 Stück </s> 1.4543
+-1.7515 Stück jetzt -0.1573
+-1.1197 Stück links -0.0750
+-0.3010 Stück nach 0.9427
+-1.7515 Stück rechts 0.0986
+-1.7515 Stück stopp 0.0618
+-0.2430 Stückchen links 0.0912
+-1.0108 Stückchen nach 0.9830
+-1.5553 Stückchen rechts 0.0986
+-1.5553 Stückchen und 0.1594
+-1.5553 Stückchen weiter -0.2103
+-0.4091 Zentimeter nach 0.0013
+-0.0783 abwärts </s> 2.2627
+-0.4091 ach daneben -0.0142
+-0.4091 ah einwerfen -0.0517
+-0.7102 also bitte 0.0722
+-0.7102 also nach 0.1009
+-0.4091 auf zwei -0.1683
+-0.7102 bis ich -0.0142
+-0.7102 bis zum -0.1346
+-0.4091 bis'sch stopp -0.2107
+-0.4091 biss'l links 0.0761
+-0.4091 biss'n links -0.2153
+-1.5367 bisschen </s> 1.4177
+-2.0812 bisschen größeres -0.0142
+-1.4494 bisschen ja -0.1552
+-0.5260 bisschen links -0.8413
+-1.1929 bisschen mehr 0.1969
+-2.0812 bisschen na 0.0059
+-0.8270 bisschen nach 0.5669
+-1.5367 bisschen noch -0.9738
+-2.0812 bisschen oh -0.1346
+-0.8270 bisschen rechts 0.1085
+-1.5367 bisschen weiter -0.0472
+-2.0812 bisschen zurück -0.1683
+-1.4091 bitte </s> 2.3153
+-1.4091 bitte deutlich 0.5536
+-1.4091 bitte fahren -0.0142
+-1.4091 bitte in 0.5536
+-0.3010 bitte nach 0.7966
+-1.4091 bitte zurück -0.1683
+-0.4091 daneben rechts -0.2278
+-0.4091 danke stopp -0.1723
+-0.8862 das funktioniert -0.0142
+-0.8862 das geht -0.1935
+-0.8862 das reicht -0.0142
+-0.1228 den Müll 0.5011
+-0.7102 der Strecke -0.0142
+-0.7102 der geht -0.0902
+-0.0783 des Bildschirms -0.0142
+-0.0783 deutlich weiter -0.1107
+-0.0783 die Mitte 0.5011
+-1.8862 ein Millimeter -0.1346
+-1.3418 ein Stück -0.0607
+-1.3418 ein Stückchen 0.1340
+-0.6990 ein bisschen -0.1408
+-1.8862 ein gan -0.0142
+-1.2544 ein ganz -0.2176
+-1.8862 ein großes -0.0142
+-0.6990 ein klein 0.2802
+-0.6990 ein kleines 0.0552
+-1.8862 ein wenig 0.6743
+-0.4091 eine kleine -0.0142
+-0.4091 einfach fallen -0.1919
+-0.2544 einmal bitte -0.1935
+-0.8862 einmal nach 0.0013
+-0.7315 einwerfen </s> 2.2627
+-1.3634 einwerfen ach -0.0142
+-0.7315 einwerfen links -0.1461
+-0.4750 einwerfen rechts 0.3428
+-0.7677 etwas mehr 0.5186
+-1.3122 etwas nach 0.1009
+-0.7677 etwas rechts -0.7990
+-1.3122 etwas weiter -0.2137
+-0.4091 fahren </s> 2.3153
+-1.0890 fallen </s> 2.0358
+-0.0497 fallen lassen 0.1912
+-0.4091 falsch links -0.0936
+-0.4091 funktioniert nich 0.3153
+-0.4091 gan kleines 0.4244
+-1.4091 ganz bisschen -0.2252
+-1.4091 ganz ein -0.1319
+-0.8646 ganz kleines 0.6754
+-0.7773 ganz stark -0.1428
+-0.7773 ganz weit -0.0785
+-1.4091 ganz zum -0.1346
+-0.8862 geh bitte 0.0722
+-0.8862 geh ganz -0.2115
+-0.8862 geh nach 0.0013
+-1.1081 geht 's -0.0142
+-1.1081 geht links 0.0761
+-0.5636 geht nich -0.5823
+-0.8862 genau in 0.5536
+-0.8862 genau jetzt -0.1573
+-0.8862 genau weiter -0.0581
+-0.4091 großes Stück 0.0722
+-0.4091 größer </s> 2.3153
+-0.4091 größeres Stück 0.0722
+-1.0112 halt links -0.2262
+-0.3794 halt rechts -0.1844
+-1.0112 halt stopp -0.2246
+-0.4091 he </s> 2.3153
+-1.1081 hm </s> 2.3153
+-1.1081 hm links 0.0761
+-1.1081 hm nach 0.1009
+-0.4763 hm noch 0.1814
+-0.4091 ich stopp -0.2107
+-0.4091 ihn einfach -0.0142
+-0.0783 in die 0.5011
+-1.1081 ja lass -0.0902
+-1.1081 ja okay -0.1573
+-1.1081 ja rechts 0.0986
+-1.1081 ja so -0.1843
+-1.1081 ja stopp -0.1723
+-0.9060 jetzt fallen -0.1603
+-1.4505 jetzt genau -0.1683
+-1.4505 jetzt nach -0.2236
+-0.8187 jetzt noch -0.0483
+-0.8187 jetzt runter 0.1068
+-1.4505 jetzt stopp -0.2246
+-1.4505 jetzt weiter -0.0581
+-0.4091 joa nach 0.1009
+-1.2542 klein biss'n -0.0142
+-0.0669 klein wenig -0.2489
+-0.4091 kleine Lück -0.0142
+-0.4091 kleineres bisschen -0.0752
+-0.1091 kleines Stück 0.5300
+-1.6644 kleines Stückchen -0.1842
+-1.1199 kleines bisschen -0.1780
+-0.5636 lass fallen -1.0895
+-1.1081 lass ihn -0.0142
+-1.1081 lass los -0.0142
+-0.1698 lassen </s> 1.1823
+-1.9406 lassen ein -0.1319
+-1.9406 lassen einmal -0.1683
+-1.9406 lassen geh -0.1683
+-1.9406 lassen links -0.2281
+-1.9406 lassen na 0.0059
+-1.3088 lassen nach 1.0173
+-1.3088 lassen okay -0.1969
+-1.3088 lassen rechts -0.1222
+-0.4091 linken Rand -0.1346
+-2.7671 links 'n 0.2271
+-0.2972 links </s> 0.4834
+-2.7671 links ah -0.0142
+-2.7671 links bis -0.1346
+-2.7671 links deutlich 0.5536
+-2.2226 links einwerfen 0.1315
+-2.7671 links etwas -0.2071
+-1.5128 links fallen 0.7472
+-2.7671 links genau -0.1683
+-2.1352 links halt -0.0467
+-2.1352 links hm 0.0018
+-2.7671 links klein 0.6163
+-0.5726 links links 0.1326
+-2.7671 links no 0.5536
+-1.3579 links noch 0.3581
+-2.7671 links okay -0.2131
+-1.8787 links rechts -0.4114
+-2.1352 links runter -0.1643
+-1.5798 links stopp 0.1960
+-2.1352 links und 0.1068
+-2.7671 links warm -0.1346
+-2.2226 links weiter -0.0699
+-2.7671 links wieder -0.0142
+-0.4091 los </s> 2.3153
+-0.0202 loslassen </s> 1.2218
+-1.0326 mehr </s> 2.2627
+-0.1091 mehr nach 0.6135
+-1.6644 mehr rechts 0.0986
+-1.6644 mehr stopp -0.1723
+-0.4091 mein kleines -0.1945
+-1.0112 na 'nen -0.1346
+-1.0112 na das -0.1683
+-0.3794 na rechts -0.2068
+-1.9265 nach </s> 2.2627
+-0.2742 nach links -0.0221
+-2.5583 nach oben 0.5536
+-2.5583 nach rech -0.0142
+-0.3858 nach rechts -0.1258
+-2.5583 nach ret -0.0142
+-1.9265 nach unten -0.0142
+-2.5583 nach weiter -0.0581
+-0.1461 nich </s> 1.4543
+-1.2542 nich ein -0.2086
+-1.2542 nich okay -0.1712
+-0.4091 nja danke -0.0142
+-0.0783 no mehr 0.3719
+-0.5283 noch 'n 0.1089
+-2.1415 noch Stückchen -0.2165
+-2.1415 noch bisschen -0.2252
+-0.5019 noch ein 0.0611
+-2.1415 noch eine -0.0142
+-1.5097 noch etwas -0.2001
+-2.1415 noch kleineres -0.0142
+-0.8873 noch mehr 0.0486
+-1.5970 noch nach 0.0691
+-1.0334 noch weiter 0.4287
+-0.6804 nochmal </s> 2.2627
+-1.3122 nochmal links 0.0761
+-0.7677 nochmal rechts 0.3046
+-0.6804 nochmal so 0.0854
+-0.0783 oben </s> 2.2627
+-0.4091 oder nach -0.2276
+-0.7102 oh fallen 0.7373
+-0.7102 oh äh -0.1271
+-1.4505 okay 'n -0.1981
+-0.9060 okay </s> 1.4177
+-1.4505 okay ganz -0.1494
+-1.4505 okay geh -0.1683
+-0.8187 okay lass -0.1428
+-1.4505 okay nach 0.1009
+-1.4505 okay rechts 0.0986
+-1.4505 okay ähm -0.0142
+-0.4091 rech stopp -0.2141
+-0.4091 rechten Rand -0.1346
+-0.2762 rechts </s> 0.5898
+-2.6396 rechts bis'sch -0.0142
+-2.6396 rechts bitte -0.2115
+-2.0951 rechts ein -0.1408
+-1.7512 rechts einwerfen 0.0379
+-2.0077 rechts etwas -0.2001
+-2.6396 rechts falsch -0.0142
+-2.6396 rechts jetzt -0.1712
+-1.7512 rechts links -0.3731
+-2.6396 rechts mehr 0.4244
+-1.7512 rechts nach -0.2781
+-2.6396 rechts no 0.5536
+-1.3274 rechts noch 0.2356
+-2.0077 rechts nochmal -0.2001
+-2.6396 rechts okay -0.1573
+-0.6990 rechts rechts -0.3471
+-1.7512 rechts runter 0.1783
+-2.6396 rechts stopp 0.0618
+-2.0951 rechts und -0.7382
+-1.7512 rechts weiter -0.4503
+-0.4091 reicht nich -0.2039
+-0.4091 ret noch -0.0762
+-0.2285 runter </s> 1.4301
+-1.7515 runter he -0.0142
+-1.1197 runter links -0.1461
+-1.2071 runter rechts -0.1167
+-1.2071 runter runter -0.2055
+-0.0783 sage </s> 2.2627
+-0.4091 sehr weit -0.1166
+-1.0112 so nach 0.0013
+-1.0112 so rechts 0.0986
+-0.3794 so weit -0.0785
+-0.4763 stark links 0.0235
+-0.5636 stark rechts -0.7990
+-0.3118 stopp </s> 1.2430
+-0.9138 stopp fallen -0.1237
+-2.0219 stopp genau -0.1683
+-1.4774 stopp links 0.1164
+-2.0219 stopp nach 0.0013
+-2.0219 stopp noch -0.0762
+-2.0219 stopp rechts -0.2210
+-2.0219 stopp runter 0.1594
+-1.3901 stopp sage 0.5011
+-0.9138 stopp und 0.0235
+-2.0219 stopp äh -0.2071
+-0.4091 uhm ja -0.1935
+-0.4091 un fallen 0.7373
+-1.1197 und abwärts 0.5011
+-0.2285 und fallen -0.1478
+-1.2071 und jetzt -0.1194
+-0.8632 und runter -0.1201
+-0.7102 unten </s> 2.3153
+-0.7102 unten bitte -0.2115
+-0.3418 viel weiter 0.2250
+-0.4091 vier größer -0.0142
+-0.7102 warm links 0.0761
+-0.7102 warm warm -0.1346
+-1.1873 weit </s> 2.3153
+-1.1873 weit etwas -0.2071
+-0.6428 weit nach 0.9830
+-1.1873 weit rechts 0.0986
+-0.4559 weiter </s> 1.3979
+-1.3794 weiter bisschen -0.2685
+-1.4667 weiter links 0.3788
+-0.4881 weiter nach 0.7998
+-2.0112 weiter noch -0.1866
+-0.9031 weiter rechts 0.0459
+-1.3794 weiter stopp 0.0699
+-0.0580 wenig nach 0.5633
+-0.4091 wieder </s> 2.3153
+-0.4091 windiges bisschen -0.1588
+-0.4091 zu weit -0.1996
+-0.7102 zum linken -0.0142
+-0.7102 zum rechten -0.0142
+-0.8862 zurück </s> 2.3153
+-0.8862 zurück auf -0.0142
+-0.8862 zurück oh -0.1346
+-0.8862 zwei Drittel -0.0142
+-0.8862 zwei Millimeter -0.1346
+-0.8862 zwei Zentimeter -0.0142
+-0.4091 zweimal so 0.0059
+-1.3122 äh </s> 2.3153
+-1.3122 äh ein -0.1319
+-1.3122 äh geh -0.1683
+-1.3122 äh ja -0.1935
+-1.3122 äh lass -0.1935
+-0.6804 äh noch -0.1172
+-1.3122 äh und 0.1594
+-0.4091 ähm nach 0.0013
+
+\3-grams:
+-0.3877 'ch oben </s> 
+-0.8648 'n Stück </s> 
+-0.4977 'n Stück nach 
+-0.3877 'n biss'l links 
+-1.5017 'n bisschen </s> 
+-1.1346 'n bisschen ja 
+-1.5017 'n bisschen links 
+-1.1346 'n bisschen mehr 
+-1.1346 'n bisschen nach 
+-0.6706 'n bisschen noch 
+-1.5017 'n bisschen oh 
+-1.5017 'n bisschen rechts 
+-0.3216 'n kleines Stück 
+-0.3877 'n mehr nach 
+-0.3877 'nen bisschen mehr 
+-0.3877 'nen kleines Stück 
+-0.3877 'rück </s> <s> 
+-0.3877 's nich </s> 
+-2.9305 </s> <s> 'ch 
+-2.5634 </s> <s> 'n 
+-2.9305 </s> <s> 'nen 
+-1.5428 </s> <s> </s> 
+-2.9305 </s> <s> Mist 
+-2.9305 </s> <s> Schütte 
+-1.5886 </s> <s> Stückchen 
+-2.5634 </s> <s> also 
+-2.9305 </s> <s> bis 
+-1.3124 </s> <s> bisschen 
+-2.9305 </s> <s> bitte 
+-2.5634 </s> <s> das 
+-2.1021 </s> <s> den 
+-2.9305 </s> <s> der 
+-1.7964 </s> <s> ein 
+-2.5634 </s> <s> einmal 
+-2.9305 </s> <s> einwerfen 
+-2.5634 </s> <s> etwas 
+-2.1021 </s> <s> fallen 
+-1.7964 </s> <s> ganz 
+-2.0994 </s> <s> geht 
+-2.5634 </s> <s> halt 
+-2.0994 </s> <s> hm 
+-2.9305 </s> <s> ja 
+-1.8807 </s> <s> jetzt 
+-2.9305 </s> <s> joa 
+-2.1021 </s> <s> kleines 
+-2.9305 </s> <s> lass 
+-0.9094 </s> <s> links 
+-1.2418 </s> <s> loslassen 
+-2.9305 </s> <s> mein 
+-2.5634 </s> <s> na 
+-0.8439 </s> <s> nach 
+-2.9305 </s> <s> nich 
+-1.1626 </s> <s> noch 
+-1.7964 </s> <s> nochmal 
+-2.9305 </s> <s> oder 
+-1.8807 </s> <s> okay 
+-1.0657 </s> <s> rechts 
+-1.7964 </s> <s> runter 
+-2.9305 </s> <s> sehr 
+-2.0994 </s> <s> stark 
+-1.2004 </s> <s> stopp 
+-2.9305 </s> <s> uhm 
+-2.9305 </s> <s> un 
+-1.5886 </s> <s> und 
+-2.0994 </s> <s> viel 
+-2.9305 </s> <s> vier 
+-1.3967 </s> <s> weiter 
+-2.9305 </s> <s> windiges 
+-2.9305 </s> <s> zu 
+-2.9305 </s> <s> zurück 
+-2.5634 </s> <s> zwei 
+-2.9305 </s> <s> zweimal 
+-1.8807 </s> <s> äh 
+-0.3877 <s> 'ch oben 
+-0.3216 <s> 'n bisschen 
+-0.3877 <s> 'nen kleines 
+-0.0414 <s> </s> <s> 
+-0.3877 <s> Mist </s> 
+-0.3877 <s> Schütte nach 
+-0.2078 <s> Stückchen links 
+-0.9749 <s> Stückchen nach 
+-1.3420 <s> Stückchen rechts 
+-0.6888 <s> also bitte 
+-0.6888 <s> also nach 
+-0.3877 <s> bis zum 
+-1.6182 <s> bisschen größeres 
+-0.2304 <s> bisschen links 
+-0.5683 <s> bisschen rechts 
+-1.6182 <s> bisschen weiter 
+-0.3877 <s> bitte nach 
+-0.6888 <s> das funktioniert 
+-0.6888 <s> das geht 
+-0.1613 <s> den Müll 
+-0.3877 <s> der geht 
+-1.1659 <s> ein Millimeter 
+-1.1659 <s> ein bisschen 
+-1.1659 <s> ein ganz 
+-1.1659 <s> ein großes 
+-1.1659 <s> ein kleines 
+-1.1659 <s> ein wenig 
+-0.3216 <s> einmal bitte 
+-0.3877 <s> einwerfen links 
+-0.6888 <s> etwas mehr 
+-0.6888 <s> etwas rechts 
+-0.1613 <s> fallen lassen 
+-1.1659 <s> ganz bisschen 
+-1.1659 <s> ganz ein 
+-1.1659 <s> ganz kleines 
+-0.7988 <s> ganz stark 
+-1.1659 <s> ganz weit 
+-0.8648 <s> geht 's 
+-0.4977 <s> geht nich 
+-0.6888 <s> halt links 
+-0.6888 <s> halt stopp 
+-0.8648 <s> hm links 
+-0.8648 <s> hm nach 
+-0.8648 <s> hm noch 
+-0.3877 <s> ja stopp 
+-0.7196 <s> jetzt fallen 
+-1.0867 <s> jetzt genau 
+-1.0867 <s> jetzt runter 
+-1.0867 <s> jetzt stopp 
+-0.3877 <s> joa nach 
+-0.1613 <s> kleines Stück 
+-0.3877 <s> lass los 
+-2.0212 <s> links 'n 
+-0.1421 <s> links </s> 
+-2.0212 <s> links einwerfen 
+-2.0212 <s> links halt 
+-2.0212 <s> links hm 
+-0.8871 <s> links links 
+-2.0212 <s> links noch 
+-2.0212 <s> links stopp 
+-0.0212 <s> loslassen </s> 
+-0.3877 <s> mein kleines 
+-0.6888 <s> na 'nen 
+-0.6888 <s> na das 
+-0.2366 <s> nach links 
+-2.0867 <s> nach rech 
+-0.4202 <s> nach rechts 
+-2.0867 <s> nach unten 
+-0.3877 <s> nich ein 
+-0.9375 <s> noch 'n 
+-1.7679 <s> noch bisschen 
+-0.9375 <s> noch ein 
+-1.7679 <s> noch eine 
+-1.4008 <s> noch etwas 
+-1.7679 <s> noch kleineres 
+-1.7679 <s> noch mehr 
+-1.7679 <s> noch nach 
+-0.9368 <s> noch weiter 
+-0.7988 <s> nochmal </s> 
+-1.1659 <s> nochmal links 
+-1.1659 <s> nochmal rechts 
+-0.7988 <s> nochmal so 
+-0.3877 <s> oder nach 
+-0.7196 <s> okay </s> 
+-1.0867 <s> okay nach 
+-1.0867 <s> okay rechts 
+-1.0867 <s> okay ähm 
+-0.1549 <s> rechts </s> 
+-1.8648 <s> rechts ein 
+-1.8648 <s> rechts nach 
+-1.4977 <s> rechts noch 
+-1.0337 <s> rechts rechts 
+-1.4977 <s> rechts weiter 
+-0.3374 <s> runter </s> 
+-1.1659 <s> runter he 
+-1.1659 <s> runter links 
+-0.3877 <s> sehr weit 
+-0.4977 <s> stark links 
+-0.8648 <s> stark rechts 
+-0.1663 <s> stopp </s> 
+-0.8990 <s> stopp fallen 
+-1.7301 <s> stopp noch 
+-1.7301 <s> stopp rechts 
+-1.3630 <s> stopp und 
+-0.3877 <s> uhm ja 
+-0.3877 <s> un fallen 
+-0.9749 <s> und abwärts 
+-1.3420 <s> und fallen 
+-0.9749 <s> und jetzt 
+-0.5135 <s> und runter 
+-0.0337 <s> viel weiter 
+-0.3877 <s> vier größer 
+-0.2430 <s> weiter </s> 
+-0.7054 <s> weiter nach 
+-1.5338 <s> weiter noch 
+-1.5338 <s> weiter stopp 
+-0.3877 <s> windiges bisschen 
+-0.3877 <s> zu weit 
+-0.3877 <s> zurück </s> 
+-0.6888 <s> zwei Millimeter 
+-0.6888 <s> zwei Zentimeter 
+-0.3877 <s> zweimal so 
+-1.1659 <s> äh </s> 
+-1.1659 <s> äh ein 
+-1.1659 <s> äh geh 
+-1.1659 <s> äh ja 
+-1.1659 <s> äh lass 
+-1.1659 <s> äh noch 
+-0.3877 Bildschirms bitte fahren 
+-0.3877 Bildschirms nja danke 
+-0.3877 Drittel der Strecke 
+-0.3877 Lück nach links 
+-0.3877 Millimeter </s> <s> 
+-0.3877 Millimeter nach links 
+-0.3877 Mist </s> <s> 
+-0.3216 Mitte des Bildschirms 
+-0.3216 Müll bitte nach 
+-0.6888 Müll nach links 
+-0.6888 Müll nach rechts 
+-0.3877 Rand </s> <s> 
+-0.3877 Rand nach links 
+-0.3877 Schütte nach links 
+-0.3877 Strecke </s> <s> 
+-0.3877 Stück 'rück </s> 
+-0.0368 Stück </s> <s> 
+-0.3877 Stück jetzt noch 
+-0.6888 Stück links fallen 
+-0.6888 Stück links links 
+-0.5987 Stück nach links 
+-0.6006 Stück nach rechts 
+-0.3877 Stück rechts </s> 
+-0.3877 Stück stopp </s> 
+-0.4604 Stückchen links </s> 
+-1.2908 Stückchen links hm 
+-0.4977 Stückchen nach links 
+-0.8648 Stückchen nach rechts 
+-0.3877 Stückchen rechts </s> 
+-0.3877 Stückchen und fallen 
+-0.3877 Stückchen weiter stopp 
+-0.3877 Zentimeter nach rechts 
+-0.3216 abwärts </s> <s> 
+-0.3877 ach daneben rechts 
+-0.3877 ah einwerfen rechts 
+-0.3877 also bitte nach 
+-0.3877 also nach links 
+-0.3877 auf zwei Drittel 
+-0.3877 bis ich stopp 
+-0.3877 bis zum linken 
+-0.3877 bis'sch stopp sage 
+-0.3877 biss'l links </s> 
+-0.3877 biss'n links fallen 
+-0.0337 bisschen </s> <s> 
+-0.3877 bisschen größeres Stück 
+-0.6888 bisschen ja lass 
+-0.6888 bisschen ja okay 
+-0.0322 bisschen links </s> 
+-0.9898 bisschen mehr </s> 
+-0.1587 bisschen mehr nach 
+-0.3877 bisschen na rechts 
+-0.4017 bisschen nach links 
+-0.4043 bisschen nach rechts 
+-0.0337 bisschen noch 'n 
+-0.3877 bisschen oh fallen 
+-0.4024 bisschen rechts </s> 
+-0.8648 bisschen weiter </s> 
+-0.4977 bisschen weiter bisschen 
+-0.3877 bisschen zurück oh 
+-0.3877 bitte </s> <s> 
+-0.3877 bitte deutlich weiter 
+-0.3877 bitte fahren </s> 
+-0.3877 bitte in die 
+-1.0867 bitte nach </s> 
+-0.2556 bitte nach links 
+-1.0867 bitte nach rechts 
+-0.3877 bitte zurück auf 
+-0.3877 daneben rechts falsch 
+-0.3877 danke stopp und 
+-0.3877 das funktioniert nich 
+-0.3877 das geht links 
+-0.3877 das reicht nich 
+-0.6227 den Müll bitte 
+-0.6227 den Müll nach 
+-0.3877 der Strecke </s> 
+-0.3877 der geht nich 
+-0.6888 des Bildschirms bitte 
+-0.6888 des Bildschirms nja 
+-0.3216 deutlich weiter nach 
+-0.3216 die Mitte des 
+-0.3877 ein Millimeter </s> 
+-0.8648 ein Stück </s> 
+-0.8648 ein Stück links 
+-0.8648 ein Stück stopp 
+-0.4977 ein Stückchen links 
+-0.8648 ein Stückchen weiter 
+-1.1659 ein bisschen </s> 
+-1.1659 ein bisschen links 
+-1.1659 ein bisschen mehr 
+-0.3348 ein bisschen nach 
+-0.3877 ein gan kleines 
+-0.3216 ein ganz kleines 
+-0.3877 ein großes Stück 
+-1.1659 ein klein biss'n 
+-0.1160 ein klein wenig 
+-0.1160 ein kleines Stück 
+-1.1659 ein kleines bisschen 
+-0.3877 ein wenig nach 
+-0.3877 eine kleine Lück 
+-0.3877 einfach fallen </s> 
+-0.6888 einmal bitte in 
+-0.6888 einmal bitte zurück 
+-0.3877 einmal nach rechts 
+-0.3216 einwerfen </s> <s> 
+-0.3877 einwerfen ach daneben 
+-0.3216 einwerfen links links 
+-0.6227 einwerfen rechts </s> 
+-0.9898 einwerfen rechts einwerfen 
+-0.9898 einwerfen rechts rechts 
+-0.8648 etwas mehr nach 
+-0.8648 etwas mehr rechts 
+-0.8648 etwas mehr stopp 
+-0.3877 etwas nach links 
+-0.0337 etwas rechts </s> 
+-0.3877 etwas weiter links 
+-0.3877 fahren </s> <s> 
+-0.1613 fallen </s> <s> 
+-0.1761 fallen lassen </s> 
+-1.9062 fallen lassen ein 
+-1.9062 fallen lassen einmal 
+-1.9062 fallen lassen geh 
+-1.9062 fallen lassen links 
+-1.9062 fallen lassen na 
+-1.5391 fallen lassen nach 
+-1.5391 fallen lassen okay 
+-1.5391 fallen lassen rechts 
+-0.3877 falsch links links 
+-0.3877 funktioniert nich </s> 
+-0.3877 gan kleines Stück 
+-0.3877 ganz bisschen zurück 
+-0.3877 ganz ein bisschen 
+-0.8648 ganz kleines Stück 
+-0.8648 ganz kleines Stückchen 
+-0.8648 ganz kleines bisschen 
+-0.3216 ganz stark rechts 
+-0.6888 ganz weit nach 
+-0.6888 ganz weit rechts 
+-0.3877 ganz zum rechten 
+-0.3877 geh bitte nach 
+-0.3877 geh ganz zum 
+-0.3877 geh nach rechts 
+-0.3877 geht 's nich 
+-0.3877 geht links </s> 
+-0.0337 geht nich </s> 
+-0.3877 genau in die 
+-0.3877 genau jetzt noch 
+-0.3877 genau weiter nach 
+-0.3877 großes Stück nach 
+-0.3877 größer </s> <s> 
+-0.3877 größeres Stück nach 
+-0.3877 halt links einwerfen 
+-0.3216 halt rechts rechts 
+-0.3877 halt stopp äh 
+-0.3877 he </s> <s> 
+-0.3877 hm </s> <s> 
+-0.3877 hm links </s> 
+-0.3877 hm nach links 
+-0.6888 hm noch 'n 
+-0.6888 hm noch ein 
+-0.3877 ich stopp sage 
+-0.3877 ihn einfach fallen 
+-0.3216 in die Mitte 
+-0.3877 ja lass fallen 
+-0.3877 ja okay lass 
+-0.3877 ja rechts </s> 
+-0.3877 ja so nach 
+-0.3877 ja stopp und 
+-0.0337 jetzt fallen lassen 
+-0.3877 jetzt genau in 
+-0.3877 jetzt nach unten 
+-0.6888 jetzt noch ein 
+-0.6888 jetzt noch nach 
+-0.3216 jetzt runter </s> 
+-0.3877 jetzt stopp nach 
+-0.3877 jetzt weiter nach 
+-0.3877 joa nach links 
+-0.3877 klein biss'n links 
+-0.0317 klein wenig nach 
+-0.3877 kleine Lück nach 
+-0.3877 kleineres bisschen links 
+-1.5338 kleines Stück 'rück 
+-0.7027 kleines Stück </s> 
+-1.5338 kleines Stück jetzt 
+-1.5338 kleines Stück links 
+-0.7034 kleines Stück nach 
+-1.5338 kleines Stück rechts 
+-0.3877 kleines Stückchen nach 
+-0.8648 kleines bisschen </s> 
+-0.4977 kleines bisschen nach 
+-0.0337 lass fallen </s> 
+-0.3877 lass ihn einfach 
+-0.3877 lass los </s> 
+-0.0193 lassen </s> <s> 
+-0.3877 lassen ein klein 
+-0.3877 lassen einmal nach 
+-0.3877 lassen geh nach 
+-0.3877 lassen links klein 
+-0.3877 lassen na rechts 
+-0.6888 lassen nach links 
+-0.6888 lassen nach rechts 
+-0.6888 lassen okay ganz 
+-0.6888 lassen okay geh 
+-0.6888 lassen rechts rechts 
+-0.6888 lassen rechts weiter 
+-0.3877 linken Rand nach 
+-0.3877 links 'n bisschen 
+-0.0038 links </s> <s> 
+-0.3877 links ah einwerfen 
+-0.3877 links bis ich 
+-0.3877 links deutlich weiter 
+-0.8648 links einwerfen ach 
+-0.8648 links einwerfen links 
+-0.8648 links einwerfen rechts 
+-0.3877 links etwas nach 
+-0.4024 links fallen lassen 
+-0.3877 links genau weiter 
+-0.3216 links halt rechts 
+-0.6888 links hm </s> 
+-0.6888 links hm noch 
+-0.3877 links klein wenig 
+-1.1232 links links </s> 
+-2.1731 links links ah 
+-2.1731 links links einwerfen 
+-1.8059 links links fallen 
+-2.1731 links links halt 
+-0.1943 links links links 
+-2.1731 links links noch 
+-1.3419 links links rechts 
+-1.8059 links links runter 
+-1.8059 links links stopp 
+-2.1731 links links warm 
+-1.3419 links links weiter 
+-0.3877 links no mehr 
+-1.3877 links noch 'n 
+-1.0206 links noch ein 
+-0.3379 links noch mehr 
+-1.3877 links noch nach 
+-1.3877 links noch weiter 
+-0.3877 links okay 'n 
+-0.1613 links rechts rechts 
+-0.6888 links runter links 
+-0.6888 links runter rechts 
+-1.1659 links stopp </s> 
+-0.7988 links stopp fallen 
+-0.7988 links stopp links 
+-1.1659 links stopp runter 
+-0.3216 links und fallen 
+-0.3877 links warm warm 
+-0.4977 links weiter links 
+-0.8648 links weiter nach 
+-0.3877 links wieder </s> 
+-0.3877 los </s> <s> 
+-0.0212 loslassen </s> <s> 
+-0.3216 mehr </s> <s> 
+-1.5338 mehr nach </s> 
+-0.2430 mehr nach links 
+-0.7054 mehr nach rechts 
+-1.5338 mehr nach ret 
+-0.3877 mehr rechts </s> 
+-0.3877 mehr stopp und 
+-0.3877 mein kleines bisschen 
+-0.3877 na 'nen bisschen 
+-0.3877 na das reicht 
+-0.6888 na rechts noch 
+-0.6888 na rechts okay 
+-0.3216 nach </s> <s> 
+-0.1849 nach links </s> 
+-2.2628 nach links bis 
+-2.2628 nach links deutlich 
+-2.2628 nach links etwas 
+-1.8957 nach links fallen 
+-2.2628 nach links genau 
+-1.4343 nach links links 
+-2.2628 nach links no 
+-0.9720 nach links noch 
+-2.2628 nach links okay 
+-1.4317 nach links stopp 
+-1.8957 nach links und 
+-2.2628 nach links wieder 
+-0.3877 nach oben </s> 
+-0.3877 nach rech stopp 
+-0.1836 nach rechts </s> 
+-2.1511 nach rechts bis'sch 
+-2.1511 nach rechts bitte 
+-1.7840 nach rechts ein 
+-1.7840 nach rechts etwas 
+-2.1511 nach rechts jetzt 
+-2.1511 nach rechts mehr 
+-1.7840 nach rechts nach 
+-2.1511 nach rechts no 
+-1.1013 nach rechts noch 
+-2.1511 nach rechts rechts 
+-1.3200 nach rechts und 
+-0.3877 nach ret noch 
+-0.6888 nach unten </s> 
+-0.6888 nach unten bitte 
+-0.3877 nach weiter nach 
+-0.0368 nich </s> <s> 
+-0.3877 nich ein Stück 
+-0.3877 nich okay </s> 
+-0.3877 nja danke stopp 
+-0.3216 no mehr nach 
+-1.2247 noch 'n Stück 
+-1.5918 noch 'n biss'l 
+-0.2041 noch 'n bisschen 
+-1.2247 noch 'n kleines 
+-1.5918 noch 'n mehr 
+-0.3877 noch Stückchen und 
+-0.3877 noch bisschen na 
+-1.6182 noch ein Stück 
+-0.7871 noch ein Stückchen 
+-0.7897 noch ein bisschen 
+-1.6182 noch ein gan 
+-1.6182 noch ein ganz 
+-0.7871 noch ein klein 
+-0.7897 noch ein kleines 
+-0.3877 noch eine kleine 
+-0.3216 noch etwas rechts 
+-0.3877 noch kleineres bisschen 
+-1.2328 noch mehr </s> 
+-0.0987 noch mehr nach 
+-0.4977 noch nach links 
+-0.8648 noch nach weiter 
+-0.7196 noch weiter </s> 
+-0.7196 noch weiter nach 
+-1.0867 noch weiter rechts 
+-0.3216 nochmal </s> <s> 
+-0.3877 nochmal links </s> 
+-0.8648 nochmal rechts </s> 
+-0.4977 nochmal rechts rechts 
+-0.6888 nochmal so rechts 
+-0.6888 nochmal so weit 
+-0.3216 oben </s> <s> 
+-0.3877 oder nach oben 
+-0.3877 oh fallen lassen 
+-0.3877 oh äh noch 
+-0.3877 okay 'n Stück 
+-0.0337 okay </s> <s> 
+-0.3877 okay ganz weit 
+-0.3877 okay geh ganz 
+-0.3216 okay lass fallen 
+-0.3877 okay nach links 
+-0.3877 okay rechts </s> 
+-0.3877 okay ähm nach 
+-0.3877 rech stopp links 
+-0.3877 rechten Rand </s> 
+-0.0049 rechts </s> <s> 
+-0.3877 rechts bis'sch stopp 
+-0.3877 rechts bitte deutlich 
+-0.8648 rechts ein Stück 
+-0.4977 rechts ein klein 
+-0.6227 rechts einwerfen </s> 
+-0.6227 rechts einwerfen rechts 
+-0.3216 rechts etwas mehr 
+-0.3877 rechts falsch links 
+-0.3877 rechts jetzt fallen 
+-0.1613 rechts links links 
+-0.3877 rechts mehr nach 
+-0.1613 rechts nach rechts 
+-0.3877 rechts no mehr 
+-0.9237 rechts noch 'n 
+-1.2908 rechts noch Stückchen 
+-0.4623 rechts noch ein 
+-1.2908 rechts noch mehr 
+-0.3216 rechts nochmal rechts 
+-0.3877 rechts okay lass 
+-0.7851 rechts rechts </s> 
+-1.0881 rechts rechts einwerfen 
+-1.0881 rechts rechts links 
+-1.9192 rechts rechts nach 
+-1.9192 rechts rechts nochmal 
+-0.3274 rechts rechts rechts 
+-1.0881 rechts rechts runter 
+-1.9192 rechts rechts stopp 
+-0.6227 rechts runter </s> 
+-0.6227 rechts runter runter 
+-0.3877 rechts stopp </s> 
+-0.0337 rechts und fallen 
+-0.1613 rechts weiter rechts 
+-0.3877 reicht nich okay 
+-0.3877 ret noch 'n 
+-0.0348 runter </s> <s> 
+-0.3877 runter he </s> 
+-0.3216 runter links links 
+-0.8648 runter rechts links 
+-0.8648 runter rechts nochmal 
+-0.8648 runter rechts rechts 
+-0.4977 runter runter rechts 
+-0.8648 runter runter runter 
+-0.3216 sage </s> <s> 
+-0.3877 sehr weit nach 
+-0.3877 so nach rechts 
+-0.3877 so rechts </s> 
+-0.6888 so weit </s> 
+-0.6888 so weit nach 
+-0.3216 stark links </s> 
+-0.0337 stark rechts </s> 
+-0.0223 stopp </s> <s> 
+-0.0368 stopp fallen lassen 
+-0.3877 stopp genau jetzt 
+-0.8648 stopp links </s> 
+-0.8648 stopp links fallen 
+-0.8648 stopp links rechts 
+-0.3877 stopp nach rechts 
+-0.3877 stopp noch 'n 
+-0.3877 stopp rechts runter 
+-0.3877 stopp runter </s> 
+-0.3216 stopp sage </s> 
+-0.2582 stopp und fallen 
+-1.0867 stopp und jetzt 
+-0.3877 stopp äh und 
+-0.3877 uhm ja so 
+-0.3877 un fallen lassen 
+-0.3216 und abwärts </s> 
+-0.0348 und fallen lassen 
+-0.8648 und jetzt nach 
+-0.8648 und jetzt runter 
+-0.8648 und jetzt weiter 
+-0.1613 und runter </s> 
+-0.3877 unten </s> <s> 
+-0.3877 unten bitte </s> 
+-0.4977 viel weiter </s> 
+-0.8648 viel weiter nach 
+-0.3877 vier größer </s> 
+-0.3877 warm links </s> 
+-0.3877 warm warm links 
+-0.3877 weit </s> <s> 
+-0.3877 weit etwas weiter 
+-0.8648 weit nach links 
+-0.4977 weit nach rechts 
+-0.3877 weit rechts </s> 
+-0.0322 weiter </s> <s> 
+-0.3216 weiter bisschen weiter 
+-0.8648 weiter links </s> 
+-0.4977 weiter links links 
+-0.6712 weiter nach links 
+-0.3675 weiter nach rechts 
+-0.3877 weiter noch weiter 
+-1.0867 weiter rechts </s> 
+-0.2556 weiter rechts rechts 
+-1.0867 weiter rechts weiter 
+-0.6888 weiter stopp </s> 
+-0.6888 weiter stopp genau 
+-0.8657 wenig nach links 
+-0.1830 wenig nach rechts 
+-0.3877 wieder </s> <s> 
+-0.3877 windiges bisschen rechts 
+-0.3877 zu weit etwas 
+-0.3877 zum linken Rand 
+-0.3877 zum rechten Rand 
+-0.3877 zurück </s> <s> 
+-0.3877 zurück auf zwei 
+-0.3877 zurück oh äh 
+-0.3877 zwei Drittel der 
+-0.3877 zwei Millimeter nach 
+-0.3877 zwei Zentimeter nach 
+-0.3877 zweimal so weit 
+-0.3877 äh </s> <s> 
+-0.3877 äh ein kleines 
+-0.3877 äh geh bitte 
+-0.3877 äh ja rechts 
+-0.3877 äh lass ihn 
+-0.3216 äh noch ein 
+-0.3877 äh und fallen 
+-0.3877 ähm nach rechts 
+
+\end\

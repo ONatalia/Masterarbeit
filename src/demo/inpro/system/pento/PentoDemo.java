@@ -1,4 +1,4 @@
-package demo.inpro.pento;
+package demo.inpro.system.pento;
 
 import inpro.apps.SimpleText;
 import inpro.incremental.PushBuffer;
@@ -10,7 +10,6 @@ import java.net.MalformedURLException;
 import java.util.List;
 
 import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
 
 import work.inpro.gui.pentomino.january.GameCanvas;
 import work.inpro.system.pentomino.Setting;
@@ -24,8 +23,6 @@ import edu.cmu.sphinx.util.props.S4String;
 
 public class PentoDemo {
 	
-	private static final Logger logger = Logger.getLogger(PentoDemo.class);
-
 	@S4Component(type = CurrentASRHypothesis.class)
 	public final static String PROP_CURRENT_HYPOTHESIS = "currentASRHypothesis";
 

@@ -260,7 +260,7 @@
     <component name="ngram" type="edu.cmu.sphinx.linguist.language.ngram.SimpleNGramModel">
         <property name="dictionary" value="dictionary"/>
         <property name="logMath" value="logMath"/>
-        <property name="location" value="file:///home/timo/uni/experimente/014_greifarm/lm/Greifarm_Woz.cleaned.lm"/>
+        <property name="location" value="file:demo/inpro/system/greifarm/Greifarm_Woz.cleaned.lm"/>
         <property name="maxDepth" value="3"/>
         <property name="unigramWeight" value=".7"/>
     </component>
