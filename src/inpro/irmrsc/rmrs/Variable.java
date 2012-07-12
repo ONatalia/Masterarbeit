@@ -46,7 +46,7 @@ public class Variable {
 	}
 	
 	public boolean isSpecifiedIndexVariable() {
-		return getType().equals(Type.EVENT) || getType().equals(Type.EVENT);
+		return getType().equals(Type.INDIVIDUAL) || getType().equals(Type.EVENT);
 	}
 
 	public void setID(int ID) {
