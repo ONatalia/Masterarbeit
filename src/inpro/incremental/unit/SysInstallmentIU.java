@@ -71,7 +71,7 @@ public class SysInstallmentIU extends InstallmentIU {
 				next.setSameLevelLink(first);
 				first = next;
 			}
-			WordIU newWord = new WordIU(w.word, prevWord, (List) newSegments);
+			WordIU newWord = new WordIU(w.getWord(), prevWord, (List) newSegments);
 			newWords.add(newWord);
 			prevWord = newWord;
 		}

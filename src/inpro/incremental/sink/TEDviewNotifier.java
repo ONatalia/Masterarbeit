@@ -64,7 +64,12 @@ public class TEDviewNotifier extends IUModule implements FrameAware {
 		else
 			tedAdapter = tedLogAdapter;
 	}
-
+	
+	public void setTEDadapter(String tedAddress, int tedPort) {
+		tedAdapter = new TedAdapter(tedAddress, tedPort);
+		tedLogAdapter = tedAdapter;
+	}
+	
 	@Override
 	public synchronized void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
 		if (tedAdapter.isConnected() && (edits.size() > 0) && (ius.size() > 0)) {

@@ -18,12 +18,11 @@ import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 
 public class WordIU extends IU {
 
-	/* TODO: implement magic to actually fill this map */
-	static Map<String, List<AVPair>> avPairs;
+	private static Map<String, List<AVPair>> avPairs;
 	
-	final boolean isSilence;
-	final Pronunciation pron;
-	final String word;
+	private final boolean isSilence;
+	private final Pronunciation pron;
+	private final String word;
 
 	public WordIU(Pronunciation pron, WordIU sll, List<IU> groundedIn) {
 		this(pron.getWord().getSpelling(), pron, sll, groundedIn);
@@ -262,8 +261,6 @@ public class WordIU extends IU {
 			sb.append("</syllable>\n</t>\n");
 		}
 	}
-
-
 	
 	/** returns a new list with all silent words removed */
 	public static List<WordIU> removeSilentWords(List<WordIU> words) {

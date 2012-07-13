@@ -80,7 +80,7 @@ public class SysSegmentIU extends SegmentIU {
 	
 	/**	the duration of this segment in multiples of 5 ms */
 	public int durationInSynFrames() {
-		return (int) Math.round(duration() * FullPStream.FRAMES_PER_SECOND);
+		return (int) Math.round(duration() * FullPStream.FRAMES_PER_SECOND / Double.valueOf(System.getProperty("inpro.tts.tempoScaling", "1.0")));
 	}
 	
 	public double originalDuration() {

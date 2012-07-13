@@ -6,6 +6,7 @@ import inpro.incremental.unit.IUList;
 import inpro.incremental.util.TedAdapter;
 import inpro.util.TimeUtil;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -59,6 +60,13 @@ public abstract class IUModule extends PushBuffer {
 		String tedAddress = ps.getString(PROP_TEDVIEW_LOG_ADDRESS);
 		this.logToTedView = ps.getBoolean(PROP_LOG_TO_TEDVIEW);
 		tedLogAdapter = new TedAdapter(tedAddress, tedPort);
+	}
+	
+	public void addListener(PushBuffer listener) {
+		if (iulisteners == null) {
+			iulisteners = new ArrayList<PushBuffer>();
+		}
+		iulisteners.add(listener);
 	}
 	
 	/**

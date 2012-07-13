@@ -78,7 +78,7 @@ public class InstallmentIU extends IU {
 			StringBuilder text = new StringBuilder(WordIU.wordsToString(words));
 			if (!words.isEmpty()) { 
 				WordIU lastWord = words.get(words.size() - 1);
-				while (lastWord != null && lastWord.isSilence) {
+				while (lastWord != null && lastWord.isSilence()) {
 					lastWord = (WordIU) lastWord.previousSameLevelLink;
 				}
 				if (lastWord != null && lastWord.hasProsody()) {

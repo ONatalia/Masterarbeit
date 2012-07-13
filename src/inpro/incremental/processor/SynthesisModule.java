@@ -57,15 +57,15 @@ public class SynthesisModule extends IUModule {
 			List<? extends EditMessage<? extends IU>> edits) {
 		boolean startPlayInstallment = false;
 		for (EditMessage<?> em : edits) {
-			final PhraseIU phraseIU;
-			if (em.getIU() instanceof PhraseIU) {
-				phraseIU = (PhraseIU) em.getIU();
-			} else {
-				phraseIU = new PhraseIU((WordIU) em.getIU());
-			}
-			System.out.println("   " + em.getType() + " " + phraseIU.toPayLoad() + " (" + phraseIU.getType() + ")");
+			System.out.println("   " + em.getType() + " " + em.getIU().toPayLoad());
 			switch (em.getType()) {
 			case ADD:
+				PhraseIU phraseIU;
+				if (em.getIU() instanceof PhraseIU) {
+					phraseIU = (PhraseIU) em.getIU();
+				} else {
+					phraseIU = new PhraseIU((WordIU) em.getIU());
+				}
 				if (currentInstallment != null && !currentInstallment.isCompleted()) {
 					WordIU choiceWord = currentInstallment.getFinalWord();
 					// mark the ongoing utterance as non-final, check whether there's still enough time
@@ -85,6 +85,18 @@ public class SynthesisModule extends IUModule {
 			case REVOKE:
 				//throw new NotImplementedException("phrases cannot yet be revoked from synthesis; check for our next release");
 				// silently ignore revokes for now
+			case COMMIT:
+				// ensure that this phrase can be finished
+				IU iu = em.getIU();
+				if (iu instanceof PhraseIU) {
+					((PhraseIU) iu).setFinal();
+				} else {
+					for (SysSegmentIU seg : currentInstallment.getSegments()) {
+						// clear any locks that might block the vocoder from finishing the utterance phrase
+						seg.setAwaitContinuation(false);			
+					}
+				}
+				break;
 			default:
 				break;
 			}
