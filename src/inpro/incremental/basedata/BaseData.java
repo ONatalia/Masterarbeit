@@ -32,6 +32,8 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable, Signal
 	
 	@S4Component(type = EOTFeatureAggregator.class, defaultClass = EOTFeatureAggregator.class, mandatory = false)
 	public static final String PROP_EOTFA = "eotFeatureAggregator";
+	
+	private static BaseData CONFIGURED_INSTANCE;
 
 	final static Logger logger = Logger.getLogger(BaseData.class);
 	
@@ -51,6 +53,7 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable, Signal
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		eotfa = (EOTFeatureAggregator) ps.getComponent(PROP_EOTFA);
+		CONFIGURED_INSTANCE = this;
 	//	eotfa.printArffHeader();
 	}
 
@@ -249,7 +252,7 @@ public class BaseData implements Configurable, BaseDataKeeper, Resetable, Signal
 	}
 
 	public static BaseData getInstance() {
-		return null;
+		return CONFIGURED_INSTANCE;
 	}
 
 }
