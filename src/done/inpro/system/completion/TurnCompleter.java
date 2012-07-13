@@ -96,7 +96,6 @@ public class TurnCompleter extends IUModule implements FrameAware {
 				}
 			}
 			logger.info("new installment " + wordsSoFar.toString());
-			fullInstallment = new CompletionInstallmentIU(wordsSoFar.toString());
 			fmatch = fullInstallment.fuzzyMatching(fullInput, 0.2, 2);
 			if (fmatch.matches() && shouldFire()) {
 				doComplete();
@@ -134,15 +133,17 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		double estimatedStartTime = extrapolateStart(estimatedSpeechRate);
 		// this is the logic that decides what the completion should be (it could very well be different!)
 		List<WordIU> remainder = fmatch.getRemainder();
-		WordIU nextWord = remainder.get(0);
-		// now generate the completion this consists of two steps: 
-		// a) deep-copy and scale the SysInstallmentIU
-		SysInstallmentIU output = new SysInstallmentIU(Collections.<WordIU>singletonList(nextWord));
-		output.scaleDeepCopyAndStartAtZero(estimatedSpeechRate);
-		
-		// c) synthesize and play the completion
-		for (CompletionAdapter ca : compAdapters) {
-			ca.newCompletion(estimatedStartTime, output);
+		if (!remainder.isEmpty()) {
+			WordIU nextWord = remainder.get(0);
+			// now generate the completion this consists of two steps: 
+			// a) deep-copy and scale the SysInstallmentIU
+			SysInstallmentIU output = new SysInstallmentIU(Collections.<WordIU>singletonList(nextWord));
+			output.scaleDeepCopyAndStartAtZero(estimatedSpeechRate);
+			
+			// c) synthesize and play the completion
+			for (CompletionAdapter ca : compAdapters) {
+				ca.newCompletion(estimatedStartTime, output);
+			}
 		}
 	}
 	

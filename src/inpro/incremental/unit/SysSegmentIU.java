@@ -36,15 +36,16 @@ public class SysSegmentIU extends SegmentIU {
 	
 	boolean awaitContinuation; // used to mark that a continuation will follow, even though no fSLL exists yet.
 	
-	public SysSegmentIU(Label l, List<PitchMark> pitchMarks, List<FullPFeatureFrame> featureFrames) {
+	public SysSegmentIU(Label l, List<PitchMark> pitchMarks, HTSModel htsModel, List<FullPFeatureFrame> featureFrames) {
 		super(l);
 		plannedLabel = new Label(l);
 		this.pitchMarks = pitchMarks;
+		this.htsModel = htsModel;
 		this.hmmSynthesisFeatures = featureFrames;
 	}
 	
 	public SysSegmentIU(Label l, List<PitchMark> pitchMarks) {
-		this(l, pitchMarks, null);
+		this(l, pitchMarks, null, null);
 	}
 	
 	@Override
