@@ -3,7 +3,7 @@ package done.inpro.system.calendar;
 import inpro.apps.SimpleMonitor;
 import inpro.audio.DispatchStream;
 import inpro.incremental.IUModule;
-import inpro.incremental.PushBuffer;
+import inpro.incremental.sink.TEDviewNotifier;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.PhraseIU;
@@ -220,10 +220,12 @@ public class GenerationModule extends IUModule {
 		}
 		
 		final DispatchStream speechDispatcher = SimpleMonitor.setupDispatcher();
-		final NoisySynthesisModule sm = new NoisySynthesisModule(speechDispatcher);
-
-		gm.iulisteners = new ArrayList<PushBuffer>();
-		gm.iulisteners.add(sm);
+		final NoisySynthesisModule synthesisModule = new NoisySynthesisModule(speechDispatcher);
+		TEDviewNotifier ted = new inpro.incremental.sink.TEDviewNotifier();
+		ted.setTEDadapter("localhost", 2000);
+		synthesisModule.addListener(ted);
+	
+		gm.addListener(synthesisModule);
 		
 		Logger speedLogger = Logger.getLogger("speedlogger");
 		if (measureTiming) {
@@ -262,7 +264,7 @@ public class GenerationModule extends IUModule {
 		long duration = System.currentTimeMillis() - start;
 		speedLogger.info("full onset took: " + duration);
 		if (playNoise) {
-			NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), sm, gm.phraseUpdateListener, noiseHandling);
+			NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), synthesisModule, gm.phraseUpdateListener, noiseHandling);
 			nt.start();
 		}
 		

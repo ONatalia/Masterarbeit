@@ -42,9 +42,9 @@ public class DispatchStream extends InputStream implements Configurable {
 	public final static String PROP_SPEECH_STATE_VISUALIZER = "speechStateVisualizer";
 	SpeechStateVisualizer ssv;
 
-	@S4Boolean(defaultValue = false)
+	@S4Boolean(defaultValue = true)
 	public final static String PROP_SEND_SILENCE = "sendSilence";
-	private boolean sendSilence;
+	private boolean sendSilence = true;
 	
 	/** A map of tts strings and corresponding audio files. */
 	private static Map<String, String> ttsCache = new HashMap<String, String>();

@@ -71,6 +71,8 @@ import marytts.util.data.BaseDoubleDataSource;
  */
 public class VocodingAudioStream extends BaseDoubleDataSource implements Runnable {
 
+	private static double MAX_AMPLITUDE_START_VALUE = 32767;
+	
     private final Random rand = new Random(HTSVocoder.SEED);
     private final HMMData htsData;
     private final double alpha, beta, gamma;
@@ -107,7 +109,7 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
     private final ArrayBlockingQueue<Double> output;
 
     // TODO: think about how gain scaling can be incrementalized
-    private double maxAmplitude = 24000; //32768;
+    private double maxAmplitude = MAX_AMPLITUDE_START_VALUE; //32768;
     
     boolean doneVocoding = false;
     
@@ -455,8 +457,11 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
 
     private final double scale(double d) {
     	if (Math.abs(d) > maxAmplitude) {
-    		System.err.println("max amplitude!");
+    		System.err.println("max amplitude: " + d);
     		maxAmplitude = Math.abs(d);
+    	}
+    	else if (maxAmplitude > MAX_AMPLITUDE_START_VALUE) {
+   			maxAmplitude -= 0.01 * maxAmplitude;
     	}
         return d / maxAmplitude;
     }
