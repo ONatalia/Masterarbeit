@@ -25,7 +25,7 @@
     <property name="baseData" value="baseData"/>
     <property name="dialogueManager" value="echoDialogueManager"/>
     
-    <property name="setting" value="file:src/demo/inpro/pento/pentodemo.xml" />
+    <property name="setting" value="file:src/demo/inpro/system/pento/pentodemo.xml" />
       <!-- for dotViewer -->
     <property name="display" value="true" />
     <property name="tmpDir" value="/tmp" />
@@ -102,7 +102,7 @@
         </propertylist>
      </component>    
     
-	<component name="resolver" type="demo.inpro.pento.nlu.PentoRMRSResolver">
+	<component name="resolver" type="demo.inpro.system.pento.nlu.PentoRMRSResolver">
 		<property name="settingXML" value="${setting}" />
 		<property name="showSetting" value="true" />
 	</component>    
