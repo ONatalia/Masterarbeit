@@ -301,10 +301,15 @@ public class RMRSComposer extends IUModule {
 						}
 						List<String> lastDerive = ca.getCandidateAnalysis().getLastDerive();
 						//logger.debug(logPrefix+"-------");
+						//System.err.println("-------: "+lastDerive.toString());
 						Formula newForm = new Formula(previousFIU.getFormula());
+						
+						boolean missingSemanticRule = false;
 						
 						// ## 2. go through all new syntactic rule applications
 						for (String rule : lastDerive) {
+							missingSemanticRule = false;
+							
 							//logger.debug(logPrefix+"= "+newForm.toStringOneLine());
 							System.err.println("[C] = "+newForm.toStringOneLine());
 							
@@ -317,6 +322,10 @@ public class RMRSComposer extends IUModule {
 								} else {
 									// the current rule is a lexical one; build lexical formula.						
 									Variable.Type type = semanticTypesOfTags.get(tag);
+									if (! semanticTypesOfTags.containsKey(tag)) {
+										logger.debug("The POS-tag '"+tag+"' has no specified semantic type. Using underspecified index type.");
+										type = Variable.Type.INDEX;
+									}
 									String lexname = tag.toUpperCase(); // fallback to this if no better information is there
 									// find the word/lemma
 									TagIU tiu = (TagIU) ca.groundedIn().get(0);
@@ -339,6 +348,10 @@ public class RMRSComposer extends IUModule {
 							} else if (rule.startsWith("r(") || rule.startsWith("d(")) {
 								String tag = rule.substring(2, rule.length()-1);
 								Variable.Type type = semanticTypesOfTags.get(tag);
+								if (! semanticTypesOfTags.containsKey(tag)) {
+									logger.debug("The POS-tag '"+tag+"' has no specified semantic type. Using underspecified index type.");
+									type = Variable.Type.INDEX;
+								}
 								String lexname = tag.toUpperCase();
 								Formula lexitem = new Formula(lexname, type);
 								//logger.debug(logPrefix+"+ "+rule);
@@ -371,7 +384,14 @@ public class RMRSComposer extends IUModule {
 								Formula rulesem = semanticRules.get(rule);
 								//logger.debug(logPrefix+"+ "+rule);
 								//logger.debug(logPrefix+"+ "+rulesem.toStringOneLine());
-								newForm.forwardCombine(rulesem);
+								// TODO: check if rulesem is given!
+								if (rulesem == null) {
+									logger.fatal("No semantic rule specified for the syntactic rule '"+rule+"'! Skipping this reading.");
+									missingSemanticRule = true;
+									break;
+								} else {
+									newForm.forwardCombine(rulesem);
+								}
 							}
 
 							// reduce formula
@@ -380,9 +400,17 @@ public class RMRSComposer extends IUModule {
 							//newForm.renumber(0);
 							//logger.debug(logPrefix+"= "+newForm.toStringOneLine());
 							//logger.debug(logPrefix+"> "+newForm.getNominalAssertions());
+							
+						}
+						
+						if (missingSemanticRule) {
+							// do not output anything for this problematic reading, just skip to the next edit message.
+							// TODO: this somehow produces strange IU networks. not yet clear to me why...
+							continue;
 						}
 						
 						// ## 3. Add the output formula to the outgoing newEdits.
+						//System.err.println("[C] = "+newForm.toStringOneLine());
 						FormulaIU newFIU = new FormulaIU(previousFIU, ca, newForm);
 						newEdits.add(new EditMessage<FormulaIU>(EditType.ADD, newFIU));
 						states.put(ca,newFIU);

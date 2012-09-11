@@ -107,7 +107,7 @@ public class RMRSLoader {
 						case 'i' : mType = Variable.Type.INDEX; break;
 						case 'x' : mType = Variable.Type.INDIVIDUAL; break;
 						case 'e' : mType = Variable.Type.EVENT; break;
-						case '_' : mType = null; break;
+						case '_' : mType = null; break; // do not use underspec here, as null is the signal for Formula(lexname, type) to make a relation without argument
 						}
 					} else {
 						System.out.println("Warning: No specific semantic type given for tag "+tag+".");
