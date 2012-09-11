@@ -316,4 +316,19 @@
 </rmrsincrement>
 </defmacro>
 
+<defmacro longname="SubjRelS" shortname="SubjRelS">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="x"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="e"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="0" a="1" i="2"/><hook l="3" a="4" i="5"/></slots>
+<rels>
+  <rel type="arg" name="ARG1" a="4" i="2"/>
+</rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
 </semmacros>

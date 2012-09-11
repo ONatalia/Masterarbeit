@@ -38,5 +38,8 @@
 <defrule id="frag/np"><refmacro longname="ArgN"/></defrule>
 <defrule id="frag/pp@np"><refmacro longname="ppfrag@np"/></defrule>
 <defrule id="frag/pp@vp"><refmacro longname="pass"/></defrule>
-
+<!-- NEW -->
+<defrule id="s/np-vp"><refmacro longname="Arg1"/></defrule>
+<defrule id="v1/vz"><refmacro longname="pass"/></defrule>
+<defrule id="nz/prels-vp"><refmacro longname="SubjRelS"/></defrule>
 </semrules>

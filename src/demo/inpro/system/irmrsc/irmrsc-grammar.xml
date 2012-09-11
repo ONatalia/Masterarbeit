@@ -26,18 +26,16 @@
 			<sym>S*</sym><sym>S</sym>
 		</syntax>
 	</rule>
-	<rule id="s/vp" prob="1.0">
+	<rule id="s/vp" prob="0.9"> <!-- former 1.0 -->
 		<syntax>
 			<sym>S</sym><sym>VP</sym>
 		</syntax>
 	</rule>
-<!-- 
-	<rule id="s/np-vp" prob="0.2">
+	<rule id="s/np-vp" prob="0.1"> <!-- *NEW* reactivated -->
 		<syntax>
 			<sym>S</sym><sym>NP</sym><sym>VP</sym>
 		</syntax>
 	</rule>
- -->
 	<rule id="vp/v-v1" prob="0.7">
 		<syntax>
 			<sym>VP</sym><sym>v</sym><sym>V1</sym>
@@ -48,9 +46,14 @@
 			<sym>VP</sym><sym>V1</sym><sym>v</sym>
 		</syntax>
 	</rule>
-	<rule id="v1/np-vz" prob="1.0">
+	<rule id="v1/np-vz" prob="0.9"> <!-- former 1.0 -->
 		<syntax>
 			<sym>V1</sym><sym>NP</sym><sym>VZ</sym>
+		</syntax>
+	</rule>
+	<rule id="v1/vz" prob="0.1"> <!-- *NEW* no direct obj -->
+		<syntax>
+			<sym>V1</sym><sym>VZ</sym>
 		</syntax>
 	</rule>
 	<rule id="vz/pp-vz" prob="0.2">
@@ -118,7 +121,12 @@
 			<sym>NZ</sym><sym>NP</sym><sym>NZ</sym>
 		</syntax>
 	</rule>
-	<rule id="nz/eps" prob="0.3">
+	<rule id="nz/prels-vp" prob="0.1"> <!-- *NEW* subjektrelativsatz: das kreuz das unten liegt -->
+		<syntax>
+			<sym>NZ</sym><sym>prels</sym><sym>VP</sym>
+		</syntax>
+	</rule>
+	<rule id="nz/eps" prob="0.2"> <!-- former: 0.3 -->
 		<syntax>
 			<sym>NZ</sym>
 		</syntax>

@@ -50,6 +50,7 @@ spiegel	tag:v, lemma:spiegeln
 spiegle	tag:v, lemma:spiegeln
 spiegele	tag:v, lemma:spiegeln
 spiegeln	tag:v, lemma:spiegeln
+liegt	tag:v, lemma:liegen
 #
 # ARTIKEL
 #
@@ -62,6 +63,10 @@ dieser	tag:det, lemma:def
 diese	tag:det, lemma:def
 diesen	tag:det, lemma:def
 dieses	tag:det, lemma:def
+# *new*
+welcher	tag:prels, lemma:def 
+welches	tag:prels, lemma:def
+welche	tag:prels, lemma:def
 #
 # PRONOMEN
 # (nur nom und akk)
