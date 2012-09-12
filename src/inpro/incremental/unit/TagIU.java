@@ -28,7 +28,13 @@ public class TagIU extends IU {
 	 */
 	@Override
 	public boolean equals(Object iu) {
-		return iu instanceof TagIU && this.tag.equals(((TagIU) iu).tag);
+		//return iu instanceof TagIU && this.tag.equals(((TagIU) iu).tag);
+		// TODO: The old version yields Nullpointers for uninitialized TagIUs that are compared by IU.ground(IU). 
+		return iu instanceof TagIU && this.toPayloadString().equals(((TagIU) iu).toPayloadString());
+	}
+	
+	public String toPayloadString() {
+		return (this.tag != null) ? this.tag.toString() : "null";
 	}
 	
 	@Override

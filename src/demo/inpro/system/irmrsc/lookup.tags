@@ -54,9 +54,9 @@ liegt	tag:v, lemma:liegen
 #
 # ARTIKEL
 #
-der	tag:det, lemma:def
-die	tag:det, lemma:def
-das	tag:det, lemma:def
+der	tag:det, tag:prels, lemma:def
+die	tag:det, tag:prels, lemma:def
+das	tag:det, tag:prels, lemma:def
 den	tag:det, lemma:def
 dem	tag:det, lemma:def
 dieser	tag:det, lemma:def
@@ -67,6 +67,7 @@ dieses	tag:det, lemma:def
 welcher	tag:prels, lemma:def 
 welches	tag:prels, lemma:def
 welche	tag:prels, lemma:def
+was	tag:prels, lemma:def
 #
 # PRONOMEN
 # (nur nom und akk)
