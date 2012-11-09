@@ -22,6 +22,10 @@
 	
 
 	<!-- ### INPUT ### -->
+	
+	<component name="dispatchStream" type="inpro.audio.DispatchStream">
+		<property name="sendSilence" value="true"/>
+	</component> 
 
 	<component name="textBasedFloorTracker" type="inpro.incremental.processor.TextBasedFloorTracker" /> 
    
