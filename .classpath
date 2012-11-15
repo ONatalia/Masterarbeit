@@ -39,5 +39,6 @@
 	<classpathentry kind="lib" path="lib/xmlrpc/xmlrpc-common-3.1.3.jar"/>
 	<classpathentry kind="lib" path="lib/xmlrpc/xmlrpc-server-3.1.3.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.10.jar"/>
+	<classpathentry kind="lib" path="lib/common-for-convenience/jgraphx.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
