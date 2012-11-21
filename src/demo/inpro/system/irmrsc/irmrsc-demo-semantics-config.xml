@@ -101,17 +101,25 @@
 
 	<!-- ### IU NETWORK DISPLAY ### -->
 
+	<!--  
     <property name="runDot" value="true" />
     <property name="tmpDir" value="/tmp" />
 	<property name="display" value="true" />
 	<property name="useFastScaling" value="false" />
-	<property name="iuTypes" value="" /> <!-- empty = show all -->
+	<property name="iuTypes" value="" />
 
     <component name="dotNotifier" type="inpro.incremental.sink.IUNetworkToDOT">
         <property name="runDot" value="${runDot}" />
         <property name="tmpDir" value="${tmpDir}" />
         <property name="display" value="${display}" />
         <property name="useFastScaling" value="${useFastScaling}" />
+        <property name="iuTypes" value="${iuTypes}" />
+    </component>
+    -->
+    
+	<property name="iuTypes" value="" /> <!-- empty = show all -->
+
+    <component name="dotNotifier" type="inpro.incremental.sink.IUNetworkJGraphX">
         <property name="iuTypes" value="${iuTypes}" />
     </component>
 

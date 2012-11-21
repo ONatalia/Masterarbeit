@@ -311,7 +311,7 @@ public class RMRSComposer extends IUModule {
 							missingSemanticRule = false;
 							
 							//logger.debug(logPrefix+"= "+newForm.toStringOneLine());
-							System.err.println("[C] = "+newForm.toStringOneLine());
+							//System.err.println("[C] = "+newForm.toStringOneLine());
 							
 							// ## a) normal match (add lexical semantics of the token)
 							if (rule.startsWith("m(")) {

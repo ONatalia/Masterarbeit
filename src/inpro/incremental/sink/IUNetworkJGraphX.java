@@ -5,7 +5,7 @@ import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.Dimension;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,33 +13,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-import com.mxgraph.layout.mxCompactTreeLayout;
-import com.mxgraph.layout.mxFastOrganicLayout;
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.layout.mxStackLayout;
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.model.mxCell;
-import com.mxgraph.model.mxGraphModel;
-import com.mxgraph.model.mxIGraphModel;
 import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.util.mxMorphing;
-import com.mxgraph.util.mxConstants;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
+import com.mxgraph.swing.mxGraphOutline;
 import com.mxgraph.view.mxGraph;
-import com.mxgraph.view.mxStylesheet;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4String;
-import edu.cmu.sphinx.util.props.S4Boolean;
 
 /**
  * A viewer for IU networks using the JGraphX library.
@@ -56,8 +46,6 @@ public class IUNetworkJGraphX extends PushBuffer {
 
 	/** Frame for display of output */
 	JFrame f = new JFrame("IU Network");
-	/** Label for display of output */
-	JLabel l;
 	/** The graph */
 	mxGraph graph;
 	/** The graphical component to display the graph in */
@@ -65,56 +53,10 @@ public class IUNetworkJGraphX extends PushBuffer {
 	/** The layout type of the graph */
 	mxIGraphLayout layout;
 	
-	public static final String CUSTOM_NODE_STYLE = "CUSTOM_NODE_STYLE";
-    public static final String CUSTOM_SLL_EDGE_STYLE = "CUSTOM_SLL_EDGE_STYLE";
-    public static final String CUSTOM_GRIN_EDGE_STYLE = "CUSTOM_GRIN_EDGE_STYLE";
-	
-	
-    private static mxStylesheet getCustomStyleSheet() {
-    	Map<String, Object> s = new HashMap<String, Object>();
-    	mxStylesheet stylesheet = new mxStylesheet();
-    	
-        // base style
-        Map<String, Object> baseStyle = new HashMap<String, Object>();
-        baseStyle.put(mxConstants.STYLE_STROKECOLOR, "#000000");
-
-        // custom node style
-        s = new HashMap<String, Object>(baseStyle);
-	    //s.put(mxConstants.STYLE_ROUNDED, true);
-        s.put(mxConstants.STYLE_FILLCOLOR, "#FFFFFF");
-	    //s.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
-	    //s.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE);
-	    //s.put(mxConstants.STYLE_ALIGN, mxConstants.ALIGN_CENTER);
-	    s.put(mxConstants.STYLE_STROKEWIDTH, 1);
-        stylesheet.putCellStyle(CUSTOM_NODE_STYLE, s);
-
-        // custom same level link style
-        s = new HashMap<String, Object>(baseStyle);
-//	    s.put(mxConstants.STYLE_ROUNDED, true);
-//	    s.put(mxConstants.STYLE_ORTHOGONAL, false);
-//	    s.put(mxConstants.STYLE_EDGE, "elbowEdgeStyle");
-//	    s.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_CONNECTOR);
-//	    s.put(mxConstants.STYLE_ENDARROW, mxConstants.ARROW_CLASSIC);
-//	    s.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE);
-//	    s.put(mxConstants.STYLE_ALIGN, mxConstants.ALIGN_CENTER);
-        s.put(mxConstants.STYLE_STROKEWIDTH, 1);
-        stylesheet.putCellStyle(CUSTOM_SLL_EDGE_STYLE, s);
-        
-        // custom grounded in link style
-        s = new HashMap<String, Object>(baseStyle);
-//	    s.put(mxConstants.STYLE_ROUNDED, true);
-//	    s.put(mxConstants.STYLE_ORTHOGONAL, false);
-//	    s.put(mxConstants.STYLE_EDGE, "elbowEdgeStyle");
-//	    s.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_CONNECTOR);
-//	    s.put(mxConstants.STYLE_ENDARROW, mxConstants.ARROW_CLASSIC);
-//	    s.put(mxConstants.STYLE_VERTICAL_ALIGN, mxConstants.ALIGN_MIDDLE);
-//	    s.put(mxConstants.STYLE_ALIGN, mxConstants.ALIGN_CENTER);
-	    s.put(mxConstants.STYLE_DASHED, true);
-        s.put(mxConstants.STYLE_STROKEWIDTH, 1);
-        stylesheet.putCellStyle(CUSTOM_GRIN_EDGE_STYLE, s);
-
-        return stylesheet;
-    }
+	public static final String GROUP_STYLE = "shape=swimlane;fontSize=9;fontStyle=1;startSize=20;horizontal=false;padding=5;";
+	public static final String NODE_STYLE = "shape=rectangle;rounded=true;fillColor=#FFFFFF;opacity=80;spacing=3;";
+	public static final String SLL_EDGE_STYLE = "strokewidth=1;";
+	public static final String GRIN_EDGE_STYLE = "strokewidth=1;dashed=1;";
     
 	/**
 	 * Sets up the IU Network listener
@@ -132,28 +74,39 @@ public class IUNetworkJGraphX extends PushBuffer {
 		
 		// setup graph
 		graph = new mxGraph();
-		graph.setAllowDanglingEdges(false);
-		graph.setAutoOrigin(true);
-		graph.setAutoSizeCells(true);
-		graph.setCellsEditable(false);
+		graph.setMultigraph(true);
 		graph.setCellsBendable(false);
+		graph.setCellsCloneable(false);
+		graph.setCellsEditable(false);
+		graph.setCellsResizable(false);
+		
+		graph.setAllowDanglingEdges(false);
 		graph.setKeepEdgesInBackground(true);
 		
-		// setup styles
-		graph.setStylesheet(getCustomStyleSheet());
-		
 		// setup layout
-		layout = new mxHierarchicalLayout(graph); //mxCompactTreeLayout(graph); //mxHierarchicalLayout(graph); // mxFastOrganicLayout(graph); // new mxStackLayout(graph, true, 10, 0);
+		layout = new mxStackLayout(graph, false); //mxCompactTreeLayout(graph); //mxHierarchicalLayout(graph); // mxFastOrganicLayout(graph); // new mxStackLayout(graph, true, 10, 0);
 		layout.execute(graph.getDefaultParent());
 		
 		// setup frame
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				f.setLocation(0, 100);
-				graphComponent = new mxGraphComponent(graph);
-				f.getContentPane().add(BorderLayout.CENTER, graphComponent);
+				f.setLocation(0, 0);
 				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				f.setSize(600, 600);
+				f.setSize(1000, 800);
+				
+				graphComponent = new mxGraphComponent(graph);
+				graphComponent.setConnectable(false);	
+				f.getContentPane().add(BorderLayout.CENTER, graphComponent);
+				
+				// graphOutline in toolbar
+				JPanel toolBar = new JPanel();
+		        toolBar.setLayout(new BorderLayout());
+		        final mxGraphOutline graphOutline = new mxGraphOutline(graphComponent);
+		        graphOutline.setPreferredSize(new Dimension(100, 100));
+		        toolBar.add(graphOutline, BorderLayout.WEST);
+				f.getContentPane().add(BorderLayout.NORTH, toolBar);
+				
+				// make it so
 				f.setVisible(true);
 			}
 		});
@@ -189,48 +142,40 @@ public class IUNetworkJGraphX extends PushBuffer {
 			graph.getModel().beginUpdate();
 			Object parent = graph.getDefaultParent();
 			try {
-				// first add a node for each iu (and store the links for second step)
+				// first step: add a node for each iu (and save the links for second step)
 				while (!iuProcessingQueue.isEmpty()) {
 					// get next IU
 					IU iu = iuProcessingQueue.remove();
 					String id = Integer.toString(iu.getID());
+					String iuType = iu.getClass().getSimpleName();
 					
-					// if no corresponding node in the graph yet
+					// make sure strange IUs don't enter the graph
+					// TODO: this is the very first IU causing problems here. need to fix the IU bootstrap bug
+					if (iuType == "" || iuType == null) { continue; }
+					
+					// build a new iuType group, if it doesn't exist already
+					if (! groupsByIUType.containsKey(iuType)) {
+						// make new group and register it
+						mxCell group = (mxCell)graph.insertVertex(parent, null, iuType, 0, 0, 0, 0, GROUP_STYLE);
+						groupsByIUType.put(iuType, group);
+					}
+					
+					// if there is no node in the graph yet for this IU, make one and follow the IUs links 
 					if (!insertedNodesByIUID.containsKey(id)) {
-						// add node
-						String iuType = iu.getClass().getSimpleName();
-						String label = iuType + " " + id; //+ "\n" + iu.toPayLoad();
-						Object node = graph.insertVertex(parent, id, label, 300, 300, 0, 0, CUSTOM_NODE_STYLE);
+						// find the group to add this node to
+						Object group = groupsByIUType.get(iuType);
+						String label = iuType + " " + id+ "\n" + iu.toPayLoad().replace("\\n", "\n");
+						Object node = graph.insertVertex(group, id, label, 0, 0, 0, 0, NODE_STYLE);
 						graph.updateCellSize(node);
-						
-						// add node to group
-						Object [] cells = { node };
-						if (groupsByIUType.containsKey(iuType)) {
-							// find group and add node to it
-							Object group = groupsByIUType.get(iuType);
-							graph.groupCells(group, 1, cells);
-							System.out.println("add "+id+" to group "+iuType);
-						} else {
-							// make new group and register it
-							mxCell group = (mxCell)graph.insertVertex(parent, null, iuType, 0, 0, 350, 200, "shape=swimlane;fontSize=9;fontStyle=1;startSize=20;horizontal=false;autosize=1;");
-							// TODO: groups must be layouted internally
-							graph.groupCells(group, 1, cells); // somehow this is needed, dunnow why.
-							Object [] groups = { group };
-							graph.setCellStyles(mxConstants.STYLE_OPACITY, "50", groups);
-							graph.setCellStyles(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_SWIMLANE, groups);
-							groupsByIUType.put(iuType, group);
-							
-							System.out.println("add "+id+" to new group "+iuType);
-						}
-						
-						// add sll link
+										
+						// save sll link for later, queue linked IU
 						IU sll = iu.getSameLevelLink();
 						if (sll != null) {
 							ConservedLinks.add(new ConservedLink(id, Integer.toString(sll.getID()), "sll"));
 							iuProcessingQueue.add(sll);
 						}
 			
-						// add grin links
+						// save grin links for later, queue linked IUs
 						List<? extends IU> grin = iu.groundedIn();
 						if (grin != null) {
 							for (IU gr : grin) {			
@@ -249,20 +194,24 @@ public class IUNetworkJGraphX extends PushBuffer {
 					// get nodes
 					Object from = insertedNodesByIUID.get(l.from);
 					Object to = insertedNodesByIUID.get(l.to);
-					String style = (l.type.equals("sll")) ? CUSTOM_SLL_EDGE_STYLE : CUSTOM_GRIN_EDGE_STYLE ;
+					String style = (l.type.equals("sll")) ? SLL_EDGE_STYLE : GRIN_EDGE_STYLE ;
 					graph.insertEdge(parent, null, null, from, to, style);
 				}
-			
-				// refresh all
-				graph.updateGroupBounds();
 				
-				// arrange the graph layout
-				layout.execute(graph.getDefaultParent());
-//				graph.refresh();
-//				graph.getModel().validate();
 			} finally {
 				graph.getModel().endUpdate();
 			}
+				
+			// arrange the group internal layout
+			for (Object group : groupsByIUType.values()) {
+//				mxCompactTreeLayout grouplayout = new mxCompactTreeLayout(graph);
+//				grouplayout.setHorizontal(true);
+				mxHierarchicalLayout grouplayout = new mxHierarchicalLayout(graph, SwingConstants.WEST);
+				grouplayout.execute((mxCell) group);				
+			}
+			
+			// arrange the overall graph layout
+			layout.execute(graph.getDefaultParent());
 		}
 	}
 }
