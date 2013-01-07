@@ -280,8 +280,7 @@ public class SimpleReco {
 //			cm.lookup("newWordNotifierAgent");
 //		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.TED_OUTPUT)) {
-			PushBuffer ted = (PushBuffer) cm.lookup("tedNotifier");
-			casrh.addListener(ted);
+			casrh.addListener((PushBuffer) cm.lookup("tedNotifier"));
 		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
 			casrh.addListener((PushBuffer) cm.lookup("labelWriter2"));

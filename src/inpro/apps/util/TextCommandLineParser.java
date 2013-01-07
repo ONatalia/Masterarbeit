@@ -76,8 +76,17 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 			else if (args[i].equals("-STDIN")) {
 				textReader = new InputStreamReader(System.in);
 			} 
+			else if (args[i].equals("-O")) {
+				outputMode |= DISPATCHER_OBJECT_OUTPUT;
+			}
 			else if (args[i].equals("-C")) {
 				outputMode |= CURRHYP_OUTPUT;
+			}
+			else if (args[i].equals("-L")) {
+				outputMode |= LABEL_OUTPUT;
+			}
+			else if (args[i].equals("-TED")) {
+				outputMode |= TED_OUTPUT;
 			}
 			else if (args[i].equals("-server")) {
 				serverMode = true;
@@ -98,11 +107,15 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -c <URL>       sphinx configuration file to use (reasonable default)");
 //		System.err.println("    -v             more verbose output (speed and memory tracker)");
 		System.err.println("input selection:");
-		System.err.println("    -T \"<text>\"    simulate input of the given text");
+		System.err.println("    -T \"<text>\"    simulate input of the given text; all following arguments " +
+				           "                   are used as input text, so use this as last parameter!");
 		System.err.println("    -F <URL>       read input from file (one line will be committed at a time)");
 		System.err.println("    -STDIN         read input from standard in");
 		System.err.println("output selection:");
+		System.err.println("    -O             output dialogue system responses");
 		System.err.println("    -C             show current incremental ASR hypothesis");
-	}
+		System.err.println("    -TED           send incremental hypotheses to TEDview");
+		System.err.println("    -L             incremental output using LabelWriter");
+}
 
 }

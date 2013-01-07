@@ -1,6 +1,8 @@
 package inpro.apps;
 
+import inpro.apps.util.CommonCommandLineParser;
 import inpro.apps.util.MonitorCommandLineParser;
+import inpro.apps.util.RecoCommandLineParser;
 import inpro.apps.util.TextCommandLineParser;
 import inpro.incremental.PushBuffer;
 import inpro.incremental.processor.TextBasedFloorTracker;
@@ -151,20 +153,24 @@ public class SimpleText extends JPanel implements ActionListener {
     	final TextBasedFloorTracker textBasedFloorTracker = (TextBasedFloorTracker) cm.lookup(PROP_FLOOR_MANAGER);
     	final List<PushBuffer> hypListeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
     	
+		if (clp.matchesOutputMode(TextCommandLineParser.TED_OUTPUT)) {
+			hypListeners.add((PushBuffer) cm.lookup("tedNotifier"));
+		}
+		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
+			hypListeners.add((PushBuffer) cm.lookup("labelWriter2"));
+		}
     	
-    	// TODO/FIXME: this is really hacky. in fact, we should implement a proper -O switch as in SimpleReco
-    	{
-		MonitorCommandLineParser clp1 = new MonitorCommandLineParser(new String[] {
-				"-F", "file:/tmp/monitor.raw", "-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
-			});
-		clp1.setInputMode(MonitorCommandLineParser.DISPATCHER_OBJECT_INPUT);
-		try {
-			new SimpleMonitor(clp1, cm);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-		}
+    	if (clp.matchesOutputMode(CommonCommandLineParser.DISPATCHER_OBJECT_OUTPUT)) {
+			MonitorCommandLineParser clp1 = new MonitorCommandLineParser(new String[] {
+					"-F", "file:/tmp/monitor.raw", "-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
+				});
+			clp1.setInputMode(MonitorCommandLineParser.DISPATCHER_OBJECT_INPUT);
+			try {
+				new SimpleMonitor(clp1, cm);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    	}
     	
     	if (clp.hasTextFromReader()) { // if we already know the text:
     		logger.info("running in non-interactive mode");
