@@ -29,6 +29,9 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  		this.firstIU = firstIU;
  	}
 
+ 	/** constructor to create a list with a certain default size) */
+	public IUList(int i) { super(i); }
+
 	public void apply(EditMessage<IUType> edit) {
  		switch (edit.getType()) {
  			case ADD: 

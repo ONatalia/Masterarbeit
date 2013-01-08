@@ -104,6 +104,10 @@ public abstract class IU implements Comparable<IU> {
 		if (previousSameLevelLink != null) {
 		//	throw new RuntimeException("SLL may not be changed");
 		}
+		// if you call setSameLevelLink with null as parameter, remove the link to us in the predecessor
+		if (previousSameLevelLink != null && link == null && previousSameLevelLink.nextSameLevelLinks != null) {
+			previousSameLevelLink.nextSameLevelLinks.remove(this);
+		}
 		previousSameLevelLink = link;
 		if (link != null) {
 			link.addNextSameLevelLink(this);
@@ -112,7 +116,7 @@ public abstract class IU implements Comparable<IU> {
 	
 	public void addNextSameLevelLink(IU iu) {
 		if (nextSameLevelLinks == null)
-			nextSameLevelLinks = new IUList<IU>();
+			nextSameLevelLinks = new IUList<IU>(1);
 		nextSameLevelLinks.add(iu);
 	}
 
@@ -240,13 +244,13 @@ public abstract class IU implements Comparable<IU> {
 
 	/** two IUs are equal if their IDs are the same */
 	public boolean equals(Object iu) {
-		return (iu instanceof IU && this.id == ((IU) iu).id); 
+		return (iu instanceof IU && this.getID() == ((IU) iu).getID()); 
 	}
 	
 	/** IDs make for ideal hash codes */
 	@Override
 	public int hashCode() {
-		return this.id;
+		return this.getID();
 	}
 
 	/**
@@ -389,14 +393,14 @@ public abstract class IU implements Comparable<IU> {
 		sb.append("\n  Committed: " + this.isCommitted());
 		sb.append("\n  pSLL: ");
 		if (previousSameLevelLink != null) {
-			sb.append(previousSameLevelLink.id);
+			sb.append(previousSameLevelLink.getID());
 		} else {
 			sb.append("none");
 		}
 		if (getNextSameLevelLink() != null) {
 			sb.append("\n  nSLL: [");
 			for (IU nsll : getNextSameLevelLinks()) {
-				sb.append(nsll.id);
+				sb.append(nsll.getID());
 				sb.append(", ");
 			}
 			sb.append("]");
@@ -464,7 +468,7 @@ public abstract class IU implements Comparable<IU> {
 	 */
 	@Override
 	public int compareTo(IU other) {
-		return this.id - other.id;
+		return this.getID() - other.getID();
 	}
 
 	List<IUUpdateListener> updateListeners;

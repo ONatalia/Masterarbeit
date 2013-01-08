@@ -79,20 +79,27 @@ public class WordIU extends IU {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // the untyped list in the call to Collections.checkedList
 	public List<SegmentIU> getSegments() {
-		List<IU> returnList;
+		List<SegmentIU> returnList;
 		if ((groundedIn == null) || groundedIn.size() == 0) {
-			returnList = Collections.<IU>emptyList();
+			returnList = Collections.<SegmentIU>emptyList();
 		} else if (groundedIn.get(0) instanceof SegmentIU) {
-			returnList = groundedIn;
-		} else if (groundedIn.get(0) instanceof SyllableIU) {
-			returnList = new ArrayList<IU>();
-			for (IU gIn : groundedIn) {
-				returnList.addAll(gIn.groundedIn);
-			}
+			returnList = Collections.checkedList((List) groundedIn, SegmentIU.class);
 		} else {
-			throw new RuntimeException("I don't know how to get segments from my groundedIn list");
+			returnList = new ArrayList<SegmentIU>();
+			recursivelyAggregateSegments(groundedIn, returnList);
 		}
-		return Collections.checkedList((List) returnList, SegmentIU.class);
+		return returnList;
+	}
+	
+	/** follow groundedIn links and collect all SegmentIUs along the way */ 
+	private void recursivelyAggregateSegments(List<IU> grin, List<SegmentIU> returnList) {
+		for (IU iu : grin) {
+			if (iu instanceof SegmentIU) {
+				returnList.add((SegmentIU)iu);
+			} else {
+				recursivelyAggregateSegments(iu.groundedIn, returnList);
+			}
+		}
 	}
 	
 	public SegmentIU getFirstSegment() {

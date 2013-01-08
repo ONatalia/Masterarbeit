@@ -43,7 +43,7 @@ import edu.cmu.sphinx.util.props.PropertySheet;
  * 
  * Descendents of this class implement methods described in NAACL-HLT 2009
  * 
- * @author Timo Baumann
+ * @author Timo Baumann, Rabih Hamadeh
  */
 public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeeper, SignalListener {
 

@@ -105,6 +105,7 @@ public class SysSegmentIU extends SegmentIU {
 	 */
 	public synchronized boolean setAwaitContinuation(boolean b) {
 		awaitContinuation = b;
+		notifyAll();
 		return !isCompleted();
 	}
 	
