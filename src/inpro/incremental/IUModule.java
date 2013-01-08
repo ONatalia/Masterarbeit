@@ -1,6 +1,7 @@
 package inpro.incremental;
 
 import inpro.incremental.unit.EditMessage;
+import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.IUList;
 import inpro.incremental.util.TedAdapter;
@@ -106,6 +107,10 @@ public abstract class IUModule extends PushBuffer {
 		}
 	}
 	
+	public void notifyListeners() {
+		rightBuffer.notify(iulisteners);
+	}
+	
 	/**
 	 * Encapsulates the module's output in two representations. 
 	 * 
@@ -118,7 +123,11 @@ public abstract class IUModule extends PushBuffer {
 		/** true if the content has changed since the last call to notify */
 		boolean hasUpdates = false;
 		IUList<IU> ius = new IUList<IU>();
-		List<EditMessage<IU>> edits;
+		List<EditMessage<IU>> edits = new ArrayList<EditMessage<IU>>();
+		
+		public List<IU> getBuffer() {
+			return new ArrayList<IU>(ius); 
+		}
 		
 		// just a list of IUs, automatically infers the edits since the last call 
 		public void setBuffer(Collection<? extends IU> outputIUs) {
@@ -147,6 +156,18 @@ public abstract class IUModule extends PushBuffer {
 			hasUpdates = (edits != null) && !edits.isEmpty();
 		}
 		
+		public void addToBuffer(IU iu) {
+			ius.add(iu);
+			edits.add(new EditMessage<IU>(EditType.ADD, iu));
+			hasUpdates = true;
+		}
+		
+		public void editBuffer(EditMessage<IU> edit) {
+			ius.apply(edit);
+			edits.add(edit);
+			hasUpdates = true;
+		}
+		
 		public void notify(PushBuffer listener) {
 			if (hasUpdates) {
 				listener.hypChange(ius, edits);
@@ -159,6 +180,7 @@ public abstract class IUModule extends PushBuffer {
 			for (PushBuffer listener : listeners) {
 				notify(listener);
 			}
+			edits.clear();
 			hasUpdates = false;
 		}	
 	}

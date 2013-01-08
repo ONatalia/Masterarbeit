@@ -78,6 +78,38 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 			backsubstituteHTSModels((SysSegmentIU) newSeg.getSameLevelLink(), (SysSegmentIU) oldSeg.getSameLevelLink());
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	public void revokePhrase(PhraseIU phrase) {
+		assert phrase.isUpcoming();
+//		SegmentIU seg = ((WordIU) phrase.groundedIn()).getSegments().get(0);
+//		seg.getSameLevelLink().removeAllNextSameLevelLinks();
+		for (WordIU word : (List<WordIU>) phrase.groundedIn()) {
+			word.setSameLevelLink(null);
+			word.removeAllNextSameLevelLinks();
+			groundedIn.remove(word);
+			//word.revoke();
+			for (SegmentIU seg : word.getSegments()) {
+				seg.setSameLevelLink(null);
+				seg.removeAllNextSameLevelLinks();
+			}
+		}
+		//System.err.println(phrase.deepToString());
+		/*
+		if (revokedIU.isUpcoming()){
+			if (revokedIU instanceof WordIU) {
+				SegmentIU seg = ((WordIU)revokedIU).getFirstSegment();
+				seg.getSameLevelLink().removeAllNextSameLevelLinks(); //FIXME: this is too eager, it would be much better to only remove seg from nextSLL!
+			} else {
+				throw new NotImplementedException("and now you're revoking an IU that I cannot handle.");
+			}
+		} else { // warn if revoke comes too late.
+			if (revokedIU.isOngoing()) 
+				logger.warn("SynthesisModule: so far, I'm unable to revoke ongoing IUs; sorry about that; check for our next release.");
+			else
+				logger.warn("SynthesisModule: you asked me to revoke a completed IU. I'm unable to change the past.");
+		} */
+	}
 
 	/** breaks the segment links between words so that crawling synthesis stops after the currently ongoing word */
 	public void stopAfterOngoingWord() {

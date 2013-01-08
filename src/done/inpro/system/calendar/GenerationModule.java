@@ -92,7 +92,7 @@ public class GenerationModule extends IUModule {
 		long start = System.currentTimeMillis();
 		
 		String phrase = nlg.generateNextPhrase();
-		PhraseIU piu = new PhraseIU(phrase, PhraseIU.PhraseType.INITIAL);
+		PhraseIU piu = new PhraseIU(phrase, PhraseIU.PhraseType.NONFINAL);
 		phrases.add(piu);
 		
 		String projectedPhrase = nlg.simulateNextButOnePhrase();

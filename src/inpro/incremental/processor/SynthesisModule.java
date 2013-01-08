@@ -10,11 +10,12 @@ import inpro.incremental.unit.SysInstallmentIU;
 import inpro.incremental.unit.SysSegmentIU;
 import inpro.incremental.unit.WordIU;
 import inpro.incremental.unit.IU.IUUpdateListener;
-import inpro.incremental.unit.IU.Progress;
 import inpro.synthesis.MaryAdapter;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -29,15 +30,24 @@ public class SynthesisModule extends IUModule {
 	@S4Component(type = DispatchStream.class)
 	public final static String PROP_DISPATCHER = "dispatcher";
 	
-	
 	protected DispatchStream speechDispatcher;
 	
 	protected PhraseBasedInstallmentIU currentInstallment;
 	
+	private Any2PhraseIUWrapper words2phrase = new Any2PhraseIUWrapper(); 
+	
+	/** 
+	 * This constructor is necessary for use with Configuration Management. 
+	 * You should rather use SynthesisModule(SimpleMonitor.setupDispatcher()) 
+	 * if you need to create your own synthesis module. 
+	 */
 	public SynthesisModule() {
 		this(null);
 	}
 	
+	/**
+	 * @param speechDispatcher, if in doubt, create one by calling SimpleMonitor.setupDispatcher()
+	 */
 	public SynthesisModule(DispatchStream speechDispatcher) {
 		this.speechDispatcher = speechDispatcher;
 		MaryAdapter.initializeMary(); // preload mary
@@ -57,18 +67,13 @@ public class SynthesisModule extends IUModule {
 			List<? extends EditMessage<? extends IU>> edits) {
 		boolean startPlayInstallment = false;
 		for (EditMessage<?> em : edits) {
-			System.out.println("   " + em.getType() + " " + em.getIU().toPayLoad());
+			logger.warn(em.getType() + " " + em.getIU().toPayLoad());
+			PhraseIU phraseIU = words2phrase.getPhraseIU(em.getIU());
 			switch (em.getType()) {
 			case ADD:
-				PhraseIU phraseIU;
-				if (em.getIU() instanceof PhraseIU) {
-					phraseIU = (PhraseIU) em.getIU();
-				} else {
-					phraseIU = new PhraseIU((WordIU) em.getIU());
-				}
 				if (currentInstallment != null && !currentInstallment.isCompleted()) {
 					WordIU choiceWord = currentInstallment.getFinalWord();
-					// mark the ongoing utterance as non-final, check whether there's still enough time
+					// mark the ongoing utterance as non-final, (includes check whether there's still enough time)
 					boolean canContinue = ((SysSegmentIU) choiceWord.getLastSegment()).setAwaitContinuation(true);
 					if (canContinue) {
 						currentInstallment.appendPhrase(phraseIU);
@@ -76,7 +81,7 @@ public class SynthesisModule extends IUModule {
 						currentInstallment = null;
 					}
 				} 
-				if (currentInstallment == null) { // start a new installment
+				if (currentInstallment == null || currentInstallment.isCompleted()) { // start a new installment
 					currentInstallment = new PhraseBasedInstallmentIU(phraseIU);
 					startPlayInstallment = true;
 				}
@@ -84,17 +89,22 @@ public class SynthesisModule extends IUModule {
 				break;
 			case REVOKE:
 				//throw new NotImplementedException("phrases cannot yet be revoked from synthesis; check for our next release");
-				// silently ignore revokes for now
+				if (currentInstallment == null || currentInstallment.isCompleted()) {
+					logger.warn("phrase " + phraseIU + " was revoked but installment has been completed already, can't revoke anymore.");
+				} else {
+					if (!phraseIU.isUpcoming()) {
+						logger.warn("phrase " + phraseIU + " is not upcoming anymore, can't revoke anymore. (send us an e-mail if you really need to revoke ongoing phrases)");
+					} else {
+						currentInstallment.revokePhrase(phraseIU);
+					}
+				}
+				break;
 			case COMMIT:
 				// ensure that this phrase can be finished
-				IU iu = em.getIU();
-				if (iu instanceof PhraseIU) {
-					((PhraseIU) iu).setFinal();
-				} else {
-					for (SysSegmentIU seg : currentInstallment.getSegments()) {
-						// clear any locks that might block the vocoder from finishing the utterance phrase
-						seg.setAwaitContinuation(false);			
-					}
+				phraseIU.setFinal();
+				for (SysSegmentIU seg : currentInstallment.getSegments()) {
+					// clear any locks that might block the vocoder from finishing the utterance phrase
+					seg.setAwaitContinuation(false);			
 				}
 				break;
 			default:
@@ -149,12 +159,25 @@ public class SynthesisModule extends IUModule {
 			if (updatedIU.isOngoing()) {
 				// block vocoding from finishing synthesis before our completion is available
 				if (!completed.getType().equals(PhraseIU.PhraseType.FINAL)) {
-					SysSegmentIU seg = (SysSegmentIU) currentInstallment.getFinalWord().getLastSegment();  
-					if (seg != null) 
-						seg.setAwaitContinuation(true);
+					SysSegmentIU seg = (SysSegmentIU) currentInstallment.getFinalWord().getLastSegment();
+					// TODO/FIXME: this was only useful in the Calendar domain -- how can we fix this to be generic?
+				//	if (seg != null) 
+					//	seg.setAwaitContinuation(true);
 				}
-				completed.setProgress(Progress.COMPLETED);
 			}
+		}
+	}
+	
+	class Any2PhraseIUWrapper {
+		Map<WordIU,PhraseIU> map = new HashMap<WordIU,PhraseIU>();
+		PhraseIU getPhraseIU(WordIU w) {
+			if (!map.containsKey(w)) {
+				map.put(w, new PhraseIU(w));
+			}
+			return map.get(w);
+		}
+		PhraseIU getPhraseIU(IU iu) {
+			return (iu instanceof PhraseIU) ? (PhraseIU) iu : getPhraseIU((WordIU) iu);
 		}
 	}
 	

@@ -9,17 +9,15 @@ import java.util.List;
  * units that roughly correspond to prosodic phrases
  * @author timo
  */
-public class PhraseIU extends IU {
+public class PhraseIU extends WordIU {
 
 	final String phrase;
 	private PhraseType type;
 	/** the state of delivery that this unit is in */
-	Progress progress = Progress.UPCOMING;
+	Progress progress = null;
 	
 	public enum PhraseType {
-	    INITIAL, // the first phrase in the utterance
-	    CONTINUATION, // continues the previous phrase 
-	    REPAIR, // correction of the previous phrase
+	    NONFINAL, // we're still awaiting more content in this utterance
 	    FINAL, // last phrase of the utterance <-- this is not exclusive with e.g. continuation,initial,repair,
 	    	   // unlike the other types this describes the end of the phrase, not the beginning 
 	    UNDEFINED // dunno
@@ -27,6 +25,8 @@ public class PhraseIU extends IU {
 	
 	public PhraseIU(WordIU word) {
 		this(word.toPayLoad());
+		word.groundIn(this);
+		this.setFinal();
 	}
 	
 	public PhraseIU(String phrase) {
@@ -34,6 +34,7 @@ public class PhraseIU extends IU {
 	}
 	
 	public PhraseIU(String phrase, PhraseType type) {
+		super(phrase, null, null);
 		this.phrase = phrase;
 		this.type = type;
 	}
@@ -66,21 +67,24 @@ public class PhraseIU extends IU {
 	
 	@Override
 	public Progress getProgress() {
-		return progress;
+		return progress != null ? progress : super.getProgress();
 	}
 
 	public void setFinal() {
 		this.type = PhraseIU.PhraseType.FINAL;
-		WordIU lastWord = null;
-		if (groundedIn != null) {
-			lastWord = (WordIU) groundedIn.get(groundedIn.size() - 1);
+		for (SegmentIU seg : getSegments()) {
+			((SysSegmentIU) seg).setAwaitContinuation(false);			
 		}
-		if (lastWord != null) {
-			for (SegmentIU seg : lastWord.getSegments()) {
-				// clear any locks that might block the vocoder from finishing the final phrase
-				((SysSegmentIU) seg).setAwaitContinuation(false);			
-			}
-		}
+//		WordIU lastWord = null;
+//		if (groundedIn != null) {
+//			lastWord = (WordIU) groundedIn.get(groundedIn.size() - 1);
+//		}
+//		if (lastWord != null) {
+//			for (SegmentIU seg : lastWord.getSegments()) {
+//				// clear any locks that might block the vocoder from finishing the final phrase
+//				((SysSegmentIU) seg).setAwaitContinuation(false);			
+//			}
+//		}
 	}
 
 	public PhraseType getType() {
