@@ -253,7 +253,9 @@ public class SimpleReco {
         	cm.setGlobalProperty("searchManager", "simpleSearch");
         	Pattern regexp = Pattern.compile("^(.*)/(.*?).gram$");
         	Matcher regexpResult = regexp.matcher(lmUrl.toString());
-        	assert regexpResult.matches() : "mal-formatted grammar URL.";
+        	if (!regexpResult.matches()) { 
+        		throw new RuntimeException("mal-formatted grammar URL."); 
+        	}
         	String grammarLocation = regexpResult.group(1);
         	String grammarName = regexpResult.group(2);
         	logger.info(grammarLocation);
