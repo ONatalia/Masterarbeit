@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.URL;
 import java.net.UnknownHostException;
 
 import javax.sound.sampled.AudioFormat;
@@ -271,8 +272,8 @@ public class SimpleMonitor implements RtpListener {
 	}
 	
 	@SuppressWarnings("unused")
-	public static DispatchStream setupDispatcher() {
-		ConfigurationManager cm = new ConfigurationManager(SimpleMonitor.class.getResource("config.xml"));
+	public static DispatchStream setupDispatcher(URL configURL) {
+		ConfigurationManager cm = new ConfigurationManager(configURL);
 		final String tmpAudio = "file:///" + System.getProperty("java.io.tmpdir") + "/" + "monitor.raw";
 		MonitorCommandLineParser clp = new MonitorCommandLineParser(new String[] {
 				"-F", tmpAudio, "-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
@@ -284,7 +285,11 @@ public class SimpleMonitor implements RtpListener {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		return (DispatchStream) cm.lookup("dispatchStream");
+		return (DispatchStream) cm.lookup("dispatchStream");		
+	}
+	
+	public static DispatchStream setupDispatcher() {
+		return setupDispatcher(SimpleMonitor.class.getResource("config.xml"));
 	}
 	
     /**
