@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE config[
-  <!ENTITY sphinx SYSTEM "src/inpro/apps/sphinx.xml">
-  <!ENTITY sphinxlang SYSTEM "src/inpro/apps/sphinx-de.xml">
-  <!ENTITY frontend SYSTEM "src/inpro/apps/frontend.xml">
+  <!ENTITY sphinx SYSTEM "../../../../inpro/apps/sphinx.xml">
+  <!ENTITY sphinxlang SYSTEM "../../../../inpro/apps/sphinx-de.xml">
+  <!ENTITY frontend SYSTEM "../../../../inpro/apps/frontend.xml">
 ]>
 <!--
    Sphinx-4 Configuration file
@@ -45,7 +45,7 @@
 
 	<!-- ### POS TAGGER ### -->
 	
-	<property name="lookupTags" value="file:src/demo/inpro/system/irmrsc/lookup.tags" />
+	<property name="lookupTags" value="file:demo/inpro/system/irmrsc/lookup.tags" />
 
     <component name="tagger" type="inpro.incremental.processor.Tagger">
         <property name="lookupTags" value="${lookupTags}" />
@@ -58,7 +58,7 @@
 	
 	<!-- ### PARSER ### -->
 
-	<property name="grammarFile" value="file:src/demo/inpro/system/irmrsc/irmrsc-grammar.xml" />
+	<property name="grammarFile" value="file:demo/inpro/system/irmrsc/irmrsc-grammar.xml" />
 	<property name="baseBeamFactor" value="0.01" />
 	<property name="beRobust" value="true" />
 

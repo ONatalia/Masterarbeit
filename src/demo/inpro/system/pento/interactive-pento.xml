@@ -1,9 +1,7 @@
-
-
 <!DOCTYPE config[
-  <!ENTITY sphinx SYSTEM "src/inpro/apps/sphinx.xml">
-  <!ENTITY sphinxlang SYSTEM "src/inpro/apps/sphinx-de.xml">
-  <!ENTITY frontend SYSTEM "src/inpro/apps/frontend.xml">
+  <!ENTITY sphinx SYSTEM "../../../../inpro/apps/sphinx.xml">
+  <!ENTITY sphinxlang SYSTEM "../../../../inpro/apps/sphinx-de.xml">
+  <!ENTITY frontend SYSTEM "../../../../inpro/apps/frontend.xml">
 ]>
 <!--
    Sphinx-4 Configuration file
@@ -25,23 +23,23 @@
     <property name="baseData" value="baseData"/>
     <property name="dialogueManager" value="echoDialogueManager"/>
     
-    <property name="setting" value="file:src/demo/inpro/system/pento/pentodemo.xml" />
+    <property name="setting" value="file:demo/inpro/system/pento/pentodemo.xml" />
       <!-- for dotViewer -->
     <property name="display" value="true" />
     <property name="tmpDir" value="/tmp" />
     <property name="runDot" value="false" />
     <property name="domain" value="domain" />
       <!--  for Tagger -->
-    <property name="lookupTags" value="file:src/demo/inpro/system/irmrsc/lookup.tags" />
+    <property name="lookupTags" value="file:demo/inpro/system/irmrsc/lookup.tags" />
       <!--  for TagParser -->
-    <property name="grammarFile" value="file:src/demo/inpro/system/irmrsc/irmrsc-grammar.xml" />
+    <property name="grammarFile" value="file:demo/inpro/system/irmrsc/irmrsc-grammar.xml" />
       <!--  for RMRSComposer -->
     <property name="referencePruning" value="true"/>
     <property name="malusNoReference" value="0.01"/>
     <property name="gold" value="delete tile-1"/>
-    <property name="semMacrosFile" value="file:src/demo/inpro/system/irmrsc/irmrsc-semmacros.xml" />
-   	<property name="semRulesFile" value="file:src/demo/inpro/system/irmrsc/irmrsc-semrules.xml" />
-   	<property name="tagLexiconFile" value="file:src/demo/inpro/system/irmrsc/irmrsc-taglexicon.xml" />    
+    <property name="semMacrosFile" value="file:demo/inpro/system/irmrsc/irmrsc-semmacros.xml" />
+   	<property name="semRulesFile" value="file:demo/inpro/system/irmrsc/irmrsc-semrules.xml" />
+   	<property name="tagLexiconFile" value="file:demo/inpro/system/irmrsc/irmrsc-taglexicon.xml" />    
 
     <!-- ******************************************************** -->
     <!-- The incremental processing configuration                 -->

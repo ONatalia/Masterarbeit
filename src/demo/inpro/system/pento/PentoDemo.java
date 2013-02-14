@@ -5,8 +5,6 @@ import inpro.incremental.PushBuffer;
 import inpro.incremental.processor.TextBasedFloorTracker;
 import inpro.incremental.source.CurrentASRHypothesis;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.util.List;
 
 import org.apache.log4j.BasicConfigurator;
@@ -45,10 +43,9 @@ public class PentoDemo {
 	static Setting setting;
 	
 	public static void main (String[] args) {
-		
 		try {
 			BasicConfigurator.configure();
-			cm = new ConfigurationManager(new File("src/demo/inpro/system/pento/interactive-pento.xml").toURI().toURL());
+			cm = new ConfigurationManager(PentoDemo.class.getResource("interactive-pento.xml"));
 	    	ps = cm.getPropertySheet(PROP_CURRENT_HYPOTHESIS);
 	    	textBasedFloorTracker = (TextBasedFloorTracker) cm.lookup(PROP_FLOOR_MANAGER);
 	    	final List<PushBuffer> hypListeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
@@ -57,11 +54,6 @@ public class PentoDemo {
 		catch (PropertyException e) {
 			e.printStackTrace();
 		} 
-		catch (MalformedURLException e) {
-			e.printStackTrace();
-		} 
-
-
 	}
 	
 }

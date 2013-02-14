@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE config[
-  <!ENTITY sphinx SYSTEM "/home/timo/uni/projekte/inpro/src/inpro/apps/sphinx.xml">
-  <!ENTITY sphinxlang SYSTEM "/home/timo/uni/projekte/inpro/src/inpro/apps/sphinx-de.xml">
-  <!ENTITY frontend SYSTEM "/home/timo/uni/projekte/inpro/src/inpro/apps/frontend.xml">
+  <!ENTITY sphinx SYSTEM "../../../../inpro/apps/sphinx.xml">
+  <!ENTITY sphinxlang SYSTEM "../../../../inpro/apps/sphinx-de.xml">
+  <!ENTITY frontend SYSTEM "../../../../inpro/apps/frontend.xml">
 ]>
 
 <!-- ******************************************************** -->
@@ -48,19 +48,6 @@
     <component name="turnCompleter" type="done.inpro.system.completion.TurnCompleter">
 	<property name="dispatchStream" value="dispatchStream" />
 	<property name="evaluator" value="completionEvaluator" />
-	<propertylist name="utterances">
-            <item>nordwind und sonne</item>
-            <!--item>einst stritten sich nordwind und sonne</item>
-            <item>wer von ihnen beiden wohl der stärkere wäre</item>
-            <item>als ein wanderer der in einen warmen mantel gehüllt war des weges daherkam</item>
-            <item>sie wurden einig dass derjenige für den stärkeren gelten sollte der den wanderer zwingen würde seinen mantel abzunehmen</item>
-            <item>der nordwind blies mit aller macht</item>
-            <item>aber je mehr er blies, desto fester hüllte sich der wanderer in seinen mantel ein</item>
-            <item>endlich gab der nordwind den kampf auf</item>
-            <item>nun erwärmte die sonne die luft mit ihren freundlichen strahlen</item>
-            <item>und schon nach wenigen augenblicken zog der wanderer seinen mantel aus</item>
-            <item>da musste der nordwind zugeben dass die sonne von ihnen beiden der stärkere war</item-->
-	</propertylist>
     </component>
 
     <component name="completionEvaluator" type="done.inpro.system.completion.CompletionEvaluator" />
