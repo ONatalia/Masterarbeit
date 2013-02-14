@@ -2,7 +2,6 @@ package inpro.incremental.source;
 
 import inpro.incremental.FrameAware;
 import inpro.incremental.PushBuffer;
-import inpro.incremental.basedata.BaseData;
 import inpro.incremental.deltifier.ASRWordDeltifier;
 import inpro.incremental.sink.TEDviewNotifier;
 import inpro.incremental.unit.EditMessage;
@@ -30,23 +29,25 @@ import edu.cmu.sphinx.util.props.S4ComponentList;
  * this class is the glue between sphinx and InproTK and is the
  * starting point into the IU world.
  * @author timo
+ * 
+ * TODO: commit words as soon as they are unambiguously recognized 
+ *       (i.e., when there are no alternatives left on the beam)
+ * TODO: add support for top-down revokes (i.e., remove hypotheses
+ *       from the search space when higher-level tells us to)
+ * 
  */
 public class CurrentASRHypothesis implements Configurable, ResultListener, Monitor {
 
 	@S4Component(type = FrontEnd.class, mandatory = true)
-	public final static String PROP_ASR_FRONTEND = "frontend";
+	public final static String PROP_ASR_FRONTEND = "frontend"; // NO_UCD (unused code)
 
 	@S4Component(type = ASRWordDeltifier.class, defaultClass = ASRWordDeltifier.class)
-	public final static String PROP_ASR_DELTIFIER = "asrFilter";
-	ASRWordDeltifier asrDeltifier;
-	
-	@S4Component(type = BaseData.class, mandatory = false)
-	public final static String PROP_BASE_DATA_KEEPER = "baseData";
-	BaseData basedata;
+	public final static String PROP_ASR_DELTIFIER = "asrFilter"; // NO_UCD (use private)
+	protected ASRWordDeltifier asrDeltifier;
 	
 	@S4ComponentList(type = PushBuffer.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
-	List<PushBuffer> listeners;
+	private List<PushBuffer> listeners;
 	
 //	@S4Component(type = TemporalNGramModel.class, mandatory = false)
 //	public final static String PROP_TNGM = "tngm";
@@ -59,7 +60,6 @@ public class CurrentASRHypothesis implements Configurable, ResultListener, Monit
 			asrDeltifier = new ASRWordDeltifier();
 		}
 		System.err.println("deltifier is " + asrDeltifier);
-		basedata = (BaseData) ps.getComponent(PROP_BASE_DATA_KEEPER);
 		listeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
 		
 //		tngm = (TemporalNGramModel) ps.getComponent(PROP_TNGM);
@@ -85,6 +85,13 @@ public class CurrentASRHypothesis implements Configurable, ResultListener, Monit
 	
 	public void newResult(Result result) {
 		asrDeltifier.deltify(result);
+		notifyListeners();
+		if (result.isFinal()) {
+			commit();
+		}
+	}
+	
+	protected void notifyListeners() {
 		List<EditMessage<WordIU>> edits = asrDeltifier.getWordEdits();
 		List<WordIU> ius = asrDeltifier.getWordIUs();
 		int currentFrame = asrDeltifier.getCurrentFrame();
@@ -99,11 +106,8 @@ public class CurrentASRHypothesis implements Configurable, ResultListener, Monit
 			if (ius != null && edits != null)
 				listener.hypChange(ius, edits);
 		}
-		if (result.isFinal()) {
-			commit();
-		}
 	}
-	
+
 	/** for TEDview, we additionally notify about segments and syllables */
 	private void checkForTEDview(PushBuffer listener) {
 		if ((listener instanceof TEDviewNotifier)) {
@@ -123,11 +127,6 @@ public class CurrentASRHypothesis implements Configurable, ResultListener, Monit
 
 	public void reset() {
 		asrDeltifier.reset();
-// I believe it's not necessary to reset all incremental modules just because ASR reset, is it?
-/*		for (PushBuffer listener : iulisteners) {
-				listener.reset();
-		}
-*/ 
 	}
 
 	public void commit() {
@@ -142,7 +141,6 @@ public class CurrentASRHypothesis implements Configurable, ResultListener, Monit
 		for (PushBuffer listener : listeners) {
 			listener.hypChange(ius, edits);
 		}
-//		basedata.reset();
 		this.reset();
 	}
 	
