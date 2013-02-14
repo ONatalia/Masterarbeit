@@ -26,7 +26,7 @@ public class TextGrid {
 		Pattern.compile("^\\s*size = (\\d+)\\s*$") 
 	); 
 	
-	HashMap<String,Tier> tiers;
+	private HashMap<String,Tier> tiers;
 	
 	public static TextGrid newFromTextGridFile(String filename) throws IOException {
 		return newFromTextGridFile(new File(filename));

@@ -207,7 +207,7 @@ public class IUNetworkJGraphX extends PushBuffer {
 //				mxCompactTreeLayout grouplayout = new mxCompactTreeLayout(graph);
 //				grouplayout.setHorizontal(true);
 				mxHierarchicalLayout grouplayout = new mxHierarchicalLayout(graph, SwingConstants.WEST);
-				grouplayout.execute((mxCell) group);				
+				grouplayout.execute(group);				
 			}
 			
 			// arrange the overall graph layout

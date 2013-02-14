@@ -83,8 +83,8 @@ public class SimpleText extends JPanel implements ActionListener {
 	@S4Component(type = TextBasedFloorTracker.Listener.class)
 	public final static String PROP_FLOOR_MANAGER_LISTENERS = TextBasedFloorTracker.PROP_STATE_LISTENERS;
 
-	IUDocument iuDocument;
-	JTextField textField;
+	private IUDocument iuDocument;
+	private JTextField textField;
 	
 	SimpleText(TextBasedFloorTracker textBasedFloorTracker) {
 		iuDocument = new IUDocument();
