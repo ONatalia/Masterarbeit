@@ -63,8 +63,20 @@ public class MaryAdapter4internal extends MaryAdapter {
 	public synchronized List<IU> text2IUs(String tts) {
 		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class); 
 		InputStream is = text2maryxml(tts);
+/*      // useful code for looking at Mary's XML  
+		BufferedReader in = new BufferedReader(new InputStreamReader(is));
+		String line = null;
+		try {
+			while((line = in.readLine()) != null) {
+			  System.err.println(line);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		is = text2maryxml(tts); /**/
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, ihtse.uttHMMs);
+		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, ihtse.getUttHMMs());
 		return groundedIn;
 	}
 
@@ -100,7 +112,7 @@ public class MaryAdapter4internal extends MaryAdapter {
 	        request.process();
 	        request.writeOutputData(baos);
         } catch (Exception e) {
-        	//e.printStackTrace();
+        	e.printStackTrace();
         	//throw new RuntimeException(e);
         }
         return baos;

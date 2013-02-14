@@ -46,17 +46,6 @@ public class InteractiveHTSEngine extends HTSEngine {
         	uttHMMs.add(um.getUttModel(i));
         }
         
-        // this can then later be done
-        /* Process UttModel * /
-        PHTSParameterGeneration ipdf2par = new PHTSParameterGeneration(hmmv.getHMMData());
-        // Generate sequence of speech parameter vectors, generate parameters out of sequence of pdf's  
-        ipdf2par.phtsIncrementalParameterGeneration(um); /**/
-
-        //ITTSExperimenter.visualize("Incremental", new SynthesisHeatMap(new HTSFullPStream(pdf2par)));
-        //ITTSExperimenter.visualize("Incremental", new SynthesisHeatMap(ipdf2par.getFullPStream()));
-
-        
-        
         MaryData output = new MaryData(outputType(), d.getLocale());
         if (synthesizeAudio) {
             AudioInputStream ais = null;
@@ -65,8 +54,6 @@ public class InteractiveHTSEngine extends HTSEngine {
             // Generate sequence of speech parameter vectors, generate parameters out of sequence of pdf's  
             pdf2par.htsMaximumLikelihoodParameterGeneration(um, hmmv.getHMMData()); /**/
 
-//            ITTSExperimenter.visualize("Non-Incremental", new SynthesisHeatMap(new HTSFullPStream(pdf2par)));
-//            ITTSExperimenter.visualize("Difference", new SynthesisHeatMapComparator(ipdf2par.getFullPStream(), new HTSFullPStream(pdf2par)));
 	        /* Vocode speech waveform out of sequence of parameters */
 	        DoubleDataSource dds = new VocodingAudioStream(pdf2par, hmmv.getHMMData(), returnIncrementalAudioStream);
 	        float sampleRate = 16000.0F;  //8000,11025,16000,22050,44100
@@ -98,5 +85,10 @@ public class InteractiveHTSEngine extends HTSEngine {
         
         return output;
     }
+
+	public List<HTSModel> getUttHMMs() {
+		assert uttHMMs != null : "You are calling getUttHMMs without having called my process() method before (Hint: you may think that it was called but the buildpath order might be in your way.)";
+		return uttHMMs;
+	}
     
 }
