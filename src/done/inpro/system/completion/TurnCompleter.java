@@ -142,7 +142,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 			
 			// c) synthesize and play the completion
 			for (CompletionAdapter ca : compAdapters) {
-				ca.newCompletion(estimatedStartTime, output);
+				ca.newCompletion(estimatedStartTime, estimatedSpeechRate, output);
 			}
 		}
 	}
@@ -195,7 +195,7 @@ public class TurnCompleter extends IUModule implements FrameAware {
 	}
 
 	public interface CompletionAdapter {
-		public void newCompletion(double estimatedStartTime, SysInstallmentIU completion);
+		public void newCompletion(double estimatedStartTime, double scalingFactor, SysInstallmentIU completion);
 	}
 	
 	private class CompletionEvalAdapter implements CompletionAdapter {
@@ -206,11 +206,11 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		}
 		
 		@Override
-		public void newCompletion(double estimatedStartTime,
+		public void newCompletion(double estimatedStartTime, double scalingFactor,
 				SysInstallmentIU completion) {
 			WordIU nextWord = completion.getWords().get(0);
 			double nextWordEndEstimate = estimatedStartTime + nextWord.duration();
-			ce.newOnsetResult(lastElement(fullInput), estimatedStartTime, currentFrame, nextWord, nextWordEndEstimate);
+			ce.newOnsetResult(lastElement(fullInput), estimatedStartTime, currentFrame, nextWord, nextWordEndEstimate, scalingFactor);
 		}
 	}
 	
@@ -224,7 +224,8 @@ public class TurnCompleter extends IUModule implements FrameAware {
 		}
 
 		@Override
-		public void newCompletion(double estimatedStartTime, SysInstallmentIU completion) {
+		public void newCompletion(double estimatedStartTime, double scalingFactor, // scalingFactor is silently ignored
+				SysInstallmentIU completion) {
 			double holdingTime = estimatedStartTime - currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR;
 			WordIU nextWord = completion.getWords().get(0);
 			if (!nextWord.isSilence()) {

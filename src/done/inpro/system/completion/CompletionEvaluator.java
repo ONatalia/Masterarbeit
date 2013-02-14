@@ -17,8 +17,8 @@ public class CompletionEvaluator extends BasicEvaluator {
 
 	private final Queue<EvalEntry> onsetResults = new LinkedList<EvalEntry>();
 	
-	public void newOnsetResult(WordIU word, double onsetTime, int frameCount, WordIU nextWord, double nextWordEndEstimate) {
-		onsetResults.add(new EvalEntry(word, onsetTime, frameCount, nextWord, nextWordEndEstimate));
+	public void newOnsetResult(WordIU word, double onsetTime, int frameCount, WordIU nextWord, double nextWordEndEstimate, double scalingFactor) {
+		onsetResults.add(new EvalEntry(word, onsetTime, frameCount, nextWord, nextWordEndEstimate, scalingFactor));
 	}
 
 	protected void evaluate() {
@@ -41,11 +41,12 @@ public class CompletionEvaluator extends BasicEvaluator {
 				}
 				System.err.print(
 					String.format(Locale.ENGLISH, 
-						"(wstart:%.3f\tdec:%.3f\test:%.3f\tnest:%.3f) ",
+						"(wstart:%.3f\tdec:%.3f\test:%.3f\tnest:%.3f\tscal:%.3f) ",
 						evalEntry.triggerWord.startTime(), // start time of the triggering word *when the decision was taken* (this may change during recognition)
 						evalEntry.logicalTimeOfDecision(),
 						evalEntry.estimatedOnsetTime(), // of the next word
-						nextWordEstimation // estimation of when the next word ends
+						nextWordEstimation, // estimation of when the next word ends
+						evalEntry.ttsScaling
 					)
 				);
 			}
@@ -58,15 +59,17 @@ public class CompletionEvaluator extends BasicEvaluator {
 		WordIU triggerWord;
 		double onset; // the time at which we believe the trigger word to be over
 		int frameCount; // the time at which this decision was taken
+		double ttsScaling; // the scaling factor applied in TTS-based micro-timing estimations
 		WordIU nextWord;
 		double nextWordEndEstimate;
 		
-		private EvalEntry(WordIU trigger, double onset, int frameCount, WordIU nextWord, double nextWordEndEstimate) {
+		private EvalEntry(WordIU trigger, double onset, int frameCount, WordIU nextWord, double nextWordEndEstimate, double scalingFactor) {
 			this.triggerWord = trigger;
 			this.onset = onset;
 			this.frameCount = frameCount;
 			this.nextWord = nextWord;
 			this.nextWordEndEstimate = nextWordEndEstimate;
+			this.ttsScaling = scalingFactor;
 		}
 		
 		/** in seconds */
