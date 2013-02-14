@@ -121,7 +121,7 @@ public class DataCollector extends JPanel implements ActionListener {
 		chv.updateResults(false); // do not update for now
 		chv.getTextField().setText("\t\tInitialisierung...");
 		wavWriter = (WavTEDLogger) configuration.lookup("utteranceWavWriter");
-		wavWriter.setDumpFilePath(System.getProperty("java.io.tmpdir") + "/dc.");
+		wavWriter.setOutFilePattern(System.getProperty("java.io.tmpdir") + "/dc.");
 
 		ssv = (SpeechStateVisualizer) configuration.lookup("speechStateVisualizer");
 

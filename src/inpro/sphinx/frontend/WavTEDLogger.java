@@ -36,7 +36,6 @@ public class WavTEDLogger extends WavWriter {
     private String mostRecentFilename;
     
     public WavTEDLogger() {
-    	dumpFilePath = "";
     	final WavTEDLogger self = this;
 		Runnable shutdownHook = new Runnable() {
 			public void run() {
@@ -56,21 +55,12 @@ public class WavTEDLogger extends WavWriter {
 		tedPort = ps.getInt(PROP_TED_PORT);
 		tedTrack = ps.getString(PROP_TED_TRACK);
 		captureUtts = ps.getBoolean(PROP_CAPTURE_UTTERANCES);
-		dumpFilePath = ps.getString(PROP_OUT_FILE_NAME_PATTERN);
 	}
 	
 	public String getMostRecentFilename() {
 		return mostRecentFilename;
 	}
 	
-	public String getDumpFilePath() {
-		return dumpFilePath;
-	}
-	
-	public void setDumpFilePath(String s) {
-		dumpFilePath = s;
-	}
-
 	@Override
 	protected void writeFile(String wavName) {
 		mostRecentFilename = wavName;

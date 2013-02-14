@@ -37,14 +37,13 @@ public class ConversionUtil {
 	
 	public static DoubleData bytesToDoubleData(byte[] ba) {
 		ByteBuffer bb = ByteBuffer.wrap(ba);
-		long collectTime = bb.getLong();
 		long firstSampleNumber = bb.getLong();
 		int sampleRate = bb.getInt();
 		double[] da = new double[(ba.length - 20) / 2];
 		for (int i = 0; i < da.length; i++) {
 			da[i] = bb.getShort();
 		}
-		return new DoubleData(da, sampleRate, collectTime, firstSampleNumber);
+		return new DoubleData(da, sampleRate, firstSampleNumber);
 	}
 
 	public static byte[] doublesToBytes(double[] da) {

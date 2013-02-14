@@ -29,7 +29,7 @@ import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
 import edu.cmu.sphinx.frontend.util.VUMeterMonitor;
 import edu.cmu.sphinx.linguist.Linguist;
-import edu.cmu.sphinx.linguist.language.grammar.ForcedAlignerGrammar;
+import edu.cmu.sphinx.linguist.language.grammar.AlignerGrammar;
 import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
@@ -237,7 +237,7 @@ public class SimpleReco {
         	cm.setGlobalProperty("grammar", "forcedAligner");
 	    	Linguist linguist = (Linguist) cm.lookup("flatLinguist");
 	    	linguist.allocate();
-	    	ForcedAlignerGrammar forcedAligner = (ForcedAlignerGrammar) cm.lookup("forcedAligner");
+	    	AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
 	    	forcedAligner.setText(clp.getReference());
     	} else if (clp.isRecoMode(RecoCommandLineParser.FAKE_RECO)) {
     		logger.info("Running in fake recognition mode.");

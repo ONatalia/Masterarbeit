@@ -53,7 +53,7 @@ public class PitchedDoubleData extends DoubleData {
 	
 	/** use this if calculation has already finished and all values can be set */
 	public PitchedDoubleData(DoubleData data, boolean voiced, double voicing, double pitch, List<PitchCandidate> candidates) {
-		super(data.getValues(), data.getSampleRate(), data.getCollectTime(), data.getFirstSampleNumber());
+		super(data.getValues(), data.getSampleRate(), data.getFirstSampleNumber());
 		this.voiced = voiced;
 		this.voicing = voicing;
 		this.pitchHz = pitch;

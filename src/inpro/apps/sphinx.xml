@@ -179,7 +179,7 @@
     <!-- ******************************************************** -->
     <!-- The Grammar  configuration                               -->
     <!-- ******************************************************** -->
-    <component name="forcedAligner" type="edu.cmu.sphinx.linguist.language.grammar.ForcedAlignerGrammar">
+    <component name="forcedAligner" type="edu.cmu.sphinx.linguist.language.grammar.AlignerGrammar">
         <property name="dictionary" value="dictionary"/>
         <property name="addSilenceWords" value="true"/>
         <property name="addFillerWords" value="false"/>
