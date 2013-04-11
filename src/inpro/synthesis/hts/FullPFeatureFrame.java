@@ -3,6 +3,8 @@ package inpro.synthesis.hts;
 import inpro.pitch.PitchUtils;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class FullPFeatureFrame {
@@ -53,8 +55,31 @@ public class FullPFeatureFrame {
         (voiced ? ", voiced with pitch " + Math.exp(lf0Par) + " Hz" : ", unvoiced");
     }
 
-	public String toPitchString() {
-		return (voiced ? ", voiced with pitch " + Math.exp(lf0Par) + " Hz" : ", unvoiced");
+	static final Pattern fromStringPattern = Pattern.compile("mcep: \\[(.*)\\], mag: \\[(.*)\\], str: \\[(.*)\\], (.*)voiced(.*)");
+	
+	static double[] stringToDoubleList(String s) {
+		String[] sarray = s.split(", ");
+		double[] darray = new double[sarray.length];
+		for (int i = 0; i < sarray.length; i++) {
+			darray[i] = Double.parseDouble(sarray[i]);
+		}
+		return darray;
+	}
+	
+	public static FullPFeatureFrame fromString(String s) {
+		Matcher m = fromStringPattern.matcher(s);
+		boolean b = m.matches();
+		assert b && m.groupCount() == 5 : s + " does not match " + fromStringPattern.toString();
+		double[] mcep = stringToDoubleList(m.group(1));
+		double[] mag = stringToDoubleList(m.group(2));
+		double[] str = stringToDoubleList(m.group(3));
+		boolean voiced = m.group(4).equals("");
+		double lf0Par = 0.0;
+		if (voiced) {
+			String lf0String = m.group(5).replaceFirst(" with pitch ", "").replaceAll(" Hz", "");
+			lf0Par = Double.parseDouble(lf0String);
+		}
+		return new FullPFeatureFrame(mcep, mag, str, voiced, lf0Par);
 	}
 
 }

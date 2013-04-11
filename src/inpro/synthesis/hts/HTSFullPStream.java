@@ -54,31 +54,6 @@ public class HTSFullPStream extends FullPStream {
         return strPst.getOrder();
     }
 
-//    @Override
-//	public double[] getMcepParVec(int t) {
-//        return mcepPst.getParVec(t);
-//    }
-//
-//    @Override
-//	public double[] getMagParVec(int t) {
-//        return magPst.getParVec(t);
-//    }
-//
-//    @Override
-//	public double[] getStrParVec(int t) {
-//        return strPst.getParVec(t);
-//    }
-//
-//    @Override
-//	public double getlf0Par(int t) {
-//        return lf0Pst.getPar(lf0indices[t], 0); 
-//    }
-//
-//    @Override
-//	public boolean isVoiced(int t) {
-//        return voiced[t];
-//    }
-
     @Override
 	public int getMaxT() {
         return mcepPst.getT();

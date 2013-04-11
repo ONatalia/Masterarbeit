@@ -51,5 +51,24 @@ public abstract class FullPStream {
 		return t < getMaxT();
 	}
 	
+	public String deepToString() {
+		StringBuilder sb = new StringBuilder("FullPStream:\n");
+		int oldPos = currPosition;
+		setNextFrame(0);
+		while (hasNextFrame()) {
+			sb.append("frame ");
+			sb.append(currPosition);
+			sb.append(": ");
+			sb.append(getNextFrame().toString());
+			sb.append("\n");
+		}
+		currPosition = oldPos;
+		return sb.toString();
+	}
+	
+	public void reset() {
+		currPosition = 0;
+	}
+	
     public abstract int getMaxT();
 }

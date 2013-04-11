@@ -28,5 +28,12 @@ public class ListBackedFullPStream extends FullPStream {
 	public void appendFeatures(List<FullPFeatureFrame> fullFrames) {
 		frames.addAll(fullFrames);
 	}
+	
+	public void appendFeatures(FullPStream fullStream) {
+		fullStream.setNextFrame(0);
+		while (fullStream.hasNextFrame()) {
+			frames.add(fullStream.getNextFrame());
+		}
+	}
 
 }
