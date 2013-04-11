@@ -92,8 +92,8 @@ public class AVM {
 
 	/**
 	 * Convenience method checking equality of two AVMs.
-	 * @param avm - an AVM to compare this AVM with.
-	 * @return true if they are the same.
+	 * @param o - an object to compare this AVM with.
+	 * @return true if o is an AVM and they are the same.
 	 */
 	public boolean equals(Object o) {
 		assert o instanceof AVM;

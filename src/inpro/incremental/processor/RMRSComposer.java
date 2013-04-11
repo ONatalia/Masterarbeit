@@ -48,9 +48,9 @@ import edu.cmu.sphinx.util.props.S4String;
  * The semantic actions, mapping from syntactic rule to semantic action and the basic
  * semantic representation of lexemes are defined in separate xml files.
  * <p />
- * If {@link resolveReferences} is set accordingly, the composer can call a
+ * If {@link #resolveReferences} is set accordingly, the composer can call a
  * {@link Resolver} to test whether the semantic representations successfully refer to 
- * objects in the world (specified by a world setting). If {@link referencePruning},
+ * objects in the world (specified by a world setting). If {@link #referencePruning},
  * too, is set accordingly, the composer will provide feedback to the parser by requesting
  * him to degrade those syntactic derivations that do not successfully refer. If both are
  * set to false, the processor runs in a pure 'semantic combination only'-mode.
@@ -92,7 +92,7 @@ public class RMRSComposer extends IUModule {
 	
 	@S4Component(type = Resolver.class, mandatory = false)
 	public final static String PROP_RESOLVER = "resolver";
-	/** The resolver to be used if {@link resolveReferences} is true. */
+	/** The resolver to be used if {@link #resolveReferences} is true. */
 	private Resolver resolver;
 	
 	

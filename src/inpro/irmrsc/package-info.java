@@ -1,5 +1,5 @@
 /**
- * Package for a NLU pipeline with a POS-tag PCFG syntax and RMRS rule semantics
+ * Package for a NLU pipeline with a POS-tag PCFG syntax and RMRS rule semantics.
 <pre>
 _____________________________________________________________
   _                                         _           _   

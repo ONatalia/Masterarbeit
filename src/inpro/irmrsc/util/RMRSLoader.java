@@ -87,7 +87,7 @@ public class RMRSLoader {
 	 * basic semantic types that lexical predicate formulas of words with
 	 * this tags receive.
 	 * @param url the specified url of the xml to load
-	 * @return the mapping from POS-tags as Strings to {@link Variable.Type}s
+	 * @return the mapping from POS-tags as Strings to {@link inpro.irmrsc.rmrs.Variable.Type}s
 	 */
 	@SuppressWarnings("unchecked")
 	public static Map<String,Variable.Type> loadTagLexicon (URL url) {

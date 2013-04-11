@@ -257,7 +257,8 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	}
 
 	/** for the remaining words in the new list, add them to the old list and send add notifications 
-	 * @return */
+	 * @return a list of add messages  
+	 */
 	private List<EditMessage<WordIU>> makeAdds(ListIterator<Token> newIt, double segmentStartTime, double segmentEndTime, Iterator<SegmentIU> currSegmentIt){
 		List<EditMessage<WordIU>> edits = new ArrayList<EditMessage<WordIU>>();
 		while (newIt.hasNext()) { //newIt = newTokens.listIterator();

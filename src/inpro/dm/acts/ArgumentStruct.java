@@ -69,8 +69,8 @@ public class ArgumentStruct {
 	
 	/**
 	 * Compares this argument structure with another.
-	 * @param as the argument structure to compare against
-	 * @return true if they have the same arguments, false if not.
+	 * @param o the argument structure to compare against
+	 * @return true if o is an ArgumentStruct and they have the same arguments, false if not.
 	 */
 	public boolean equals(Object o) {
 		assert o instanceof ArgumentStruct;

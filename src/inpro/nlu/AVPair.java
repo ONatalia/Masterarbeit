@@ -100,8 +100,8 @@ public class AVPair {
 	
 	/**
 	 * Compares this AVPair to another
-	 * @param avp the AVPair to compare to
-	 * @return true if they have the same attribute and value, else false
+	 * @param o the object to compare to
+	 * @return true if o is an AVPair and they have the same attribute and value, else false
 	 */
 	public boolean equals(Object o) {
 		assert o instanceof AVPair;

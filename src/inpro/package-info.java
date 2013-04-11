@@ -1,7 +1,9 @@
 /**
- * Root for all the code developed in the inpro project at the University of Potsdam.
+ * Root for all the code developed in the inpro project 
+ * (originally developed at the University of Potsdam, now 
+ * at the universities of Hamburg and Bielefeld) 
  *
- * The inpro project, blabla balabala
+ * The inpro project is further described at http://www.inpro.tk 
  * 
  * @author Timo Baumann
  * @author Okko Buß 
