@@ -1,5 +1,7 @@
 package inpro.synthesis.hts;
 
+import inpro.synthesis.MaryAdapter4internal;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,12 +11,9 @@ import javax.sound.sampled.AudioInputStream;
 import org.w3c.dom.Element;
 
 import marytts.datatypes.MaryData;
-import marytts.htsengine.HMMVoice;
 import marytts.htsengine.HTSModel;
-import marytts.htsengine.HTSParameterGeneration;
 import marytts.htsengine.HTSUttModel;
 import marytts.modules.HTSEngine;
-import marytts.modules.synthesis.Voice;
 import marytts.unitselection.select.Target;
 import marytts.util.data.DoubleDataSource;
 import marytts.util.data.audio.AppendableSequenceAudioInputStream;
@@ -26,22 +25,18 @@ public class InteractiveHTSEngine extends HTSEngine {
     
     public static boolean returnIncrementalAudioStream = false;
     
-    public List<HTSModel> uttHMMs = null;
+    public final List<HTSModel> uttHMMs = new ArrayList<HTSModel>();
     
     @Override
     public MaryData process(MaryData d, List<Target> targetFeaturesList, List<Element> segmentsAndBoundaries, List<Element> tokensAndBoundaries)
     throws Exception
     {
-        Voice v = d.getDefaultVoice(); /* This is the way of getting a Voice through a MaryData type */
-        assert v instanceof HMMVoice;
-        HMMVoice hmmv = (HMMVoice) v;
 
         /** The utterance model, um, is a Vector (or linked list) of Model objects. 
          * It will contain the list of models for current label file. */
         /* Process label file of Mary context features and creates UttModel um */
-        HTSUttModel um = processTargetList(targetFeaturesList, segmentsAndBoundaries, hmmv.getHMMData());
+        HTSUttModel um = processTargetList(targetFeaturesList, segmentsAndBoundaries, MaryAdapter4internal.getDefaultHMMData());
 
-        uttHMMs = new ArrayList<HTSModel>(um.getNumModel());
         for (int i = 0; i < um.getNumModel(); i++) {
         	uttHMMs.add(um.getUttModel(i));
         }
@@ -50,12 +45,16 @@ public class InteractiveHTSEngine extends HTSEngine {
         if (synthesizeAudio) {
             AudioInputStream ais = null;
             /* Process UttModel */
-            HTSParameterGeneration pdf2par = new HTSParameterGeneration();
             // Generate sequence of speech parameter vectors, generate parameters out of sequence of pdf's  
-            pdf2par.htsMaximumLikelihoodParameterGeneration(um, hmmv.getHMMData()); /**/
-
+            // # non-incremental MaryTTS version:
+            /**/ HTSParameterGeneration npdf2par = new HTSParameterGeneration();
+            npdf2par.htsMaximumLikelihoodParameterGeneration(um, MaryAdapter4internal.getDefaultHMMData());
+            FullPStream pstream = new HTSFullPStream(npdf2par); /**/
+            // # incremental pHTS version:
+            /* PHTSParameterGeneration pdf2par = MaryAdapter4internal.getNewParamGen(); // new PHTSParameterGeneration(hmmv.getHMMData());
+            FullPStream pstream = pdf2par.buildFullPStreamFor(uttHMMs); /**/
 	        /* Vocode speech waveform out of sequence of parameters */
-	        DoubleDataSource dds = new VocodingAudioStream(pdf2par, hmmv.getHMMData(), returnIncrementalAudioStream);
+	        DoubleDataSource dds = new VocodingAudioStream(pstream, MaryAdapter4internal.getDefaultHMMData(), returnIncrementalAudioStream);
 	        float sampleRate = 16000.0F;  //8000,11025,16000,22050,44100
 	        int sampleSizeInBits = 16;  //8,16
 	        int channels = 1;     //1,2
@@ -88,7 +87,11 @@ public class InteractiveHTSEngine extends HTSEngine {
 
 	public List<HTSModel> getUttHMMs() {
 		assert uttHMMs != null : "You are calling getUttHMMs without having called my process() method before (Hint: you may think that it was called but the buildpath order might be in your way.)";
-		return uttHMMs;
+		return new ArrayList<HTSModel>(uttHMMs);
+	}
+	
+	public void resetUttHMMstore() {
+		uttHMMs.clear();
 	}
     
 }

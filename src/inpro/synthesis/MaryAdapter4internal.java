@@ -23,6 +23,7 @@ import javax.sound.sampled.AudioSystem;
 import org.apache.log4j.Logger;
 
 import marytts.datatypes.MaryDataType;
+import marytts.htsengine.HMMData;
 import marytts.htsengine.HMMVoice;
 import marytts.modules.ModuleRegistry;
 import marytts.modules.synthesis.Voice;
@@ -61,9 +62,10 @@ public class MaryAdapter4internal extends MaryAdapter {
 
 	@Override
 	public synchronized List<IU> text2IUs(String tts) {
-		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class); 
+		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class);
+		ihtse.resetUttHMMstore();
 		InputStream is = text2maryxml(tts);
-/*      // useful code for looking at Mary's XML  
+/*      // useful code for looking at Mary's XML (for debugging): 
 		BufferedReader in = new BufferedReader(new InputStreamReader(is));
 		String line = null;
 		try {
@@ -79,12 +81,16 @@ public class MaryAdapter4internal extends MaryAdapter {
 		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, ihtse.getUttHMMs());
 		return groundedIn;
 	}
-
-	public static PHTSParameterGeneration getNewParamGen() {
-        String defaultVoiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
+	
+	public static HMMData getDefaultHMMData() {
+		String defaultVoiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
 		Voice voice = Voice.getVoice(defaultVoiceName);
 		assert (voice instanceof HMMVoice);
-        return new PHTSParameterGeneration(((HMMVoice) voice).getHMMData());
+        return ((HMMVoice) voice).getHMMData();
+	}
+
+	public static PHTSParameterGeneration getNewParamGen() {
+		return new PHTSParameterGeneration(getDefaultHMMData());
 	}
 
 	@Override
@@ -113,7 +119,6 @@ public class MaryAdapter4internal extends MaryAdapter {
 	        request.writeOutputData(baos);
         } catch (Exception e) {
         	e.printStackTrace();
-        	//throw new RuntimeException(e);
         }
         return baos;
 	}
