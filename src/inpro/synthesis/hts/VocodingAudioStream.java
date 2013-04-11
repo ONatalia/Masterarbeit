@@ -71,7 +71,7 @@ import marytts.util.data.BaseDoubleDataSource;
  */
 public class VocodingAudioStream extends BaseDoubleDataSource implements Runnable {
 
-	private static double MAX_AMPLITUDE_START_VALUE = 32767;
+	private static double MAX_AMPLITUDE_START_VALUE = 32768;
 	
     private final Random rand = new Random(HTSVocoder.SEED);
     private final HMMData htsData;
@@ -82,7 +82,7 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
     /** frame shift */
     private final int fprd;        
     /** used in excitation generation */
-    private double p1 = -1.0;      
+    private double p1 = -1.0;     // set to -1; will be changed in the first frame 
     /** used in excitation generation */
     private double pc = 0.0;       
     /** used in the MLSA/MGLSA filter */
@@ -97,7 +97,7 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
     private final int pt2;                            
     /** used in mlsadf2 */
     private final int pt3[] = new int[HTSVocoder.PADEORDER + 1];
-    // the parameter streams for synthesis, all in one object
+    /** the parameter streams for synthesis, all in one object */
     FullPStream fullPStream;
     
     /** mcepPst.getOrder() */
@@ -115,16 +115,16 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
     
     boolean firstDelivery = true;
     
+    /** for backward compatibility with Mary */
     public VocodingAudioStream(HTSParameterGeneration pdf2par, HMMData htsData, boolean immediateReturn) {
-        this(pdf2par.getMcepPst(), pdf2par.getStrPst(), pdf2par.getMagPst(), pdf2par.getlf0Pst(), 
-             pdf2par.getVoicedArray(), htsData, immediateReturn);
+        this(new HTSFullPStream(pdf2par), htsData, immediateReturn);
     }
     
-    public VocodingAudioStream(HTSPStream mcepPst, HTSPStream strPst, HTSPStream magPst, HTSPStream lf0Pst,
-            boolean[] voiced, HMMData htsData, boolean immediateReturn) {
-    	this(new HTSFullPStream(mcepPst, strPst, magPst, lf0Pst, voiced), htsData, immediateReturn);
-    }
-    
+    /** 
+     * Vocode based on a FullPStream.
+     * initialization happens in this constructor, actual vocoding is implemented in {@link #run()} further down.
+     * @param immediateReturn whether to vocode in a separate thread and return immediately, allowing for concurrent processing   
+     */
     public VocodingAudioStream(FullPStream pstream, HMMData htsData, boolean immediateReturn) {
         this.htsData = htsData;
         this.fullPStream = pstream;
@@ -224,14 +224,16 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
         int magSample = 1;
         int magPulseSize = 0;
         fullPStream.setNextFrame(0);
+        //int frameCounter = 0;
         while (fullPStream.hasNextFrame()) {
-        //for (int t = 0; fullPStream.hasFrame(t); t++) { /* for each frame */
           double inc;
           FullPFeatureFrame frame = fullPStream.getNextFrame();
-          if (frame == null) {
-        	  break;
-          }
-          
+          if (frame == null) 
+        	  break; // abort if no frame is left (for whatever reason)
+
+          //System.err.println("frame " + frameCounter + ": " + frame.toString());
+          //frameCounter++;
+
           /* feature vector for a particular frame */
           /* get current feature vector mcp */ 
           double[] mc = frame.getMcepParVec();
@@ -264,7 +266,7 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
              f0 = htsData.getRate() / f0;
           // f0 now holds fundamental period instead of frequency  
           
-          /* p1 is initialised in -1, so this will be done just for the first frame */
+          /* p1 is initialised to -1, so this will be done just for the first frame */
           if( p1 < 0 ) {  
             p1 = f0;           
             pc = p1;   
@@ -297,12 +299,12 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
             for (int i = 1; i < mcepOrder; i++)
               CC[i] *= gamma;
             for (int i = 0; i < mcepOrder; i++)
-              CINC[i] = (CC[i] - C[i]) / fprd;
+              CINC[i] = (CC[i] - C[i]) * HTSVocoder.IPERIOD / fprd;
           } 
-            
+          
           /* p=f0 in c code!!! */
           if( p1 != 0.0 && f0 != 0.0 ) {
-            inc = (f0 - p1) / fprd;
+            inc = (f0 - p1) * HTSVocoder.IPERIOD / fprd;
           } else {
             inc = 0.0;
             pc = f0;
@@ -332,8 +334,9 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
                     x = magPulse[magSample];
                     magSample++;
                   } else
-                   x = Math.sqrt(p1);  
-                  pc = pc - p1;
+                	x = Math.sqrt(p1);  
+                  
+                  pc -= p1;
                 } else {
                   if (fourierMagnitudes) {
                     if (magSample >= magPulseSize ) { 
@@ -376,13 +379,11 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
               if (x != 0.0)
                 x *= Math.exp(C[0]);
               x = HTSVocoder.mlsadf(x, C, mcepOrder, alpha, D1, pt2, pt3);
-              
             } else {
                x *= C[0];
                x = HTSVocoder.mglsadf(x, C, (mcepOrder-1), alpha, stage, D1);
             }
             output.put(Double.valueOf(x));
-
             if ((--i) == 0 ) {
               p1 += inc;
               for (int k = 0; k < mcepOrder; k++) {
@@ -406,13 +407,13 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
     private final void lsp2mgc(double lsp[], double mgc[]) {
       /* lsp2lpc */
       HTSVocoder.lsp2lpc(lsp, mgc, mcepOrder - 1);  /* lsp starts in 1!  lsp[1..m] --> mgc[0..m] */
-      if(use_log_gain)
+      if (use_log_gain)
         mgc[0] = Math.exp(lsp[0]);
       else
         mgc[0] = lsp[0];
       /* mgc2mgc*/
       HTSVocoder.ignorm(mgc, mgc, mcepOrder - 1, gamma);  
-      for(int i=mcepOrder - 1; i>=1; i--) 
+      for (int i = mcepOrder - 1; i > 0; i--) 
         mgc[i] *= -stage;    
       HTSVocoder.mgc2mgc(mgc, mcepOrder - 1, alpha, gamma, mgc, mcepOrder - 1, alpha, gamma);  /* input and output is in mgc=C */
     }
@@ -455,15 +456,18 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
         return outputAmount;
     }
 
+    int samples = 0;
+    
     private final double scale(double d) {
+    	samples++;
     	if (Math.abs(d) > maxAmplitude) {
-    		System.err.println("max amplitude: " + d);
-    		maxAmplitude = Math.abs(d);
+    		System.err.println("max amplitude: " + d + " in sample: " + samples);
+//    		maxAmplitude = Math.abs(d);
     	}
-    	else if (maxAmplitude > MAX_AMPLITUDE_START_VALUE) {
-   			maxAmplitude -= 0.01 * maxAmplitude;
-    	}
+//    	else if (maxAmplitude > MAX_AMPLITUDE_START_VALUE) {
+//   			maxAmplitude -= 0.05 * maxAmplitude;
+//    	}
         return d / maxAmplitude;
-    }
+    } 
     
 }

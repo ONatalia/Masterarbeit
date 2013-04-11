@@ -15,11 +15,9 @@ import marytts.htsengine.HMMData.FeatureType;
 
 
 
-public class PHTSParameterGeneration extends HTSParameterGeneration {
+public class PHTSParameterGeneration {
 
-    FullPStream outputFeatureStream = new ListBackedFullPStream();
-
-    private boolean[] voiced;
+	private boolean[] voiced;
     
     private final HMMData htsData; 
     
@@ -31,9 +29,11 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
      * incremental formulation for parameter generation, following pHTS
      * however, this interface is totaly non-incremental and will have to be replaced soon 
      * */
-    public void phtsIncrementalParameterGeneration(HTSUttModel um) throws Exception {
-        // foreach phone triplet
+    public FullPStream phtsIncrementalParameterGeneration(HTSUttModel um) throws Exception {
+    	ListBackedFullPStream outputFeatureStream = new ListBackedFullPStream();
+    	// foreach phone triplet
         // we start at 1 and end at max-1, because we're talking triplets
+    	/**/
         int numModels = um.getNumUttModel() - 2;
         for (int i = 1; i <= numModels; i++) { 
             // build and optimize sequence
@@ -46,14 +46,15 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
         	int startFrame = (i == 1) ? 0 : prev.getTotalDur();
         	// handle last HMM differently: also copy data for i+1 to output
         	int length = curr.getTotalDur() + ((i == 1) ? prev.getTotalDur() : 0) + ((i == numModels) ? next.getTotalDur() : 0);
-        	((ListBackedFullPStream) outputFeatureStream).appendFeatures(pstream.getFullFrames(startFrame, length));
+        	outputFeatureStream.appendFeatures(pstream.getFullFrames(startFrame, length));
         } /**/
         /* non-incremental version * /
         List<HTSModel> hmms = new java.util.ArrayList<HTSModel>(um.getNumUttModel()); 
         for (int i = 0; i < um.getNumUttModel(); i++) {
         	hmms.add(um.getUttModel(i));
         }
-        outputFeatureStream = buildFullPStreamFor(hmms, features, htsData); /**/
+        outputFeatureStream.appendFeatures(buildFullPStreamFor(hmms, htsData.getFeatureSet())); /**/
+        return outputFeatureStream;
     }
     
     public FullPStream buildFullPStreamFor(List<HTSModel> hmms) {
@@ -138,7 +139,7 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
 						// copy pdfs for types 
 						pStream.setMseq(lf0Frame, hmm.getLf0Mean(state));
 						if (boundary) {// the variances for dynamic features are set to inf on v/uv boundary
-							pStream.setIvseq(state, 0, finv(hmm.getLf0Variance(state, 0)));
+							pStream.setIvseq(state, 0, HTSParameterGeneration.finv(hmm.getLf0Variance(state, 0)));
 							for (int k = 1; k < ms.getLf0Stream(); k++)
 								pStream.setIvseq(lf0Frame, k, 0.0);
 							boundary = false; // clear flag: we've set the boundary
@@ -157,29 +158,13 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
 		return pStream;
 	}
 
-/*	private void buildVoicingArray(List<HTSModel> hmms) {
-		CartTreeSet ms = htsData.getCartTreeSet();
-		int totalLength = 0;
-		for (HTSModel hmm : hmms) {
-			totalLength += hmm.getTotalDur();
-		}
-		voiced = new boolean[totalLength]; // automatically initialized to false
-		int uttFrame = 0; // count all frames
-		for (HTSModel hmm : hmms) {
-			for (int state = 0; state < ms.getNumStates(); state++) {
-				if (hmm.getVoiced(state))
-					Arrays.fill(voiced, uttFrame, uttFrame + hmm.getDur(state), true);
-				uttFrame += hmm.getDur(state);
-			}
-
-		}
-	} */
-	
 	private boolean useGVperType(FeatureType type) {
 		switch (type) {
 		case STR: return htsData.getUseGV() && htsData.getPdfStrGVFile() != null;
 		case MAG: return htsData.getUseGV() && htsData.getPdfMagGVFile() != null;
-		default: return htsData.getUseGV();
+		//TODO: find out why GV for MCP doesn't work and make it work 
+		case MCP: return false; //htsData.getUseGV(); // for some reason, MCP GV does not work incrementally!
+		default: return htsData.getUseGV(); // LF0 and DUR
 		}
 	}
 
@@ -195,9 +180,5 @@ public class PHTSParameterGeneration extends HTSParameterGeneration {
 		}
 		return length;
 	}  
-
-    public FullPStream getFullPStream() {
-    	return outputFeatureStream;
-    }
 
 }
