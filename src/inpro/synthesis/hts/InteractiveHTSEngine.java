@@ -12,6 +12,7 @@ import org.w3c.dom.Element;
 
 import marytts.datatypes.MaryData;
 import marytts.htsengine.HTSModel;
+import marytts.htsengine.HTSParameterGeneration;
 import marytts.htsengine.HTSUttModel;
 import marytts.modules.HTSEngine;
 import marytts.unitselection.select.Target;
