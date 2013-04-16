@@ -46,7 +46,7 @@ public class SynthesisModule extends IUModule {
 	}
 	
 	/**
-	 * @param speechDispatcher, if in doubt, create one by calling SimpleMonitor.setupDispatcher()
+	 * @param speechDispatcher if in doubt, create one by calling SimpleMonitor.setupDispatcher()
 	 */
 	public SynthesisModule(DispatchStream speechDispatcher) {
 		this.speechDispatcher = speechDispatcher;
@@ -77,7 +77,7 @@ public class SynthesisModule extends IUModule {
 					boolean canContinue = ((SysSegmentIU) choiceWord.getLastSegment()).setAwaitContinuation(true);
 					if (canContinue) {
 						currentInstallment.appendPhrase(phraseIU);
-					} else { // 
+					} else { 
 						currentInstallment = null;
 					}
 				} 
@@ -88,7 +88,7 @@ public class SynthesisModule extends IUModule {
 				appendNotification(currentInstallment, phraseIU);
 				break;
 			case REVOKE:
-				//throw new NotImplementedException("phrases cannot yet be revoked from synthesis; check for our next release");
+				// throw new NotImplementedException("phrases cannot yet be revoked from synthesis; check for our next release");
 				if (currentInstallment == null || currentInstallment.isCompleted()) {
 					logger.warn("phrase " + phraseIU + " was revoked but installment has been completed already, can't revoke anymore.");
 				} else {
@@ -106,15 +106,18 @@ public class SynthesisModule extends IUModule {
 					// clear any locks that might block the vocoder from finishing the utterance phrase
 					seg.setAwaitContinuation(false);			
 				}
+				currentInstallment = null; 
+				startPlayInstallment = false; // to avoid a null pointer
 				break;
 			default:
 				break;
 			}
 		}
 		if (startPlayInstallment) {
-			speechDispatcher.playStream(currentInstallment.getAudio());
+			speechDispatcher.playStream(currentInstallment.getAudio(), false);
 		}
-		rightBuffer.setBuffer(currentInstallment.getWords());
+		if (currentInstallment != null)
+			rightBuffer.setBuffer(currentInstallment.getWords());
 	}
 	
 	private void appendNotification(SysInstallmentIU installment, PhraseIU phrase) {
@@ -156,7 +159,8 @@ public class SynthesisModule extends IUModule {
 		}
 		@Override
 		public void update(IU updatedIU) {
-			if (updatedIU.isOngoing()) {
+			completed.notifyListeners();
+/*			if (updatedIU.isOngoing()) {
 				// block vocoding from finishing synthesis before our completion is available
 				if (!completed.getType().equals(PhraseIU.PhraseType.FINAL)) {
 					SysSegmentIU seg = (SysSegmentIU) currentInstallment.getFinalWord().getLastSegment();
@@ -164,7 +168,7 @@ public class SynthesisModule extends IUModule {
 				//	if (seg != null) 
 					//	seg.setAwaitContinuation(true);
 				}
-			}
+			} */
 		}
 	}
 	

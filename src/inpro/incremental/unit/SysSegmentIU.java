@@ -59,6 +59,7 @@ public class SysSegmentIU extends SegmentIU {
 		return sb;
 	}
 	
+	/** add a MaryXML representation of this segment to the given StringBuilder */
 	@Override
 	public void appendMaryXML(StringBuilder sb) {
 		sb.append("<ph d='");
@@ -129,25 +130,44 @@ public class SysSegmentIU extends SegmentIU {
 	
 	private static PHTSParameterGeneration paramGen = null;
 
-	// synthesizes 
-	private void generateParameterFrames() {
-		assert this.htsModel != null;
-		List<HTSModel> localHMMs = new ArrayList<HTSModel>(3);
-		int start = appendSllHtsModel(localHMMs, getSameLevelLink() != null ? getSameLevelLink().getSameLevelLink() : null); 
-		start += appendSllHtsModel(localHMMs, getSameLevelLink()); 
-		localHMMs.add(htsModel);
-		int length = htsModel.getTotalDur();
-		awaitContinuation();
-		appendSllHtsModel(localHMMs, getNextSameLevelLink());
-		appendSllHtsModel(localHMMs, getNextSameLevelLink() != null ? getNextSameLevelLink().getNextSameLevelLink() : null);
-		// make sure we have a paramGenerator
-		if (paramGen == null) { paramGen = MaryAdapter4internal.getNewParamGen(); }
-		FullPStream pstream = paramGen.buildFullPStreamFor(localHMMs);
-		hmmSynthesisFeatures = new ArrayList<FullPFeatureFrame>(length);
-		for (int i = start; i < start + length; i++)
-			hmmSynthesisFeatures.add(pstream.getFullFrame(i));
-		//assert htsModel.getNumVoiced() == pitchMarks.size();
-	}
+		// synthesizes 
+		private void generateParameterFrames() {
+			assert this.htsModel != null;
+			List<HTSModel> localHMMs = new ArrayList<HTSModel>();
+			/** iterates over left/right context IUs */
+			SysSegmentIU contextIU = this;
+			// deal with left context units
+			int maxPredecessors = 7; // increasing this may improve synthesis performance at the cost of computational effort 
+			// initialize contextIU to the very first IU in the list
+			while (contextIU.getSameLevelLink() != null && maxPredecessors > 0) {
+				contextIU = (SysSegmentIU) contextIU.getSameLevelLink();
+				maxPredecessors--;
+			}
+			// now traverse the predecessor IUs and add their models to the list
+			int start = 0;
+			while (contextIU != this) {
+				start += appendSllHtsModel(localHMMs, contextIU);
+				contextIU = (SysSegmentIU) contextIU.getNextSameLevelLink();
+			}
+			localHMMs.add(htsModel);
+			int length = htsModel.getTotalDur();
+			awaitContinuation();
+			// deal with the right context units
+			int maxSuccessors = 3;
+			contextIU = (SysSegmentIU) getNextSameLevelLink();
+			if (contextIU != null && maxSuccessors > 0) {
+				appendSllHtsModel(localHMMs, contextIU);
+				contextIU = (SysSegmentIU) getNextSameLevelLink();
+				maxSuccessors--;
+			}
+			// make sure we have a paramGenerator
+			if (paramGen == null) { paramGen = MaryAdapter4internal.getNewParamGen(); }
+			FullPStream pstream = paramGen.buildFullPStreamFor(localHMMs);
+			hmmSynthesisFeatures = new ArrayList<FullPFeatureFrame>(length);
+			for (int i = start; i < start + length; i++)
+				hmmSynthesisFeatures.add(pstream.getFullFrame(i));
+			//assert htsModel.getNumVoiced() == pitchMarks.size();
+		}
 	
 	public FullPFeatureFrame getHMMSynthesisFrame(int req) {
 		if (hmmSynthesisFeatures == null) {
@@ -165,12 +185,14 @@ public class SysSegmentIU extends SegmentIU {
 		try { // übler hack!
 		if (frame != null && frame.isVoiced()) {
 			//FIXME: investigate why this is necessary
-			frameNumber = Math.max(0, Math.min(frameNumber, pitchMarks.size() - 1)); 
+			frameNumber = Math.max(0, Math.min(frameNumber, pitchMarks.size() - 1));
+			//System.err.println("saying " + toLabelLine() + " at "+ frameNumber + " with pitch " + pitchMarks.get(frameNumber).getPitch());
 			frame.setf0Par(pitchMarks.get(frameNumber).getPitch());
 			frame.shiftlf0Par(pitchShiftInCent);
 		} 
 		} catch (Exception e) {
 			// dann halt nicht!!
+			System.err.println("bad pitchmark!");
 			frame = new FullPFeatureFrame(frame.getMcepParVec(), frame.getMagParVec(), frame.getStrParVec(), false, 0);
 		}
 		if (req == dur - 1) { // last frame 
@@ -270,10 +292,6 @@ public class SysSegmentIU extends SegmentIU {
 		return String.format(Locale.US,	"%.3f\t%.3f\t%s", startTime(), endTime(), toPayLoad());
 	}
 
-	public boolean isVoiced() {
-		return htsModel != null && htsModel.getVoiced(3); // just assume that a segment is voiced if its center state is voiced 
-	}
-	
 	/* the bug with a pitchmark landing in the wrong frame is triggered by
 	 * 		SysInstallmentIU preheat = new SysInstallmentIU("der nächste termin am Montag den 14. Mai 10 bis 12 uhr betreff Einkaufen auf dem Wochenmarkt überschneidet sich mit dem termin:");
 	 * in "überschneidet" y: will get one voiced frame to few, b wil get one too many

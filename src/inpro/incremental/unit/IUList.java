@@ -40,7 +40,7 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
  			case REVOKE: // assertion errors on REVOKE seem to only happen as a consequence of earlier errors on ADD
  				assert !isEmpty() : "Can't revoke from an empty list: " + edit;
  				assert (!edit.getIU().isCommitted()) : "you're trying to revoke an IU that was previously committed.";
- 				edit.getIU().revoke();
+ 				//edit.getIU().revoke();
  				this.remove(size() - 1);
 				break;
  			case COMMIT:

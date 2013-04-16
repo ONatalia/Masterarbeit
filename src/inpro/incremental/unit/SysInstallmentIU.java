@@ -17,9 +17,6 @@ import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
 
-import marytts.htsengine.HMMVoice;
-import marytts.modules.synthesis.Voice;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -107,7 +104,7 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	public AudioInputStream getAudio() {
         boolean immediateReturn = true;
-		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), ((HMMVoice) Voice.getVoice(MaryAdapter4internal.DEFAULT_VOICE)).getHMMData(), immediateReturn);
+		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), MaryAdapter4internal.getDefaultHMMData(), immediateReturn);
         return new DDS16kAudioInputStream(vas);
 	}
 	
