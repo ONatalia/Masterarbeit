@@ -1,6 +1,7 @@
 package inpro.incremental.processor;
 
 import inpro.apps.SimpleMonitor;
+import inpro.audio.DispatchStream;
 import inpro.incremental.unit.SysSegmentIU;
 
 import java.util.List;
@@ -11,6 +12,10 @@ public class AdaptableSynthesisModule extends SynthesisModule {
 	public AdaptableSynthesisModule() {
 		super(SimpleMonitor.setupDispatcher());
 	}
+	
+	public AdaptableSynthesisModule(DispatchStream ds) {
+        super(ds);
+    }
 	
 	/** stop the ongoing (uncommitted) utterance after the ongoing word */
 	public void stopAfterOngoingWord() {
