@@ -1,11 +1,18 @@
 package inpro.incremental.processor;
 
+import inpro.apps.SimpleMonitor;
 import inpro.incremental.unit.SysSegmentIU;
 
 import java.util.List;
 
 public class AdaptableSynthesisModule extends SynthesisModule {
 	
+	/** use default dispatcher for Herwin's convenience */
+	public AdaptableSynthesisModule() {
+		super(SimpleMonitor.setupDispatcher());
+	}
+	
+	/** stop the ongoing (uncommitted) utterance after the ongoing word */
 	public void stopAfterOngoingWord() {
 		currentInstallment.stopAfterOngoingWord();
 	}
