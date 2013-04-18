@@ -116,6 +116,9 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 		ListIterator<IU> groundIt = groundedIn.listIterator(groundedIn.size());
 		for (; groundIt.hasPrevious(); ) {
 			WordIU word = (WordIU) groundIt.previous();
+			if (word.isCompleted()) {
+				break;
+			}
 			// break the segmentIU layer
 			SegmentIU seg = word.getLastSegment();
 			seg.removeAllNextSameLevelLinks();
