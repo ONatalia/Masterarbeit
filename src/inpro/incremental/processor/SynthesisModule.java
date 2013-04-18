@@ -3,6 +3,7 @@ package inpro.incremental.processor;
 import inpro.audio.DispatchStream;
 import inpro.incremental.IUModule;
 import inpro.incremental.unit.EditMessage;
+import inpro.incremental.unit.HesitationIU;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.PhraseBasedInstallmentIU;
 import inpro.incremental.unit.PhraseIU;
@@ -88,7 +89,6 @@ public class SynthesisModule extends IUModule {
 				appendNotification(currentInstallment, phraseIU);
 				break;
 			case REVOKE:
-				// throw new NotImplementedException("phrases cannot yet be revoked from synthesis; check for our next release");
 				if (currentInstallment == null || currentInstallment.isCompleted()) {
 					logger.warn("phrase " + phraseIU + " was revoked but installment has been completed already, can't revoke anymore.");
 				} else {
@@ -102,6 +102,8 @@ public class SynthesisModule extends IUModule {
 			case COMMIT:
 				// ensure that this phrase can be finished
 				phraseIU.setFinal();
+				if (currentInstallment == null) 
+					break; // do nothing if the installment has been discarded already
 				for (SysSegmentIU seg : currentInstallment.getSegments()) {
 					// clear any locks that might block the vocoder from finishing the utterance phrase
 					seg.setAwaitContinuation(false);			
@@ -175,6 +177,9 @@ public class SynthesisModule extends IUModule {
 	class Any2PhraseIUWrapper {
 		Map<WordIU,PhraseIU> map = new HashMap<WordIU,PhraseIU>();
 		PhraseIU getPhraseIU(WordIU w) {
+			if ("<hes>".equals(w.toPayLoad())) {
+				return new HesitationIU();
+			}
 			if (!map.containsKey(w)) {
 				map.put(w, new PhraseIU(w));
 			}

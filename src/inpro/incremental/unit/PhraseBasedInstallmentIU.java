@@ -12,6 +12,9 @@ import java.util.ListIterator;
  * @author timo
  */
 public class PhraseBasedInstallmentIU extends SysInstallmentIU {
+	/** counts the hesitations in this installment (which need to be accounted for when counting the continuation point of a resynthesis when appending a continuation */
+	private int numHesitationsInserted = 0;
+	
 	/** create a phrase from  */
 	public PhraseBasedInstallmentIU(PhraseIU phrase) {
 		// todo: think about a new method in PhraseIU that gets us more specifically tuned text for synthesis depending on phraseTypes
@@ -22,39 +25,44 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 
 	/** append words for this phrase at the end of the installment */
 	public void appendPhrase(PhraseIU phrase) {
-		IU oldLastWord = getFinalWord(); // everything that follows this word via fSLL belongs to the new phrase
-		String fullPhrase = toPayLoad() + phrase.toPayLoad();
-		fullPhrase = fullPhrase.replaceAll(" <sil>", ""); // it's nasty when there are silences pronounced as "kleiner als sil größer als"
-//		addAlternativeVariant(fullPhrase);
-		appendContinuation(phrase);
+		WordIU oldLastWord = getFinalWord(); // everything that follows this word via fSLL belongs to the new phrase
 		List<IU> phraseWords = new ArrayList<IU>(phrase.expectedWordCount());
-		while (oldLastWord.getNextSameLevelLink() != null) {
-			IU w = oldLastWord.getNextSameLevelLink();
-			phraseWords.add(w);
-			oldLastWord = w;
+		if (phrase instanceof HesitationIU) {
+			phraseWords.add(phrase);
+			oldLastWord.getLastSegment().addNextSameLevelLink(phrase.getFirstSegment());
+			oldLastWord.addNextSameLevelLink(phrase);
+			numHesitationsInserted++;
+		} else {
+			appendContinuation(phrase);
+			while (oldLastWord.getNextSameLevelLink() != null) {
+				IU w = oldLastWord.getNextSameLevelLink();
+				phraseWords.add(w);
+				oldLastWord = (WordIU) w;
+			}
+			phrase.groundIn(phraseWords);
 		}
-		phrase.groundIn(phraseWords);
 		groundedIn.addAll(phraseWords);
 	}
 	
-	/** append a continuation to the ongoing installment <pre>
-	// this works as follows: 
-	// * we have linguistic preprocessing generate a full IU structure for both the base words and the continuation
-	// * we then identify the words which are the continuation part of the full structure: 
-	// * we append the continuation part to the last utterance of the IU
-	// * we then move backwards in the lists of segments and copy over synthesis information to the old segments
-	// we call this last step "back-substitution"
+	/** append a continuation to the ongoing installment. 
+	 * this works as follows: <pre>
+	 * we have linguistic preprocessing generate a full IU structure for both the base words and the continuation
+	 * we then identify the words which are the continuation part of the full structure: 
+	 * we append the continuation part to the last utterance of the IU
+	 * we then move backwards in the lists of segments and copy over synthesis information to the old segments
+	 we call this last step "back-substitution"
 	 </pre>*/
 	private void appendContinuation(PhraseIU phrase) {
 		WordIU firstNewWord = null;
 		if (System.getProperty("proso.cond.connect", "true").equals("true")) {
 			String fullPhrase = toPayLoad() + phrase.toPayLoad();
 			fullPhrase = fullPhrase.replaceAll(" <sil>", ""); // it's nasty when there are silences pronounced as "kleiner als sil größer als"
+			fullPhrase = fullPhrase.replaceAll(" <hes>", ""); // ... or hesitations as "kleiner als hes größer als"
 			@SuppressWarnings("unchecked")
 			List<WordIU> newWords = (List<WordIU>) (new SysInstallmentIU(fullPhrase)).groundedIn();
-			assert newWords.size() >= groundedIn.size();
+			assert newWords.size() >= groundedIn.size() - numHesitationsInserted;
 //			assert newWords.size() == groundedIn.size() + phrase.expectedWordCount(); // for some reason, this assertion breaks sometimes -> nasty stuff going on with pauses
-			firstNewWord = newWords.get(groundedIn.size());
+			firstNewWord = newWords.get(groundedIn.size() - numHesitationsInserted);
 		} else {
 			firstNewWord = (WordIU) (new SysInstallmentIU(phrase.toPayLoad())).groundedIn().get(0);
 		}
