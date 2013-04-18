@@ -1,5 +1,6 @@
 package inpro.incremental.unit;
 
+import java.util.Collections;
 import java.util.List;
 
 public class HesitationIU extends PhraseIU {
@@ -31,6 +32,12 @@ public class HesitationIU extends PhraseIU {
 		for (IU iu : getSegments()) {
 			((SysSegmentIU) iu).setNewDuration(0f);
 		}
+	}
+	
+	/** a hesitation PhraseIU is it's own word */
+	@Override
+	public List<WordIU> getWords() {
+		return Collections.<WordIU>singletonList(this);
 	}
 
 }

@@ -32,6 +32,7 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 			oldLastWord.getLastSegment().addNextSameLevelLink(phrase.getFirstSegment());
 			oldLastWord.addNextSameLevelLink(phrase);
 			numHesitationsInserted++;
+			logger.warn("num hesitations now: " + numHesitationsInserted);
 		} else {
 			appendContinuation(phrase);
 			while (oldLastWord.getNextSameLevelLink() != null) {
@@ -87,12 +88,14 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void revokePhrase(PhraseIU phrase) {
 		assert phrase.isUpcoming();
 //		SegmentIU seg = ((WordIU) phrase.groundedIn()).getSegments().get(0);
 //		seg.getSameLevelLink().removeAllNextSameLevelLinks();
-		for (WordIU word : (List<WordIU>) phrase.groundedIn()) {
+		if (phrase instanceof HesitationIU) {
+			numHesitationsInserted--;
+			logger.warn("num hesitations now: " + numHesitationsInserted);		}
+		for (WordIU word : phrase.getWords()) {
 			word.setSameLevelLink(null);
 			word.removeAllNextSameLevelLinks();
 			groundedIn.remove(word);

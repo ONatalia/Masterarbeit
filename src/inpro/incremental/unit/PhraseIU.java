@@ -1,6 +1,7 @@
 package inpro.incremental.unit;
 
 
+import java.util.Collections;
 import java.util.List;
 
 /** 
@@ -48,6 +49,11 @@ public class PhraseIU extends WordIU {
 	public int expectedWordCount() {
 		String phrase = toPayLoad();
 		return phrase.split("\\s+").length;
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" }) // the untyped list in the call to Collections.checkedList
+	public List<WordIU> getWords() {
+		return Collections.checkedList((List) groundedIn, SegmentIU.class);
 	}
 	
 	/** grounds in the list of wordIUs, which must have the expected number of elements */

@@ -177,11 +177,11 @@ public class SynthesisModule extends IUModule {
 	class Any2PhraseIUWrapper {
 		Map<WordIU,PhraseIU> map = new HashMap<WordIU,PhraseIU>();
 		PhraseIU getPhraseIU(WordIU w) {
-			if ("<hes>".equals(w.toPayLoad())) {
-				return new HesitationIU();
-			}
 			if (!map.containsKey(w)) {
-				map.put(w, new PhraseIU(w));
+				if ("<hes>".equals(w.toPayLoad()))
+					map.put(w,  new HesitationIU());
+				else 
+					map.put(w, new PhraseIU(w));
 			}
 			return map.get(w);
 		}
