@@ -22,6 +22,14 @@ public class AdaptableSynthesisModule extends SynthesisModule {
 		currentInstallment.stopAfterOngoingWord();
 	}
 	
+	public void stopAfterOngoingPhoneme() {
+		for (SysSegmentIU seg : currentInstallment.getSegments()) {
+			seg.setSameLevelLink(null);
+			seg.removeAllNextSameLevelLinks();
+		}
+	}
+	
+	
 	/**
 	 * @param s absolute scaling, that is, applying s=2 multiple times does not result in multiple changes
 	 */
