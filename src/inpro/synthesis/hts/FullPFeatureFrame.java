@@ -23,7 +23,17 @@ public class FullPFeatureFrame {
         this.lf0Par = lf0Par;
     }
     
-    public double[] getMcepParVec() { return mcepParVec; }
+    /** copy a different frame's data */
+    public FullPFeatureFrame(FullPFeatureFrame frame) {
+    	this(frame.getMcepParVec().clone(), 
+    	     frame.getMagParVec().clone(), 
+    	     frame.getStrParVec().clone(), 
+    	     frame.isVoiced(), 
+    	     frame.getlf0Par()
+    	);
+	}
+
+	public double[] getMcepParVec() { return mcepParVec; }
     public double[] getMagParVec() { return magParVec; }
     public double[] getStrParVec() { return strParVec; }
 

@@ -2,8 +2,7 @@ package demo.inpro.synthesis;
 
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.SysSegmentIU;
-import inpro.synthesis.hts.FullPFeatureFrame;
-import inpro.synthesis.hts.VocodingFramePostProcessor;
+import inpro.synthesis.hts.LoudnessPostProcessor;
 
 import java.awt.event.ActionEvent;
 import java.util.Collections;
@@ -37,7 +36,7 @@ public class ProsodyDemonstrator extends PatternDemonstrator {
 		final BoundedRangeModel loudnessRange = new DefaultBoundedRangeModel(0, 0, -100, 100);
 		tempoRange.addChangeListener(tempoChangeListener);
 		pitchRange.addChangeListener(pitchChangeListener);
-		loudnessRange.addChangeListener(loudnessPostProcessor);
+		loudnessRange.addChangeListener(loudnessChangeListener);
 		this.add(generatedText);
 		this.add(new JButton(new AbstractAction("", new ImageIcon(ProsodyDemonstrator.class.getResource("media-playback-start.png"))) {
 			@Override
@@ -124,37 +123,11 @@ public class ProsodyDemonstrator extends PatternDemonstrator {
 		}
 	};
 	
-	private interface LoudnessPostProcessor extends ChangeListener, VocodingFramePostProcessor {}
-	/** 
-	 * adapts the loudness of every frame of every segment in the utterance.
-	 * has to be set as vocodingframepostprocessor for every segment it is supposed to influence
-	 * also, needs to be set as ChangeListener of the corresponding slider
-	 */
-	final LoudnessPostProcessor loudnessPostProcessor = new LoudnessPostProcessor() {
-		/** 0.5 for breathy voice, 2 for clear voicing */
-		double voicingFactor = 1.0;
-		double spectralEmphasis = 1.0; 
-		double energy = 1.0;
-		@Override
-		public FullPFeatureFrame postProcess(FullPFeatureFrame frame) {
-			FullPFeatureFrame fout = new FullPFeatureFrame(frame);
-			for (int j = 0; j < 5; j++) 
-				fout.getStrParVec()[j] = Math.pow(fout.getStrParVec()[j],1 / voicingFactor);
-			fout.getMcepParVec()[0] *= energy;
-			for (int j = 1; j < 25; j++) 
-				fout.getMcepParVec()[j] *= Math.pow(spectralEmphasis, j);
-			return fout;
-		}
-		/** source value should be in the interval [-100;100] */
-		public void stateChanged(int sourceValue) {
-			voicingFactor =  sourceValue / 50; // normalize to [-2;+2]
-			voicingFactor = Math.exp(voicingFactor * Math.log(2)); // convert to [-.25;4]
-			spectralEmphasis = 1f + (sourceValue / 4000f); // [0.975;1.025]
-			energy = .9f + (sourceValue / 1000f);
-		}
+	final LoudnessPostProcessor loudnessPostProcessor = new LoudnessPostProcessor();
+	final ChangeListener loudnessChangeListener = new ChangeListener() {
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			stateChanged(getSourceValue(e));
+			loudnessPostProcessor.setLoudness(getSourceValue(e));
 		}
 	};
 	
