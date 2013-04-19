@@ -5,6 +5,7 @@ import inpro.synthesis.MaryAdapter4internal;
 import inpro.synthesis.PitchMark;
 import inpro.synthesis.hts.FullPFeatureFrame;
 import inpro.synthesis.hts.FullPStream;
+import inpro.synthesis.hts.VocodingFramePostProcessor;
 import inpro.synthesis.hts.PHTSParameterGeneration;
 import inpro.util.TimeUtil;
 
@@ -29,6 +30,7 @@ public class SysSegmentIU extends SegmentIU {
 	HTSModel htsModel = null;
 	List<FullPFeatureFrame> hmmSynthesisFeatures;
 	public double pitchShiftInCent = 0.0;
+	private VocodingFramePostProcessor vocodingFramePostProcessor = null;
 	/** the state of delivery that this unit is in */
 	Progress progress = Progress.UPCOMING;
 	/** the number of frames that this segment has already been going on */
@@ -204,7 +206,10 @@ public class SysSegmentIU extends SegmentIU {
 		// check whether we've been requested to wait for our continuation
 		if (realizedDurationInSynFrames == durationInSynFrames())
 			awaitContinuation();
-		return frame;
+		if (vocodingFramePostProcessor != null) 
+			return vocodingFramePostProcessor.postProcess(frame);
+		else
+			return frame;
 	}
 	
 	private void setProgress(Progress p) {
