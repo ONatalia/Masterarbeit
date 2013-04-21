@@ -51,7 +51,7 @@ public class SynthesisModule extends IUModule {
 	 */
 	public SynthesisModule(DispatchStream speechDispatcher) {
 		this.speechDispatcher = speechDispatcher;
-		MaryAdapter.initializeMary(); // preload mary
+		MaryAdapter.getInstance(); // preload mary
 	}
 	
 	@Override
