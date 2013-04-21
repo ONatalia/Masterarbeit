@@ -28,11 +28,11 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 		WordIU oldLastWord = getFinalWord(); // everything that follows this word via fSLL belongs to the new phrase
 		List<IU> phraseWords = new ArrayList<IU>(phrase.expectedWordCount());
 		if (phrase instanceof HesitationIU) {
+			phrase.shiftBy(oldLastWord.getLastSegment().endTime());
 			phraseWords.add(phrase);
 			oldLastWord.getLastSegment().addNextSameLevelLink(phrase.getFirstSegment());
 			oldLastWord.addNextSameLevelLink(phrase);
 			numHesitationsInserted++;
-			logger.warn("num hesitations now: " + numHesitationsInserted);
 		} else {
 			appendContinuation(phrase);
 			while (oldLastWord.getNextSameLevelLink() != null) {
@@ -94,7 +94,7 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 //		seg.getSameLevelLink().removeAllNextSameLevelLinks();
 		if (phrase instanceof HesitationIU) {
 			numHesitationsInserted--;
-			logger.warn("num hesitations now: " + numHesitationsInserted);		}
+		}
 		for (WordIU word : phrase.getWords()) {
 			word.setSameLevelLink(null);
 			word.removeAllNextSameLevelLinks();
