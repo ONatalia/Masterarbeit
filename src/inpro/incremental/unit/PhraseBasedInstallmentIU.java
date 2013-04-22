@@ -2,8 +2,10 @@ package inpro.incremental.unit;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+
 
 /** 
  * an synthesizable InstallmentIU that uses phrases to structure its output.
@@ -15,12 +17,16 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 	/** counts the hesitations in this installment (which need to be accounted for when counting the continuation point of a resynthesis when appending a continuation */
 	private int numHesitationsInserted = 0;
 	
+	public PhraseBasedInstallmentIU(HesitationIU hesitation) {
+		super("<hes>", new ArrayList<WordIU>(Collections.<WordIU>singletonList((WordIU)hesitation)));
+		numHesitationsInserted++;
+	}
+	
 	/** create a phrase from  */
 	public PhraseBasedInstallmentIU(PhraseIU phrase) {
 		// todo: think about a new method in PhraseIU that gets us more specifically tuned text for synthesis depending on phraseTypes
 		super(phrase.toPayLoad());
-		phrase.groundIn(new ArrayList<IU>(groundedIn));
-		
+		phrase.groundIn(new ArrayList<IU>(groundedIn));	
 	}
 
 	/** append words for this phrase at the end of the installment */
@@ -58,7 +64,7 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 		if (System.getProperty("proso.cond.connect", "true").equals("true")) {
 			String fullPhrase = toPayLoad() + phrase.toPayLoad();
 			fullPhrase = fullPhrase.replaceAll(" <sil>", ""); // it's nasty when there are silences pronounced as "kleiner als sil größer als"
-			fullPhrase = fullPhrase.replaceAll(" <hes>", ""); // ... or hesitations as "kleiner als hes größer als"
+			fullPhrase = fullPhrase.replaceAll(" *<hes>", ""); // ... or hesitations as "kleiner als hes größer als"
 			@SuppressWarnings("unchecked")
 			List<WordIU> newWords = (List<WordIU>) (new SysInstallmentIU(fullPhrase)).groundedIn();
 			assert newWords.size() >= groundedIn.size() - numHesitationsInserted;

@@ -76,6 +76,7 @@ public class MaryAdapter4internal extends MaryAdapter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		ihtse.resetUttHMMstore();
 		is = text2maryxml(tts); /**/
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, ihtse.getUttHMMs());

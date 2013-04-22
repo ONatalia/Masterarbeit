@@ -83,7 +83,10 @@ public class SynthesisModule extends IUModule {
 					}
 				} 
 				if (currentInstallment == null || currentInstallment.isCompleted()) { // start a new installment
-					currentInstallment = new PhraseBasedInstallmentIU(phraseIU);
+					if (phraseIU instanceof HesitationIU)
+						currentInstallment = new PhraseBasedInstallmentIU((HesitationIU) phraseIU);
+					else
+						currentInstallment = new PhraseBasedInstallmentIU(phraseIU);
 					startPlayInstallment = true;
 				}
 				appendNotification(currentInstallment, phraseIU);
