@@ -25,14 +25,19 @@ public class AdaptableSynthesisModule extends SynthesisModule {
 	
 	/** stop the ongoing (uncommitted) utterance after the ongoing word */
 	public void stopAfterOngoingWord() {
-		currentInstallment.stopAfterOngoingWord();
+		synchronized(currentInstallment) {
+			if (currentInstallment != null)
+				currentInstallment.stopAfterOngoingWord();
+			currentInstallment = null;
+		}
 	}
 	
 	public void stopAfterOngoingPhoneme() {
-		for (SysSegmentIU seg : currentInstallment.getSegments()) {
+		for (SysSegmentIU seg : getSegments()) {
 			seg.setSameLevelLink(null);
 			seg.removeAllNextSameLevelLinks();
 		}
+		currentInstallment = null;
 	}
 	
 	@Override
