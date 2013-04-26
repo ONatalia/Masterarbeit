@@ -1,6 +1,8 @@
 package inpro.incremental.unit;
 
 
+import inpro.synthesis.MaryAdapter;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -53,7 +55,10 @@ public class PhraseIU extends WordIU {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // the untyped list in the call to Collections.checkedList
 	public List<WordIU> getWords() {
-		return Collections.checkedList((List) groundedIn, SegmentIU.class);
+		if (groundedIn != null)
+			return Collections.checkedList((List) groundedIn, WordIU.class);
+		else
+			return null;
 	}
 	
 	/** grounds in the list of wordIUs, which must have the expected number of elements */
@@ -69,6 +74,12 @@ public class PhraseIU extends WordIU {
 			this.progress = p;
 			notifyListeners();
 		}
+	}
+	
+	public void preSynthesize() {
+		assert previousSameLevelLink == null : "You shouldn't pre-synthesize something that is already connected";
+		assert groundedIn == null : "You shouldn't pre-synthesize something that is already connected";
+		groundedIn = MaryAdapter.getInstance().text2IUs(this.phrase);
 	}
 	
 	@Override

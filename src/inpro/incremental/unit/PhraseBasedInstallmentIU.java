@@ -1,6 +1,8 @@
 package inpro.incremental.unit;
 
 
+import inpro.synthesis.MaryAdapter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +27,10 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 	/** create a phrase from  */
 	public PhraseBasedInstallmentIU(PhraseIU phrase) {
 		// todo: think about a new method in PhraseIU that gets us more specifically tuned text for synthesis depending on phraseTypes
-		super(phrase.toPayLoad());
+		super(phrase.toPayLoad(), phrase.getWords());
+		if (phrase.getWords() == null) {
+			groundedIn = MaryAdapter.getInstance().text2IUs(tts);
+		}
 		phrase.groundIn(new ArrayList<IU>(groundedIn));	
 	}
 
