@@ -3,6 +3,7 @@ package inpro.incremental.unit;
 
 import inpro.synthesis.MaryAdapter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -66,6 +67,8 @@ public class PhraseIU extends WordIU {
 	public void groundIn(List<IU> ius) {
 		if (groundedIn != null)
 			groundedIn.clear();
+		else 
+			groundedIn = new ArrayList<IU>();
 		groundedIn.addAll(ius);
 	}
 
