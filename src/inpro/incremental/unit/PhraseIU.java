@@ -61,12 +61,12 @@ public class PhraseIU extends WordIU {
 			return null;
 	}
 	
-	/** grounds in the list of wordIUs, which must have the expected number of elements */
+	/** grounds in the list of wordIUs, potentially replacing previously grounding words */
 	@Override
 	public void groundIn(List<IU> ius) {
-		super.groundIn(ius);
-		// we don't ever look at the groundedIn's, so we don't need to care about this failing assertion
-		//assert (((WordIU) ius.get(0)).isSilence()) ? ius.size() == expectedWordCount() + 1 : ius.size() == expectedWordCount();
+		if (groundedIn != null)
+			groundedIn.clear();
+		groundedIn.addAll(ius);
 	}
 
 	public void setProgress(Progress p) {
