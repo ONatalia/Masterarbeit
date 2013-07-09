@@ -139,7 +139,7 @@ public class PHTSParameterGeneration {
 						// copy pdfs for types 
 						pStream.setMseq(lf0Frame, hmm.getLf0Mean(state));
 						if (boundary) {// the variances for dynamic features are set to inf on v/uv boundary
-							pStream.setIvseq(state, 0, HTSParameterGeneration.finv(hmm.getLf0Variance(state, 0)));
+							pStream.setIvseq(lf0Frame, 0, HTSParameterGeneration.finv(hmm.getLf0Variance(state, 0)));
 							for (int k = 1; k < ms.getLf0Stream(); k++)
 								pStream.setIvseq(lf0Frame, k, 0.0);
 							boundary = false; // clear flag: we've set the boundary

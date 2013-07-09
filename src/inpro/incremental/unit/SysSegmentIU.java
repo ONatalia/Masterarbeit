@@ -138,8 +138,8 @@ public class SysSegmentIU extends SegmentIU {
 			List<HTSModel> localHMMs = new ArrayList<HTSModel>();
 			/** iterates over left/right context IUs */
 			SysSegmentIU contextIU = this;
-			// deal with left context units
-			int maxPredecessors = 7; // increasing this may improve synthesis performance at the cost of computational effort 
+			/** size of left context; increasing this may improve synthesis performance at the cost of computational effort */
+			int maxPredecessors = 7;  
 			// initialize contextIU to the very first IU in the list
 			while (contextIU.getSameLevelLink() != null && maxPredecessors > 0) {
 				contextIU = (SysSegmentIU) contextIU.getSameLevelLink();
@@ -154,10 +154,10 @@ public class SysSegmentIU extends SegmentIU {
 			localHMMs.add(htsModel);
 			int length = htsModel.getTotalDur();
 			awaitContinuation();
-			// deal with the right context units
+			/** deal with the right context units; increasing this may improve synthesis quality at the cost of computaitonal effort */
 			int maxSuccessors = 3;
 			contextIU = (SysSegmentIU) getNextSameLevelLink();
-			if (contextIU != null && maxSuccessors > 0) {
+			while (contextIU != null && maxSuccessors > 0) {
 				appendSllHtsModel(localHMMs, contextIU);
 				contextIU = (SysSegmentIU) getNextSameLevelLink();
 				maxSuccessors--;
