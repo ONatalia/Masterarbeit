@@ -62,6 +62,7 @@ import marytts.htsengine.HTSPStream;
 import marytts.htsengine.HTSParameterGeneration;
 import marytts.htsengine.HTSVocoder;
 import marytts.util.data.BaseDoubleDataSource;
+import marytts.util.data.DoubleDataSource;
 
 /**
  * a vocoding thread that that can return immediately and from which the 
@@ -425,7 +426,10 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
 
     @Override
     public long getDataLength() {
-        return -1; // not specified
+    	if (!doneVocoding)
+    		return DoubleDataSource.NOT_SPECIFIED; // not specified
+    	else
+    		return dataLength;
     }
 
     @Override

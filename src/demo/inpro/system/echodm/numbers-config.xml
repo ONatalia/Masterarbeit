@@ -146,7 +146,7 @@
     
     <component name="jsgfGrammar" type="edu.cmu.sphinx.jsgf.JSGFGrammar">
         <property name="dictionary" value="dictionary"/>
-        <property name="grammarLocation" value="http://www.ling.uni-potsdam.de/~timo/code/inprotk/demo/"/>
+        <property name="grammarLocation" value="demo/inpro/system/echodm/"/>
         <property name="grammarName" value="digits"/>
         <property name="logMath" value="logMath"/>
     </component>
@@ -154,7 +154,7 @@
     <component name="ngram" type="edu.cmu.sphinx.linguist.language.ngram.SimpleNGramModel">
         <property name="dictionary" value="dictionary"/>
         <property name="logMath" value="logMath"/>
-        <property name="location" value="http://www.ling.uni-potsdam.de/~timo/code/inprotk/demo/digits.lm"/>
+        <property name="location" value="demo/inpro/system/echodm/digits.lm"/>
         <property name="maxDepth" value="3"/>
         <property name="unigramWeight" value=".7"/>
     </component>
@@ -164,7 +164,7 @@
     <!-- ******************************************************** -->
     
     <component name="dictionary" type="inpro.sphinx.linguist.dictionary.SyllableAwareFullDictionary"> 
-        <property name="dictionaryPath" value="http://www.ling.uni-potsdam.de/~timo/code/inprotk/demo/digits.lex"/>
+        <property name="dictionaryPath" value="demo/inpro/system/echodm/digits.lex"/>
         <property name="fillerPath" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab_DE.filler"/>
         <property name="addSilEndingPronunciation" value="false"/>
         <property name="unitManager" value="unitManager"/>
