@@ -39,5 +39,10 @@ public class HesitationIU extends PhraseIU {
 	public List<WordIU> getWords() {
 		return Collections.<WordIU>singletonList(this);
 	}
+	
+	@Override
+	public String toPayLoad() {
+		return "<hes>";
+	}
 
 }

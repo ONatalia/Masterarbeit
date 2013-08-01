@@ -87,17 +87,17 @@ public class SegmentIU extends IU {
 	
 	public SegmentIU(String segment, SegmentIU sll) {
 		super(sll);
-		assert (Label.SILENCE.contains(segment) || VOWELS.contains(segment) || CONSONANTS.contains(segment)) : "segment " + segment + " is neither a vowel, consonant nor silence I could understand.";
+		//assert (Label.SILENCE.contains(segment) || VOWELS.contains(segment) || CONSONANTS.contains(segment)) : "segment " + segment + " is neither a vowel, consonant nor silence I could understand.";
 		this.l = new Label(segment);
 	}
 	
 	public SegmentIU(Label l) {
-		assert (Label.SILENCE.contains(l.getLabel()) || VOWELS.contains(l.getLabel()) || CONSONANTS.contains(l.getLabel())) : "segment " + l.getLabel() + " is neither a vowel, consonant nor silence I could understand.";
+		//assert (Label.SILENCE.contains(l.getLabel()) || VOWELS.contains(l.getLabel()) || CONSONANTS.contains(l.getLabel())) : "segment " + l.getLabel() + " is neither a vowel, consonant nor silence I could understand.";
 		this.l = l;
 	}
 
 	public void updateLabel(Label l) {
-		assert (this.l.getLabel().equals(l.getLabel())) : "my label is " + this.l.toString() + ", was asked to update with " + l.toString();
+		//assert (this.l.getLabel().equals(l.getLabel())) : "my label is " + this.l.toString() + ", was asked to update with " + l.toString();
 		this.l = l;
 		notifyListeners();
 	}

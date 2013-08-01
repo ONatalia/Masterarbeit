@@ -5,8 +5,11 @@ import inpro.synthesis.MaryAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /** 
@@ -37,7 +40,7 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 	/** append words for this phrase at the end of the installment */
 	public void appendPhrase(PhraseIU phrase) {
 		WordIU oldLastWord = getFinalWord(); // everything that follows this word via fSLL belongs to the new phrase
-		List<IU> phraseWords = new ArrayList<IU>(phrase.expectedWordCount());
+		List<IU> phraseWords = new ArrayList<IU>();
 		if (phrase instanceof HesitationIU) {
 			phrase.shiftBy(oldLastWord.getLastSegment().endTime());
 			phraseWords.add(phrase);
@@ -62,16 +65,26 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 	 * we then identify the words which are the continuation part of the full structure: 
 	 * we append the continuation part to the last utterance of the IU
 	 * we then move backwards in the lists of segments and copy over synthesis information to the old segments
-	 we call this last step "back-substitution"
+	 * we call this last step "back-substitution"
 	 </pre>*/
 	private void appendContinuation(PhraseIU phrase) {
 		WordIU firstNewWord = null;
 		if (System.getProperty("proso.cond.connect", "true").equals("true")) {
-			String fullPhrase = toPayLoad() + phrase.toPayLoad();
-			fullPhrase = fullPhrase.replaceAll(" <sil>", ""); // it's nasty when there are silences pronounced as "kleiner als sil größer als"
-			fullPhrase = fullPhrase.replaceAll(" *<hes>", ""); // ... or hesitations as "kleiner als hes größer als"
+			LinkedList<String> phraseTexts = new LinkedList<String>();
+			assert phrase.previousSameLevelLink != null : "You're appending a phrase that is not SLL connected to any previous phrase!";
+			// move back to the first phraseIU of the installment
+			IU startPhrase = phrase;
+			while (startPhrase != null)  {
+				phraseTexts.addFirst(startPhrase.toPayLoad());
+				startPhrase = startPhrase.previousSameLevelLink;
+			}
+			String fullInstallmentText = StringUtils.join(phraseTexts, " "); 
+			//String fullPhrase = toPayLoad() + phrase.toPayLoad();
+			logger.debug("querying MaryTTS for: " + fullInstallmentText);
+			fullInstallmentText = fullInstallmentText.replaceAll(" <sil>", ""); // it's nasty when there are silences pronounced as "kleiner als sil größer als"
+			fullInstallmentText = fullInstallmentText.replaceAll(" *<hes>", ""); // ... or hesitations as "kleiner als hes größer als"
 			@SuppressWarnings("unchecked")
-			List<WordIU> newWords = (List<WordIU>) (new SysInstallmentIU(fullPhrase)).groundedIn();
+			List<WordIU> newWords = (List<WordIU>) (new SysInstallmentIU(fullInstallmentText)).groundedIn();
 			assert newWords.size() >= groundedIn.size() - numHesitationsInserted;
 //			assert newWords.size() == groundedIn.size() + phrase.expectedWordCount(); // for some reason, this assertion breaks sometimes -> nasty stuff going on with pauses
 			firstNewWord = newWords.get(groundedIn.size() - numHesitationsInserted);

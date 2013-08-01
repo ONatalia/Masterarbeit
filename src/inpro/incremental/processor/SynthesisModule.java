@@ -5,6 +5,7 @@ import inpro.incremental.IUModule;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.HesitationIU;
 import inpro.incremental.unit.IU;
+import inpro.incremental.unit.IU.Progress;
 import inpro.incremental.unit.PhraseBasedInstallmentIU;
 import inpro.incremental.unit.PhraseIU;
 import inpro.incremental.unit.SysInstallmentIU;
@@ -68,7 +69,7 @@ public class SynthesisModule extends IUModule {
 			List<? extends EditMessage<? extends IU>> edits) {
 		boolean startPlayInstallment = false;
 		for (EditMessage<?> em : edits) {
-			logger.warn(em.getType() + " " + em.getIU().toPayLoad());
+			logger.debug(em.getType() + " " + em.getIU().toPayLoad());
 			PhraseIU phraseIU = words2phrase.getPhraseIU(em.getIU());
 			switch (em.getType()) {
 			case ADD:
@@ -119,6 +120,7 @@ public class SynthesisModule extends IUModule {
 			}
 		}
 		if (startPlayInstallment) {
+			assert speechDispatcher != null;
 			speechDispatcher.playStream(currentInstallment.getAudio(), false);
 		}
 		if (currentInstallment != null)
@@ -162,8 +164,12 @@ public class SynthesisModule extends IUModule {
 		NotifyCompletedOnOngoing(PhraseIU notify) {
 			completed = notify;
 		}
+		/** @param updatedIU the SegmentIU that this listener is attached to in {@link SynthesisModule#appendNotification()} */
 		@Override
 		public void update(IU updatedIU) {
+            if (updatedIU.isCompleted()) { // make sure that the phrase is marked as completed even though not necessarily the last segment has been completed
+                completed.setProgress(Progress.COMPLETED);
+            }
 			completed.notifyListeners();
 /*			if (updatedIU.isOngoing()) {
 				// block vocoding from finishing synthesis before our completion is available
