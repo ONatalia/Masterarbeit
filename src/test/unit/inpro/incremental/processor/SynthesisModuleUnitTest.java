@@ -9,6 +9,7 @@ import inpro.audio.DispatchStream;
 import inpro.incremental.IUModule;
 import inpro.incremental.processor.SynthesisModule;
 import inpro.incremental.unit.EditMessage;
+import inpro.incremental.unit.HesitationIU;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.PhraseIU;
 import inpro.incremental.unit.IU.IUUpdateListener;
@@ -31,6 +32,8 @@ public class SynthesisModuleUnitTest {
 	
 	@Before
 	public void setupMinimalSynthesisEnvironment() {
+        System.setProperty("inpro.tts.language", "de");
+		System.setProperty("inpro.tts.voice", "bits1-hsmm");
 		dispatcher = SimpleMonitor.setupDispatcher();
 		myIUModule = new TestIUModule();
 		myIUModule.addListener(new SynthesisModule(dispatcher));
@@ -39,6 +42,7 @@ public class SynthesisModuleUnitTest {
 	@After
 	public void waitForSynthesis() {
 		dispatcher.waitUntilDone();
+		myIUModule.reset();
 	}
 	
 	/**  
@@ -47,14 +51,11 @@ public class SynthesisModuleUnitTest {
 	@Test
 	public void testLeftBufferUpdateWithSomeUtterances() {
 		for (String[] list : testList) {
-			PhraseIU prevPhrase = null;
 			for (String s : list) {
-				PhraseIU phrase = new PhraseIU(s);
-				phrase.setSameLevelLink(prevPhrase);
-				myIUModule.addIUAndUpdate(phrase);
-				prevPhrase = phrase;
+				myIUModule.addIUAndUpdate(new PhraseIU(s));
 			}
 			dispatcher.waitUntilDone();
+			myIUModule.reset();
 		}
 	}
 	
@@ -64,15 +65,13 @@ public class SynthesisModuleUnitTest {
 	@Test
 	public void testLeftBufferUpdateWithPreSynthesis() {
 		for (String[] list : testList) {
-			PhraseIU prevPhrase = null;
 			for (String s : list) {
 				PhraseIU phrase = new PhraseIU(s);
 				phrase.preSynthesize();
-				phrase.setSameLevelLink(prevPhrase);
 				myIUModule.addIUAndUpdate(phrase);
-				prevPhrase = phrase;
 			}
 			dispatcher.waitUntilDone();
+			myIUModule.reset();
 		}
 	}
 	
@@ -82,10 +81,8 @@ public class SynthesisModuleUnitTest {
 	@Test
 	public void testAddWordOnUpdate() throws InterruptedException {
         final Semaphore semaphore = new Semaphore(1);
-		PhraseIU prevPhrase = null;
 		for (String s : testList[0]) {
 			PhraseIU phrase = new PhraseIU(s);
-			phrase.setSameLevelLink(prevPhrase);
 			phrase.addUpdateListener(new IUUpdateListener() {
             	int counter = 0;
 				@Override
@@ -97,8 +94,24 @@ public class SynthesisModuleUnitTest {
 				}
             });
 			myIUModule.addIUAndUpdate(phrase);
-            prevPhrase = phrase;
             semaphore.acquire();
+		}
+	}
+
+	/**
+	 * test hesitations by adding the content after a hesitations after increasing delays
+	 */
+	@Test 
+	public void testHesitations() throws InterruptedException {
+		String s1 = "Und dann";
+		String s2 = "weiter";
+		for (int delay = 200; delay < 600; delay+= 40) {
+			myIUModule.addIUAndUpdate(new PhraseIU(s1));
+			myIUModule.addIUAndUpdate(new HesitationIU());
+			Thread.sleep(delay);
+			myIUModule.addIUAndUpdate(new PhraseIU(s2));
+			dispatcher.waitUntilDone();
+			myIUModule.reset();
 		}
 	}
 	
@@ -113,6 +126,7 @@ public class SynthesisModuleUnitTest {
         System.setProperty("inpro.tts.language", "en_GB");
         myIUModule.addIUAndUpdate(new PhraseIU("I can also speak in British English."));
         dispatcher.waitUntilDone();
+		myIUModule.reset();
 		System.setProperty("inpro.tts.voice", "cmu-slt-hsmm");
         System.setProperty("inpro.tts.language", "en_US");
         myIUModule.addIUAndUpdate(new PhraseIU("I can also speak with an American accent."));
@@ -126,6 +140,11 @@ public class SynthesisModuleUnitTest {
 		void addIUAndUpdate(IU iu) {
 			rightBuffer.addToBuffer(iu);
 			notifyListeners();
+		}
+		
+		@Override
+		public void reset() {
+			rightBuffer.setBuffer(null, null);
 		}
 	}
 
