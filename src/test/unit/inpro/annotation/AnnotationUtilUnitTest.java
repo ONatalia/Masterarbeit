@@ -32,7 +32,7 @@ public class AnnotationUtilUnitTest {
 		 * Set up the invocation for a private static method
 		 */
 		try {
-			Class[] argtypes = new Class[2];
+			Class<?>[] argtypes = new Class[2];
 			argtypes[0] = List.class;
 			argtypes[1] = List.class;
 			Method m = inpro.annotation.AnnotationUtil.class.getDeclaredMethod("interpret", argtypes);
