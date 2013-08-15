@@ -5,8 +5,6 @@ import inpro.incremental.util.TTSUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
@@ -113,6 +111,10 @@ public abstract class MaryAdapter {
 		return bais;
 	}
 	
+	public InputStream text2maryxml(String text) {
+		return getInputStreamFromMary(text, "TEXT", "REALISED_ACOUSTPARAMS");
+	}
+	
 	public List<IU> text2IUs(String tts) {
 		InputStream is = text2maryxml(tts);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -128,22 +130,8 @@ public abstract class MaryAdapter {
 		return getInputStreamFromMary(text, "TEXT", "MBROLA");
 	}
 	
-	public InputStream text2maryxml(String text) {
-		return getInputStreamFromMary(text, "TEXT", "REALISED_ACOUSTPARAMS");
-	}
-	
 	public AudioInputStream mbrola2audio(String mbrola) {
 		return getAudioInputStreamFromMary(mbrola, "MBROLA");
 	}
 	
-	public AudioInputStream maryxml2audio(String maryxml) {
-		return getAudioInputStreamFromMary(maryxml, "ACOUSTPARAMS");
-	}
-	
-	public void mbrola2file(String mbrola, File file) throws UnknownHostException, IOException {
-        ByteArrayOutputStream baos = process(mbrola, "MBROLA", "AUDIO", "WAVE");
-		FileOutputStream fos = new FileOutputStream(file);
-		fos.write(baos.toByteArray());
-		fos.close();
-	}
 }

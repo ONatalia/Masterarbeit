@@ -12,9 +12,12 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 
+import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
@@ -264,7 +267,9 @@ public class VisualTTS extends JPanel {
 					if (!selectedFile.exists() || returnValue == JOptionPane.YES_OPTION) {
 						try {
 							String mbrola = segmentPanel.getSegmentModel().toString();
-							maryAdapter.mbrola2file(mbrola, selectedFile);
+							AudioInputStream is = maryAdapter.mbrola2audio(mbrola);
+							FileOutputStream fos = new FileOutputStream(selectedFile);
+							AudioSystem.write(is, AudioFileFormat.Type.WAVE, fos);
 						} catch (Exception e) {
 							e.printStackTrace();
 							JOptionPane.showMessageDialog(null, "Datei " + selectedFile.toString() + " konnte nicht geschrieben werden.");

@@ -65,8 +65,8 @@ public class MaryAdapter4internal extends MaryAdapter {
 		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class);
 		ihtse.resetUttHMMstore();
 		InputStream is = text2maryxml(tts);
-/*      // useful code for looking at Mary's XML (for debugging): 
-		BufferedReader in = new BufferedReader(new InputStreamReader(is));
+      // useful code for looking at Mary's XML (for debugging): 
+/*		BufferedReader in = new BufferedReader(new InputStreamReader(is));
 		String line = null;
 		try {
 			while((line = in.readLine()) != null) {
@@ -105,11 +105,12 @@ public class MaryAdapter4internal extends MaryAdapter {
         assert voice != null : "Cannot find the Mary voice " + voiceName;
         AudioFormat audioFormat = voice.dbAudioFormat();
         logger.debug("audioFormat is " + audioFormat);
+        logger.debug("query is " + query);
         AudioFileFormat.Type audioFileFormatType = //MaryAudioUtils.getAudioFileFormatType(audioType);
         						AudioFileFormat.Type.WAVE;
-        logger.debug("audioFileFormatType is " + audioFileFormatType);
+        logger.trace("audioFileFormatType is " + audioFileFormatType);
         AudioFileFormat audioFileFormat = new AudioFileFormat(audioFileFormatType, audioFormat, AudioSystem.NOT_SPECIFIED);
-        logger.debug("audioFileFormat is " + audioFileFormat);
+        logger.trace("audioFileFormat is " + audioFileFormat);
         Request request = new Request(mInputType, mOutputType, mLocale, voice, 
         							  (String) null, (String) null, 
         							  // the following true ↓ is experimental (switches on streaming) which doesn't do anything it appears
