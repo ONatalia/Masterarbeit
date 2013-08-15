@@ -134,7 +134,7 @@ public class SynthesisModuleUnitTest {
         System.setProperty("inpro.tts.language", language);
 	}
 
-	private static class TestIUModule extends IUModule {
+	protected static class TestIUModule extends IUModule {
 		protected void leftBufferUpdate(Collection<? extends IU> ius, 
 				List<? extends EditMessage<? extends IU>> edits) { } // do nothing, this is only a source of IUs
 		void addIUAndUpdate(IU iu) {
