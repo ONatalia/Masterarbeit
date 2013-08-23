@@ -187,7 +187,7 @@ public abstract class IU implements Comparable<IU> {
     			if (link.groundedIn != null && !link.groundedIn.isEmpty()) {
     				prevLast = link.groundedIn.get(link.groundedIn.size() - 1);
     				if (prevLast.getClass() != firstGrounding.getClass()) {
-    					throw new RuntimeException("I can only connect IUs of identical types!");
+    					throw new RuntimeException("I can only connect IUs of identical types but you wanted to connect a " + prevLast.getClass().toString() + " to a " + firstGrounding.getClass().toString() + "!");
     				}
     			} else {
     				prevLast = FIRST_IU;

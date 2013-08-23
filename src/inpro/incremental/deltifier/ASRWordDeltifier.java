@@ -77,7 +77,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	 * adds a bunch of assertions to the output of {@link ResultUtil#getTokenList(Token,boolean,boolean)}
 	 * @param finalToken the token to start the backwards trace from
 	 * @return a list of tokens, word tokens precede their corresponding segment tokens
-	 * TODO?!! currently, no provisions are taken for SILs to be preceded by a <sil> word!
+	 * currently, no provisions are taken for SILs to be preceded by a <sil> word!
 	 * -> it would be really annoying to insert such words in the token list, 
 	 *    we hence handle silence-insertion at a later step in the process
 	 * -> should we do the opposite and strip silence words, 
@@ -93,20 +93,11 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 		for (Token token : tokens) {
 			if (isSilenceSegment(token)) {
 				assert precedingToken != null : "null oops: " + tokens;
-				if (!isSilenceWord(precedingToken)) {
-				//	System.err.println("no silence word: " + tokens);
-				}
 			} else {
 				precedingToken = token;
 			}
 		}
 		return tokens;
-	}
-	
-	private static boolean isSilenceWord(Token t) {
-		SearchState s = t.getSearchState();
-		return (s instanceof WordSearchState &&
-				((WordSearchState) s).getPronunciation().getWord().isFiller());
 	}
 	
 	private static boolean isSilenceSegment(Token t) {

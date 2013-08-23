@@ -47,7 +47,7 @@ public class CurrentASRHypothesis implements Configurable, ResultListener, Monit
 	
 	@S4ComponentList(type = PushBuffer.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
-	private List<PushBuffer> listeners;
+	private final List<PushBuffer> listeners = new ArrayList<PushBuffer>();
 	
 //	@S4Component(type = TemporalNGramModel.class, mandatory = false)
 //	public final static String PROP_TNGM = "tngm";
@@ -60,14 +60,13 @@ public class CurrentASRHypothesis implements Configurable, ResultListener, Monit
 			asrDeltifier = new ASRWordDeltifier();
 		}
 		System.err.println("deltifier is " + asrDeltifier);
-		listeners = ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class);
+		listeners.clear();
+		listeners.addAll(ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class));
 		
 //		tngm = (TemporalNGramModel) ps.getComponent(PROP_TNGM);
 	}
 	
 	public void addListener(PushBuffer pb) {
-		if (listeners == null)
-			listeners = new ArrayList<PushBuffer>();
 		listeners.add(pb);
 	}
 	
@@ -136,7 +135,6 @@ public class CurrentASRHypothesis implements Configurable, ResultListener, Monit
 		for (WordIU iu : ius) {
 			edits.add(new EditMessage<WordIU>(EditType.COMMIT, iu));
 			iu.commit();
-//			iu.update(EditType.COMMIT);
 		}
 		for (PushBuffer listener : listeners) {
 			listener.hypChange(ius, edits);

@@ -5,7 +5,6 @@ import inpro.synthesis.MaryAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -21,10 +20,13 @@ import org.apache.commons.lang.StringUtils;
 public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 	/** counts the hesitations in this installment (which need to be accounted for when counting the continuation point of a resynthesis when appending a continuation */
 	private int numHesitationsInserted = 0;
+	/** keeps the list of phrases that this installment is based on */
+	private final IUList<PhraseIU> phrases = new IUList<PhraseIU>();
 	
 	public PhraseBasedInstallmentIU(HesitationIU hesitation) {
 		super("<hes>", new ArrayList<WordIU>(Collections.<WordIU>singletonList((WordIU)hesitation)));
 		numHesitationsInserted++;
+		phrases.add(hesitation);
 	}
 	
 	/** create a phrase from  */
@@ -35,6 +37,7 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 			groundedIn = MaryAdapter.getInstance().text2IUs(tts);
 		}
 		phrase.groundIn(new ArrayList<IU>(groundedIn));	
+		phrases.add(phrase);
 	}
 
 	/** append words for this phrase at the end of the installment */
@@ -57,6 +60,8 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 			phrase.groundIn(phraseWords);
 		}
 		groundedIn.addAll(phraseWords);
+		phrase.setSameLevelLink(phrases.getLast());
+		phrases.add(phrase);
 	}
 	
 	/** append a continuation to the ongoing installment. 
@@ -70,14 +75,12 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 	private void appendContinuation(PhraseIU phrase) {
 		WordIU firstNewWord = null;
 		if (System.getProperty("proso.cond.connect", "true").equals("true")) {
-			LinkedList<String> phraseTexts = new LinkedList<String>();
-			assert phrase.previousSameLevelLink != null : "You're appending a phrase that is not SLL connected to any previous phrase!";
+			List<String> phraseTexts = new ArrayList<String>();
 			// move back to the first phraseIU of the installment
-			IU startPhrase = phrase;
-			while (startPhrase != null)  {
-				phraseTexts.addFirst(startPhrase.toPayLoad());
-				startPhrase = startPhrase.previousSameLevelLink;
+			for (PhraseIU oldPhrase : phrases) {
+				phraseTexts.add(oldPhrase.toPayLoad());
 			}
+			phraseTexts.add(phrase.toPayLoad());
 			String fullInstallmentText = StringUtils.join(phraseTexts, " "); 
 			//String fullPhrase = toPayLoad() + phrase.toPayLoad();
 			logger.debug("querying MaryTTS for: " + fullInstallmentText);

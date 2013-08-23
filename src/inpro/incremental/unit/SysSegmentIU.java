@@ -177,7 +177,7 @@ public class SysSegmentIU extends SegmentIU {
 		}
 		assert req >= 0;
 		setProgress(Progress.ONGOING);
-		assert req < durationInSynFrames();
+		assert req < durationInSynFrames() || req == 0;
 	//	req = Math.max(req, durationInSynFrames() - 1);
 		int dur = durationInSynFrames(); // the duration in frames (= the number of frames that should be there)
 		int fra = hmmSynthesisFeatures.size(); // the number of frames available

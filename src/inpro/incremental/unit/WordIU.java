@@ -146,13 +146,13 @@ public class WordIU extends IU {
 	public boolean pronunciationEquals(Pronunciation pron) {
 		// words are equal if their pronunciations match
 		// OR if the word is silent and the other's pronunciation is silent as well
-		return ((isSilence && pron.getWord().isFiller()) || this.pron.equals(pron));
+		return ((isSilence && pron.getWord().isFiller()) || this.pron.toString().equals(pron.toString()));
 	}
 	
 	public boolean pronunciationEquals(WordIU iu) {
 		assert pron != null;
 		assert iu.pron != null;
-		return ((isSilence && iu.isSilence) || pron.equals(iu.pron));
+		return ((isSilence && iu.isSilence) || pron.getWord().getSpelling().equals(iu.pron.getWord().getSpelling()));
 	}
 	
 	public boolean spellingEquals(WordIU iu) {
