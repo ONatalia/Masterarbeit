@@ -9,6 +9,7 @@ import inpro.util.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -132,7 +133,8 @@ public abstract class IUModule extends PushBuffer {
 		// just a list of IUs, automatically infers the edits since the last call 
 		public void setBuffer(Collection<? extends IU> outputIUs) {
 			IUList<IU> newList = new IUList<IU>();
-			newList.addAll(outputIUs);
+			if (outputIUs != null) 
+				newList.addAll(outputIUs);
 			edits = ius.diff(newList);
 			ius = newList;
 			hasUpdates = !edits.isEmpty();
@@ -141,6 +143,7 @@ public abstract class IUModule extends PushBuffer {
 		// just a list of edits, automatically updates IUs from last call
 		@SuppressWarnings("unchecked")
 		public void setBuffer(List<? extends EditMessage<? extends IU>> edits) {
+			assert (edits != null);
 			ius.apply((List<EditMessage<IU>>) edits);
 			this.edits = (List<EditMessage<IU>>) edits;
 			hasUpdates = !edits.isEmpty();
@@ -151,12 +154,22 @@ public abstract class IUModule extends PushBuffer {
 		public void setBuffer(Collection<? extends IU> outputIUs,
 				List<? extends EditMessage<? extends IU>> outputEdits) {
 			ius = new IUList<IU>();
-			ius.addAll(outputIUs);
-			edits = (List<EditMessage<IU>>) outputEdits;
-			hasUpdates = (edits != null) && !edits.isEmpty();
+			if (outputIUs != null)
+				ius.addAll(outputIUs);
+			edits = new ArrayList<EditMessage<IU>>();
+			if (outputEdits != null) 
+				edits.addAll((List<EditMessage<IU>>)outputEdits);
+			hasUpdates = !edits.isEmpty();
 		}
 		
 		public void addToBuffer(IU iu) {
+			ius.add(iu);
+			edits.add(new EditMessage<IU>(EditType.ADD, iu));
+			hasUpdates = true;
+		}
+		
+		public void addToBufferSetSLL(IU iu) {
+			iu.setSameLevelLink(ius.getLast());
 			ius.add(iu);
 			edits.add(new EditMessage<IU>(EditType.ADD, iu));
 			hasUpdates = true;
@@ -168,6 +181,10 @@ public abstract class IUModule extends PushBuffer {
 			hasUpdates = true;
 		}
 		
+		public void clearBuffer() {
+			setBuffer(Collections.<IU>emptyList(), Collections.<EditMessage<IU>>emptyList());
+		}	
+
 		public void notify(PushBuffer listener) {
 			if (hasUpdates) {
 				listener.hypChange(ius, edits);
@@ -182,7 +199,7 @@ public abstract class IUModule extends PushBuffer {
 			}
 			edits.clear();
 			hasUpdates = false;
-		}	
+		}
 	}
 	
 }
