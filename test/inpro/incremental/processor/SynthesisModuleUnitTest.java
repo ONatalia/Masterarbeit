@@ -1,4 +1,4 @@
-package test.unit.inpro.incremental.processor;
+package inpro.incremental.processor;
 
 import java.util.Collection;
 import java.util.List;

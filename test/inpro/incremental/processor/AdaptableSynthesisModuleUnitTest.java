@@ -1,4 +1,4 @@
-package test.unit.inpro.incremental.processor;
+package inpro.incremental.processor;
 
 import static org.junit.Assert.*;
 import inpro.apps.SimpleMonitor;

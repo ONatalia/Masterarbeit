@@ -1,4 +1,4 @@
-package test.unit.gov.nist.sphere;
+package gov.nist.sphere;
 
 import static org.junit.Assert.*;
 import gov.nist.sphere.SphereException;

@@ -1,4 +1,4 @@
-package test.unit.inpro.annotation;
+package inpro.annotation;
 
 import java.io.IOException;
 import java.util.Arrays;

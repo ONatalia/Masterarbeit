@@ -1,4 +1,4 @@
-package test.unit.inpro.annotation;
+package inpro.annotation;
 
 
 import static org.junit.Assert.*;
