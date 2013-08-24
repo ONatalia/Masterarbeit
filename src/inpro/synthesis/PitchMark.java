@@ -17,6 +17,7 @@ public class PitchMark {
 	}
 	
 	/** create a pitchMark from an mbrola pitchmark-string */
+	@SuppressWarnings("resource")
 	public PitchMark(String pitchMarkString) {
 		assert pitchMarkString.matches("\\(?(\\d+),(\\d+)\\)?") : pitchMarkString;
 		Pattern format = Pattern.compile("\\(?(\\d+),(\\d+)\\)?");

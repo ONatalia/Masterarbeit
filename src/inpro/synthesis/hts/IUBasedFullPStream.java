@@ -46,13 +46,13 @@ public class IUBasedFullPStream extends FullPStream {
     
     @Override
     public FullPFeatureFrame getNextFrame() {
-    	while (currPosition >= currIUFrameOffset + currIU.durationInSynFrames()) {
+    	while (currIU != null && currPosition >= currIUFrameOffset + currIU.durationInSynFrames()) {
     		currIUFrameOffset += currIU.durationInSynFrames();
     		currIU = (SysSegmentIU) currIU.getNextSameLevelLink();
     	}
     	int iuLocalPosition = currPosition - currIUFrameOffset;
 		currPosition++;
-    	return currIU.getHMMSynthesisFrame(iuLocalPosition);
+    	return currIU != null ? currIU.getHMMSynthesisFrame(iuLocalPosition) : null;
     }
     
     @Override

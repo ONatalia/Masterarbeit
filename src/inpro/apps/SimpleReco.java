@@ -243,8 +243,6 @@ public class SimpleReco {
     		logger.info("Running in fake recognition mode.");
     		logger.info("Reading transcript from: " + clp.getReference());
         	cm.setGlobalProperty("searchManager", "fakeSearch");
-//        	FakeSearch fs = (FakeSearch) cm.lookup("fakeSearch");
-//        	fs.setTranscript(clp.getReference());
         	cm.getPropertySheet("fakeSearch").setString("transcriptName", clp.getReference());
     	} else if (clp.isRecoMode(RecoCommandLineParser.GRAMMAR_RECO)) {
         	URL lmUrl = clp.getLanguageModelURL();
@@ -277,10 +275,6 @@ public class SimpleReco {
 		ResultListener resultlistener = (ResultListener) cm.lookup("currentASRHypothesis");
 		recognizer.addResultListener(resultlistener);
 		CurrentASRHypothesis casrh = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
-//		// we don't support OAA output anymore
-//		if (clp.matchesOutputMode(RecoCommandLineParser.OAA_OUTPUT)) {
-//			cm.lookup("newWordNotifierAgent");
-//		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.TED_OUTPUT)) {
 			casrh.addListener((PushBuffer) cm.lookup("tedNotifier"));
 		}
@@ -361,5 +355,4 @@ public class SimpleReco {
     	simpleReco.getRecognizer().deallocate();
     	System.exit(0);
 	}
-
 }

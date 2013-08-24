@@ -373,7 +373,7 @@
         <property name="baseData" value="${baseData}"/>
         <propertylist name="hypChangeListeners">
            <item>${dialogueManager}</item>
-           <item>hypViewer</item>
+     <!--  <item>hypViewer</item> -->
            <item>iuBasedFloorTracker</item>
         </propertylist>
     </component>

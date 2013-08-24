@@ -7,12 +7,15 @@
     <!-- ******************************************************** -->
     <!-- The incremental processing configuration                 -->
     <!-- ******************************************************** -->
+    <!--component name="currentASRHypothesis" type="test.inpro.sphinx.RevokingSphinxASRSource"-->
     <component name="currentASRHypothesis" type="inpro.incremental.source.CurrentASRHypothesis">
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
+        <!--property name="brutalPruner" value="trivialPruner"/-->
         <propertylist name="hypChangeListeners">
 <!--           <item>${dialogueManager}</item> 
+           <item>topdownrevoketestmodule</item>
            <item>iuBasedFloorTracker</item> -->
 <!--
            <item>iuBasedFloorTracker</item>
@@ -28,6 +31,8 @@
 -->
         </propertylist>
     </component>
+    
+    <component name="topdownrevoketestmodule" type="work.inpro.sphinx.topdownrevoke.TopDownRevokeTestModule" />
     
     <component name="iSS" type="inpro.incremental.processor.SynthesisModule">
     	<property name="dispatcher" value="dispatchStream" />

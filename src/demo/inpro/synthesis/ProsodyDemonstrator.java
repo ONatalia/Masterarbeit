@@ -16,6 +16,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -26,7 +27,7 @@ import javax.swing.event.ChangeListener;
 public class ProsodyDemonstrator extends PatternDemonstrator {
 	
 	public ProsodyDemonstrator() {
-		generatedText.setPreferredSize(new JTextField(52).getPreferredSize());
+		generatedText.setPreferredSize(new JTextField(42).getPreferredSize());
 		//generatedText.setText("Press the play button to synthesize this utterance."); 
 		generatedText.setEditable(true);
 		String synText = System.getProperty("inpro.tts.demo.longUtt", "Nimm bitte das Kreuz ganz oben links in der Ecke, lege es in den Fuss des Elefanten bevor Du ihn auf den Kopf drehst.");
@@ -47,7 +48,7 @@ public class ProsodyDemonstrator extends PatternDemonstrator {
 				System.err.println(txt);
 				greatNewUtterance(txt);
 		        dispatcher.playStream(installment.getAudio(), true);
-		        for (SysSegmentIU seg : installment.getSegments()) {
+		        for (SysSegmentIU seg : getSegments()) {
 		        	seg.setVocodingFramePostProcessor(loudnessPostProcessor);
 		        }
 		        tempoRange.setValue(0);
@@ -55,19 +56,15 @@ public class ProsodyDemonstrator extends PatternDemonstrator {
 		        loudnessRange.setValue(0);
 			}
 		}));
-		this.addLabel("tempo:");
-		this.add(createSlider(tempoRange, "0.5", "0.7", "1.0", "1.4", "2.0"));
-		this.addLabel("pitch:");
-		this.add(createSlider(pitchRange, "-12", "-6", "0", "+6", "+12"));
-		this.addLabel("voice:");
-		this.add(createSlider(loudnessRange, "", "softer", "", "stronger", ""));
+		this.add(createSlider("tempo:", tempoRange, "0.5", "0.7", "1.0", "1.4", "2.0"));
+		this.add(createSlider("pitch:", pitchRange, "-12", "-6", "0", "+6", "+12"));
+		this.add(createSlider("voice:", loudnessRange, "", "softer", "", "stronger", ""));
 	}
 	
-	/** add a JLabel with the given string to this component */ 
-	private void addLabel(String label) { this.add(new JLabel(label)); }
-
-	/** create a slider for a given rangeModel with equidistant labels */ 
-	private static JSlider createSlider(BoundedRangeModel rangeModel, String... labels) {
+	/** create a label and a slider for a given rangeModel with equidistant labels */ 
+	private static JComponent createSlider(String label, BoundedRangeModel rangeModel, String... labels) {
+		JPanel panel = new JPanel();
+		panel.add(new JLabel(label));
 		JSlider slider = new JSlider(rangeModel);
 		int min = rangeModel.getMinimum();
 		int max = rangeModel.getMaximum();
@@ -77,7 +74,8 @@ public class ProsodyDemonstrator extends PatternDemonstrator {
 		slider.setMajorTickSpacing(range / 2);
 		slider.setMinorTickSpacing(range / 4);
 		slider.setLabelTable(createLabelTable(min, max, labels));
-		return slider;
+		panel.add(slider);
+		return panel;
 	}
 	
 	/** create a hashtable of position/label pairs, equidistantly spaced between min and max */

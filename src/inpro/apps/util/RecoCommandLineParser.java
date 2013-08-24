@@ -16,12 +16,12 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	public static final int SMOOTHED_INCREMENTAL = 2;
 	public static final int FIXEDLAG_INCREMENTAL = 3;
 	
-	public RecoCommandLineParser(String[] args) {
+	public RecoCommandLineParser(String... args) {
 		super(args);
 	}
 	
 	public RecoCommandLineParser() {
-		this(new String[0]);
+		super(new String[0]);
 	}
 
 	int recoMode;

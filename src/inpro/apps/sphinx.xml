@@ -114,13 +114,13 @@
         </propertylist>
     </component>
 
-    <component name="standardActiveListFactory" type="edu.cmu.sphinx.decoder.search.PartitionActiveListFactory">
+    <component name="standardActiveListFactory" type="edu.cmu.sphinx.decoder.search.SimpleActiveListFactory">
         <property name="logMath" value="logMath"/>
         <property name="absoluteBeamWidth" value="${absoluteBeamWidth}"/>
         <property name="relativeBeamWidth" value="${relativeBeamWidth}"/>
     </component>
 
-    <component name="wordActiveListFactory" type="edu.cmu.sphinx.decoder.search.PartitionActiveListFactory">
+    <component name="wordActiveListFactory" type="edu.cmu.sphinx.decoder.search.SimpleActiveListFactory">
         <property name="logMath" value="logMath"/>
         <property name="absoluteBeamWidth" value="${absoluteWordBeamWidth}"/>
         <property name="relativeBeamWidth" value="${relativeWordBeamWidth}"/>
@@ -132,6 +132,7 @@
         <property name="relativeBeamWidth" value="${relativeBeamWidth}"/>
     </component>
 
+    <!--component name="trivialPruner" type="test.inpro.sphinx.DislikePruner"/-->
     <component name="trivialPruner" type="edu.cmu.sphinx.decoder.pruner.SimplePruner"/>
 
     <component name="simpleScorer" type="edu.cmu.sphinx.decoder.scorer.SimpleAcousticScorer">

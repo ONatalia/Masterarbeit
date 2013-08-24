@@ -288,7 +288,6 @@ public class PentoRMRSResolver implements Resolver {
 	 * @param firstObject the first object
 	 * @param secondObject the second object
 	 * @param predicate the predicate to check the two objects with
-	 * @return
 	 */
 	private boolean ditransitivePredicateResolvesObjects(PentoObject firstObject, PentoObject secondObject, String predicate) {
 		boolean resolves = false;

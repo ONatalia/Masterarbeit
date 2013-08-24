@@ -150,7 +150,8 @@ public class LabelWriter implements Configurable,
     	step = 0;
     }
     
-    private PrintStream setStream(String extension) {
+    @SuppressWarnings("resource")
+	private PrintStream setStream(String extension) {
     	PrintStream output = null;
     	if (fileOutput) {
 			String filename = fileBaseName + "." + extension;
