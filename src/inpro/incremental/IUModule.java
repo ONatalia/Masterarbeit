@@ -130,7 +130,7 @@ public abstract class IUModule extends PushBuffer {
 			return new ArrayList<IU>(ius); 
 		}
 		
-		// just a list of IUs, automatically infers the edits since the last call 
+		/** just a list of IUs, automatically infers the edits since the last call */ 
 		public void setBuffer(Collection<? extends IU> outputIUs) {
 			IUList<IU> newList = new IUList<IU>();
 			if (outputIUs != null) 
@@ -140,7 +140,7 @@ public abstract class IUModule extends PushBuffer {
 			hasUpdates = !edits.isEmpty();
 		}
 		
-		// just a list of edits, automatically updates IUs from last call
+		/** just a list of edits, automatically updates IUs from last call */
 		@SuppressWarnings("unchecked")
 		public void setBuffer(List<? extends EditMessage<? extends IU>> edits) {
 			assert (edits != null);
@@ -149,7 +149,7 @@ public abstract class IUModule extends PushBuffer {
 			hasUpdates = !edits.isEmpty();
 		}
 		
-		// both ius and edits
+		/** both ius and edits */
 		@SuppressWarnings("unchecked")
 		public void setBuffer(Collection<? extends IU> outputIUs,
 				List<? extends EditMessage<? extends IU>> outputEdits) {
@@ -162,19 +162,29 @@ public abstract class IUModule extends PushBuffer {
 			hasUpdates = !edits.isEmpty();
 		}
 		
+		/** 
+		 * add a single IU to the output buffer.
+		 * automatically generatees the appropriate edit message 
+		 */
 		public void addToBuffer(IU iu) {
 			ius.add(iu);
 			edits.add(new EditMessage<IU>(EditType.ADD, iu));
 			hasUpdates = true;
 		}
 		
+		/** 
+		 * add a single IU to the output buffer.
+		 * automatically generatees the appropriate edit message and 
+		 * attaches the new IU to the previously last in the buffer. 
+		 */
 		public void addToBufferSetSLL(IU iu) {
 			iu.setSameLevelLink(ius.getLast());
-			ius.add(iu);
-			edits.add(new EditMessage<IU>(EditType.ADD, iu));
-			hasUpdates = true;
+			addToBuffer(iu);
 		}
 		
+		/**
+		 * apply the given EditMessage to the output buffer.
+		 */
 		public void editBuffer(EditMessage<IU> edit) {
 			ius.apply(edit);
 			edits.add(edit);

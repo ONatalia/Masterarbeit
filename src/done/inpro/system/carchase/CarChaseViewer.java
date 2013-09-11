@@ -9,15 +9,12 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 
 import org.apache.log4j.Logger;
 import org.pushingpixels.trident.Timeline;
@@ -152,67 +149,4 @@ public class CarChaseViewer extends JPanel {
 			timeline.playSkipping(10);
 		}
 	}
-
-	private static void playTimeline(CarChaseViewer viewer, Point targetPosition, int duration) throws InterruptedException {
-		viewer.execute(new WorldAction(0, targetPosition, duration));
-		while (!viewer.timeline.isDone()) { 
-			Thread.sleep(10);
-		}
-	}
-	
-/*	private static void playCurve(final CarChaseViewer viewer, final double radius, final double targetAngle, long duration) throws InterruptedException {
-		Timeline timeline = new SwingRepaintTimeline(viewer);
-		final double startAngle = viewer.carAngle;
-		timeline.addPropertyToInterpolate("carAngle", startAngle, targetAngle);
-		final Point startPosition = new Point(viewer.carPosition);
-		final Point targetPosition = new Point(startPosition.x + (int) (radius * Math.cos(targetAngle-Math.PI / 2-startAngle)),
-											   startPosition.y + (int) (radius * Math.sin(startAngle-targetAngle)));
-		timeline.addCallback(new TimelineCallback() {
-			@Override
-			public void onTimelineStateChanged(TimelineState oldState, TimelineState newState, float durationFraction, float timelinePosition) {
-				if (newState == TimelineState.DONE) {
-					viewer.carPosition = targetPosition;
-					viewer.carAngle = targetAngle;
-				}
-			}
-			@Override
-			public void onTimelinePulse(float durationFraction, float timelinePosition) {
-				int newX = (int) (radius * Math.cos((targetAngle - startAngle) * timelinePosition));
-				int newY = (int) (radius * Math.sin((targetAngle - startAngle) * timelinePosition));
-				viewer.setCarPosition(new Point(targetPosition.x - newX, startPosition.y - newY));
-			}
-		});
-		timeline.setDuration(duration);
-		timeline.playSkipping(10);
-		while (!timeline.isDone()) { 
-			Thread.sleep(10);
-		}
-	} */
-	
-	public static void main(String[] args) throws InvocationTargetException, InterruptedException {
-		final CarChaseViewer panel = new CarChaseViewer();
-		SwingUtilities.invokeAndWait(new Runnable() {
-			@Override
-			public void run() {
-				JFrame frame = new JFrame("CarApp");
-				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				// add our object
-				frame.setContentPane(panel);
-				//Display the window.
-		        frame.pack();
-				frame.setVisible(true);
-			}
-		});
-		panel.carPosition = new Point(250, 670);
-		panel.targetPoint = panel.carPosition;
-		playTimeline(panel, new Point(250, 430), 3000);
-//		playCurve(panel, 20, Math.PI / 2, 350);
-		playTimeline(panel, new Point(255, 415),  250);
-		playTimeline(panel, new Point(270, 410),   50);
-		playTimeline(panel, new Point(280, 410),  250);
-		playTimeline(panel, new Point(580, 410), 3000);
-//		playCurve(panel, 10, Math.PI, 350);
-//		playCurve(panel, 100, -Math.PI / 2, 3000);
-	}
-
 }

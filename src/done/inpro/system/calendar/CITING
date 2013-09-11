@@ -1,0 +1,33 @@
+This is free and open source software. 
+Please see the file LICENSE for details of the license.
+
+The license sets the requirements for using this software.
+The requirements in this section are not legally binding; 
+however, they represent things that the author would appreciate: 
+If you write a paper based on work that uses this software, 
+please include a citation to our paper, and send a copy 
+of your paper. If you create a derivative work based on a this 
+software, tell me about it and let me know how I can get a 
+copy, and include this request if it’s appropriate.
+
+The system implemented here is described in
+
+  
+  Hendrik Buschmeier, Timo Baumann, Benjamin Dorsch,
+  Stefan Kopp and David Schlangen (2011).
+  "Combining Incremental Language Generation and Incremental
+  Speech Synthesis for Adaptive Information Presentation".
+  in Proceedings of SIGDial, Seoul, Korea.
+
+For your convenience, a bibtex entry for the paper is given below:
+
+@INPROCEEDINGS{buschmeieretal2012:sigdial,
+  author = {Hendrik Buschmeier and Timo Baumann and 
+	Benjamin Dorsch and Stefan Kopp and David Schlangen},
+  title = {Combining Incremental Language Generation and Incremental 
+	Speech Synthesis for Adaptive Information Presentation},
+  booktitle = {Proceedings of SigDial},
+  year = {2012},
+  pages = {295--303},
+  address = {Seoul, Korea}
+}

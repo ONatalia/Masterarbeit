@@ -164,7 +164,7 @@ public class SynthesisModule extends IUModule {
 		NotifyCompletedOnOngoing(PhraseIU notify) {
 			completed = notify;
 		}
-		/** @param updatedIU the SegmentIU that this listener is attached to in {@link SynthesisModule#appendNotification()} */
+		/** @param updatedIU the SegmentIU that this listener is attached to in {@link SynthesisModule#appendNotification(SysInstallmentIU, PhraseIU)} */
 		@Override
 		public void update(IU updatedIU) {
             if (updatedIU.isCompleted()) { // make sure that the phrase is marked as completed even though not necessarily the last segment has been completed

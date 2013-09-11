@@ -1,5 +1,5 @@
-This is free and open source software, released under the
-General Public License 3. Please see the file COPYING for details.
+This is free and open source software. 
+Please see the file LICENSE for details of the license.
 
 The license sets the requirements for using this software.
 The requirements in this section are not legally binding; 
@@ -10,26 +10,42 @@ of your paper. If you create a derivative work based on a this
 software, tell me about it and let me know how I can get a 
 copy, and include this request if it’s appropriate.
 
-The algorithms in this software are described in
+The architecture of this software is described in
 
-  Timo Baumann, Michaela Atterer, and David Schlangen (2009).
-  "Assessing and Improving the Performance of 
-  Speech Recognition for Incremental Systems".
-  in Proceedings of NAACL-HLT 2009, Boulder, USA.
+  Timo Baumann and David Schlangen (2012).
+  "The InproTK 2012 Release".
+  in Proceedings of SDCTD, Montréal, Canada, 
 
   http://www.aclweb.org/anthology/N/N09/N09-1043.pdf
 
-For your convenience, a bibtex entry for the paper is given below:
+as well as in Chapter 4 of
 
-  @InProceedings{baumann-atterer-schlangen:2009:NAACLHLT09,
-    author    = {Baumann, Timo  and  Atterer, Michaela  and  Schlangen, David},
-    title     = {Assessing and Improving the Performance of Speech Recognition for Incremental Systems},
-    booktitle = {Proceedings of Human Language Technologies: The 2009 Annual Conference of the North American Chapter of the Association for Computational Linguistics},
-    month     = {June},
-    year      = {2009},
-    address   = {Boulder, Colorado},
-    publisher = {Association for Computational Linguistics},
-    pages     = {380--388},
-    url       = {http://www.aclweb.org/anthology/N/N09/N09-1043}
+  Timo Baumann (2013).
+  "Incremental Spoken Dialogue Processing: 
+  Architectures and Lower-level Components"
+  PhD thesis, Bielefeld University, 2013.
+  
+  http://nbn-resolving.org/urn:nbn:de:hbz:361-25819101
+
+
+For your convenience, bibtex entries are provided below:
+
+  @INPROCEEDINGS{bauschla2012:sdctd,
+    author = {Timo Baumann and David Schlangen},
+    title = {The {I\textsc{npro}TK} 2012 Release},
+    booktitle = {Proceedings of SDCTD},
+    month = 6,
+    year = {2012},
+    address = {Montréal, Canada},
+    publisher = {Association for Computational Linguistics}
   }
 
+  @PHDTHESIS{baumann2013:phd,
+    author = {Timo Baumann},
+    title = {Incremental Spoken Dialogue Processing: 
+	  Architecture and Lower-level Components},
+    institution = {Universität Bielefeld, Germany},
+    year = {2013},
+    month = {5},
+    url = {http://nbn-resolving.org/urn:nbn:de:hbz:361-25819101}
+  }

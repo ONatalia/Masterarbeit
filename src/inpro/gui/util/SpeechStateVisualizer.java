@@ -142,15 +142,4 @@ public class SpeechStateVisualizer extends BaseDataProcessor {
 		}
 		return d;
 	}
-	
-	/**
-	 * for testing purposes; this should initialize the microphone, add 
-	 * a speech state visualizer and a mutebutton preceeding it.
-	 * when muted, nothing should pass the speech state visualizer
-	 * when not muted, speech state should be visualized
-	 */
-	public static void main(String args[]) {
-		
-	}
-
 }

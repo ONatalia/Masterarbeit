@@ -67,6 +67,8 @@ jitter is unfavourable (whereas latency is fixed for the FixedLagDeltifier).
 <dd>switches off incrementality by only adding committed hypotheses</dd>
 </dl>
 
+Please see the file CITING and LICENSE on citation and license information, respectively.
+
 
 @author Timo Baumann
  */

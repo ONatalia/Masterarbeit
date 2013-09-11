@@ -42,11 +42,11 @@ _____________________________________________________________
  * {@code FullPFeatureFrame}s one-by-one.
  * </ul>
  * <p>
- * {@link PHTSParameterGeneration} performs the HMM observation optimization based on 
+ * {@link inpro.synthesis.hts.PHTSParameterGeneration} performs the HMM observation optimization based on 
  * Mary's {@link marytts.htsengine.HTSParameterGeneration} and transforms the data layout 
  * to suit stream-based processing as outlined above.
- * {@link inpro.incremental.unit.SysSegmentIU}s use {@code PHTSParameterGeneration#buildFullPStreamFor(java.util.List)} 
- * to optimize their associated features frames (which are returned as {@link FullPStream}s). 
+ * {@link inpro.incremental.unit.SysSegmentIU}s use {@code inpro.synthesis.hts.PHTSParameterGeneration#buildFullPStreamFor(java.util.List)} 
+ * to optimize their associated features frames (which are returned as {@link inpro.synthesis.hts.FullPStream}s). 
  * {@link inpro.incremental.unit.SysSegmentIU}s use a context of two segments left and right
  * (as proposed by Dutoit et al., 2011).
  * <p>

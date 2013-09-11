@@ -47,17 +47,4 @@ public class AVMWorldUtil {
 		return list;
 	}
 	
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		String worldFile = "file:res/AVMWorldList";
-		String structureFile = "file:res/AVMStructure";
-		System.out.println(
-				AVMWorldUtil.setAVMsFromFile(worldFile, 
-											 AVMStructureUtil.parseStructureFile(new URL(structureFile)))
-				);
-	}
-
 }

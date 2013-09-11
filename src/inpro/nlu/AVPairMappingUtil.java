@@ -47,13 +47,4 @@ public class AVPairMappingUtil {
 		return readAVPairs(url.openStream());
 	}
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		Map<String, List<AVPair>> avPairs = readAVPairs("res/AVMapping");
-		System.out.println(avPairs.toString());
-	}
-
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="done/inpro/system/calendar/*" kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="lib" path="lib/mary3/java-diff.jar"/>
 	<classpathentry kind="lib" path="lib/weka.jar"/>

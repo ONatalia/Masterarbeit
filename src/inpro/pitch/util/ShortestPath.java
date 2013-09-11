@@ -39,7 +39,6 @@ public class ShortestPath<NodeType> {
 	}
 	
 	public List<NodeType> calculate () {
-					
 		while (!queue.isEmpty()) {
 			Node node = queue.poll();
 			if (node == targetNode) {
@@ -58,9 +57,7 @@ public class ShortestPath<NodeType> {
 				}
 			}
 		}
-		
 		return null;
-		
 	}
 	
 	public void addNode(NodeType node) {
@@ -141,30 +138,6 @@ public class ShortestPath<NodeType> {
 			return result;
 		}
 	}
-	
-	public static void main(String[] args) {
-		Integer[] nodes = new Integer[5];
-		for (int i = 0; i < 5; i++) {
-			nodes[i] = Integer.valueOf(i);
-		}
-		ShortestPath<Integer> sp = new ShortestPath<Integer>();
-		sp.connect(nodes[0], nodes[1], 2);
-		sp.connect(nodes[0], nodes[2], 4);
-		sp.connect(nodes[0], nodes[3], 7);
-		sp.connect(nodes[1], nodes[3], 3);
-		sp.connect(nodes[2], nodes[3], 2);
-		sp.connect(nodes[2], nodes[4], 3);
-		sp.connect(nodes[3], nodes[4], 1);
-		sp.setStart(nodes[0]);
-		sp.setTarget(nodes[4]);
-		List<Integer> result = sp.calculate();
-		
-		for (Integer i : result) {
-			System.out.println(i);
-		}
-		
-	}
-	
 }
 
 

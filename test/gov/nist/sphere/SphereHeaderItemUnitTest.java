@@ -2,10 +2,6 @@ package gov.nist.sphere;
 
 import static org.junit.Assert.*;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-
 import org.junit.Test;
 
 import gov.nist.sphere.SphereHeaderItem;
@@ -44,6 +40,7 @@ public class SphereHeaderItemUnitTest {
 		assertEquals(fhi.getValueAsString(),""+f);	
 	}
 
+	@SuppressWarnings("cast")
 	@Test
 	public void testGetValueAsObject() {
 		assertEquals(ihi.getValueAsObject(),Integer.parseInt(i));	

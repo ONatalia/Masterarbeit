@@ -1,0 +1,34 @@
+This is free and open source software. 
+Please see the file LICENSE for details of the license.
+
+The license sets the requirements for using this software.
+The requirements in this section are not legally binding; 
+however, they represent things that the author would appreciate: 
+If you write a paper based on work that uses this software, 
+please include a citation to our paper, and send a copy 
+of your paper. If you create a derivative work based on a this 
+software, tell me about it and let me know how I can get a 
+copy, and include this request if it’s appropriate.
+
+The implementation of and the experiments performed with 
+this software are described in Chapter 5.6 of
+
+  Timo Baumann (2013).
+  "Incremental Spoken Dialogue Processing: 
+  Architectures and Lower-level Components"
+  PhD thesis, Bielefeld University, 2013.
+  
+  http://nbn-resolving.org/urn:nbn:de:hbz:361-25819101
+
+
+For your convenience, a bibtex entry for the thesis is given below:
+
+@PHDTHESIS{baumann2013:phd,
+  author = {Timo Baumann},
+  title = {Incremental Spoken Dialogue Processing: 
+	Architecture and Lower-level Components},
+  institution = {Universität Bielefeld, Germany},
+  year = {2013},
+  month = {5},
+  url = {http://nbn-resolving.org/urn:nbn:de:hbz:361-25819101}
+}

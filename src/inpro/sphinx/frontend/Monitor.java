@@ -1,24 +1,15 @@
 package inpro.sphinx.frontend;
 
-import inpro.audio.AudioUtils;
-
-import java.io.IOException;
-import java.net.URL;
-
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
-import javax.sound.sampled.UnsupportedAudioFileException;
-
 
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DataProcessingException;
 import edu.cmu.sphinx.frontend.DoubleData;
-import edu.cmu.sphinx.frontend.util.StreamDataSource;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Boolean;
@@ -96,20 +87,5 @@ public class Monitor extends BaseDataProcessor {
     	}
    		line.write(bValues, 0, bValues.length);
     }
-
-	public static void main(String[] args) throws UnsupportedAudioFileException, IOException {
-		URL audioURL = new URL("file:/home/timo/inpro/inpro/res/DE_1234.wav");
-		AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);
-		StreamDataSource sds = new StreamDataSource(16000, 320, 16, false, true);
-		sds.initialize();
-		sds.setInputStream(ais, audioURL.getFile());
-		Monitor monitor = new Monitor();
-		monitor.initialize();
-		monitor.setPredecessor(sds);
-		Data d = null;
-		do {
-			d = monitor.getData();
-		} while (d != null);
-	}
 
 }

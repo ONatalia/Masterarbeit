@@ -1,8 +1,5 @@
 package inpro.nlu;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,34 +25,6 @@ public class AVMComposer {
 
  	private Logger logger = Logger.getLogger(AVMComposer.class);
  	
-	/**
-	 * Creates AVMComposer with a list of prototypes (avmStructures) of
-	 * different typed AVMs and a local list of composed AVMs (avmList).
-	 * @throws MalformedURLException 
-	 */
-	public AVMComposer() throws MalformedURLException {
-		AVMComposer.avmStructures = AVMStructureUtil.parseStructureFile(new URL("res/AVMStructure"));
-		worldList = AVMWorldUtil.setAVMsFromFile("res/AVMWorldList", avmStructures);
-		avmList = getAllAVMs();
-		resolvedList = new ArrayList<AVM>();
-		keepList = new ArrayList<AVM>();
-	}
-
-	/**
-	 * Creates AVMComposer with a list of prototypes (avmStructures) of
-	 * different typed AVMs and a local list of composed AVMs (avmList).
-	 * Defaults to res/PentoAVMStructures for structure file.
-	 * @param worldFile with list of AVMs in the world. 
-	 * @throws MalformedURLException 
-	 */
-	public AVMComposer(String worldFile) throws MalformedURLException {
-		AVMComposer.avmStructures = AVMStructureUtil.parseStructureFile(new URL("file:res/PentoAVMStructure"));
-		worldList = AVMWorldUtil.setAVMsFromFile(worldFile, avmStructures);
-		avmList = getAllAVMs();
-		resolvedList = new ArrayList<AVM>(worldList.size());
-		keepList = new ArrayList<AVM>();
-	}
-
 	/**
 	 * Creates AVMComposer with a list of prototypes (avmStructures) of
 	 * different typed AVMs and a local list of composed AVMs (avmList).
@@ -214,7 +183,7 @@ public class AVMComposer {
 	/**
 	 * Prints out all known AVMs.
 	 */
-	private void printAVMs() {
+	void printAVMs() {
 		logger.info("Composed AVMs:");
 		if (avmList != null) {
 			for (AVM a : this.avmList) {
@@ -237,67 +206,6 @@ public class AVMComposer {
 	 */
 	public void setAvmList(ArrayList<AVM> avmList) {
 		this.avmList = avmList;
-	}
-	
-	static void interactiveTest() throws IOException {
-		BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-		String line = stdin.readLine();
-		AVMComposer composer = new AVMComposer();
-		while (!line.equals("exit")) {
-			if (line.equals("new"))  
-				composer = new AVMComposer();
-			else {
-				composer.compose(new AVPair(line));
-			}
-			composer.printAVMs();
-			line = stdin.readLine();
-		}
-		System.exit(0);
-	}
-
-	/**
-	 * Main method mostly for local testing.
-	 * @param args
-	 * @throws IOException
-	 */
-	public static void main(String[] args) throws IOException {
-		//For debug only...
-		System.out.println("Starting AVM Composer.");
-		AVMComposer composer = new AVMComposer();
-
-		System.out.println("World contains following objects:");
-		for (AVM avm : worldList) {
-			System.out.println(avm.toString());
-		}
-
-		// Below is a demonstration of what should happen when tags come in.
-
-		ArrayList<AVPair> avps = new ArrayList<AVPair>();
-		
-		avps.add(new AVPair("act", "take"));
-		avps.add(new AVPair("yesno", "yes"));
-		avps.add(new AVPair("yesno", "no"));
-
-		for (AVPair avp : avps) {
-			System.out.println("Adding tag AVPair '" + avp.toString() + "'.");
-			if (composer.avmList != null) {
-				composer.compose(avp);
-				composer.printAVMs();
-			} 
-			if (composer.avmList != null) {
-				ArrayList<AVM> resolvedList = composer.resolve();
-				if (resolvedList.size() > 0) {
-					System.out.println("Found these that resolve...");
-					for (AVM avm : resolvedList)
-					System.out.println(avm.toString());
-				} else {
-					System.out.println("Nothing resolves...");
-				}
-			}
-		}
-		System.out.println();
-		System.out.println("Done! Continue composing by entering any AVPair (e.g. ord:1). Enter 'exit' to stop or 'new' to restart'");
-		interactiveTest();
 	}
 	
 }

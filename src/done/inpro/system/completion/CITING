@@ -1,0 +1,31 @@
+This is free and open source software. 
+Please see the file LICENSE for details of the license.
+
+The license sets the requirements for using this software.
+The requirements in this section are not legally binding; 
+however, they represent things that the author would appreciate: 
+If you write a paper based on work that uses this software, 
+please include a citation to our paper, and send a copy 
+of your paper. If you create a derivative work based on a this 
+software, tell me about it and let me know how I can get a 
+copy, and include this request if it’s appropriate.
+
+The algorithms in this software are described in
+
+  Timo Baumann and David Schlangen (2011).
+  "Predicting the Micro-Timing of User Input for an Incremental 
+  Spoken Dialogue System that Completes a User's Ongoing Turn".
+  in Proceedings of SIGDial, Portland, USA.
+
+For your convenience, a bibtex entry for the paper is given below:
+
+@INPROCEEDINGS{baumannschlangen2011:sigdial,
+  author = {Timo Baumann and David Schlangen},
+  title = {Predicting the Micro-Timing of User Input for an Incremental 
+	Spoken Dialogue System that Completes a User's Ongoing Turn},
+  booktitle = {Proceedings of SigDial 2011},
+  month = jun,
+  year = {2011},
+  address = {Portland, USA},
+}
+

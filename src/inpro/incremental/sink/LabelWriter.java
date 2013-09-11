@@ -1,14 +1,12 @@
 package inpro.incremental.sink;
 
 import inpro.incremental.unit.EditMessage;
-import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
 import inpro.util.TimeUtil;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,7 +39,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
     public final static String PROP_FILE_NAME = "fileName";    
     
     private boolean writeToFile;
-    private boolean writeToStdOut;
+    private boolean writeToStdOut = true;
     private String filePath;
     private String fileName;
     int frameOutput = -1;
@@ -79,7 +77,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		/*
 		 * If there were only commits, or if there are not IUs, then print out as specified
 		 */
-		if (ius.size() > 0 && added && frameOutput != currentFrame) {
+		if (ius.size() > 0 && added) { // && frameOutput != currentFrame) {
 			frameOutput = currentFrame;
 
 			if (writeToFile) {

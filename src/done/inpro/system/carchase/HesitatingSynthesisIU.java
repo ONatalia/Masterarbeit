@@ -2,18 +2,12 @@ package done.inpro.system.carchase;
 
 import java.util.List;
 
-import inpro.apps.SimpleMonitor;
-import inpro.audio.DDS16kAudioInputStream;
-import inpro.audio.DispatchStream;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.SegmentIU;
 import inpro.incremental.unit.SysInstallmentIU;
 import inpro.incremental.unit.SysSegmentIU;
 import inpro.incremental.unit.WordIU;
 import inpro.synthesis.MaryAdapter;
-import inpro.synthesis.MaryAdapter4internal;
-import inpro.synthesis.hts.IUBasedFullPStream;
-import inpro.synthesis.hts.VocodingAudioStream;
 
 public class HesitatingSynthesisIU extends SysInstallmentIU {
 
@@ -105,14 +99,4 @@ public class HesitatingSynthesisIU extends SysInstallmentIU {
 		}
 
 	}
-
-	public static void main(String[] args) {
-		MaryAdapter.getInstance();
-		DispatchStream dispatcher = SimpleMonitor.setupDispatcher();
-		HesitationIU hes = new HesitationIU(null);
-		dispatcher.playStream(new DDS16kAudioInputStream(new VocodingAudioStream(new IUBasedFullPStream(hes), MaryAdapter4internal.getDefaultHMMData(), true)), false);
-		dispatcher.waitUntilDone();
-		dispatcher.shutdown();
-	}
-
 }

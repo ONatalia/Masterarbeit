@@ -1,5 +1,7 @@
 package inpro.incremental.processor;
 
+import static org.junit.Assert.*;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -73,6 +75,23 @@ public class SynthesisModuleUnitTest {
 			dispatcher.waitUntilDone();
 			myIUModule.reset();
 		}
+	}
+	
+	/**
+	 * test timing consecutivity(?) of PhraseIUs when pre-synthesis is used
+	 */
+	@Test
+	public void testPreSynthesisTiming() {
+		PhraseIU initialPhrase = new PhraseIU("Dies ist ein");
+		initialPhrase.preSynthesize();
+		PhraseIU continuationPhrase = new PhraseIU("komplizierter Satz.");
+		continuationPhrase.preSynthesize();
+		assertTrue("continuation should start at 0 before it is being synthesized", continuationPhrase.startTime() == 0);
+		myIUModule.addIUAndUpdate(initialPhrase);
+		myIUModule.addIUAndUpdate(continuationPhrase);
+		assertTrue("continuation should start immediately after initial phrase", initialPhrase.endTime() == continuationPhrase.startTime());
+		dispatcher.waitUntilDone();
+		assertTrue("continuation should start immediately after initial phrase (even after uttering)", initialPhrase.startTime() != continuationPhrase.startTime());
 	}
 	
 	/**
