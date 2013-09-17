@@ -156,6 +156,7 @@ public class Formula extends VariableEnvironment
 		for (VariableIDPair p : f.mEqs) this.mEqs.add(p);
 		
 		// pop slot
+		if (this.mSlots.isEmpty()) return false;
 		Hook slotToFill = this.mSlots.pop();
 		
 		// push new slots (forward!)
@@ -517,6 +518,11 @@ public class Formula extends VariableEnvironment
 			}
 		}
 		checkVariableEnvironmentConsistency();
+	}
+
+	public List<Relation> getRelations() {
+		
+		return mRels;
 	}
 	
 }
