@@ -28,7 +28,6 @@ public class NoisySynthesisModule extends SynthesisModule {
 	protected synchronized void playNoiseSmart(String file) {
 		noiseDispatcher.playFile(file, true);
 		sleepy(300);
-		// TODO: interrupt ongoing utterance 
 		// stop after ongoing word, 
 		currentInstallment.stopAfterOngoingWord();
 		// (no need to keep reference to the ongoing utterance as we'll start a new one anyway)
@@ -54,7 +53,6 @@ public class NoisySynthesisModule extends SynthesisModule {
 		try {
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

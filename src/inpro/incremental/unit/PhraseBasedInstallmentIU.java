@@ -31,7 +31,6 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 	
 	/** create a phrase from  */
 	public PhraseBasedInstallmentIU(PhraseIU phrase) {
-		// todo: think about a new method in PhraseIU that gets us more specifically tuned text for synthesis depending on phraseTypes
 		super(phrase.toPayLoad(), phrase.getWords());
 		if (phrase.getWords() == null) {
 			groundedIn = MaryAdapter.getInstance().text2IUs(tts);
@@ -88,6 +87,7 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 			fullInstallmentText = fullInstallmentText.replaceAll(" *<hes>", ""); // ... or hesitations as "kleiner als hes größer als"
 			@SuppressWarnings("unchecked")
 			List<WordIU> newWords = (List<WordIU>) (new SysInstallmentIU(fullInstallmentText)).groundedIn();
+			logger.debug("received the words" + newWords.toString());
 			assert newWords.size() >= groundedIn.size() - numHesitationsInserted;
 //			assert newWords.size() == groundedIn.size() + phrase.expectedWordCount(); // for some reason, this assertion breaks sometimes -> nasty stuff going on with pauses
 			firstNewWord = newWords.get(groundedIn.size() - numHesitationsInserted);

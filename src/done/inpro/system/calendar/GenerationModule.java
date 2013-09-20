@@ -18,6 +18,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import done.inpro.system.calendar.NoiseThread.NoiseHandling;
 
@@ -44,9 +45,12 @@ public class GenerationModule extends IUModule {
 		
 		@Override
 		public synchronized void update(IU updatedIU) {
+			assert logger != null;
+			logger.warn("update on IU " + (updatedIU != null ? updatedIU.toString() : "null"));
 			String projectedPhrase;
 			if (updatedIU == null || updatedIU.isCompleted()) {
 				if (AdaptionManager.getInstance().hasChanged()) {
+					// --> this is usually the case when noise has been played
 					System.out.println("*************** CHANGE ****************");
 					phrases.remove(phrases.size() - 1);
 					String phrase = nlg.generateNextPhrase();
@@ -81,7 +85,7 @@ public class GenerationModule extends IUModule {
 				rightBuffer.setBuffer(phrases);
 				rightBuffer.notify(iulisteners);
 			}
-			System.out.println("Current update id: " + new Integer(nlg.getCurrentUpdateId()).toString());
+			System.out.println("Current update id: " + nlg.getCurrentUpdateId());
 		}
 	};
 		
@@ -169,6 +173,7 @@ public class GenerationModule extends IUModule {
 	
 	
 	public static void main(String[] args) throws Exception {
+		PropertyConfigurator.configure("log4j.properties");
 		int stimulusID = 1;
 		// for detailed timing-measurements:
 		boolean measureTiming = false;
@@ -219,6 +224,7 @@ public class GenerationModule extends IUModule {
 			System.exit(0);
 		}
 		
+		// normal program flow
 		final DispatchStream speechDispatcher = SimpleMonitor.setupDispatcher();
 		final NoisySynthesisModule synthesisModule = new NoisySynthesisModule(speechDispatcher);
 		TEDviewNotifier ted = new inpro.incremental.sink.TEDviewNotifier();

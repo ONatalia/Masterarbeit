@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
  */
 public class SysInstallmentIU extends InstallmentIU {
 	
-	Logger logger = Logger.getLogger(SysInstallmentIU.class);
+	Logger logger = Logger.getLogger(this.getClass());
 	
 	public SysInstallmentIU(String tts) {
 		super(null, tts);
