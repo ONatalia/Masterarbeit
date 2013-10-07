@@ -23,7 +23,7 @@ For your convenience, a bibtex entry for the paper is given below:
 
 @INPROCEEDINGS{buschmeieretal2012:sigdial,
   author = {Hendrik Buschmeier and Timo Baumann and 
-	Benjamin Dorsch and Stefan Kopp and David Schlangen},
+	Benjamin Dosch and Stefan Kopp and David Schlangen},
   title = {Combining Incremental Language Generation and Incremental 
 	Speech Synthesis for Adaptive Information Presentation},
   booktitle = {Proceedings of SigDial},
