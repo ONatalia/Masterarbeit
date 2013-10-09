@@ -37,7 +37,7 @@
  * noise events that interfer with its own speech. 
  * 
  * This system is further described in:<br>
- * Hendrik Buschmeier, Timo Baumann, Benjamin Dorsch, Stefan Kopp and David Schlangen (2012):<br>
+ * Hendrik Buschmeier, Timo Baumann, Benjamin Dosch, Stefan Kopp and David Schlangen (2012):<br>
  * "Combining Incremental Language Generation and Incremental Speech Synthesis for Adaptive Information Presentation",<br>
  * in: <em>Proceedings of SigDial 2012</em>, Seoul, South Korea. 
  * 
