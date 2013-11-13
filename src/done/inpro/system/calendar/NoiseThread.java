@@ -4,7 +4,7 @@ import inpro.incremental.unit.IU.IUUpdateListener;
 
 import java.util.Random;
 
-import scalendar.adaptionmanager.AdaptionManager;
+import org.soa.incremental.nlg.adaptionmanager.AdaptionManager;
 
 public class NoiseThread extends Thread {
 	private Random random = new Random(); 
@@ -43,8 +43,8 @@ public class NoiseThread extends Thread {
 			try {
 				Thread.sleep(randomIntBetween(2000, 5000));
 				System.out.println("BRRRRRRRRRRRRRRRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUMMMMMMMMMMMMMM!");
-				//String pathToFile = "file:///Users/hendrik/Desktop/iNLG_iSS/noise/pinknoise.";
-				String pathToFile = "file:/home/timo/uni/experimente/050_itts+inlg/noise/pinknoise.";
+				String pathToFile = "file:///Users/hendrik/Projects/iNLG_iSS/noise/pinknoise.";
+				//String pathToFile = "file:/home/timo/uni/experimente/050_itts+inlg/noise/pinknoise.";
 				//String fileSuffix = "ms.-3db.wav";
 				String fileSuffix = "ms.wav";
 

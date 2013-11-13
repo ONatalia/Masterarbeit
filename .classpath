@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="done/inpro/system/calendar/*" kind="src" path="src"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="lib" path="lib/mary3/java-diff.jar"/>
 	<classpathentry kind="lib" path="lib/weka.jar"/>
@@ -29,9 +29,6 @@
 	<classpathentry kind="lib" path="lib/common-for-convenience/jflac-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/common-for-convenience/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="lib/common-for-convenience/jdom1-1.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/scalendar.jar"/>
-	<classpathentry kind="lib" path="lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-	<classpathentry kind="lib" path="lib/jspud-nlg.jar"/>
 	<classpathentry kind="lib" path="lib/oaa2/antlr-oaa.jar"/>
 	<classpathentry kind="lib" path="lib/oaa2/oaa2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
@@ -42,5 +39,6 @@
 	<classpathentry kind="lib" path="lib/junit-4.10.jar"/>
 	<classpathentry kind="lib" path="lib/common-for-convenience/jgraphx.jar"/>
 	<classpathentry kind="lib" path="lib/sphinx4/sphinx4.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jspud"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

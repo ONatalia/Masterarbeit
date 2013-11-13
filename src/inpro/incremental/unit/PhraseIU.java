@@ -20,6 +20,8 @@ public class PhraseIU extends WordIU {
 	/** the state of delivery that this unit is in */
 	Progress progress = null;
 	
+	public boolean completionNotified = false;
+	
 	public enum PhraseType {
 	    NONFINAL, // we're still awaiting more content in this utterance
 	    FINAL, // last phrase of the utterance <-- this is not exclusive with e.g. continuation,initial,repair,

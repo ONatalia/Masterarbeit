@@ -382,7 +382,7 @@ public abstract class IU implements Comparable<IU> {
 	
 	@Override
 	public String toString() {
-		return getID() + "," + toLabelLine(); // + "\n";
+		return getID() + ", " + toLabelLine() + " completed: " + this.isCompleted(); // + "\n";
 	}
 	
 	public String deepToString() {
@@ -471,7 +471,7 @@ public abstract class IU implements Comparable<IU> {
 		return this.getID() - other.getID();
 	}
 
-	List<IUUpdateListener> updateListeners;
+	public List<IUUpdateListener> updateListeners;
 	/** this has no effect if listener is already in the list of updatelisteners*/
 	public synchronized void addUpdateListener(IUUpdateListener listener) {
 		if (updateListeners == null)

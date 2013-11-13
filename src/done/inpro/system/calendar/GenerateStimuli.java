@@ -5,13 +5,13 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Random;
 
-import scalendar.knowledgeobject.CalendarEvent;
-import scalendar.spud.CalendarKnowledgeInterface;
-import scalendar.spudmanager.SpudManager;
-import scalendar.spudmanager.UtteranceObject;
-import scalendar.uttereanceobject.EventConflict;
-import scalendar.uttereanceobject.MovedEvent;
-import scalendar.uttereanceobject.UpcomingEvents;
+import org.soa.incremental.nlg.knowledgeobject.CalendarEvent;
+import org.soa.incremental.nlg.spud.CalendarKnowledgeInterface;
+import org.soa.incremental.nlg.spudmanager.SpudManager;
+import org.soa.incremental.nlg.spudmanager.UtteranceObject;
+import org.soa.incremental.nlg.uttereanceobject.EventConflict;
+import org.soa.incremental.nlg.uttereanceobject.MovedEvent;
+import org.soa.incremental.nlg.uttereanceobject.UpcomingEvents;
 
 public class GenerateStimuli {
 	
@@ -137,7 +137,7 @@ public class GenerateStimuli {
 	public static void main(String[] args)  throws Exception {
 		SpudManager spudmanager = new SpudManager(
 				new CalendarKnowledgeInterface(),
-				"src/inpro/domains/calendar/calendar.gs");
+				"src/done/inpro/system/calendar/calendar.gs");
 		//UtteranceObject uo = GenerateStimuli.createMovedEvent(gs.createRandomEvent("Austellung: China: Stadt, Land, Fluss", 2));
 		//UtteranceObject uo = GenerateStimuli.createEventConflict(gs.createRandomEvent("Austellung: China: Stadt, Land, Fluss", 2), "Spazierengehen");
 		UtteranceObject uo = GenerateStimuli.createUpcomingEvents(
