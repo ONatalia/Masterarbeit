@@ -2,6 +2,7 @@ package done.inpro.system.calendar;
 
 import inpro.incremental.unit.IU.IUUpdateListener;
 
+import java.io.InputStream;
 import java.util.Random;
 
 import org.soa.incremental.nlg.adaptionmanager.AdaptionManager;
@@ -43,22 +44,23 @@ public class NoiseThread extends Thread {
 			try {
 				Thread.sleep(randomIntBetween(2000, 5000));
 				System.out.println("BRRRRRRRRRRRRRRRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUMMMMMMMMMMMMMM!");
-				String pathToFile = "file:///Users/hendrik/Projects/iNLG_iSS/noise/pinknoise.";
+				//String pathToFile = "file:///Users/hendrik/Projects/iNLG_iSS/noise/pinknoise.";
 				//String pathToFile = "file:/home/timo/uni/experimente/050_itts+inlg/noise/pinknoise.";
 				//String fileSuffix = "ms.-3db.wav";
 				String fileSuffix = "ms.wav";
-
+				InputStream noiseFile = NoiseThread.class.getResourceAsStream("noise/pinknoise." + Integer.toString(noiseLength) + fileSuffix);
+				
 				switch (noiseHandling) {
 				case none: // CONDITION A
-					sm.playNoiseDeaf(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
+					sm.playNoiseDeaf(noiseFile);
 					Thread.sleep(noiseLength - responsiveness);
 					break;
 				case pauseStream: // CONDITION B
-					sm.playNoiseDumb(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
+					sm.playNoiseDumb(noiseFile);
 					Thread.sleep(noiseLength - responsiveness);
 					break;
 				case regenerate: // CONDITION C
-					sm.playNoiseSmart(pathToFile + new Integer(noiseLength).toString() + fileSuffix);
+					sm.playNoiseSmart(noiseFile);
 					Thread.sleep(noiseLength - responsiveness);
 					am.noGrounding(); 
 					am.setLevelOfUnderstanding(5);

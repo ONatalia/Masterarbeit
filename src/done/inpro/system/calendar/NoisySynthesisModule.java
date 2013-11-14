@@ -1,5 +1,7 @@
 package done.inpro.system.calendar;
 
+import java.io.InputStream;
+
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import inpro.apps.SimpleMonitor;
 import inpro.apps.util.CommonCommandLineParser;
@@ -25,8 +27,8 @@ public class NoisySynthesisModule extends SynthesisModule {
 	}
 	
 	/** any ongoing noise is replaced with this one */
-	protected synchronized void playNoiseSmart(String file) {
-		noiseDispatcher.playFile(file, true);
+	protected synchronized void playNoiseSmart(InputStream noiseFile) {
+		noiseDispatcher.playStream(noiseFile, true);
 		sleepy(300);
 		// stop after ongoing word, 
 		currentInstallment.stopAfterOngoingWord();
@@ -35,8 +37,8 @@ public class NoisySynthesisModule extends SynthesisModule {
 	}
 
 	/** any ongoing noise is replaced with this one */
-	protected synchronized void playNoiseDumb(String file) {
-		noiseDispatcher.playFile(file, true);
+	protected synchronized void playNoiseDumb(InputStream noiseFile) {
+		noiseDispatcher.playStream(noiseFile, true);
 		sleepy(300);
 		speechDispatcher.interruptPlayback();
 		// wait until noiseDispatcher is done
@@ -45,8 +47,8 @@ public class NoisySynthesisModule extends SynthesisModule {
 		speechDispatcher.continuePlayback();
 	}
 	
-	public synchronized void playNoiseDeaf(String file) {
-		noiseDispatcher.playFile(file, true);
+	public synchronized void playNoiseDeaf(InputStream noiseFile) {
+		noiseDispatcher.playStream(noiseFile, true);
 	}
 
 	void sleepy(int ms) {
