@@ -49,6 +49,7 @@ public class MaryAdapter4internal extends MaryAdapter {
 	private static void startupInternalMary() throws Exception {
         MaryProperties.readProperties();
         Mary.startup(MARY_AUTOLOAD_JARS);
+        assert ModuleRegistry.getModule(InteractiveHTSEngine.class) != null : "Mary is not configured properly for use with InproTK!"; 
 	}
 	
 	@Override
