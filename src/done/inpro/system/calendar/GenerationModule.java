@@ -270,6 +270,7 @@ public class GenerationModule extends IUModule {
 	
 	public static void main(String[] args) throws Exception {
 		PropertyConfigurator.configure("log4j.properties");
+		
 		int stimulusID = 1;
 		// for detailed timing-measurements:
 		boolean measureTiming = false;
@@ -383,5 +384,9 @@ public class GenerationModule extends IUModule {
 	@Override
 	protected void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) { }
+
+	public SpudManager getNLG() {
+		return this.nlg;
+	}
 
 }
