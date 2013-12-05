@@ -128,15 +128,18 @@ public class SynthesisModule extends IUModule {
 	}
 	
 	private void appendNotification(SysInstallmentIU installment, PhraseIU phrase) {
+		IUUpdateListener listener = new NotifyCompletedOnOngoing(phrase);
+		// add listener to first segment for UPCOMING/ONGOING updates
+		phrase.getFirstSegment().addUpdateListener(listener);
 		String updateposition = System.getProperty("proso.cond.updateposition", "end");
 		if (updateposition.equals("end")) 
 			installment.getFinalWord()
-					.getLastSegment().getSameLevelLink()
-					.addUpdateListener(new NotifyCompletedOnOngoing(phrase));
+					.getLastSegment().getSameLevelLink() // attach to second-to-last segment of the last word
+					.addUpdateListener(listener);
 		else if (updateposition.equals("-1word"))
 			((WordIU) installment.getFinalWord().getSameLevelLink())
 			.getLastSegment().getSameLevelLink()
-			.addUpdateListener(new NotifyCompletedOnOngoing(phrase));
+			.addUpdateListener(listener);
 		else {
 			int req;
 			if (updateposition.equals("+1word"))
@@ -154,32 +157,27 @@ public class SynthesisModule extends IUModule {
 			}
 			((WordIU) phrase.groundedIn().get(req))
 			.getLastSegment().getSameLevelLink()
-			.addUpdateListener(new NotifyCompletedOnOngoing(phrase));
+			.addUpdateListener(listener);
 		}
 	}
 	
 	/** notifies the given PhraseIU when the IU this is listening to is completed */
 	class NotifyCompletedOnOngoing implements IUUpdateListener {
 		PhraseIU completed;
+		Progress previousProgress = null;
 		NotifyCompletedOnOngoing(PhraseIU notify) {
 			completed = notify;
 		}
-		/** @param updatedIU the SegmentIU that this listener is attached to in {@link SynthesisModule#appendNotification(SysInstallmentIU, PhraseIU)} */
+		/** @param updatingIU the SegmentIU that this listener is attached to in {@link SynthesisModule#appendNotification(SysInstallmentIU, PhraseIU)} */
 		@Override
-		public void update(IU updatedIU) {
-            if (updatedIU.isCompleted()) { // make sure that the phrase is marked as completed even though not necessarily the last segment has been completed
+		public void update(IU updatingIU) {
+			if (updatingIU.isCompleted() && updatingIU != completed.getFirstSegment()) { // make sure that the phrase is marked as completed even though not necessarily the last segment has been completed
                 completed.setProgress(Progress.COMPLETED);
+                previousProgress = completed.getProgress();
             }
-			completed.notifyListeners();
-/*			if (updatedIU.isOngoing()) {
-				// block vocoding from finishing synthesis before our completion is available
-				if (!completed.getType().equals(PhraseIU.PhraseType.FINAL)) {
-					SysSegmentIU seg = (SysSegmentIU) currentInstallment.getFinalWord().getLastSegment();
-					// TODO/FIXME: this was only useful in the Calendar domain -- how can we fix this to be generic?
-				//	if (seg != null) 
-					//	seg.setAwaitContinuation(true);
-				}
-			} */
+			if (!completed.getProgress().equals(previousProgress))
+				completed.notifyListeners();
+			previousProgress = completed.getProgress();
 		}
 	}
 	

@@ -382,7 +382,7 @@ public abstract class IU implements Comparable<IU> {
 	
 	@Override
 	public String toString() {
-		return getID() + ", " + toLabelLine() + " completed: " + this.isCompleted(); // + "\n";
+		return getID() + ", " + toLabelLine() + " progress: " + ((this.getProgress() != null) ? this.getProgress().toString() : "null"); // + "\n";
 	}
 	
 	public String deepToString() {
@@ -482,11 +482,15 @@ public abstract class IU implements Comparable<IU> {
 	
 	
 	public synchronized void notifyListeners() {
+		//System.err.println("call to updateListeners in " + toString());
 		if (updateListeners != null)
 			for (final IUUpdateListener listener : updateListeners) {
 				final IU that = this;
 				// why not spawn a new thread per notification to avoid deadlocks? live long and prosper!
-				(new Thread(listener.getClass().toString()) {
+				String threadName = listener.getClass().toString() + " called from " + this.toString() + " by thread " + Thread.currentThread().getName();
+				if (threadName.length() > 100)
+					threadName = threadName.substring(0, 100) + "...";
+				(new Thread(listener.getClass().toString() + " called from " + this.toString() + " by thread " + Thread.currentThread().getName()) {
 					@Override
 					public void run() {
 						listener.update(that);

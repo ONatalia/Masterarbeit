@@ -1,10 +1,19 @@
 package inpro.incremental.processor;
 
 import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import inpro.apps.SimpleMonitor;
 import inpro.incremental.processor.AdaptableSynthesisModule;
+import inpro.incremental.sink.LabelWriter;
+import inpro.incremental.unit.IU;
+import inpro.incremental.unit.IU.IUUpdateListener;
+import inpro.incremental.unit.IU.Progress;
 import inpro.incremental.unit.PhraseIU;
 
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,6 +29,7 @@ public class AdaptableSynthesisModuleUnitTest extends SynthesisModuleUnitTest {
 		dispatcher = SimpleMonitor.setupDispatcher();
 		myIUModule = new TestIUModule();
 		asm = new AdaptableSynthesisModule(dispatcher);
+		asm.addListener(new LabelWriter());
 		myIUModule.addListener(asm);
 	}
 
@@ -57,6 +67,51 @@ public class AdaptableSynthesisModuleUnitTest extends SynthesisModuleUnitTest {
 			assertTrue(Long.toString(timeUntilAbort), timeUntilAbort < 250);
 		}
 	}
+	
+	/**
+	 * assert that stopping results in the underlying phraseIUs being, well, what?
+	 */
+	@Test
+	public void testPhraseIUProgressOnStop() throws InterruptedException {
+		int[] delay = { 100, 200, 1500, 2100, 3500 };
+		// we expect the first phrase to be ongoing for 300 and 700 ms, and to have completed after 2100 ms
+		Progress[][] expectedProgressOfFirstPhrase = { { Progress.ONGOING }, 
+											   { Progress.ONGOING }, 
+											   { Progress.ONGOING, Progress.COMPLETED }, 
+											   { Progress.ONGOING, Progress.COMPLETED }, 
+											   { Progress.ONGOING, Progress.COMPLETED }, 
+											 };
+		// we expect the second phrase to only start after more than 700 ms, and to be completed before 3500 ms
+		Progress[][] expectedProgressOfSecondPhrase = { 
+												{ },
+										        { },
+										        { Progress.UPCOMING, Progress.ONGOING },										       
+										        { Progress.UPCOMING, Progress.ONGOING },										       
+										        { Progress.UPCOMING, Progress.ONGOING, Progress.COMPLETED },										       
+											  };
+		for (int i = 0; i < delay.length; i++) {
+			PhraseIU firstPhrase = new PhraseIU("Ein ganz besonders langer"); // takes ~ 870 ms
+			final List<Progress> firstPhraseProgressUpdates = new ArrayList<Progress>();
+			firstPhrase.addUpdateListener(new IUUpdateListener() {@Override
+				public void update(IU updatedIU) {
+					firstPhraseProgressUpdates.add(updatedIU.getProgress());
+				}});
+			PhraseIU secondPhrase = new PhraseIU("und sehr komplizierter Satz."); // full utterances takes ~2700 ms
+			final List<Progress> secondPhraseProgressUpdates = new ArrayList<Progress>();
+			secondPhrase.addUpdateListener(new IUUpdateListener() {@Override
+				public void update(IU updatedIU) {
+					secondPhraseProgressUpdates.add(updatedIU.getProgress());
+				}});
+			myIUModule.addIUAndUpdate(firstPhrase);
+			myIUModule.addIUAndUpdate(secondPhrase);
+			Thread.sleep(delay[i]);
+			asm.stopAfterOngoingWord();
+			dispatcher.waitUntilDone();
+			//System.err.println(firstPhraseProgressUpdates.toString());
+			assertArrayEquals(firstPhraseProgressUpdates.toString(), expectedProgressOfFirstPhrase[i], firstPhraseProgressUpdates.toArray());
+			assertArrayEquals(secondPhraseProgressUpdates.toString(), expectedProgressOfSecondPhrase[i], secondPhraseProgressUpdates.toArray());
+		}
+	}
 
 	/**
 	 * test that scaling works as expected (scaling error is within 10%)
@@ -87,6 +142,14 @@ public class AdaptableSynthesisModuleUnitTest extends SynthesisModuleUnitTest {
 	private void startPhrase(String s) {
 		PhraseIU phrase = new PhraseIU(s);
 		phrase.preSynthesize();
+		phrase.addUpdateListener(new IUUpdateListener() {
+			@Override
+			public void update(IU updatedIU) {
+				Logger.getLogger(AdaptableSynthesisModuleUnitTest.class).info(
+						"update message on IU " + updatedIU.toString() + 
+						" with progress " + updatedIU.getProgress());
+			}
+		});
 		myIUModule.addIUAndUpdate(phrase);
 	}
 
