@@ -102,7 +102,7 @@ public class CurrentASRHypothesis implements Configurable, ResultListener, Monit
 			// for TEDview, we additionally notify about segments and syllables
 			checkForTEDview(listener);
 			// notify
-			if (ius != null && edits != null)
+			if (ius != null && edits != null && !edits.isEmpty())
 				listener.hypChange(ius, edits);
 		}
 	}
