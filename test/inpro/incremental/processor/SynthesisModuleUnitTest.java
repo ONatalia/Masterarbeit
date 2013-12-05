@@ -89,9 +89,9 @@ public class SynthesisModuleUnitTest {
 		assertTrue("continuation should start at 0 before it is being synthesized", continuationPhrase.startTime() == 0);
 		myIUModule.addIUAndUpdate(initialPhrase);
 		myIUModule.addIUAndUpdate(continuationPhrase);
-		assertTrue("continuation should start immediately after initial phrase", initialPhrase.endTime() == continuationPhrase.startTime());
+		assertTrue("continuation should follow initial phrase but timings were initialEnd: " + initialPhrase.endTime() + ", continuationStart: " + continuationPhrase.startTime(), Math.abs(initialPhrase.endTime() - continuationPhrase.startTime()) < 0.00001);
 		dispatcher.waitUntilDone();
-		assertTrue("continuation should start immediately after initial phrase (even after uttering)", initialPhrase.startTime() != continuationPhrase.startTime());
+		assertTrue("continuation should start immediately after initial phrase (even after uttering)", Math.abs(initialPhrase.startTime() - continuationPhrase.startTime()) > 0.00001);
 	}
 	
 	/**

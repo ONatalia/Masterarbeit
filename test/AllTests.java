@@ -1,27 +1,31 @@
-import gov.nist.sphere.SphereExceptionUnitTest;
-import gov.nist.sphere.SphereHeaderItemUnitTest;
-import inpro.annotation.AnnotationUtilUnitTest;
-import inpro.annotation.LabelUnitTest;
-import inpro.annotation.TextGridUnitTest;
-import inpro.incremental.processor.AdaptableSynthesisModuleUnitTest;
-import inpro.incremental.processor.SynthesisModuleUnitTest;
-import inpro.incremental.source.CurrentASRHypothesisTest;
-import inpro.synthesis.MaryAdapterIUUnitTest;
-import inpro.synthesis.MaryAdapterMbrolaUnitTest;
-
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import work.inpro.alchemy.spatial.util.SpatialRandomUnitTest;
-
 @RunWith(Suite.class)
-@SuiteClasses({ AnnotationUtilUnitTest.class, LabelUnitTest.class, 
-	TextGridUnitTest.class, 
-	SphereExceptionUnitTest.class, SphereHeaderItemUnitTest.class,
-	MaryAdapterMbrolaUnitTest.class, MaryAdapterIUUnitTest.class, 
-	SynthesisModuleUnitTest.class, AdaptableSynthesisModuleUnitTest.class, 
-	SpatialRandomUnitTest.class, CurrentASRHypothesisTest.class })
+@SuiteClasses({ 
+	done.inpro.system.carchase.CarChaseViewerTest.class,
+	done.inpro.system.carchase.HesitatingSynthesisIUTest.class,
+	done.inpro.system.carchase.MyYamlTest.class,
+	gov.nist.sphere.SphereExceptionUnitTest.class, 
+	gov.nist.sphere.SphereHeaderItemUnitTest.class,
+	inpro.annotation.AnnotationUtilUnitTest.class, 
+	inpro.annotation.LabelUnitTest.class, 
+	inpro.annotation.TextGridUnitTest.class, 
+	inpro.incremental.processor.AdaptableSynthesisModuleUnitTest.class,
+	inpro.incremental.processor.SynthesisModuleUnitTest.class,
+	inpro.incremental.source.CurrentASRHypothesisTest.class,
+	inpro.irmrsc.parser.SITDBSParserTest.class,
+	inpro.nlu.AVMComposerTest.class,
+	inpro.nlu.AVMWorldUtilTest.class,
+	inpro.nlu.AVPairMappingUtilTest.class,
+	inpro.pitch.util.ShortestPathTest.class,
+	inpro.sphinx.frontend.ConversionUtilTest.class,
+	inpro.sphinx.frontend.MonitorTest.class,
+	inpro.synthesis.MaryAdapterIUUnitTest.class,
+	inpro.synthesis.MaryAdapterMbrolaUnitTest.class,   
+	work.inpro.alchemy.spatial.util.SpatialRandomUnitTest.class
+	})
 public class AllTests {
 
 }

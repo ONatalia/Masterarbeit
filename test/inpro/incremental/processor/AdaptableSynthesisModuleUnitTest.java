@@ -24,8 +24,8 @@ public class AdaptableSynthesisModuleUnitTest extends SynthesisModuleUnitTest {
 	}
 
 	/**
-	 * assert that aborting after the ongoing phoneme does not take longer than 500 ms 
-	 * (this test uses digits, which should not last much longer than 500 ms to say) 
+	 * assert that aborting after the ongoing phoneme does not take longer than 600 ms 
+	 * (this test uses digits, which should not last much longer than 600 ms to say) 
 	 * in addition, assert that aborting something that has already ended does not fail
 	 */
 	@Test
@@ -37,7 +37,7 @@ public class AdaptableSynthesisModuleUnitTest extends SynthesisModuleUnitTest {
 			asm.stopAfterOngoingWord();
 			dispatcher.waitUntilDone();
 			long timeUntilAbort = System.currentTimeMillis() - timeBeforeAbort;
-			assertTrue(Long.toString(timeUntilAbort), timeUntilAbort < 500);
+			assertTrue(Long.toString(timeUntilAbort), timeUntilAbort < 600);
 		}
 	}
 

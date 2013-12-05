@@ -1,4 +1,4 @@
-AVMStructure# This file describes objects in the world for AVM processing
+# This file describes objects in the world for AVM processing
 # Hashes start commented lines.
 #
 # The format of each (non-comment) line is as follows:

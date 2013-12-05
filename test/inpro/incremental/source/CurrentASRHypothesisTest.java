@@ -21,7 +21,8 @@ import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertyException;
 
 /**
- * moderately important test: make sure that there are not revoke/add pairs within one call to leftBufferUpdate (i.e., do not send revoke/add if nothing changes
+ * moderately important test: make sure that there are not revoke/add pairs within one call to leftBufferUpdate 
+ * (i.e., do not send revoke/add if nothing changes)
  * @author timo
  */
 public class CurrentASRHypothesisTest {
@@ -32,7 +33,7 @@ public class CurrentASRHypothesisTest {
 		testConfiguration("-F", "file:res/DE_1234.wav", "-gr", "file:src/demo/inpro/system/echodm/digits.gram"); // test a grammar
 		testConfiguration("-F", "file:res/DE_1234.wav", "-Is", "7"); // test smoothing with a common value  
 		testConfiguration("-F", "file:res/DE_1234.wav", "-If", "7"); // test right-context with a common value  
-		testConfiguration("-F", "file:res/DE_1234.wav", "-N"); // test right-context with a common value  
+		testConfiguration("-F", "file:res/DE_1234.wav", "-N"); // test without partial results  
 	}
 	
 	private void testConfiguration(String... recoArgs) throws PropertyException, IOException, UnsupportedAudioFileException {
@@ -45,7 +46,7 @@ public class CurrentASRHypothesisTest {
 		simpleReco.recognizeOnce();
 		assertTrue("for some reason, the testing IU module has not been called!", tm.hasBeenCalled > 0);
 		if (recoArgs[recoArgs.length - 1].equals("-N"))
-			assertTrue(tm.hasBeenCalled == 1);
+			assertTrue("hasBeenCalled was " + tm.hasBeenCalled + " in the -N condition (should be 2)", tm.hasBeenCalled == 2);
     	simpleReco.getRecognizer().deallocate();
 	}
 
