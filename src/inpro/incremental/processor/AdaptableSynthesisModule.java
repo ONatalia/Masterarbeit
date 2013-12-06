@@ -5,11 +5,13 @@ import inpro.audio.DispatchStream;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.SysSegmentIU;
+import inpro.incremental.unit.WordIU;
 import inpro.synthesis.hts.VocodingFramePostProcessor;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 public class AdaptableSynthesisModule extends SynthesisModule {
 	
@@ -23,11 +25,46 @@ public class AdaptableSynthesisModule extends SynthesisModule {
         super(ds);
     }
 	
+	@SuppressWarnings("unchecked")
+	public void pauseAfterOngoingWord() {
+		synchronized(currentInstallment) {
+			if (currentInstallment != null) {
+				List<WordIU> words = (List<WordIU>) currentInstallment.groundedIn();
+				ListIterator<WordIU> wordIt = words.listIterator(words.size());
+				for (; wordIt.hasPrevious(); ) {
+					SysSegmentIU wordStartSeg = (SysSegmentIU) wordIt.previous().getFirstSegment();
+					wordStartSeg.setAwaitContinuation(true);
+				}
+			}
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void resumePausedSynthesis() {
+		synchronized(currentInstallment) {
+			if (currentInstallment != null) {
+				List<WordIU> words = (List<WordIU>) currentInstallment.groundedIn();
+				ListIterator<WordIU> wordIt = words.listIterator(words.size());
+				for (; wordIt.hasPrevious(); ) {
+					SysSegmentIU wordStartSeg = (SysSegmentIU) wordIt.previous().getFirstSegment();
+					wordStartSeg.setAwaitContinuation(false);
+				}
+			}
+		}
+	}
+	
 	/** stop the ongoing (uncommitted) utterance after the ongoing word */
 	public void stopAfterOngoingWord() {
-		synchronized(currentInstallment) {
+		synchronized(currentInstallment) { // TODO: find out why this is synchronized
 			if (currentInstallment != null)
 				currentInstallment.stopAfterOngoingWord();
+			// NOTE: the following two lines first resume synthesis and afterwards discard
+			// NOTE: the stream that is played which is necessary for paused installments. 
+			// NOTE: TODO: This may lead to (short) audible noise.
+			// NOTE: However, changing the order of the lines is impossible as skipping a stream 
+			// NOTE: in that situation becomes impossible because of deadlock (synchronized(this) in DispatchStream)
+			resumePausedSynthesis();
+			speechDispatcher.clearStream(); 
 			currentInstallment = null;
 		}
 	}
