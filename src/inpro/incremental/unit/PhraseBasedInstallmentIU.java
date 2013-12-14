@@ -135,21 +135,7 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 				seg.removeAllNextSameLevelLinks();
 			}
 		}
-		//System.err.println(phrase.deepToString());
-		/*
-		if (revokedIU.isUpcoming()){
-			if (revokedIU instanceof WordIU) {
-				SegmentIU seg = ((WordIU)revokedIU).getFirstSegment();
-				seg.getSameLevelLink().removeAllNextSameLevelLinks(); //FIXME: this is too eager, it would be much better to only remove seg from nextSLL!
-			} else {
-				throw new NotImplementedException("and now you're revoking an IU that I cannot handle.");
-			}
-		} else { // warn if revoke comes too late.
-			if (revokedIU.isOngoing()) 
-				logger.warn("SynthesisModule: so far, I'm unable to revoke ongoing IUs; sorry about that; check for our next release.");
-			else
-				logger.warn("SynthesisModule: you asked me to revoke a completed IU. I'm unable to change the past.");
-		} */
+		phrases.remove(phrase);
 	}
 
 	/** breaks the segment links between words so that crawling synthesis stops after the currently ongoing word */

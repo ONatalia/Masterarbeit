@@ -11,6 +11,7 @@ import inpro.audio.DispatchStream;
 import inpro.incremental.IUModule;
 import inpro.incremental.processor.SynthesisModule;
 import inpro.incremental.unit.EditMessage;
+import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.HesitationIU;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.PhraseIU;
@@ -134,6 +135,22 @@ public class SynthesisModuleUnitTest {
 		}
 	}
 	
+	/** test that it is possible to revoke phrases and to add other material afterwards */
+	@Test
+	public void testRevokeAndReplace() {
+		PhraseIU p1 = new PhraseIU("In diesem ziemlich langen Satz");
+		PhraseIU p2 = new PhraseIU("sollte man");
+		PhraseIU prevoked = new PhraseIU("dieses nicht");
+		PhraseIU p4 = new PhraseIU("nur dieses");
+		PhraseIU p5 = new PhraseIU("hören");
+		myIUModule.addIUAndUpdate(p1);
+		myIUModule.addIUAndUpdate(p2);
+		myIUModule.addIUAndUpdate(prevoked);
+		myIUModule.revokeIUAndUpdate(prevoked); // highly unlikely that p1 and p2 have already been completed
+		myIUModule.addIUAndUpdate(p4);
+		myIUModule.addIUAndUpdate(p5);
+	}
+	
 	/**
 	 * test en_US and en_GB
 	 */
@@ -156,8 +173,14 @@ public class SynthesisModuleUnitTest {
 	protected static class TestIUModule extends IUModule {
 		protected void leftBufferUpdate(Collection<? extends IU> ius, 
 				List<? extends EditMessage<? extends IU>> edits) { } // do nothing, this is only a source of IUs
+		
 		void addIUAndUpdate(IU iu) {
 			rightBuffer.addToBuffer(iu);
+			notifyListeners();
+		}
+		
+		void revokeIUAndUpdate(IU iu) {
+			rightBuffer.editBuffer(new EditMessage<IU>(EditType.REVOKE, iu));
 			notifyListeners();
 		}
 		
