@@ -1,6 +1,5 @@
 package inpro.incremental.processor;
 
-import inpro.apps.SimpleMonitor;
 import inpro.audio.DispatchStream;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
@@ -17,14 +16,11 @@ public class AdaptableSynthesisModule extends SynthesisModule {
 	
 	VocodingFramePostProcessor framePostProcessor = null;
 	
-	public AdaptableSynthesisModule() {
-		this(SimpleMonitor.setupDispatcher());
-	}
-	
+	/** call this to set up a synthesis module; you may use SimpleMonitor.setupDispatcher() for a default dispatcher */
 	public AdaptableSynthesisModule(DispatchStream ds) {
         super(ds);
     }
-	
+
 	@SuppressWarnings("unchecked")
 	public void pauseAfterOngoingWord() {
 		synchronized(currentInstallment) {

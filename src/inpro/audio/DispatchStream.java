@@ -211,6 +211,7 @@ public class DispatchStream extends InputStream implements Configurable {
 		//}
 	}
 	
+	/** clears any ongoing stream, as well as any queued streams */
 	public void clearStream() {
 		setStream(null);
 		setIsSilent();

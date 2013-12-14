@@ -15,13 +15,9 @@ import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Boolean;
 import edu.cmu.sphinx.util.props.S4String;
 
-
-
-
 /**
  * An IU left buffer that prints its contents to STDOUT.
  * The format used resembles wavesurfer label files 
- * 
  * @author timo
  */
 public class LabelWriter extends FrameAwarePushBuffer {
@@ -55,17 +51,10 @@ public class LabelWriter extends FrameAwarePushBuffer {
 
 	@Override
 	public void hypChange(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
-		
-		/*
-		 * Get the time first
-		 */
+		/* Get the time first */
 		String toOut = String.format(Locale.US, "Time: %.2f", 
 				currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
-		
-		
-		/*
-		 * Then go through all the IUs, ignoring commits 
-		 */
+		/* Then go through all the IUs, ignoring commits */
 		boolean added = false;
 		for (IU iu : ius) {
 			if (iu.isCommitted()) continue;
@@ -73,32 +62,25 @@ public class LabelWriter extends FrameAwarePushBuffer {
 			toOut += "\n" + iu.toLabelLine();
 		}
 		toOut += "\n\n";
-		
-		/*
-		 * If there were only commits, or if there are not IUs, then print out as specified
-		 */
+		/* If there were only commits, or if there are not IUs, then print out as specified */
 		if (ius.size() > 0 && added) { // && frameOutput != currentFrame) {
 			frameOutput = currentFrame;
-
 			if (writeToFile) {
 				try {
-				FileWriter writer = new FileWriter(filePath + "/" + fileName + ".inc_reco", true);
-				writer.write(toOut);
-				writer.close();
+					FileWriter writer = new FileWriter(filePath + "/" + fileName + ".inc_reco", true);
+					writer.write(toOut);
+					writer.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-			
 			if (writeToStdOut) {
 				System.out.println(toOut);
 			}
 		}
 	}
 	
-	/*
-	 * A file name can be specified here, if not specified in the config file
-	 */
+	/** A file name can be specified here, if not specified in the config file */
 	public void setFileName(String name) {
 		fileName = name;
 	}
