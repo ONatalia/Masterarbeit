@@ -11,7 +11,6 @@ import inpro.incremental.unit.PhraseIU;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class SynthesisModuleAdaptationUnitTest extends SynthesisModuleUnitTest {
