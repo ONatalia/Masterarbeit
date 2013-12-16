@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="demo/inpro/system/pento/|done/inpro/system/calendar/" kind="src" path="src"/>
-	<classpathentry kind="src" path="test"/>
+	<classpathentry excluding="work/inpro/alchemy/spatial/util/" kind="src" path="test"/>
 	<classpathentry kind="lib" path="lib/mary3/java-diff.jar"/>
 	<classpathentry kind="lib" path="lib/weka.jar"/>
 	<classpathentry kind="lib" path="lib/drej.jar"/>

@@ -26,7 +26,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	inpro.sphinx.frontend.MonitorTest.class,
 	inpro.synthesis.MaryAdapterIUUnitTest.class,
 	inpro.synthesis.MaryAdapterMbrolaUnitTest.class,   
-	work.inpro.alchemy.spatial.util.SpatialRandomUnitTest.class
+//	work.inpro.alchemy.spatial.util.SpatialRandomUnitTest.class
 	})
 public class AllTests {
 
