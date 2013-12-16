@@ -88,7 +88,7 @@ public class GreifarmExperiment implements DropListener {
 		}
 		
 		@Override
-		public synchronized void run() {
+		public void run() {
     		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
     		while(true) {
     			if (inRecoMode) {

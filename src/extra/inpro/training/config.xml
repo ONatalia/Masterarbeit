@@ -71,7 +71,7 @@
         </propertylist>
     </component>
 
-    <component name="currentHypothesis" type="inpro.incremental.processor.CurrentASRHypothesis">
+    <component name="currentHypothesis" type="inpro.incremental.source.CurrentASRHypothesis">
         <property name="recognizer" value="recognizer"/>
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
@@ -88,7 +88,7 @@
         <property name="smoothing" value="2"/>
     </component>
 
-    <component name="hypViewer" type="inpro.incremental.listener.CurrentHypothesisViewer">
+    <component name="hypViewer" type="inpro.incremental.sink.CurrentHypothesisViewer">
     	<property name="showWindow" value="false"/>
     </component>
 
