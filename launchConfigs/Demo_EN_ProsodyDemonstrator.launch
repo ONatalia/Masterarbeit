@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/Inpro/src/demo/inpro/synthesis/ProsodyDemonstrator.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="demo.inpro.synthesis.ProsodyDemonstrator"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Inpro"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dmary.base=/home/timo/uni/projekte/itts/openmary-4.3.0-svn -Dinpro.tts.demo.longUtt=&quot;This is a very long and at least somewhat complex utterance.&quot; -Dinpro.tts.voice=cmu-slt-hsmm -Dmary.voice=cmu-slt-hsmm -Dinpro.tts.language=en-US -da"/>
+<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:Inpro}/bin"/>
+</launchConfiguration>

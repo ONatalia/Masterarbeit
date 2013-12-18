@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/Inpro/src/done/inpro/system/carchase/CarChaseExperimenter.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="done.inpro.system.carchase.CarChaseExperimenter"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Inpro"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dinpro.tts.voice=bits1-hsmm -Dinpro.tts.language=de -Dmary.base=${maryBase} -ea"/>
+<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:Inpro/bin}"/>
+</launchConfiguration>
