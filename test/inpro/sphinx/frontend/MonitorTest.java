@@ -15,9 +15,9 @@ import edu.cmu.sphinx.frontend.util.StreamDataSource;
 
 public class MonitorTest {
 
-	@Test
+	@Test(timeout=60000)
 	public void test() throws UnsupportedAudioFileException, IOException {
-		URL audioURL = new URL("file:/home/timo/uni/projekte/inpro/res/DE_1234.wav");
+		URL audioURL = MonitorTest.class.getResource("DE_1234.wav");
 		AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);
 		StreamDataSource sds = new StreamDataSource(16000, 320, 16, false, true);
 		sds.initialize();
