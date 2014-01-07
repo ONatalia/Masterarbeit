@@ -27,7 +27,7 @@ import edu.cmu.sphinx.util.props.PropertyException;
  */
 public class CurrentASRHypothesisTest {
 
-	@Test
+	@Test(timeout=60000)
 	public void testRecognition() throws PropertyException, IOException, UnsupportedAudioFileException {
 		testConfiguration("-F", "file:res/DE_1234.wav"); // test with built-in SLM
 		testConfiguration("-F", "file:res/DE_1234.wav", "-gr", "file:src/demo/inpro/system/echodm/digits.gram"); // test a grammar

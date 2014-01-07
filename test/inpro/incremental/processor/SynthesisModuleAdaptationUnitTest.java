@@ -32,7 +32,7 @@ public class SynthesisModuleAdaptationUnitTest extends SynthesisModuleUnitTest {
 	/**
 	 * test that scaling works as expected (scaling error is within 10%)
 	 */
-	@Test
+	@Test(timeout=60000)
 	public void testScaleTempo() {
 		String textKurz = "eins zwei drei vier fünf";
 		// get the standard duration

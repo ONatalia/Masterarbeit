@@ -12,7 +12,7 @@ import org.junit.Test;
 
 public class HesitationIUTest {
 
-	@Test
+	@Test(timeout=60000)
 	public void test() {
 		MaryAdapter.getInstance();
 		DispatchStream dispatcher = SimpleMonitor.setupDispatcher();

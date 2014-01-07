@@ -41,7 +41,7 @@ public class SynthesisModulePauseStopUnitTest extends SynthesisModuleAdaptationU
 	 * (this test uses digits, which should not last much longer than 600 ms to say) 
 	 * in addition, assert that aborting something that has already ended does not fail
 	 */
-	@Test
+	@Test(timeout=60000)
 	public void testStopAfterOngoingWord() throws InterruptedException {
 		for (int initialDelay = 300; initialDelay < 4000; initialDelay += 300) {
 			startPhrase("eins zwei drei vier fünf sechs sieben acht neun zehn");
@@ -58,7 +58,7 @@ public class SynthesisModulePauseStopUnitTest extends SynthesisModuleAdaptationU
 	 * assert that aborting after the ongoing phoneme does not take longer than 250 ms 
 	 * in addition, assert that aborting something that has already ended does not fail
 	 */
-	@Test
+	@Test(timeout=60000)
 	public void testStopAfterOngoingPhoneme() throws InterruptedException {
 		for (int initialDelay = 300; initialDelay < 4000; initialDelay += 300) {
 			startPhrase("eins zwei drei vier fünf sechs sieben acht neun zehn");
@@ -74,7 +74,7 @@ public class SynthesisModulePauseStopUnitTest extends SynthesisModuleAdaptationU
 	/**
 	 * assert that stopping results in the underlying phraseIUs being, well, what?
 	 */
-	@Test
+	@Test(timeout=60000)
 	public void testPhraseIUProgressOnStop() throws InterruptedException {
 		int[] delay = { 100, 200, 1500, 2100, 3500 };
 		// we expect the first phrase to be ongoing for 300 and 700 ms, and to have completed after 2100 ms

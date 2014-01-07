@@ -51,7 +51,7 @@ public class SynthesisModuleUnitTest {
 	/**  
 	 * test the addition of a few phrases as specified in testList
 	 */
-	@Test
+	@Test(timeout=60000)
 	public void testLeftBufferUpdateWithSomeUtterances() {
 		for (String[] list : testList) {
 			for (String s : list) {
@@ -65,7 +65,7 @@ public class SynthesisModuleUnitTest {
 	/**
 	 * test pre-synthesis (mostly that it works, it will be hard to judge whether this is successful)
 	 */
-	@Test
+	@Test(timeout=60000)
 	public void testLeftBufferUpdateWithPreSynthesis() {
 		for (String[] list : testList) {
 			for (String s : list) {
@@ -81,7 +81,7 @@ public class SynthesisModuleUnitTest {
 	/**
 	 * test timing consecutivity(?) of PhraseIUs when pre-synthesis is used
 	 */
-	@Test
+	@Test(timeout=60000)
 	public void testPreSynthesisTiming() {
 		PhraseIU initialPhrase = new PhraseIU("Dies ist ein");
 		initialPhrase.preSynthesize();
@@ -98,7 +98,7 @@ public class SynthesisModuleUnitTest {
 	/**
 	 * test whether it's possible to add the next chunk only on update of the previous chunk
 	 */
-	@Test
+	@Test(timeout=60000)
 	public void testAddWordOnUpdate() throws InterruptedException {
         final Semaphore semaphore = new Semaphore(1);
 		for (String s : testList[0]) {
@@ -121,7 +121,7 @@ public class SynthesisModuleUnitTest {
 	/**
 	 * test hesitations by adding the content after a hesitations after increasing delays
 	 */
-	@Test 
+	@Test(timeout=60000)
 	public void testHesitations() throws InterruptedException {
 		String s1 = "Und dann";
 		String s2 = "weiter";
@@ -136,7 +136,7 @@ public class SynthesisModuleUnitTest {
 	}
 	
 	/** test that it is possible to revoke phrases and to add other material afterwards */
-	@Test
+	@Test(timeout=60000)
 	public void testRevokeAndReplace() {
 		PhraseIU p1 = new PhraseIU("In diesem ziemlich langen Satz");
 		PhraseIU p2 = new PhraseIU("sollte man");
@@ -154,7 +154,7 @@ public class SynthesisModuleUnitTest {
 	/**
 	 * test en_US and en_GB
 	 */
-	@Test
+	@Test(timeout=60000)
 	public void testInternationalisation() {
 		String voice = System.getProperty("inpro.tts.voice");
 		String language = System.getProperty("inpro.tts.language");
