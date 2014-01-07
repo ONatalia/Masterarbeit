@@ -12,6 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	inpro.annotation.AnnotationUtilUnitTest.class, 
 	inpro.annotation.LabelUnitTest.class, 
 	inpro.annotation.TextGridUnitTest.class, 
+	inpro.incremental.util.TTSUtilTest.class,
 	inpro.incremental.unit.HesitationIUTest.class,
 	inpro.incremental.processor.SynthesisModuleUnitTest.class,
 	inpro.incremental.processor.SynthesisModulePauseStopUnitTest.class,
