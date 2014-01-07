@@ -13,17 +13,22 @@
 
 <xsl:template match="mary:t">
  <xsl:element name="t">
-  <xsl:apply-templates select="text()" /> 
-  <xsl:element name="syllable">
-   <xsl:apply-templates />
-  </xsl:element>
+  <xsl:apply-templates />
+ </xsl:element>
+</xsl:template>
+
+<xsl:template match="mary:syllable">
+ <xsl:element name="syl">
+  <xsl:attribute name="accent"><xsl:value-of select="@accent" /></xsl:attribute>
+  <xsl:attribute name="stress"><xsl:value-of select="@stress" /></xsl:attribute>
+  <xsl:apply-templates />
  </xsl:element>
 </xsl:template>
 
 <xsl:template match="mary:boundary">
  <xsl:element name="t">
   <xsl:text>&lt;sil&gt;</xsl:text>
-  <xsl:element name="syllable">
+  <xsl:element name="syl">
    <xsl:element name="ph">
     <xsl:attribute name="d"><xsl:apply-templates select="@duration" /></xsl:attribute>
     <xsl:attribute name="p"><xsl:text>_</xsl:text></xsl:attribute>

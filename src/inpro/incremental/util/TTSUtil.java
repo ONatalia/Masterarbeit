@@ -2,6 +2,7 @@ package inpro.incremental.util;
 
 import inpro.annotation.Label;
 import inpro.incremental.unit.IU;
+import inpro.incremental.unit.SyllableIU;
 import inpro.incremental.unit.SysSegmentIU;
 import inpro.incremental.unit.WordIU;
 import inpro.synthesis.PitchMark;
@@ -21,7 +22,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.util.JAXBResult;
@@ -31,7 +31,9 @@ import javax.xml.transform.stream.StreamSource;
 
 import marytts.htsengine.HTSModel;
 
-
+/**
+ * utility functions to build IU sub-networks from MaryXML
+ */
 public class TTSUtil {
 	
 	public static List<WordIU> wordIUsFromMaryXML(InputStream is, List<HTSModel> hmms) {
@@ -56,7 +58,7 @@ public class TTSUtil {
 			te.printStackTrace();
 			throw new RuntimeException(te);
 		}
-		List<WordIU> words =  paragraph.getWordIUs(hmms.iterator());
+		List<WordIU> words =  paragraph.getWordIUs(hmms != null ? hmms.iterator() : null);
 		// remove utterance final silences
 		ListIterator<WordIU> fromEnd = words.listIterator(words.size());
 		while (fromEnd.hasPrevious()) {
@@ -72,7 +74,7 @@ public class TTSUtil {
 	}
 	
 	@XmlRootElement(name = "s")
-	private static class Paragraph {
+	static class Paragraph {
 		@XmlElement(name = "t")
 		private List<Word> words;
 
@@ -109,9 +111,8 @@ public class TTSUtil {
 		@XmlMixed
 		private List<String> tokenList;
 		private transient String token;
-		@XmlElementWrapper(name = "syllable")
-		@XmlElement(name = "ph")
-		private List<Segment> segments;
+		@XmlElement(name = "syl")
+		private List<Syllable> syllables;
 		
 		@SuppressWarnings("unused")
 		public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
@@ -132,15 +133,42 @@ public class TTSUtil {
 		}
 		
 		public boolean isEmpty() {
-			return segments == null || segments.isEmpty();
+			return syllables == null || syllables.isEmpty();
 		}
 		
 		@Override
 		public String toString() {
-			return "; " + token + "\n" + ((segments != null) ? segments.toString() : "");
+			return "; " + token + "\n" + ((syllables != null) ? syllables.toString() : "");
 		}
 		
 		public WordIU toIU(Iterator<HTSModel> hmmIterator) {
+			List<IU> syllableIUs = new ArrayList<IU>(syllables.size());
+			IU prev = null;
+			for (Syllable s : syllables) {
+				IU sIU = s.toIU(hmmIterator);
+				sIU.connectSLL(prev);
+				syllableIUs.add(sIU);
+				prev = sIU;
+			}
+			return new WordIU(token, null, syllableIUs);
+		}
+	}
+	
+	@XmlRootElement(name = "syl") 
+	private static class Syllable {
+		@XmlAttribute(name = "stress")
+		private String stress;
+		@XmlAttribute(name = "accent")		
+		private String accent;
+		@XmlElement(name = "ph")
+		private List<Segment> segments;
+		
+		@Override
+		public String toString() {
+			return "stress:" + stress + ", accent:" + accent + "\n" + segments.toString();
+		}
+
+		public SyllableIU toIU(Iterator<HTSModel> hmmIterator) {
 			List<IU> segmentIUs = new ArrayList<IU>(segments.size());
 			IU prev = null;
 			for (Segment s : segments) {
@@ -149,7 +177,7 @@ public class TTSUtil {
 				segmentIUs.add(sIU);
 				prev = sIU;
 			}
-			return new WordIU(token, null, segmentIUs);
+			return new SyllableIU(null, segmentIUs);
 		}
 	}
 	
@@ -227,26 +255,4 @@ public class TTSUtil {
 		return sb;
 	}
 	
-//	public static void main(String[] args) throws JAXBException, TransformerException {
-//		MaryAdapter ma = MaryAdapter.getInstance();
-//		//InputStream is = TTSUtil.class.getResourceAsStream("example.maryxml");
-//		//InputStream is = ma.text2maryxml("nordwind und sonne");
-//		String testUtterance = "Nimm bitte das rote Kreuz.";
-//		InputStream is = ma.text2maryxml(testUtterance);
-//
-//		JAXBContext context = JAXBContext.newInstance(Paragraph.class);
-//		JAXBResult result = new JAXBResult(context);
-//		TransformerFactory tf = TransformerFactory.newInstance();
-//		Transformer t = tf.newTransformer(new StreamSource(TTSUtil.class.getResourceAsStream("mary2simple.xsl")));
-//		t.transform(new StreamSource(is), result);
-//		
-//		Paragraph paragraph = (Paragraph) result.getResult(); //unmarshaller.unmarshal(is);
-//		System.err.println(paragraph.toString());
-//		Marshaller marshaller = context.createMarshaller();
-//		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-//		marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-//		marshaller.marshal(paragraph, System.out);
-//		System.out.println((new SysInstallmentIU(testUtterance)).deepToString());
-//	}
-
 }

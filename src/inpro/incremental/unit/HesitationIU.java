@@ -15,10 +15,10 @@ public class HesitationIU extends PhraseIU {
 		//}
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" }) // the cast for GRINs
+	@SuppressWarnings({ "unchecked", "rawtypes" }) // the casts for GRINs
 	public HesitationIU() {
 		super("<hes>", PhraseIU.PhraseType.NONFINAL);
-		this.groundedIn = (List) protoHesitation.getSegments();
+		this.groundedIn = (List) Collections.singletonList(new SyllableIU(null, (List) protoHesitation.getSegments()));
 		protoHesitation.scaleDeepCopyAndStartAtZero(1f); // create new IU substructure for the next protohesitation
 	}
 	
