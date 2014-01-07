@@ -157,11 +157,6 @@ public class SegmentIU extends IU {
 		return TYPE_MAPPING.get(this.l.getLabel());
 	}
 	
-	@SuppressWarnings("unused") 
-	public void appendMaryXML(StringBuilder sb) {
-		throw new UnsupportedOperationException("only SysSegmentIUs can be converted to MaryXML!");
-	}
-
 	public void shiftBy(double offset, boolean recurse) {
 		Label l = this.l;
 		this.l = new Label(l.getStart() + offset, l.getEnd() + offset, l.getLabel());

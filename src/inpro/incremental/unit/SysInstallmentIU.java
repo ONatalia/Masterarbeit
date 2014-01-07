@@ -108,15 +108,6 @@ public class SysInstallmentIU extends InstallmentIU {
         return new DDS16kAudioInputStream(vas);
 	}
 	
-	public String toMaryXML() {
-		StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<maryxml xmlns=\"http://mary.dfki.de/2002/MaryXML\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"0.5\" xml:lang=\"de\">\n<p>\n<s>\n<phrase>\n");
-		for (WordIU word : getWords()) {
-			word.appendMaryXML(sb);
-		}
-		sb.append("</phrase>\n</s>\n</p>\n</maryxml>");
-		return sb.toString();
-	}
-	
 	public String toMbrola() {
 		StringBuilder sb = new StringBuilder();
 		for (WordIU word : getWords()) {

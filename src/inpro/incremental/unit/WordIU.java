@@ -253,22 +253,6 @@ public class WordIU extends IU {
 		return sb;
 	}
 	
-	public void appendMaryXML(StringBuilder sb) {
-		if ("<sil>".equals(toPayLoad())) {
-			sb.append("<boundary duration='");
-			sb.append(duration());
-			sb.append("'/>\n");
-		} else { 
-			sb.append("<t>\n");
-			sb.append(toPayLoad().replace("<", "&lt;").replace(">", "&lt;"));
-			sb.append("\n<syllable>\n");
-			for (SegmentIU seg : getSegments()) {
-				seg.appendMaryXML(sb);
-			}
-			sb.append("</syllable>\n</t>\n");
-		}
-	}
-	
 	/** returns a new list with all silent words removed */
 	public static List<WordIU> removeSilentWords(List<WordIU> words) {
 		List<WordIU> outList = new ArrayList<WordIU>(words);
