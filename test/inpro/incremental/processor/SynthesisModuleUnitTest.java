@@ -98,9 +98,21 @@ public class SynthesisModuleUnitTest {
 	/**
 	 * test whether it's possible to add the next chunk only on update of the previous chunk
 	 */
-	@Test(timeout=60000)
+	@Test (timeout=120000)
 	public void testAddWordOnUpdate() throws InterruptedException {
-        final Semaphore semaphore = new Semaphore(1);
+		for (int lookahead = 0; lookahead < 10; lookahead++) {
+			synthesizeWithLookahead(lookahead);
+			dispatcher.waitUntilDone();
+			myIUModule.reset();
+		}
+	}
+	
+	/**
+	 * synthesize a number sequence, adding the next number with zero or more words of lookahead 
+	 * @param lookahead lookahead parameter (0..inf)
+	 */
+	private void synthesizeWithLookahead(int lookahead) throws InterruptedException {
+        final Semaphore semaphore = new Semaphore(lookahead);
 		for (String s : testList[0]) {
 			PhraseIU phrase = new PhraseIU(s);
 			phrase.addUpdateListener(new IUUpdateListener() {
@@ -108,9 +120,9 @@ public class SynthesisModuleUnitTest {
 				@Override
 				public void update(IU updatedIU) {
 					counter++;
+					System.err.println("notified of " + updatedIU.getProgress() + " in " + updatedIU.toPayLoad() + " counter: " + counter);
 					if (counter == 1)
 						semaphore.release();
-					System.err.println("notified of " + updatedIU.getProgress() + " in " + updatedIU.toPayLoad() + " counter: " + counter);
 				}
             });
 			myIUModule.addIUAndUpdate(phrase);
