@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import rsb.Event;
 import rsb.Handler;
 import adapter.Listener;
@@ -18,6 +20,8 @@ import inpro.incremental.unit.IU;
 
 public class VeniceListenerModule extends IUModule implements Handler {
 
+	static Logger log = Logger.getLogger(VeniceListenerModule.class.getName());
+	
  	@S4String(defaultValue = "")
 	public final static String ID_PROP = "id";	
  	
@@ -39,7 +43,7 @@ public class VeniceListenerModule extends IUModule implements Handler {
 		String scope = ps.getString(VeniceListenerModule.SCOPE_PROP);
 		String id = ps.getString(VeniceListenerModule.ID_PROP);
 		String fullScope = makeScope(scope,id);
-		System.out.println("Listening on scope: " + fullScope);
+		logger.info("Listening on scope: " + fullScope);
 		listener = new Listener<String>(this, fullScope);
 		this.setID(ps.getString(ID_PROP));
 	}
@@ -57,7 +61,7 @@ public class VeniceListenerModule extends IUModule implements Handler {
 
 	@Override
 	public void internalNotify(Event e) {
-		//example e.getScope(): /dsg/kinect/ 
+		//example e.getScope(): /dsg/kinect
 		//example e.getData():  TR
 		process(e.getData().toString());
 		
@@ -103,7 +107,7 @@ public class VeniceListenerModule extends IUModule implements Handler {
 	}
 
 	public VeniceListenerModule() {
-		this("generic");
+		this("VeniceListenerModule");
 	}
 	
 	public VeniceListenerModule(String type) {

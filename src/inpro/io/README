@@ -1,0 +1,15 @@
+Note:
+
+Informer scopes should not end with a /
+whereas
+Listener scopes should end with a /
+
+Example config:
+
+   <component name="listener" type="inpro.io.VeniceListenerModule">
+        <property name="id" value="listener"/>
+        <property name="scope" value="${baseScope}"/>
+	    <propertylist name="hypChangeListeners">
+	    	<item>informer</item>    
+	    </propertylist>
+    </component>
