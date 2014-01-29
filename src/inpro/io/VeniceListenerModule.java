@@ -32,16 +32,14 @@ public class VeniceListenerModule extends IUModule implements Handler {
 
 	private SensorIU prevIU;
 	
-	int currentFrame = 0;
- 	
 	private String id;
 	Listener<String> listener;
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
-		String scope = ps.getString(VeniceListenerModule.SCOPE_PROP);
-		String id = ps.getString(VeniceListenerModule.ID_PROP);
+		String scope = ps.getString(SCOPE_PROP);
+		String id = ps.getString(ID_PROP);
 		String fullScope = makeScope(scope,id);
 		logger.info("Listening on scope: " + fullScope);
 		listener = new Listener<String>(this, fullScope);
@@ -56,13 +54,13 @@ public class VeniceListenerModule extends IUModule implements Handler {
 	 * (non-Javadoc)
 	 * @see rsb.Handler#internalNotify(rsb.Event)
 	 * 
-	 * It is assumed that end events happen before start events
 	 */
 
 	@Override
 	public void internalNotify(Event e) {
 		//example e.getScope(): /dsg/kinect
 		//example e.getData():  TR
+		System.out.println("got new data " + e.getData().toString());
 		process(e.getData().toString());
 		
 	}
@@ -92,7 +90,6 @@ public class VeniceListenerModule extends IUModule implements Handler {
 				}
 			}
 		}
-		
 	}	
 	
 	public ArrayList<String> parseScopedString(String line) {

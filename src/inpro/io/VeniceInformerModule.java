@@ -29,8 +29,8 @@ public class VeniceInformerModule extends IUModule {
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
-		String scope = ps.getString(VeniceListenerModule.SCOPE_PROP);
-		String id = ps.getString(VeniceListenerModule.ID_PROP);
+		String scope = ps.getString(SCOPE_PROP);
+		String id = ps.getString(ID_PROP);
 		String fullScope = makeScope(scope,id);
 		logger.info("Informing on scope: " + fullScope);
 		informer = new Informer<String>(fullScope);
