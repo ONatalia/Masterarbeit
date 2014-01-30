@@ -1,11 +1,23 @@
 Note:
 
+-------------------------------
+		VENICE
+-------------------------------
 Informer scopes should not end with a /
 whereas
 Listener scopes should end with a /
 
-Example config:
 
+
+
+
+-------------------------------
+		EXAMPLES
+-------------------------------	
+Example configs:
+
+
+	<!-- Venice listener -->
    <component name="listener" type="inpro.io.VeniceListenerModule">
         <property name="id" value="listener"/>
         <property name="scope" value="${baseScope}"/>
@@ -13,3 +25,33 @@ Example config:
 	    	<item>informer</item>    
 	    </propertylist>
     </component>
+    
+    <!-- Venice informer -->
+     <component name="informer" type="inpro.io.VeniceInformerModule">
+        <property name="id" value="informer"/>
+        <property name="scope" value="${baseScope}"/>
+	    <propertylist name="hypChangeListeners">
+	    </propertylist>
+    </component>
+    
+    <!-- InstantIO listener -->
+    <component name="instantIOlistener" type="inpro.io.InstantIOListenerModule">
+        <property name="inslot" value="replayer/VeniceHub/OpenDS/Trigger/triggered"/>
+	    <propertylist name="hypChangeListeners">
+	    </propertylist>
+    </component>
+    
+    <!-- InstantIO informer -->
+    <component name="instantIoInformer" type="inpro.io.InstantIOInformerModule">
+        <property name="outslot" value="QA"/>
+        <property name="namespace" value="Comprehension"/>
+	    <propertylist name="hypChangeListeners">
+	    </propertylist>
+    </component>
+    
+    
+    
+    
+    
+    
+    

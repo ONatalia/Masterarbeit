@@ -25,7 +25,10 @@ public class InstantIOInformer {
 		return instance;
 	}
 	
-	public InstantIOInformer() {
+	/*
+	 * Constructor should be private; access via the getInstance() singleton
+	 */
+	private InstantIOInformer() {
 		namespaceMaps = new HashMap<String,Namespace>();
 		irNetworkNode = new NetworkNode();
 		this.setPrefix("InproTK");
