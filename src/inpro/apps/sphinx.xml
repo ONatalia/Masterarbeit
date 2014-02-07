@@ -184,6 +184,7 @@
         <property name="dictionary" value="dictionary"/>
         <property name="addSilenceWords" value="true"/>
         <property name="addFillerWords" value="false"/>
+        <property name="logMath" value="logMath"/>
     </component>
 
     <component name="ngramGrammar" type="edu.cmu.sphinx.linguist.language.grammar.LMGrammar">

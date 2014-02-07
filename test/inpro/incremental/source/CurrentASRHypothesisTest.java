@@ -28,9 +28,22 @@ import edu.cmu.sphinx.util.props.PropertyException;
 public class CurrentASRHypothesisTest {
 
 	@Test(timeout=60000)
-	public void testRecognition() throws PropertyException, IOException, UnsupportedAudioFileException {
+	public void testBuiltInSLM()  throws PropertyException, IOException, UnsupportedAudioFileException {
 		testConfiguration("-F", "file:res/DE_1234.wav"); // test with built-in SLM
+	}
+	
+	@Test(timeout=60000)
+	public void testGrammar()  throws PropertyException, IOException, UnsupportedAudioFileException {
 		testConfiguration("-F", "file:res/DE_1234.wav", "-gr", "file:src/demo/inpro/system/echodm/digits.gram"); // test a grammar
+	}
+	
+	@Test(timeout=60000)
+	public void testForcedAlignment()  throws PropertyException, IOException, UnsupportedAudioFileException {
+		testConfiguration("-F", "file:res/DE_1234.wav", "-fa", "eins zwei drei vier"); // test forced-alignment
+	}
+	
+	@Test(timeout=60000)
+	public void testIncrementalOutput() throws PropertyException, IOException, UnsupportedAudioFileException {
 		testConfiguration("-F", "file:res/DE_1234.wav", "-Is", "7"); // test smoothing with a common value  
 		testConfiguration("-F", "file:res/DE_1234.wav", "-If", "7"); // test right-context with a common value  
 		testConfiguration("-F", "file:res/DE_1234.wav", "-N"); // test without partial results  
