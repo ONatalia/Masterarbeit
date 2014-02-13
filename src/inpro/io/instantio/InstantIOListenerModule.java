@@ -1,4 +1,4 @@
-package inpro.io;
+package inpro.io.instantio;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,6 +8,7 @@ import inpro.incremental.IUModule;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
+import inpro.io.SensorIU;
 
 import org.apache.log4j.Logger;
 import org.instantreality.InstantIO.InSlot;

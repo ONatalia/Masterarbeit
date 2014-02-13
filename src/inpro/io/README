@@ -9,12 +9,32 @@ Listener scopes should end with a /
 
 
 
+-------------------------------
+	Google Web Speech
+-------------------------------
+
+--how to get a secret key
+--language codes	
+
+
+
 
 
 -------------------------------
 		EXAMPLES
 -------------------------------	
 Example configs:
+
+	<!-- Google Web Speech -->
+     <component name="webSpeech" type="inpro.io.webspeech.WebSpeech">
+        <property name="lang" value="de-de"/>
+        <property name="secretKey" value=" !!! INSERT YOUR SECRET KEY HERE !!!"/>
+        <property name="maxAlternatives" value="25"/>
+        <property name="interimResults" value="true"/>
+        <property name="continuous" value="true"/>
+	    <propertylist name="hypChangeListeners">
+	    </propertylist>
+    </component>
 
 
 	<!-- Venice listener -->

@@ -1,4 +1,4 @@
-package inpro.io;
+package inpro.io.instantio;
 
 import java.util.Collection;
 import java.util.List;

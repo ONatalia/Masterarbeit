@@ -1,4 +1,4 @@
-package inpro.io;
+package inpro.io.instantio;
 
 
 import org.apache.log4j.Logger;
