@@ -13,11 +13,16 @@ Listener scopes should end with a /
 	Google Web Speech
 -------------------------------
 
---how to get a secret key
---language codes	
+To use the Google Web Speech, you need to install Chrome or Choromium browser. 
 
+After starting InproTK with WebSpeech as an IUModule, you can open localhost:8080/dialog
+and you should get a mic interface, asking for permission to access your mic. Click allow, 
+then click start to begin streaming the audio (it may ask for permission again). You can
+change your mic settings by clicking on the video/mic image on the right-hand side of the 
+address bar. 
 
-
+Language codes can be found at the following URL: http://www.science.co.il/language/locale-codes.asp
+Some common ones: de-de, en_uk, en_us, ja
 
 
 -------------------------------
@@ -28,7 +33,6 @@ Example configs:
 	<!-- Google Web Speech -->
      <component name="webSpeech" type="inpro.io.webspeech.WebSpeech">
         <property name="lang" value="de-de"/>
-        <property name="secretKey" value=" !!! INSERT YOUR SECRET KEY HERE !!!"/>
         <property name="maxAlternatives" value="25"/>
         <property name="interimResults" value="true"/>
         <property name="continuous" value="true"/>

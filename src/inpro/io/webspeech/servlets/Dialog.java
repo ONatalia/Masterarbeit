@@ -22,8 +22,6 @@ import edu.cmu.sphinx.util.props.PropertySheet;
 public class Dialog extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-	
-	private String secretKey;
 	private String lang;
 	private int maxAlternatives;
 	private boolean interimResults;
@@ -35,7 +33,6 @@ public class Dialog extends HttpServlet {
      */
     public Dialog(PropertySheet ps) {
         super();
-        setSecretKey(ps.getString(WebSpeech.SECRET_KEY));
         setLang(ps.getString(WebSpeech.LANG));
         setMaxAlternatives(ps.getInt(WebSpeech.MAX_ALTERNATIVES));
         setInterimResults(ps.getBoolean(WebSpeech.INTERIM_RESULTS));
@@ -50,7 +47,7 @@ public class Dialog extends HttpServlet {
 		//this is used to set the initial session variables
 		HttpSession session = request.getSession();
 		session.setAttribute("timeout", 86400*30); // thirty days
-		session.setAttribute("secret_key", this.getSecretKey());
+		session.setAttribute("secret_key", "inprotk");
 		//session.setAttribute("utterance_key", 0);
 		session.setAttribute("csrf_token", UUID.randomUUID().toString());
 		//then redirect to index.html via the web.xml mappings (default goes to index.html)
@@ -70,14 +67,6 @@ public class Dialog extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
-	}
-
-	public String getSecretKey() {
-		return secretKey;
-	}
-
-	public void setSecretKey(String secretKey) {
-		this.secretKey = secretKey;
 	}
 
 	public String getLang() {

@@ -47,9 +47,6 @@ public class WebSpeech extends IUModule {
 	@S4String(defaultValue = "en-UK")
 	public final static String LANG = "lang";
 	
-	@S4String(defaultValue = "")
-	public final static String SECRET_KEY = "secretKey";
-	
 	@S4Integer(defaultValue = 25)
 	public final static String MAX_ALTERNATIVES = "maxAlternatives";
 	
