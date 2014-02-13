@@ -1,5 +1,9 @@
 package inpro.io.webspeech.model;
 
+import java.util.LinkedList;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
+
 public class AsrHyp {
 	
 	private boolean isFinal;
@@ -19,6 +23,10 @@ public class AsrHyp {
 
 	public void setConfidence(double confidence) {
 		this.confidence = confidence;
+	}
+	
+	public LinkedList<String> getWords() {
+		return new LinkedList<String>(Arrays.asList(this.getHyp().split("\\s+")));
 	}
 
 	public String getHyp() {

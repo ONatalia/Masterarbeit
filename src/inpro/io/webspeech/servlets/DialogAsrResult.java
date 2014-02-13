@@ -1,5 +1,8 @@
 package inpro.io.webspeech.servlets;
 
+import inpro.incremental.unit.EditMessage;
+import inpro.incremental.unit.WordIU;
+import inpro.io.webspeech.WebSpeech;
 import inpro.io.webspeech.model.AsrHyp;
 
 import java.io.BufferedReader;
@@ -29,11 +32,15 @@ import org.json.simple.parser.ParseException;
 public class DialogAsrResult extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
+	
+	protected WebSpeech webSpeech;
     /**
+     * @param webSpeech 
      * @see HttpServlet#HttpServlet()
      */
-    public DialogAsrResult() {
+    public DialogAsrResult(WebSpeech webSpeech) {
         super();
+        this.webSpeech = webSpeech;
     }
 
 	/**
@@ -114,19 +121,12 @@ public class DialogAsrResult extends HttpServlet {
           }
           
 //        this is where you would send the results along to something else
-          System.out.println(asrHyps); 
-          System.out.println();
-          
-          // we dont want a full hyp, rather a diff of the previous
-          // what about partial words? if I say "testing" it sends "test" then "testing" but the diff would just be ing, 
-          // what really needs to happen is test is revoked and replaced. 
-          // also, I can't tell the order, if something has been bumped up or down....
+          webSpeech.setRightBuffer(asrHyps);
+        
         }
         catch(ParseException pe){
           System.out.println(pe);
         }
-
-//    	request.getRequestDispatcher("dialog.jsp").forward(request, response);
 	}
 
 	/**
