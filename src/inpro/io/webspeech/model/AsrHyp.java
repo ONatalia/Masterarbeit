@@ -2,6 +2,7 @@ package inpro.io.webspeech.model;
 
 import java.util.LinkedList;
 
+
 import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class AsrHyp {
@@ -30,7 +31,7 @@ public class AsrHyp {
 	}
 
 	public String getHyp() {
-		return hyp;
+		return hyp.toLowerCase();
 	}
 
 	public void setHyp(String hyp) {
