@@ -1,3 +1,35 @@
+This will describe three ways to get data into and out of InproTK: XmlRpc, RSB (using Venice), and InstantIO. At the moment,
+only strings can be sent via these methods, but in the future RSB/Venice could send custom protbuf objects.
+
+
+Questions or comments, please contact Casey Kennington at ckennington@cit-ec.uni-bielefeld.de
+
+-------------------------------
+		XMLRPC
+-------------------------------
+XmlRpc is probably the easiest way to get external data into InproTK (short of using files). To get data into 
+InproTK, your code needs to be an XmlRpc client that connects to a server on localhost:9050 (or specified port).
+Your client needs to send data to the handle you specify in the config (default=inprotk) and the method is push(String). 
+
+For example, to push data from a Python client to the InproTK XmlRpcListenerModule, and you set handle=myhandle, you
+would execute the following:
+
+server = xmlrpclib.ServerProxy("http://localhost:9050")
+server.handle.push("data")
+
+In order to get data out of InproTK via XmlRpc, you need to set up a server on the handle you specify, and it needs 
+to have a push method. Basic python example:
+
+server = SimpleXMLRPCServer("localhost", 9050)
+def push(string):
+	print string
+server.register_function(push)
+server.serve_forever()
+
+Note that the XmlRpcListenerModule sets up an XmlRpc server, and the XmlRpcInformerModule is an XmlRpc client, so the 
+informer can send data to a server specified in the config file (i.e., localhost or a remote server). 
+
+
 -------------------------------
 		VENICE/RSB
 -------------------------------
@@ -11,10 +43,37 @@ on that scope. For example, if you make an informer on scope /base/scope/ and se
 the data via /base/scope/new_data which will be received by any and all listeners that listen on the
 /base/scope/ scope. See example configs below.
 
+To get data into InproTK, you need a VeniceListenerModule, and you need to make an informer that sends stuff to the
+specified scope (you could use Venice which wraps RSB for that). E.g., in python:
+
+from adapter.Informer import Informer
+informer = Informer("/my/scope/")
+informer.send("data")
+
+Where the scope is the same as the scope in the config for the VeniceListenerModule in InproTK (example config below). 
+Getting data out of InproTK is reverse; use the VeniceInformerModule and it will send data put onto its left buffer
+to whatever scope is specified in the config file. Your python code would receive that data (example, using Venice):
+
+from adapter.Listener import Listener
+def printMessage(event):
+    print str(event.data)
+listener = Listener(printMessage)
+while True:
+    time.sleep(1)
+
 Notes:
-Informer scopes should not end with a /
+Informer scopes should NOT end with a /
 whereas
 Listener scopes should end with a /
+
+
+Finally, RSB/Venice requires a properties file which specifies the type of transport and which server to connect to. 
+The file name should be dsg.properties, and should have at least the two following lines:
+rsb.host = localhost
+transport = socket
+
+Note that if you don't use Venice, you need to set the rsb.conf file yourself. Venice uses these properties to generate
+the rsb.conf file. 
 
 -------------------------------
 		InstantIO
@@ -43,9 +102,8 @@ Some common ones: de-de, en_uk, en_us, ja
 
 
 -------------------------------
-		EXAMPLES
+	  EXAMPLE CONFIGS
 -------------------------------	
-Example configs:
 
 	<!-- Google Web Speech -->
      <component name="webSpeech" type="inpro.io.webspeech.WebSpeech">
@@ -86,6 +144,24 @@ Example configs:
     <component name="instantIoInformer" type="inpro.io.InstantIOInformerModule">
         <property name="outslot" value="QA"/>
         <property name="namespace" value="Comprehension"/>
+	    <propertylist name="hypChangeListeners">
+	    </propertylist>
+    </component>
+    
+    <!-- XmlRpc Informer -->
+ 	<component name="rpcinformer" type="inpro.io.xmlrpc.XmlRpcInformerModule">
+    	<property name="host" value="http://localhost" />
+    	<property name="port" value="9050" />
+    	<property name="handler" value="inprotk" />
+	    <propertylist name="hypChangeListeners">
+	    	<item>rpclistener</item>
+	    </propertylist>
+    </component>
+
+	<!-- XmlRpc Listener -->    
+    <component name="rpclistener" type="inpro.io.xmlrpc.XmlRpcListenerModule">
+    	<property name="handler" value="inprotk" />
+    	<property name="port" value="9050" />
 	    <propertylist name="hypChangeListeners">
 	    </propertylist>
     </component>
