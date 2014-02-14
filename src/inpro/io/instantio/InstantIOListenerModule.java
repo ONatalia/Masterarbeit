@@ -17,6 +17,10 @@ import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4String;
 
+/**
+ * @author casey
+ *
+ */
 public class InstantIOListenerModule extends IUModule implements InSlot.Listener {
 	
 	static Logger log = Logger.getLogger(InstantIOListenerModule.class.getName());
@@ -46,6 +50,12 @@ public class InstantIOListenerModule extends IUModule implements InSlot.Listener
 		log.warn("This module does not accept anything on the left buffer.");
 	}
 
+	/* (non-Javadoc)
+	 * @see org.instantreality.InstantIO.InSlot.Listener#newData(org.instantreality.InstantIO.InSlot)
+	 * 
+	 * Anything received on the InstantIO network on the namespace for this object is sent through this method.
+	 * 
+	 */
 	@Override
 	public void newData(InSlot data) {
 		try {
@@ -57,6 +67,11 @@ public class InstantIOListenerModule extends IUModule implements InSlot.Listener
 		
 	}
 
+	/**
+	 * Processes the data received from the InstantIO network on the specific namespace.
+	 * 
+	 * @param data which is the String received from the InstantIO network.
+	 */
 	private void process(String data) {
 		edits = new ArrayList<EditMessage<SensorIU>>();
 		//create an incremental unit and put it onto the right buffer
@@ -68,8 +83,6 @@ public class InstantIOListenerModule extends IUModule implements InSlot.Listener
 		rightBuffer.setBuffer(edits);
 		super.notifyListeners();		
 	}
-	
-	
 
 	@Override
 	public void startInSlot(InSlot arg0) {
@@ -81,10 +94,18 @@ public class InstantIOListenerModule extends IUModule implements InSlot.Listener
 		
 	}
 
+	/**
+	 * @return String, the ID is the namespace ID, it is also copied into the SensorIU so one knows the source. 
+	 */
 	public String getID() {
 		return id;
 	}
 
+	/**
+	 * One can set the ID here. See getID() for other comments. 
+	 * 
+	 * @param id
+	 */
 	public void setID(String id) {
 		this.id = id;
 	}

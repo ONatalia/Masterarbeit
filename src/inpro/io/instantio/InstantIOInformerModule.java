@@ -14,6 +14,10 @@ import inpro.incremental.IUModule;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 
+/**
+ * @author casey
+ *
+ */
 public class InstantIOInformerModule extends IUModule {
 
 	static Logger log = Logger.getLogger(InstantIOInformerModule.class.getName());
@@ -37,6 +41,9 @@ public class InstantIOInformerModule extends IUModule {
 	
  	
  	
+	/* (non-Javadoc)
+	 * @see inpro.incremental.IUModule#newProperties(edu.cmu.sphinx.util.props.PropertySheet)
+	 */
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
@@ -46,6 +53,7 @@ public class InstantIOInformerModule extends IUModule {
 		String servers = ps.getString(SERVERS_PROP);
 		String outslot = ps.getString(OUTSLOT_PROP);
 		String namespace = ps.getString(NAMESPACE_PROP);
+//		set up the InstantIO server
 		InstantIOInformer instance = InstantIOInformer.getInstance();
 		instance.setPort(port);
 		instance.setPrefix(prefix);
@@ -54,12 +62,18 @@ public class InstantIOInformerModule extends IUModule {
 		outSlot = instance.addOutSlot(outslot, namespace);
 	}
 	
+	/* (non-Javadoc)
+	 * @see inpro.incremental.IUModule#leftBufferUpdate(java.util.Collection, java.util.List)
+	 * 
+	 * The left buffer just takes whatever comes onto the left buffer and pushes it to the 
+	 * defined outslot.
+	 * 
+	 */
 	@Override
 	protected void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		
 		for (EditMessage<? extends IU> edit : edits) {
-			System.out.println("sending instantio data " + edit.getIU().toPayLoad());
 			outSlot.push(edit.getIU().toPayLoad());
 		}
 		
