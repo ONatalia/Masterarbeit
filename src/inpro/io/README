@@ -1,12 +1,29 @@
-Note:
+-------------------------------
+		VENICE/RSB
+-------------------------------
 
--------------------------------
-		VENICE
--------------------------------
+First, you need to install RSB. Instructions here: http://docs.cor-lab.org/rsb-manual/trunk/html/install.html
+specifically, for Java: http://docs.cor-lab.org/rsb-manual/trunk/html/install-java.html
+which includes installing the RSC and RSBProtocol and RSBJava.
+
+RSB allows you to set a scope (e.g., /base/scope/) and set listeners and informers to receive and send information
+on that scope. For example, if you make an informer on scope /base/scope/ and send a string "new_data" it will send
+the data via /base/scope/new_data which will be received by any and all listeners that listen on the
+/base/scope/ scope. See example configs below.
+
+Notes:
 Informer scopes should not end with a /
 whereas
 Listener scopes should end with a /
 
+-------------------------------
+		InstantIO
+-------------------------------	
+InstantIO is a framework of information passing in order to receive data into a virtual
+world. There isn't any extra software that needs to be installed; but the instantio jar needs
+to be in the classpath. 
+
+http://doc.instantreality.org/apidocs/instantio/ 
 
 
 -------------------------------
@@ -72,10 +89,4 @@ Example configs:
 	    <propertylist name="hypChangeListeners">
 	    </propertylist>
     </component>
-    
-    
-    
-    
-    
-    
     

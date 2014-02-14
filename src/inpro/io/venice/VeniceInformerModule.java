@@ -13,8 +13,12 @@ import inpro.incremental.IUModule;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 
+/**
+ * @author casey
+ *
+ */
 public class VeniceInformerModule extends IUModule {
-
+	
 	static Logger log = Logger.getLogger(VeniceInformerModule.class.getName());
 	
  	@S4String(defaultValue = "")
@@ -33,6 +37,7 @@ public class VeniceInformerModule extends IUModule {
 		String id = ps.getString(ID_PROP);
 		String fullScope = makeScope(scope,id);
 		logger.info("Informing on scope: " + fullScope);
+//		this Informer comes from the DSG venice wrapper over RSB. 
 		informer = new Informer<String>(fullScope);
 		this.setID(ps.getString(ID_PROP));
 	}
@@ -49,24 +54,27 @@ public class VeniceInformerModule extends IUModule {
 		
 	}
 	
+	/**
+	 * @param scope
+	 * @param id
+	 * @return scope used for RSB/venice
+	 */
 	private String makeScope(String scope, String id) {
 		return "/" + scope + "/" + id;
 	}
 	
-	public VeniceInformerModule() {
-		this("VeniceInformerModule");
-	}
-	
-	public VeniceInformerModule(String type) {
-		this.setID(type);
-	}
-
+	/**
+	 * @return id of the scope / module, not really used in the informer module
+	 */
 	public String getID() {
 		return id;
 	}
 
-	public void setID(String type) {
-		this.id = type;
+	/**
+	 * @param id set the id of the scope / module
+	 */
+	public void setID(String id) {
+		this.id = id;
 	}
 
 

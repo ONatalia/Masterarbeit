@@ -27,7 +27,10 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import com.sun.media.sound.WaveFileWriter;
 
 /**
- * Servlet implementation class DialogRecording
+ * Record the wav file as recorded from the mic
+ * 
+ * @author casey
+ *
  */
 @WebServlet("/DialogRecording")
 @MultipartConfig
@@ -55,7 +58,7 @@ public class DialogRecording extends HttpServlet {
 //		need to make sure it can append the file that has already started
 		long unixTime = System.currentTimeMillis() / 1000L;
 		String path = "wavs/" + csrf + ".wav";
-		FileOutputStream out = new FileOutputStream(new File(path), true);
+		FileOutputStream out = new FileOutputStream(new File(path), true); // when the second param is true, it appends to the end of the file
 		byte[] buf = new byte[1024];
 		int len;
 		while ((len = in.read(buf)) > 0) {
@@ -67,6 +70,13 @@ public class DialogRecording extends HttpServlet {
 	}
 		
 	
+	/**
+	 * Gets the value from a multipart data stream, only works for variables that have strings as values. 
+	 * 
+	 * @param part Part object
+	 * @return String value
+	 * @throws IOException
+	 */
 	private String getValue(Part part) throws IOException {
 	    BufferedReader reader = new BufferedReader(new InputStreamReader(part.getInputStream(), "UTF-8"));
 	    StringBuilder value = new StringBuilder();
@@ -81,7 +91,7 @@ public class DialogRecording extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// uncomment the line below when you want to use this "feature"
+		// uncomment the line below when you want to use this "feature" 
 		
 		//doGet(request, response);
 	}

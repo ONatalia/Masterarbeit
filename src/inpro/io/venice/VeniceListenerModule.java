@@ -19,6 +19,10 @@ import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
 import inpro.io.SensorIU;
 
+/**
+ * @author casey
+ *
+ */
 public class VeniceListenerModule extends IUModule implements Handler {
 
 	static Logger log = Logger.getLogger(VeniceListenerModule.class.getName());
@@ -43,6 +47,7 @@ public class VeniceListenerModule extends IUModule implements Handler {
 		String id = ps.getString(ID_PROP);
 		String fullScope = makeScope(scope,id);
 		logger.info("Listening on scope: " + fullScope);
+//		listener from the venice wrapper for RSB
 		listener = new Listener<String>(this, fullScope);
 		this.setID(ps.getString(ID_PROP));
 	}
@@ -51,21 +56,23 @@ public class VeniceListenerModule extends IUModule implements Handler {
 		return "/" + scope + "/" + id;
 	}
 	
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see rsb.Handler#internalNotify(rsb.Event)
+	 * This method is called from RSB/venice when new data is received on a specified scope.
 	 * 
 	 */
-
 	@Override
 	public void internalNotify(Event e) {
 		//example e.getScope(): /dsg/kinect
 		//example e.getData():  TR
-		System.out.println("got new data " + e.getData().toString());
 		process(e.getData().toString());
-		
 	}
 	
+	/**
+	 * Take the data from the scope, put it into a SensorIU, and put it onto the right buffer.
+	 * 
+	 * @param data data to be put onto the right buffer
+	 */
 	private void process(String data) {
 			edits = new ArrayList<EditMessage<SensorIU>>();
 			//create an incremental unit and put it onto the right buffer
@@ -77,8 +84,6 @@ public class VeniceListenerModule extends IUModule implements Handler {
 			rightBuffer.setBuffer(edits);
 			super.notifyListeners();
 	}
-	
-
 	
 	@Override
 	protected void leftBufferUpdate(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
@@ -93,6 +98,12 @@ public class VeniceListenerModule extends IUModule implements Handler {
 		}
 	}	
 	
+	/**
+	 * Take data from the scope and split it up into an ArrayList
+	 * 
+	 * @param line
+	 * @return list of data from the scope
+	 */
 	public ArrayList<String> parseScopedString(String line) {
 		
 		//sometimes it has slashes at the beginning and end
@@ -104,20 +115,21 @@ public class VeniceListenerModule extends IUModule implements Handler {
 		return splitString;
 	}
 
-	public VeniceListenerModule() {
-		this("VeniceListenerModule");
-	}
-	
-	public VeniceListenerModule(String type) {
-		this.setID(type);
-	}
-
+	/**
+	 * @return id of the module, this tells the SensorIU where the data came from
+	 */
 	public String getID() {
 		return id;
 	}
 
-	public void setID(String type) {
-		this.id = type;
+	
+	/**
+	 * Sets the id of the module.
+	 * 
+	 * @param id
+	 */
+	public void setID(String id) {
+		this.id = id;
 	}
 
 

@@ -1,6 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=US-ASCII"
     pageEncoding="US-ASCII"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- 
+Most of this was written by Matt Henderson, with edits by Casey Kennington to connect to Tomcat and InproTK
+
+
+ -->
+ 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
     <head> 
         <meta http-equiv="content-type" content="text/html;charset=UTF-8" /> 

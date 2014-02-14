@@ -1,7 +1,5 @@
 package inpro.io.webspeech.servlets;
 
-import inpro.incremental.unit.EditMessage;
-import inpro.incremental.unit.WordIU;
 import inpro.io.webspeech.WebSpeech;
 import inpro.io.webspeech.model.AsrHyp;
 
@@ -21,16 +19,20 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.json.simple.parser.ContainerFactory;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * Servlet implementation class DialogueAsrResult
+ * @author casey
+ *
  */
 @WebServlet("/DialogAsrResult")
 public class DialogAsrResult extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	static Logger log = Logger.getLogger(DialogAsrResult.class.getName());
        
 	
 	protected WebSpeech webSpeech;
@@ -40,6 +42,7 @@ public class DialogAsrResult extends HttpServlet {
      */
     public DialogAsrResult(WebSpeech webSpeech) {
         super();
+        log.info("initialising");
         this.webSpeech = webSpeech;
     }
 
@@ -59,14 +62,13 @@ public class DialogAsrResult extends HttpServlet {
 //      convert the JSON object into Java objects
         JSONParser parser = new JSONParser();
         ContainerFactory containerFactory = new ContainerFactory(){
-          public List<?> creatArrayContainer() {
+        @SuppressWarnings("rawtypes")
+		public List<?> creatArrayContainer() {
             return new LinkedList();
           }
-
           public Map<Object, Object> createObjectContainer() {
             return new LinkedHashMap<Object, Object>();
           }
-                              
         };
                       
         try{
@@ -76,9 +78,10 @@ public class DialogAsrResult extends HttpServlet {
           double timestamp = -1;
           boolean isFinal = false;
           int utteranceKey = -1;
-//        step through the items in the list
+//        step through the items in the list, keep track of things we need
           while(iter.hasNext()){
-            Map.Entry entry = (Map.Entry)iter.next();
+            @SuppressWarnings("rawtypes")
+			Map.Entry entry = (Map.Entry)iter.next();
 //          save the timestamp 
             if (entry.getKey().equals("timeStamp")) {
             	timestamp = Double.parseDouble(entry.getValue().toString());
@@ -97,7 +100,7 @@ public class DialogAsrResult extends HttpServlet {
             if (entry.getKey().equals("hypList")) {
             	String value = entry.getValue().toString();
             	value = value.substring(2,value.length()-2);
-//            	Somewhat hacky, but we get the hyps and confidence scores from the string
+//            	Somewhat hacky, but we get the hyps and confidence scores from the string itself
             	String hyps = value.substring(value.indexOf("hyps=")+5);
             	hyps = hyps.substring(hyps.indexOf("[")+1,hyps.indexOf("]"));
             	String confs = value.substring(value.indexOf("confidence=")+11);
@@ -111,21 +114,22 @@ public class DialogAsrResult extends HttpServlet {
             	}
             }
             	
-          }
+          } // end of while
           
 //        set some of the shared information for each utterance hyp
           for (AsrHyp hyp : asrHyps) {
+        	  log.debug("new hyp: " + hyp);
         	  hyp.setUtteranceKey(utteranceKey);
         	  hyp.setTimestamp(timestamp);
-        	  hyp.isFinal(isFinal);
+        	  hyp.setFinal(isFinal);
           }
           
-//        this is where you would send the results along to something else
-          webSpeech.setRightBuffer(asrHyps);
+//        this is where you would send the results along to something else, in this case the WebSpeech that makes IUs out of them
+          webSpeech.setNewHyps(asrHyps);
         
         }
         catch(ParseException pe){
-          System.out.println(pe);
+          pe.printStackTrace();
         }
 	}
 

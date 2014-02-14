@@ -3,9 +3,7 @@ package inpro.io.webspeech;
 import inpro.incremental.IUModule;
 import inpro.incremental.PushBuffer;
 import inpro.incremental.deltifier.ASRWordDeltifier;
-import inpro.incremental.source.CurrentASRHypothesis;
 import inpro.incremental.unit.EditMessage;
-import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.IUList;
 import inpro.incremental.unit.TextualWordIU;
@@ -19,8 +17,8 @@ import inpro.io.webspeech.servlets.DialogRecording;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.log4j.Logger;
 
-import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Boolean;
@@ -36,6 +34,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class WebSpeech extends IUModule {
+	
+	static Logger log = Logger.getLogger(WebSpeech.class.getName());
 	
 	@S4ComponentList(type = PushBuffer.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
@@ -59,6 +59,8 @@ public class WebSpeech extends IUModule {
 	IUList<WordIU> prevList;
 	
   public void run(PropertySheet ps) throws LifecycleException {
+	  	log.info("Starting Tomcat server...");
+	  
 	  	Tomcat tomcat = new Tomcat();
 	    tomcat.setPort(8080);
 
@@ -81,13 +83,14 @@ public class WebSpeech extends IUModule {
 	    
 	    tomcat.start();
 	    
+	    log.info("Tomcat server started on port " + 8080);
 	    System.out.println("Using Google Web Speech: open Chrome/Chromium at localhost:8080/dialog");
 //	    tomcat.getServer().await();
   }
 
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
-		prevList = new IUList<WordIU>();
+		prevList = new IUList<WordIU>(); // start off with an empty word list so the diff is all the new stuff
 		asrDeltifier = (ASRWordDeltifier) ps.getComponent(PROP_ASR_DELTIFIER);
 		if (asrDeltifier == null) {
 			asrDeltifier = new ASRWordDeltifier();
@@ -102,7 +105,7 @@ public class WebSpeech extends IUModule {
 		
 	}
 	
-	public void setRightBuffer(ArrayList<AsrHyp> asrHyps) {
+	public void setNewHyps(ArrayList<AsrHyp> asrHyps) {
 		System.out.println(asrHyps);
 		
 //		At the moment, we are just working with the argmax, we don't have IU network stuff ready to handle nbest lattices
@@ -133,6 +136,6 @@ public class WebSpeech extends IUModule {
 	@Override
 	protected void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
-		
+		log.warn("This does not accept anything on the left buffer!");
 	}
 }
