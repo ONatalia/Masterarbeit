@@ -4,12 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Enumeration;
-import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -17,14 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
-
-import com.sun.media.sound.WaveFileWriter;
 
 /**
  * Record the wav file as recorded from the mic
@@ -50,13 +40,13 @@ public class DialogRecording extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// This receives the wav data and writes it to file, if wanted
 //		System.out.println("receiving recording...");
-		String uttKey = getValue(request.getPart("utterance_key")).toString();
+//		String uttKey = getValue(request.getPart("utterance_key")).toString();
 		String csrf = (String) request.getSession().getAttribute("csrf_token");
 		
 		Part part = request.getPart("data");
 		InputStream in = new BufferedInputStream(part.getInputStream());
 //		need to make sure it can append the file that has already started
-		long unixTime = System.currentTimeMillis() / 1000L;
+//		long unixTime = System.currentTimeMillis() / 1000L;
 		String path = "wavs/" + csrf + ".wav";
 		FileOutputStream out = new FileOutputStream(new File(path), true); // when the second param is true, it appends to the end of the file
 		byte[] buf = new byte[1024];
