@@ -86,6 +86,20 @@ http://doc.instantreality.org/apidocs/instantio/
 
 
 -------------------------------
+	Adding New Input/Output
+-------------------------------
+If you want to add your own way to put information into InproTK, and get information out of InproTK, then
+I recommend that you use a similar Listener/Informer pattern. A parent ListenerModule exists as an IUModule
+that you can extend which will do most of the work for you. You just need to make a newProperties() method
+to set up the input information, then any string added to the process(String) method will be put into the 
+right buffer of that module. Look at venice.VeniceListenerModule as an example (which extends ListenerModule).
+
+To add an Informer, there is no parent class, so you can use venice.VeniceInformerModule as an example. 
+It sets up the informer in newProperties() then when something is received on the left buffer (leftBufferUpdate)
+it is pushed to the output. The same pattern goes for XmlRpc and InstantIO. 
+
+
+-------------------------------
 	Google Web Speech
 -------------------------------
 

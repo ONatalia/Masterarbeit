@@ -19,9 +19,10 @@ import inpro.incremental.IUModule;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
+import inpro.io.ListenerModule;
 import inpro.io.SensorIU;
 
-public class XmlRpcListenerModule extends IUModule {
+public class XmlRpcListenerModule extends ListenerModule {
 	
 	static Logger log = Logger.getLogger(XmlRpcListenerModule.class.getName());
 	
@@ -30,12 +31,6 @@ public class XmlRpcListenerModule extends IUModule {
  	
  	@S4Integer(defaultValue = 9050)
 	public final static String PORT = "port";	
-	
-	List<EditMessage<SensorIU>> edits;
-
-	private SensorIU prevIU;
-	
-	private String id;
 	
 	/**
 	 * Method that receives the data. 
@@ -53,21 +48,6 @@ public class XmlRpcListenerModule extends IUModule {
 		}
 		return true;
 	}
-	
-
-	private void process(String data) {
-		edits = new ArrayList<EditMessage<SensorIU>>();
-		//create an incremental unit and put it onto the right buffer
-		SensorIU iu = new SensorIU(data, this.getID());
-		iu.setSameLevelLink(prevIU);
-		edits.add(new EditMessage<SensorIU>(EditType.ADD, iu));
-		prevIU = iu;
-		//set to right buffer for the next module's left buffer
-		System.out.println("Sending data via XMLRPCLISTENER " + edits);
-		rightBuffer.setBuffer(edits);
-		super.notifyListeners();
-	}
-
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
@@ -90,30 +70,5 @@ public class XmlRpcListenerModule extends IUModule {
 			e.printStackTrace();
 		}
 	}
-	
-	@Override
-	protected void leftBufferUpdate(Collection<? extends IU> ius,
-			List<? extends EditMessage<? extends IU>> edits) {
-		log.warn("This module does not accept left buffer updates.");
-	}
-
-
-	/**
-	 * @return id of the module, which is the handler, is the source for the SensorIU
-	 */
-	public String getID() {
-		return id;
-	}
-
-
-	/**
-	 * Set the id of the module.
-	 * 
-	 * @param id
-	 */
-	public void setID(String id) {
-		this.id = id;
-	}
-	
 
 }

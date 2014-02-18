@@ -8,6 +8,7 @@ import inpro.incremental.IUModule;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
+import inpro.io.ListenerModule;
 import inpro.io.SensorIU;
 
 import org.apache.log4j.Logger;
@@ -21,17 +22,12 @@ import edu.cmu.sphinx.util.props.S4String;
  * @author casey
  *
  */
-public class InstantIOListenerModule extends IUModule implements InSlot.Listener {
+public class InstantIOListenerModule extends ListenerModule implements InSlot.Listener {
 	
 	static Logger log = Logger.getLogger(InstantIOListenerModule.class.getName());
 	
 	@S4String(defaultValue = "")
 	public final static String INSLOT_PROP = "inslot";
-	
-	private String id;
-	List<EditMessage<SensorIU>> edits;
-	private SensorIU prevIU;
-
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
@@ -41,13 +37,6 @@ public class InstantIOListenerModule extends IUModule implements InSlot.Listener
 		this.setID(inslot);
 		InstantIOListener.getInstance().addInSlotListener(inslot, this);
 		System.out.println("instantIO listener listening...");
-	}
-
-	@Override
-	protected void leftBufferUpdate(Collection<? extends IU> ius,
-			List<? extends EditMessage<? extends IU>> edits) {
-		
-		log.warn("This module does not accept anything on the left buffer.");
 	}
 
 	/* (non-Javadoc)
@@ -67,23 +56,6 @@ public class InstantIOListenerModule extends IUModule implements InSlot.Listener
 		
 	}
 
-	/**
-	 * Processes the data received from the InstantIO network on the specific namespace.
-	 * 
-	 * @param data which is the String received from the InstantIO network.
-	 */
-	private void process(String data) {
-		edits = new ArrayList<EditMessage<SensorIU>>();
-		//create an incremental unit and put it onto the right buffer
-		SensorIU iu = new SensorIU(data, this.getID());
-		iu.setSameLevelLink(prevIU);
-		edits.add(new EditMessage<SensorIU>(EditType.ADD, iu));
-		prevIU = iu;
-		//set to right buffer for the next module's left buffer
-		rightBuffer.setBuffer(edits);
-		super.notifyListeners();		
-	}
-
 	@Override
 	public void startInSlot(InSlot arg0) {
 		
@@ -92,22 +64,6 @@ public class InstantIOListenerModule extends IUModule implements InSlot.Listener
 	@Override
 	public void stopInSlot(InSlot arg0) {
 		
-	}
-
-	/**
-	 * @return String, the ID is the namespace ID, it is also copied into the SensorIU so one knows the source. 
-	 */
-	public String getID() {
-		return id;
-	}
-
-	/**
-	 * One can set the ID here. See getID() for other comments. 
-	 * 
-	 * @param id
-	 */
-	public void setID(String id) {
-		this.id = id;
 	}
 
 }
