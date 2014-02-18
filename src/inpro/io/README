@@ -29,7 +29,6 @@ server.serve_forever()
 Note that the XmlRpcListenerModule sets up an XmlRpc server, and the XmlRpcInformerModule is an XmlRpc client, so the 
 informer can send data to a server specified in the config file (i.e., localhost or a remote server). 
 
-
 -------------------------------
 		VENICE/RSB
 -------------------------------

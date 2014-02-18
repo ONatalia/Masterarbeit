@@ -41,11 +41,12 @@ public class XmlRpcInformerModule extends IUModule {
 		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
 		this.setHandler(ps.getString(HANDLER));
 		String port = ps.getString(PORT);
+		host = ps.getString(HOST);
 	    try {
-			config.setServerURL(new URL(host + port));
+			config.setServerURL(new URL(host + ":" + port));
 			client = new XmlRpcClient();
 			client.setConfig(config);
-			log.info("Setting up XmlRpcListener at " + host + "on port " + port);
+			log.info("Setting up XmlRpcListener at " + host + " on port " + port);
 	    } 
 	    catch (MalformedURLException e) {
 			e.printStackTrace();
