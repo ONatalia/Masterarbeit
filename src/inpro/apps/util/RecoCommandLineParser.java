@@ -119,7 +119,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				}
 				else if (args[i].equals("-c")) {
 					i++;
-					configURL = getURLForPath(args[i]);
+					configURL = anyToURL(args[i]);
 				}
 				else if (args[i].equals("-v")) {
 					verbose = true;
@@ -148,7 +148,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				else if (args[i].equals("-F")) {
 					inputMode = FILE_INPUT;
 					i++;
-					audioURL = getURLForPath(args[i]);
+					audioURL = anyToURL(args[i]);
 				}
 				else if (args[i].equals("-T")) {
 					outputMode |= TED_OUTPUT;
@@ -181,12 +181,12 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				else if (args[i].equals("-lm")) {
 					recoMode = SLM_RECO;
 					i++;
-					languageModelURL = getURLForPath(args[i]);
+					languageModelURL = anyToURL(args[i]);
 				} 
 				else if (args[i].equals("-gr")) {
 					recoMode = GRAMMAR_RECO;
 					i++;
-					languageModelURL = getURLForPath(args[i]);
+					languageModelURL = anyToURL(args[i]);
 				} 
 				else if (args[i].equals("-rt")) {
 					dataThrottle = true;

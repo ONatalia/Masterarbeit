@@ -65,7 +65,7 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-c")) {
 				i++;
-				configURL = getURLForPath(args[i]);
+				configURL = anyToURL(args[i]);
 			}
 			else if (args[i].equals("-v")) {
 				verbose = true;
@@ -73,7 +73,7 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 			else if (args[i].equals("-F")) {
 				outputMode |= FILE_OUTPUT;
 				i++;
-				audioURL = getURLForPath(args[i]);
+				audioURL = anyToURL(args[i]);
 			}
 			else if (args[i].equals("-S")) {
 				outputMode |= SPEAKER_OUTPUT;

@@ -60,7 +60,7 @@ public class RTPCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-c")) {
 				i++;
-				configURL = getURLForPath(args[i]);
+				configURL = anyToURL(args[i]);
 			}
 			else if (args[i].equals("-v")) {
 				verbose = true;
@@ -71,7 +71,7 @@ public class RTPCommandLineParser extends CommonCommandLineParser {
 			else if (args[i].equals("-F")) {
 				inputMode = FILE_INPUT;
 				i++;
-				audioURL = getURLForPath(args[i]);
+				audioURL = anyToURL(args[i]);
 			}
 			else if (args[i].equals("-D")) {
 				inputMode = OAA_DISPATCHER_INPUT;

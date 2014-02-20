@@ -37,7 +37,7 @@ public abstract class CommonCommandLineParser {
 			verbose = false;
 			inputMode = UNSPECIFIED_INPUT;
 			configURL = CommonCommandLineParser.class.getResource("../config.xml");
-			audioURL = getURLForPath("file:res/DE_1234.wav");
+			audioURL = anyToURL("file:res/DE_1234.wav");
 			parse(args);
 			success = checkConfiguration();
 		} catch (Exception e) {
@@ -87,7 +87,7 @@ public abstract class CommonCommandLineParser {
 	 * @param path URL or normal path
 	 * @return URL if it is able to build one directly or out of path
 	 */
-	protected URL getURLForPath(String path)
+	protected URL anyToURL(String path)
 	{
 		URL result;
 		//first try to read the given string as an URL
@@ -107,7 +107,7 @@ public abstract class CommonCommandLineParser {
 			result = new File(path).toURI().toURL();
 			return result;
 		} catch (MalformedURLException e) {
-			System.err.println("The Argument " + path + " was also no path.");
+			System.err.println("The Argument " + path + " is no path.");
 		}
 		System.exit(1);
 		return null;
