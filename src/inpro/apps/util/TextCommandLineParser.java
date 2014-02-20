@@ -48,7 +48,7 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-c")) {
 				i++;
-				configURL = new URL(args[i]);
+				configURL = getURLForPath(args[i]);
 			}
 			else if (args[i].equals("-v")) {
 				verbose = true;
@@ -66,7 +66,7 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 			else if (args[i].equals("-F")) {
 				i++;
 				try {
-					textReader = new InputStreamReader(new URL(args[i]).openStream());
+					textReader = new InputStreamReader(getURLForPath(args[i]).openStream());
 				} catch (IOException e) {
 					System.err.println("Could not open URL " + args[i]);
 					e.printStackTrace();

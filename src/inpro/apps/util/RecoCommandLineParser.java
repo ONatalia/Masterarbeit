@@ -233,33 +233,5 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	
 	public boolean playAtRealtime() {
 		return dataThrottle;
-	}
-	
-	private URL getURLForPath(String path)
-	{
-		URL result;
-		//first try to read the given string as an URL
-		try
-		{
-			result = new URL(path);
-			return result;
-		}
-		catch(MalformedURLException e)
-		{
-			System.err.println(path + " is no URL - I'll try to use it as path.");
-		}
-		/*if it wasn't a string try to read it as file path
-		 *the catching part should be useless since there will be a file not found exception
-		 */
-		try {
-			result = new File(path).toURI().toURL();
-			return result;
-		} catch (MalformedURLException e) {
-			System.err.println("The Argument " + path + " was also no path.");
-		}
-		System.exit(1);
-		return null;
-		
-	}
-	
+	}	
 }
