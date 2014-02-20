@@ -1,5 +1,7 @@
 package inpro.apps.util;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class RecoCommandLineParser extends CommonCommandLineParser {
@@ -117,7 +119,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				}
 				else if (args[i].equals("-c")) {
 					i++;
-					configURL = new URL(args[i]);
+					configURL = getURLForPath(args[i]);
 				}
 				else if (args[i].equals("-v")) {
 					verbose = true;
@@ -146,7 +148,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				else if (args[i].equals("-F")) {
 					inputMode = FILE_INPUT;
 					i++;
-					audioURL = new URL(args[i]);
+					audioURL = getURLForPath(args[i]);
 				}
 				else if (args[i].equals("-T")) {
 					outputMode |= TED_OUTPUT;
@@ -179,12 +181,12 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				else if (args[i].equals("-lm")) {
 					recoMode = SLM_RECO;
 					i++;
-					languageModelURL = new URL(args[i]);
+					languageModelURL = getURLForPath(args[i]);
 				} 
 				else if (args[i].equals("-gr")) {
 					recoMode = GRAMMAR_RECO;
 					i++;
-					languageModelURL = new URL(args[i]);
+					languageModelURL = getURLForPath(args[i]);
 				} 
 				else if (args[i].equals("-rt")) {
 					dataThrottle = true;
@@ -231,6 +233,33 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	
 	public boolean playAtRealtime() {
 		return dataThrottle;
+	}
+	
+	private URL getURLForPath(String path)
+	{
+		URL result;
+		//first try to read the given string as an URL
+		try
+		{
+			result = new URL(path);
+			return result;
+		}
+		catch(MalformedURLException e)
+		{
+			System.err.println(path + " is no URL - I'll try to use it as path.");
+		}
+		/*if it wasn't a string try to read it as file path
+		 *the catching part should be useless since there will be a file not found exception
+		 */
+		try {
+			result = new File(path).toURI().toURL();
+			return result;
+		} catch (MalformedURLException e) {
+			System.err.println("The Argument " + path + " was also no path.");
+		}
+		System.exit(1);
+		return null;
+		
 	}
 	
 }
