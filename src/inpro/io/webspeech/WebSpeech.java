@@ -1,11 +1,13 @@
 package inpro.io.webspeech;
 
+import inpro.annotation.Label;
 import inpro.incremental.IUModule;
 import inpro.incremental.PushBuffer;
 import inpro.incremental.deltifier.ASRWordDeltifier;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.IUList;
+import inpro.incremental.unit.SegmentIU;
 import inpro.incremental.unit.TextualWordIU;
 import inpro.incremental.unit.WordIU;
 import inpro.io.webspeech.model.AsrHyp;
@@ -13,9 +15,12 @@ import inpro.io.webspeech.servlets.Dialog;
 import inpro.io.webspeech.servlets.DialogAsrResult;
 import inpro.io.webspeech.servlets.DialogEnd;
 import inpro.io.webspeech.servlets.DialogRecording;
+import inpro.io.webspeech.servlets.SetStartTime;
+import inpro.util.TimeUtil;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.log4j.Logger;
 
@@ -56,13 +61,29 @@ public class WebSpeech extends IUModule {
 	@S4Boolean(defaultValue = true)
 	public final static String INTERIM_RESULTS = "interimResults";
 	
+	@S4Boolean(defaultValue = true)
+	public final static String ALIGN_FIRST = "aligntFirstOnly";
+	
 	IUList<WordIU> prevList;
 	
   public void run(PropertySheet ps) throws LifecycleException {
 	  	log.info("Starting Tomcat server...");
+	  	
+	  	Connector httpsConnector = new Connector();
+	    httpsConnector.setPort(8081);	     httpsConnector.setSecure(true);
+        httpsConnector.setScheme("https");
+        httpsConnector.setAttribute("keyAlias", "tomcat");
+        httpsConnector.setAttribute("keystorePass", "changeit");
+//      httpsConnector.setAttribute("keystoreFile", keystorePath);
+        httpsConnector.setAttribute("clientAuth", "false");
+        httpsConnector.setAttribute("sslProtocol", "TLS");
+        httpsConnector.setAttribute("protocol", "org.apache.coyote.http11.Http11NioProtocol");
+        httpsConnector.setAttribute("SSLEnabled", true); 	
 	  
 	  	Tomcat tomcat = new Tomcat();
+	  	tomcat.getService().addConnector(httpsConnector);
 	    tomcat.setPort(8080);
+	    tomcat.getConnector().setRedirectPort(8081);
 
 	    String domainPath = WebSpeech.class.getProtectionDomain().getCodeSource().getLocation().getPath() + "inpro/io/webspeech/";
 	    tomcat.addWebapp(tomcat.getHost(), "", new File(domainPath).getAbsolutePath()); 
@@ -71,6 +92,9 @@ public class WebSpeech extends IUModule {
 
 	    Tomcat.addServlet(ctx, "dialog", new Dialog(ps));
 	    ctx.addServletMapping("/dialog", "dialog");
+	    
+	    Tomcat.addServlet(ctx, "startTime", new SetStartTime(ps.getBoolean(ALIGN_FIRST)));
+	    ctx.addServletMapping("/dialog/start_time", "startTime");
 	    
 	    Tomcat.addServlet(ctx, "dialogASRResult", new DialogAsrResult(this));
 	    ctx.addServletMapping("/dialog/asr_result", "dialogASRResult");
@@ -82,11 +106,16 @@ public class WebSpeech extends IUModule {
 	    ctx.addServletMapping("/dialog/end", "dialogEnd");
 	    
 	    tomcat.start();
-	    
-	    log.info("Tomcat server started on port " + 8080);
-	    System.out.println("Using Google Web Speech: open Chrome/Chromium at localhost:8080/dialog");
+	    setStartTime();
+	    log.info("Tomcat server started on port ");
+	    System.out.println("Using Google Web Speech: open Chrome/Chromium at https://localhost:8081/dialog");
 //	    tomcat.getServer().await();
   }
+
+	public void setStartTime() {
+		TimeUtil.startupTime = System.currentTimeMillis();
+		log.info("Setting start time to " + TimeUtil.startupTime);
+	}
 
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
@@ -106,7 +135,7 @@ public class WebSpeech extends IUModule {
 	}
 	
 	public void setNewHyps(ArrayList<AsrHyp> asrHyps) {
-		System.out.println(asrHyps);
+//		System.out.println(asrHyps);
 		
 //		At the moment, we are just working with the argmax, we don't have IU network stuff ready to handle nbest lattices
 		AsrHyp argMax = asrHyps.get(0);
@@ -116,8 +145,13 @@ public class WebSpeech extends IUModule {
 //		This splits the words and makes the IU list
 		List<WordIU> ius = new LinkedList<WordIU>();
 		WordIU prev = TextualWordIU.FIRST_ATOMIC_WORD_IU;
+		
 		for (String word : argMax.getWords()) {
-			WordIU wiu = new WordIU(word, prev, null);
+			SegmentIU siu = new SegmentIU(new Label(argMax.getPreviousTimestamp(), argMax.getTimestamp(), word));
+			List<IU> gIns = new LinkedList<IU>();
+			gIns.add(siu);
+			WordIU wiu = new WordIU(word, null, gIns);
+			wiu.setSameLevelLink(prev);
 			prev = wiu;
 			ius.add(wiu);
 			list.add(wiu);

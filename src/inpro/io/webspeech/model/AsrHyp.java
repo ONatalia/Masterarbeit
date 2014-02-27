@@ -20,6 +20,8 @@ public class AsrHyp {
 	private String  hyp;
 	private double confidence;
 	private int utteranceKey;
+
+	private double previousTimestamp;
 	
 	/**
 	 * Constructor, set the hypothesis (usually a sentence / utterance) and the confidence score
@@ -73,6 +75,10 @@ public class AsrHyp {
 	public void setHyp(String hyp) {
 		log.debug("New hyp:" + hyp);
 		this.hyp = hyp;
+	}
+	
+	public void appendHyp(String append){
+		this.hyp = this.hyp.trim() + " " + append;
 	}
 
 	public String toString() {
@@ -128,4 +134,16 @@ public class AsrHyp {
 		this.utteranceKey = utteranceKey;
 	}
 
+	public void setPreviousTimestamp(double previousTimestamp) {
+		this.previousTimestamp = previousTimestamp;
+		
+	}
+
+	public double getPreviousTimestamp() {
+		return this.previousTimestamp;
+	}
+	
+	public boolean equals(AsrHyp other) {
+		return other.getHyp().equals(this.getHyp());
+	}
 }

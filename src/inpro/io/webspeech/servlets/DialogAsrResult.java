@@ -2,11 +2,14 @@ package inpro.io.webspeech.servlets;
 
 import inpro.io.webspeech.WebSpeech;
 import inpro.io.webspeech.model.AsrHyp;
+import inpro.util.TimeUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -33,6 +36,8 @@ public class DialogAsrResult extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	static Logger log = Logger.getLogger(DialogAsrResult.class.getName());
+	public static double previousTimestamp = -1;
+	private Thread prevResetThread;
        
 	
 	protected WebSpeech webSpeech;
@@ -44,6 +49,7 @@ public class DialogAsrResult extends HttpServlet {
         super();
         log.info("initialising");
         this.webSpeech = webSpeech;
+        this.updateResetThread();
     }
 
 	/**
@@ -51,7 +57,9 @@ public class DialogAsrResult extends HttpServlet {
 	 */
     @Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	
+		if (prevResetThread != null) {
+			prevResetThread.interrupt();
+		}
 //		get received JSON data from request
         BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
         String json = "";
@@ -82,6 +90,7 @@ public class DialogAsrResult extends HttpServlet {
           while(iter.hasNext()){
             @SuppressWarnings("rawtypes")
 			Map.Entry entry = (Map.Entry)iter.next();
+//            System.out.println(entry.getKey() + " " + entry.getValue());
 //          save the timestamp 
             if (entry.getKey().equals("timeStamp")) {
             	timestamp = Double.parseDouble(entry.getValue().toString());
@@ -99,31 +108,27 @@ public class DialogAsrResult extends HttpServlet {
 //			Now, the hyplist, which is the list of             
             if (entry.getKey().equals("hypList")) {
             	String value = entry.getValue().toString();
-            	value = value.substring(2,value.length()-2);
-//            	Somewhat hacky, but we get the hyps and confidence scores from the string itself
-            	String hyps = value.substring(value.indexOf("hyps=")+5);
-            	hyps = hyps.substring(hyps.indexOf("[")+1,hyps.indexOf("]"));
-            	String confs = value.substring(value.indexOf("confidence=")+11);
-            	confs = confs.substring(confs.indexOf("[")+1,confs.indexOf("]"));
-            	String[] confSplit = confs.split(", ");
-            	String[] hypSplit = hyps.split(", ");
-//            	step through each hyp and add a new AsrHyp object for each
-            	for (int i=0; i<hypSplit.length; i++) {
-            		AsrHyp hyp = new AsrHyp(hypSplit[i], Double.parseDouble(confSplit[i]));
-            		asrHyps.add(hyp);
-            	}
+            	System.out.println(value);
+            	asrHyps = getHyps(value);
             }
             	
           } // end of while
           
 //        set some of the shared information for each utterance hyp
+          if (this.previousTimestamp == -1) this.previousTimestamp = timestamp;
+          
           for (AsrHyp hyp : asrHyps) {
         	  log.debug("new hyp: " + hyp);
         	  hyp.setUtteranceKey(utteranceKey);
-        	  hyp.setTimestamp(timestamp);
+        	  hyp.setTimestamp(timestamp/1000.0 - TimeUtil.startupTime/1000.0);
+        	  hyp.setPreviousTimestamp(Math.abs(this.previousTimestamp/1000.0 - TimeUtil.startupTime/1000.0));
         	  hyp.setFinal(isFinal);
           }
           
+          updateResetThread();
+          
+          this.previousTimestamp = timestamp;
+//          if (isFinal) webSpeech.setStartTime(); // reset start time if endpointing detected the end of an utterance
 //        this is where you would send the results along to something else, in this case the WebSpeech that makes IUs out of them
           webSpeech.setNewHyps(asrHyps);
         
@@ -131,6 +136,65 @@ public class DialogAsrResult extends HttpServlet {
         catch(ParseException pe){
           pe.printStackTrace();
         }
+	}
+
+	private ArrayList<AsrHyp> getHyps(String value) {
+		ArrayList<AsrHyp> asrHyps = new ArrayList<AsrHyp>();
+		HashMap<Integer,AsrHyp> buffer = new HashMap<Integer,AsrHyp>();
+		value = value.substring(2,value.length()-2);
+//    	Somewhat hacky, but we get the hyps and confidence scores from the string itself
+    	
+		String[] splitValue = value.split("\\}, \\{");
+		for (int j=0; j<splitValue.length; j++) {
+			value = splitValue[j];
+			System.out.println(value);
+	    	String hyps = value.substring(value.indexOf("hyps=")+5);
+	    	hyps = hyps.substring(hyps.indexOf("[")+1,hyps.indexOf("]"));
+	    	String confs = value.substring(value.indexOf("confidence=")+11);
+	    	int cutoff = confs.indexOf("]");
+	    	confs = confs.substring(confs.indexOf("[")+1,cutoff);
+	    	String[] confSplit = confs.split(", ");
+	    	String[] hypSplit = hyps.split(", ");
+//    		step through each hyp and add a new AsrHyp object for each
+    		for (int i=0; i<hypSplit.length; i++) {
+    			if (!buffer.containsKey(i)) {
+    				AsrHyp hyp = new AsrHyp(hypSplit[i], Double.parseDouble(confSplit[i]));
+    				buffer.put(i,  hyp);
+    			}
+    			else {
+    				buffer.get(i).appendHyp(hypSplit[i]);
+    			}
+    		}
+    		value = value.substring(cutoff);
+		}
+		
+		for (Integer i : buffer.keySet()) {
+			asrHyps.add(buffer.get(i));
+		}
+		
+		return asrHyps;
+	}
+
+	private void updateResetThread() {
+		
+		prevResetThread = new Thread() {
+			public void run() {
+				try{
+					while (!Thread.currentThread().isInterrupted()) {
+						Thread.sleep(3000);
+						previousTimestamp = System.currentTimeMillis();	
+//						webSpeech.setStartTime();
+					}
+				}
+				catch (InterruptedException e) {
+					// ...
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+        };
+        prevResetThread.start();		
 	}
 
 	/**

@@ -116,6 +116,22 @@ Most of this was written by Matt Henderson, with edits by Casey Kennington to co
 
             window.recognition.onstart = function () {
                 window.recognizing = true;
+                var fd = new FormData();
+                fd.append('set_start', "true");
+                $.ajax({
+                    type: 'POST',
+                    url: 'dialog/start_time',
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    error: function (response) {
+                        window.dialog.trigger("error", "Unable to set start time.");
+                    },
+                    success:function (response) {
+                        // pass
+//                         window.csrf_token = response.csrf_token;
+                    }
+                });
             };
 
             window.recognition.onerror = function (event) {
