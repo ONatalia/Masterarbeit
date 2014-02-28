@@ -288,6 +288,7 @@ Most of this was written by Matt Henderson, with edits by Casey Kennington to co
   <input type="file" accept="audio/*">
   <button onclick="playSound()" disabled>Start</button>
   <button onclick="stopSound()" disabled>Stop</button>
+  <!-- 
 <script>
 var context = new window.webkitAudioContext();
 var source = null;
@@ -345,6 +346,6 @@ function loadSoundFile(url) {
 }
 </script>
 
-
+ -->
     
 </html>
