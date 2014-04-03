@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 public class TextCommandLineParser extends CommonCommandLineParser {
 

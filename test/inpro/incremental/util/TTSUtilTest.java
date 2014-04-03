@@ -18,11 +18,8 @@ import inpro.incremental.unit.SysInstallmentIU;
 import inpro.incremental.util.TTSUtil.Paragraph;
 import inpro.synthesis.MaryAdapter;
 
-import marytts.htsengine.HTSModel;
 
 import org.junit.Test;
-
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
 public class TTSUtilTest {
 

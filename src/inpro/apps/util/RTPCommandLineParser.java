@@ -1,7 +1,6 @@
 package inpro.apps.util;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 
 public class RTPCommandLineParser extends CommonCommandLineParser {
 

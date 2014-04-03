@@ -7,7 +7,6 @@ import inpro.synthesis.hts.FullPFeatureFrame;
 import inpro.synthesis.hts.FullPStream;
 import inpro.synthesis.hts.VocodingFramePostProcessor;
 import inpro.synthesis.hts.PHTSParameterGeneration;
-import inpro.util.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;

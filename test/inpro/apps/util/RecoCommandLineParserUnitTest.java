@@ -3,7 +3,6 @@ package inpro.apps.util;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.net.URL;
 
 import org.junit.Test;
 
