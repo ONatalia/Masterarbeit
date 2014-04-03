@@ -513,6 +513,7 @@ public abstract class IU implements Comparable<IU> {
 		};
 		for (IU iu : groundedIn()) {
 			iu.addUpdateListener(listener);
+			iu.updateOnGrinUpdates();
 		}
 	}
 	
