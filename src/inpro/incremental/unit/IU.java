@@ -3,11 +3,15 @@ package inpro.incremental.unit;
 import inpro.util.TimeUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public abstract class IU implements Comparable<IU> {
@@ -31,6 +35,8 @@ public abstract class IU implements Comparable<IU> {
 	
 	private boolean committed = false;
 	private boolean revoked = false;
+	
+	private HashMap<String, Object> userData;
 	
 	/** types of temporal progress states the IU may be in */ 
 	public enum Progress { UPCOMING, ONGOING, COMPLETED }
@@ -517,6 +523,90 @@ public abstract class IU implements Comparable<IU> {
 		}
 	}
 	
+	public void setUserData(String key, Object value) {
+		if (userData == null) 
+			userData = new HashMap<String, Object>();
+		userData.put(key, value);
+	}
+	
+	public Object getUserData(String key) {
+		return userData != null ? userData.get(key) : null;
+	}
+	
+	public String getUserDataAsString(String key) {
+		return String.valueOf(getUserData(key));
+	}
+	
+	/** 
+	 * find an IU in this IU's network
+	 * 
+	 * "back" --> the same-level-link relation
+	 * "next" --> the next-same-level-link relation
+	 * "up" --> the grounds relation
+	 * "down" --> the grounded-in relation
+	 * 
+	 * apart from "back", all relations can take an additional numeric argument (in [brackets])
+	 * that specifies *which* of the IUs in the corresponding lists should be choosen; 
+	 * negative values are allowed and count from the end of the list (e.g., -1 is the last element of the list)
+	 * 
+	 * @param path a list of individual arc specifications as described above
+	 * @return the IU at the desired point in the network, or null if it can't be found
+	 */
+	public IU getFromNetwork(String... path) {
+		if (path.length == 0) // we are the target!
+			return this;
+		ArcSpec arcSpec = new ArcSpec(path[0]);
+		IU target = arcSpec.followArc();
+		if (target == null) { // there is no target matching the path specification
+			return null;
+		} else { // continue recursively
+			String[] remainder = Arrays.<String>copyOfRange(path, 1, path.length);
+			return target.getFromNetwork(remainder);
+		}
+	}
+
+	private class ArcSpec {
+		String operator;
+		int listPos = 0;
+		
+		private ArcSpec(String arcSpec) {
+			Pattern format = Pattern.compile("(back|next|up|down|b|n|u|d)(?:\\[(-?\\d+)\\])?");
+			Matcher m = format.matcher(arcSpec);
+			if (!m.matches()) { // we have to match, whether assertions are enabled or not
+				throw new IllegalArgumentException("unable to interpret arcSpec " + arcSpec);
+			}
+			assert m.groupCount() == 1 || m.groupCount() == 2;
+			this.operator = m.group(1);
+			if (m.groupCount() == 2 && m.group(2) != null)
+				this.listPos = Integer.parseInt(m.group(2));
+		}
+		private IU followArc() {
+			if ("back".equals(operator)) {
+				return IU.this.getSameLevelLink();
+			}
+			List<? extends IU> resultList = null;
+			if ("next".equals(operator)) {
+				resultList = IU.this.getNextSameLevelLinks();
+			} else if ("up".equals(operator)) {
+				resultList = IU.this.grounds();
+			} else if ("down".equals(operator)) {
+				resultList = IU.this.groundedIn();
+			} 
+			if (resultList != null) {
+				if (listPos >= 0) {
+					return resultList.size() > listPos ? resultList.get(listPos) : null;
+				} else {
+					return (resultList.size() + listPos >= 0) ? resultList.get(resultList.size() + listPos) : null; //listPos is negative, two minuses -> one plus
+				}
+			} else 
+				return null;
+		}
+		@Override
+		public String toString() {
+			return operator + (listPos != 0 ? "[" + listPos + "]" : "");
+		}
+	}
+
 /*	public void commitRecursively() {
 		IUUpdateListener listener = new IUUpdateListener() {
 			@Override 
