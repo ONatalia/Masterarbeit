@@ -3,14 +3,20 @@ package inpro.incremental.sink;
 import inpro.incremental.PushBuffer;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
+import inpro.incremental.unit.IU.IUUpdateListener;
+import inpro.incremental.unit.IU.Progress;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.util.Collection;
 import java.util.List;
 
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+
+import demo.inpro.synthesis.TreeStructuredInstallmentIU;
 
 
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -24,14 +30,16 @@ public class CurrentHypothesisViewer extends PushBuffer {
 	
 	public final static Font DEFAULT_FONT = new Font("Dialog", Font.BOLD, 24); 
 	
-	JTextField textField;
+	JEditorPane textField;
 	String lastString = "";
 	boolean updateResults;
-	
+			
 	public CurrentHypothesisViewer() {
-		textField = new JTextField("", 35);
+		textField  = new JEditorPane("text/html", "");
+		textField.setPreferredSize(new Dimension(800, 40));
 		textField.setEditable(false);
 		textField.setFont(DEFAULT_FONT);
+		
 		updateResults = true;
 	}
 	
@@ -49,8 +57,13 @@ public class CurrentHypothesisViewer extends PushBuffer {
 		}
 	}
 	
-	public JTextField getTextField() {
+	public JEditorPane getTextField() {
 		return textField;
+	}
+	
+	protected void updateFromIU()
+	{
+		
 	}
 	
 	@Override
@@ -59,8 +72,22 @@ public class CurrentHypothesisViewer extends PushBuffer {
 		if (updateResults) {
 			StringBuilder sb = new StringBuilder();
 			for (IU iu : ius) {
-				sb.append(iu.toPayLoad());
+				if (iu.isCompleted()) {
+					sb.append("<strong>");
+					sb.append(iu.toPayLoad());
+					sb.append("</strong>");
+				} else if (iu.isOngoing()) {
+					sb.append("<em>");
+					sb.append(iu.toPayLoad());
+					sb.append("</em>");
+					
+				} else
+					sb.append(iu.toPayLoad());
 				sb.append(" ");
+			}
+			for (EditMessage e : edits)
+			{
+				
 			}
 			final String text = sb.toString();
 			if (!text.equals(lastString)) {
