@@ -7,7 +7,7 @@ import inpro.incremental.processor.AdaptableSynthesisModule;
 import inpro.incremental.sink.LabelWriter;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.IU.IUUpdateListener;
-import inpro.incremental.unit.PhraseIU;
+import inpro.incremental.unit.ChunkIU;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -36,14 +36,14 @@ public class SynthesisModuleAdaptationUnitTest extends SynthesisModuleUnitTest {
 	public void testScaleTempo() {
 		String textKurz = "eins zwei drei vier fünf";
 		// get the standard duration
-		startPhrase(textKurz);
+		startChunk(textKurz);
 		long timeBeforeSynthesis = System.currentTimeMillis();
 		dispatcher.waitUntilDone();
 		long timeForNormalSynthesis = System.currentTimeMillis() - timeBeforeSynthesis;
 		// now mesure scaled synthesis
 		double[] scalingFactors = {0.41, 0.51, 0.64, 0.8, 1.0, 1.25, 1.56, 1.95, 2.44};
 		for (double scalingFactor : scalingFactors) {
-			startPhrase(textKurz);
+			startChunk(textKurz);
 			timeBeforeSynthesis = System.currentTimeMillis();
 			asm.scaleTempo(scalingFactor);
 			dispatcher.waitUntilDone();
@@ -55,10 +55,10 @@ public class SynthesisModuleAdaptationUnitTest extends SynthesisModuleUnitTest {
 		}
 	}
 	
-	protected void startPhrase(String s) {
-		PhraseIU phrase = new PhraseIU(s);
-		phrase.preSynthesize();
-		phrase.addUpdateListener(new IUUpdateListener() {
+	protected void startChunk(String s) {
+		ChunkIU chunk = new ChunkIU(s);
+		chunk.preSynthesize();
+		chunk.addUpdateListener(new IUUpdateListener() {
 			@Override
 			public void update(IU updatedIU) {
 				Logger.getLogger(SynthesisModuleAdaptationUnitTest.class).info(
@@ -66,7 +66,7 @@ public class SynthesisModuleAdaptationUnitTest extends SynthesisModuleUnitTest {
 						" with progress " + updatedIU.getProgress());
 			}
 		});
-		myIUModule.addIUAndUpdate(phrase);
+		myIUModule.addIUAndUpdate(chunk);
 	}
 
 	// ignore tests from super class

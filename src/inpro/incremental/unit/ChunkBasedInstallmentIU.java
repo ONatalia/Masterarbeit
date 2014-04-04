@@ -12,58 +12,59 @@ import org.apache.commons.lang.StringUtils;
 
 
 /** 
- * an synthesizable InstallmentIU that uses phrases to structure its output.
- * phrases can be added even when the utterance is already being produced
- * (currently, phrases cannot be "revoked" from the installment as that wasn't necessary in our tasks yet)
+ * an synthesizable InstallmentIU that uses chunkss to structure its output.
+ * Chunks are simply sequences of words, that might or might no co-incide with intonation phrases
+ * chunkss can be added even when the utterance is already being produced
+ * (currently, chunkss cannot be "revoked" from the installment as that wasn't necessary in our tasks yet)
  * @author timo
  */
-public class PhraseBasedInstallmentIU extends SysInstallmentIU {
+public class ChunkBasedInstallmentIU extends SysInstallmentIU {
 	/** counts the hesitations in this installment (which need to be accounted for when counting the continuation point of a resynthesis when appending a continuation */
 	private int numHesitationsInserted = 0;
-	/** keeps the list of phrases that this installment is based on */
-	private final IUList<PhraseIU> phrases = new IUList<PhraseIU>();
+	/** keeps the list of chunks that this installment is based on */
+	private final IUList<ChunkIU> chunks = new IUList<ChunkIU>();
 	
-	public PhraseBasedInstallmentIU(HesitationIU hesitation) {
+	public ChunkBasedInstallmentIU(HesitationIU hesitation) {
 		super("<hes>", new ArrayList<WordIU>(Collections.<WordIU>singletonList((WordIU)hesitation)));
 		numHesitationsInserted++;
-		phrases.add(hesitation);
+		chunks.add(hesitation);
 	}
 	
-	/** create a phrase from  */
-	public PhraseBasedInstallmentIU(PhraseIU phrase) {
-		super(phrase.toPayLoad(), phrase.getWords());
-		// if the phrase that we're starting from isn't yet pre-synthesized, we have to build the IU structure
-		if (phrase.getWords() == null) {
+	/** create a chunk from  */
+	public ChunkBasedInstallmentIU(ChunkIU chunk) {
+		super(chunk.toPayLoad(), chunk.getWords());
+		// if the chunk that we're starting from isn't yet pre-synthesized, we have to build the IU structure
+		if (chunk.getWords() == null) {
 			groundedIn = MaryAdapter.getInstance().text2IUs(tts);
 		} else {
-			groundedIn = new ArrayList<IU>(groundedIn); // ensure that the grounded-in lists aren't shared between InstallmentIU and PhraseIU!
+			groundedIn = new ArrayList<IU>(groundedIn); // ensure that the grounded-in lists aren't shared between InstallmentIU and ChunkIU!
 		}
-		phrase.groundIn(groundedIn);	
-		phrases.add(phrase);
+		chunk.groundIn(groundedIn);	
+		chunks.add(chunk);
 	}
 
-	/** append words for this phrase at the end of the installment */
-	public void appendPhrase(PhraseIU phrase) {
-		WordIU oldLastWord = getFinalWord(); // everything that follows this word via fSLL belongs to the new phrase
-		List<IU> phraseWords = new ArrayList<IU>();
-		if (phrase instanceof HesitationIU) {
-			phrase.shiftBy(oldLastWord.getLastSegment().endTime());
-			phraseWords.add(phrase);
-			oldLastWord.getLastSegment().addNextSameLevelLink(phrase.getFirstSegment());
-			oldLastWord.addNextSameLevelLink(phrase);
+	/** append words for this chunk at the end of the installment */
+	public void appendChunk(ChunkIU chunk) {
+		WordIU oldLastWord = getFinalWord(); // everything that follows this word via fSLL belongs to the new chunk
+		List<IU> chunkWords = new ArrayList<IU>();
+		if (chunk instanceof HesitationIU) {
+			chunk.shiftBy(oldLastWord.getLastSegment().endTime());
+			chunkWords.add(chunk);
+			oldLastWord.getLastSegment().addNextSameLevelLink(chunk.getFirstSegment());
+			oldLastWord.addNextSameLevelLink(chunk);
 			numHesitationsInserted++;
 		} else {
-			appendContinuation(phrase);
+			appendContinuation(chunk);
 			while (oldLastWord.getNextSameLevelLink() != null) {
 				IU w = oldLastWord.getNextSameLevelLink();
-				phraseWords.add(w);
+				chunkWords.add(w);
 				oldLastWord = (WordIU) w;
 			}
-			phrase.groundIn(phraseWords);
+			chunk.groundIn(chunkWords);
 		}
-		groundedIn.addAll(phraseWords);
-		phrase.setSameLevelLink(phrases.getLast());
-		phrases.add(phrase);
+		groundedIn.addAll(chunkWords);
+		chunk.setSameLevelLink(chunks.getLast());
+		chunks.add(chunk);
 	}
 	
 	/** append a continuation to the ongoing installment. 
@@ -74,28 +75,27 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 	 * we then move backwards in the lists of segments and copy over synthesis information to the old segments
 	 * we call this last step "back-substitution"
 	 </pre>*/
-	private void appendContinuation(PhraseIU phrase) {
+	private void appendContinuation(ChunkIU chunk) {
 		WordIU firstNewWord = null;
 		if (System.getProperty("proso.cond.connect", "true").equals("true")) {
-			List<String> phraseTexts = new ArrayList<String>();
-			// move back to the first phraseIU of the installment
-			for (PhraseIU oldPhrase : phrases) {
-				phraseTexts.add(oldPhrase.toPayLoad());
+			List<String> chunkTexts = new ArrayList<String>();
+			// move back to the first chunkIU of the installment
+			for (ChunkIU oldChunk : chunks) {
+				chunkTexts.add(oldChunk.toPayLoad());
 			}
-			phraseTexts.add(phrase.toPayLoad());
-			String fullInstallmentText = StringUtils.join(phraseTexts, " "); 
-			//String fullPhrase = toPayLoad() + phrase.toPayLoad();
+			chunkTexts.add(chunk.toPayLoad());
+			String fullInstallmentText = StringUtils.join(chunkTexts, " "); 
 			logger.debug("querying MaryTTS for: " + fullInstallmentText);
 			fullInstallmentText = fullInstallmentText.replaceAll(" <sil>", ""); // it's nasty when there are silences pronounced as "kleiner als sil größer als"
 			fullInstallmentText = fullInstallmentText.replaceAll(" *<hes>", ""); // ... or hesitations as "kleiner als hes größer als"
-			@SuppressWarnings("unchecked")
-			List<WordIU> newWords = (List<WordIU>) (new SysInstallmentIU(fullInstallmentText)).groundedIn();
+			@SuppressWarnings({ "unchecked", "cast", "rawtypes" })
+			List<WordIU> newWords = (List<WordIU>) (List) (new SysInstallmentIU(fullInstallmentText)).groundedIn();
 			logger.debug("received the words" + newWords.toString());
 			assert newWords.size() >= groundedIn.size() - numHesitationsInserted;
-//			assert newWords.size() == groundedIn.size() + phrase.expectedWordCount(); // for some reason, this assertion breaks sometimes -> nasty stuff going on with pauses
+//			assert newWords.size() == groundedIn.size() + chunk.expectedWordCount(); // for some reason, this assertion breaks sometimes -> nasty stuff going on with pauses
 			firstNewWord = newWords.get(groundedIn.size() - numHesitationsInserted);
 		} else {
-			firstNewWord = (WordIU) (new SysInstallmentIU(phrase.toPayLoad())).groundedIn().get(0);
+			firstNewWord = (WordIU) (new SysInstallmentIU(chunk.toPayLoad())).groundedIn().get(0);
 		}
 		WordIU lastOldWord = getFinalWord();
 		//assert lastOldWord.payloadEquals(firstNewWord.getSameLevelLink());
@@ -118,14 +118,14 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 		}
 	}
 	
-	public void revokePhrase(PhraseIU phrase) {
-		assert phrase.isUpcoming();
-//		SegmentIU seg = ((WordIU) phrase.groundedIn()).getSegments().get(0);
+	public void revokeChunk(ChunkIU chunk) {
+		assert chunk.isUpcoming();
+//		SegmentIU seg = ((WordIU) chunk.groundedIn()).getSegments().get(0);
 //		seg.getSameLevelLink().removeAllNextSameLevelLinks();
-		if (phrase instanceof HesitationIU) {
+		if (chunk instanceof HesitationIU) {
 			numHesitationsInserted--;
 		}
-		for (WordIU word : phrase.getWords()) {
+		for (WordIU word : chunk.getWords()) {
 			word.setSameLevelLink(null);
 			word.removeAllNextSameLevelLinks();
 			groundedIn.remove(word);
@@ -135,7 +135,7 @@ public class PhraseBasedInstallmentIU extends SysInstallmentIU {
 				seg.removeAllNextSameLevelLinks();
 			}
 		}
-		phrases.remove(phrase);
+		chunks.remove(chunk);
 	}
 
 	/** breaks the segment links between words so that crawling synthesis stops after the currently ongoing word */

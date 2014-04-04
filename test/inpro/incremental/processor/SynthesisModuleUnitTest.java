@@ -14,7 +14,7 @@ import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.HesitationIU;
 import inpro.incremental.unit.IU;
-import inpro.incremental.unit.PhraseIU;
+import inpro.incremental.unit.ChunkIU;
 import inpro.incremental.unit.IU.IUUpdateListener;
 
 import org.junit.After;
@@ -49,13 +49,13 @@ public class SynthesisModuleUnitTest {
 	}
 	
 	/**  
-	 * test the addition of a few phrases as specified in testList
+	 * test the addition of a few chunks as specified in testList
 	 */
 	@Test(timeout=60000)
 	public void testLeftBufferUpdateWithSomeUtterances() {
 		for (String[] list : testList) {
 			for (String s : list) {
-				myIUModule.addIUAndUpdate(new PhraseIU(s));
+				myIUModule.addIUAndUpdate(new ChunkIU(s));
 			}
 			dispatcher.waitUntilDone();
 			myIUModule.reset();
@@ -69,9 +69,9 @@ public class SynthesisModuleUnitTest {
 	public void testLeftBufferUpdateWithPreSynthesis() {
 		for (String[] list : testList) {
 			for (String s : list) {
-				PhraseIU phrase = new PhraseIU(s);
-				phrase.preSynthesize();
-				myIUModule.addIUAndUpdate(phrase);
+				ChunkIU chunk = new ChunkIU(s);
+				chunk.preSynthesize();
+				myIUModule.addIUAndUpdate(chunk);
 			}
 			dispatcher.waitUntilDone();
 			myIUModule.reset();
@@ -79,20 +79,20 @@ public class SynthesisModuleUnitTest {
 	}
 	
 	/**
-	 * test timing consecutivity(?) of PhraseIUs when pre-synthesis is used
+	 * test timing consecutivity(?) of ChunkIUs when pre-synthesis is used
 	 */
 	@Test(timeout=60000)
 	public void testPreSynthesisTiming() {
-		PhraseIU initialPhrase = new PhraseIU("Dies ist ein");
-		initialPhrase.preSynthesize();
-		PhraseIU continuationPhrase = new PhraseIU("komplizierter Satz.");
-		continuationPhrase.preSynthesize();
-		assertTrue("continuation should start at 0 before it is being synthesized", continuationPhrase.startTime() == 0);
-		myIUModule.addIUAndUpdate(initialPhrase);
-		myIUModule.addIUAndUpdate(continuationPhrase);
-		assertTrue("continuation should follow initial phrase but timings were initialEnd: " + initialPhrase.endTime() + ", continuationStart: " + continuationPhrase.startTime(), Math.abs(initialPhrase.endTime() - continuationPhrase.startTime()) < 0.00001);
+		ChunkIU initialChunk = new ChunkIU("Dies ist ein");
+		initialChunk.preSynthesize();
+		ChunkIU continuationChunk = new ChunkIU("komplizierter Satz.");
+		continuationChunk.preSynthesize();
+		assertTrue("continuation should start at 0 before it is being synthesized", continuationChunk.startTime() == 0);
+		myIUModule.addIUAndUpdate(initialChunk);
+		myIUModule.addIUAndUpdate(continuationChunk);
+		assertTrue("continuation should follow initial chunk but timings were initialEnd: " + initialChunk.endTime() + ", continuationStart: " + continuationChunk.startTime(), Math.abs(initialChunk.endTime() - continuationChunk.startTime()) < 0.00001);
 		dispatcher.waitUntilDone();
-		assertTrue("continuation should start immediately after initial phrase (even after uttering)", Math.abs(initialPhrase.startTime() - continuationPhrase.startTime()) > 0.00001);
+		assertTrue("continuation should start immediately after initial chunk (even after uttering)", Math.abs(initialChunk.startTime() - continuationChunk.startTime()) > 0.00001);
 	}
 	
 	/**
@@ -114,8 +114,8 @@ public class SynthesisModuleUnitTest {
 	private void synthesizeWithLookahead(int lookahead) throws InterruptedException {
         final Semaphore semaphore = new Semaphore(lookahead);
 		for (String s : testList[0]) {
-			PhraseIU phrase = new PhraseIU(s);
-			phrase.addUpdateListener(new IUUpdateListener() {
+			ChunkIU chunk = new ChunkIU(s);
+			chunk.addUpdateListener(new IUUpdateListener() {
             	int counter = 0;
 				@Override
 				public void update(IU updatedIU) {
@@ -125,7 +125,7 @@ public class SynthesisModuleUnitTest {
 						semaphore.release();
 				}
             });
-			myIUModule.addIUAndUpdate(phrase);
+			myIUModule.addIUAndUpdate(chunk);
             semaphore.acquire();
 		}
 	}
@@ -138,29 +138,29 @@ public class SynthesisModuleUnitTest {
 		String s1 = "Und dann";
 		String s2 = "weiter";
 		for (int delay = 200; delay < 600; delay+= 40) {
-			myIUModule.addIUAndUpdate(new PhraseIU(s1));
+			myIUModule.addIUAndUpdate(new ChunkIU(s1));
 			myIUModule.addIUAndUpdate(new HesitationIU());
 			Thread.sleep(delay);
-			myIUModule.addIUAndUpdate(new PhraseIU(s2));
+			myIUModule.addIUAndUpdate(new ChunkIU(s2));
 			dispatcher.waitUntilDone();
 			myIUModule.reset();
 		}
 	}
 	
-	/** test that it is possible to revoke phrases and to add other material afterwards */
+	/** test that it is possible to revoke chunks and to add other material afterwards */
 	@Test(timeout=60000)
 	public void testRevokeAndReplace() {
-		PhraseIU p1 = new PhraseIU("In diesem ziemlich langen Satz");
-		PhraseIU p2 = new PhraseIU("sollte man");
-		PhraseIU prevoked = new PhraseIU("dieses nicht");
-		PhraseIU p4 = new PhraseIU("nur dieses");
-		PhraseIU p5 = new PhraseIU("hören");
-		myIUModule.addIUAndUpdate(p1);
-		myIUModule.addIUAndUpdate(p2);
-		myIUModule.addIUAndUpdate(prevoked);
-		myIUModule.revokeIUAndUpdate(prevoked); // highly unlikely that p1 and p2 have already been completed
-		myIUModule.addIUAndUpdate(p4);
-		myIUModule.addIUAndUpdate(p5);
+		ChunkIU ch1 = new ChunkIU("In diesem ziemlich langen Satz");
+		ChunkIU ch2 = new ChunkIU("sollte man");
+		ChunkIU chRevoked = new ChunkIU("dieses nicht");
+		ChunkIU ch4 = new ChunkIU("nur dieses");
+		ChunkIU ch5 = new ChunkIU("hören");
+		myIUModule.addIUAndUpdate(ch1);
+		myIUModule.addIUAndUpdate(ch2);
+		myIUModule.addIUAndUpdate(chRevoked);
+		myIUModule.revokeIUAndUpdate(chRevoked); // highly unlikely that p1 and p2 have already been completed
+		myIUModule.addIUAndUpdate(ch4);
+		myIUModule.addIUAndUpdate(ch5);
 	}
 	
 	/**
@@ -172,12 +172,12 @@ public class SynthesisModuleUnitTest {
 		String language = System.getProperty("inpro.tts.language");
 		System.setProperty("inpro.tts.voice", "dfki-prudence-hsmm");
         System.setProperty("inpro.tts.language", "en_GB");
-        myIUModule.addIUAndUpdate(new PhraseIU("I can also speak in British English."));
+        myIUModule.addIUAndUpdate(new ChunkIU("I can also speak in British English."));
         dispatcher.waitUntilDone();
 		myIUModule.reset();
 		System.setProperty("inpro.tts.voice", "cmu-slt-hsmm");
         System.setProperty("inpro.tts.language", "en_US");
-        myIUModule.addIUAndUpdate(new PhraseIU("I can also speak with an American accent."));
+        myIUModule.addIUAndUpdate(new ChunkIU("I can also speak with an American accent."));
         System.setProperty("inpro.tts.voice", voice);
         System.setProperty("inpro.tts.language", language);
 	}

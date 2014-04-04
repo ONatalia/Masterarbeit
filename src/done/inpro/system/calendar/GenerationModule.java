@@ -7,7 +7,7 @@ import inpro.incremental.sink.TEDviewNotifier;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.IU.IUUpdateListener;
-import inpro.incremental.unit.PhraseIU;
+import inpro.incremental.unit.ChunkIU;
 import inpro.incremental.unit.SysInstallmentIU;
 import inpro.synthesis.MaryAdapter;
 import inpro.synthesis.hts.InteractiveHTSEngine;
@@ -32,34 +32,34 @@ import edu.rutgers.nlp.spud.SPUD;
 public class GenerationModule extends IUModule {
 
 	private SpudManager nlg;
-	private List<PhraseIU> phrases;
+	private List<CIU> chunks;
 	
 	public GenerationModule(SpudManager sm) {
 		this.nlg = sm;
 		this.nlg.setPrePlanningSteps(6);
-		phrases = new ArrayList<PhraseIU>();
+		chunks = new ArrayList<ChunkIU>();
 		SPUD.setDebugLevel(30);
 	}
 	
-	/*private IUUpdateListener phraseUpdateListener = new IUUpdateListener() {
+	/*private IUUpdateListener ChunkUpdateListener = new IUUpdateListener() {
 		
 		@Override
 		public synchronized void update(IU updatedIU) {
 			assert logger != null;
 			logger.warn("update on IU " + (updatedIU != null ? updatedIU.toString() : "null"));
-			String projectedPhrase;
+			String projectedChunk;
 			if (updatedIU == null || updatedIU.isCompleted()) {
 				if (AdaptionManager.getInstance().hasChanged()) {
 					// --> this is usually the case when noise has been played
 					System.out.println("*************** CHANGE ****************");
-					phrases.remove(phrases.size() - 1);
+					chunks.remove(chunks.size() - 1);
 					nlg.invalidatePreplanCache();
 					nlg.preplanIncrements();
-					String phrase = nlg.takePreplannedAndPreplanNextIncrements();
-					if (phrase != null) {
-						PhraseIU piu = new PhraseIU(phrase); // add type: continuation or repair?
-						piu.addUpdateListener(phraseUpdateListener);
-						phrases.add(piu);
+					String chunk = nlg.takePreplannedAndPreplanNextIncrements();
+					if (chunk != null) {
+						ChunkIU piu = new ChunkIU(chunk); // add type: continuation or repair?
+						piu.addUpdateListener(chunkUpdateListener);
+						chunks.add(piu);
 					} else {
 						return;
 					}
@@ -68,25 +68,25 @@ public class GenerationModule extends IUModule {
 					AdaptionManager.getInstance().setVerbosityFactor(1);
 					AdaptionManager.getInstance().hasChanged(); // we know it has, but sets flag to false again.
 					//nlg.preplanIncrements();
-					projectedPhrase = nlg.peekPreplannedIncrement(0);
+					projectedChunk = nlg.peekPreplannedIncrement(0);
 				} else {
 					nlg.takePreplannedAndPreplanNextIncrements(); //consume the previously peeked increment
-					projectedPhrase = nlg.peekPreplannedIncrement(0);
+					projectedChunk = nlg.peekPreplannedIncrement(0);
 					// give prev. IU normal status
-					PhraseIU iu = phrases.get(phrases.size() - 1);
-					iu.addUpdateListener(phraseUpdateListener);
+					ChunkIU iu = chunks.get(chunks.size() - 1);
+					iu.addUpdateListener(chunkUpdateListener);
 				} 	 
 				
-				if (projectedPhrase != null) {
-					PhraseIU ppiu = new PhraseIU(projectedPhrase);
-					ppiu.addUpdateListener(phraseUpdateListener);
-					phrases.add(ppiu);
+				if (projectedChunk != null) {
+					ChunkIU ppiu = new ChunkIU(projectedChunk);
+					ppiu.addUpdateListener(chunkUpdateListener);
+					chunks.add(ppiu);
 				} else {
-					PhraseIU finalPhrase = phrases.get(phrases.size() - 1);
-					// set phrase to final, this also removes any vocoder locks
-					finalPhrase.setFinal();
+					ChunkIU finalChunk = chunks.get(chunks.size() - 1);
+					// set chunk to final, this also removes any vocoder locks
+					finalChunk.setFinal();
 				}
-				rightBuffer.setBuffer(phrases);
+				rightBuffer.setBuffer(chunks);
 				rightBuffer.notify(iulisteners);
 			}
 			System.out.println("Current update id: " + nlg.getCurrentUpdateId());
@@ -94,18 +94,18 @@ public class GenerationModule extends IUModule {
 	};
 */	
 
-	private IUUpdateListener phraseUpdateListener_new = new IUUpdateListener() {
+	private IUUpdateListener chunkUpdateListener_new = new IUUpdateListener() {
 		
 		@Override
 		public synchronized void update(IU updatedIU) {
-			PhraseIU piu, ppiu;
+			ChunkIU piu, ppiu;
 			
 			System.out.println("update on IU " + (updatedIU != null ? updatedIU.toString() : "null"));
 			
 			if (updatedIU == null || updatedIU.isCompleted()) {
 				
 				if (updatedIU != null && updatedIU.isCompleted()) {
-					PhraseIU ipiu = (PhraseIU)updatedIU;
+					ChunkIU ipiu = (ChunkIU)updatedIU;
 					if (!ipiu.completionNotified) {
 						ipiu.completionNotified = true;
 					} else {
@@ -116,26 +116,26 @@ public class GenerationModule extends IUModule {
 				
 				if (AdaptionManager.getInstance().hasChanged()) {
 					System.out.println("*************CHANGE************");
-					phrases.remove(phrases.size() - 1);
-					phrases.remove(phrases.size() - 1);
+					chunks.remove(chunks.size() - 1);
+					chunks.remove(chunks.size() - 1);
 					nlg.invalidatePreplanCache();
 					nlg.preplanIncrements();
 
-					String phrase = nlg.peekPreplannedIncrement(0); //takePreplannedAndPreplanNextIncrements();
-					String phrase2 = nlg.peekPreplannedIncrement(1);
+					String chunk = nlg.peekPreplannedIncrement(0); //takePreplannedAndPreplanNextIncrements();
+					String chunk2 = nlg.peekPreplannedIncrement(1);
 
-					if (phrase != null) {
-						if (phrase2 != null) {
-							piu = new PhraseIU(phrase, PhraseIU.PhraseType.NONFINAL);
-							ppiu = new PhraseIU(phrase2, PhraseIU.PhraseType.NONFINAL);
-							phrases.add(piu);
-							phrases.add(ppiu);
-							ppiu.addUpdateListener(phraseUpdateListener_new);
+					if (chunk != null) {
+						if (chunk2 != null) {
+							piu = new ChunkIU(chunk, ChunkIU.ChunkType.NONFINAL);
+							ppiu = new ChunkIU(chunk2, ChunkIU.ChunkType.NONFINAL);
+							chunks.add(piu);
+							chunks.add(ppiu);
+							ppiu.addUpdateListener(chunkUpdateListener_new);
 						} else {
-							piu = new PhraseIU(phrase, PhraseIU.PhraseType.FINAL);
-							phrases.add(piu);
+							piu = new ChunkIU(chunk, ChunkIU.ChunkType.FINAL);
+							chunks.add(piu);
 						}
-						piu.addUpdateListener(phraseUpdateListener_new);
+						piu.addUpdateListener(ChunkUpdateListener_new);
 					} else {
 						return;
 					}
@@ -145,26 +145,26 @@ public class GenerationModule extends IUModule {
 				} else {
 					System.out.println("***********NO CHANGE***********");
 					nlg.takePreplannedAndPreplanNextIncrements(); //consume the previously peeked increment
-					String lookaheadPhrase = nlg.peekPreplannedIncrement(1);
-					System.out.println("Lookahead: " +lookaheadPhrase);
-					if (lookaheadPhrase != null) {
-						ppiu = new PhraseIU(lookaheadPhrase, PhraseIU.PhraseType.NONFINAL);
+					String lookaheadChunk = nlg.peekPreplannedIncrement(1);
+					System.out.println("Lookahead: " +lookaheadChunk);
+					if (lookaheadChunk != null) {
+						ppiu = new ChunkIU(lookaheadChunk, ChunkIU.ChunkType.NONFINAL);
 						// give prev. IU normal status
-						phrases.get(phrases.size() - 1).addUpdateListener(phraseUpdateListener_new);
-						phrases.add(ppiu);
+						chunks.get(chunks.size() - 1).addUpdateListener(chunkUpdateListener_new);
+						chunks.add(ppiu);
 					} else {
-						// set phrase to final, this also removes any vocoder locks
-						phrases.get(phrases.size() - 1).setFinal();
+						// set chunk to final, this also removes any vocoder locks
+						chunks.get(chunks.size() - 1).setFinal();
 					}
 				}	
 			}
 			System.out.println("-------");
-			for (PhraseIU p : phrases) {
-				System.out.println(p);
+			for (ChunkIU c : chunks) {
+				System.out.println(c);
 			}
 			System.out.println("-------");
 			
-			rightBuffer.setBuffer(phrases);
+			rightBuffer.setBuffer(chunks);
 			rightBuffer.notify(iulisteners);
 		}
 	};
@@ -175,40 +175,40 @@ public class GenerationModule extends IUModule {
 		Logger speedLogger = Logger.getLogger("speedlogger");
 		long start = System.currentTimeMillis();
 		
-		String phrase = nlg.generateNextIncrement();
-		PhraseIU piu = new PhraseIU(phrase, PhraseIU.PhraseType.NONFINAL);
-		phrases.add(piu);
+		String chunk = nlg.generateNextIncrement();
+		ChunkIU piu = new ChunkIU(chunk, ChunkIU.ChunkType.NONFINAL);
+		chunks.add(piu);
 		
 		nlg.preplanIncrements();
-		String projectedPhrase = nlg.peekPreplannedIncrement(0);
-		PhraseIU ppiu = new PhraseIU(projectedPhrase);
-		phrases.add(ppiu);
+		String projectedChunk = nlg.peekPreplannedIncrement(0);
+		ChunkIU ppiu = new ChunkIU(projectedChunk);
+		chunks.add(ppiu);
 		
 		// for timing-measurements:
 		long duration = System.currentTimeMillis() - start;
 		speedLogger.info("NLG for onset took: " + duration);
 		
-		rightBuffer.setBuffer(phrases);
+		rightBuffer.setBuffer(chunks);
 		rightBuffer.notify(iulisteners);
-		//if (System.getProperty("proso.cond.onephraseahead", "true").equals("true")) {
-		piu.addUpdateListener(phraseUpdateListener);
+		//if (System.getProperty("proso.cond.onePhraseahead", "true").equals("true")) {
+		piu.addUpdateListener(chunkUpdateListener);
 		//}
-		ppiu.addUpdateListener(phraseUpdateListener);
+		ppiu.addUpdateListener(chunkUpdateListener);
 		System.out.println("generate is done");
 	}*/
 	
 	public void generate_new() {
 		nlg.preplanIncrements();
-		String phrase = nlg.peekPreplannedIncrement(0);// takePreplannedAndPreplanNextIncrements();
-		PhraseIU piu = new PhraseIU(phrase, PhraseIU.PhraseType.NONFINAL);
-		piu.addUpdateListener(phraseUpdateListener_new);
-		phrases.add(piu);
+		String chunk = nlg.peekPreplannedIncrement(0);// takePreplannedAndPreplanNextIncrements();
+		ChunkIU piu = new ChunkIU(chunk, ChunkIU.ChunkType.NONFINAL);
+		piu.addUpdateListener(chunkUpdateListener_new);
+		chunks.add(piu);
 		
-		String phrase2 = nlg.peekPreplannedIncrement(1);
-		PhraseIU ppiu = new PhraseIU(phrase2, PhraseIU.PhraseType.NONFINAL);
-		phrases.add(ppiu);
+		String chunk2 = nlg.peekPreplannedIncrement(1);
+		ChunkIU ppiu = new ChunkIU(chunk2, ChunkIU.ChunkType.NONFINAL);
+		chunks.add(ppiu);
 		
-		rightBuffer.setBuffer(phrases);
+		rightBuffer.setBuffer(chunks);
 		rightBuffer.notify(iulisteners);
 	}
 	
@@ -216,48 +216,48 @@ public class GenerationModule extends IUModule {
 	public void setStimulus(int stimulus) {
 		assert stimulus > 0 && stimulus < 10;
 		switch (stimulus) {
-		case 1: // --> 6 phrases
+		case 1: // --> 6 Chunks
 			final CalendarEvent event1 = new CalendarEvent("Einkaufen auf dem Wochenmarkt", new GregorianCalendar(2012, 4, 14, 10, 0), 2);
 			final CalendarEvent event1conflict = new CalendarEvent("Zahn Arzt", new GregorianCalendar(2012, 4, 14, 10, 30), 1);
 			nlg.setUtteranceObject(new EventConflict(event1, event1conflict));
 			break;
-		case 2: // --> 6 phrases
+		case 2: // --> 6 Chunks
 			final CalendarEvent event2 = new CalendarEvent("Einkaufen auf dem Wochenmarkt", new GregorianCalendar(2012, 4, 14, 10, 0), 2);
-			// synthesis doesn't like the one-word phrase "äh" which is inserted for moved events on the same day
+			// synthesis doesn't like the one-word Chunk "äh" which is inserted for moved events on the same day
 			final CalendarEvent event2changed = new CalendarEvent("Einkaufen auf dem Wochenmarkt", new GregorianCalendar(2012, 4, 16, 9, 30), 2);
 			nlg.setUtteranceObject(new MovedEvent(event2, event2changed));
 			break;
-		case 3: // --> 7 phrases
+		case 3: // --> 7 Chunks
 			final CalendarEvent event3 = new CalendarEvent("Austellungseröffnung", new GregorianCalendar(2012, 5, 20, 11, 00), 2);
 			final CalendarEvent event3followup = new CalendarEvent("Sekt und Kringel", new GregorianCalendar(2012, 5, 20, 12, 00), 1);
 			nlg.setUtteranceObject(GenerateStimuli.createUpcomingEvents(event3, event3followup));
 			break;
-		case 4: // --> 7 phrases
+		case 4: // --> 7 Chunks
 			final CalendarEvent event4 = new CalendarEvent("Geschenk besorgen", new GregorianCalendar(2012, 3, 21, 17, 0), 1);
 			final CalendarEvent event4followup = new CalendarEvent("Spieleabend bei Hanne", new GregorianCalendar(2012, 3, 22, 15, 0), 3);
 			nlg.setUtteranceObject(GenerateStimuli.createUpcomingEvents(event4, event4followup));
 			break;
-		case 5: // --> 6 phrases
+		case 5: // --> 6 Chunks
 			final CalendarEvent event5 = new CalendarEvent("Vorlesung Linguistik", new GregorianCalendar(2012, 3, 4, 10, 0), 2);
 			final CalendarEvent event5changed = new CalendarEvent("Vorlesung Linguistik", new GregorianCalendar(2012, 3, 6, 12, 0), 2);
 			nlg.setUtteranceObject(new MovedEvent(event5, event5changed));
 			break;
-		case 6: // --> 6 phrases
+		case 6: // --> 6 Chunks
 			final CalendarEvent event6 = new CalendarEvent("Schwimmen gehen", new GregorianCalendar(2012, 6, 6, 14, 0), 2);
 			final CalendarEvent event6conflict = new CalendarEvent("Geburtstag Tante Ilse", new GregorianCalendar(2012, 6, 6, 15, 0), 4);
 			nlg.setUtteranceObject(new EventConflict(event6, event6conflict));
 			break;
-		case 7: // --> 7 phrases
+		case 7: // --> 7 Chunks
 			final CalendarEvent event7 = new CalendarEvent("Semesterstart", new GregorianCalendar(2012, 3, 4, 8, 0), 12);
 			final CalendarEvent event7followup = new CalendarEvent("Westend Party", new GregorianCalendar(2012, 3, 6, 21, 0), 3);
 			nlg.setUtteranceObject(GenerateStimuli.createUpcomingEvents(event7, event7followup));
 			break;
-		case 8: // --> 7 phrases
+		case 8: // --> 7 Chunks
 			final CalendarEvent event8 = new CalendarEvent("Zug nach München", new GregorianCalendar(2012, 10, 8, 13, 37), 5);
 			final CalendarEvent event8followup = new CalendarEvent("Tagungsbeginn", new GregorianCalendar(2012, 10, 9, 9, 00), 1);
 			nlg.setUtteranceObject(GenerateStimuli.createUpcomingEvents(event8, event8followup));
 			break;
-		case 9: // --> 6 phrases
+		case 9: // --> 6 Chunks
 			final CalendarEvent event9 = new CalendarEvent("Besprechung mit Betreuer", new GregorianCalendar(2012, 6, 27, 14,0), 1);
 			final CalendarEvent event9conflict = new CalendarEvent("Mensaführung", new GregorianCalendar(2012, 6, 27, 13, 00), 3);
 			nlg.setUtteranceObject(new EventConflict(event9, event9conflict));
@@ -367,7 +367,7 @@ public class GenerationModule extends IUModule {
 		long duration = System.currentTimeMillis() - start;
 		speedLogger.info("full onset took: " + duration);
 		if (playNoise) {
-			NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), synthesisModule, gm.phraseUpdateListener_new, noiseHandling);
+			NoiseThread nt = new NoiseThread(AdaptionManager.getInstance(), synthesisModule, gm.ChunkUpdateListener_new, noiseHandling);
 			nt.start();
 		}
 		

@@ -3,7 +3,7 @@ package inpro.incremental.processor;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 import inpro.incremental.unit.IU;
-import inpro.incremental.unit.PhraseIU;
+import inpro.incremental.unit.ChunkIU;
 import inpro.incremental.unit.IU.IUUpdateListener;
 import inpro.incremental.unit.IU.Progress;
 
@@ -18,7 +18,7 @@ public class SynthesisModulePauseStopUnitTest extends SynthesisModuleAdaptationU
 	public void testPauseResumeAfterOngoingWord() throws InterruptedException {
 		int initialDelay = 400;
 		int pauseDuration = 1000;
-		startPhrase("eins zwei drei vier fünf sechs sieben acht neun zehn");
+		startChunk("eins zwei drei vier fünf sechs sieben acht neun zehn");
 		Thread.sleep(initialDelay);
 		asm.pauseAfterOngoingWord();
 		Thread.sleep(pauseDuration);
@@ -29,7 +29,7 @@ public class SynthesisModulePauseStopUnitTest extends SynthesisModuleAdaptationU
 	public void testPauseStopAfterOngoingWord() throws InterruptedException {
 		int initialDelay = 400;
 		int pauseDuration = 1000;
-		startPhrase("eins zwei drei vier fünf sechs sieben acht neun zehn");
+		startChunk("eins zwei drei vier fünf sechs sieben acht neun zehn");
 		Thread.sleep(initialDelay);
 		asm.pauseAfterOngoingWord();
 		Thread.sleep(pauseDuration);
@@ -44,7 +44,7 @@ public class SynthesisModulePauseStopUnitTest extends SynthesisModuleAdaptationU
 	@Test(timeout=60000)
 	public void testStopAfterOngoingWord() throws InterruptedException {
 		for (int initialDelay = 300; initialDelay < 4000; initialDelay += 300) {
-			startPhrase("eins zwei drei vier fünf sechs sieben acht neun zehn");
+			startChunk("eins zwei drei vier fünf sechs sieben acht neun zehn");
 			Thread.sleep(initialDelay);
 			long timeBeforeAbort = System.currentTimeMillis();
 			asm.stopAfterOngoingWord();
@@ -61,7 +61,7 @@ public class SynthesisModulePauseStopUnitTest extends SynthesisModuleAdaptationU
 	@Test(timeout=60000)
 	public void testStopAfterOngoingPhoneme() throws InterruptedException {
 		for (int initialDelay = 300; initialDelay < 4000; initialDelay += 300) {
-			startPhrase("eins zwei drei vier fünf sechs sieben acht neun zehn");
+			startChunk("eins zwei drei vier fünf sechs sieben acht neun zehn");
 			Thread.sleep(initialDelay);
 			long timeBeforeAbort = System.currentTimeMillis();
 			asm.stopAfterOngoingPhoneme();
@@ -72,20 +72,20 @@ public class SynthesisModulePauseStopUnitTest extends SynthesisModuleAdaptationU
 	}
 	
 	/**
-	 * assert that stopping results in the underlying phraseIUs being, well, what?
+	 * assert that stopping results in the underlying chunkIUs being, well, what?
 	 */
 	@Test(timeout=60000)
-	public void testPhraseIUProgressOnStop() throws InterruptedException {
+	public void testChunkIUProgressOnStop() throws InterruptedException {
 		int[] delay = { 100, 200, 1500, 2100, 3500 };
-		// we expect the first phrase to be ongoing for 300 and 700 ms, and to have completed after 2100 ms
-		Progress[][] expectedProgressOfFirstPhrase = { { Progress.ONGOING }, 
+		// we expect the first chunk to be ongoing for 300 and 700 ms, and to have completed after 2100 ms
+		Progress[][] expectedProgressOfFirstChunk = { { Progress.ONGOING }, 
 											   { Progress.ONGOING }, 
 											   { Progress.ONGOING, Progress.COMPLETED }, 
 											   { Progress.ONGOING, Progress.COMPLETED }, 
 											   { Progress.ONGOING, Progress.COMPLETED }, 
 											 };
-		// we expect the second phrase to only start after more than 700 ms, and to be completed before 3500 ms
-		Progress[][] expectedProgressOfSecondPhrase = { 
+		// we expect the second chunk to only start after more than 700 ms, and to be completed before 3500 ms
+		Progress[][] expectedProgressOfSecondChunk = { 
 												{ },
 										        { },
 										        { Progress.UPCOMING, Progress.ONGOING },										       
@@ -93,30 +93,30 @@ public class SynthesisModulePauseStopUnitTest extends SynthesisModuleAdaptationU
 										        { Progress.UPCOMING, Progress.ONGOING, Progress.COMPLETED },										       
 											  };
 		for (int i = 0; i < delay.length; i++) {
-			PhraseIU firstPhrase = new PhraseIU("Ein ganz besonders langer"); // takes ~ 870 ms
-			final List<Progress> firstPhraseProgressUpdates = new ArrayList<Progress>();
-			firstPhrase.addUpdateListener(new IUUpdateListener() {@Override
+			ChunkIU firstChunk = new ChunkIU("Ein ganz besonders langer"); // takes ~ 870 ms
+			final List<Progress> firstChunkProgressUpdates = new ArrayList<Progress>();
+			firstChunk.addUpdateListener(new IUUpdateListener() {@Override
 				public void update(IU updatedIU) {
-					firstPhraseProgressUpdates.add(updatedIU.getProgress());
+					firstChunkProgressUpdates.add(updatedIU.getProgress());
 				}});
-			PhraseIU secondPhrase = new PhraseIU("und sehr komplizierter Satz."); // full utterances takes ~2700 ms
-			final List<Progress> secondPhraseProgressUpdates = new ArrayList<Progress>();
-			secondPhrase.addUpdateListener(new IUUpdateListener() {@Override
+			ChunkIU secondChunk = new ChunkIU("und sehr komplizierter Satz."); // full utterances takes ~2700 ms
+			final List<Progress> secondChunkProgressUpdates = new ArrayList<Progress>();
+			secondChunk.addUpdateListener(new IUUpdateListener() {@Override
 				public void update(IU updatedIU) {
-					secondPhraseProgressUpdates.add(updatedIU.getProgress());
+					secondChunkProgressUpdates.add(updatedIU.getProgress());
 				}});
-			myIUModule.addIUAndUpdate(firstPhrase);
-			myIUModule.addIUAndUpdate(secondPhrase);
+			myIUModule.addIUAndUpdate(firstChunk);
+			myIUModule.addIUAndUpdate(secondChunk);
 			Thread.sleep(delay[i]);
 			asm.stopAfterOngoingWord();
 			dispatcher.waitUntilDone();
-			//System.err.println(firstPhraseProgressUpdates.toString());
-			assertArrayEquals("in round " + i + " first Phrase updates: " + firstPhraseProgressUpdates.toString(), 
-					expectedProgressOfFirstPhrase[i], 
-					firstPhraseProgressUpdates.toArray());
-			assertArrayEquals("in round " + i + " second Phrase updates: " + secondPhraseProgressUpdates.toString(), 
-					expectedProgressOfSecondPhrase[i], 
-					secondPhraseProgressUpdates.toArray());
+			//System.err.println(firstChunkProgressUpdates.toString());
+			assertArrayEquals("in round " + i + " first chunk updates: " + firstChunkProgressUpdates.toString(), 
+					expectedProgressOfFirstChunk[i], 
+					firstChunkProgressUpdates.toArray());
+			assertArrayEquals("in round " + i + " second chunk updates: " + secondChunkProgressUpdates.toString(), 
+					expectedProgressOfSecondChunk[i], 
+					secondChunkProgressUpdates.toArray());
 		}
 	}
 

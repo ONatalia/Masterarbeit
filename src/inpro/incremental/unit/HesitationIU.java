@@ -3,7 +3,7 @@ package inpro.incremental.unit;
 import java.util.Collections;
 import java.util.List;
 
-public class HesitationIU extends PhraseIU {
+public class HesitationIU extends ChunkIU {
 
 	public static final SysInstallmentIU protoHesitation;
 	
@@ -17,7 +17,7 @@ public class HesitationIU extends PhraseIU {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // the casts for GRINs
 	public HesitationIU() {
-		super("<hes>", PhraseIU.PhraseType.NONFINAL);
+		super("<hes>", ChunkIU.ChunkType.NONFINAL);
 		this.groundedIn = (List) Collections.singletonList(new SyllableIU(null, (List) protoHesitation.getSegments()));
 		protoHesitation.scaleDeepCopyAndStartAtZero(1f); // create new IU substructure for the next protohesitation
 	}
@@ -34,7 +34,7 @@ public class HesitationIU extends PhraseIU {
 		}
 	}
 	
-	/** a hesitation PhraseIU is it's own word */
+	/** a hesitation ChunkIU is it's own word */
 	@Override
 	public List<WordIU> getWords() {
 		return Collections.<WordIU>singletonList(this);

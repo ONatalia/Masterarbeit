@@ -15,7 +15,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
 import inpro.incremental.unit.SysInstallmentIU;
-import inpro.incremental.util.TTSUtil.Paragraph;
+import inpro.incremental.util.TTSUtil.AllContent;
 import inpro.synthesis.MaryAdapter;
 
 
@@ -38,14 +38,14 @@ public class TTSUtilTest {
 		
 		TTSUtil.wordIUsFromMaryXML(is, null);
 
-		JAXBContext context = JAXBContext.newInstance(Paragraph.class);
+		JAXBContext context = JAXBContext.newInstance(AllContent.class);
 		JAXBResult result = new JAXBResult(context);
 		TransformerFactory tf = TransformerFactory.newInstance();
 		Transformer t = tf.newTransformer(new StreamSource(TTSUtil.class.getResourceAsStream("mary2simple.xsl")));
 		is = ma.text2maryxml(testUtterance);
 		t.transform(new StreamSource(is), result);
 		
-		Paragraph paragraph = (Paragraph) result.getResult(); //unmarshaller.unmarshal(is);
+		AllContent paragraph = (AllContent) result.getResult(); //unmarshaller.unmarshal(is);
 		
 		System.err.println(paragraph.toString());
 		Marshaller marshaller = context.createMarshaller();

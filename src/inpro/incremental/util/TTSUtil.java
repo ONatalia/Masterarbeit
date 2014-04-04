@@ -2,6 +2,7 @@ package inpro.incremental.util;
 
 import inpro.annotation.Label;
 import inpro.incremental.unit.IU;
+import inpro.incremental.unit.PhraseIU;
 import inpro.incremental.unit.SyllableIU;
 import inpro.incremental.unit.SysSegmentIU;
 import inpro.incremental.unit.WordIU;
@@ -36,17 +37,17 @@ import marytts.htsengine.HTSModel;
  */
 public class TTSUtil {
 	
-	public static List<WordIU> wordIUsFromMaryXML(InputStream is, List<HTSModel> hmms) {
-		Paragraph paragraph ;
+	private static AllContent mary2content(InputStream is) {
+		AllContent content;
 		try {
-			JAXBContext context = JAXBContext.newInstance(Paragraph.class);
+			JAXBContext context = JAXBContext.newInstance(AllContent.class);
 			JAXBResult result = new JAXBResult(context);
 			TransformerFactory tf = TransformerFactory.newInstance();
 			Transformer t;
 			is.mark(Integer.MAX_VALUE);
 			t = tf.newTransformer(new StreamSource(TTSUtil.class.getResourceAsStream("mary2simple.xsl")));
 			t.transform(new StreamSource(is), result);
-			paragraph = (Paragraph) result.getResult(); //unmarshaller.unmarshal(is);
+			content = (AllContent) result.getResult(); //unmarshaller.unmarshal(is);
 		} catch (Exception te) {
 			try {
 				is.reset();
@@ -58,7 +59,12 @@ public class TTSUtil {
 			te.printStackTrace();
 			throw new RuntimeException(te);
 		}
-		List<WordIU> words =  paragraph.getWordIUs(hmms != null ? hmms.iterator() : null);
+		return content;
+	}
+	
+	public static List<WordIU> wordIUsFromMaryXML(InputStream is, List<HTSModel> synthesisPayload) {
+		AllContent content = mary2content(is);
+		List<WordIU> words =  content.getWordIUs(synthesisPayload != null ? synthesisPayload.iterator() : Collections.<HTSModel>emptyIterator());
 		// remove utterance final silences
 		ListIterator<WordIU> fromEnd = words.listIterator(words.size());
 		while (fromEnd.hasPrevious()) {
@@ -73,37 +79,99 @@ public class TTSUtil {
 		return words;
 	}
 	
-	@XmlRootElement(name = "s")
-	static class Paragraph {
+	public static List<PhraseIU> phraseIUsFromMaryXML(InputStream is, List<HTSModel> synthesisPayload, boolean connectPhrases) {
+		AllContent content = mary2content(is);
+		List<PhraseIU> phrases =  content.getPhraseIUs(synthesisPayload != null ? synthesisPayload.iterator() : Collections.<HTSModel>emptyIterator(), connectPhrases);
+		return phrases;
+	}
+	
+	@XmlRootElement(name = "all")
+	static class AllContent {
+		@XmlElement(name = "phr")
+		private List<Phrase> phrases;
+
+		@Override
+		public String toString() {
+			return phrases.toString();
+		}
+		
+		public List<PhraseIU> getPhraseIUs(Iterator<HTSModel> hmmIterator, boolean connect) {
+			List<PhraseIU> phraseIUs = new ArrayList<PhraseIU>(phrases.size());
+			IU prev = null;
+			for (Phrase phrase : phrases) {
+				PhraseIU pIU = phrase.toIU(hmmIterator);
+				if (connect) {
+					pIU.connectSLL(prev);
+				}
+				phraseIUs.add(pIU);
+				prev = pIU;
+			}
+			return phraseIUs;
+		}
+		
+		public List<WordIU> getWordIUs(Iterator<HTSModel> hmmIterator) {
+			List<PhraseIU> phraseIUs = getPhraseIUs(hmmIterator, true);
+			List<WordIU> wordIUs = new ArrayList<WordIU>();
+			for (PhraseIU phraseIU : phraseIUs) {
+				wordIUs.addAll(phraseIU.getWords());
+			}
+			return wordIUs;
+		}
+	}
+	
+	@XmlRootElement(name = "phr")
+	private static class Phrase {
+		@XmlMixed
+		private List<String> tokenList;
+		@XmlAttribute private String tone;
+		@XmlAttribute private int breakIndex;
+		@XmlAttribute private String pitchOffset;
+		private transient double pitchOffsetValue;
+		@XmlAttribute private String pitchRange;
+		private transient double pitchRangeValue;
 		@XmlElement(name = "t")
 		private List<Word> words;
+
+		@SuppressWarnings("unused")
+		public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+			List<Word> newWords = new ArrayList<Word>(words.size());
+			// filter out the occasional empty words (which are caused by punctuation) 
+			for (Word word : words) {
+				if (!word.isEmpty())
+					newWords.add(word);
+			}
+
+			words = newWords;
+		}
+		
+		String phraseText() {
+			String retVal = "";
+			for (Word w : words) {
+				if (!w.isBreak() && !retVal.equals("")) {
+					retVal += " ";
+				}
+				retVal += w.token;
+			}
+			return retVal;
+		}
+
+		public PhraseIU toIU(Iterator<HTSModel> hmmIterator) {
+			List<WordIU> wordIUs = new ArrayList<WordIU>(words.size());
+			WordIU prev = null;
+			for (Word w : words) {
+				WordIU wIU = w.toIU(hmmIterator);
+				wIU.connectSLL(prev);
+				wordIUs.add(wIU);
+				prev = wIU;
+			}
+			return new PhraseIU(wordIUs, phraseText(), tone, breakIndex);
+		}
 
 		@Override
 		public String toString() {
 			return words.toString();
 		}
-		
-		@SuppressWarnings("unused")
-		public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-			List<Word> newWords = new ArrayList<Word>(words.size());
-			for (Word word : words) {
-				if (!word.isEmpty())
-					newWords.add(word);
-			}
-			words = newWords;
-		}
-		
-		public List<WordIU> getWordIUs(Iterator<HTSModel> hmmIterator) {
-			List<WordIU> wordIUs = new ArrayList<WordIU>(words.size());
-			WordIU prev = null;
-			for (Word word : words) {
-				WordIU wordIU = word.toIU(hmmIterator);
-				wordIU.connectSLL(prev);
-				wordIUs.add(wordIU);
-				prev = wordIU;
-			}
-			return wordIUs;
-		}
+
 	}
 	
 	@XmlRootElement(name = "t")
@@ -111,6 +179,8 @@ public class TTSUtil {
 		@XmlMixed
 		private List<String> tokenList;
 		private transient String token;
+		@XmlAttribute private boolean isBreak;
+		@XmlAttribute private String pos; 
 		@XmlElement(name = "syl")
 		private List<Syllable> syllables;
 		
@@ -136,6 +206,10 @@ public class TTSUtil {
 			return syllables == null || syllables.isEmpty();
 		}
 		
+		public boolean isBreak() {
+			return isBreak;
+		}
+		
 		@Override
 		public String toString() {
 			return "; " + token + "\n" + ((syllables != null) ? syllables.toString() : "");
@@ -150,17 +224,17 @@ public class TTSUtil {
 				syllableIUs.add(sIU);
 				prev = sIU;
 			}
-			return new WordIU(token, null, syllableIUs);
+			WordIU wiu = new WordIU(token, isBreak(), null, syllableIUs);
+			wiu.setUserData("pos", pos);
+			return wiu;
 		}
 	}
 	
 	@XmlRootElement(name = "syl") 
 	private static class Syllable {
-		@XmlAttribute(name = "stress")
-		private String stress;
-		@XmlAttribute(name = "accent")		
-		private String accent;
-		@XmlElement(name = "ph")
+		@XmlAttribute private String stress;
+		@XmlAttribute private String accent;
+		@XmlElement(name = "seg")
 		private List<Segment> segments;
 		
 		@Override
@@ -177,11 +251,14 @@ public class TTSUtil {
 				segmentIUs.add(sIU);
 				prev = sIU;
 			}
-			return new SyllableIU(null, segmentIUs);
+			SyllableIU siu = new SyllableIU(null, segmentIUs);
+			siu.setUserData("stress", stress);
+			siu.setUserData("accent", accent);
+			return siu;
 		}
 	}
 	
-	@XmlRootElement(name = "ph")
+	@XmlRootElement(name = "seg")
 	private static class Segment {
 		@XmlAttribute(name = "d")
 		private int duration;
@@ -235,11 +312,14 @@ public class TTSUtil {
 		
 		public SysSegmentIU toIU(Iterator<HTSModel> hmmIterator) {
 			Label l = new Label(endTime - (duration / TimeUtil.SECOND_TO_MILLISECOND_FACTOR), endTime, sampaLabel);
-			SysSegmentIU segIU = new SysSegmentIU(l, pitchMarks);
-			if (hmmIterator != null && hmmIterator.hasNext()) {
+			SysSegmentIU segIU;
+			assert hmmIterator != null;
+			if (hmmIterator.hasNext()) { // the HMM case
 				HTSModel hmm = hmmIterator.next();
 				assert (sampaLabel.equals(hmm.getPhoneName())) : " oups, wrong segment alignment: " + sampaLabel + " != " + hmm.getPhoneName();
-				segIU.setHTSModel(hmm);
+				segIU = new SysSegmentIU(l, pitchMarks, hmm, null);
+			} else { // the standard case: no HMM synthesis with this segment
+				segIU = new SysSegmentIU(l, pitchMarks);
 			}
 			return segIU;
 		}

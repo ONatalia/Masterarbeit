@@ -32,11 +32,19 @@ public class WordIU extends IU {
 		this(spelling, null, sll, groundedIn);
 	}
 	
-	protected WordIU(String word, Pronunciation pron, WordIU sll, List<IU> groundedIn) {
+	public WordIU(String token, boolean isSilence, WordIU sll, List<IU> groundedIn) {
+		this(token, null, sll, groundedIn, isSilence);
+	}
+	
+	public WordIU(String word, Pronunciation pron, WordIU sll, List<IU> groundedIn) {
+		this(word, pron, sll, groundedIn, "<sil>".equals(word));
+	}
+	
+	protected WordIU(String word, Pronunciation pron, WordIU sll, List<IU> groundedIn, boolean isSilence) {
 		super(sll, groundedIn, true);
 		this.pron = pron;
 		this.word = word;
-		isSilence = this.word.equals("<sil>");
+		this.isSilence = isSilence;
 	}
 	
 	/**

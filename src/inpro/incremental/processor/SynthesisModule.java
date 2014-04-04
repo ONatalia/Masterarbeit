@@ -6,8 +6,8 @@ import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.HesitationIU;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.IU.Progress;
-import inpro.incremental.unit.PhraseBasedInstallmentIU;
-import inpro.incremental.unit.PhraseIU;
+import inpro.incremental.unit.ChunkBasedInstallmentIU;
+import inpro.incremental.unit.ChunkIU;
 import inpro.incremental.unit.SysInstallmentIU;
 import inpro.incremental.unit.SysSegmentIU;
 import inpro.incremental.unit.WordIU;
@@ -34,9 +34,9 @@ public class SynthesisModule extends IUModule {
 	
 	protected DispatchStream speechDispatcher;
 	
-	protected PhraseBasedInstallmentIU currentInstallment;
+	protected ChunkBasedInstallmentIU currentInstallment;
 	
-	private Any2PhraseIUWrapper words2phrase = new Any2PhraseIUWrapper(); 
+	private Any2ChunkIUWrapper words2chunk = new Any2ChunkIUWrapper(); 
 	
 	/** 
 	 * This constructor is necessary for use with Configuration Management. 
@@ -62,7 +62,7 @@ public class SynthesisModule extends IUModule {
 	}
 	
 	/**
-	 * please only send PhraseIUs or WordIUs; everything else will result in assertions failing
+	 * please only send ChunkIUs or WordIUs; everything else will result in assertions failing
 	 */
 	@Override
 	protected synchronized void leftBufferUpdate(Collection<? extends IU> ius,
@@ -70,7 +70,7 @@ public class SynthesisModule extends IUModule {
 		boolean startPlayInstallment = false;
 		for (EditMessage<?> em : edits) {
 			logger.debug(em.getType() + " " + em.getIU().toPayLoad());
-			PhraseIU phraseIU = words2phrase.getPhraseIU(em.getIU());
+			ChunkIU chunkIU = words2chunk.getChunkIU(em.getIU());
 			switch (em.getType()) {
 			case ADD:
 				if (currentInstallment != null && !currentInstallment.isCompleted()) {
@@ -78,38 +78,38 @@ public class SynthesisModule extends IUModule {
 					// mark the ongoing utterance as non-final, (includes check whether there's still enough time)
 					boolean canContinue = ((SysSegmentIU) choiceWord.getLastSegment()).setAwaitContinuation(true);
 					if (canContinue) {
-						currentInstallment.appendPhrase(phraseIU);
+						currentInstallment.appendChunk(chunkIU);
 					} else { 
 						currentInstallment = null;
 					}
 				} 
 				if (currentInstallment == null || currentInstallment.isCompleted()) { // start a new installment
-					if (phraseIU instanceof HesitationIU)
-						currentInstallment = new PhraseBasedInstallmentIU((HesitationIU) phraseIU);
+					if (chunkIU instanceof HesitationIU)
+						currentInstallment = new ChunkBasedInstallmentIU((HesitationIU) chunkIU);
 					else
-						currentInstallment = new PhraseBasedInstallmentIU(phraseIU);
+						currentInstallment = new ChunkBasedInstallmentIU(chunkIU);
 					startPlayInstallment = true;
 				}
-				appendNotification(currentInstallment, phraseIU);
+				appendNotification(currentInstallment, chunkIU);
 				break;
 			case REVOKE:
 				if (currentInstallment == null || currentInstallment.isCompleted()) {
-					logger.warn("phrase " + phraseIU + " was revoked but installment has been completed already, can't revoke anymore.");
+					logger.warn("chunk " + chunkIU + " was revoked but installment has been completed already, can't revoke anymore.");
 				} else {
-					if (!phraseIU.isUpcoming()) {
-						logger.warn("phrase " + phraseIU + " is not upcoming anymore, can't revoke anymore. (send us an e-mail if you really need to revoke ongoing phrases)");
+					if (!chunkIU.isUpcoming()) {
+						logger.warn("chunk " + chunkIU + " is not upcoming anymore, can't revoke anymore. (send us an e-mail if you really need to revoke ongoing chunks)");
 					} else {
-						currentInstallment.revokePhrase(phraseIU);
+						currentInstallment.revokeChunk(chunkIU);
 					}
 				}
 				break;
 			case COMMIT:
-				// ensure that this phrase can be finished
-				phraseIU.setFinal();
+				// ensure that this chunk can be finished
+				chunkIU.setFinal();
 				if (currentInstallment == null) 
 					break; // do nothing if the installment has been discarded already
 				for (SysSegmentIU seg : currentInstallment.getSegments()) {
-					// clear any locks that might block the vocoder from finishing the utterance phrase
+					// clear any locks that might block the vocoder from finishing the utterance chunk
 					seg.setAwaitContinuation(false);			
 				}
 				currentInstallment = null; 
@@ -127,10 +127,10 @@ public class SynthesisModule extends IUModule {
 			rightBuffer.setBuffer(currentInstallment.getWords());
 	}
 	
-	private void appendNotification(SysInstallmentIU installment, PhraseIU phrase) {
-		IUUpdateListener listener = new NotifyCompletedOnOngoing(phrase);
+	private void appendNotification(SysInstallmentIU installment, ChunkIU chunk) {
+		IUUpdateListener listener = new NotifyCompletedOnOngoing(chunk);
 		// add listener to first segment for UPCOMING/ONGOING updates
-		phrase.getFirstSegment().addUpdateListener(listener);
+		chunk.getFirstSegment().addUpdateListener(listener);
 		String updateposition = System.getProperty("proso.cond.updateposition", "end");
 		if (updateposition.equals("end")) 
 			installment.getFinalWord()
@@ -151,27 +151,27 @@ public class SynthesisModule extends IUModule {
 			else
 				throw new RuntimeException("proso.cond.updateposition was set to the invalid value " + updateposition);
 				
-			if (phrase.groundedIn().size() <= req) {
-				logger.warn("cannot update on " + req + ", will update on " + (phrase.groundedIn().size() - 1) + " instead");
-				req = phrase.groundedIn().size() - 1;
+			if (chunk.groundedIn().size() <= req) {
+				logger.warn("cannot update on " + req + ", will update on " + (chunk.groundedIn().size() - 1) + " instead");
+				req = chunk.groundedIn().size() - 1;
 			}
-			((WordIU) phrase.groundedIn().get(req))
+			((WordIU) chunk.groundedIn().get(req))
 			.getLastSegment().getSameLevelLink()
 			.addUpdateListener(listener);
 		}
 	}
 	
-	/** notifies the given PhraseIU when the IU this is listening to is completed */
+	/** notifies the given ChunkIU when the IU this is listening to is completed */
 	class NotifyCompletedOnOngoing implements IUUpdateListener {
-		PhraseIU completed;
+		ChunkIU completed;
 		Progress previousProgress = null;
-		NotifyCompletedOnOngoing(PhraseIU notify) {
+		NotifyCompletedOnOngoing(ChunkIU notify) {
 			completed = notify;
 		}
-		/** @param updatingIU the SegmentIU that this listener is attached to in {@link SynthesisModule#appendNotification(SysInstallmentIU, PhraseIU)} */
+		/** @param updatingIU the SegmentIU that this listener is attached to in {@link SynthesisModule#appendNotification(SysInstallmentIU, ChunkIU)} */
 		@Override
 		public void update(IU updatingIU) {
-			if (updatingIU.isCompleted() && updatingIU != completed.getFirstSegment()) { // make sure that the phrase is marked as completed even though not necessarily the last segment has been completed
+			if (updatingIU.isCompleted() && updatingIU != completed.getFirstSegment()) { // make sure that the chunk is marked as completed even though not necessarily the last segment has been completed
                 completed.setProgress(Progress.COMPLETED);
                 previousProgress = completed.getProgress();
             }
@@ -181,19 +181,19 @@ public class SynthesisModule extends IUModule {
 		}
 	}
 	
-	class Any2PhraseIUWrapper {
-		Map<WordIU,PhraseIU> map = new HashMap<WordIU,PhraseIU>();
-		PhraseIU getPhraseIU(WordIU w) {
+	class Any2ChunkIUWrapper {
+		Map<WordIU,ChunkIU> map = new HashMap<WordIU,ChunkIU>();
+		ChunkIU getChunkIU(WordIU w) {
 			if (!map.containsKey(w)) {
 				if ("<hes>".equals(w.toPayLoad()))
 					map.put(w,  new HesitationIU());
 				else 
-					map.put(w, new PhraseIU(w));
+					map.put(w, new ChunkIU(w));
 			}
 			return map.get(w);
 		}
-		PhraseIU getPhraseIU(IU iu) {
-			return (iu instanceof PhraseIU) ? (PhraseIU) iu : getPhraseIU((WordIU) iu);
+		ChunkIU getChunkIU(IU iu) {
+			return (iu instanceof ChunkIU) ? (ChunkIU) iu : getChunkIU((WordIU) iu);
 		}
 	}
 	

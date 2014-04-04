@@ -1,6 +1,7 @@
 package inpro.synthesis;
 
 import inpro.incremental.unit.IU;
+import inpro.incremental.unit.PhraseIU;
 import inpro.incremental.util.TTSUtil;
 
 import java.io.ByteArrayInputStream;
@@ -119,6 +120,12 @@ public abstract class MaryAdapter {
 		InputStream is = text2maryxml(tts);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, Collections.<HTSModel>emptyList());
+		return groundedIn;
+	}
+	
+	public List<PhraseIU> text2phraseIUs(String tts) {
+		InputStream is = text2maryxml(tts);
+		List<PhraseIU> groundedIn = TTSUtil.phraseIUsFromMaryXML(is, Collections.<HTSModel>emptyList(), true);
 		return groundedIn;
 	}
 	

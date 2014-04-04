@@ -5,6 +5,7 @@ package inpro.synthesis;
  */
 
 import inpro.incremental.unit.IU;
+import inpro.incremental.unit.PhraseIU;
 import inpro.incremental.util.TTSUtil;
 import inpro.synthesis.hts.InteractiveHTSEngine;
 import inpro.synthesis.hts.PHTSParameterGeneration;
@@ -84,6 +85,31 @@ public class MaryAdapter4internal extends MaryAdapter {
 		return groundedIn;
 	}
 	
+	@Override
+	public synchronized List<PhraseIU> text2phraseIUs(String tts) {
+		return text2phraseIUs(tts, true);
+	}
+	
+	public synchronized List<PhraseIU> text2phraseIUs(String tts, boolean connectedPhrases) {
+		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class);
+		ihtse.resetUttHMMstore();
+		InputStream is = text2maryxml(tts);
+/*		BufferedReader in = new BufferedReader(new InputStreamReader(is));
+		String line = null;
+		try {
+			while((line = in.readLine()) != null) {
+			  System.err.println(line);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ihtse.resetUttHMMstore();
+		is = text2maryxml(tts); /**/
+		List<PhraseIU> groundedIn = TTSUtil.phraseIUsFromMaryXML(is, ihtse.getUttHMMs(), connectedPhrases);
+		return groundedIn;
+	}
+
 	public static HMMData getDefaultHMMData() {
 		String defaultVoiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
 		Voice voice = Voice.getVoice(defaultVoiceName);

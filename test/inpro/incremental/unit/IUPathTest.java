@@ -44,7 +44,7 @@ public class IUPathTest {
 		assertSame(instIU.getFromNetwork("down", "next", "back"), instIU.getFromNetwork("down"));
 		assertSame(instIU.getFromNetwork("down", "next[-1]", "back[0]"), instIU.getFromNetwork("down"));
 		assertSame(instIU.getFromNetwork("down", "down", "down"), instIU.getSegments().get(0));
-		//TODO: this is a problem with SysInstallmentIUs: they point downwards to words, but the words point up to phrases...
+		//TODO: this is a problem with SysInstallmentIUs: they point downwards to words, but the words point up to chunks...
 		//assertSame(instIU.getFromNetwork("down", "down", "up", "up"), instIU);
 		assertSame(instIU.getFromNetwork("down", "down", "up"), instIU.getFromNetwork("down"));
 		// the last segment of the last syllable of the first word should be the same as the segment preceding the second word's first 
