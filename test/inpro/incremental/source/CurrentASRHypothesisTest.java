@@ -79,7 +79,8 @@ public class CurrentASRHypothesisTest {
 					previouslyRevokedWord = inputWord;
 					break;
 				case ADD:
-					assertTrue(previouslyRevokedWord == null || !previouslyRevokedWord.payloadEquals(inputWord));
+					assertTrue("revoked IUs should not be re-added (but this one was:) " + previouslyRevokedWord, 
+							previouslyRevokedWord == null || !previouslyRevokedWord.equals(inputWord));
 					previouslyRevokedWord = null;
 					break;
 				default: 
