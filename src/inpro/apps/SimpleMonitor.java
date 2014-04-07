@@ -271,25 +271,32 @@ public class SimpleMonitor implements RtpListener {
 		if (clp.verbose()) System.err.println(arg0);
 	}
 	
-	@SuppressWarnings("unused")
+	public static DispatchStream setupDispatcher() {
+		return setupDispatcher(SimpleMonitor.class.getResource("config.xml"));
+	}
+	
 	public static DispatchStream setupDispatcher(URL configURL) {
-		ConfigurationManager cm = new ConfigurationManager(configURL);
 		final String tmpAudio = "file:///" + System.getProperty("java.io.tmpdir") + "/" + "monitor.raw";
 		MonitorCommandLineParser clp = new MonitorCommandLineParser(new String[] {
-				"-F", tmpAudio, "-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
+				"-c", configURL.toString(), 
+				"-F", tmpAudio, // output to /tmp/monitor.raw
+				"-S", // output to speakers
+				"-D" // -M is just a placeholder here, it's immediately overridden in the next line:
 			});
-		clp.setInputMode(CommonCommandLineParser.DISPATCHER_OBJECT_INPUT);
+		return setupDispatcher(clp);
+	}
+	
+	@SuppressWarnings("unused") // SimpleMonitor needs to be called for a full setup but is never used afterwards
+	public static DispatchStream setupDispatcher(MonitorCommandLineParser clp) {
+		assert clp.getInputMode() == CommonCommandLineParser.DISPATCHER_OBJECT_INPUT || clp.getInputMode() == CommonCommandLineParser.DISPATCHER_OBJECT_2_INPUT;
+		ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
 		try {
 			new SimpleMonitor(clp, cm);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		return (DispatchStream) cm.lookup("dispatchStream");		
-	}
-	
-	public static DispatchStream setupDispatcher() {
-		return setupDispatcher(SimpleMonitor.class.getResource("config.xml"));
+		return (DispatchStream) cm.lookup("dispatchStream");
 	}
 	
     /**
