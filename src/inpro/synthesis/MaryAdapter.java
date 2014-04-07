@@ -15,8 +15,6 @@ import java.util.List;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
-import marytts.htsengine.HTSModel;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -119,13 +117,13 @@ public abstract class MaryAdapter {
 	public List<IU> text2IUs(String tts) {
 		InputStream is = text2maryxml(tts);
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, Collections.<HTSModel>emptyList());
+		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, Collections.<TTSUtil.SynthesisPayload>emptyList());
 		return groundedIn;
 	}
 	
 	public List<PhraseIU> text2phraseIUs(String tts) {
 		InputStream is = text2maryxml(tts);
-		List<PhraseIU> groundedIn = TTSUtil.phraseIUsFromMaryXML(is, Collections.<HTSModel>emptyList(), true);
+		List<PhraseIU> groundedIn = TTSUtil.phraseIUsFromMaryXML(is, Collections.<TTSUtil.SynthesisPayload>emptyList(), true);
 		return groundedIn;
 	}
 	

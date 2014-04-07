@@ -53,13 +53,15 @@ public class SysInstallmentIU extends InstallmentIU {
 		for (WordIU w : words) {
 			List<SysSegmentIU> newSegments = new ArrayList<SysSegmentIU>();
 			for (SegmentIU seg : w.getSegments()) {
-				// TODO: these will have to become SysSegementIUs when I add pitch-scaling!
+				// TODO: these will have to become SysSegmentIUs when I add pitch-scaling!
 				newSegments.add(new SysSegmentIU(new Label(
 						(seg.l.getStart() - startTime) * scale, 
 						(seg.l.getEnd() - startTime) * scale, 
 						seg.l.getLabel()
 				), seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).pitchMarks : Collections.<PitchMark>emptyList(),
-				   seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).htsModel : null,
+				   seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).legacyHTSmodel : null,
+				   seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).fv : null,
+			       seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).hmmdata : null,
 				   seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).hmmSynthesisFeatures : Collections.<FullPFeatureFrame>emptyList()));
 			}
 			// connect same-level-links

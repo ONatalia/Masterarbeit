@@ -61,7 +61,7 @@ public class MaryAdapter4internal extends MaryAdapter {
 	    ihtse.synthesizeAudio = true;
 		return is;
 	}
-
+	
 	@Override
 	public synchronized List<IU> text2IUs(String tts) {
 		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class);
@@ -81,7 +81,7 @@ public class MaryAdapter4internal extends MaryAdapter {
 		ihtse.resetUttHMMstore();
 		is = text2maryxml(tts); /**/
 		@SuppressWarnings({ "unchecked", "rawtypes" })
-		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, ihtse.getUttHMMs());
+		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, ihtse.getUttData());
 		return groundedIn;
 	}
 	
@@ -106,7 +106,7 @@ public class MaryAdapter4internal extends MaryAdapter {
 		}
 		ihtse.resetUttHMMstore();
 		is = text2maryxml(tts); /**/
-		List<PhraseIU> groundedIn = TTSUtil.phraseIUsFromMaryXML(is, ihtse.getUttHMMs(), connectedPhrases);
+		List<PhraseIU> groundedIn = TTSUtil.phraseIUsFromMaryXML(is, ihtse.getUttData(), connectedPhrases);
 		return groundedIn;
 	}
 

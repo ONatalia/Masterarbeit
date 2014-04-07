@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 
+import marytts.features.FeatureVector;
+import marytts.htsengine.HMMData;
 import marytts.htsengine.HTSModel;
 
 import org.apache.log4j.Logger;
@@ -26,7 +28,10 @@ public class SysSegmentIU extends SegmentIU {
 	/** the label that was originally planned by TTS, before any stretching has been done */ 
 	Label originalLabel;
 	List<PitchMark> pitchMarks;
-	HTSModel htsModel = null;
+	public HMMData hmmdata = null;
+	public FeatureVector fv = null;
+	public HTSModel legacyHTSmodel = null;
+	HTSModel htsModel;
 	List<FullPFeatureFrame> hmmSynthesisFeatures;
 	public double pitchShiftInCent = 0.0;
 	private VocodingFramePostProcessor vocodingFramePostProcessor = null;
@@ -37,16 +42,19 @@ public class SysSegmentIU extends SegmentIU {
 	
 	boolean awaitContinuation; // used to mark that a continuation will follow, even though no fSLL exists yet.
 	
-	public SysSegmentIU(Label l, List<PitchMark> pitchMarks, HTSModel htsModel, List<FullPFeatureFrame> featureFrames) {
+	public SysSegmentIU(Label l, List<PitchMark> pitchMarks, HTSModel htsModel, FeatureVector fv, HMMData hmmdata, List<FullPFeatureFrame> featureFrames) {
 		super(l);
 		plannedLabel = new Label(l);
 		this.pitchMarks = pitchMarks;
-		this.htsModel = htsModel;
+		this.fv = fv;
+		this.hmmdata = hmmdata;
 		this.hmmSynthesisFeatures = featureFrames;
+		if (htsModel != null)
+			this.setHTSModel(htsModel);
 	}
 	
 	public SysSegmentIU(Label l, List<PitchMark> pitchMarks) {
-		this(l, pitchMarks, null, null);
+		this(l, pitchMarks, null, null, null, null);
 	}
 	
 	@Override
@@ -106,7 +114,7 @@ public class SysSegmentIU extends SegmentIU {
 	private static int appendSllHtsModel(List<HTSModel> hmms, IU sll) {
 		int length = 0;
 		if (sll != null && sll instanceof SysSegmentIU) {
-			HTSModel hmm = ((SysSegmentIU) sll).htsModel;
+			HTSModel hmm = ((SysSegmentIU) sll).legacyHTSmodel;
 			hmms.add(hmm);
 			length = hmm.getTotalDur();
 		}
@@ -115,44 +123,52 @@ public class SysSegmentIU extends SegmentIU {
 	
 	private static PHTSParameterGeneration paramGen = null;
 
-		// synthesizes 
-		private void generateParameterFrames() {
-			assert this.htsModel != null;
-			List<HTSModel> localHMMs = new ArrayList<HTSModel>();
-			/** iterates over left/right context IUs */
-			SysSegmentIU contextIU = this;
-			/** size of left context; increasing this may improve synthesis performance at the cost of computational effort */
-			int maxPredecessors = 7;  
-			// initialize contextIU to the very first IU in the list
-			while (contextIU.getSameLevelLink() != null && maxPredecessors > 0) {
-				contextIU = (SysSegmentIU) contextIU.getSameLevelLink();
-				maxPredecessors--;
-			}
-			// now traverse the predecessor IUs and add their models to the list
-			int start = 0;
-			while (contextIU != this) {
-				start += appendSllHtsModel(localHMMs, contextIU);
-				contextIU = (SysSegmentIU) contextIU.getNextSameLevelLink();
-			}
-			localHMMs.add(htsModel);
-			int length = htsModel.getTotalDur();
-			awaitContinuation();
-			/** deal with the right context units; increasing this may improve synthesis quality at the cost of computaitonal effort */
-			int maxSuccessors = 3;
-			contextIU = (SysSegmentIU) getNextSameLevelLink();
-			while (contextIU != null && maxSuccessors > 0) {
-				appendSllHtsModel(localHMMs, contextIU);
-				contextIU = (SysSegmentIU) getNextSameLevelLink();
-				maxSuccessors--;
-			}
-			// make sure we have a paramGenerator
-			if (paramGen == null) { paramGen = MaryAdapter4internal.getNewParamGen(); }
-			FullPStream pstream = paramGen.buildFullPStreamFor(localHMMs);
-			hmmSynthesisFeatures = new ArrayList<FullPFeatureFrame>(length);
-			for (int i = start; i < start + length; i++)
-				hmmSynthesisFeatures.add(pstream.getFullFrame(i));
-			//assert htsModel.getNumVoiced() == pitchMarks.size();
+	HTSModel getHTSModel() {
+		if (htsModel != null) {
+			return htsModel;
+		} else 
+			return legacyHTSmodel;
+	}
+	
+	// synthesizes 
+	private void generateParameterFrames() {
+		assert this.legacyHTSmodel != null;
+		HTSModel htsModel = getHTSModel();
+		List<HTSModel> localHMMs = new ArrayList<HTSModel>();
+		/** iterates over left/right context IUs */
+		SysSegmentIU contextIU = this;
+		/** size of left context; increasing this may improve synthesis performance at the cost of computational effort */
+		int maxPredecessors = 7;  
+		// initialize contextIU to the very first IU in the list
+		while (contextIU.getSameLevelLink() != null && maxPredecessors > 0) {
+			contextIU = (SysSegmentIU) contextIU.getSameLevelLink();
+			maxPredecessors--;
 		}
+		// now traverse the predecessor IUs and add their models to the list
+		int start = 0;
+		while (contextIU != this) {
+			start += appendSllHtsModel(localHMMs, contextIU);
+			contextIU = (SysSegmentIU) contextIU.getNextSameLevelLink();
+		}
+		localHMMs.add(htsModel);
+		int length = htsModel.getTotalDur();
+		awaitContinuation();
+		/** deal with the right context units; increasing this may improve synthesis quality at the cost of computaitonal effort */
+		int maxSuccessors = 3;
+		contextIU = (SysSegmentIU) getNextSameLevelLink();
+		while (contextIU != null && maxSuccessors > 0) {
+			appendSllHtsModel(localHMMs, contextIU);
+			contextIU = (SysSegmentIU) getNextSameLevelLink();
+			maxSuccessors--;
+		}
+		// make sure we have a paramGenerator
+		if (paramGen == null) { paramGen = MaryAdapter4internal.getNewParamGen(); }
+		FullPStream pstream = paramGen.buildFullPStreamFor(localHMMs);
+		hmmSynthesisFeatures = new ArrayList<FullPFeatureFrame>(length);
+		for (int i = start; i < start + length; i++)
+			hmmSynthesisFeatures.add(pstream.getFullFrame(i));
+		//assert htsModel.getNumVoiced() == pitchMarks.size();
+	}
 	
 	public FullPFeatureFrame getHMMSynthesisFrame(int req) {
 		if (hmmSynthesisFeatures == null) {
@@ -167,7 +183,8 @@ public class SysSegmentIU extends SegmentIU {
 		// just repeat/drop frames as necessary if the amount of frames available is not right
 		int frameNumber = (int) (req * (fra / (double) dur));
 		FullPFeatureFrame frame =  hmmSynthesisFeatures.get(frameNumber);
-		try { // übler hack!
+/*TIMO pre-Interspeech 2014: pitch marking needs to be reworked; I don't want these errors */
+ 		try { // übler hack!
 		if (frame != null && frame.isVoiced()) {
 			//FIXME: investigate why this is necessary
 			frameNumber = Math.max(0, Math.min(frameNumber, pitchMarks.size() - 1));
@@ -315,7 +332,7 @@ public class SysSegmentIU extends SegmentIU {
 				logger.debug("removing spurious PM in segment " + toPayLoad());
 			}
 		}
-		htsModel = hmm;
+		legacyHTSmodel = hmm;
 	}
 
 	/** copy all data necessary for synthesis -- i.e. the htsModel and pitchmarks */
@@ -323,7 +340,7 @@ public class SysSegmentIU extends SegmentIU {
 		assert payloadEquals(newSeg);
 		this.l = newSeg.l;
 		this.pitchMarks = newSeg.pitchMarks;
-		setHTSModel(newSeg.htsModel);
+		setHTSModel(newSeg.legacyHTSmodel);
 	}
 
 }

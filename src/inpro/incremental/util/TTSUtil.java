@@ -30,6 +30,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
+import marytts.features.FeatureVector;
+import marytts.htsengine.HMMData;
 import marytts.htsengine.HTSModel;
 
 /**
@@ -62,9 +64,9 @@ public class TTSUtil {
 		return content;
 	}
 	
-	public static List<WordIU> wordIUsFromMaryXML(InputStream is, List<HTSModel> synthesisPayload) {
+	public static List<WordIU> wordIUsFromMaryXML(InputStream is, List<SynthesisPayload> synthesisPayload) {
 		AllContent content = mary2content(is);
-		List<WordIU> words =  content.getWordIUs(synthesisPayload != null ? synthesisPayload.iterator() : Collections.<HTSModel>emptyIterator());
+		List<WordIU> words =  content.getWordIUs(synthesisPayload != null ? synthesisPayload.iterator() : Collections.<SynthesisPayload>emptyIterator());
 		// remove utterance final silences
 		ListIterator<WordIU> fromEnd = words.listIterator(words.size());
 		while (fromEnd.hasPrevious()) {
@@ -79,9 +81,9 @@ public class TTSUtil {
 		return words;
 	}
 	
-	public static List<PhraseIU> phraseIUsFromMaryXML(InputStream is, List<HTSModel> synthesisPayload, boolean connectPhrases) {
+	public static List<PhraseIU> phraseIUsFromMaryXML(InputStream is, List<SynthesisPayload> synthesisPayload, boolean connectPhrases) {
 		AllContent content = mary2content(is);
-		List<PhraseIU> phrases =  content.getPhraseIUs(synthesisPayload != null ? synthesisPayload.iterator() : Collections.<HTSModel>emptyIterator(), connectPhrases);
+		List<PhraseIU> phrases =  content.getPhraseIUs(synthesisPayload != null ? synthesisPayload.iterator() : Collections.<SynthesisPayload>emptyIterator(), connectPhrases);
 		return phrases;
 	}
 	
@@ -95,11 +97,11 @@ public class TTSUtil {
 			return phrases.toString();
 		}
 		
-		public List<PhraseIU> getPhraseIUs(Iterator<HTSModel> hmmIterator, boolean connect) {
+		public List<PhraseIU> getPhraseIUs(Iterator<SynthesisPayload> spIterator, boolean connect) {
 			List<PhraseIU> phraseIUs = new ArrayList<PhraseIU>(phrases.size());
 			IU prev = null;
 			for (Phrase phrase : phrases) {
-				PhraseIU pIU = phrase.toIU(hmmIterator);
+				PhraseIU pIU = phrase.toIU(spIterator);
 				if (connect) {
 					pIU.connectSLL(prev);
 				}
@@ -109,8 +111,8 @@ public class TTSUtil {
 			return phraseIUs;
 		}
 		
-		public List<WordIU> getWordIUs(Iterator<HTSModel> hmmIterator) {
-			List<PhraseIU> phraseIUs = getPhraseIUs(hmmIterator, true);
+		public List<WordIU> getWordIUs(Iterator<SynthesisPayload> spIterator) {
+			List<PhraseIU> phraseIUs = getPhraseIUs(spIterator, true);
 			List<WordIU> wordIUs = new ArrayList<WordIU>();
 			for (PhraseIU phraseIU : phraseIUs) {
 				wordIUs.addAll(phraseIU.getWords());
@@ -155,11 +157,11 @@ public class TTSUtil {
 			return retVal;
 		}
 
-		public PhraseIU toIU(Iterator<HTSModel> hmmIterator) {
+		public PhraseIU toIU(Iterator<SynthesisPayload> spIterator) {
 			List<WordIU> wordIUs = new ArrayList<WordIU>(words.size());
 			WordIU prev = null;
 			for (Word w : words) {
-				WordIU wIU = w.toIU(hmmIterator);
+				WordIU wIU = w.toIU(spIterator);
 				wIU.connectSLL(prev);
 				wordIUs.add(wIU);
 				prev = wIU;
@@ -215,11 +217,11 @@ public class TTSUtil {
 			return "; " + token + "\n" + ((syllables != null) ? syllables.toString() : "");
 		}
 		
-		public WordIU toIU(Iterator<HTSModel> hmmIterator) {
+		public WordIU toIU(Iterator<SynthesisPayload> spIterator) {
 			List<IU> syllableIUs = new ArrayList<IU>(syllables.size());
 			IU prev = null;
 			for (Syllable s : syllables) {
-				IU sIU = s.toIU(hmmIterator);
+				IU sIU = s.toIU(spIterator);
 				sIU.connectSLL(prev);
 				syllableIUs.add(sIU);
 				prev = sIU;
@@ -242,11 +244,11 @@ public class TTSUtil {
 			return "stress:" + stress + ", accent:" + accent + "\n" + segments.toString();
 		}
 
-		public SyllableIU toIU(Iterator<HTSModel> hmmIterator) {
+		public SyllableIU toIU(Iterator<SynthesisPayload> spIterator) {
 			List<IU> segmentIUs = new ArrayList<IU>(segments.size());
 			IU prev = null;
 			for (Segment s : segments) {
-				IU sIU = s.toIU(hmmIterator);
+				IU sIU = s.toIU(spIterator);
 				sIU.setSameLevelLink(prev);
 				segmentIUs.add(sIU);
 				prev = sIU;
@@ -310,18 +312,34 @@ public class TTSUtil {
 			return sb.toString();
 		}
 		
-		public SysSegmentIU toIU(Iterator<HTSModel> hmmIterator) {
+		public SysSegmentIU toIU(Iterator<SynthesisPayload> spIterator) {
 			Label l = new Label(endTime - (duration / TimeUtil.SECOND_TO_MILLISECOND_FACTOR), endTime, sampaLabel);
 			SysSegmentIU segIU;
-			assert hmmIterator != null;
-			if (hmmIterator.hasNext()) { // the HMM case
-				HTSModel hmm = hmmIterator.next();
+			assert spIterator != null;
+			if (spIterator.hasNext()) { // the HMM case
+				SynthesisPayload sp = spIterator.next();
+				HTSModel hmm = sp.htsModel;
 				assert (sampaLabel.equals(hmm.getPhoneName())) : " oups, wrong segment alignment: " + sampaLabel + " != " + hmm.getPhoneName();
-				segIU = new SysSegmentIU(l, pitchMarks, hmm, null);
+				segIU = new SysSegmentIU(l, pitchMarks, hmm, sp.fv, sp.hmmdata, null);
 			} else { // the standard case: no HMM synthesis with this segment
 				segIU = new SysSegmentIU(l, pitchMarks);
 			}
 			return segIU;
+		}
+	}
+	
+	public static class SynthesisPayload {
+		FeatureVector fv;
+		HTSModel htsModel;
+		HMMData hmmdata;
+		public SynthesisPayload(FeatureVector fv, HTSModel htsModel, HMMData hmmdata) {
+			this.fv = fv;
+			this.htsModel = htsModel;					
+			this.hmmdata = hmmdata;
+		}
+		@Override
+		public String toString() {
+			return "synthesis payload for " + htsModel.getPhoneName();
 		}
 	}
 	

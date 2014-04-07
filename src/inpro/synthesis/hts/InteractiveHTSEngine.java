@@ -1,5 +1,6 @@
 package inpro.synthesis.hts;
 
+import inpro.incremental.util.TTSUtil.SynthesisPayload;
 import inpro.synthesis.MaryAdapter4internal;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import javax.sound.sampled.AudioInputStream;
 import org.w3c.dom.Element;
 
 import marytts.datatypes.MaryData;
-import marytts.htsengine.HTSModel;
+import marytts.htsengine.HMMVoice;
 import marytts.htsengine.HTSParameterGeneration;
 import marytts.htsengine.HTSUttModel;
 import marytts.modules.HTSEngine;
@@ -26,7 +27,7 @@ public class InteractiveHTSEngine extends HTSEngine {
     
     public static boolean returnIncrementalAudioStream = false;
     
-    public final List<HTSModel> uttHMMs = new ArrayList<HTSModel>();
+    public final List<SynthesisPayload> uttData = new ArrayList<SynthesisPayload>();
     
     @Override
     public MaryData process(MaryData d, List<Target> targetFeaturesList, List<Element> segmentsAndBoundaries, List<Element> tokensAndBoundaries)
@@ -37,9 +38,9 @@ public class InteractiveHTSEngine extends HTSEngine {
          * It will contain the list of models for current label file. */
         /* Process label file of Mary context features and creates UttModel um */
         HTSUttModel um = processTargetList(targetFeaturesList, segmentsAndBoundaries, MaryAdapter4internal.getDefaultHMMData());
-
+        assert um.getNumModel() == targetFeaturesList.size() : "UttModel size is " + um.getNumModel() + ", but targetFeaturesList size is " + targetFeaturesList.size();
         for (int i = 0; i < um.getNumModel(); i++) {
-        	uttHMMs.add(um.getUttModel(i));
+        	uttData.add(new SynthesisPayload(targetFeaturesList.get(i).getFeatureVector(), um.getUttModel(i), ((HMMVoice)d.getDefaultVoice()).getHMMData()));
         }
         
         MaryData output = new MaryData(outputType(), d.getLocale());
@@ -86,13 +87,13 @@ public class InteractiveHTSEngine extends HTSEngine {
         return output;
     }
 
-	public List<HTSModel> getUttHMMs() {
-		assert uttHMMs != null : "You are calling getUttHMMs without having called my process() method before (Hint: you may think that it was called but the buildpath order might be in your way.)";
-		return new ArrayList<HTSModel>(uttHMMs);
-	}
-	
+    public List<SynthesisPayload> getUttData() {
+		assert uttData != null : "You are calling getUttHMMs without having called my process() method before (Hint: you may think that it was called but the buildpath order might be in your way.)";
+		return new ArrayList<SynthesisPayload>(uttData);
+    }
+    
 	public void resetUttHMMstore() {
-		uttHMMs.clear();
+		uttData.clear();
 	}
     
 }
