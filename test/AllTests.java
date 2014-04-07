@@ -15,6 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	inpro.incremental.util.TTSUtilTest.class,
 	inpro.incremental.unit.IUPathTest.class,
 	inpro.incremental.unit.HesitationIUTest.class,
+	inpro.incremental.unit.IncrementalCARTTest.class,
 	inpro.incremental.processor.SynthesisModuleUnitTest.class,
 	inpro.incremental.processor.SynthesisModulePauseStopUnitTest.class,
 	inpro.incremental.processor.SynthesisModuleAdaptationUnitTest.class,

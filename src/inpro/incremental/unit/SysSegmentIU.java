@@ -1,6 +1,7 @@
 package inpro.incremental.unit;
 
 import inpro.annotation.Label;
+import inpro.incremental.transaction.ComputeHMMFeatureVector;
 import inpro.synthesis.MaryAdapter4internal;
 import inpro.synthesis.PitchMark;
 import inpro.synthesis.hts.FullPFeatureFrame;
@@ -124,10 +125,21 @@ public class SysSegmentIU extends SegmentIU {
 	private static PHTSParameterGeneration paramGen = null;
 
 	HTSModel getHTSModel() {
+		if (htsModel != null) 
+			return htsModel;
+		htsModel = generateHTSModel();
 		if (htsModel != null) {
+		//	IncrementalCARTTest.same(htsModel, legacyHTSmodel);
 			return htsModel;
 		} else 
 			return legacyHTSmodel;
+	}
+	
+	HTSModel generateHTSModel() {
+		FeatureVector fv = ComputeHMMFeatureVector.featuresForSegmentIU(this);
+		double prevErr = getSameLevelLink() != null & getSameLevelLink() instanceof SysSegmentIU ? ((SysSegmentIU) getSameLevelLink()).getHTSModel().getDurError() : 0f;
+		HTSModel htsModel = hmmdata.getCartTreeSet().generateHTSModel(hmmdata, hmmdata.getFeatureDefinition(), fv, prevErr);
+		return htsModel;
 	}
 	
 	// synthesizes 
