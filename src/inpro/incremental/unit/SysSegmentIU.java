@@ -21,6 +21,8 @@ import marytts.htsengine.HTSModel;
 
 import org.apache.log4j.Logger;
 
+import work.inpro.synthesis.ihmms.HTSModelComparator;
+
 public class SysSegmentIU extends SegmentIU {
 	
 	private static Logger logger = Logger.getLogger(SysSegmentIU.class);
@@ -129,6 +131,8 @@ public class SysSegmentIU extends SegmentIU {
 			return htsModel;
 		htsModel = generateHTSModel();
 		if (htsModel != null) {
+			// for evaluation of various incremental FV computation strategies:
+			HTSModelComparator.compare(htsModel, legacyHTSmodel);
 		//	IncrementalCARTTest.same(htsModel, legacyHTSmodel);
 			return htsModel;
 		} else 
