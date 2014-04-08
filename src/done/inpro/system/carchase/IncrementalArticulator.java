@@ -28,7 +28,7 @@ public class IncrementalArticulator extends StandardArticulator {
 	public void say(TTSAction action) {
 		logger.info(action.text);
 		if (installment == null || installment.isCompleted()) {
-			installment = (HesitatingSynthesisIU) action.appData;
+			installment = (HesitatingSynthesisIU) action.installmentIU;
 			dispatcher.playStream(installment.getAudio(), false);
 		} else { // installment is still in progress
 			// inspect the word that is being uttered

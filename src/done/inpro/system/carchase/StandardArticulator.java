@@ -11,13 +11,13 @@ public class StandardArticulator extends CarChaseExperimenter.Articulator {
 	
 	@Override
 	public void precompute(TTSAction action) {
-		action.appData = new HesitatingSynthesisIU(action.text);
+		action.installmentIU = new HesitatingSynthesisIU(action.text);
 	}
 
 	@Override
 	public void say(TTSAction action) {
 //		SysInstallmentIU inst = new IncrSysInstallmentIU(action.text);
-		HesitatingSynthesisIU inst = (HesitatingSynthesisIU) action.appData;
+		HesitatingSynthesisIU inst = (HesitatingSynthesisIU) action.installmentIU;
 		boolean skipQueue = true;
 		if (!dispatcher.isSpeaking() || !action.isOptional()) 
 			dispatcher.playStream(inst.getAudio(), skipQueue);
