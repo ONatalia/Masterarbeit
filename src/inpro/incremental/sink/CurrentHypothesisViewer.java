@@ -3,8 +3,6 @@ package inpro.incremental.sink;
 import inpro.incremental.PushBuffer;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
-import inpro.incremental.unit.IU.IUUpdateListener;
-import inpro.incremental.unit.IU.Progress;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -13,11 +11,7 @@ import java.util.List;
 
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-
-import demo.inpro.synthesis.TreeStructuredInstallmentIU;
-
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -46,15 +40,20 @@ public class CurrentHypothesisViewer extends PushBuffer {
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		if (ps.getBoolean(PROP_SHOW_WINDOW)) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					JFrame f = new JFrame("current hypothesis");
-					f.add(textField);
-					f.pack();
-					f.setVisible(true);
-				}
-			});
+			show();
 		}
+	}
+	
+	public CurrentHypothesisViewer show() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				JFrame f = new JFrame("current hypothesis");
+				f.add(textField);
+				f.pack();
+				f.setVisible(true);
+			}
+		});
+		return this;
 	}
 	
 	public JEditorPane getTextField() {
