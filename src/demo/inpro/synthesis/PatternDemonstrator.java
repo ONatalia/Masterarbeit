@@ -4,7 +4,6 @@ import inpro.apps.SimpleMonitor;
 import inpro.audio.DispatchStream;
 import inpro.incremental.sink.CurrentHypothesisViewer;
 import inpro.incremental.unit.EditMessage;
-import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.SegmentIU;
 import inpro.incremental.unit.SysSegmentIU;
