@@ -35,6 +35,11 @@ public class SetStartTime extends HttpServlet {
 			TimeUtil.startupTime = time;
 			DialogAsrResult.previousTimestamp = time;
 		}
+		else if (!this.getAlignFirstOnly()) {
+			log.info("Setting start time " + time);
+			TimeUtil.startupTime = time;
+			DialogAsrResult.previousTimestamp = time;
+		}		
 		this.setFirstIsAligned(true);
 	}
 

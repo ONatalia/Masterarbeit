@@ -94,6 +94,7 @@ public class DialogAsrResult extends HttpServlet {
 //          save the timestamp 
             if (entry.getKey().equals("timeStamp")) {
             	timestamp = Double.parseDouble(entry.getValue().toString());
+            	System.out.println("Timestamp:" + (long)timestamp);
             }
 //			utterance key to check ordering            
             if (entry.getKey().equals("utteranace_key")) {
@@ -111,23 +112,22 @@ public class DialogAsrResult extends HttpServlet {
             	System.out.println(value);
             	asrHyps = getHyps(value);
             }
-            	
           } // end of while
           
 //        set some of the shared information for each utterance hyp
-          if (this.previousTimestamp == -1) this.previousTimestamp = timestamp;
+          if (previousTimestamp == -1) previousTimestamp = timestamp;
           
           for (AsrHyp hyp : asrHyps) {
         	  log.debug("new hyp: " + hyp);
         	  hyp.setUtteranceKey(utteranceKey);
         	  hyp.setTimestamp(timestamp/1000.0 - TimeUtil.startupTime/1000.0);
-        	  hyp.setPreviousTimestamp(Math.abs(this.previousTimestamp/1000.0 - TimeUtil.startupTime/1000.0));
+        	  hyp.setPreviousTimestamp(Math.abs(previousTimestamp/1000.0 - TimeUtil.startupTime/1000.0));
         	  hyp.setFinal(isFinal);
           }
           
-          updateResetThread();
+//          updateResetThread();
           
-          this.previousTimestamp = timestamp;
+          previousTimestamp = timestamp;
 //          if (isFinal) webSpeech.setStartTime(); // reset start time if endpointing detected the end of an utterance
 //        this is where you would send the results along to something else, in this case the WebSpeech that makes IUs out of them
           webSpeech.setNewHyps(asrHyps);

@@ -70,7 +70,8 @@ public class WebSpeech extends IUModule {
 	  	log.info("Starting Tomcat server...");
 	  	
 	  	Connector httpsConnector = new Connector();
-	    httpsConnector.setPort(8081);	     httpsConnector.setSecure(true);
+	    httpsConnector.setPort(8081);	     
+	    httpsConnector.setSecure(true);
         httpsConnector.setScheme("https");
         httpsConnector.setAttribute("keyAlias", "tomcat");
         httpsConnector.setAttribute("keystorePass", "changeit");
@@ -112,7 +113,7 @@ public class WebSpeech extends IUModule {
 //	    tomcat.getServer().await();
   }
 
-	public void setStartTime() {
+	public static void setStartTime() {
 		TimeUtil.startupTime = System.currentTimeMillis();
 		log.info("Setting start time to " + TimeUtil.startupTime);
 	}
@@ -147,10 +148,10 @@ public class WebSpeech extends IUModule {
 		WordIU prev = TextualWordIU.FIRST_ATOMIC_WORD_IU;
 		
 		for (String word : argMax.getWords()) {
-			SegmentIU siu = new SegmentIU(new Label(argMax.getPreviousTimestamp(), argMax.getTimestamp(), word));
+			SegmentIU siu = new SegmentIU(new Label(argMax.getPreviousTimestamp(), argMax.getTimestamp(), word.toLowerCase()));
 			List<IU> gIns = new LinkedList<IU>();
 			gIns.add(siu);
-			WordIU wiu = new WordIU(word, null, gIns);
+			WordIU wiu = new WordIU(word.toLowerCase(), null, gIns);
 			wiu.setSameLevelLink(prev);
 			prev = wiu;
 			ius.add(wiu);

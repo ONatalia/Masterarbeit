@@ -130,6 +130,7 @@ Most of this was written by Matt Henderson, with edits by Casey Kennington to co
                     success:function (response) {
                         // pass
 //                         window.csrf_token = response.csrf_token;
+                        
                     }
                 });
             };

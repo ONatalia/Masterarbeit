@@ -34,15 +34,15 @@ public class VeniceListenerModule extends ListenerModule implements Handler {
 		super.newProperties(ps);
 		String scope = ps.getString(SCOPE_PROP);
 		String id = ps.getString(ID_PROP);
-		String fullScope = makeScope(scope,id);
+		String fullScope = makeScope(scope);
 		logger.info("Listening on scope: " + fullScope);
 //		listener from the venice wrapper for RSB
 		listener = new Listener<String>(this, fullScope);
-		this.setID(ps.getString(ID_PROP));
+		this.setID(id);
 	}
 	
-	private String makeScope(String scope, String id) {
-		return "/" + scope + "/" + id;
+	private String makeScope(String scope) {
+		return "/" + scope + "/" ;
 	}
 	
 	/* (non-Javadoc)
@@ -54,6 +54,7 @@ public class VeniceListenerModule extends ListenerModule implements Handler {
 	public void internalNotify(Event e) {
 		//example e.getScope(): /dsg/kinect
 		//example e.getData():  TR
+		System.out.println(e.getData().toString());
 		process(e.getData().toString());
 	}
 	
