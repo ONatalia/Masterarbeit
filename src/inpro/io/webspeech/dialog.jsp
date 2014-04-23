@@ -27,6 +27,7 @@ Most of this was written by Matt Henderson, with edits by Casey Kennington to co
         var got_error = false;
         var in_dialog = false;
         var utterance_key = 0;
+        var speech_start_timestamp = 0;
 
         $(document).ready(function () {
             // check browser
@@ -82,7 +83,7 @@ Most of this was written by Matt Henderson, with edits by Casey Kennington to co
 
         function stopDialog() {
             in_dialog = false;
-            stopRecording(false);
+//             stopRecording(false);
             window.recognition.stop();
             window.dialog.trigger("dialog_ended");
             $.ajax({
@@ -161,6 +162,16 @@ Most of this was written by Matt Henderson, with edits by Casey Kennington to co
                     startListening();
                 }
             };
+            
+            window.recognition.onaudiostart = function() {
+            	speech_start_timestamp = new Date().getTime();
+            	
+            };
+            
+            window.recognition.onaudioend = function() {
+            	window.dialog.trigger("error", "sound ended");
+            	speech_start_timestamp = new Date().getTime();
+            };
 
             window.recognition.onresult = function (event) {
 
@@ -184,6 +195,7 @@ Most of this was written by Matt Henderson, with edits by Casey Kennington to co
                     }
                     event.hypList = hypList;
                     event.utterance_key = utterance_key;
+                    event.speech_start_timestamp = speech_start_timestamp;
                     utterance_key++;
                     stopRecording(true);
                     $.ajax({
@@ -197,7 +209,7 @@ Most of this was written by Matt Henderson, with edits by Casey Kennington to co
                             window.recognition.stop();
                         },
                         error: function (response) {
-                            window.dialog.trigger("error", "Unable to send speech to server.");
+//                             window.dialog.trigger("error", "Unable to send speech to server.");
                         }
                     });
                // }
