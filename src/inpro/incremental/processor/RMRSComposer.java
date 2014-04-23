@@ -6,10 +6,15 @@ import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.FormulaIU;
 import inpro.incremental.unit.IU;
+import inpro.incremental.unit.IUList;
+import inpro.incremental.unit.RelationIU;
 import inpro.incremental.unit.TagIU;
 import inpro.incremental.unit.WordIU;
 import inpro.irmrsc.parser.CandidateAnalysis;
+import inpro.irmrsc.rmrs.Entity;
 import inpro.irmrsc.rmrs.Formula;
+import inpro.irmrsc.rmrs.Relation;
+import inpro.irmrsc.rmrs.Relation.Type;
 import inpro.irmrsc.rmrs.Variable;
 import inpro.irmrsc.util.RMRSLoader;
 import inpro.irmrsc.util.SemanticMacro;
@@ -24,8 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-
-
+import java.util.TreeSet;
 
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
@@ -142,13 +146,23 @@ public class RMRSComposer extends IUModule {
 
 	/** the semantic representation to start with */
 	private static FormulaIU firstUsefulFormulaIU;	
-
+	
+	IUList<RelationIU> prevList;
+	TreeSet<String> acceptedEntityTypes;
 	
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {		
 		super.newProperties(ps);
+		
+		prevList = new IUList<RelationIU>(); // start off with an empty word list so the diff is all the new stuff
+		acceptedEntityTypes  = new TreeSet<String>(); 
+		acceptedEntityTypes.add("e");
+		acceptedEntityTypes.add("x");
+		acceptedEntityTypes.add("i");
+		acceptedEntityTypes.add("#");
+		
 		// TODO: this is weird 
 		//PentoRMRSResolver.setLogger(logger);
 		
@@ -564,6 +578,39 @@ public class RMRSComposer extends IUModule {
 		}
 		
 		// finish
+		
+		
+		IUList<RelationIU> list = new IUList<RelationIU>();
+		
+		for (EditMessage<FormulaIU> formulaEdit : newEdits) {
+			System.out.println(formulaEdit.getIU().getFormula().toRMRSString());
+			
+			Formula formula = formulaEdit.getIU().getFormula();
+			RelationIU prev = RelationIU.FIRST_RELATION_IU;
+		
+			for (Relation relation : formula.getRelations()) {
+	
+				RelationIU riu = new RelationIU(relation, formula);
+				riu.groundIn(formulaEdit.getIU().grounds());
+				riu.setSameLevelLink(prev);
+				list.add(riu);
+				
+				prev = riu;
+				
+			}
+			break;
+		
+		}
+		
+		List<EditMessage<RelationIU>> diffs = prevList.diffByPayload(list);
+		prevList = list;
+		
+		
+		for (EditMessage<RelationIU> iu : diffs) {
+			System.out.println(iu);
+		}
+		System.out.println();
+		
 		this.rightBuffer.setBuffer(newEdits);
 	}
 

@@ -52,6 +52,7 @@ public class Tagger extends IUModule {
 		List<EditMessage<TagIU>> newEdits = new ArrayList<EditMessage<TagIU>>();
 		for (EditMessage<? extends IU> edit : edits) {
 			WordIU newWord = (WordIU) edit.getIU();
+			if (newWord.getSameLevelLink() == null) continue;
 			switch (edit.getType()) {
 				case REVOKE:
 					for (IU tag : newWord.grounds()) {
