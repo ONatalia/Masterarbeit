@@ -32,7 +32,8 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	String referenceText;
 	
 	/* stores location of a grammar or SLM */ 
-	URL languageModelURL; 
+	URL languageModelURL;
+	static String labelPath;
 	
 	/**
 	 * @return the languageModelURL
@@ -44,6 +45,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	boolean dataThrottle;
 	
 	protected boolean ignoreErrors;
+
 	
 	@Override
 	void printUsage() {
@@ -78,6 +80,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -lm <URL>      recognize using the given language model");
 		System.err.println("                   (-fa, -tg, -gr, and -lm are exclusive)");
 		System.err.println("    -rt	           when reading from file, run no faster than real-time (includes VAD)");
+		System.err.println("    -Lp	           when set, will write the inc_reco file from LabelWriter to this path");
 	}
 
 	/**
@@ -186,6 +189,10 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 					i++;
 					languageModelURL = new URL(args[i]);
 				} 
+				else if (args[i].equals("-Lp")) {
+					i++;
+					labelPath = new String(args[i]);
+				} 				
 				else if (args[i].equals("-rt")) {
 					dataThrottle = true;
 				}
@@ -231,6 +238,10 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	
 	public boolean playAtRealtime() {
 		return dataThrottle;
+	}
+	
+	public static String getLabelPath() {
+		return labelPath;
 	}
 	
 }

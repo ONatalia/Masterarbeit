@@ -4,6 +4,7 @@ import inpro.apps.util.MonitorCommandLineParser;
 import inpro.apps.util.RecoCommandLineParser;
 import inpro.audio.AudioUtils;
 import inpro.incremental.PushBuffer;
+import inpro.incremental.sink.LabelWriter;
 import inpro.incremental.source.CurrentASRHypothesis;
 import inpro.sphinx.frontend.RtpRecvProcessor;
 import inpro.util.TimeUtil;
@@ -279,7 +280,9 @@ public class SimpleReco {
 			casrh.addListener((PushBuffer) cm.lookup("tedNotifier"));
 		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.LABEL_OUTPUT)) {
-			casrh.addListener((PushBuffer) cm.lookup("labelWriter2"));
+			LabelWriter lw = (LabelWriter) cm.lookup("labelWriter2");
+			lw.setFileName(RecoCommandLineParser.getLabelPath());
+			casrh.addListener(lw);
 		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.CURRHYP_OUTPUT)) {
 			casrh.addListener((PushBuffer) cm.lookup("hypViewer"));
