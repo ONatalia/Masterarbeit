@@ -3,7 +3,6 @@ package done.inpro.system.calendar;
 import inpro.apps.SimpleMonitor;
 import inpro.audio.DispatchStream;
 import inpro.incremental.IUModule;
-import inpro.incremental.sink.TEDviewNotifier;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.IU.IUUpdateListener;
@@ -36,63 +35,10 @@ public class GenerationModule extends IUModule {
 	
 	public GenerationModule(SpudManager sm) {
 		this.nlg = sm;
-		this.nlg.setPrePlanningSteps(6);
+		this.nlg.setPrePlanningSteps(3);
 		phrases = new ArrayList<PhraseIU>();
 		SPUD.setDebugLevel(30);
 	}
-	
-	/*private IUUpdateListener phraseUpdateListener = new IUUpdateListener() {
-		
-		@Override
-		public synchronized void update(IU updatedIU) {
-			assert logger != null;
-			logger.warn("update on IU " + (updatedIU != null ? updatedIU.toString() : "null"));
-			String projectedPhrase;
-			if (updatedIU == null || updatedIU.isCompleted()) {
-				if (AdaptionManager.getInstance().hasChanged()) {
-					// --> this is usually the case when noise has been played
-					System.out.println("*************** CHANGE ****************");
-					phrases.remove(phrases.size() - 1);
-					nlg.invalidatePreplanCache();
-					nlg.preplanIncrements();
-					String phrase = nlg.takePreplannedAndPreplanNextIncrements();
-					if (phrase != null) {
-						PhraseIU piu = new PhraseIU(phrase); // add type: continuation or repair?
-						piu.addUpdateListener(phraseUpdateListener);
-						phrases.add(piu);
-					} else {
-						return;
-					}
-					// change back to initial values - hack for SigDial Paper
-					AdaptionManager.getInstance().setLevelOfUnderstanding(3);
-					AdaptionManager.getInstance().setVerbosityFactor(1);
-					AdaptionManager.getInstance().hasChanged(); // we know it has, but sets flag to false again.
-					//nlg.preplanIncrements();
-					projectedPhrase = nlg.peekPreplannedIncrement(0);
-				} else {
-					nlg.takePreplannedAndPreplanNextIncrements(); //consume the previously peeked increment
-					projectedPhrase = nlg.peekPreplannedIncrement(0);
-					// give prev. IU normal status
-					PhraseIU iu = phrases.get(phrases.size() - 1);
-					iu.addUpdateListener(phraseUpdateListener);
-				} 	 
-				
-				if (projectedPhrase != null) {
-					PhraseIU ppiu = new PhraseIU(projectedPhrase);
-					ppiu.addUpdateListener(phraseUpdateListener);
-					phrases.add(ppiu);
-				} else {
-					PhraseIU finalPhrase = phrases.get(phrases.size() - 1);
-					// set phrase to final, this also removes any vocoder locks
-					finalPhrase.setFinal();
-				}
-				rightBuffer.setBuffer(phrases);
-				rightBuffer.notify(iulisteners);
-			}
-			System.out.println("Current update id: " + nlg.getCurrentUpdateId());
-		}
-	};
-*/	
 
 	private IUUpdateListener phraseUpdateListener_new = new IUUpdateListener() {
 		
@@ -109,7 +55,7 @@ public class GenerationModule extends IUModule {
 					if (!ipiu.completionNotified) {
 						ipiu.completionNotified = true;
 					} else {
-						System.out.println("Redundant notification of completion of IU.");
+						System.out.println("Redundant notification of completion of IU. Ignoring");
 						return;
 					}
 				}
@@ -127,76 +73,57 @@ public class GenerationModule extends IUModule {
 					if (phrase != null) {
 						if (phrase2 != null) {
 							piu = new PhraseIU(phrase, PhraseIU.PhraseType.NONFINAL);
-							ppiu = new PhraseIU(phrase2, PhraseIU.PhraseType.NONFINAL);
 							phrases.add(piu);
+							piu.addUpdateListener(phraseUpdateListener_new);
+							ppiu = new PhraseIU(phrase2, PhraseIU.PhraseType.NONFINAL);
 							phrases.add(ppiu);
 							ppiu.addUpdateListener(phraseUpdateListener_new);
 						} else {
 							piu = new PhraseIU(phrase, PhraseIU.PhraseType.FINAL);
+							piu.addUpdateListener(phraseUpdateListener_new);
 							phrases.add(piu);
 						}
-						piu.addUpdateListener(phraseUpdateListener_new);
 					} else {
 						return;
 					}
 					AdaptionManager.getInstance().setLevelOfUnderstanding(3);
 					AdaptionManager.getInstance().setVerbosityFactor(1);
-					AdaptionManager.getInstance().hasChanged(); // we know it has, but sets flag to false again.	
+					AdaptionManager.getInstance().hasChanged(); // we know it has, but sets flag to false again.
 				} else {
 					System.out.println("***********NO CHANGE***********");
 					nlg.takePreplannedAndPreplanNextIncrements(); //consume the previously peeked increment
 					String lookaheadPhrase = nlg.peekPreplannedIncrement(1);
-					System.out.println("Lookahead: " +lookaheadPhrase);
+					System.out.println("Lookahead: " + lookaheadPhrase);
 					if (lookaheadPhrase != null) {
 						ppiu = new PhraseIU(lookaheadPhrase, PhraseIU.PhraseType.NONFINAL);
-						// give prev. IU normal status
-						phrases.get(phrases.size() - 1).addUpdateListener(phraseUpdateListener_new);
+						ppiu.addUpdateListener(phraseUpdateListener_new);
 						phrases.add(ppiu);
 					} else {
 						// set phrase to final, this also removes any vocoder locks
-						phrases.get(phrases.size() - 1).setFinal();
+						if (!phrases.isEmpty())
+							phrases.get(phrases.size() - 1).setFinal();
 					}
 				}	
 			}
 			System.out.println("-------");
-			for (PhraseIU p : phrases) {
-				System.out.println(p);
+			for (IU p : rightBuffer.getBuffer()) {
+				System.out.println((PhraseIU)p);
 			}
 			System.out.println("-------");
 			
 			rightBuffer.setBuffer(phrases);
-			rightBuffer.notify(iulisteners);
+			//if (phrases.size() > 0) rightBuffer.notify(iulisteners);
+			//rightBuffer.notify(iulisteners);
+			try {
+				if (phrases.size() > 0) rightBuffer.notify(iulisteners);
+			}
+			catch (IndexOutOfBoundsException e) {
+				System.out.println("exception");
+			}
 		}
 	};
 		
 	/** only called on startup  */
-	/*public void generate() {
-		// for timing-measurements:
-		Logger speedLogger = Logger.getLogger("speedlogger");
-		long start = System.currentTimeMillis();
-		
-		String phrase = nlg.generateNextIncrement();
-		PhraseIU piu = new PhraseIU(phrase, PhraseIU.PhraseType.NONFINAL);
-		phrases.add(piu);
-		
-		nlg.preplanIncrements();
-		String projectedPhrase = nlg.peekPreplannedIncrement(0);
-		PhraseIU ppiu = new PhraseIU(projectedPhrase);
-		phrases.add(ppiu);
-		
-		// for timing-measurements:
-		long duration = System.currentTimeMillis() - start;
-		speedLogger.info("NLG for onset took: " + duration);
-		
-		rightBuffer.setBuffer(phrases);
-		rightBuffer.notify(iulisteners);
-		//if (System.getProperty("proso.cond.onephraseahead", "true").equals("true")) {
-		piu.addUpdateListener(phraseUpdateListener);
-		//}
-		ppiu.addUpdateListener(phraseUpdateListener);
-		System.out.println("generate is done");
-	}*/
-	
 	public void generate_new() {
 		nlg.preplanIncrements();
 		String phrase = nlg.peekPreplannedIncrement(0);// takePreplannedAndPreplanNextIncrements();
@@ -206,10 +133,82 @@ public class GenerationModule extends IUModule {
 		
 		String phrase2 = nlg.peekPreplannedIncrement(1);
 		PhraseIU ppiu = new PhraseIU(phrase2, PhraseIU.PhraseType.NONFINAL);
+		ppiu.addUpdateListener(phraseUpdateListener_new);
 		phrases.add(ppiu);
+		rightBuffer.setBuffer(phrases);
+		//rightBuffer.notify(iulisteners);
+		try {
+			if (phrases.size() > 0) rightBuffer.notify(iulisteners);
+		}
+		catch (IndexOutOfBoundsException e) {
+			System.out.println("exception");
+		}
+		
+	}
+	
+	public void continueAtNextPhrase() {
+		PhraseIU piu, ppiu;
+		if (AdaptionManager.getInstance().hasChanged()) {
+			System.out.println("*************CHANGE************");
+			if (phrases.size() > 0) phrases.remove(phrases.size() - 1);
+			if (phrases.size() > 0) phrases.remove(phrases.size() - 1);
+			//phrases.remove(phrases.size() - 1);  <--- there were two of these
+			nlg.invalidatePreplanCache();
+			nlg.preplanIncrements();
+
+			String phrase = nlg.peekPreplannedIncrement(0); //takePreplannedAndPreplanNextIncrements();
+			String phrase2 = nlg.peekPreplannedIncrement(1);
+
+			if (phrase != null) {
+				if (phrase2 != null) {
+					piu = new PhraseIU(phrase, PhraseIU.PhraseType.NONFINAL);
+					phrases.add(piu);
+					piu.addUpdateListener(phraseUpdateListener_new);
+					ppiu = new PhraseIU(phrase2, PhraseIU.PhraseType.NONFINAL);
+					phrases.add(ppiu);
+					ppiu.addUpdateListener(phraseUpdateListener_new);
+				} else {
+					piu = new PhraseIU(phrase, PhraseIU.PhraseType.FINAL);
+					piu.addUpdateListener(phraseUpdateListener_new);
+					phrases.add(piu);
+				}
+			} else {
+				return;
+			}
+			AdaptionManager.getInstance().setLevelOfUnderstanding(3);
+			AdaptionManager.getInstance().setVerbosityFactor(1);
+			AdaptionManager.getInstance().hasChanged(); // we know it has, but sets flag to false again.
+		} else {
+			System.out.println("***********NO CHANGE***********");
+			nlg.takePreplannedAndPreplanNextIncrements(); //consume the previously peeked increment
+			String lookaheadPhrase = nlg.peekPreplannedIncrement(1);
+			System.out.println("Lookahead: " + lookaheadPhrase);
+			if (lookaheadPhrase != null) {
+				ppiu = new PhraseIU(lookaheadPhrase, PhraseIU.PhraseType.NONFINAL);
+				ppiu.addUpdateListener(phraseUpdateListener_new);
+				phrases.add(ppiu);
+			} else {
+				// set phrase to final, this also removes any vocoder locks
+				//if (phrases.size() > 0) phrases.get(phrases.size() - 1).setFinal();
+				if (!phrases.isEmpty())
+					phrases.get(phrases.size() - 1).setFinal();
+			}
+		}
+		System.out.println("-------");
+		for (IU p : rightBuffer.getBuffer()) {
+			System.out.println(p);
+		}
+		System.out.println("-------");
 		
 		rightBuffer.setBuffer(phrases);
-		rightBuffer.notify(iulisteners);
+		// rightBuffer.notify(iulisteners);
+		//if (phrases.size() > 0) rightBuffer.notify(iulisteners);
+		try {
+			if (phrases.size() > 0) rightBuffer.notify(iulisteners);
+		}
+		catch (IndexOutOfBoundsException e) {
+			System.out.println("exception");
+		}
 	}
 	
 	/** set the stimulus (between 1 and 9) */
@@ -266,7 +265,6 @@ public class GenerationModule extends IUModule {
 			throw new RuntimeException("illegal stimulus ID " + stimulus);
 		}
 	}
-	
 	
 	public static void main(String[] args) throws Exception {
 		PropertyConfigurator.configure("log4j.properties");
