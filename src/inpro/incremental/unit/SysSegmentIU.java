@@ -3,14 +3,12 @@ package inpro.incremental.unit;
 import inpro.annotation.Label;
 import inpro.incremental.transaction.ComputeHMMFeatureVector;
 import inpro.synthesis.MaryAdapter4internal;
-import inpro.synthesis.PitchMark;
 import inpro.synthesis.hts.FullPFeatureFrame;
 import inpro.synthesis.hts.FullPStream;
 import inpro.synthesis.hts.VocodingFramePostProcessor;
 import inpro.synthesis.hts.PHTSParameterGeneration;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -28,7 +26,6 @@ public class SysSegmentIU extends SegmentIU {
 	Label plannedLabel; // -> alternatively store "realizedLabel"
 	/** the label that was originally planned by TTS, before any stretching has been done */ 
 	Label originalLabel;
-	List<PitchMark> pitchMarks;
 	public HMMData hmmdata = null;
 	public FeatureVector fv = null;
 	public HTSModel legacyHTSmodel = null;
@@ -43,28 +40,29 @@ public class SysSegmentIU extends SegmentIU {
 	
 	boolean awaitContinuation; // used to mark that a continuation will follow, even though no fSLL exists yet.
 	
-	public SysSegmentIU(Label l, List<PitchMark> pitchMarks, HTSModel htsModel, FeatureVector fv, HMMData hmmdata, List<FullPFeatureFrame> featureFrames) {
+	public SysSegmentIU(Label l, HTSModel htsModel, FeatureVector fv, HMMData hmmdata, List<FullPFeatureFrame> featureFrames) {
 		super(l);
 		plannedLabel = new Label(l);
-		this.pitchMarks = pitchMarks;
 		this.fv = fv;
 		this.hmmdata = hmmdata;
 		this.hmmSynthesisFeatures = featureFrames;
 		if (htsModel != null)
 			this.setHTSModel(htsModel);
 	}
-	
-	public SysSegmentIU(Label l, List<PitchMark> pitchMarks) {
-		this(l, pitchMarks, null, null, null, null);
+
+	public SysSegmentIU(Label l) {
+		this(l, null, null, null, null);
 	}
 	
 	@Override
 	public StringBuilder toMbrolaLine() {
 		StringBuilder sb = l.toMbrola();
-		for (PitchMark pm : pitchMarks) {
+/* TODO: regenerate pitch marks from hmmSynthesisFrames
+ * 		for (PitchMark pm : pitchMarks) {
 			sb.append(" ");
 			sb.append(pm.toString());
 		}
+*/
 		sb.append("\n");
 		return sb;
 	}
@@ -195,26 +193,13 @@ public class SysSegmentIU extends SegmentIU {
 		// just repeat/drop frames as necessary if the amount of frames available is not right
 		int frameNumber = (int) (req * (fra / (double) dur));
 		FullPFeatureFrame frame =  hmmSynthesisFeatures.get(frameNumber);
-/*TIMO pre-Interspeech 2014: pitch marking needs to be reworked; I don't want these errors */
- 		try { // übler hack!
-		if (frame != null && frame.isVoiced()) {
-			//FIXME: investigate why this is necessary
-			frameNumber = Math.max(0, Math.min(frameNumber, pitchMarks.size() - 1));
-			//System.err.println("saying " + toLabelLine() + " at "+ frameNumber + " with pitch " + pitchMarks.get(frameNumber).getPitch());
-			frame.setf0Par(pitchMarks.get(frameNumber).getPitch());
-			frame.shiftlf0Par(pitchShiftInCent);
-		} 
-		} catch (Exception e) {
-			// dann halt nicht!!
-			System.err.println("bad pitchmark!");
-			frame = new FullPFeatureFrame(frame.getMcepParVec(), frame.getMagParVec(), frame.getStrParVec(), false, 0);
-		}
 		if (req == dur - 1) { // last frame 
 			setProgress(Progress.COMPLETED);
 //			logger.debug("completed " + deepToString());
 			logger.debug("completed " + toMbrolaLine());
 		}
 		realizedDurationInSynFrames++;
+		frame.shiftlf0Par(pitchShiftInCent);
 		// check whether we've been requested to wait for our continuation
 		if (realizedDurationInSynFrames == durationInSynFrames())
 			awaitContinuation();
@@ -257,7 +242,7 @@ public class SysSegmentIU extends SegmentIU {
 		vocodingFramePostProcessor = postProcessor;
 	}
 	
-	/** TODO: must be reworked to use PitchMarks
+	/** 
 	 * change the synthesis frames' pitch curve to attain the given pitch in the final pitch
 	 * in a smooth manner
 	 * @param finalPitch the log pitch to be reached in the final synthesis frame 
@@ -313,37 +298,7 @@ public class SysSegmentIU extends SegmentIU {
 		return String.format(Locale.US,	"%.3f\t%.3f\t%s", startTime(), endTime(), toPayLoad());
 	}
 
-	/* the bug with a pitchmark landing in the wrong frame is triggered by
-	 * 		SysInstallmentIU preheat = new SysInstallmentIU("der nächste termin am Montag den 14. Mai 10 bis 12 uhr betreff Einkaufen auf dem Wochenmarkt überschneidet sich mit dem termin:");
-	 * in "überschneidet" y: will get one voiced frame to few, b wil get one too many
-	 */
 	public void setHTSModel(HTSModel hmm) {
-		// FIXME: dirty hack, we should also check voicing for silence
-		// FIXME: hmm.getNumVoiced() == pitchMarks.size() should always be the case!
-		if (pitchMarks != null && !hmm.getPhoneName().equals("_") && hmm.getNumVoiced() == pitchMarks.size()) { 
-			// check consistency of PMs and voicing information in the model
-			// FIXME: this is weird, very seldomly there are more pitch marks than hmm states
-			// assert hmm.getNumVoiced() == pitchMarks.size();
-			assert hmm.getNumVoiced() <= pitchMarks.size() : hmm.getNumVoiced() + " != " + pitchMarks.size(); // check that there are enough pms, for now
-			// re-position PMs to reflect positions of voiced frames in the model
-			Iterator<PitchMark> pitchIt = pitchMarks.iterator();
-			int frameTotal = hmm.getTotalDur();
-			for (int frame = 0; frame < frameTotal; frame++) {
-				if (hmm.getFrameVoicing(frame)) {
-					assert pitchIt.hasNext() : "there should still be a PM left, something is wrong with getFrameVoicing, getTotalDur or the like";
-					PitchMark pm = pitchIt.next();
-					pm.setRelativePosition((0.0 + frame) / frameTotal);
-				}
-			}
-			// FIXME: should work if the above (hmm.getNumVoiced() == pitchMarks.size()) would work
-			// assert !pitchIt.hasNext() : "there shouldn't be any Pitchmarks left over, the foor loop above is broken";
-			// let's just delete spurious PMs to get rid of them
-			while (pitchIt.hasNext()) {
-				pitchIt.next();
-				pitchIt.remove();
-				logger.debug("removing spurious PM in segment " + toPayLoad());
-			}
-		}
 		legacyHTSmodel = hmm;
 	}
 
@@ -351,7 +306,6 @@ public class SysSegmentIU extends SegmentIU {
 	public void copySynData(SysSegmentIU newSeg) {
 		assert payloadEquals(newSeg);
 		this.l = newSeg.l;
-		this.pitchMarks = newSeg.pitchMarks;
 		setHTSModel(newSeg.legacyHTSmodel);
 	}
 

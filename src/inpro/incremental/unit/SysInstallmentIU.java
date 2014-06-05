@@ -58,8 +58,7 @@ public class SysInstallmentIU extends InstallmentIU {
 						(seg.l.getStart() - startTime) * scale, 
 						(seg.l.getEnd() - startTime) * scale, 
 						seg.l.getLabel()
-				), seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).pitchMarks : Collections.<PitchMark>emptyList(),
-				   seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).legacyHTSmodel : null,
+				), seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).legacyHTSmodel : null,
 				   seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).fv : null,
 			       seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).hmmdata : null,
 				   seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).hmmSynthesisFeatures : Collections.<FullPFeatureFrame>emptyList()));

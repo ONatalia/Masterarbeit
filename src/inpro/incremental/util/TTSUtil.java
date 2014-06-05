@@ -320,9 +320,9 @@ public class TTSUtil {
 				SynthesisPayload sp = spIterator.next();
 				HTSModel hmm = sp.htsModel;
 				assert (sampaLabel.equals(hmm.getPhoneName())) : " oups, wrong segment alignment: " + sampaLabel + " != " + hmm.getPhoneName();
-				segIU = new SysSegmentIU(l, pitchMarks, hmm, sp.fv, sp.hmmdata, null);
+				segIU = new SysSegmentIU(l, hmm, sp.fv, sp.hmmdata, null);
 			} else { // the standard case: no HMM synthesis with this segment
-				segIU = new SysSegmentIU(l, pitchMarks);
+				segIU = new SysSegmentIU(l);
 			}
 			return segIU;
 		}
