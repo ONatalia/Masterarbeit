@@ -23,8 +23,6 @@ public class SysSegmentIU extends SegmentIU {
 	
 	private static Logger logger = Logger.getLogger(SysSegmentIU.class);
 	
-	Label plannedLabel; // -> alternatively store "realizedLabel"
-	/** the label that was originally planned by TTS, before any stretching has been done */ 
 	Label originalLabel;
 	public HMMData hmmdata = null;
 	public FeatureVector fv = null;
@@ -42,7 +40,6 @@ public class SysSegmentIU extends SegmentIU {
 	
 	public SysSegmentIU(Label l, HTSModel htsModel, FeatureVector fv, HMMData hmmdata, List<FullPFeatureFrame> featureFrames) {
 		super(l);
-		plannedLabel = new Label(l);
 		this.fv = fv;
 		this.hmmdata = hmmdata;
 		this.hmmSynthesisFeatures = featureFrames;
@@ -284,7 +281,6 @@ public class SysSegmentIU extends SegmentIU {
 	/** shift the start and end times of this (and possibly all following SysSegmentIUs */
 	public void shiftBy(double offset, boolean recurse) {
 		super.shiftBy(offset, recurse);
-		this.plannedLabel = this.l;
 	}
 
 	@Override
