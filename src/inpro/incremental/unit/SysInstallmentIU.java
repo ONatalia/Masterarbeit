@@ -4,7 +4,6 @@ import inpro.annotation.Label;
 import inpro.audio.DDS16kAudioInputStream;
 import inpro.synthesis.MaryAdapter;
 import inpro.synthesis.MaryAdapter4internal;
-import inpro.synthesis.PitchMark;
 import inpro.synthesis.hts.FullPFeatureFrame;
 import inpro.synthesis.hts.FullPStream;
 import inpro.synthesis.hts.IUBasedFullPStream;
@@ -53,7 +52,7 @@ public class SysInstallmentIU extends InstallmentIU {
 		for (WordIU w : words) {
 			List<SysSegmentIU> newSegments = new ArrayList<SysSegmentIU>();
 			for (SegmentIU seg : w.getSegments()) {
-				// TODO: these will have to become SysSegmentIUs when I add pitch-scaling!
+				// TODO: the following needs to be reworked to restart from a newly generated feature vector
 				newSegments.add(new SysSegmentIU(new Label(
 						(seg.l.getStart() - startTime) * scale, 
 						(seg.l.getEnd() - startTime) * scale, 

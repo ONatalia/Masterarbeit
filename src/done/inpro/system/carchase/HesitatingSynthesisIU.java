@@ -96,7 +96,7 @@ public class HesitatingSynthesisIU extends SysInstallmentIU {
 			if (isOngoing() && updatedIU == mUnit && nextSameLevelLinks != null) {
 				IU somethingbelow = nextSameLevelLinks.get(0).groundedIn().get(0);
 				System.err.println(somethingbelow.toString());
-				((SysSegmentIU) somethingbelow).stretch(1.2);
+				((SysSegmentIU) somethingbelow).stretchFromOriginal(1.2);
 			}
 		}
 

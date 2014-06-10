@@ -2,7 +2,6 @@ package inpro.incremental.unit;
 
 import inpro.annotation.Label;
 import inpro.incremental.transaction.ComputeHMMFeatureVector;
-import inpro.synthesis.MaryAdapter4internal;
 import inpro.synthesis.hts.FullPFeatureFrame;
 import inpro.synthesis.hts.FullPStream;
 import inpro.synthesis.hts.VocodingFramePostProcessor;
@@ -24,19 +23,31 @@ public class SysSegmentIU extends SegmentIU {
 	private static Logger logger = Logger.getLogger(SysSegmentIU.class);
 	
 	Label originalLabel;
-	public HMMData hmmdata = null;
-	public FeatureVector fv = null;
-	public HTSModel legacyHTSmodel = null;
+	/** the speech synthesis HMM models to be used for this segment */
+	public HMMData hmmdata;
+	/** HMM optimization helper */
+	private static PHTSParameterGeneration paramGen;
+
+
+	/** the feature vector as it was derived from surrounding symbolic information (ideally from within the IU network, de-facto by MaryTTS) */
+	public FeatureVector fv;
+	HTSModel legacyHTSmodel;
+	/** the HMM states to be used for the segment (as determined from the feature vector) */
 	HTSModel htsModel;
+	/** the synthesis parameters that result from HMM optimization */
 	List<FullPFeatureFrame> hmmSynthesisFeatures;
+	
+	/** post-processing options: */
 	public double pitchShiftInCent = 0.0;
-	private VocodingFramePostProcessor vocodingFramePostProcessor = null;
+	private VocodingFramePostProcessor vocodingFramePostProcessor;
+
 	/** the state of delivery that this unit is in */
 	Progress progress = Progress.UPCOMING;
-	/** the number of frames that this segment has already been going on */
+	/** more detailed status during Progress.ONGOING: the number of frames that this segment has already been going on */
 	int realizedDurationInSynFrames = 0;
 	
-	boolean awaitContinuation; // used to mark that a continuation will follow, even though no fSLL exists yet.
+	/** used to mark that a continuation will follow, even though no fSLL exists yet */
+	boolean awaitContinuation; 
 	
 	public SysSegmentIU(Label l, HTSModel htsModel, FeatureVector fv, HMMData hmmdata, List<FullPFeatureFrame> featureFrames) {
 		super(l);
@@ -55,18 +66,9 @@ public class SysSegmentIU extends SegmentIU {
 	public StringBuilder toMbrolaLine() {
 		StringBuilder sb = l.toMbrola();
 /* TODO: regenerate pitch marks from hmmSynthesisFrames
- * 		for (PitchMark pm : pitchMarks) {
-			sb.append(" ");
-			sb.append(pm.toString());
-		}
-*/
+ * this is not really urgent though, as toMbrolaLine is only used for debugging anyway, not in production code */
 		sb.append("\n");
 		return sb;
-	}
-	
-	public void setHmmSynthesisFrames(List<FullPFeatureFrame> hmmSynthesisFeatures) {
-		this.hmmSynthesisFeatures = hmmSynthesisFeatures;
-		assert Math.abs(hmmSynthesisFeatures.size() - duration() * 200) < 0.001 : "" + hmmSynthesisFeatures.size() + " != " + (duration() * 200) + " in " + toString();
 	}
 	
 	/**	the duration of this segment in multiples of 5 ms */
@@ -81,13 +83,26 @@ public class SysSegmentIU extends SegmentIU {
 			return duration();
 	}
 	
-	/** adds fSLL, and allows continuation of synthesis */
-	@Override
-	public synchronized void addNextSameLevelLink(IU iu) {
-		super.addNextSameLevelLink(iu);
-		awaitContinuation = false;
-		notifyAll();
+	/* * * * * * * * * * * * * * * * * * * * * * * * */
+	/* replacement/recontextualisation of synthesis  */
+	/* * * * * * * * * * * * * * * * * * * * * * * * */
+	
+	/** copy all data necessary for synthesis -- i.e. the htsModel and pitchmarks */
+	public void copySynData(SysSegmentIU newSeg) {
+		assert payloadEquals(newSeg);
+		this.l = newSeg.l;
+		this.hmmdata = newSeg.hmmdata;
+		this.fv = newSeg.fv;
+		
+		setHTSModel(newSeg.getHTSModel());
+		this.legacyHTSmodel = newSeg.legacyHTSmodel;
+		
+		this.hmmSynthesisFeatures = newSeg.hmmSynthesisFeatures;
 	}
+
+	/* * * * * * * * * * * * * * * * * * * * * * * */
+	/*   interruption/continuation of synthesis    */
+	/* * * * * * * * * * * * * * * * * * * * * * * */
 	
 	/**
 	 * tell this segment that it will be followed by more input later on
@@ -99,11 +114,46 @@ public class SysSegmentIU extends SegmentIU {
 		return !isCompleted();
 	}
 	
-	// awaits the awaitContinuation field to be cleared
+	/** awaits the awaitContinuation field to be cleared */
 	private synchronized void awaitContinuation() {
 		while (awaitContinuation) {
 			try { wait(); } catch (InterruptedException e) {}
 		}		
+	}
+	
+	/** adds fSLL, and allows continuation of synthesis */
+	@Override
+	public synchronized void addNextSameLevelLink(IU iu) {
+		super.addNextSameLevelLink(iu);
+		awaitContinuation = false;
+		notifyAll();
+	}
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * */
+	/*   HMM state handling (from Feature Vector)    */
+	/* * * * * * * * * * * * * * * * * * * * * * * * */
+	
+	HTSModel getHTSModel() {
+		if (htsModel != null) 
+			return htsModel;
+		htsModel = generateHTSModel();
+		if (htsModel != null) {
+		//	assert this.legacyHTSmodel != null;
+		//	IncrementalCARTTest.same(htsModel, legacyHTSmodel);
+			return htsModel;
+		} else 
+			return legacyHTSmodel;
+	}
+	
+	public void setHTSModel(HTSModel hmm) {
+		legacyHTSmodel = hmm;
+	}
+
+	HTSModel generateHTSModel() {
+		FeatureVector fv = ComputeHMMFeatureVector.featuresForSegmentIU(this);
+		double prevErr = getSameLevelLink() != null & getSameLevelLink() instanceof SysSegmentIU ? ((SysSegmentIU) getSameLevelLink()).getHTSModel().getDurError() : 0f;
+		HTSModel htsModel = hmmdata.getCartTreeSet().generateHTSModel(hmmdata, hmmdata.getFeatureDefinition(), fv, prevErr);
+		return htsModel;
 	}
 	
 	/** helper, append HMM if possible, return emission length */
@@ -117,29 +167,12 @@ public class SysSegmentIU extends SegmentIU {
 		return length;
 	}
 	
-	private static PHTSParameterGeneration paramGen = null;
-
-	HTSModel getHTSModel() {
-		if (htsModel != null) 
-			return htsModel;
-		htsModel = generateHTSModel();
-		if (htsModel != null) {
-		//	IncrementalCARTTest.same(htsModel, legacyHTSmodel);
-			return htsModel;
-		} else 
-			return legacyHTSmodel;
-	}
+	/* * * * * * * * * * * * * * * * * * * * */
+	/*   vocoding features                   */
+	/* * * * * * * * * * * * * * * * * * * * */
 	
-	HTSModel generateHTSModel() {
-		FeatureVector fv = ComputeHMMFeatureVector.featuresForSegmentIU(this);
-		double prevErr = getSameLevelLink() != null & getSameLevelLink() instanceof SysSegmentIU ? ((SysSegmentIU) getSameLevelLink()).getHTSModel().getDurError() : 0f;
-		HTSModel htsModel = hmmdata.getCartTreeSet().generateHTSModel(hmmdata, hmmdata.getFeatureDefinition(), fv, prevErr);
-		return htsModel;
-	}
-	
-	// synthesizes 
+	/** perform the HMM optimization of vocoding parameter frames, using as much context as is possible/reasonable */
 	private void generateParameterFrames() {
-		assert this.legacyHTSmodel != null;
 		HTSModel htsModel = getHTSModel();
 		List<HTSModel> localHMMs = new ArrayList<HTSModel>();
 		/** iterates over left/right context IUs */
@@ -169,14 +202,14 @@ public class SysSegmentIU extends SegmentIU {
 			maxSuccessors--;
 		}
 		// make sure we have a paramGenerator
-		if (paramGen == null) { paramGen = MaryAdapter4internal.getNewParamGen(); }
+		if (paramGen == null) { paramGen = new PHTSParameterGeneration(hmmdata); }
 		FullPStream pstream = paramGen.buildFullPStreamFor(localHMMs);
 		hmmSynthesisFeatures = new ArrayList<FullPFeatureFrame>(length);
 		for (int i = start; i < start + length; i++)
 			hmmSynthesisFeatures.add(pstream.getFullFrame(i));
-		//assert htsModel.getNumVoiced() == pitchMarks.size();
 	}
 	
+	/** return the next vocoding parameter frame */
 	public FullPFeatureFrame getHMMSynthesisFrame(int req) {
 		if (hmmSynthesisFeatures == null) {
 			generateParameterFrames();
@@ -184,7 +217,6 @@ public class SysSegmentIU extends SegmentIU {
 		assert req >= 0;
 		setProgress(Progress.ONGOING);
 		assert req < durationInSynFrames() || req == 0;
-	//	req = Math.max(req, durationInSynFrames() - 1);
 		int dur = durationInSynFrames(); // the duration in frames (= the number of frames that should be there)
 		int fra = hmmSynthesisFeatures.size(); // the number of frames available
 		// just repeat/drop frames as necessary if the amount of frames available is not right
@@ -206,16 +238,28 @@ public class SysSegmentIU extends SegmentIU {
 			return frame;
 	}
 	
+	/* * * * * * * * * * * * * * * * * * * * * * * */
+	/* progress handling                           */
+	/* * * * * * * * * * * * * * * * * * * * * * * */
+	@Override
+	public Progress getProgress() {
+		return progress;
+	}
+	
 	private void setProgress(Progress p) {
 		if (p != this.progress) { 
 			this.progress = p;
 			notifyListeners();
+			// on completion, notify the next segment (which will in turn notify it's listeners about its own UPCOMING status)
 			if (p == Progress.COMPLETED && getNextSameLevelLink() != null) {
 				getNextSameLevelLink().notifyListeners();
 			}
 		}
 	}
 	
+	/* * * * * * * * * * * * * * * * * * * * * * * */
+	/* prosodic manipulation                       */
+	/* * * * * * * * * * * * * * * * * * * * * * * */
 	/** 
 	 * stretch the current segment by a given factor.
 	 * NOTE: as time is discrete (in 5ms steps), the stretching factor that is actually applied
@@ -223,16 +267,29 @@ public class SysSegmentIU extends SegmentIU {
 	 * @param factor larger than 1 to lengthen, smaller than 1 to shorten; must be larger than 0
 	 * @return the actual duration that has been applied 
 	 */
-	public double stretch(double factor) {
-		assert factor > 0f;
-		double newDuration = duration() * factor;
-		return setNewDuration(newDuration);
-	}
-	
 	public double stretchFromOriginal(double factor) {
 		assert factor > 0f;
 		double newDuration = originalDuration() * factor;
 		return setNewDuration(newDuration);
+	}
+	
+	/** 
+	 * set a new duration of this segment; if this segment is already ongoing, the 
+	 * resulting duration cannot be shortend to less than what has already been going on (obviously, we can't revert the past)  
+	 * @return the actual new duration (multiple of 5ms) 
+	 */
+	public synchronized double setNewDuration(double d) {
+		assert d >= 0;
+		d = Math.max(d, realizedDurationInSynFrames / 200.f); 
+		if (originalLabel == null) 
+			originalLabel = this.l;
+		Label oldLabel = this.l;
+		// change duration to conform to 5ms limit
+		double newDuration = Math.round(d * 200.f) / 200.f;
+		shiftBy(newDuration - duration(), true);
+		// correct this' label to start where it used to start (instead of the shifted version)
+		this.l = new Label(oldLabel.getStart(), this.l.getEnd(), this.l.getLabel());
+		return newDuration;
 	}
 	
 	public void setVocodingFramePostProcessor(VocodingFramePostProcessor postProcessor) {
@@ -259,50 +316,10 @@ public class SysSegmentIU extends SegmentIU {
 		}
 	}
 	
-	/** 
-	 * set a new duration of this segment; if this segment is already ongoing, the 
-	 * resulting duration cannot be shortend to less than what has already been going on (obviously, we can't revert the past)  
-	 * @return the actual new duration (multiple of 5ms) 
-	 */
-	public synchronized double setNewDuration(double d) {
-		assert d >= 0;
-		d = Math.max(d, realizedDurationInSynFrames / 200.f); 
-		if (originalLabel == null) 
-			originalLabel = this.l;
-		Label oldLabel = this.l;
-		// change duration to conform to 5ms limit
-		double newDuration = Math.round(d * 200.f) / 200.f;
-		shiftBy(newDuration - duration(), true);
-		// correct this' label to start where it used to start (instead of the shifted version)
-		this.l = new Label(oldLabel.getStart(), this.l.getEnd(), this.l.getLabel());
-		return newDuration;
-	}
-	
-	/** shift the start and end times of this (and possibly all following SysSegmentIUs */
-	public void shiftBy(double offset, boolean recurse) {
-		super.shiftBy(offset, recurse);
-	}
-
-	@Override
-	public Progress getProgress() {
-		return progress;
-	}
-	
-	/** SysSegmentIUs may have a granularity finer than 10 ms (5ms) */
+	/** SysSegmentIUs has a granularity finer than 10 ms (5ms), hence output must be more precise */
 	@Override
 	public String toLabelLine() {
 		return String.format(Locale.US,	"%.3f\t%.3f\t%s", startTime(), endTime(), toPayLoad());
-	}
-
-	public void setHTSModel(HTSModel hmm) {
-		legacyHTSmodel = hmm;
-	}
-
-	/** copy all data necessary for synthesis -- i.e. the htsModel and pitchmarks */
-	public void copySynData(SysSegmentIU newSeg) {
-		assert payloadEquals(newSeg);
-		this.l = newSeg.l;
-		setHTSModel(newSeg.legacyHTSmodel);
 	}
 
 }
