@@ -89,28 +89,6 @@ public class CartTreeSet {
     private int strVsize;             /* vector size for strengths modeling */
     private int magVsize;             /* vector size for Fourier magnitudes modeling */
    
-    final HTSCARTReader htsReader; 
-    
-    /** TODO: monitoredFeatures needs a comment */
-    // private List<List<String>> monitoredFeatures;
-   // private int[] staticFeatureCounts; // index is featureIndex in featureDef
-    //private double[] weightedStaticFeatureCounts;
-    //private static int[] dynamicFeatureCounts;
-    //private static int[][] dynamicFeatureValueCounts; // counts, for every feature, the occurrence of the corresponding values
-    //private static boolean[][] dynamicFeatureValueUsage;
-    //private static FeatureVector previousFeature;
-    /** CartTreeSet is used in two distinct places in Mary Code (first in overal duration/f0 targetting, second in HMM state selection) */
-    private boolean isHMMCartTreeSet = false;
-    /** the feature definitions used during HMM state selection */
-    //private static FeatureDefinition featDef;
-/*    
-*/    
-    public CartTreeSet() {
-        htsReader = new HTSCARTReader();
-//        monitoredFeatures = new ArrayList<String>();
-//        monitoredFeatures.add("phone");
-    }
-    
     public int getNumStates(){ return numStates; }
     public int getLf0Stream(){ return lf0Stream; }
     public int getMcepVsize(){ return mcepVsize; }
@@ -126,198 +104,9 @@ public class CartTreeSet {
         }
     }
     
-//        Runtime.getRuntime().addShutdownHook(new Thread() {
-//            public void run() {
-////                printFeatureStatistics(dynamicFeatureCounts);
-////                printFeatureValueStatistics(dynamicFeatureValueCounts);
-//                System.err.println("f0 (Cent) mean:\t" + f0Stats.getMean());
-//                System.err.println("f0 (Cent) stddev:\t" + f0Stats.getStandardDeviation());
-//                System.err.println("f0 (Cent) error:\t" + f0Error.getMean());
-//                System.err.println("f0 z-normalized error:\t" + f0Error.getMean() / f0Stats.getStandardDeviation());
-//
-//                System.err.println("dur (ms) mean:\t" + durStats.getMean());
-//                System.err.println("dur (ms) stddev:\t" + durStats.getStandardDeviation());
-//                System.err.println("dur (ms) error:\t" + durError.getMean());
-//                System.err.println("dur z-normalized error:\t" + durError.getMean() / durStats.getStandardDeviation());
-//
-//                System.err.println("MCP Euklidian z-normalized error:\t" + aggregatedError(mcpStats, mcpError));
-//                System.err.println("STR Euklidian z-normalized error:\t" + aggregatedError(strStats, strError));
-//
-//                System.err.println("minimum decision tree depth: " + minDepth);
-//                System.err.println("maximum decision tree depth: " + maxDepth);
-//            }
-//        }); /**/
-//    }
-    
-/*    private void generateStaticFeatureStatistics() {
-        List<CART> allCarts = new ArrayList<CART>(Arrays.asList(durTree));
-        allCarts.addAll(Arrays.asList(lf0Tree));
-        allCarts.addAll(Arrays.asList(mcpTree));
-        allCarts.addAll(Arrays.asList(strTree));
-        assert featDef != null;
-        staticFeatureCounts = new int[featDef.getNumberOfFeatures()];
-        weightedStaticFeatureCounts = new double[featDef.getNumberOfFeatures()];
-        dynamicFeatureCounts = new int[featDef.getNumberOfFeatures()];
-        for (int i = 0; i < featDef.getNumberOfFeatures(); i++) {
-            for (CART cart : allCarts) {
-                assert featDef.equals(cart.getFeatureDefinition());
-                staticFeatureCounts[i] += cart.countAppearanceOfFeatureAtMaxDepth(featDef.getFeatureName(i), 1);
-                weightedStaticFeatureCounts[i] += cart.weightedCountAppearanceOfFeatureAtMaxDepth(featDef.getFeatureName(i), 1);
-            }
-        }
-//        printFeatureStatistics(staticFeatureCounts);
-//        printFeatureStatistics(weightedStaticFeatureCounts);
-    }
-    */
-//    private static void printFeatureStatistics(int[] featureCounts) {
-//        // get total counts (to be able to output percentages below) 
-//        int total = 0; for (int val : featureCounts) total += val;
-//        if (total > 0) { // ignore empty arrays
-//            for (int i = 0; i < featDef.getNumberOfFeatures(); i++) {
-//                System.err.println(featureCounts[i] + "\t: " + featDef.getFeatureName(i));
-//            }
-//            for (FeatureClasses fc : FeatureClasses.values()) {
-//                int sum = 0;
-//                for (String featName : featureClasses.get(fc)) {
-//                    if (featDef.hasFeature(featName))
-//                        sum += featureCounts[featDef.getFeatureIndex(featName)];
-//                }
-//                System.err.println(sum + "\t" + (sum * 100 / total) + "%\tin feature class " + fc.toString());
-//            }
-//        }
-//    }
-    
-/*    private static class FeatureCount implements Comparable<FeatureCount> {
-        String valueName; 
-        int count;
-        FeatureCount(String featureName, int count) {
-            this.valueName = featureName; 
-            this.count = count;
-        }
-        public int compareTo(FeatureCount o) {
-            return Integer.compare(o.count, count);
-        }
-    }
-    
-    private static void printFeatureValueStatistics(int[][] featureValueCounts) {
-        for (int i = 0; i < featDef.getNumberOfFeatures(); i++) {
-            System.err.print(featDef.getFeatureName(i));
-            String[] valueNames = featDef.getPossibleValues(i);
-            if ((valueNames.length == 10 || valueNames.length == 20) && valueNames[8].equals("8")) {
-                // numeric: calculate mean value
-                int total = 0; 
-                int weightedSum = 0;
-                for (int j = 0; j < valueNames.length; j++) {
-                    total += featureValueCounts[i][j];
-                    weightedSum += featureValueCounts[i][j] * j;
-                }
-                System.err.println("\twas used " + total + " times.");
-                System.err.println("\tmean value: " + (((float)weightedSum) / total));
-//                System.err.print(Math.round(((float)weightedSum) / total) + ", ");
-            } else { // non-numeric: show most frequent values
-                List<FeatureCount> namedValues = new ArrayList<FeatureCount>(valueNames.length);
-                int total = 0; 
-                for (int j = 0; j < valueNames.length; j++) {
-                    namedValues.add(new FeatureCount(valueNames[j], featureValueCounts[i][j]));
-                    total += featureValueCounts[i][j];
-                }
-                System.err.println("\twas used " + total + " times.");
-                Collections.sort(namedValues);
-                if (total > 0) {
-                    for (int j = 0; j < 10 && j < namedValues.size(); j++) {
-                        System.err.print("\t" + namedValues.get(j).valueName + " : " + (namedValues.get(j).count * 100 / total) + "%,");
-                    }
-                    System.err.println();
-                } else {
-                    System.err.println("\tnever used at all in any encountered path along the decision trees");
-                }
-// use the following line for outputting the feature default list:
-//                System.err.print((namedValues.size() > 0 ? featDef.getFeatureValueAsByte(i, namedValues.get(0).valueName) : 0) + ", ");
-            }
-        }
-    }
-    */
-//    private static void printFeatureStatistics(double[] featureCounts) {
-//        for (FeatureClasses fc : FeatureClasses.values()) {
-//            double sum = 0;
-//            for (String featName : featureClasses.get(fc)) {
-//                if (featDef.hasFeature(featName))
-//                    sum += featureCounts[featDef.getFeatureIndex(featName)];
-//            }
-//            System.err.println(String.format(Locale.US, "%.2f", sum) + "\t");//mass in feature class " + fc.toString());
-//        }
-//    }
-    
-    /** print statistics regarding feature use in a tree at given maximum depths */
-/*    private void printMonitoredFeatureStatistics(String name, CART[] carts) {
-        try {
-        if (carts != null)
-            for (int i = 0; i < carts.length; i++) {
-                CART cart = carts[i];
-                System.err.println(name + i + ": " + cart.countAppearanceOfFeatureAtMaxDepth("phone", 2));
-                PrintWriter pw = new PrintWriter("/tmp/" + name + i + ".CART");
-                (new MaryCARTWriter()).toTextOut(cart, pw);
-                pw.close();
-            }
-        } catch (IOException e) { e.printStackTrace(); }
-    }
-    
-    private static int minDepth = Integer.MAX_VALUE;
-    private static int maxDepth = Integer.MIN_VALUE;
-
-    private static void recordFeatureUsage(Node node) {
-        if (dynamicFeatureCounts == null)
-            dynamicFeatureCounts = new int[featDef.getNumberOfFeatures()];
-        Node it = node;
-        if (it instanceof LeafNode) it = it.getMother();
-        int depth = 0;
-        while (it != null) {
-            depth++;
-            DecisionNode dn = (DecisionNode) it;
-            dynamicFeatureCounts[dn.getFeatureIndex()]++;
-            it = it.getMother();
-        }
-        if (depth < minDepth) minDepth = depth;
-        if (depth > maxDepth) maxDepth = depth; 
-    }
-    
-    private static void recordFeatureValues(FeatureVector fv) {
-        if (dynamicFeatureValueCounts == null)
-            dynamicFeatureValueCounts = new int[featDef.getNumberOfFeatures()][256];
-        for (int i = 0; i < featDef.getNumberOfFeatures(); i++) {
-            assert fv.isByteFeature(i);
-            dynamicFeatureValueCounts[i][fv.getFeatureAsInt(i)]++;
-        }
-    }
-  */
-    /** this is actually annoyingly complex: record usage of the same feature in a boolean array, 
-     * carry over to int array when the next feature starts to be used */
-/*    private static void recordFeatureValueUsage(FeatureVector fv, Node node) {
-        if (dynamicFeatureValueCounts == null)
-            dynamicFeatureValueCounts = new int[featDef.getNumberOfFeatures()][256];
-        if (fv != previousFeature && dynamicFeatureValueUsage != null) {
-            for (int i = 0; i < dynamicFeatureValueUsage.length; i++) {
-                for (int j = 0; j < dynamicFeatureValueUsage[0].length; j++) {
-                    dynamicFeatureValueCounts[i][j] += dynamicFeatureValueUsage[i][j] ? 1 : 0;
-                }
-            }
-            dynamicFeatureValueUsage = null;
-        }
-        if (dynamicFeatureValueUsage == null)
-            dynamicFeatureValueUsage = new boolean[featDef.getNumberOfFeatures()][256];
-        Node it = node;
-        if (it instanceof LeafNode) it = it.getMother();
-        while (it != null) {
-            DecisionNode dn = (DecisionNode) it;
-            int i = dn.getFeatureIndex();
-            dynamicFeatureValueUsage[i][fv.getFeatureAsInt(i)] = true;
-            it = it.getMother();
-        }
-        previousFeature = fv;
-    }
-    */
     /** Loads all the CART trees */
     public void loadTreeSet(HMMData htsData, FeatureDefinition featureDef, String trickyPhones) throws Exception {
+      HTSCARTReader htsReader = new HTSCARTReader();
       try {
         // Check if there are tricky phones, and create a PhoneTranslator object
         PhoneTranslator phTranslator = new PhoneTranslator(trickyPhones);
@@ -335,24 +124,15 @@ public class CartTreeSet {
         if( htsData.getTreeMcpFile() != null){
           mcpTree = htsReader.load(numStates, htsData.getTreeMcpFile(), htsData.getPdfMcpFile(), featureDef, phTranslator);
           mcepVsize = htsReader.getVectorSize();
-          isHMMCartTreeSet = true;
         }
         /* STR and MAG are optional for generating mixed excitation */ 
         if( htsData.getTreeStrFile() != null){
            strTree = htsReader.load(numStates, htsData.getTreeStrFile(), htsData.getPdfStrFile(), featureDef, phTranslator);
            strVsize = htsReader.getVectorSize();
-           isHMMCartTreeSet = true;
         }
         if( htsData.getTreeMagFile() != null){
           magTree = htsReader.load(numStates, htsData.getTreeMagFile(), htsData.getPdfMagFile(), featureDef, phTranslator);
           magVsize = htsReader.getVectorSize();
-        }
-        if (isHMMCartTreeSet) {
-    //        featDef = featureDef;
-//            printMonitoredFeatureStatistics("mcp", mcpTree);
-//            printMonitoredFeatureStatistics("str", strTree);
-//            printMonitoredFeatureStatistics("lf0", lf0Tree);
-//            printMonitoredFeatureStatistics("dur", durTree);
         }
       } catch (Exception e) {
         throw new Exception("LoadTreeSet failed: ", e);
@@ -361,7 +141,8 @@ public class CartTreeSet {
 
     /** Loads duration CART */
     public void loadDurationTree(String treeDurFile, String pdfDurFile, FeatureDefinition featureDef, String trickyPhones) throws Exception {
-      try {
+    	HTSCARTReader htsReader = new HTSCARTReader();
+    	try {
         // Check if there are tricky phones, and create a PhoneTranslator object
         PhoneTranslator phTranslator = new PhoneTranslator(trickyPhones);
         /* The duration tree has only one state.
@@ -393,13 +174,6 @@ public class CartTreeSet {
       double durscale = htsData.getDurationScale();
       double meanVector[], varVector[];
       PdfLeafNode node = (PdfLeafNode) durTree[0].interpretToNode(fv, 1);
-      // the duration tree has only one state
-/*      if (isHMMCartTreeSet) {
-          //System.err.println(node.getDecisionPath());
-          recordFeatureUsage(node);
-          recordFeatureValueUsage(fv, node);
-      }
-*/      //System.out.println("  PDF INDEX = " + ((PdfLeafNode)node).getUniqueLeafId() );  
         meanVector = node.getMean();
         varVector = node.getVariance();
           
@@ -434,14 +208,6 @@ public class CartTreeSet {
       throws Exception {
       for(int s=0; s<numStates; s++) {          
         PdfLeafNode node = (PdfLeafNode) lf0Tree[s].interpretToNode(fv, 1);
-/*        double trueValue = lf0ToCent(node.getMean()[0]);
-        if (node.getVoicedWeight() > uvthresh) {
-            f0Stats.addValue(trueValue);
-            f0Error.addValue(Math.abs(trueValue - lf0ToCent(node.getMean()[0])));
-        }
-*/        if (isHMMCartTreeSet) {
-        //    recordFeatureValueUsage(fv, node);
-        }
           m.setLf0Mean(s, node.getMean());
           m.setLf0Variance(s, node.getVariance());
         // set voiced or unvoiced
@@ -464,17 +230,6 @@ public class CartTreeSet {
       throws Exception {     
       for(int s=0; s<numStates; s++) {
         PdfLeafNode node = (PdfLeafNode) mcpTree[s].interpretToNode(fv, 1);
-/*        for (int i = 0; i < 25; i++) {
-            double trueValue = fullNode.getMean()[i];
-            mcpStats[i].addValue(trueValue);
-            mcpError[i].addValue(Math.abs(trueValue - fullNode.getMean()[i]));
-        } */
-      //  recordFeatureValueUsage(fv, node);
-//        if (isMainHMMCartTreeSet) {
-//            //System.err.println(node.getDecisionPath());
-//            recordFeatureUsage(node);
-//        }
-        
           m.setMcepMean(s, node.getMean());
           m.setMcepVariance(s, node.getVariance());
       }
@@ -492,12 +247,7 @@ public class CartTreeSet {
       throws Exception {     
       for(int s=0; s<numStates; s++) {      
           PdfLeafNode node = (PdfLeafNode) strTree[s].interpretToNode(fv, 1);
-/*          for (int i = 0; i < 5; i++) {
-              double trueValue = fullNode.getMean()[i];
-              strStats[i].addValue(trueValue);
-              strError[i].addValue(Math.abs(trueValue - croppedNode.getMean()[i]));
-          }
-*/      m.setStrMean(s, node.getMean());
+        m.setStrMean(s, node.getMean());
         m.setStrVariance(s, node.getVariance());
       }
     }

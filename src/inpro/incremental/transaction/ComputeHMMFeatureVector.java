@@ -5,6 +5,8 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 
+import work.inpro.synthesis.ihmms.HTSModelComparator;
+
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.SysSegmentIU;
 import marytts.features.FeatureDefinition;
@@ -125,6 +127,6 @@ public class ComputeHMMFeatureVector {
     
 	public static FeatureVector featuresForSegmentIU(SysSegmentIU siu) {
         
-		return substitueDefaultFeatures(maximum, siu.hmmdata.getFeatureDefinition(), siu.fv);
+		return substitueDefaultFeatures(currentWordIUinformed(siu), siu.hmmdata.getFeatureDefinition(), siu.fv);
 	}
 }

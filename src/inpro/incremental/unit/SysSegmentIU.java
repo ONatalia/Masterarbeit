@@ -18,6 +18,8 @@ import marytts.htsengine.HTSModel;
 
 import org.apache.log4j.Logger;
 
+import work.inpro.synthesis.ihmms.HTSModelComparator;
+
 public class SysSegmentIU extends SegmentIU {
 	
 	private static Logger logger = Logger.getLogger(SysSegmentIU.class);
@@ -31,7 +33,7 @@ public class SysSegmentIU extends SegmentIU {
 
 	/** the feature vector as it was derived from surrounding symbolic information (ideally from within the IU network, de-facto by MaryTTS) */
 	public FeatureVector fv;
-	HTSModel legacyHTSmodel;
+	public HTSModel legacyHTSmodel;
 	/** the HMM states to be used for the segment (as determined from the feature vector) */
 	HTSModel htsModel;
 	/** the synthesis parameters that result from HMM optimization */
@@ -138,7 +140,9 @@ public class SysSegmentIU extends SegmentIU {
 			return htsModel;
 		htsModel = generateHTSModel();
 		if (htsModel != null) {
-		//	assert this.legacyHTSmodel != null;
+		assert this.legacyHTSmodel != null;
+		// for evaluation of various incremental FV computation strategies:
+			HTSModelComparator.compare(htsModel, legacyHTSmodel);
 		//	IncrementalCARTTest.same(htsModel, legacyHTSmodel);
 			return htsModel;
 		} else 
