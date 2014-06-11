@@ -118,6 +118,8 @@ then click start to begin streaming the audio (it may ask for permission again).
 change your mic settings by clicking on the video/mic image on the right-hand side of the 
 address bar. 
 
+The above website is hosted by Apache Tomcat, license found here: http://www.apache.org/licenses/LICENSE-2.0
+
 Language codes can be found at the following URL: http://www.science.co.il/language/locale-codes.asp
 Some common ones: de-de, en_uk, en_us, ja
 
