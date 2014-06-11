@@ -4,8 +4,18 @@ only strings can be sent via these methods, but in the future RSB/Venice could s
 
 Questions or comments, please contact Casey Kennington at ckennington@cit-ec.uni-bielefeld.de
 
+
+------------------------------
+	Pre-Requisites
+------------------------------
+You will need the instantreality.jar file from the package downloaded from the InstantReality website: http://www.instantreality.org/downloads/
+
+You will also need the protobuf jar: https://code.google.com/p/protobuf/
+
+Jars for Apache Tomcat and the Robotics Service Bus are included, but please note the licenese (see below).
+
 -------------------------------
-		XMLRPC
+	XMLRPC
 -------------------------------
 XmlRpc is probably the easiest way to get external data into InproTK (short of using files). To get data into 
 InproTK, your code needs to be an XmlRpc client that connects to a server on localhost:9050 (or specified port).
@@ -30,7 +40,7 @@ Note that the XmlRpcListenerModule sets up an XmlRpc server, and the XmlRpcInfor
 informer can send data to a server specified in the config file (i.e., localhost or a remote server). 
 
 -------------------------------
-		VENICE/RSB
+	VENICE/RSB
 -------------------------------
 
 First, you need to install RSB. Instructions here: http://docs.cor-lab.org/rsb-manual/trunk/html/install.html
@@ -85,7 +95,7 @@ http://doc.instantreality.org/apidocs/instantio/
 
 
 -------------------------------
-	Adding New Input/Output
+   Adding New Input/Output
 -------------------------------
 If you want to add your own way to put information into InproTK, and get information out of InproTK, then
 I recommend that you use a similar Listener/Informer pattern. A parent ListenerModule exists as an IUModule
@@ -99,7 +109,7 @@ it is pushed to the output. The same pattern goes for XmlRpc and InstantIO.
 
 
 -------------------------------
-	Google Web Speech
+     Google Web Speech
 -------------------------------
 
 To use the Google Web Speech, you need to install Chrome or Choromium browser. 
@@ -131,7 +141,7 @@ silence gap).
 
 
 -------------------------------
-	  EXAMPLE CONFIGS
+     EXAMPLE CONFIGS
 -------------------------------	
 
 	<!-- Google Web Speech -->
@@ -149,7 +159,7 @@ silence gap).
 	<!-- Venice listener -->
    <component name="listener" type="inpro.io.VeniceListenerModule">
         <property name="id" value="listener"/>
-        <property name="scope" value="${baseScope}"/>
+        <property name="scope" value="baseScope"/>
 	    <propertylist name="hypChangeListeners">
 	    	<item>informer</item>    
 	    </propertylist>
@@ -158,7 +168,7 @@ silence gap).
     <!-- Venice informer -->
      <component name="informer" type="inpro.io.VeniceInformerModule">
         <property name="id" value="informer"/>
-        <property name="scope" value="${baseScope}"/>
+        <property name="scope" value="baseScope"/>
 	    <propertylist name="hypChangeListeners">
 	    </propertylist>
     </component>
