@@ -29,12 +29,15 @@ public class InstantIOListenerModule extends ListenerModule implements InSlot.Li
 	@S4String(defaultValue = "")
 	public final static String INSLOT_PROP = "inslot";
 	
+ 	@S4String(defaultValue = "")
+	public final static String ID_PROP = "id";	
+	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		log.info("Setting up InstantIOListenerModule");
 		String inslot = ps.getString(INSLOT_PROP);
-		this.setID(inslot);
+		this.setID(ps.getString(ID_PROP));
 		InstantIOListener.getInstance().addInSlotListener(inslot, this);
 		System.out.println("instantIO listener listening...");
 	}
@@ -48,7 +51,9 @@ public class InstantIOListenerModule extends ListenerModule implements InSlot.Li
 	@Override
 	public void newData(InSlot data) {
 		try {
-			process(data.pop().toString());
+			String d = data.pop().toString();
+//			System.out.println(d);
+			process(d);
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();

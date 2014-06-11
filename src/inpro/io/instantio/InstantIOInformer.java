@@ -16,9 +16,10 @@ public class InstantIOInformer {
 	static Logger log = Logger.getLogger(InstantIOInformer.class.getName());
 	
 	private static InstantIOInformer instance;
-	private NetworkNode irNetworkNode;
     private HashMap<String,Namespace> namespaceMaps;	
     private boolean started = false;
+
+	private NetworkNode irNetworkNode;
 	
 	/**
 	 * Always use this method to get the singleton instance.
@@ -39,7 +40,7 @@ public class InstantIOInformer {
 	 */
 	private InstantIOInformer() {
 		namespaceMaps = new HashMap<String,Namespace>();
-		irNetworkNode = new NetworkNode();
+		irNetworkNode = NetworkNodeContainer.getNetworkNode();
 		this.setPrefix("InproTK");
 		this.setPort(54445);
 		this.setServers("127.0.0.1:54444");
@@ -57,7 +58,7 @@ public class InstantIOInformer {
 		}
 		
 		log.info("Setting InstantIO prefix: " + prefix);
-		irNetworkNode.setPrefix(String.format("%s/{SlotLabel}", prefix));
+		irNetworkNode.setPrefix(String.format("{SlotLabel}", prefix));
 	}
 	
 	
@@ -100,10 +101,14 @@ public class InstantIOInformer {
 			return;
 		}
 		log.info("Starting InstantIO...");
-		irNetworkNode.setExportSlots(true);
-		irNetworkNode.setImportSlots(false);
-		Root.the().addNamespace(irNetworkNode);
+		setNodeSlotFilters();
+		Root.the().addNamespace("InproTKInformer", irNetworkNode);
 		started = true;
+	}
+	
+	public void setNodeSlotFilters() {
+		irNetworkNode.setExportSlots(true);
+		irNetworkNode.setImportSlots(true);
 	}
 	
 	/**
@@ -115,8 +120,9 @@ public class InstantIOInformer {
 		log.info("Adding namespace: " + namespace);
 		Namespace irNamespace = new Namespace();
 		if (!namespaceMaps.containsKey(namespace)) {
-			Root.the().addNamespace(namespace, irNamespace);
 			namespaceMaps.put(namespace, irNamespace);
+			namespaceMaps.get(namespace).addExternalRoute("*", "{NamespaceLabel}/{SlotLabel}");
+			irNetworkNode.addNamespace(namespace, irNamespace);
 		}
 	}
 	
@@ -137,7 +143,6 @@ public class InstantIOInformer {
 		OutSlot irOut = new OutSlot(String.class);
 		//add the outslot to the namespace
 		namespaceMaps.get(namespace).addOutSlot(outSlot, irOut);
-		namespaceMaps.get(namespace).addExternalRoute("*", "{NamespaceLabel}/{SlotLabel}");
 		return irOut;
 	}
 	

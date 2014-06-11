@@ -55,9 +55,9 @@ public class InstantIOInformerModule extends IUModule {
 		String namespace = ps.getString(NAMESPACE_PROP);
 //		set up the InstantIO server
 		InstantIOInformer instance = InstantIOInformer.getInstance();
-		instance.setPort(port);
-		instance.setPrefix(prefix);
-		instance.setServers(servers);
+//		instance.setPort(port);
+//		instance.setPrefix("");
+//		instance.setServers(servers);
 		instance.start();
 		outSlot = instance.addOutSlot(outslot, namespace);
 	}
@@ -74,9 +74,9 @@ public class InstantIOInformerModule extends IUModule {
 			List<? extends EditMessage<? extends IU>> edits) {
 		
 		for (EditMessage<? extends IU> edit : edits) {
+//			System.out.println("PUSHING TO INSTANTIO: " + edit);
 			outSlot.push(edit.getIU().toPayLoad());
 		}
-		
 	}
 
 }

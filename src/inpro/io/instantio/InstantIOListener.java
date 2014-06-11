@@ -37,12 +37,13 @@ public class InstantIOListener implements Namespace.Listener {
 	 * Constructor should be private.
 	 */
 	private InstantIOListener() {
-		node = new NetworkNode();
+		node = NetworkNodeContainer.getNetworkNode();
+		node.addListener(this);
+//		Root.the().addNamespace(node);
 //		This is a listener, so set it up to only listen
-		node.setExportSlots(false);
-		node.setImportSlots(true);
-		Root.the().addNamespace(node);
-		Root.the().addListener(this);
+		this.setNetworkNodeFilters();
+		
+		
 		
 //		keep the listener alive, just in case InproTK doesn't have anything else to do. For the most part, this just sleeps. 
 		new Thread() {
@@ -59,6 +60,10 @@ public class InstantIOListener implements Namespace.Listener {
 		
 	}
 	
+	public void setNetworkNodeFilters() {
+		node.setExportSlots(true);
+		node.setImportSlots(true);
+	}
 	
 	/**
 	 * Adds a new InSlot Listener, this is where data is going to be send when it is received.
@@ -67,14 +72,17 @@ public class InstantIOListener implements Namespace.Listener {
 	 * @param listener
 	 */
 	public void addInSlotListener(String inSlotName, InSlot.Listener listener) {
+		System.out.println("Adding InstantIO inSlot: " + inSlotName);
 		InSlot inSlot = new BufferedInSlot(String.class, null, 80);
 		Root.the().addInSlot(inSlotName, inSlot);
 		inSlot.addListener(listener);
 	}
 
 	@Override
-	public void inSlotAdded(Namespace arg0, String arg1, InSlot arg2) {
-		
+	public void inSlotAdded(Namespace namespace, String outname, InSlot out) {
+		log.info("InstantIO inslot detected: " + namespace + " with outname " 
+				  + outname  + " using type " + out.getType());
+		System.out.println(out.getType()  + " " + outname + " "  +namespace);
 	}
 
 	@Override
@@ -90,8 +98,9 @@ public class InstantIOListener implements Namespace.Listener {
 	 */
 	@Override
 	public void outSlotAdded(Namespace namespace, String outname, OutSlot out) {
-		log.info("InstantIO Namespace detected: " + namespace + " with outname " 
+		log.info("InstantIO outslot detected: " + namespace + " with outname " 
 				  + outname  + " using type " + out.getType());
+		System.out.println(out.getType()  + " " + outname + " "  +namespace);
 	}
 
 	@Override
@@ -101,7 +110,7 @@ public class InstantIOListener implements Namespace.Listener {
 
 	@Override
 	public void routeAdded(Namespace arg0, String arg1, String arg2) {
-		
+		System.out.println(arg0 + " " + arg1 + " " + arg2);
 	}
 
 	@Override
