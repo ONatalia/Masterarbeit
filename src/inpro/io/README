@@ -1,0 +1,208 @@
+This will describe three ways to get data into and out of InproTK: XmlRpc, RSB (using Venice), and InstantIO. At the moment,
+only strings can be sent via these methods, but in the future RSB/Venice could send custom protbuf objects.
+
+
+Questions or comments, please contact Casey Kennington at ckennington@cit-ec.uni-bielefeld.de
+
+
+------------------------------
+	Pre-Requisites
+------------------------------
+You will need the instantreality.jar file from the package downloaded from the InstantReality website: http://www.instantreality.org/downloads/
+
+You will also need the protobuf jar: https://code.google.com/p/protobuf/
+
+Jars for Apache Tomcat and the Robotics Service Bus are included, but please note the licenese (see below).
+
+-------------------------------
+	XMLRPC
+-------------------------------
+XmlRpc is probably the easiest way to get external data into InproTK (short of using files). To get data into 
+InproTK, your code needs to be an XmlRpc client that connects to a server on localhost:9050 (or specified port).
+Your client needs to send data to the handle you specify in the config (default=inprotk) and the method is push(String). 
+
+For example, to push data from a Python client to the InproTK XmlRpcListenerModule, and you set handle=myhandle, you
+would execute the following:
+
+server = xmlrpclib.ServerProxy("http://localhost:9050")
+server.handle.push("data")
+
+In order to get data out of InproTK via XmlRpc, you need to set up a server on the handle you specify, and it needs 
+to have a push method. Basic python example:
+
+server = SimpleXMLRPCServer("localhost", 9050)
+def push(string):
+	print string
+server.register_function(push)
+server.serve_forever()
+
+Note that the XmlRpcListenerModule sets up an XmlRpc server, and the XmlRpcInformerModule is an XmlRpc client, so the 
+informer can send data to a server specified in the config file (i.e., localhost or a remote server). 
+
+-------------------------------
+	VENICE/RSB
+-------------------------------
+
+First, you need to install RSB. Instructions here: http://docs.cor-lab.org/rsb-manual/trunk/html/install.html
+specifically, for Java: http://docs.cor-lab.org/rsb-manual/trunk/html/install-java.html
+which includes installing the RSC and RSBProtocol and RSBJava.
+
+RSB allows you to set a scope (e.g., /base/scope/) and set listeners and informers to receive and send information
+on that scope. For example, if you make an informer on scope /base/scope/ and send a string "new_data" it will send
+the data via /base/scope/new_data which will be received by any and all listeners that listen on the
+/base/scope/ scope. See example configs below.
+
+To get data into InproTK, you need a VeniceListenerModule, and you need to make an informer that sends stuff to the
+specified scope (you could use Venice which wraps RSB for that). E.g., in python:
+
+from adapter.Informer import Informer
+informer = Informer("/my/scope/")
+informer.send("data")
+
+Where the scope is the same as the scope in the config for the VeniceListenerModule in InproTK (example config below). 
+Getting data out of InproTK is reverse; use the VeniceInformerModule and it will send data put onto its left buffer
+to whatever scope is specified in the config file. Your python code would receive that data (example, using Venice):
+
+from adapter.Listener import Listener
+def printMessage(event):
+    print str(event.data)
+listener = Listener(printMessage)
+while True:
+    time.sleep(1)
+
+Notes:
+Informer scopes should NOT end with a /
+whereas
+Listener scopes should end with a /
+
+
+Finally, RSB/Venice requires a properties file which specifies the type of transport and which server to connect to. 
+The file name should be dsg.properties, and should have at least the two following lines:
+rsb.host = localhost
+transport = socket
+
+Note that if you don't use Venice, you need to set the rsb.conf file yourself. Venice uses these properties to generate
+the rsb.conf file. 
+
+-------------------------------
+		InstantIO
+-------------------------------	
+InstantIO is a framework of information passing in order to receive data into a virtual
+world. There isn't any extra software that needs to be installed; but the instantio jar needs
+to be in the classpath. 
+
+http://doc.instantreality.org/apidocs/instantio/ 
+
+
+-------------------------------
+   Adding New Input/Output
+-------------------------------
+If you want to add your own way to put information into InproTK, and get information out of InproTK, then
+I recommend that you use a similar Listener/Informer pattern. A parent ListenerModule exists as an IUModule
+that you can extend which will do most of the work for you. You just need to make a newProperties() method
+to set up the input information, then any string added to the process(String) method will be put into the 
+right buffer of that module. Look at venice.VeniceListenerModule as an example (which extends ListenerModule).
+
+To add an Informer, there is no parent class, so you can use venice.VeniceInformerModule as an example. 
+It sets up the informer in newProperties() then when something is received on the left buffer (leftBufferUpdate)
+it is pushed to the output. The same pattern goes for XmlRpc and InstantIO. 
+
+
+-------------------------------
+     Google Web Speech
+-------------------------------
+
+To use the Google Web Speech, you need to install Chrome or Choromium browser. 
+
+You will need to create a .keystore file for ssl/https (necessary otherwise Chrome will
+ask you multiple times if you want to allow access to the microphone). Run the following 
+(keytool is a java program) and answer the questions. This will put a .keystore file
+in your home directory:
+
+keytool -genkey -v -keyalg RSA -alias tomcat -keypass changeit -storepass changeit
+
+
+After starting InproTK with WebSpeech as an IUModule, you can open localhost:8080/dialog
+and you should get a mic interface, asking for permission to access your mic. Click allow, 
+then click start to begin streaming the audio (it may ask for permission again). You can
+change your mic settings by clicking on the video/mic image on the right-hand side of the 
+address bar. 
+
+The above website is hosted by Apache Tomcat, license found here: http://www.apache.org/licenses/LICENSE-2.0
+
+Language codes can be found at the following URL: http://www.science.co.il/language/locale-codes.asp
+Some common ones: de-de, en_uk, en_us, ja
+
+We are doing the best we can with timestamps; Google returns a timestamp that we interpret as the
+end of a chunk (often, more than one word is returned). The timestamp offset is based on when
+you clicked "start" on the Chrome browser page. If you set alignFirstOnly to false in the config
+file, it will set the start time to every time Google detects a new utterance (i.e., after a sizable
+silence gap). 
+
+
+-------------------------------
+     EXAMPLE CONFIGS
+-------------------------------	
+
+	<!-- Google Web Speech -->
+     <component name="webSpeech" type="inpro.io.webspeech.WebSpeech">
+        <property name="lang" value="de-de"/>
+        <property name="maxAlternatives" value="25"/>
+        <property name="interimResults" value="true"/>
+        <property name="continuous" value="true"/>
+        <property name="alignFirstOnly" value="true"/>
+	    <propertylist name="hypChangeListeners">
+	    </propertylist>
+    </component>
+
+
+	<!-- Venice listener -->
+   <component name="listener" type="inpro.io.VeniceListenerModule">
+        <property name="id" value="listener"/>
+        <property name="scope" value="baseScope"/>
+	    <propertylist name="hypChangeListeners">
+	    	<item>informer</item>    
+	    </propertylist>
+    </component>
+    
+    <!-- Venice informer -->
+     <component name="informer" type="inpro.io.VeniceInformerModule">
+        <property name="id" value="informer"/>
+        <property name="scope" value="baseScope"/>
+	    <propertylist name="hypChangeListeners">
+	    </propertylist>
+    </component>
+    
+    <!-- InstantIO listener -->
+    <component name="instantIOlistener" type="inpro.io.InstantIOListenerModule">
+        <property name="inslot" value="replayer/VeniceHub/OpenDS/Trigger/triggered"/>
+	    <propertylist name="hypChangeListeners">
+	    </propertylist>
+    </component>
+    
+    <!-- InstantIO informer -->
+    <component name="instantIoInformer" type="inpro.io.InstantIOInformerModule">
+        <property name="outslot" value="QA"/>
+        <property name="namespace" value="Comprehension"/>
+	    <propertylist name="hypChangeListeners">
+	    </propertylist>
+    </component>
+    
+    <!-- XmlRpc Informer -->
+ 	<component name="rpcinformer" type="inpro.io.xmlrpc.XmlRpcInformerModule">
+    	<property name="host" value="http://localhost" />
+    	<property name="port" value="9050" />
+    	<property name="handler" value="inprotk" />
+	    <propertylist name="hypChangeListeners">
+	    	<item>rpclistener</item>
+	    </propertylist>
+    </component>
+
+	<!-- XmlRpc Listener -->    
+    <component name="rpclistener" type="inpro.io.xmlrpc.XmlRpcListenerModule">
+    	<property name="handler" value="inprotk" />
+    	<property name="port" value="9050" />
+	    <propertylist name="hypChangeListeners">
+	    </propertylist>
+    </component>
+    
