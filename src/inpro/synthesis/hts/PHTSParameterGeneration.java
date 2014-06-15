@@ -103,6 +103,10 @@ public class PHTSParameterGeneration {
 		            pStream.setVseq(uttFrame, hmm.getVariance(type, state));
 					uttFrame++;
 		}}}
+		// ensure that we set variances to inf at the last frame (similarly to v/uv boundaries) to avoid downwards slopes
+		for (int k = 1; k < ms.getVsize(type); k++) {
+			pStream.setIvseq(uttFrame - 1, k, 0.0);
+		}
 		boolean useGV = useGVperType(type);
 		pStream.mlpg(htsData, useGV);
 		return pStream;
@@ -152,6 +156,10 @@ public class PHTSParameterGeneration {
 				uttFrame += hmm.getDur(state);
 				prevVoicing = hmm.getVoiced(state);
 			}
+		}
+		// ensure that we set variances to inf at the last frame (similarly to v/uv boundaries) to avoid downwards slopes
+		if (lf0Frame > 0) for (int k = 1; k < ms.getLf0Stream(); k++) {
+			pStream.setIvseq(lf0Frame - 1, k, 0.0);
 		}
 		boolean useGV = useGVperType(FeatureType.LF0);
 		pStream.mlpg(htsData, useGV);

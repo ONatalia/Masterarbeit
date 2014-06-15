@@ -199,10 +199,10 @@ public class SysSegmentIU extends SegmentIU {
 		awaitContinuation();
 		/** deal with the right context units; increasing this may improve synthesis quality at the cost of computaitonal effort */
 		int maxSuccessors = 3;
-		contextIU = (SysSegmentIU) getNextSameLevelLink();
+		contextIU = (SysSegmentIU) contextIU.getNextSameLevelLink();
 		while (contextIU != null && maxSuccessors > 0) {
 			appendSllHtsModel(localHMMs, contextIU);
-			contextIU = (SysSegmentIU) getNextSameLevelLink();
+			contextIU = (SysSegmentIU) contextIU.getNextSameLevelLink();
 			maxSuccessors--;
 		}
 		// make sure we have a paramGenerator
