@@ -116,6 +116,8 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
     
     boolean firstDelivery = true;
     
+    Logger logger = Logger.getLogger("Vocoding Audio Stream");
+    
     /** for backward compatibility with Mary */
     public VocodingAudioStream(HTSParameterGeneration pdf2par, HMMData htsData, boolean immediateReturn) {
         this(new HTSFullPStream(pdf2par), htsData, immediateReturn);
@@ -199,22 +201,22 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
           //Check if the number of filters is equal to the order of strpst 
           //i.e. the number of filters is equal to the number of generated strengths per frame.
           if(htsData.getNumFilters() != fullPStream.getStrParSize()) {
-            HTSVocoder.logger.debug("htsMLSAVocoder: error num mix-excitation filters =" + numM + " in configuration file is different from generated str order=" + fullPStream.getStrParSize());
+            logger.debug("htsMLSAVocoder: error num mix-excitation filters =" + numM + " in configuration file is different from generated str order=" + fullPStream.getStrParSize());
             throw new RuntimeException("htsMLSAVocoder: error num mix-excitation filters = " + numM + " in configuration file is different from generated str order=" + fullPStream.getStrParSize());
           }
-          HTSVocoder.logger.info("HMM speech generation with mixed-excitation.");
+          logger.info("HMM speech generation with mixed-excitation.");
         } else
-          HTSVocoder.logger.info("HMM speech generation without mixed-excitation.");  
+          logger.info("HMM speech generation without mixed-excitation.");  
         
         if( fourierMagnitudes && htsData.getPdfMagStream() != null)
-          HTSVocoder.logger.info("Pulse generated with Fourier Magnitudes.");
+          logger.info("Pulse generated with Fourier Magnitudes.");
         else
-          HTSVocoder.logger.info("Pulse generated as a unit pulse.");
+          logger.info("Pulse generated as a unit pulse.");
         
         if (beta != 0.0)
-          HTSVocoder.logger.info("Postfiltering applied with beta=" + beta);
+          logger.info("Postfiltering applied with beta=" + beta);
         else
-          HTSVocoder.logger.info("No postfiltering applied.");
+          logger.info("No postfiltering applied.");
 
         double f0Std = htsData.getF0Std();
         double f0Shift = htsData.getF0Mean();

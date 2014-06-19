@@ -19,7 +19,6 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.xml.transform.Source;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -131,7 +130,10 @@ public class MaryAdapter5internal extends MaryAdapter {
 		try {
 			TransformerFactory.newInstance().newTransformer()
 					.transform(xmlSource, outputTarget);
-		} catch (TransformerException | TransformerFactoryConfigurationError e) {
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerFactoryConfigurationError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -198,8 +200,7 @@ public class MaryAdapter5internal extends MaryAdapter {
 	
 	public static HMMData getDefaultHMMData() {
 		String defaultVoiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
-		//Voice voice = Voice.getVoice(defaultVoiceName);
-		Voice voice = Voice.getVoice("cmu-slt-hsmm");
+		Voice voice = Voice.getVoice(defaultVoiceName);
 		assert (voice instanceof HMMVoice);
         return ((HMMVoice) voice).getHMMData();
 	}
