@@ -1,6 +1,7 @@
 package inpro.incremental.unit;
 
 import inpro.annotation.Label;
+import inpro.config.SynthesisConfig;
 import inpro.incremental.transaction.ComputeHMMFeatureVector;
 import inpro.synthesis.hts.FullPFeatureFrame;
 import inpro.synthesis.hts.FullPStream;
@@ -182,7 +183,7 @@ public class SysSegmentIU extends SegmentIU {
 		/** iterates over left/right context IUs */
 		SysSegmentIU contextIU = this;
 		/** size of left context; increasing this may improve synthesis performance at the cost of computational effort */
-		int maxPredecessors = 7;  
+		int maxPredecessors = SynthesisConfig.getDefaultInstance().getHmmOptimizationPastContext();  
 		// initialize contextIU to the very first IU in the list
 		while (contextIU.getSameLevelLink() != null && maxPredecessors > 0) {
 			contextIU = (SysSegmentIU) contextIU.getSameLevelLink();
@@ -198,7 +199,7 @@ public class SysSegmentIU extends SegmentIU {
 		int length = htsModel.getTotalDur();
 		awaitContinuation();
 		/** deal with the right context units; increasing this may improve synthesis quality at the cost of computaitonal effort */
-		int maxSuccessors = 3;
+		int maxSuccessors = SynthesisConfig.getDefaultInstance().getHmmOptimizationFutureContext();
 		contextIU = (SysSegmentIU) contextIU.getNextSameLevelLink();
 		while (contextIU != null && maxSuccessors > 0) {
 			appendSllHtsModel(localHMMs, contextIU);

@@ -5,8 +5,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 
-import work.inpro.synthesis.ihmms.HTSModelComparator;
-
+import inpro.config.SynthesisConfig;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.SysSegmentIU;
 import marytts.features.FeatureDefinition;
@@ -31,14 +30,10 @@ public class ComputeHMMFeatureVector {
     	CURRPHRASE, // pertaining to the overall layout of the current phrase, INCLUDING ToBI
     	CURRPHRASE_ENDING, // number of things in phrase; position from phrase end
 //    	CURRPHRASE_PLUS_FUTUREWORDS, // used to be the combination of CURRPHRASE and CURRPHRASE_ENDING
-    	FULL_CONTEXT }
+    	FULL_CONTEXT;
+    }
     static EnumMap<FeatureClasses, List<String>> featureClasses = new EnumMap<FeatureClasses, List<String>>(FeatureClasses.class);
-    static byte[] featureDefaultsGerman = { // on my corpus with BITS-1 voice
-        43, 0, 2, 1, 0, 0, 0, 6, 2, 0, 1, 0, 0, 1, 1, 43, 1, 0, 0, 0, 0, 43, 1, 1, 1, 0, 0, 2, 2, 0, 1, 0, 0, 0, 0, 0, 2, 2, 0, 0, 2, 2, 0, 0, 0, 9, 12, 9, 0, 0, 1, 1, 1, 6, 2, 0, 0, 0, 43, 0, 2, 0, 0, 43, 2, 0, 0, 0, 0, 0, 1, 1, 2, 0, 2, 0, 0, 1, 1, 2, 3, 0, 1, 1, 9, 1, 1, 3, 4, 0, 1, 3, 6, 7, 2, 1, 1, 1, 2, 1, 0, 0, 0, 6, 2, 3, 4, 4, 4, 4, 4
-    };
-    static byte[] featureDefaultsEnglish = { // on my corpus with CMU-SLT voice
-        1, 0, 2, 2, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 17, 2, 0, 0, 0, 0, 35, 0, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 6, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 1, 1, 0, 2, 0, 0, 1, 0, 0, 2, 0, 0, 12, 0, 1, 4, 4, 0, 1, 0, 0, 7, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0
-    };
+    
     static {
         featureClasses.put(FeatureClasses.PAST, Arrays.asList("prev_phone", "prev_accent", "prev_cplace", "prev_ctype", "prev_cvox", "prev_vc", "prev_vfront", "prev_vheight", "prev_vlng", "prev_vrnd", "prev_is_pause", "prev_prev_cplace", "prev_prev_ctype", "prev_prev_cvox", "prev_prev_phone", "prev_prev_vc", "prev_prev_vfront", "prev_prev_vheight", "prev_prev_vlng", "prev_prev_vrnd", "segs_from_syl_start", "prev_stressed", "prev_syl_break", "segs_from_word_start", "syls_from_word_start", "syls_from_prev_accent", "syls_from_prev_stressed", "syls_from_phrase_start", "stressed_syls_from_phrase_start", "accented_syls_from_phrase_start", "words_from_phrase_start", "words_from_prev_punctuation", "words_from_sentence_start", "prev_punctuation", "prev_phrase_endtone", "phrases_from_sentence_start"));
         featureClasses.put(FeatureClasses.CURRPHONE, Arrays.asList("phone", "ph_cplace", "ph_ctype", "ph_cvox", "ph_vc", "ph_vfront", "ph_vheight", "ph_vlng", "ph_vrnd", "style"));
@@ -75,58 +70,94 @@ public class ComputeHMMFeatureVector {
         byte[] byteValues = Arrays.copyOf(fv.getByteValuedDiscreteFeatures(), fv.getByteValuedDiscreteFeatures().length);
         for (FeatureClasses overwriteFeature : EnumSet.complementOf(includedClasses)) {
             for (String featureName : featureClasses.get(overwriteFeature)) { 
-                int featureIndex = featDef.getFeatureIndex(featureName);
-                byteValues[featureIndex] = featureDefaultsGerman[featureIndex];
+            	if (featDef.hasFeature(featureName)) { // allow missing features, saves the trouble of making featureClasses language-dependent
+	                int featureIndex = featDef.getFeatureIndex(featureName);
+	                byteValues[featureIndex] = SynthesisConfig.getDefaultInstance().getDTreeFeatureDefaults()[featureIndex];
+            	}
             }
         }
         return new FeatureVector(byteValues, null, null, 0);
     }
     
     static EnumSet<FeatureClasses> allClasses = EnumSet.allOf(FeatureClasses.class);
-    static EnumSet<FeatureClasses> minimum = EnumSet.of(FeatureClasses.PAST, FeatureClasses.CURRPHONE);
-    static EnumSet<FeatureClasses> reasonableMinimum = EnumSet.of(FeatureClasses.PAST, FeatureClasses.CURRPHONE, FeatureClasses.CURRSYLL, FeatureClasses.NEXT_1PHONE);
-    static EnumSet<FeatureClasses> currentWordN1 = EnumSet.of(FeatureClasses.PAST, FeatureClasses.CURRPHONE, FeatureClasses.CURRSYLL, FeatureClasses.NEXT_1PHONE, FeatureClasses.CURRWORD, FeatureClasses.CURRWORD_ENDING);
-    static EnumSet<FeatureClasses> currentWordN2 = EnumSet.of(FeatureClasses.PAST, FeatureClasses.CURRPHONE, FeatureClasses.CURRSYLL, FeatureClasses.NEXT_1PHONE, FeatureClasses.NEXT_2PHONE, FeatureClasses.CURRWORD, FeatureClasses.CURRWORD_ENDING);
-    static EnumSet<FeatureClasses> currentWordIUinformed(SysSegmentIU siu) {
-    	EnumSet<FeatureClasses> iuInfoCurrentWord = currentWordN1;
-    	// remove the next phoneme if it's not part of the current word
-    	//if (siu.getFromNetwork("next", "up", "up") != siu.getFromNetwork("up", "up"))
-    	//	iuInfoCurrentWord.remove(FeatureClasses.NEXT_1PHONE);
+    static EnumSet<FeatureClasses> currentWordIUinformed(SysSegmentIU siu, EnumSet<FeatureClasses> base) {
     	// we can safely include the next but one segment, if the next but one segment has the same syllable as this one  
     	if (siu.getFromNetwork("next", "next", "up") == siu.getFromNetwork("up"))
-    		iuInfoCurrentWord.add(FeatureClasses.NEXT_2PHONE);
-    	// we can safely include the next syllable if its part of the same word
+    		base.add(FeatureClasses.NEXT_2PHONE);
+    	// we can safely include the next syllable if its part of the current word
     	if (siu.getFromNetwork("up", "next", "up") == siu.getFromNetwork("up", "up")) 
-    		iuInfoCurrentWord.add(FeatureClasses.NEXT_SYLLABLE);
-    	// we can include phrase info for the last word of the phrase
-    	// i.e. if the next word's phrase differs from the current word's phrase
+    		base.add(FeatureClasses.NEXT_SYLLABLE);
+    	return base;
+    }
+    static EnumSet<FeatureClasses> currentPhraseIUinformed(SysSegmentIU siu, EnumSet<FeatureClasses> base) {
+    	EnumSet<FeatureClasses> currentWordFeatures = currentWordIUinformed(siu, base);
     	SysSegmentIU nextWordFirstSegment = (SysSegmentIU) siu.getFromNetwork("up", "up", "down[-1]", "down[-1]", "next");
     	IU myPhrase = siu.getFromNetwork("up", "up", "up");
+    	// we can include phrase info for the last word of the phrase
+    	// i.e. if the next word's phrase differs from the current word's phrase
     	if (nextWordFirstSegment == null || 
     		nextWordFirstSegment.getFromNetwork("up", "up", "up") != myPhrase || 
     		(nextWordFirstSegment.isSilence() && nextWordFirstSegment.getFromNetwork("next", "up", "up", "up") != myPhrase)) { 
-    		iuInfoCurrentWord.add(FeatureClasses.CURRPHRASE);
-    		iuInfoCurrentWord.add(FeatureClasses.CURRPHRASE_ENDING);
+    		currentWordFeatures.add(FeatureClasses.CURRPHRASE);
+    		currentWordFeatures.add(FeatureClasses.CURRPHRASE_ENDING);
     		//System.out.println("***"); // --> indicates how often this constraint is met. should be as many occurrences as the last word in the phrase has segments (plus one for the final pause)
     		//HTSModelComparator.active = false;
     	} else {
     		//HTSModelComparator.active = true;
     	}
+    	return currentWordFeatures;
+    }
+    static EnumSet<FeatureClasses> currentUtteranceIUinformed(SysSegmentIU siu, EnumSet<FeatureClasses> base) {
+    	EnumSet<FeatureClasses> currentPhraseFeatures = currentPhraseIUinformed(siu, base);
+    	SysSegmentIU nextWordFirstSegment = (SysSegmentIU) siu.getFromNetwork("up", "up", "down[-1]", "down[-1]", "next");
     	// if the word is the last in the utterance (no phoneme follows after this word), we can include all remaining information
     	if (nextWordFirstSegment == null || (nextWordFirstSegment.isSilence() && nextWordFirstSegment.getFromNetwork("next") == null)) {
     		//System.out.println("***"); // --> indicates how often this constraint is met. should be as many occurrences as the last word in the utterance has segments (plus one for the final pause) 
-    		//iuInfoCurrentWord.add(FeatureClasses.FULL_CONTEXT);
+    		currentPhraseFeatures.add(FeatureClasses.FULL_CONTEXT);
     		//HTSModelComparator.active = false;
     	} else {
     		//HTSModelComparator.active = true;
     	}
-    	return iuInfoCurrentWord;
+    	return currentPhraseFeatures;
     }
     static EnumSet<FeatureClasses> currentPhraseAndWords = EnumSet.range(FeatureClasses.PAST, FeatureClasses.CURRPHRASE_ENDING); 
     static EnumSet<FeatureClasses> maximum = EnumSet.allOf(FeatureClasses.class);
     
 	public static FeatureVector featuresForSegmentIU(SysSegmentIU siu) {
-        
-		return substitueDefaultFeatures(currentWordIUinformed(siu), siu.hmmdata.getFeatureDefinition(), siu.fv);
+		EnumSet<FeatureClasses> featureSet = EnumSet.noneOf(FeatureClasses.class);
+		switch (SynthesisConfig.getDefaultInstance().getDTreeContext()) {
+		case PHRASE : 
+			featureSet = EnumSet.range(FeatureClasses.PAST, FeatureClasses.CURRPHRASE_ENDING);
+			break;
+		case CURRWORDN2 : 
+			featureSet = EnumSet.range(FeatureClasses.PAST, FeatureClasses.CURRWORD_ENDING);
+			break;
+		case FULL : 
+			featureSet.add(FeatureClasses.FULL_CONTEXT);
+			//$FALL-THROUGH$
+		case IUINFORMED : 
+			featureSet = currentUtteranceIUinformed(siu, featureSet);
+			//$FALL-THROUGH$
+		case CURRPHRASEIU : 
+			featureSet = currentPhraseIUinformed(siu, featureSet);
+			//$FALL-THROUGH$
+		case CURRWORDIU : 
+			featureSet = currentWordIUinformed(siu, featureSet);
+			//$FALL-THROUGH$
+		case CURRWORDN1 : 
+			featureSet.add(FeatureClasses.CURRWORD);
+			featureSet.add(FeatureClasses.CURRWORD_ENDING);
+			//$FALL-THROUGH$
+		case MINIMAL_LOOKAHEAD : 
+			featureSet.add(FeatureClasses.CURRSYLL);
+			featureSet.add(FeatureClasses.NEXT_1PHONE);
+			//$FALL-THROUGH$
+		case NO_LOOKAHEAD : 
+			featureSet.add(FeatureClasses.PAST);
+			//$FALL-THROUGH$
+		case PHONE : 
+			featureSet.add(FeatureClasses.CURRPHONE);
+		}
+		return substitueDefaultFeatures(featureSet, siu.hmmdata.getFeatureDefinition(), siu.fv);
 	}
 }
