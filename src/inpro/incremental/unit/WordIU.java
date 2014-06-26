@@ -135,6 +135,7 @@ public class WordIU extends IU {
 		for (Label label : newLabels) {
 			segIt.next().updateLabel(label);
 		}
+		notifyListeners();
 	}
 	
 	/**
