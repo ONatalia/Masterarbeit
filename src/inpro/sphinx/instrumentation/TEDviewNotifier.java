@@ -63,11 +63,11 @@ public class TEDviewNotifier extends LabelWriter {
 // FIXME: the token times must be adjusted correctly!
     		// TODO: it would be cool to port LabelWriter's nBest handling to ZeitGeist output
     		if (wordAlignment) {
-    			List<Token> list = getBestWordTokens(result.getBestToken());
+    			List<Token> list = ResultUtil.getTokenList(result.getBestToken(), true, false);
     			messageZeitGeist(list, "asr_words");
     		}
     		if (phoneAlignment) {
-    			List<Token> list = getBestPhoneTokens(result.getBestToken());
+    			List<Token> list = ResultUtil.getTokenList(result.getBestToken(), false, true);
     			messageZeitGeist(list, "asr_phones");
     		}
     		

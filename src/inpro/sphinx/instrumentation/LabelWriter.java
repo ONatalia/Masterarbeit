@@ -11,19 +11,18 @@
 package inpro.sphinx.instrumentation;
 
 import inpro.sphinx.ResultUtil;
+import inpro.util.TimeUtil;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Locale;
 
 
 import edu.cmu.sphinx.linguist.SearchState;
-import edu.cmu.sphinx.linguist.UnitSearchState;
-import edu.cmu.sphinx.linguist.WordSearchState;
-import edu.cmu.sphinx.linguist.lextree.LexTreeLinguist;
 import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.recognizer.StateListener;
 import edu.cmu.sphinx.recognizer.Recognizer.State;
@@ -143,7 +142,6 @@ public class LabelWriter implements Configurable,
 
     /*
      * (non-Javadoc)
-     * 
      * @see edu.cmu.sphinx.instrumentation.Resetable
      */
     public void reset() {
@@ -168,90 +166,41 @@ public class LabelWriter implements Configurable,
     }
 
     /**
-     * get the word-tokens on the best path
-     *
-     * @param token the result to analyse
-     * @return List of word tokens on the best path
-     */
-    protected List<Token> getBestWordTokens(Token token) {
-		List<Token> list = new ArrayList<Token>();
-    	while (token != null) {
-			SearchState searchState = token.getSearchState(); 
-            if ((searchState instanceof WordSearchState) // each word starts with a PronunciationState
-            || ((searchState instanceof UnitSearchState) // each pause starts with a unit that is a filler 
-//            	&& ((ExtendedUnitState) searchState).getUnit().isFiller())) 
-            	&& list.isEmpty())) {
-            	// add these tokens to the list
-        	    list.add(0, token);
-            }
-            token = token.getPredecessor();
-        }
-		return list;
-    }
-    
-    /**
-     * get the phone-tokens on the best path
-     *
-     * @param token the result to analyse
-     * @return List of phone tokens on the best path
-     */
-    protected static List<Token> getBestPhoneTokens(Token token) {
-		List<Token> list = new ArrayList<Token>();
-		// recover the visited segmental tokens in the best path
-    	list.add(token);
-    	while (token != null) {
-			SearchState searchState = token.getSearchState(); 
-            if ((searchState instanceof UnitSearchState)
-             && !(searchState instanceof LexTreeLinguist.LexTreeEndUnitState)){
-            	// add these tokens to the list
-        	    list.add(0, token);
-            }
-            token = token.getPredecessor();
-        }
-    	return list;
-    }
-    
-    
-    /**
-     * get all tokens on the best path
-     *
-     * @param result the result to analyse
-     * @return List of all tokens on the best path
-     */
-    @SuppressWarnings("unused")
-	private static List<Token> getAllBestTokens(Result result) {
-		List<Token> list = new ArrayList<Token>();
-    	Token token = result.getBestToken();
-		// recover the path of visited word- and silence-tokens in the best token
-		while (token != null) {
-    	    list.add(0, token);
-            token = token.getPredecessor();
-		}
-		return list;
-    }
-    
-    /**
      * convert a token list to an alignment string 
      * 
-     * @param list list of tokens
+     * @param tokens list of tokens
      */
-    public static String tokenListToAlignment(List<Token> list, int lastFrame) {
-		StringBuilder sb = new StringBuilder(); 
-		if (list.size() > 0) {
+    public static String tokenListToAlignment(List<Token> tokens, int lastFrame) {
+		StringBuilder sb = new StringBuilder();
+		if (tokens.size() > 0) {
+			boolean tokenFollowsData = ResultUtil.hasWordTokensLast(tokens.get(0));
+			ListIterator<Token> tokenIt = tokens.listIterator();
 			// iterate over the list and print the associated times
-			Token prevToken = list.get(0);
-	        for (int i = 1; i < list.size() - 1; i++) {
-	            Token token = list.get(i);
-	            sb.append(prevToken.getFrameNumber() / 100.0); // a frame always lasts 10ms 
+	        while (tokenIt.hasNext()) {
+	            Token token = tokenIt.next();
+	            int startFrame;
+	            int endFrame;
+	            if (tokenFollowsData) {
+	            	if (tokenIt.hasPrevious()) {
+		            	startFrame = tokenIt.previous().getFrameNumber();
+		            	tokenIt.next();
+	            	} else { startFrame = 0; }
+	            	endFrame = token.getFrameNumber();
+	            } else {
+	            	startFrame = token.getFrameNumber();
+	            	if (tokenIt.hasNext()) {
+		            	endFrame = tokenIt.next().getFrameNumber();
+		            	tokenIt.previous();
+	            	} else break;
+	            }
+	            sb.append(String.format(Locale.US, "%.2f", startFrame * TimeUtil.FRAME_TO_SECOND_FACTOR)); // a frame always lasts 10ms 
 	            sb.append("\t");
-	            int endFrame = token.getFrameNumber();
-	            sb.append(endFrame / 100.0); // dito
+	            sb.append(String.format(Locale.US, "%.2f", endFrame * TimeUtil.FRAME_TO_SECOND_FACTOR)); // dito
 	            sb.append("\t");
 	            // depending on whether word, filler or other, dump the string-representation
 	            SearchState state = token.getSearchState();
 	            sb.append(ResultUtil.stringForSearchState(state)); 
 	            sb.append("\n");
-	            prevToken = token;
 	            if (endFrame > lastFrame)
 	            	break;
 	        }
@@ -267,7 +216,7 @@ public class LabelWriter implements Configurable,
      * @param timestamp
      */
     private String writeAlignment(List<Token> list, PrintStream stream, boolean timestamp) {
-    	String alignment = tokenListToAlignment(list, step - fixedLag);
+    	String alignment = tokenListToAlignment(list, timestamp ? step - fixedLag : Integer.MAX_VALUE);
 		if (timestamp) {
 			stream.print("Time: ");
 			stream.println(step / 100.0);
@@ -288,25 +237,30 @@ public class LabelWriter implements Configurable,
     	|| (finalResult && result.isFinal())) {
     		boolean timestamp = !result.isFinal();
     		// create n-best list
-    		List<Token> nBestList = result.getResultTokens();
-    		if (nBestList.size() < 0) {
-    			System.out.println("# reverting to active tokens...");
-    			nBestList = result.getActiveTokens().getTokens();
-    		}
-    		Collections.sort(nBestList, Token.COMPARATOR);
-    		if (nBestList.size() > nBest) {
-    			nBestList = nBestList.subList(0, nBest);
+    		List<Token> nBestList;
+    		if (nBest == 1) {
+    			nBestList = Collections.singletonList(result.getBestToken());
+    		} else {
+	    		nBestList = result.getResultTokens();
+	    		if (nBestList.size() <= 0) {
+	    			System.out.println("# reverting to active tokens...");
+	    			nBestList = result.getActiveTokens().getTokens();
+	    		}
+	    		Collections.sort(nBestList, Token.COMPARATOR);
+	    		if (nBestList.size() > nBest) {
+	    			nBestList = nBestList.subList(0, nBest);
+	    		}
     		}
     		// iterate through n-best list
     		Iterator<Token> nBestIt = nBestList.iterator();
     		while (nBestIt.hasNext()) {
     			Token nBestToken = nBestIt.next();
 	    		if (wordAlignment) {
-	    			List<Token> wordTokenList = getBestWordTokens(nBestToken);
+	    			List<Token> wordTokenList = ResultUtil.getTokenList(nBestToken, true, false);
 	    			writeAlignment(wordTokenList, wordAlignmentStream, timestamp);
 	    		}
 	    		if (phoneAlignment) {
-	    			List<Token> phoneTokenList = getBestPhoneTokens(nBestToken);
+	    			List<Token> phoneTokenList = ResultUtil.getTokenList(nBestToken, false, true);
 	    			writeAlignment(phoneTokenList, phoneAlignmentStream, timestamp);
 	    		}
     		}
