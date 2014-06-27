@@ -7,7 +7,6 @@ import inpro.util.TimeUtil;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -63,9 +62,7 @@ public class DialogAsrResult extends HttpServlet {
 //		get received JSON data from request
         BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
         String json = "";
-        if(br != null){
-            json = br.readLine();
-        }
+        json = br.readLine();
         
 //      convert the JSON object into Java objects
         JSONParser parser = new JSONParser();
