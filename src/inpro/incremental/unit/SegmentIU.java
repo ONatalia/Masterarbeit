@@ -98,8 +98,10 @@ public class SegmentIU extends IU {
 
 	public void updateLabel(Label l) {
 		//assert (this.l.getLabel().equals(l.getLabel())) : "my label is " + this.l.toString() + ", was asked to update with " + l.toString();
+		boolean needsUpdate = !this.l.equals(l);
 		this.l = l;
-		notifyListeners();
+		if (needsUpdate)
+			notifyListeners();
 	}
 	
 	@Override
