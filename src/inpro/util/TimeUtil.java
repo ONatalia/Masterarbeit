@@ -8,5 +8,13 @@ public class TimeUtil {
 
 	public static long startupTime;
 	static { startupTime = System.currentTimeMillis(); }
+	
+	public static long timeSinceStartupInMilliseconds() {
+		return System.currentTimeMillis() - startupTime;
+	}
+	
+	public static double timeSinceStartup() {
+		return timeSinceStartupInMilliseconds() / SECOND_TO_MILLISECOND_FACTOR;
+	}
 
 }
