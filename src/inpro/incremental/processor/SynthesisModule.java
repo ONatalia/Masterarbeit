@@ -13,6 +13,7 @@ import inpro.incremental.unit.SysSegmentIU;
 import inpro.incremental.unit.WordIU;
 import inpro.incremental.unit.IU.IUUpdateListener;
 import inpro.synthesis.MaryAdapter;
+import inpro.util.TimeUtil;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -88,6 +89,7 @@ public class SynthesisModule extends IUModule {
 						currentInstallment = new ChunkBasedInstallmentIU((HesitationIU) chunkIU);
 					else
 						currentInstallment = new ChunkBasedInstallmentIU(chunkIU);
+					currentInstallment.getSegments().get(0).shiftBy(TimeUtil.timeSinceStartup(), true);
 					startPlayInstallment = true;
 				}
 				appendNotification(currentInstallment, chunkIU);
