@@ -320,8 +320,8 @@ public abstract class IU implements Comparable<IU> {
 			iu.grounds.remove(this);
 	}
 
-	public void groundIn(List<IU> ius) {
-		for (IU iu : ius) {
+	public void groundIn(List<? extends IU> list) {
+		for (IU iu : list) {
 			this.groundIn(iu);
 		}
 	}

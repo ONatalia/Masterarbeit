@@ -330,7 +330,9 @@ public class Formula extends VariableEnvironment
 	public List<SimpleAssertion> getUnscopedPredicateLogic() {
 		List<SimpleAssertion> l = new ArrayList<SimpleAssertion>();
 		// find all anchors ids
-		for (Variable v : mVariables.values()) {
+		TreeSet<Integer> ordered = new TreeSet<Integer>(mVariables.keySet());
+		for (Integer key : ordered) {
+			Variable v = mVariables.get(key);
 			if (v.getType() == Variable.Type.ANCHOR) {
 				int aid = v.getID();
 				String name = "_";

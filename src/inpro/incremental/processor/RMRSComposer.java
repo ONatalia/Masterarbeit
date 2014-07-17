@@ -11,10 +11,8 @@ import inpro.incremental.unit.RelationIU;
 import inpro.incremental.unit.TagIU;
 import inpro.incremental.unit.WordIU;
 import inpro.irmrsc.parser.CandidateAnalysis;
-import inpro.irmrsc.rmrs.Entity;
 import inpro.irmrsc.rmrs.Formula;
 import inpro.irmrsc.rmrs.Relation;
-import inpro.irmrsc.rmrs.Relation.Type;
 import inpro.irmrsc.rmrs.Variable;
 import inpro.irmrsc.util.RMRSLoader;
 import inpro.irmrsc.util.SemanticMacro;
@@ -308,11 +306,13 @@ public class RMRSComposer extends IUModule {
 					
 					// ## 1. find antecedent IUs
 					CandidateAnalysisIU previousCa = (CandidateAnalysisIU) ca.getSameLevelLink();
+					
 					if (previousCa != null) {
 						FormulaIU previousFIU = firstUsefulFormulaIU;
 						if (previousCa.grounds().size() > 0) {
 							previousFIU = states.get(previousCa);
 						}
+						
 						List<String> lastDerive = ca.getCandidateAnalysis().getLastDerive();
 						//logger.debug(logPrefix+"-------");
 						//System.err.println("-------: "+lastDerive.toString());
@@ -578,39 +578,7 @@ public class RMRSComposer extends IUModule {
 		}
 		
 		// finish
-		
-		
-		IUList<RelationIU> list = new IUList<RelationIU>();
-		
-		for (EditMessage<FormulaIU> formulaEdit : newEdits) {
-			System.out.println(formulaEdit.getIU().getFormula().toRMRSString());
-			
-			Formula formula = formulaEdit.getIU().getFormula();
-			RelationIU prev = RelationIU.FIRST_RELATION_IU;
-		
-			for (Relation relation : formula.getRelations()) {
-	
-				RelationIU riu = new RelationIU(relation, formula);
-				riu.groundIn(formulaEdit.getIU().grounds());
-				riu.setSameLevelLink(prev);
-				list.add(riu);
-				
-				prev = riu;
-				
-			}
-			break;
-		
-		}
-		
-		List<EditMessage<RelationIU>> diffs = prevList.diffByPayload(list);
-		prevList = list;
-		
-		
-		for (EditMessage<RelationIU> iu : diffs) {
-			System.out.println(iu);
-		}
-		System.out.println();
-		
+
 		this.rightBuffer.setBuffer(newEdits);
 	}
 

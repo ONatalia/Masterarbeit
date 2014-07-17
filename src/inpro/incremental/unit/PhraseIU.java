@@ -66,7 +66,7 @@ public class PhraseIU extends WordIU {
 	
 	/** grounds in the list of wordIUs, potentially replacing previously grounding words */
 	@Override
-	public void groundIn(List<IU> ius) {
+	public void groundIn(List<? extends IU> ius) {
 		if (groundedIn != null)
 			groundedIn.clear();
 		else 

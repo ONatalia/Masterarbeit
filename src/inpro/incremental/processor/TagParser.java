@@ -115,6 +115,9 @@ public class TagParser extends IUModule {
 					TagIU previousTag = (TagIU) tag.getSameLevelLink();
 					assert previousTag != null;
 					SITDBSParser newState = new SITDBSParser(this.states.get(previousTag));
+					if (previousTag.toPayLoad().equals(TagIU.FIRST_TAG_IU.toPayLoad())) {
+						analyses.clear();
+					}
 					newState.feed(tag.toPayLoad());
 					this.states.put(tag,newState);
 					for (CandidateAnalysis ca : newState.getQueue()) {

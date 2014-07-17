@@ -37,7 +37,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
     private boolean writeToFile;
     private boolean writeToStdOut = true;
     private String filePath;
-    private String fileName;
+    private static String fileName;
     int frameOutput = -1;
 
 	
@@ -67,7 +67,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 			frameOutput = currentFrame;
 			if (writeToFile) {
 				try {
-					FileWriter writer = new FileWriter(filePath + "/" + fileName + ".inc_reco", true);
+					FileWriter writer = new FileWriter( fileName + ".inc_reco", true);
 					writer.write(toOut);
 					writer.close();
 				} catch (IOException e) {
@@ -81,7 +81,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	}
 	
 	/** A file name can be specified here, if not specified in the config file */
-	public void setFileName(String name) {
+	public static void setFileName(String name) {
 		fileName = name;
 	}
 

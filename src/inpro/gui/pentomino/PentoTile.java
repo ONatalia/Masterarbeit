@@ -23,6 +23,7 @@ public class PentoTile extends Tile {
 	public static final String VERTICAL_FLIP_COMMAND = "vFlip";
 
 	final int scale;
+	
 
 	Point  clipOffset;                  // (refPoint - clipCorner)
 	Point  clipCorner;
@@ -39,6 +40,7 @@ public class PentoTile extends Tile {
 	protected int[][] defVectors = new int[2][BOX_COUNT];
 	
 	private TargetPattern myGrid;
+	private int rank = -1;
 	
 	/** the kind of pentomino tile this object represents */
 	protected char type;
@@ -87,6 +89,12 @@ public class PentoTile extends Tile {
 		generate();  /* creates indiv. boxes and determines clip rectangle */
 	}
 	
+	public PentoTile(int scale, Color interpretColor, int x, int y,
+			char type2, String id, String label, int rank) {
+		this(scale, interpretColor, x, y, type2, id, label);
+		this.rank = rank;
+	}
+
 	public static boolean isValidTile(char c) {
 		return (c == 'F' || c == 'U' || c == 'X'
 			 || c == 'W' || c == 'Y' || c == 'N'
@@ -187,6 +195,7 @@ public class PentoTile extends Tile {
 	 * to decide whether to draw the Tile's label.
 	 * */
 	public void draw(Graphics g, boolean l) {
+		l = true;
 		int tx = boxes[0].corner.x;
 		int ty = boxes[0].corner.y;
 		if (isSelected()) {
@@ -225,11 +234,14 @@ public class PentoTile extends Tile {
 			g.setFont(new Font(Font.DIALOG, Font.BOLD, 15));
 			int textWidth = g.getFontMetrics().stringWidth(this.label);
 			int textHeight = g.getFontMetrics().getHeight();
-			
-			g.drawString(this.label, box.x - (textWidth - box.width) / 2 , 
+//			if (this.rank != 0) {
+//			System.out.println(rank + " " + this.getName());
+				g.drawString(this.getName(), box.x - (textWidth - box.width) / 2 , 
 					box.y + box.height + textHeight);
+//			}
 			
 		}
+		
 	}
 	
 	public void doCommand(String command) {
