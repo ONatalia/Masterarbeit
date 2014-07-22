@@ -52,6 +52,7 @@ public class TagParser extends IUModule {
 	/** keeps track of all analyses (in order to be able to find the right IU for a given CA). */
 	private List<CandidateAnalysisIU> analyses = new ArrayList<CandidateAnalysisIU>();
 	
+	SITDBSParser p;
 	//private String startSymbol; // was this used anywhere?
 	
 	@Override
@@ -74,7 +75,7 @@ public class TagParser extends IUModule {
 		
 		// initialize first parser
 		baseBeamFactor = ps.getDouble(PROP_BASE_BEAM_FACTOR);
-		SITDBSParser p = new SITDBSParser(g, baseBeamFactor);
+		p = new SITDBSParser(g, baseBeamFactor);
 		p.setLogger(this.logger);
 		this.states.put(TagIU.FIRST_TAG_IU, p);
 	}
@@ -103,21 +104,27 @@ public class TagParser extends IUModule {
 			switch (edit.getType()) {
 				case REVOKE:
 					for (IU ca : tag.grounds()) {
-						if (ca instanceof CandidateAnalysisIU) {
-							newEdits.add(new EditMessage<CandidateAnalysisIU>(EditType.REVOKE, (CandidateAnalysisIU) ca));
-							analyses.remove(ca);
+						if (ca.toPayLoad().equals(TagIU.FIRST_TAG_IU.toPayLoad())) {
+							analyses.clear();
 						}
 					}
 					break;
 					
 				case ADD:
+					
 					// TODO: find a better root element
 					TagIU previousTag = (TagIU) tag.getSameLevelLink();
 					assert previousTag != null;
-					SITDBSParser newState = new SITDBSParser(this.states.get(previousTag));
 					if (previousTag.toPayLoad().equals(TagIU.FIRST_TAG_IU.toPayLoad())) {
 						analyses.clear();
+						states.clear();
+						states.put(TagIU.FIRST_TAG_IU, p);
 					}
+//					System.out.println(tag + " " + previousTag + " " +this.states.get(previousTag));
+					if (!states.containsKey(previousTag)) {
+						previousTag = (TagIU) previousTag.getSameLevelLink();
+					}
+					SITDBSParser newState = new SITDBSParser(this.states.get(previousTag));
 					newState.feed(tag.toPayLoad());
 					this.states.put(tag,newState);
 					for (CandidateAnalysis ca : newState.getQueue()) {
