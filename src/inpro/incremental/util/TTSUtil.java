@@ -266,48 +266,14 @@ public class TTSUtil {
 		private int duration;
 		@XmlAttribute(name = "end")
 		private double endTime;
-		@XmlAttribute(name = "f0")
-		private String f0List = null;
-		private transient List<PitchMark> pitchMarks;
 		@XmlAttribute(name = "p")
 		private String sampaLabel;
-		
-		@SuppressWarnings("unused")
-		public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-			if (f0List != null && !f0List.equals("")) { 
-				List<String> pitchStrings; 
-				if (f0List.contains(" ")) { 
-					pitchStrings = Arrays.<String>asList(f0List.split(" "));
-				} else if (f0List.contains(")(")) {
-					pitchStrings = Arrays.<String>asList(f0List.split("\\)\\("));
-				} else {
-					pitchStrings = Collections.<String>singletonList(f0List);
-				}
-				pitchMarks = new ArrayList<PitchMark>(pitchStrings.size());
-				for (String pitchString : pitchStrings) {
-					pitchMarks.add(new PitchMark(pitchString));
-				}
-			} else {
-				pitchMarks = Collections.<PitchMark>emptyList();
-			}
-		}
-		
-		@SuppressWarnings("unused")
-		public void beforeMarshal(Marshaller marshaller) {
-			if (pitchMarks.isEmpty()) {
-				f0List = null; 
-			} else {
-				f0List = joinList(pitchMarks, " ").toString();
-			}
-		}
 		
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder(sampaLabel);
 			sb.append(" ");
 			sb.append(duration);
-			sb.append(" ");
-			sb.append(joinList(pitchMarks, " "));
 			sb.append("\n");
 			return sb.toString();
 		}
