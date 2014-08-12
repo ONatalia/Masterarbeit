@@ -15,13 +15,13 @@ import inpro.incremental.unit.PhraseIU;
 import inpro.incremental.unit.SysSegmentIU;
 import inpro.incremental.unit.WordIU;
 import inpro.synthesis.MaryAdapter;
-import inpro.synthesis.MaryAdapter4internal;
+import inpro.synthesis.MaryAdapter5internal;
 import inpro.synthesis.hts.IUBasedFullPStream;
 import inpro.synthesis.hts.VocodingAudioStream;
 
 public class InterspeechExperimenter {
 
-	DispatchStream ds = SimpleMonitor.setupDispatcher(new MonitorCommandLineParser("-D"));
+	DispatchStream ds = SimpleMonitor.setupDispatcher(new MonitorCommandLineParser("-D", "-S", "-F", "/tmp/test.raw"));
 	
 	/**
 	 * @param args
@@ -61,15 +61,16 @@ public class InterspeechExperimenter {
 	}
 	
 	static List<PhraseIU> preprocess(String text, boolean connectPhrases) {
-		MaryAdapter4internal m = (MaryAdapter4internal) MaryAdapter.getInstance();
+		MaryAdapter5internal m = (MaryAdapter5internal) MaryAdapter.getInstance();
 		return m.text2phraseIUs(text, connectPhrases);
 	}
-	
+
 	private int synthesizeOnce(String text) {
 		List<PhraseIU> phrases = preprocess(text);
-		//phrases = constructIncrementalProsody(text, false);
+		// comment out the next line for non-incremental symbolic processing
+		phrases = constructIncrementalProsody(text, true); // set second parameter to true for w_n-1 condition, to false for w_n condition 
 		IUBasedFullPStream pstream = new IUBasedFullPStream(phrases.get(0));
-		VocodingAudioStream vas = new VocodingAudioStream(pstream, MaryAdapter4internal.getDefaultHMMData(), true);
+		VocodingAudioStream vas = new VocodingAudioStream(pstream, MaryAdapter5internal.getDefaultHMMData(), true);
 		ds.playStream(new DDS16kAudioInputStream(vas));
 		ds.waitUntilDone();
 		return phrases.size();
@@ -80,6 +81,7 @@ public class InterspeechExperimenter {
 	 *  - generate list of the full utterances phrases (fullPhrases)
 	 *  - incrementally generate list of phrases without right context (returnPhrases)
 	 *  - copy over "original "features for each fullPhrases' final word to the corresponding word in returnPhrases
+	 *  @param copyOverFeatures if set to true, the resulting phrase corresponds to the w_{n-1} condition, otherwise to w_n
 	 */
 	static List<PhraseIU> constructIncrementalProsody(String text, boolean copyOverFeatures) {
 		List<PhraseIU> fullPhrases = preprocess(text);

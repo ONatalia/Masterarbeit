@@ -9,6 +9,6 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="inpro.apps.SimpleText"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-O -c file:demo/inpro/synthesis/config.xml"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Inpro"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea -Dmary.base=${maryBase} -Dinpro.tts.tempoScaling=0.7  -Dinpro.tts.voice=cmu-slt-hsmm -Dinpro.tts.language=en-US -da"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea -Dinpro.tts.tempoScaling=0.7  -Dinpro.tts.voice=cmu-slt-hsmm -Dinpro.tts.language=en-US -da"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:Inpro/bin}"/>
 </launchConfiguration>

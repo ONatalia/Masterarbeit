@@ -8,6 +8,5 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="demo.inpro.synthesis.GreatEnglishPatternDemonstrator"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Inpro"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dmary.base=${maryBase}"/>
-<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${build_files}${workspace_loc:Inpro}/bin"/>
+<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:Inpro}"/>
 </launchConfiguration>

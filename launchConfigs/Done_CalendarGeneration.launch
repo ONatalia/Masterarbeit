@@ -9,6 +9,6 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="done.inpro.system.calendar.GenerationModule"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="3 done/inpro/system/calendar/calendar.gs false true conditionC"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Inpro"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dmary.base=${maryBase} -ea -Dproso.cond.onephraseahead=false -Dproso.cond.updateposition=+1word -Dproso.cond.connect=true"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea -Dproso.cond.onephraseahead=false -Dproso.cond.updateposition=+1word -Dproso.cond.connect=true"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:Inpro/bin}"/>
 </launchConfiguration>

@@ -34,14 +34,13 @@ public abstract class MaryAdapter {
 		public static CompatibilityMode fromString(String mode) {
 			if ("3".equals(mode)) return MARY36EXTERNAL;
 			if ("4".equals(mode)) return MARY4EXTERNAL; 
-			if ("internal".equals(mode)) return MARY4INTERNAL;
-			if ("internal5".equals(mode)) return MARY5INTERNAL;
-			return MARY4INTERNAL;
+			if ("internal".equals(mode)) return MARY5INTERNAL;
+			return MARY5INTERNAL;
 		}
 	}
 	
 	public static CompatibilityMode compatibilityMode = CompatibilityMode.fromString(
-								System.getProperty("mary.version", "internal5"));
+								System.getProperty("mary.version", "internal"));
 
     private static Logger logger = Logger.getLogger(MaryAdapter.class);
 
@@ -54,33 +53,13 @@ public abstract class MaryAdapter {
 	public static void initializeMary(CompatibilityMode compatibilityMode) {
 		logger.info("initializing Mary in compatibility mode " + compatibilityMode);
 		maryAdapter = null;
+		assert compatibilityMode.equals(CompatibilityMode.MARY5INTERNAL) : "InproTK does not support old versions of MaryTTS anymore.";
 		try {
-			switch (compatibilityMode) {
-			case MARY36EXTERNAL: 
-				maryAdapter = new MaryAdapter36();
-				break;
-			case MARY4EXTERNAL:
-				maryAdapter = new MaryAdapter4();
-				break;
-			case MARY4INTERNAL:
-				try {
-					maryAdapter = new MaryAdapter4internal();
-				} catch (Exception e) {
-					logger.info("could not start MaryAdapter41internal");
-					e.printStackTrace();
-				}
-			case MARY5INTERNAL:
-				try {
-					maryAdapter = new MaryAdapter5internal();
-				} catch (Exception e) {
-					logger.info("could not start MaryAdapter51internal");
-					e.printStackTrace();
-				}	
-			}
-		} catch (IOException e) {
-			logger.info("could not start external Mary Adapter");
+			maryAdapter = new MaryAdapter5internal();
+		} catch (Exception e) {
+			logger.info("could not start MaryAdapter5internal");
 			e.printStackTrace();
-		}
+		}	
 	}
 
 	public static MaryAdapter getInstance() {

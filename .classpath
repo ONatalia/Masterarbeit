@@ -6,7 +6,6 @@
 	<classpathentry kind="lib" path="lib/drej.jar"/>
 	<classpathentry kind="lib" path="lib/sphinx4/jsapi.jar"/>
 	<classpathentry kind="lib" path="lib/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-	<classpathentry kind="lib" path="lib/mary3/maryclient.jar"/>
 	<classpathentry kind="lib" path="lib/trident.jar"/>
 	<classpathentry kind="lib" path="lib/snakeyaml-1.9.jar"/>
 	<classpathentry kind="lib" path="lib/jrtp_1.0a.jar"/>

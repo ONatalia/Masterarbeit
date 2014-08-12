@@ -8,7 +8,6 @@
     <property environment="env"/>
     <property name="ECLIPSE_HOME" value="../../../../../usr/lib/eclipse"/>
     <property name="workspace_loc:Inpro/bin" value="bin"/>
-    <property name="maryBase" value="../itts/openmary-4.3.0-svn"/>
     <property name="workspace_loc:Inpro" value="."/>
     <property name="build_files" value=""/>
     <property name="junit.output.dir" value="junit"/>
@@ -24,30 +23,13 @@
 	<property name="dir.bin" location="${dir}/bin" />
     <path id="Inpro.classpath">
         <pathelement location="bin"/>
-        <pathelement location="lib/mary3/java-diff.jar"/>
         <pathelement location="lib/weka.jar"/>
         <pathelement location="lib/drej.jar"/>
         <pathelement location="lib/sphinx4/jsapi.jar"/>
         <pathelement location="lib/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-        <pathelement location="lib/mary4/commons-collections-3.2.1.jar"/>
-        <pathelement location="lib/mary4/commons-io-1.4.jar"/>
-        <pathelement location="lib/mary4/commons-lang-2.4.jar"/>
-        <pathelement location="lib/mary4/freetts-de.jar"/>
-        <pathelement location="lib/mary4/freetts.jar"/>
-        <pathelement location="lib/mary4/freetts-en_us.jar"/>
-        <pathelement location="lib/mary4/jtok.jar"/>
-        <pathelement location="lib/mary4/maxent-2.5.1.jar"/>
-        <pathelement location="lib/mary4/opennlp-tools-1.4.1.jar"/>
-        <pathelement location="lib/mary3/maryclient.jar"/>
         <pathelement location="lib/trident.jar"/>
         <pathelement location="lib/snakeyaml-1.9.jar"/>
         <pathelement location="lib/jrtp_1.0a.jar"/>
-        <pathelement location="lib/mary4/mary-common.jar"/>
-        <pathelement location="lib/mary4/mary-de.jar"/>
-        <pathelement location="lib/mary4/mary-en.jar"/>
-        <pathelement location="lib/mary4/mary-mbrola.jar"/>
-        <pathelement location="lib/mary4/signalproc.jar"/>
-        <pathelement location="lib/mary4/mary-freetts.jar"/>
         <pathelement location="lib/common-for-convenience/jflac-1.3.jar"/>
         <pathelement location="lib/common-for-convenience/log4j-1.2.15.jar"/>
         <pathelement location="lib/common-for-convenience/jdom1-1.1.1.jar"/>
@@ -89,6 +71,12 @@
         <pathelement location="lib/common-for-convenience/jgraphx.jar"/>
         <pathelement location="lib/sphinx4/sphinx4.jar"/>
         <pathelement location="lib/common-for-convenience/commons-math3.jar"/>
+        <pathelement location="lib/mary5/marytts-runtime-5.1-SNAPSHOT-jar-with-dependencies.jar"/>
+        <pathelement location="lib/mary5/marytts-client-5.1-SNAPSHOT-jar-with-dependencies.jar"/>
+        <pathelement location="lib/mary5/marytts-lang-de-5.1-SNAPSHOT.jar"/>
+        <pathelement location="lib/mary5/marytts-lang-en-5.1-SNAPSHOT.jar"/>
+        <pathelement location="lib/mary5/voice-cmu-slt-hsmm-5.1-SNAPSHOT.jar"/>
+        <pathelement location="lib/mary5/voice-bits1-hsmm-5.0-SNAPSHOT.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -123,7 +111,6 @@
             <src path="test"/>
             <exclude name="demo/inpro/system/pento/"/>
             <exclude name="done/inpro/system/calendar/"/>
-            <exclude name="inpro/io/instantio/"/>
             <exclude name="work/inpro/alchemy/spatial/util/"/>
             <exclude name="inpro/io/instantio/"/>
             <classpath refid="Inpro.classpath"/>
@@ -143,110 +130,36 @@
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
     </target>
-	<target name="Demo_EN_SimpleTextSynthesis">
-		<java classname="inpro.apps.SimpleText" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-			<jvmarg line="-ea -Dmary.base=${maryBase} -Dinpro.tts.tempoScaling=0.7  -Dinpro.tts.voice=cmu-slt-hsmm -Dinpro.tts.language=en-US -da"/>
-			<arg line="-O -c file:demo/inpro/synthesis/config.xml"/>
-            <classpath refid="Inpro.classpath"/>
-		</java>
-    </target>
-	<target name="Demo_SimplePatternDemonstrator">
-		<java classname="demo.inpro.synthesis.SimplePatternDemonstrator" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
-            <jvmarg line="-ea -Dmary.base=${maryBase}"/>
-            <classpath refid="Inpro.classpath"/>
-		</java>
-    </target>
-	<target name="Apps_SimpleText">
-		<java classname="inpro.apps.SimpleText" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-			<arg line="-L -C"/>
-			<classpath refid="Inpro.classpath"/>
-		</java>
-	</target>
-	<target name="Demo_ProsodyDemonstrator">
-		<java classname="demo.inpro.synthesis.ProsodyDemonstrator" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
-			<jvmarg line="-Dmary.base=${maryBase} -Dinpro.tts.voice=bits1-hsmm -Dmary.voice=bits1-hsmm -Dinpro.tts.language=de -ea -Dinpro.tts.tempoScaling=1.0"/>
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-    <target name="Extra_DataCollector">
-        <java classname="extra.inpro.training.DataCollector" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-	<target name="Demo_iRMRS">
-		<java classname="inpro.apps.SimpleText" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-			<arg line="-c file:demo/inpro/system/irmrsc/irmrsc-demo-semantics-config.xml"/>
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-    <target name="Done_CarChaseExperimenter">
-        <java classname="done.inpro.system.carchase.CarChaseExperimenter" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-            <jvmarg line="-Dinpro.tts.voice=bits1-hsmm -Dinpro.tts.language=de -Dmary.base=${maryBase} -ea"/>
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-	<target name="Demo_EN_ProsodyDemonstrator">
-		<java classname="demo.inpro.synthesis.ProsodyDemonstrator" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
-			<jvmarg line="-Dmary.base=/home/timo/uni/projekte/itts/openmary-4.3.0-svn -Dinpro.tts.demo.longUtt=&quot;This is a very long and at least somewhat complex utterance.&quot; -Dinpro.tts.voice=cmu-slt-hsmm -Dmary.voice=cmu-slt-hsmm -Dinpro.tts.language=en-US -da"/>
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-    <target name="Demo_SimpleTextSynthesis">
+
+<!-- executables -->
+
+    <target name="Apps_SimpleText">
         <java classname="inpro.apps.SimpleText" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-            <jvmarg line="-ea -Dmary.base=${maryBase} -Dinpro.tts.tempoScaling=0.5"/>
-            <arg line="-O -c file:demo/inpro/synthesis/config.xml"/>
+            <arg line="-L -C"/>
             <classpath refid="Inpro.classpath"/>
         </java>
     </target>
-	<target name="Extra_VisualTTS">
-		<java classname="extra.inpro.synthesis.visual.VisualTTS" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-			<jvmarg line="-ea -Dmary.base=${maryBase} -Dinpro.tts.voice=de6"/>
-			<classpath refid="Inpro.classpath"/>
-		</java>
-	</target>
-	<target name="Done_GreifarmExperiment">
-		<java classname="demo.inpro.system.greifarm.GreifarmExperiment" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
-			<classpath refid="Inpro.classpath"/>
-		</java>
-	</target>
-	<target name="Done_Completion">
+    <target name="Apps_SimpleRecoFromMicrophone">
         <java classname="inpro.apps.SimpleReco" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-			<jvmarg line="-Dmary.version=internal -Dmary.voice=bits1-hsmm -Dmary.base=${maryBase} -DturnCompleter[fullUtterance]=&quot;der nordwind blies mit aller macht; aber je mehr er blies, desto fester hüllte sich der wanderer in seinen mantel ein; endlich gab der nordwind den kampf auf; nun erwärmte die sonne die luft mit ihren freundlichen strahlen, und schon nach wenigen augenblicken zog der wanderer seinen mantel aus; da musste der nordwind zugeben, dass die sonne von ihnen beiden der stärkere war&quot;"/>
-			<arg line="-c file:done/inpro/system/completion/completion-config.xml -O -C -rt -F file:done/inpro/system/completion/k73nord2.wav -lm file:done/inpro/system/completion/nordwind.lm"/>
+            <arg line="-M -O -Is 7 -C -T"/>
             <classpath refid="Inpro.classpath"/>
         </java>
     </target>
-	<target name="Demo_EN_GreatPatternDemonstrator">
-		<java classname="demo.inpro.synthesis.GreatEnglishPatternDemonstrator" dir="${build_files}${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
-			<jvmarg line="-Dmary.base=${maryBase}"/>
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-    <target name="Demo_GreatPatternDemonstrator">
-        <java classname="demo.inpro.synthesis.GreatPatternDemonstrator" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
-            <jvmarg line="-ea -Dmary.base=${maryBase}"/>
-            <classpath refid="Inpro.classpath"/>
-        </java>
-    </target>
-	<target name="test">
-		<mkdir dir="${junit.output.dir}"/>
-		<junit fork="yes" printsummary="withOutAndErr">
-			<formatter type="xml"/>
-			<test name="AllTests" todir="${junit.output.dir}"/>
-			<jvmarg line="-ea -Dmary.base=${maryBase}"/>
-            <classpath refid="Inpro.classpath"/>
-		</junit>
-    </target>
-	<target name="Apps_SimpleRecoFromMicrophone">
+    <target name="Demo_EchoDM">
         <java classname="inpro.apps.SimpleReco" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-			<arg line="-M -O -Is 7 -C -T"/>
+            <jvmarg line="-Dmary.base=${maryBase}"/>
+            <arg line="-C -M -O -Is 7 -C -c file:demo/inpro/system/echodm/prosody-config.xml"/>
             <classpath refid="Inpro.classpath"/>
         </java>
     </target>
-	<target name="Done_CalendarGeneration">
-		<java classname="done.inpro.system.calendar.GenerationModule" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-			<jvmarg line="-Dmary.base=${maryBase} -ea -Dproso.cond.onephraseahead=false -Dproso.cond.updateposition=+1word -Dproso.cond.connect=true"/>
-			<arg line="3 done/inpro/system/calendar/calendar.gs false true conditionC"/>
+    <target name="Demo_EN_GreatPatternDemonstrator">
+        <java classname="demo.inpro.synthesis.GreatEnglishPatternDemonstrator" dir="${build_files}${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Demo_EN_ProsodyDemonstrator">
+        <java classname="demo.inpro.synthesis.ProsodyDemonstrator" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
+            <jvmarg line="-Dinpro.tts.voice=bits1-hsmm -Dmary.voice=bits1-hsmm -Dinpro.tts.language=de -ea -Dinpro.tts.tempoScaling=1.0"/>
             <classpath refid="Inpro.classpath"/>
         </java>
     </target>
@@ -256,19 +169,98 @@
             <classpath refid="Inpro.classpath"/>
         </java>
     </target>
-	<target name="Demo_EchoDM">
-		<java classname="inpro.apps.SimpleReco" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-            <jvmarg line="-Dmary.base=${maryBase}"/>
-			<arg line="-C -M -O -Is 7 -C -c file:demo/inpro/system/echodm/prosody-config.xml"/>
+    <target name="Demo_EN_SimpleTextSynthesis">
+        <java classname="inpro.apps.SimpleText" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <jvmarg line="-ea -Dinpro.tts.tempoScaling=0.7  -Dinpro.tts.voice=cmu-slt-hsmm -Dinpro.tts.language=en-US -da"/>
+            <arg line="-O -c file:demo/inpro/synthesis/config.xml"/>
             <classpath refid="Inpro.classpath"/>
         </java>
     </target>
-	<target name="Demo_SimpleRecoFromFile">
-        <java classname="inpro.apps.SimpleReco" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-			<jvmarg line="-ea"/>
-			<arg line="-F file:../res/DE_1234.wav -O -In -C -L -v -T"/>
+    <target name="Demo_GreatPatternDemonstrator">
+        <java classname="demo.inpro.synthesis.GreatPatternDemonstrator" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
+            <jvmarg line="-ea"/>
             <classpath refid="Inpro.classpath"/>
         </java>
+    </target>
+    <target name="Demo_iRMRS">
+        <java classname="inpro.apps.SimpleText" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <arg line="-c file:demo/inpro/system/irmrsc/irmrsc-demo-semantics-config.xml"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Demo_ProsodyDemonstrator">
+        <java classname="demo.inpro.synthesis.ProsodyDemonstrator" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
+            <jvmarg line="-Dinpro.tts.voice=bits1-hsmm -Dmary.voice=bits1-hsmm -Dinpro.tts.language=de -ea -Dinpro.tts.tempoScaling=1.0"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Demo_SimplePatternDemonstrator">
+        <java classname="demo.inpro.synthesis.SimplePatternDemonstrator" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
+            <jvmarg line="-ea"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Demo_SimpleRecoFromFile">
+        <java classname="inpro.apps.SimpleReco" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <jvmarg line="-ea"/>
+            <classpath refid="Inpro.classpath"/>
+            <arg line="-F file:../res/DE_1234.wav -O -In -C -L -v -T"/>
+        </java>
+    </target>
+    <target name="Demo_SimpleTextSynthesis">
+        <java classname="inpro.apps.SimpleText" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <jvmarg line="-ea -Dinpro.tts.tempoScaling=0.5"/>
+            <arg line="-O -c file:demo/inpro/synthesis/config.xml"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Done_CalendarGeneration">
+        <java classname="done.inpro.system.calendar.GenerationModule" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <jvmarg line="-ea -Dproso.cond.onephraseahead=false -Dproso.cond.updateposition=+1word -Dproso.cond.connect=true"/>
+            <arg line="3 done/inpro/system/calendar/calendar.gs false true conditionC"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Done_CarChaseExperimenter">
+        <java classname="done.inpro.system.carchase.CarChaseExperimenter" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <jvmarg line="-Dinpro.tts.voice=bits1-hsmm -Dinpro.tts.language=de -Dmary.base=${maryBase} -ea"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Done_Completion">
+        <java classname="inpro.apps.SimpleReco" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <jvmarg line="-Dmary.version=internal -Dmary.voice=bits1-hsmm -DturnCompleter[fullUtterance]=&quot;der nordwind blies mit aller macht; aber je mehr er blies, desto fester hüllte sich der wanderer in seinen mantel ein; endlich gab der nordwind den kampf auf; nun erwärmte die sonne die luft mit ihren freundlichen strahlen, und schon nach wenigen augenblicken zog der wanderer seinen mantel aus; da musste der nordwind zugeben, dass die sonne von ihnen beiden der stärkere war&quot;"/>
+            <arg line="-c file:done/inpro/system/completion/completion-config.xml -O -C -rt -F file:done/inpro/system/completion/k73nord2.wav -lm file:done/inpro/system/completion/nordwind.lm"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Done_GreifarmExperiment">
+        <java classname="demo.inpro.system.greifarm.GreifarmExperiment" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Extra_DataCollector">
+        <java classname="extra.inpro.training.DataCollector" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+    <target name="Extra_VisualTTS">
+        <java classname="extra.inpro.synthesis.visual.VisualTTS" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
+            <jvmarg line="-ea -Dinpro.tts.voice=de6"/>
+            <classpath refid="Inpro.classpath"/>
+        </java>
+    </target>
+
+<!-- testing -->
+
+    <target name="test">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="AllTests" todir="${junit.output.dir}"/>
+            <jvmarg line="-ea"/>
+            <classpath refid="Inpro.classpath"/>
+        </junit>
     </target>
     <target name="junitreport">
         <junitreport todir="${junit.output.dir}">

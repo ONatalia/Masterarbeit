@@ -8,6 +8,6 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="demo.inpro.synthesis.ProsodyDemonstrator"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Inpro"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dmary.base=${maryBase} -Dinpro.tts.voice=bits1-hsmm -Dmary.voice=bits1-hsmm -Dinpro.tts.language=de -ea -Dinpro.tts.tempoScaling=1.0"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dinpro.tts.voice=bits1-hsmm -Dmary.voice=bits1-hsmm -Dinpro.tts.language=de -ea -Dinpro.tts.tempoScaling=1.0"/>
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:Inpro}/bin"/>
 </launchConfiguration>
