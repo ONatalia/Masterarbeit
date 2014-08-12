@@ -272,8 +272,12 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 					WordIU newIU = new WordIU(null);
 					newIU.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, "SIL")));
 					edits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
+				} else {
+					assert false : "Should this really happen?";
 				}
 				segmentStartTime = segmentEndTime;
+			} else {
+				assert false : newSearchState.getClass();
 			}
 		}
 		return edits;
