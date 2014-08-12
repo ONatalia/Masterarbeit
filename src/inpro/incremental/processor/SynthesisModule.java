@@ -89,6 +89,7 @@ public class SynthesisModule extends IUModule {
 						currentInstallment = new ChunkBasedInstallmentIU((HesitationIU) chunkIU);
 					else
 						currentInstallment = new ChunkBasedInstallmentIU(chunkIU);
+					// shift forward this installment by the time since system startup
 					currentInstallment.getSegments().get(0).shiftBy(TimeUtil.timeSinceStartup(), true);
 					startPlayInstallment = true;
 				}

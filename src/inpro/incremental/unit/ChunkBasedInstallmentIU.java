@@ -77,6 +77,8 @@ public class ChunkBasedInstallmentIU extends SysInstallmentIU {
 	 </pre>*/
 	private void appendContinuation(ChunkIU chunk) {
 		WordIU firstNewWord = null;
+		// for connected prosody, resynthesize everything into a new installment, and keep only the new part (however, old parts will be back-substituted)
+		// for unconnected prosody, synthesize only the new chunk 
 		if (System.getProperty("proso.cond.connect", "true").equals("true")) {
 			List<String> chunkTexts = new ArrayList<String>();
 			// move back to the first chunkIU of the installment
@@ -93,9 +95,12 @@ public class ChunkBasedInstallmentIU extends SysInstallmentIU {
 			logger.debug("received the words" + newWords.toString());
 			assert newWords.size() >= groundedIn.size() - numHesitationsInserted;
 //			assert newWords.size() == groundedIn.size() + chunk.expectedWordCount(); // for some reason, this assertion breaks sometimes -> nasty stuff going on with pauses
+			newWords.get(0).getSegments().get(0).shiftBy(startTime(), true);
 			firstNewWord = newWords.get(groundedIn.size() - numHesitationsInserted);
 		} else {
 			firstNewWord = (WordIU) (new SysInstallmentIU(chunk.toPayLoad())).groundedIn().get(0);
+			// change timing of new words/segments to match that of previously synthesized stuff
+			firstNewWord.getSegments().get(0).shiftBy(getFinalWord().endTime() - firstNewWord.startTime(), true);
 		}
 		WordIU lastOldWord = getFinalWord();
 		//assert lastOldWord.payloadEquals(firstNewWord.getSameLevelLink());
