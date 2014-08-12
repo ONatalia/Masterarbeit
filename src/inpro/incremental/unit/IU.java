@@ -477,7 +477,7 @@ public abstract class IU implements Comparable<IU> {
 		return this.getID() - other.getID();
 	}
 
-	public List<IUUpdateListener> updateListeners;
+	protected List<IUUpdateListener> updateListeners;
 	/** this has no effect if listener is already in the list of updatelisteners*/
 	public synchronized void addUpdateListener(IUUpdateListener listener) {
 		if (updateListeners == null)
@@ -496,7 +496,7 @@ public abstract class IU implements Comparable<IU> {
 				String threadName = listener.getClass().toString() + " called from " + this.toString() + " by thread " + Thread.currentThread().getName();
 				if (threadName.length() > 100)
 					threadName = threadName.substring(0, 100) + "...";
-				(new Thread(listener.getClass().toString() + " called from " + this.toString() + " by thread " + Thread.currentThread().getName()) {
+				(new Thread(threadName) {
 					@Override
 					public void run() {
 						listener.update(that);
