@@ -8,15 +8,18 @@ import inpro.incremental.unit.SegmentIU;
 import inpro.incremental.unit.SysSegmentIU;
 import inpro.synthesis.MaryAdapter;
 
+import java.util.EnumSet;
 import java.util.List;
 
+import marytts.htsengine.HMMData.FeatureType;
 import marytts.htsengine.HTSModel;
 
 import org.junit.Test;
 
 public class IncrementalCARTTest {
 
-	@Test
+	// do not test this anymore, as legacy and generated models differ in incremental synthesis
+	//@Test
 	public void test() {
 		MaryAdapter ma = MaryAdapter.getInstance();
 		List<IU> ius = ma.text2IUs("eins zwei drei vier fünf sechs sieben acht");
@@ -38,14 +41,10 @@ public class IncrementalCARTTest {
 			if (m1.getDur(i) != m2.getDur(i))
 				System.err.println("in phone " + m1.getPhoneName() + ", state " + i + ": m1 " + m1.getDur(i) + " vs. m2 " + m2.getDur(i));
 			assertEquals("in phone " + m1.getPhoneName() + ", state " + i, m1.getDur(i), m2.getDur(i));
-			assertArrayEquals(m1.getLf0Mean(i), m2.getLf0Mean(i), 0.0001f);
-			assertArrayEquals(m1.getLf0Variance(i), m2.getLf0Variance(i), 0.0001f);
-			assertArrayEquals(m1.getStrMean(i), m2.getStrMean(i), 0.0001f);
-			assertArrayEquals(m1.getStrVariance(i), m2.getStrVariance(i), 0.0001f);
-			//assertArrayEquals(m1.getMagMean(i), m2.getMagMean(i), 0.0001f);
-			//assertArrayEquals(m1.getMagVariance(i), m2.getMagVariance(i), 0.0001f);
-			assertArrayEquals(m1.getMcepMean(i), m2.getMcepMean(i), 0.0001f);
-			assertArrayEquals(m1.getMcepVariance(i), m2.getMcepVariance(i), 0.0001f);
+			for (FeatureType ft : EnumSet.of(FeatureType.STR, FeatureType.MGC)) {
+				assertArrayEquals(m1.getMean(ft, i), m2.getMean(ft, i), 0.0001f);
+				assertArrayEquals(m1.getVariance(ft, i), m2.getVariance(ft, i), 0.0001f);
+			}
 		}
 		return true;
 	}
