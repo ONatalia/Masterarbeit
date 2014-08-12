@@ -33,7 +33,7 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // allow cast from List<WordIU> to List<IU>
 	public SysInstallmentIU(String tts, List<WordIU> words) {
-		this(tts);
+		super(null, tts);
 		groundedIn = (List) words;
 	}
 	
