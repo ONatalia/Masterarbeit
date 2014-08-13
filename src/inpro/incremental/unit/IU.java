@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +37,11 @@ public abstract class IU implements Comparable<IU> {
 	
 	private boolean committed = false;
 	private boolean revoked = false;
+	
+	/** thread pool for update listening */
+	private static final Executor updateListenerExecutor = Executors.newCachedThreadPool();
+	
+	private IUUpdateListener grinUpdateListener;
 	
 	private HashMap<String, Object> userData;
 	
@@ -477,6 +484,14 @@ public abstract class IU implements Comparable<IU> {
 		return this.getID() - other.getID();
 	}
 
+	
+	/** 
+	 * the (very simple) interface to be implemented to subscribe to IU updates
+	 */ 
+	public interface IUUpdateListener {
+		public void update(IU updatedIU);
+	}
+
 	protected List<IUUpdateListener> updateListeners;
 	/** this has no effect if listener is already in the list of updatelisteners*/
 	public synchronized void addUpdateListener(IUUpdateListener listener) {
@@ -485,40 +500,65 @@ public abstract class IU implements Comparable<IU> {
 		if (!updateListeners.contains(listener))
 			updateListeners.add(listener);
 	}
-	
-	
+
+	/** 
+	 * notify whoever is listening on this IU; 
+	 * 
+	 * this is called internally by some modules, but can also be 
+	 * used externally to trigger processing; 
+	 * Calls to listeners will be performed concurrently and this operation
+	 * does not wait for the listeners to finish processing
+	 */
 	public synchronized void notifyListeners() {
 		//System.err.println("call to updateListeners in " + toString());
 		if (updateListeners != null)
-			for (final IUUpdateListener listener : updateListeners) {
-				final IU that = this;
-				// why not spawn a new thread per notification to avoid deadlocks? live long and prosper!
-				String threadName = listener.getClass().toString() + " called from " + this.toString() + " by thread " + Thread.currentThread().getName();
-				if (threadName.length() > 100)
-					threadName = threadName.substring(0, 100) + "...";
-				(new Thread(threadName) {
-					@Override
-					public void run() {
-						listener.update(that);
-					}
-				}).start();
+			for (IUUpdateListener listener : updateListeners) {
+				callListenerConcurrently(listener);
 			}
 	}
 	
-	public interface IUUpdateListener {
-		public void update(IU updatedIU);
+	/** 
+	 * private version of notifyListeners() which synchronously executes 
+	 * the first listener update (expecting that there most often is just one)
+	 * and all remaining ones concurrently (to avoid them waiting -- 
+	 * potentially forever -- if a preceeding listener highjacks its thread)
+	 */
+	protected synchronized void notifyListenersSynchronously() {
+		if (updateListeners != null && updateListeners.size() > 0) {
+			for (int i = 1; i < updateListeners.size(); i++) {
+				callListenerConcurrently(updateListeners.get(i));
+			}
+			updateListeners.get(0).update(this);
+		}
 	}
 
-	/** registers an update listener with all groundedIn-IUs that call our own update listeners */
-	public void updateOnGrinUpdates() {
-		IUUpdateListener listener = new IUUpdateListener() {
+	/** submit a listener to the executor service */
+	private void callListenerConcurrently(final IUUpdateListener listener) {
+		updateListenerExecutor.execute(new Runnable() {
 			@Override
-			public void update(IU updatedIU) {
-				notifyListeners();
+			public void run() {
+				listener.update(IU.this);
 			}
-		};
+		});
+	}
+
+	/** 
+	 * registers an update listener with all groundedIn-IUs that call our own update listeners 
+	 * 
+	 * now includes some magic in order to reduce the number of thread switches 
+	 * when following chains of grounded-in links
+	 */
+	public void updateOnGrinUpdates() {
+		if (grinUpdateListener == null) {
+			grinUpdateListener = new IUUpdateListener() {
+				@Override
+				public void update(IU updatedIU) {
+					notifyListenersSynchronously();
+				}
+			};
+		}
 		for (IU iu : groundedIn()) {
-			iu.addUpdateListener(listener);
+			iu.addUpdateListener(grinUpdateListener);
 			iu.updateOnGrinUpdates();
 		}
 	}
