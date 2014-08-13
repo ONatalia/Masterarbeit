@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import inpro.apps.SimpleMonitor;
+import inpro.apps.util.MonitorCommandLineParser;
 import inpro.audio.DispatchStream;
 import inpro.incremental.IUModule;
 import inpro.incremental.processor.SynthesisModule;
+import inpro.incremental.sink.LabelWriter;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.HesitationIU;
@@ -37,9 +39,12 @@ public class SynthesisModuleUnitTest {
 	public void setupMinimalSynthesisEnvironment() {
         System.setProperty("inpro.tts.language", "de");
 		System.setProperty("inpro.tts.voice", "bits1-hsmm");
+		//dispatcher = SimpleMonitor.setupDispatcher(new MonitorCommandLineParser("-D"));
 		dispatcher = SimpleMonitor.setupDispatcher();
 		myIUModule = new TestIUModule();
-		myIUModule.addListener(new SynthesisModule(dispatcher));
+		SynthesisModule sm = new SynthesisModule(dispatcher);
+		myIUModule.addListener(sm);
+		sm.addListener(new LabelWriter());
 	}
 	
 	@After
@@ -95,7 +100,58 @@ public class SynthesisModuleUnitTest {
 		assertTrue("continuation should start immediately after initial chunk (even after uttering)", Math.abs(initialChunk.startTime() - continuationChunk.startTime()) > 0.00001);
 	}
 	
-	/**
+	/** 
+	 * test timing advantage of using pre-synthesis over no pre-synthesis
+	 */
+	@Test(timeout=300000)
+	public void testPreSynthesisGain() {
+//		String testSentence = "Dies ist ein sehr sehr langer, prosodisch komplizierter, und völlig bekloppter Satz, welcher jetzt sogar noch länger, unsinniger und damit andauernder zu synthetisieren sein wird als zuvor.";
+//		String testSentence = "Dies ist ein sehr sehr langer, prosodisch komplizierter, und völlig bekloppter Satz.";
+		String testSentence = "Dies ist ein kurzer Satz.";
+		long dt;
+
+		// pre-heat synthesis code
+		ChunkIU myChunk = new ChunkIU(testSentence);
+		myIUModule.addIUAndUpdate(myChunk);
+		dispatcher.waitUntilDone();
+		myIUModule.reset();
+
+		long durPresynthesis = 0;
+		long durAddWithPresynthesis = 0;
+		long durAddWithoutPresynthesis = 0;
+		for (int i = 0; i < 10; i++) { 
+
+			myChunk = new ChunkIU(testSentence);
+			dt = System.currentTimeMillis();
+			myIUModule.addIUAndUpdate(myChunk);
+			durAddWithoutPresynthesis += System.currentTimeMillis() - dt;
+			dispatcher.waitUntilDone();
+			myIUModule.reset();
+
+			myChunk = new ChunkIU(testSentence);
+			dt = System.currentTimeMillis();
+			myChunk.preSynthesize();
+			durPresynthesis += System.currentTimeMillis() - dt;
+
+			dt = System.currentTimeMillis();
+			myIUModule.addIUAndUpdate(myChunk);
+			durAddWithPresynthesis += System.currentTimeMillis() - dt;
+			dispatcher.waitUntilDone();
+			myIUModule.reset();
+
+		}
+		durPresynthesis *= .1;
+		durAddWithPresynthesis *= .1;
+		durAddWithoutPresynthesis *= .1;
+		System.out.println("duration of presynthesis: " + durPresynthesis);
+		System.out.println("add-duration with presynthesis: " + durAddWithPresynthesis);
+		System.out.println("add-duration without presynthesis: " + durAddWithoutPresynthesis);
+
+		assertTrue("presynthesis should speed things up, not slow them down!", durAddWithPresynthesis < durAddWithoutPresynthesis);
+		assertTrue("adding a presynthesized utterances should only take a few milliseconds (but it actually took " + durAddWithPresynthesis + " milliseconds)", durAddWithPresynthesis < 10);
+	}
+	
+	/** 
 	 * test whether it's possible to add the next chunk only on update of the previous chunk
 	 */
 	@Test (timeout=120000)
@@ -200,6 +256,12 @@ public class SynthesisModuleUnitTest {
 		public void reset() {
 			rightBuffer.setBuffer(null, null);
 		}
+	}
+	
+	public static void main(String... args) {
+		SynthesisModuleUnitTest smut = new SynthesisModuleUnitTest();
+		smut.setupMinimalSynthesisEnvironment();
+		smut.testPreSynthesisGain();
 	}
 
 }
