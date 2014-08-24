@@ -193,6 +193,8 @@ public class TTSUtil {
 			} else {
 				token = null;
 			}
+			if (isBreak())
+				token = "<sil>";
 		}
 		
 		@SuppressWarnings("unused")
