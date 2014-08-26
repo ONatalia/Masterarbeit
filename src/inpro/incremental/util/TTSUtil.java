@@ -6,7 +6,6 @@ import inpro.incremental.unit.PhraseIU;
 import inpro.incremental.unit.SyllableIU;
 import inpro.incremental.unit.SysSegmentIU;
 import inpro.incremental.unit.WordIU;
-import inpro.synthesis.PitchMark;
 import inpro.util.TimeUtil;
 
 import java.io.IOException;
@@ -83,7 +82,7 @@ public class TTSUtil {
 	
 	public static List<PhraseIU> phraseIUsFromMaryXML(InputStream is, List<SynthesisPayload> synthesisPayload, boolean connectPhrases) {
 		AllContent content = mary2content(is);
-		List<PhraseIU> phrases =  content.getPhraseIUs(synthesisPayload != null ? synthesisPayload.iterator() : Collections.<SynthesisPayload>emptyIterator(), connectPhrases);
+		List<PhraseIU> phrases = content.getPhraseIUs(synthesisPayload != null ? synthesisPayload.iterator() : Collections.<SynthesisPayload>emptyIterator(), connectPhrases);
 		return phrases;
 	}
 	
@@ -103,6 +102,9 @@ public class TTSUtil {
 			for (Phrase phrase : phrases) {
 				PhraseIU pIU = phrase.toIU(spIterator);
 				if (connect) {
+					if (prev != null && Math.abs(pIU.startTime() - prev.endTime()) > 0.01) {
+						pIU.shiftBy(prev.endTime() - pIU.startTime());
+					}
 					pIU.connectSLL(prev);
 				}
 				phraseIUs.add(pIU);

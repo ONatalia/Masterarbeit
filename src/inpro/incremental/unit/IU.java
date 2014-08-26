@@ -390,7 +390,7 @@ public abstract class IU implements Comparable<IU> {
 	public abstract String toPayLoad();
 	
 	public String toLabelLine() {
-		return String.format(Locale.US,	"%.2f\t%.2f\t%s", startTime(), endTime(), toPayLoad());
+		return String.format(Locale.US,	"%.3f\t%.3f\t%s", startTime(), endTime(), toPayLoad());
 	}
 	
 	@Override
