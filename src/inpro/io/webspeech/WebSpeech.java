@@ -1,9 +1,8 @@
 package inpro.io.webspeech;
 
 import inpro.annotation.Label;
-import inpro.incremental.IUModule;
 import inpro.incremental.PushBuffer;
-import inpro.incremental.deltifier.ASRWordDeltifier;
+import inpro.incremental.source.IUSourceModule;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.IUList;
@@ -27,27 +26,21 @@ import org.apache.log4j.Logger;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Boolean;
-import edu.cmu.sphinx.util.props.S4Component;
 import edu.cmu.sphinx.util.props.S4ComponentList;
 import edu.cmu.sphinx.util.props.S4Integer;
 import edu.cmu.sphinx.util.props.S4String;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-public class WebSpeech extends IUModule {
+public class WebSpeech extends IUSourceModule {
 	
 	static Logger log = Logger.getLogger(WebSpeech.class.getName());
 	
 	@S4ComponentList(type = PushBuffer.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
-	
-	@S4Component(type = ASRWordDeltifier.class, defaultClass = ASRWordDeltifier.class)
-	public final static String PROP_ASR_DELTIFIER = "asrFilter"; // NO_UCD (use private)
-	protected ASRWordDeltifier asrDeltifier;
 	
 	@S4String(defaultValue = "en-UK")
 	public final static String LANG = "lang";
@@ -120,11 +113,6 @@ public class WebSpeech extends IUModule {
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		prevList = new IUList<WordIU>(); // start off with an empty word list so the diff is all the new stuff
-		asrDeltifier = (ASRWordDeltifier) ps.getComponent(PROP_ASR_DELTIFIER);
-		if (asrDeltifier == null) {
-			asrDeltifier = new ASRWordDeltifier();
-		}
-		
 		try {
 			this.run(ps);
 		} 
@@ -167,9 +155,4 @@ public class WebSpeech extends IUModule {
 		super.notifyListeners();
 	}
 
-	@Override
-	protected void leftBufferUpdate(Collection<? extends IU> ius,
-			List<? extends EditMessage<? extends IU>> edits) {
-		log.warn("This does not accept anything on the left buffer!");
-	}
 }
