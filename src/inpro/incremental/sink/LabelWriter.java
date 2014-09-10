@@ -25,6 +25,9 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	@S4Boolean(defaultValue = false)
     public final static String PROP_WRITE_FILE = "writeToFile";
 	
+	@S4Boolean(defaultValue = false)
+    public final static String PROP_COMMITS_ONLY = "commitsOnly";	
+	
 	@S4Boolean(defaultValue = true)
     public final static String PROP_WRITE_STDOUT = "writeToStdOut";
 	
@@ -35,6 +38,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
     public final static String PROP_FILE_NAME = "fileName";    
     
     private boolean writeToFile;
+    private boolean commitsOnly;
     private boolean writeToStdOut = true;
     private String filePath;
     private static String fileName;
@@ -44,6 +48,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	@Override	
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		writeToFile = ps.getBoolean(PROP_WRITE_FILE);
+		commitsOnly = ps.getBoolean(PROP_COMMITS_ONLY);
 		writeToStdOut = ps.getBoolean(PROP_WRITE_STDOUT);
 		filePath = ps.getString(PROP_FILE_PATH);
 		fileName = ps.getString(PROP_FILE_NAME);
@@ -56,10 +61,28 @@ public class LabelWriter extends FrameAwarePushBuffer {
 				currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
 		/* Then go through all the IUs, ignoring commits */
 		boolean added = false;
-		for (IU iu : ius) {
-			if (iu.isCommitted()) continue;
-			added = true;
-			toOut += "\n" + iu.toLabelLine();
+		for (EditMessage<? extends IU> edit : edits) {
+			IU iu = edit.getIU();
+			switch (edit.getType()) {
+			case ADD:
+				if (!commitsOnly) {
+					added = true;
+					toOut += "\n" + iu.toLabelLine();
+				}
+				break;
+			case COMMIT:
+				if (commitsOnly) {
+					added = true;
+					toOut += "\n" + iu.toLabelLine();
+				}
+				break;
+			case REVOKE:
+				break;
+			default:
+				break;
+			
+			}
+
 		}
 		toOut += "\n\n";
 		/* If there were only commits, or if there are not IUs, then print out as specified */
