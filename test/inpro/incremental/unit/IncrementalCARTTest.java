@@ -41,7 +41,7 @@ public class IncrementalCARTTest {
 			if (m1.getDur(i) != m2.getDur(i))
 				System.err.println("in phone " + m1.getPhoneName() + ", state " + i + ": m1 " + m1.getDur(i) + " vs. m2 " + m2.getDur(i));
 			assertEquals("in phone " + m1.getPhoneName() + ", state " + i, m1.getDur(i), m2.getDur(i));
-			for (FeatureType ft : EnumSet.of(FeatureType.STR, FeatureType.MGC)) {
+			for (FeatureType ft : EnumSet.of(FeatureType.STR, FeatureType.MCP)) {
 				assertArrayEquals(m1.getMean(ft, i), m2.getMean(ft, i), 0.0001f);
 				assertArrayEquals(m1.getVariance(ft, i), m2.getVariance(ft, i), 0.0001f);
 			}

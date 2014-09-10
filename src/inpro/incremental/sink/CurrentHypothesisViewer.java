@@ -91,11 +91,8 @@ public class CurrentHypothesisViewer extends PushBuffer {
 				iuList.clear();
 				iuList.addAll(ius);
 				for (IU iu : ius) {
-					if (iu.updateListeners == null
-							|| !iu.updateListeners.contains(iuUpdateRepainter)) {
-						iu.updateOnGrinUpdates();
-						iu.addUpdateListener(iuUpdateRepainter);
-					}
+					iu.updateOnGrinUpdates();
+					iu.addUpdateListener(iuUpdateRepainter);
 				}
 
 			}

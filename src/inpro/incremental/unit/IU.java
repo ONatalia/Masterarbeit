@@ -41,6 +41,7 @@ public abstract class IU implements Comparable<IU> {
 	/** thread pool for update listening */
 	private static final Executor updateListenerExecutor = Executors.newCachedThreadPool();
 	
+	/** listener to call notifyListeners on whoever this is being added to (lazily initialized by updateOnGrinUpdates()) */
 	private IUUpdateListener grinUpdateListener;
 	
 	private HashMap<String, Object> userData;
