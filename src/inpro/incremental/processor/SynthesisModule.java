@@ -115,7 +115,7 @@ public class SynthesisModule extends IUModule {
 					// clear any locks that might block the vocoder from finishing the utterance chunk
 					seg.setAwaitContinuation(false);			
 				}
-				currentInstallment = null; 
+				//currentInstallment = null; 
 				startPlayInstallment = false; // to avoid a null pointer
 				break;
 			default:
