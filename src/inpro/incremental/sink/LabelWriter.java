@@ -6,6 +6,7 @@ import inpro.util.TimeUtil;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -43,8 +44,9 @@ public class LabelWriter extends FrameAwarePushBuffer {
     private String filePath;
     private static String fileName;
     int frameOutput = -1;
-
-	
+    
+    ArrayList<IU> allIUs = new ArrayList<IU>();
+    
 	@Override	
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		writeToFile = ps.getBoolean(PROP_WRITE_FILE);
@@ -68,15 +70,18 @@ public class LabelWriter extends FrameAwarePushBuffer {
 				if (!commitsOnly) {
 					added = true;
 					toOut += "\n" + iu.toLabelLine();
+					allIUs.add(iu);
 				}
 				break;
 			case COMMIT:
 				if (commitsOnly) {
 					added = true;
 					toOut += "\n" + iu.toLabelLine();
+					allIUs.add(iu);
 				}
 				break;
 			case REVOKE:
+				allIUs.remove(iu);
 				break;
 			default:
 				break;
@@ -84,6 +89,13 @@ public class LabelWriter extends FrameAwarePushBuffer {
 			}
 
 		}
+		
+		toOut = String.format(Locale.US, "Time: %.2f", 
+				currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
+		for (IU iu : allIUs) {
+			toOut += "\n" + iu.toLabelLine();
+		}
+		
 		toOut += "\n\n";
 		/* If there were only commits, or if there are not IUs, then print out as specified */
 		if (ius.size() > 0 && added) { // && frameOutput != currentFrame) {
