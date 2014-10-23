@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import inpro.annotation.Label;
 import inpro.audio.FrontEndBackedAudioInputStream;
 import inpro.incremental.unit.EditMessage;
+import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.IUList;
 import inpro.incremental.unit.SegmentIU;
@@ -224,12 +225,12 @@ public class GoogleASR extends IUSourceModule {
 			int resultIndex = json.getInt("result_index");
 			
 			System.out.println(resultIndex + " "+ transcript);
-			updateCurrentHyps(transcript, resultIndex);
-			
+			boolean isFinal = result.getJSONObject(0).has("final");
+			updateCurrentHyps(transcript, resultIndex, isFinal);
 			setLastResultIndex(resultIndex);
 		}
 
-		private void updateCurrentHyps(String transcript, int resultIndex) {
+		private void updateCurrentHyps(String transcript, int resultIndex, boolean isFinal) {
 			
 			List<String> words = Arrays.asList(transcript.toLowerCase().trim().split("\\s+"));
 					
@@ -250,18 +251,24 @@ public class GoogleASR extends IUSourceModule {
 				currentHyps.add(wiu);
 			}
 			
-			System.out.println(currentHyps);
-			
 //			This calculates the differences between the current IU list and the previous, based on payload
 			List<EditMessage<WordIU>> diffs = chunkHyps.diffByPayload(currentHyps);
 			chunkHyps.clear();
 			chunkHyps.addAll(currentHyps);
-			
-			System.out.println(diffs);
-			System.out.println();
+
+			if (isFinal) {
+//				add remaining WordIUs and commit
+				for (WordIU wordIU : chunkHyps) {
+					diffs.add(new EditMessage<WordIU>(EditType.COMMIT, wordIU));
+				}
+			}
 //			The diffs represents what edits it takes to get from prevList to list, send that to the right buffer
 //			rightBuffer.setBuffer(diffs);
 			
+		}
+		
+		public IUList<WordIU> getChunkHyps() {
+			return chunkHyps;
 		}
 
 		public void shutdown() {
