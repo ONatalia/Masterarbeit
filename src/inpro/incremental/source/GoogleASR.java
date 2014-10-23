@@ -11,11 +11,25 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import javaFlacEncoder.FLACFileWriter;
 
 import javax.sound.sampled.AudioInputStream;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import inpro.annotation.Label;
 import inpro.audio.FrontEndBackedAudioInputStream;
+import inpro.incremental.unit.EditMessage;
+import inpro.incremental.unit.IU;
+import inpro.incremental.unit.IUList;
+import inpro.incremental.unit.SegmentIU;
+import inpro.incremental.unit.TextualWordIU;
+import inpro.incremental.unit.WordIU;
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -167,12 +181,20 @@ public class GoogleASR extends IUSourceModule {
 		stream.close();
 	}
 
-	private class GoogleJSONListener implements Runnable {
+	public class GoogleJSONListener implements Runnable {
 		
 		HttpURLConnection con;
 		boolean inShutdown = false;
 		
-		private GoogleJSONListener(String pair) throws IOException {
+		private IUList<WordIU> chunkHyps;
+		private int lastResultIndex;
+		private WordIU prev;
+		
+		
+		public GoogleJSONListener(String pair) throws IOException {
+			chunkHyps = new IUList<WordIU>();
+			setLastResultIndex(-1);
+			prev = TextualWordIU.FIRST_ATOMIC_WORD_IU;
 			this.con = getDownConnection(pair);
 		}
 
@@ -185,6 +207,7 @@ public class GoogleASR extends IUSourceModule {
 					String decodedString;
 					while ((decodedString = in.readLine()) != null) {
 						System.out.println(decodedString);
+						parseJSON(decodedString);
 					}
 				}
 			} catch (Exception e) {
@@ -192,8 +215,69 @@ public class GoogleASR extends IUSourceModule {
 			}
 		}
 		
+		public void parseJSON(String decodedString) {
+			JSONObject json = new JSONObject(decodedString);
+			JSONArray result = json.getJSONArray("result");
+			if (result.length() == 0) return;
+			
+			String transcript = result.getJSONObject(0).getJSONArray("alternative").getJSONObject(0).getString("transcript");
+			int resultIndex = json.getInt("result_index");
+			
+			System.out.println(resultIndex + " "+ transcript);
+			updateCurrentHyps(transcript, resultIndex);
+			
+			setLastResultIndex(resultIndex);
+		}
+
+		private void updateCurrentHyps(String transcript, int resultIndex) {
+			
+			List<String> words = Arrays.asList(transcript.toLowerCase().trim().split("\\s+"));
+					
+			IUList<WordIU> currentHyps = new IUList<WordIU>();
+
+//			keep working on the frontier
+			if (startNewChunk(resultIndex)) {
+				chunkHyps = new IUList<WordIU>();
+			}
+			
+			for (String word : words) {
+				SegmentIU siu = new SegmentIU(new Label(0, 0, word)); // TODO: set the start and stop timestamps here
+				List<IU> gIns = new LinkedList<IU>();
+				gIns.add(siu);
+				WordIU wiu = new WordIU(word, null, gIns);
+				wiu.setSameLevelLink(prev);
+				prev = wiu;
+				currentHyps.add(wiu);
+			}
+			
+			System.out.println(currentHyps);
+			
+//			This calculates the differences between the current IU list and the previous, based on payload
+			List<EditMessage<WordIU>> diffs = chunkHyps.diffByPayload(currentHyps);
+			chunkHyps.clear();
+			chunkHyps.addAll(currentHyps);
+			
+			System.out.println(diffs);
+			System.out.println();
+//			The diffs represents what edits it takes to get from prevList to list, send that to the right buffer
+//			rightBuffer.setBuffer(diffs);
+			
+		}
+
 		public void shutdown() {
 			inShutdown = true;
+		}
+
+		public int getLastResultIndex() {
+			return lastResultIndex;
+		}
+
+		public void setLastResultIndex(int lastResultIndex) {
+			this.lastResultIndex = lastResultIndex;
+		}
+		
+		public boolean startNewChunk(int i) {
+			return i > getLastResultIndex();
 		}
 		
 	}
