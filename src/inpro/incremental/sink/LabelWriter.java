@@ -6,6 +6,7 @@ import inpro.util.TimeUtil;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +26,9 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	@S4Boolean(defaultValue = false)
     public final static String PROP_WRITE_FILE = "writeToFile";
 	
+	@S4Boolean(defaultValue = false)
+    public final static String PROP_COMMITS_ONLY = "commitsOnly";	
+	
 	@S4Boolean(defaultValue = true)
     public final static String PROP_WRITE_STDOUT = "writeToStdOut";
 	
@@ -35,15 +39,18 @@ public class LabelWriter extends FrameAwarePushBuffer {
     public final static String PROP_FILE_NAME = "fileName";    
     
     private boolean writeToFile;
+    private boolean commitsOnly;
     private boolean writeToStdOut = true;
     private String filePath;
-    private String fileName;
+    private static String fileName;
     int frameOutput = -1;
-
-	
+    
+    ArrayList<IU> allIUs = new ArrayList<IU>();
+    
 	@Override	
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		writeToFile = ps.getBoolean(PROP_WRITE_FILE);
+		commitsOnly = ps.getBoolean(PROP_COMMITS_ONLY);
 		writeToStdOut = ps.getBoolean(PROP_WRITE_STDOUT);
 		filePath = ps.getString(PROP_FILE_PATH);
 		fileName = ps.getString(PROP_FILE_NAME);
@@ -56,18 +63,53 @@ public class LabelWriter extends FrameAwarePushBuffer {
 				currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
 		/* Then go through all the IUs, ignoring commits */
 		boolean added = false;
-		for (IU iu : ius) {
-			if (iu.isCommitted()) continue;
-			added = true;
-			toOut += "\n" + iu.toLabelLine();
+		for (EditMessage<? extends IU> edit : edits) {
+			IU iu = edit.getIU();
+			switch (edit.getType()) {
+			case ADD:
+				if (!commitsOnly) {
+					added = true;
+					toOut += "\n" + iu.toLabelLine();
+					allIUs.add(iu);
+				}
+				break;
+			case COMMIT:
+				if (commitsOnly) {
+					added = true;
+					toOut += "\n" + iu.toLabelLine();
+					allIUs.add(iu);
+				}
+				break;
+			case REVOKE:
+				allIUs.remove(iu);
+				break;
+			default:
+				break;
+			
+			}
+
 		}
+		
+		toOut = String.format(Locale.US, "Time: %.2f", 
+				currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
+		IU prevIU = null;
+		for (IU iu : allIUs) {
+			
+			if (prevIU != null && (iu.startTime() < prevIU.endTime())) {
+				toOut += "\n" + String.format(Locale.US,	"%.2f\t%.2f\t%s", prevIU.endTime(), iu.endTime(), iu.toPayLoad());
+			}
+			else toOut += "\n" + iu.toLabelLine();
+		
+			prevIU = iu;
+		}
+		
 		toOut += "\n\n";
 		/* If there were only commits, or if there are not IUs, then print out as specified */
 		if (ius.size() > 0 && added) { // && frameOutput != currentFrame) {
 			frameOutput = currentFrame;
 			if (writeToFile) {
 				try {
-					FileWriter writer = new FileWriter(filePath + "/" + fileName + ".inc_reco", true);
+					FileWriter writer = new FileWriter( fileName + ".inc_reco", true);
 					writer.write(toOut);
 					writer.close();
 				} catch (IOException e) {
@@ -81,7 +123,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	}
 	
 	/** A file name can be specified here, if not specified in the config file */
-	public void setFileName(String name) {
+	public static void setFileName(String name) {
 		fileName = name;
 	}
 
