@@ -1,5 +1,6 @@
 package inpro.incremental.sink;
 
+import inpro.apps.util.RecoCommandLineParser;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.util.TimeUtil;
@@ -53,7 +54,14 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		commitsOnly = ps.getBoolean(PROP_COMMITS_ONLY);
 		writeToStdOut = ps.getBoolean(PROP_WRITE_STDOUT);
 		filePath = ps.getString(PROP_FILE_PATH);
-		fileName = ps.getString(PROP_FILE_NAME);
+//		use the one given in the command line by default
+		fileName = RecoCommandLineParser.getLabelPath();
+//		otherwise, use the config file
+		String fileName2 = ps.getString(PROP_FILE_NAME);
+		if (!fileName2.isEmpty())
+			fileName = fileName2;
+		System.out.println("LabelWriter writing to " + fileName);
+		
 	}
 
 	@Override
@@ -105,7 +113,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		
 		toOut += "\n\n";
 		/* If there were only commits, or if there are not IUs, then print out as specified */
-		if (ius.size() > 0 && added) { // && frameOutput != currentFrame) {
+		if (edits.size() > 0 && added) { // && frameOutput != currentFrame) {
 			frameOutput = currentFrame;
 			if (writeToFile) {
 				try {
@@ -123,7 +131,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	}
 	
 	/** A file name can be specified here, if not specified in the config file */
-	public static void setFileName(String name) {
+	public void setFileName(String name) {
 		fileName = name;
 	}
 
@@ -131,6 +139,10 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	public void reset() {
 		super.reset();
 		frameOutput = -1;
+	}
+	
+	public void writeToFile() {
+		writeToFile = true;
 	}
 	
 }
