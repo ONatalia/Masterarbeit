@@ -30,7 +30,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	int incrementalMode;
 	int incrementalModifier;
 	String referenceText;
-	static String labelPath;
+	private static String labelPath;
 	
 	/* stores location of a grammar or SLM */ 
 	URL languageModelURL; 
@@ -190,7 +190,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				} 
 				else if (args[i].equals("-Lp")) {
 					i++;
-					labelPath = new String(args[i]);
+					setLabelPath(new String(args[i]));
 				} 					
 				else if (args[i].equals("-rt")) {
 					dataThrottle = true;
@@ -237,5 +237,13 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	
 	public boolean playAtRealtime() {
 		return dataThrottle;
+	}
+
+	public static String getLabelPath() {
+		return labelPath;
+	}
+
+	public static void setLabelPath(String labelPath) {
+		RecoCommandLineParser.labelPath = labelPath;
 	}	
 }
