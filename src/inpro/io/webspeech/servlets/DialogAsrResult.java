@@ -22,9 +22,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.json.simple.parser.ContainerFactory;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+//import org.json.simple.parser.ContainerFactory;
+//import org.json.simple.parser.JSONParser;
+//import org.json.simple.parser.ParseException;
 
 /**
  * @author casey
@@ -56,6 +56,7 @@ public class DialogAsrResult extends HttpServlet {
 	 */
     @Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	/*
 		if (prevResetThread != null) {
 			prevResetThread.interrupt();
 		}
@@ -133,6 +134,7 @@ public class DialogAsrResult extends HttpServlet {
         catch(ParseException pe){
           pe.printStackTrace();
         }
+        */
 	}
 
 	private ArrayList<AsrHyp> getHyps(String value) {
