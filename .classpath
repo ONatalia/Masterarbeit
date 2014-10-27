@@ -41,5 +41,8 @@
 	<classpathentry kind="lib" path="lib/common-for-convenience/jgraphx.jar"/>
 	<classpathentry kind="lib" path="lib/sphinx4/sphinx4.jar"/>
 	<classpathentry kind="lib" path="lib/common-for-convenience/commons-math3.jar"/>
+	<classpathentry kind="lib" path="lib/rsb-0.10.2.jar"/>
+	<classpathentry kind="lib" path="lib/rst-0.10.1.jar"/>
+	<classpathentry kind="lib" path="lib/protobuf-java-2.4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
