@@ -1,5 +1,6 @@
 package inpro.incremental.sink;
 
+import inpro.apps.util.RecoCommandLineParser;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.util.TimeUtil;
@@ -54,6 +55,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		writeToStdOut = ps.getBoolean(PROP_WRITE_STDOUT);
 		filePath = ps.getString(PROP_FILE_PATH);
 		fileName = ps.getString(PROP_FILE_NAME);
+		filePath = RecoCommandLineParser.getLabelPath();
 	}
 
 	@Override
@@ -92,8 +94,15 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		
 		toOut = String.format(Locale.US, "Time: %.2f", 
 				currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
+		IU prevIU = null;
 		for (IU iu : allIUs) {
-			toOut += "\n" + iu.toLabelLine();
+			
+			if (prevIU != null && (iu.startTime() < prevIU.endTime())) {
+				toOut += "\n" + String.format(Locale.US,	"%.2f\t%.2f\t%s", prevIU.endTime(), iu.endTime(), iu.toPayLoad());
+			}
+			else toOut += "\n" + iu.toLabelLine();
+		
+			prevIU = iu;
 		}
 		
 		toOut += "\n\n";

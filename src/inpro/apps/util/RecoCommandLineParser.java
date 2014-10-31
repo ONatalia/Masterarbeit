@@ -33,7 +33,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	
 	/* stores location of a grammar or SLM */ 
 	URL languageModelURL;
-	static String labelPath;
+	private static String labelPath;
 	
 	/**
 	 * @return the languageModelURL
@@ -80,7 +80,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -lm <URL>      recognize using the given language model");
 		System.err.println("                   (-fa, -tg, -gr, and -lm are exclusive)");
 		System.err.println("    -rt	           when reading from file, run no faster than real-time (includes VAD)");
-		System.err.println("    -Lp	           when set, will write the inc_reco file from LabelWriter to this path");
+		System.err.println("    -Lp	<text>     when set, will write the inc_reco file from LabelWriter to this path");
 	}
 
 	/**

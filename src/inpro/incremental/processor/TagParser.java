@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -50,9 +50,12 @@ public class TagParser extends IUModule {
 	private Map<TagIU,SITDBSParser> states = new HashMap<TagIU,SITDBSParser>();
 	
 	/** keeps track of all analyses (in order to be able to find the right IU for a given CA). */
-	private List<CandidateAnalysisIU> analyses = new ArrayList<CandidateAnalysisIU>();
+	private LinkedList<CandidateAnalysisIU> analyses = new LinkedList<CandidateAnalysisIU>();
+	
+	private HashMap<String, CandidateAnalysisIU> indexedAnalyses = new HashMap<String, CandidateAnalysisIU>();
 	
 	SITDBSParser p;
+	Grammar g;
 	//private String startSymbol; // was this used anywhere?
 	
 	@Override
@@ -65,7 +68,7 @@ public class TagParser extends IUModule {
 		
 		// load grammar
 		grammarFile = ps.getString(PROP_GRAMMAR);
-		Grammar g = new Grammar();
+		g = new Grammar();
 		try {
 			g.loadXML(new URL(grammarFile));
 			//startSymbol = g.getStart().getSymbol();
@@ -83,15 +86,17 @@ public class TagParser extends IUModule {
 	/** finds all payload-string-equal IUs for a given CandidateAnalysis **/
 	private List<CandidateAnalysisIU> findIU(CandidateAnalysis ca) {
 		List<CandidateAnalysisIU> l = new ArrayList<CandidateAnalysisIU>(1);
-		Iterator<CandidateAnalysisIU> i = analyses.iterator();
-		while(i.hasNext()) {
-			CandidateAnalysisIU iu = i.next();
+//		Iterator<CandidateAnalysisIU> i = analyses.iterator();
+//		while(i.hasNext()) {
+//			CandidateAnalysisIU iu = i.next();
 			//TODO this is a hack: I compare the fullstring-representation of the CAs. a better alternative would be to
 			// properly implement equal-like functions for CA and all subobjects.
-			if(ca.toFullString().equals(iu.getCandidateAnalysis().toFullString())) {
-				l.add(iu);
-			}
-		}
+//			if(ca.toFullString().equals(iu.getCandidateAnalysis().toFullString())) {
+			String fullString = ca.toFullString();
+			if (indexedAnalyses.containsKey(fullString))
+				l.add(indexedAnalyses.get(fullString));
+//			}
+//		}
 		return l;
 	}
 	
@@ -106,18 +111,26 @@ public class TagParser extends IUModule {
 					for (IU ca : tag.grounds()) {
 						if (ca.toPayLoad().equals(TagIU.FIRST_TAG_IU.toPayLoad())) {
 							analyses.clear();
+							states.clear();
+							indexedAnalyses.clear();
+							p = new SITDBSParser(g, baseBeamFactor);
+							p.setLogger(this.logger);
+							states.put(TagIU.FIRST_TAG_IU, p);							
 						}
 					}
 					break;
 					
 				case ADD:
-					
+					while (analyses.size() >  5) analyses.pop();
 					// TODO: find a better root element
 					TagIU previousTag = (TagIU) tag.getSameLevelLink();
 					assert previousTag != null;
 					if (previousTag.toPayLoad().equals(TagIU.FIRST_TAG_IU.toPayLoad())) {
 						analyses.clear();
 						states.clear();
+						indexedAnalyses.clear();
+						p = new SITDBSParser(g, baseBeamFactor);
+						p.setLogger(this.logger);
 						states.put(TagIU.FIRST_TAG_IU, p);
 					}
 //					System.out.println(tag + " " + previousTag + " " +this.states.get(previousTag));
@@ -131,6 +144,7 @@ public class TagParser extends IUModule {
 						CandidateAnalysisIU sll = CandidateAnalysisIU.FIRST_CA_IU;
 						CandidateAnalysis ante = ca.getAntecedent();
 						if (ante != null) {
+							prepareAntecedents();
 							List<CandidateAnalysisIU> potentialAntecedents = findIU(ante);
 							for (CandidateAnalysisIU potentialAnte : potentialAntecedents) {
 								if (potentialAnte != null && potentialAnte.groundedIn().contains(previousTag)) {
@@ -156,6 +170,12 @@ public class TagParser extends IUModule {
 			}
 		}
 		this.rightBuffer.setBuffer(newEdits);
+	}
+
+	private void prepareAntecedents() {
+		for (CandidateAnalysisIU ciu : analyses) {
+			indexedAnalyses.put(ciu.getCandidateAnalysis().toFullString(), ciu);
+		}
 	}
 
 	/** degrades the analysis encapsuled in the given CandidateAnalysisIU by the given malus **/

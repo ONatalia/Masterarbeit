@@ -34,6 +34,7 @@ public class Formula extends VariableEnvironment
 	
 	/** Variable Equalities */
 	private List<VariableIDPair> mEqs;
+
 	
 	public Formula(Formula f) {
 		// deep copy vars, not only copying collections
@@ -114,6 +115,10 @@ public class Formula extends VariableEnvironment
 				// TODO: cnt mismatches, reduce gracefully
 			}
 		}
+	}
+	
+	public Hook getMainHook() {
+		return this.mHook;
 	}
 	
 	public boolean isReduced () {

@@ -6,10 +6,15 @@ import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.FormulaIU;
 import inpro.incremental.unit.IU;
+import inpro.incremental.unit.IUList;
+import inpro.incremental.unit.RelationIU;
 import inpro.incremental.unit.TagIU;
 import inpro.incremental.unit.WordIU;
 import inpro.irmrsc.parser.CandidateAnalysis;
+import inpro.irmrsc.rmrs.Entity;
 import inpro.irmrsc.rmrs.Formula;
+import inpro.irmrsc.rmrs.Relation;
+import inpro.irmrsc.rmrs.Relation.Type;
 import inpro.irmrsc.rmrs.Variable;
 import inpro.irmrsc.util.RMRSLoader;
 import inpro.irmrsc.util.SemanticMacro;
@@ -142,6 +147,7 @@ public class RMRSComposer extends IUModule {
 	/** the semantic representation to start with */
 	private static FormulaIU firstUsefulFormulaIU;	
 	
+	IUList<RelationIU> prevList;
 	TreeSet<String> acceptedEntityTypes;
 	
 	
@@ -150,6 +156,7 @@ public class RMRSComposer extends IUModule {
 	public void newProperties(PropertySheet ps) throws PropertyException {		
 		super.newProperties(ps);
 		
+		prevList = new IUList<RelationIU>(); // start off with an empty word list so the diff is all the new stuff
 		acceptedEntityTypes  = new TreeSet<String>(); 
 		acceptedEntityTypes.add("e");
 		acceptedEntityTypes.add("x");
@@ -269,7 +276,6 @@ public class RMRSComposer extends IUModule {
 		List<EditMessage<FormulaIU>> newEdits = new ArrayList<EditMessage<FormulaIU>>();
 		boolean iGotAdds = false;
 		for (EditMessage<? extends IU> edit : edits) {
-			
 			CandidateAnalysisIU ca = (CandidateAnalysisIU) edit.getIU();
 			switch (edit.getType()) {
 				case REVOKE:
@@ -302,20 +308,11 @@ public class RMRSComposer extends IUModule {
 					
 					// ## 1. find antecedent IUs
 					CandidateAnalysisIU previousCa = (CandidateAnalysisIU) ca.getSameLevelLink();
-					if (previousCa.toPayLoad().equals(CandidateAnalysisIU.FIRST_CA_IU.toPayLoad())) {
-						states.clear();
-						states.put(CandidateAnalysisIU.FIRST_CA_IU,firstUsefulFormulaIU);
-					}
-					
 					if (previousCa != null) {
 						FormulaIU previousFIU = firstUsefulFormulaIU;
 						if (previousCa.grounds().size() > 0) {
 							previousFIU = states.get(previousCa);
-							if (previousFIU == null)
-								previousFIU = firstUsefulFormulaIU;
 						}
-						
-						
 						List<String> lastDerive = ca.getCandidateAnalysis().getLastDerive();
 						//logger.debug(logPrefix+"-------");
 						//System.err.println("-------: "+lastDerive.toString());
@@ -581,7 +578,39 @@ public class RMRSComposer extends IUModule {
 		}
 		
 		// finish
-
+		
+		
+//		IUList<RelationIU> list = new IUList<RelationIU>();
+//		
+//		for (EditMessage<FormulaIU> formulaEdit : newEdits) {
+//			System.out.println(formulaEdit.getIU().getFormula().toRMRSString());
+//			
+//			Formula formula = formulaEdit.getIU().getFormula();
+//			RelationIU prev = RelationIU.FIRST_RELATION_IU;
+//		
+//			for (Relation relation : formula.getRelations()) {
+//	
+//				RelationIU riu = new RelationIU(relation, formula);
+//				riu.groundIn(formulaEdit.getIU().grounds());
+//				riu.setSameLevelLink(prev);
+//				list.add(riu);
+//				
+//				prev = riu;
+//				
+//			}
+//			break;
+//		
+//		}
+		
+//		List<EditMessage<RelationIU>> diffs = prevList.diffByPayload(list);
+//		prevList = list;
+//		
+//		
+//		for (EditMessage<RelationIU> iu : diffs) {
+//			System.out.println(iu);
+//		}
+//		System.out.println();
+		
 		this.rightBuffer.setBuffer(newEdits);
 	}
 
@@ -667,20 +696,5 @@ public class RMRSComposer extends IUModule {
 		return this.resolver;
 		
 	}	
-	
-	private WordIU getWordIU(IU iu) {
-		while (! (iu instanceof WordIU)) {
-			iu = iu.groundedIn().get(0);
-		}
-		return (WordIU)iu;
-	}
-	
-	public boolean isFirstIU(IU wordIU) {
-		return wordIU.toPayLoad().equals(WordIU.FIRST_WORD_IU.toPayLoad());
-	}
-	
-	private boolean isFirst(IU iu) {
-		return isFirstIU(getWordIU(iu).getSameLevelLink());
-	}
 
 }
