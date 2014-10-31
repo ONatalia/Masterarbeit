@@ -1,0 +1,33 @@
+Setting InstantIO prefix: InproTK
+Setting InstantIO port: 54445
+Setting InstantIO servers: 127.0.0.1:54444
+Adding outslot: QA with namespace Comprehension
+Adding namespace: Comprehension
+Adding outslot: Thing with namespace Comprehension
+Setting InstantIO prefix: InproTK
+Setting InstantIO port: 54445
+Setting InstantIO servers: 127.0.0.1:54444
+Adding outslot: QA with namespace Comprehension
+Adding namespace: Comprehension
+Adding outslot: Thing with namespace Comprehension
+Setting InstantIO prefix: InproTK
+Setting InstantIO port: 54445
+Setting InstantIO servers: 127.0.0.1:54444
+Starting InstantIO...
+Adding outslot: QA with namespace Comprehension
+Adding namespace: Comprehension
+Adding outslot: Thing with namespace Comprehension
+Setting InstantIO prefix: InproTK
+Setting InstantIO port: 54445
+Setting InstantIO servers: 127.0.0.1:54444
+Starting InstantIO...
+Adding outslot: QA with namespace Comprehension
+Adding namespace: Comprehension
+Adding outslot: Thing with namespace Comprehension
+Leaving ASR filter at config-file's value.
+Loading recognizer...
+Setting up source...
+Cannot connect to TEDview. I will not retry.
+Setting up monitors...
+Allocating recognizer...
+Configuration has finished

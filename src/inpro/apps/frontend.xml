@@ -52,6 +52,10 @@
     </component>
  
     <component name="RTPDataSource" type="inpro.sphinx.frontend.RtpRecvProcessor"/>
+    
+    <component name="RsbStreamInputSource" type="inpro.sphinx.frontend.RsbStreamInputSource">
+        <property name="scope" value="/home/wardrobe/audio/in/16bit/16000Hz/LE"/>
+    </component>
 
 	<component name="dataThrottle" type="inpro.sphinx.frontend.DataThrottle">
 		<property name="speed" value="1.0"/>

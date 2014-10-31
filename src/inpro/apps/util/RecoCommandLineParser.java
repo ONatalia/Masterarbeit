@@ -58,6 +58,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -f             force operation, i.e. try to ignore all errors");
 		System.err.println("input selection:");
 		System.err.println("    -M             read data from microphone");
+		System.err.println("    -S             read data from RsbStreamInput");
 		System.err.println("    -R <port>      read data from RTP");
 		System.err.println("    -F <fileURL>   read data from sound file with given URL");
 //		System.err.println("dialogue system options:");
@@ -140,6 +141,9 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				}
 				else if (args[i].equals("-M")) { 
 					inputMode = MICROPHONE_INPUT;
+				}
+				else if (args[i].equals("-S")) { 
+					inputMode = STREAM_INPUT;
 				}
 				else if (args[i].equals("-R")) {
 					inputMode = RTP_INPUT;
