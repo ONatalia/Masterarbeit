@@ -32,8 +32,6 @@
 	<classpathentry kind="lib" path="lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="lib" path="lib/oaa2/antlr-oaa.jar"/>
 	<classpathentry kind="lib" path="lib/oaa2/oaa2.jar"/>
-	<classpathentry kind="lib" path="lib/io/venice-java.jar"/>
-	<classpathentry kind="lib" path="lib/io/instantreality.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat/annotations-api.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat/bootstrap.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat/catalina-ant.jar"/>
@@ -60,23 +58,21 @@
 	<classpathentry kind="lib" path="lib/tomcat/websocket-api.jar"/>
 	<classpathentry kind="lib" path="lib/tomcat/json-simple-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/ws-commons-util-1.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/xmlrpc/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/jspud.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/oaa2/backport-util-concurrent.jar"/>
-	<classpathentry kind="lib" path="lib/xmlrpc/xmlrpc-client-3.1.3.jar"/>
-	<classpathentry kind="lib" path="lib/xmlrpc/xmlrpc-common-3.1.3.jar"/>
-	<classpathentry kind="lib" path="lib/xmlrpc/xmlrpc-server-3.1.3.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.10.jar"/>
 	<classpathentry kind="lib" path="lib/common-for-convenience/jgraphx.jar"/>
 	<classpathentry kind="lib" path="lib/sphinx4/sphinx4.jar"/>
 	<classpathentry kind="lib" path="lib/common-for-convenience/commons-math3.jar"/>
-<<<<<<< HEAD
-	<classpathentry kind="lib" path="lib/io/rsb-0.10.0.jar"/>
-=======
-	<classpathentry kind="lib" path="lib/rsb-0.10.2.jar"/>
-	<classpathentry kind="lib" path="lib/rst-0.10.1.jar"/>
-	<classpathentry kind="lib" path="lib/protobuf-java-2.4.1.jar"/>
->>>>>>> branch 'master' of https://bakuzen@bitbucket.org/dsgbielefeld/inprotk.git
+	<classpathentry kind="lib" path="lib/remote/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/remote/instantreality.jar"/>
+	<classpathentry kind="lib" path="lib/remote/protobuf-java-2.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/remote/rsb-0.10.2.jar"/>
+	<classpathentry kind="lib" path="lib/remote/rst-0.10.1.jar"/>
+	<classpathentry kind="lib" path="lib/remote/venicelib.jar"/>
+	<classpathentry kind="lib" path="lib/remote/xmlrpc-client-3.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/remote/xmlrpc-common-3.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/remote/xmlrpc-server-3.1.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
