@@ -196,15 +196,16 @@ public class SimpleReco {
 				if (clp.playAtRealtime()) {
 					DataProcessor throttle = (DataProcessor) cm.lookup("dataThrottle");
 					throttle.initialize();
-					DataProcessor feMonitor = (DataProcessor) cm.lookup("feMonitor");
-					feMonitor.initialize();
-					setupVuMeter();
+//					DataProcessor feMonitor = (DataProcessor) cm.lookup("feMonitor");
+//					feMonitor.initialize();
+//					setupVuMeter();
 					DataProcessor endpointing = (DataProcessor) cm.lookup("endpointing");
 					endpointing.initialize();
 					throttle.setPredecessor(sds);
-					vumeter.setPredecessor(throttle);
-					feMonitor.setPredecessor(vumeter);
-					endpointing.setPredecessor(feMonitor);
+//					vumeter.setPredecessor(throttle);
+//					feMonitor.setPredecessor(vumeter);
+//					endpointing.setPredecessor(feMonitor);
+					endpointing.setPredecessor(throttle);
 					fe.setPredecessor(endpointing);
 				} else {
 					fe.setPredecessor(sds);
