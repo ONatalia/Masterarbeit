@@ -30,17 +30,18 @@ import org.apache.log4j.Logger;
  */
 public abstract class MaryAdapter {
 
-	enum CompatibilityMode { MARY36EXTERNAL, MARY4EXTERNAL, MARY4INTERNAL;	
+	enum CompatibilityMode { MARY36EXTERNAL, MARY4EXTERNAL, MARY4INTERNAL, MARY5INTERNAL;	
 		public static CompatibilityMode fromString(String mode) {
 			if ("3".equals(mode)) return MARY36EXTERNAL;
 			if ("4".equals(mode)) return MARY4EXTERNAL; 
 			if ("internal".equals(mode)) return MARY4INTERNAL;
+			if ("internal5".equals(mode)) return MARY5INTERNAL;
 			return MARY4INTERNAL;
 		}
 	}
 	
 	public static CompatibilityMode compatibilityMode = CompatibilityMode.fromString(
-								System.getProperty("mary.version", "internal"));
+								System.getProperty("mary.version", "internal5"));
 
     private static Logger logger = Logger.getLogger(MaryAdapter.class);
 
@@ -68,6 +69,13 @@ public abstract class MaryAdapter {
 					logger.info("could not start MaryAdapter41internal");
 					e.printStackTrace();
 				}
+			case MARY5INTERNAL:
+				try {
+					maryAdapter = new MaryAdapter5internal();
+				} catch (Exception e) {
+					logger.info("could not start MaryAdapter51internal");
+					e.printStackTrace();
+				}	
 			}
 		} catch (IOException e) {
 			logger.info("could not start external Mary Adapter");

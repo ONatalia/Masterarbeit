@@ -78,7 +78,7 @@ public class PHTSParameterGeneration {
 			} else
 				pStreamMap.put(type, calculateNormalStream(hmms, type));
 		}
-		return new HTSFullPStream(pStreamMap.get(FeatureType.MCP), 
+		return new HTSFullPStream(pStreamMap.get(FeatureType.MGC), 
 								  pStreamMap.get(FeatureType.STR),
 								  pStreamMap.get(FeatureType.MAG),
 								  pStreamMap.get(FeatureType.LF0),
@@ -90,9 +90,15 @@ public class PHTSParameterGeneration {
 		assert type != FeatureType.LF0;
 		CartTreeSet ms = htsData.getCartTreeSet();
 		// initialize pStream
-		int maxIterationsGV = (type == FeatureType.MCP) ? htsData.getMaxMgcGvIter() : htsData.getMaxLf0GvIter();
+		int maxIterationsGV = (type == FeatureType.MGC) ? htsData.getMaxMgcGvIter() : htsData.getMaxLf0GvIter();
 		int length = lengthOfEmissions(hmms, type);
-		HTSPStream pStream = new HTSPStream(ms.getVsize(type), length, type, maxIterationsGV);
+		HTSPStream pStream = null;
+		try {
+			pStream = new HTSPStream(ms.getVsize(type), length, type, maxIterationsGV);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// fill in data into pStream
 		int uttFrame = 0; // count all frames
 		for (HTSModel hmm : hmms) {
@@ -126,7 +132,13 @@ public class PHTSParameterGeneration {
 			voicedLength += hmm.getNumVoiced();
 			totalLength += hmm.getTotalDur();
 		}
-		HTSPStream pStream = new HTSPStream(ms.getLf0Stream(), voicedLength, FeatureType.LF0, maxIterationsGV);
+		HTSPStream pStream = null;
+		try {
+			pStream = new HTSPStream(ms.getLf0Stream(), voicedLength, FeatureType.LF0, maxIterationsGV);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// figure out voicing
 		int uttFrame = 0; // count all frames
 		int lf0Frame = 0; // count all voiced frames
@@ -167,13 +179,14 @@ public class PHTSParameterGeneration {
 	}
 
 	private boolean useGVperType(FeatureType type) {
-		switch (type) {
-		case STR: return htsData.getUseGV() && htsData.getPdfStrGVFile() != null;
-		case MAG: return htsData.getUseGV() && htsData.getPdfMagGVFile() != null;
-		//TODO: find out why GV for MCP doesn't work and make it work 
-		case MCP: return false; //htsData.getUseGV(); // for some reason, MCP GV does not work incrementally!
-		default: return htsData.getUseGV(); // LF0 and DUR
-		}
+//		switch (type) {
+//		case STR: return htsData.getUseGV() && htsData.getPdfStrGVStream() != null;
+//		case MAG: return htsData.getUseGV() && htsData.getPdfMagGVStream() != null;
+//		//TODO: find out why GV for MCP doesn't work and make it work 
+//		case MGC: return false; //htsData.getUseGV(); // for some reason, MCP GV does not work incrementally!
+//		default: return htsData.getUseGV(); // LF0 and DUR
+//		}
+		return false;
 	}
 
 	private static int lengthOfEmissions(List<HTSModel> hmms, FeatureType type) {

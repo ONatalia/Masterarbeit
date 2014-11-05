@@ -3,7 +3,7 @@ package inpro.incremental.unit;
 import inpro.annotation.Label;
 import inpro.audio.DDS16kAudioInputStream;
 import inpro.synthesis.MaryAdapter;
-import inpro.synthesis.MaryAdapter4internal;
+import inpro.synthesis.MaryAdapter5internal;
 import inpro.synthesis.hts.FullPFeatureFrame;
 import inpro.synthesis.hts.FullPStream;
 import inpro.synthesis.hts.IUBasedFullPStream;
@@ -104,7 +104,7 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	public AudioInputStream getAudio() {
         boolean immediateReturn = true;
-		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), MaryAdapter4internal.getDefaultHMMData(), immediateReturn);
+		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), MaryAdapter5internal.getDefaultHMMData(), immediateReturn);
         return new DDS16kAudioInputStream(vas);
 	}
 	

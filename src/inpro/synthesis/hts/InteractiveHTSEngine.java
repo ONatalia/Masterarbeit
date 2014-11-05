@@ -1,7 +1,7 @@
 package inpro.synthesis.hts;
 
 import inpro.incremental.util.TTSUtil.SynthesisPayload;
-import inpro.synthesis.MaryAdapter4internal;
+import inpro.synthesis.MaryAdapter5internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class InteractiveHTSEngine extends HTSEngine {
         /** The utterance model, um, is a Vector (or linked list) of Model objects. 
          * It will contain the list of models for current label file. */
         /* Process label file of Mary context features and creates UttModel um */
-        HTSUttModel um = processTargetList(targetFeaturesList, segmentsAndBoundaries, MaryAdapter4internal.getDefaultHMMData());
+        HTSUttModel um = processTargetList(targetFeaturesList, segmentsAndBoundaries, MaryAdapter5internal.getDefaultHMMData());
         assert um.getNumModel() == targetFeaturesList.size() : "UttModel size is " + um.getNumModel() + ", but targetFeaturesList size is " + targetFeaturesList.size();
         for (int i = 0; i < um.getNumModel(); i++) {
         	uttData.add(new SynthesisPayload(targetFeaturesList.get(i).getFeatureVector(), um.getUttModel(i), ((HMMVoice)d.getDefaultVoice()).getHMMData()));
@@ -50,13 +50,13 @@ public class InteractiveHTSEngine extends HTSEngine {
             // Generate sequence of speech parameter vectors, generate parameters out of sequence of pdf's  
             // # non-incremental MaryTTS version:
             /**/ HTSParameterGeneration npdf2par = new HTSParameterGeneration();
-            npdf2par.htsMaximumLikelihoodParameterGeneration(um, MaryAdapter4internal.getDefaultHMMData());
+            npdf2par.htsMaximumLikelihoodParameterGeneration(um, MaryAdapter5internal.getDefaultHMMData());
             FullPStream pstream = new HTSFullPStream(npdf2par); /**/
             // # incremental pHTS version:
-            /* PHTSParameterGeneration pdf2par = MaryAdapter4internal.getNewParamGen(); // new PHTSParameterGeneration(hmmv.getHMMData());
+            /* PHTSParameterGeneration pdf2par = MaryAdapter5internal.getNewParamGen(); // new PHTSParameterGeneration(hmmv.getHMMData());
             FullPStream pstream = pdf2par.buildFullPStreamFor(uttHMMs); /**/
 	        /* Vocode speech waveform out of sequence of parameters */
-	        DoubleDataSource dds = new VocodingAudioStream(pstream, MaryAdapter4internal.getDefaultHMMData(), returnIncrementalAudioStream);
+	        DoubleDataSource dds = new VocodingAudioStream(pstream, MaryAdapter5internal.getDefaultHMMData(), returnIncrementalAudioStream);
 	        float sampleRate = 16000.0F;  //8000,11025,16000,22050,44100
 	        int sampleSizeInBits = 16;  //8,16
 	        int channels = 1;     //1,2

@@ -18,8 +18,13 @@ public class HTSFullPStream extends FullPStream {
     public HTSFullPStream(HTSPStream mcepPst, HTSPStream strPst, HTSPStream magPst, HTSPStream lf0Pst, boolean[] voiced) {
         this.mcepPst = mcepPst;
         this.strPst = strPst;
-        this.magPst = magPst != null ? magPst : new EmptyHTSPStream();
-        this.lf0Pst = lf0Pst != null ? lf0Pst : new EmptyHTSPStream();
+        try {
+			this.magPst = magPst != null ? magPst : new EmptyHTSPStream();
+	        this.lf0Pst = lf0Pst != null ? lf0Pst : new EmptyHTSPStream();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         this.voiced = voiced;
         if (voiced != null && lf0Pst != null) {
 	        lf0indices = new int[voiced.length];
@@ -63,7 +68,7 @@ public class HTSFullPStream extends FullPStream {
 
     	private double[] emptyParVec = new double[] {};
     	
-		public EmptyHTSPStream() {
+		public EmptyHTSPStream() throws Exception {
 			super(0, 0, null, 0);
 		}
 		

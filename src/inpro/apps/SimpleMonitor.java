@@ -145,7 +145,7 @@ public class SimpleMonitor implements RtpListener {
 	/** defines the supported audio format */
     AudioFormat getFormat() {
         AudioFormat.Encoding encoding = AudioFormat.Encoding.PCM_SIGNED;
-		float rate = 16000.f;
+		float rate = 32000.f;
 		int sampleSize = 16;
 		int channels = 1;
 		boolean bigEndian = clp.isInputMode(MonitorCommandLineParser.RTP_INPUT);

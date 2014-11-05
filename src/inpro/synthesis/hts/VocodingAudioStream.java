@@ -188,7 +188,7 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
         double[] xpulseSignal = null;
         double[] xnoiseSignal = null;
         
-        if (mixedExcitation && htsData.getPdfStrFile() != null ) {  
+        if (mixedExcitation && htsData.getPdfStrStream() != null ) {  
           xpulseSignal = new double[orderM];
           xnoiseSignal = new double[orderM];
           /* initialise xp_sig and xn_sig */ // -> automatically initialized to 0.0
@@ -206,7 +206,7 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
         } else
           HTSVocoder.logger.info("HMM speech generation without mixed-excitation.");  
         
-        if( fourierMagnitudes && htsData.getPdfMagFile() != null)
+        if( fourierMagnitudes && htsData.getPdfMagStream() != null)
           HTSVocoder.logger.info("Pulse generated with Fourier Magnitudes.");
         else
           HTSVocoder.logger.info("Pulse generated as a unit pulse.");
@@ -288,7 +288,7 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
           
           if (stage == 0){         
             /* postfiltering, this is done if beta>0.0 */
-            HTSVocoder.postfilter_mcp(mc, (mcepOrder-1), alpha, beta);
+            HTSVocoder.postfilter_mgc(mc, (mcepOrder-1), alpha, beta);
             /* mc2b: transform mel-cepstrum to MLSA digital filter coefficients */   
             HTSVocoder.mc2b(mc, CC, (mcepOrder-1), alpha);
             for (int i = 0; i < mcepOrder; i++)

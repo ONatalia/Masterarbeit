@@ -13,7 +13,7 @@ public class DDS16kAudioInputStream extends DDSAudioInputStream {
         int channels = 1;     //1,2
         boolean signed = true;    //true,false
         boolean bigEndian = false;  //true,false */
-		super(source, new AudioFormat(16000.0F, 16, 1, true, false));
+		super(source, new AudioFormat(32000.0F, 16, 1, true, false));
 	}
 	
 	@Override
