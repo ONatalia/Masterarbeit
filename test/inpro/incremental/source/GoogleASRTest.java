@@ -12,6 +12,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import inpro.apps.SimpleReco;
 import inpro.apps.util.RecoCommandLineParser;
 import inpro.incremental.IUModule;
+import inpro.incremental.sink.CurrentHypothesisViewer;
 import inpro.incremental.sink.LabelWriter;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
@@ -37,6 +38,7 @@ public class GoogleASRTest {
 		gasr.addListener(label);
 		MyIUModule mymod = new MyIUModule();
 		gasr.addListener(mymod);
+		gasr.addListener(new CurrentHypothesisViewer().show());
 		gasr.recognize();
 		assertTrue(mymod.wordsToBeRecognized.isEmpty());
 	}

@@ -289,11 +289,10 @@ public class GoogleASR extends IUSourceModule {
 			
 //			The diffs represents what edits it takes to get from prevList to list, send that to the right buffer
 			System.out.println(diffs);
-			for (PushBuffer listener : iulisteners) {
-				// update frame count in frame-aware pushbuffers
-				if (diffs != null && !diffs.isEmpty())
-					listener.hypChange(null, diffs);
+			if (diffs != null && !diffs.isEmpty()) {
+				rightBuffer.setBuffer(diffs);
 			}
+			notifyListeners();
 		}
 		
 		public double getTimestamp() {
