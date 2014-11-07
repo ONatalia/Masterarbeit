@@ -6,34 +6,23 @@ import inpro.incremental.util.TTSUtil;
 import inpro.synthesis.hts.InteractiveHTSEngine;
 import inpro.synthesis.hts.PHTSParameterGeneration;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.Result;
 
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
 
 import marytts.LocalMaryInterface;
 import marytts.MaryInterface;
 import marytts.datatypes.MaryDataType;
 import marytts.exceptions.MaryConfigurationException;
-import marytts.exceptions.SynthesisException;
 import marytts.htsengine.HMMData;
 import marytts.htsengine.HMMVoice;
 import marytts.modules.ModuleRegistry;
@@ -43,11 +32,9 @@ import marytts.util.MaryUtils;
 
 public class MaryAdapter5internal extends MaryAdapter {
 
-	public static final String DEFAULT_VOICE = System.getProperty("mary.voice",
-			"bits1-hsmm");
+	public static final String DEFAULT_VOICE = System.getProperty("mary.voice", "bits1-hsmm");
 	private static MaryAdapter maryAdapter;
 	private MaryInterface maryInterface;
-	private String voice;
 
 	private static Logger logger = Logger.getLogger(MaryAdapter5internal.class);
 
@@ -56,14 +43,9 @@ public class MaryAdapter5internal extends MaryAdapter {
 		try {
 			maryInterface = new LocalMaryInterface();
 		} catch (MaryConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.exit(0);
+			throw new RuntimeException(e);
 		}
-		Set<String> voices = maryInterface.getAvailableVoices();
-		voice = voices.iterator().next();
-		maryInterface.setVoice(voice);
-
 	}
 
 	@Override
@@ -74,12 +56,14 @@ public class MaryAdapter5internal extends MaryAdapter {
 		MaryDataType input = MaryDataType.get(inputType);
 		MaryDataType output = MaryDataType.get(outputType);
 
-		Locale mLocale = MaryUtils.string2locale(System.getProperty(
-				"inpro.tts.language", "de"));
+		Locale mLocale = MaryUtils.string2locale(System.getProperty("inpro.tts.language", "de"));
 		String voiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
-		Voice acVoice = Voice.getVoice(voice);
-		AudioFormat audioFormat = acVoice.dbAudioFormat();
+		maryInterface.setVoice(voiceName);
+		Voice voice = Voice.getVoice(voiceName);
+		AudioFormat audioFormat = voice.dbAudioFormat();
 
+		audioFormat = new AudioFormat(16000, audioFormat.getSampleSizeInBits(), audioFormat.getChannels(), true, audioFormat.isBigEndian());
+		assert audioFormat.getSampleRate() == 16000f : "InproTK cannot handle voices with sample rates other than 16000Hz, your's is " + audioFormat.getSampleRate();
 		logger.debug("audioFormat is " + audioFormat);
 		logger.debug("query is " + query);
 		assert voice != null : "Cannot find the Mary voice " + voiceName;
@@ -90,7 +74,7 @@ public class MaryAdapter5internal extends MaryAdapter {
 				audioFileFormatType, audioFormat, AudioSystem.NOT_SPECIFIED);
 		logger.trace("audioFileFormat is " + audioFileFormat);
 
-		Request req = new Request(input, output, mLocale, acVoice, (String) null,
+		Request req = new Request(input, output, mLocale, voice, (String) null,
 				(String) null, 1, audioFileFormat);
 
 		 try {
@@ -110,46 +94,6 @@ public class MaryAdapter5internal extends MaryAdapter {
 		return maryAdapter;
 	}
 
-	public static void initializeMary() {
-		maryAdapter = new MaryAdapter5internal();
-
-	}
-
-	public InputStream text2maryxml() {
-		Document doc = null;
-		try {
-			doc = maryInterface.generateXML("Test");
-		} catch (SynthesisException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		Source xmlSource = new DOMSource(doc);
-		Result outputTarget = new StreamResult(outputStream);
-		try {
-			TransformerFactory.newInstance().newTransformer()
-					.transform(xmlSource, outputTarget);
-		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TransformerFactoryConfigurationError e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		InputStream is = new ByteArrayInputStream(outputStream.toByteArray());
-		return is;
-	}
-
-	public Document text2maryxmlDoc() {
-		try {
-			return maryInterface.generateXML("Test");
-		} catch (SynthesisException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
 	@Override
 	public synchronized List<IU> text2IUs(String tts) {
 		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class);
@@ -157,7 +101,7 @@ public class MaryAdapter5internal extends MaryAdapter {
 		ihtse.synthesizeAudio = false;
 		InputStream is = text2maryxml(tts);
       // useful code for looking at Mary's XML (for debugging): 
-/*		BufferedReader in = new BufferedReader(new InputStreamReader(is));
+/*		java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(is));
 		String line = null;
 		try {
 			while((line = in.readLine()) != null) {
@@ -182,7 +126,7 @@ public class MaryAdapter5internal extends MaryAdapter {
 		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class);
 		ihtse.resetUttHMMstore();
 		InputStream is = text2maryxml(tts);
-/*		BufferedReader in = new BufferedReader(new InputStreamReader(is));
+/*		java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(is));
 		String line = null;
 		try {
 			while((line = in.readLine()) != null) {
