@@ -75,6 +75,7 @@ public class SynthesisModuleAdaptationUnitTest extends SynthesisModuleUnitTest {
 	@Override public void testPreSynthesisTiming() {}	
 	@Override public void testAddWordOnUpdate() {}
 	@Override public void testHesitations() {}
-	@Override public void testInternationalisation() {}
+	@Override public void testInternationalisationUS() {}
+	@Override public void testInternationalisationGB() {}
 	
 }

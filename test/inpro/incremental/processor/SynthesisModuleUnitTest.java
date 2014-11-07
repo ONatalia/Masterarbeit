@@ -223,7 +223,7 @@ public class SynthesisModuleUnitTest {
 	 * test en_US and en_GB
 	 */
 	@Test(timeout=60000)
-	public void testInternationalisation() {
+	public void testInternationalisationGB() {
 		String voice = System.getProperty("inpro.tts.voice");
 		String language = System.getProperty("inpro.tts.language");
 		System.setProperty("inpro.tts.voice", "dfki-prudence-hsmm");
@@ -231,9 +231,22 @@ public class SynthesisModuleUnitTest {
         myIUModule.addIUAndUpdate(new ChunkIU("I can also speak in British English."));
         dispatcher.waitUntilDone();
 		myIUModule.reset();
+        System.setProperty("inpro.tts.voice", voice);
+        System.setProperty("inpro.tts.language", language);
+	}
+
+	/**
+	 * test en_US and en_GB
+	 */
+	@Test(timeout=60000)
+	public void testInternationalisationUS() {
+		String voice = System.getProperty("inpro.tts.voice");
+		String language = System.getProperty("inpro.tts.language");
 		System.setProperty("inpro.tts.voice", "cmu-slt-hsmm");
         System.setProperty("inpro.tts.language", "en_US");
         myIUModule.addIUAndUpdate(new ChunkIU("I can also speak with an American accent."));
+        dispatcher.waitUntilDone();
+		myIUModule.reset();
         System.setProperty("inpro.tts.voice", voice);
         System.setProperty("inpro.tts.language", language);
 	}
