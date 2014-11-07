@@ -1,5 +1,7 @@
 package inpro.audio;
 
+import inpro.synthesis.hts.VocodingAudioStream;
+
 import java.io.IOException;
 import java.net.URL;
 
@@ -30,6 +32,13 @@ public class AudioUtils {
 	        ais = AudioSystem.getAudioInputStream(audioFileURL);
 		}
 		return ais;
+	}
+	
+	public static AudioInputStream get16kAudioStreamForVocodingStream(VocodingAudioStream source) {
+		if (source.getSamplingRate() == 16000) {
+			return new DDS16kAudioInputStream(source);
+		}
+		return new DDS16kAudioInputStream(source);
 	}
 	
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 import inpro.apps.SimpleMonitor;
 import inpro.apps.util.MonitorCommandLineParser;
-import inpro.audio.DDS16kAudioInputStream;
+import inpro.audio.AudioUtils;
 import inpro.audio.DispatchStream;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.PhraseIU;
@@ -71,7 +71,7 @@ public class InterspeechExperimenter {
 		phrases = constructIncrementalProsody(text, true); // set second parameter to true for w_n-1 condition, to false for w_n condition 
 		IUBasedFullPStream pstream = new IUBasedFullPStream(phrases.get(0));
 		VocodingAudioStream vas = new VocodingAudioStream(pstream, MaryAdapter5internal.getDefaultHMMData(), true);
-		ds.playStream(new DDS16kAudioInputStream(vas));
+		ds.playStream(AudioUtils.get16kAudioStreamForVocodingStream(vas));
 		ds.waitUntilDone();
 		return phrases.size();
 	}

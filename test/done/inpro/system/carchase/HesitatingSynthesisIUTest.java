@@ -1,7 +1,7 @@
 package done.inpro.system.carchase;
 
 import inpro.apps.SimpleMonitor;
-import inpro.audio.DDS16kAudioInputStream;
+import inpro.audio.AudioUtils;
 import inpro.audio.DispatchStream;
 import inpro.synthesis.MaryAdapter;
 import inpro.synthesis.MaryAdapter5internal;
@@ -19,7 +19,7 @@ public class HesitatingSynthesisIUTest {
 		MaryAdapter.getInstance();
 		DispatchStream dispatcher = SimpleMonitor.setupDispatcher();
 		HesitationIU hes = new HesitationIU(null);
-		dispatcher.playStream(new DDS16kAudioInputStream(new VocodingAudioStream(new IUBasedFullPStream(hes), MaryAdapter5internal.getDefaultHMMData(), true)), false);
+		dispatcher.playStream(AudioUtils.get16kAudioStreamForVocodingStream(new VocodingAudioStream(new IUBasedFullPStream(hes), MaryAdapter5internal.getDefaultHMMData(), true)), false);
 		dispatcher.waitUntilDone();
 		dispatcher.shutdown();
 	}

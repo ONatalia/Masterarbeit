@@ -476,4 +476,8 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
         return d / maxAmplitude;
     } 
     
+    public int getSamplingRate() {
+    	return htsData.getRate();
+    }
+    
 }

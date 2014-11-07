@@ -1,7 +1,7 @@
 package inpro.incremental.unit;
 
 import inpro.annotation.Label;
-import inpro.audio.DDS16kAudioInputStream;
+import inpro.audio.AudioUtils;
 import inpro.synthesis.MaryAdapter;
 import inpro.synthesis.MaryAdapter5internal;
 import inpro.synthesis.hts.FullPFeatureFrame;
@@ -105,7 +105,7 @@ public class SysInstallmentIU extends InstallmentIU {
 	public AudioInputStream getAudio() {
         boolean immediateReturn = true;
 		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), MaryAdapter5internal.getDefaultHMMData(), immediateReturn);
-        return new DDS16kAudioInputStream(vas);
+        return AudioUtils.get16kAudioStreamForVocodingStream(vas);
 	}
 	
 	public String toMbrola() {
