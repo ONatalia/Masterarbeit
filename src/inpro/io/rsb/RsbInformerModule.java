@@ -1,5 +1,6 @@
 package inpro.io.rsb;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,8 +42,8 @@ public class RsbInformerModule extends IUModule {
 		logger.info("Informing on scope: " + fullScope);
 //		this Informer comes from the DSG venice wrapper over RSB.
 
-		AbstractSlot[] slots = new AbstractSlot[1];
-		slots[0] = new AbstractSlot(fullScope, String.class);
+		ArrayList<AbstractSlot> slots = new ArrayList<AbstractSlot>();
+		slots.add(new AbstractSlot(fullScope, String.class));
 		RSBNamespaceBuilder.initializeOutSlot(slots);
 		
 		this.setID(ps.getString(ID_PROP));

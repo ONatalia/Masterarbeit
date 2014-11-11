@@ -38,8 +38,9 @@ public class RsbListenerModule extends ListenerModule implements AbstractSlotLis
 		logger.info("Listening on scope: " + fullScope);
 //		listener from the venice wrapper for RSB
 		
-		AbstractSlot[] slots = new AbstractSlot[1];
-		slots[0] = new AbstractSlot(fullScope, String.class);
+		ArrayList<AbstractSlot> slots = new ArrayList<AbstractSlot>();
+		slots.add(new AbstractSlot(fullScope, String.class));
+		
 		RSBNamespaceBuilder.initializeProtobuf();
 		RSBNamespaceBuilder.initializeInSlots(slots);
 		RSBNamespaceBuilder.setMasterInSlotListener(this);

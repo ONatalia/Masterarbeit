@@ -1,17 +1,16 @@
 package inpro.io.instantio;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.instantreality.InstantIO.OutSlot;
 
 import venice.lib.AbstractSlot;
 import venice.lib.networkIIO.IIONamespaceBuilder;
-import venice.lib.networkIIO.IIONamespaceBuilder.Task;
+import venice.lib.networkIIO.SlotFlags;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
-import edu.cmu.sphinx.util.props.S4Integer;
 import edu.cmu.sphinx.util.props.S4String;
 import inpro.incremental.IUModule;
 import inpro.incremental.unit.EditMessage;
@@ -43,12 +42,12 @@ public class InstantIOInformerModule extends IUModule {
 		String id = ps.getString(ID_PROP);
 		String outslot = ps.getString(OUTSLOT_PROP);
 		fullScope = id +"/"+ outslot;
-		
-		IIONamespaceBuilder.setTask(Task.READ);
+
+		IIONamespaceBuilder.setSlotFlags(new SlotFlags(true, true));
 		IIONamespaceBuilder.prepareNamespace("");
 		
-		AbstractSlot[] slots = new AbstractSlot[1];
-		slots[0] = new AbstractSlot(fullScope, String.class);
+		ArrayList<AbstractSlot> slots = new ArrayList<AbstractSlot>();
+		slots.add(new AbstractSlot(fullScope, String.class));
 		
 		IIONamespaceBuilder.initializeOutSlots(slots);
 	

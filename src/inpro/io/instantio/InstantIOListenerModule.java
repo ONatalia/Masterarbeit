@@ -1,5 +1,7 @@
 package inpro.io.instantio;
 
+import java.util.ArrayList;
+
 import inpro.io.ListenerModule;
 
 import org.apache.log4j.Logger;
@@ -7,7 +9,7 @@ import org.apache.log4j.Logger;
 import venice.lib.AbstractSlot;
 import venice.lib.AbstractSlotListener;
 import venice.lib.networkIIO.IIONamespaceBuilder;
-import venice.lib.networkIIO.IIONamespaceBuilder.Task;
+import venice.lib.networkIIO.SlotFlags;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4String;
@@ -35,12 +37,11 @@ public class InstantIOListenerModule extends ListenerModule implements AbstractS
 		inSlot = ps.getString(INSLOT_PROP);
 		String id = ps.getString(ID_PROP);
 		System.out.println(id + " " + inSlot);
-		IIONamespaceBuilder.setTask(Task.READ);
-		
+		IIONamespaceBuilder.setSlotFlags(new SlotFlags(true, true));
 		IIONamespaceBuilder.prepareNamespace("");
 		
-		AbstractSlot[] slots = new AbstractSlot[1];
-		slots[0] = new AbstractSlot(id + "/" + inSlot, String.class);
+		ArrayList<AbstractSlot> slots = new ArrayList<AbstractSlot>();
+		slots.add(new AbstractSlot(id + "/" + inSlot, String.class));
 		
 		IIONamespaceBuilder.initializeInSlots(slots);
 		IIONamespaceBuilder.setMasterInSlotListener(this);
