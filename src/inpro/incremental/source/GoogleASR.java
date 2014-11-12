@@ -203,8 +203,7 @@ public class GoogleASR extends IUSourceModule {
 		private IUList<WordIU> chunkHyps;
 		private int lastResultIndex;
 		private WordIU prev;
-		
-		
+		private double initialTime;
 		
 		public GoogleJSONListener(String pair) throws IOException {
 			prevTime = 0;
@@ -212,7 +211,16 @@ public class GoogleASR extends IUSourceModule {
 			setLastResultIndex(-1);
 			prev = TextualWordIU.FIRST_ATOMIC_WORD_IU;
 			this.con = getDownConnection(pair);
+			setInitialTime(getTimestamp());
 			setStartTime(getTimestamp());
+		}
+
+		private void setInitialTime(double timestamp) {
+			initialTime = timestamp;
+		}
+		
+		private double getInitialTime() {
+			return initialTime;
 		}
 
 		@Override
@@ -232,7 +240,6 @@ public class GoogleASR extends IUSourceModule {
 		}
 		
 		public void parseJSON(String decodedString) {
-			System.out.println(decodedString);
 			JSONObject json = new JSONObject(decodedString);
 			JSONArray result = json.getJSONArray("result");
 			if (result.length() == 0) return;
@@ -260,7 +267,7 @@ public class GoogleASR extends IUSourceModule {
 			double currentTimestamp = getTimestamp();
 			
 			double delta = (currentTimestamp - getStartTime()) / (double) words.size();
-			System.out.println("delta:" + delta + " " + currentTimestamp + " " + getStartTime());
+			int currentFrame = (int) (currentTimestamp - getInitialTime()) / 10; // I have no clue why 
 			int i = 1;
 			for (String word : words) {
 				double startTime = prevTime + delta * (i-1);
@@ -296,8 +303,10 @@ public class GoogleASR extends IUSourceModule {
 			}
 			
 //			The diffs represents what edits it takes to get from prevList to list, send that to the right buffer
-			System.out.println(diffs);
 			for (PushBuffer listener : iulisteners) {
+				
+				if (listener instanceof FrameAware)
+					((FrameAware) listener).setCurrentFrame(currentFrame);
 				// update frame count in frame-aware pushbuffers
 				if (diffs != null && !diffs.isEmpty())
 					listener.hypChange(null, diffs);
