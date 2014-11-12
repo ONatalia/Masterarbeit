@@ -68,19 +68,22 @@ public class LabelWriter extends FrameAwarePushBuffer {
 			case ADD:
 				if (!commitsOnly) {
 					added = true;
-					toOut += "\n" + iu.toLabelLine();
 					allIUs.add(iu);
 				}
 				break;
 			case COMMIT:
 				if (commitsOnly) {
 					added = true;
-					toOut += "\n" + iu.toLabelLine();
 					allIUs.add(iu);
 				}
 				break;
 			case REVOKE:
-				allIUs.remove(iu);
+//				when revoking, we can assume that we are working with a stack;
+//				hence, the most recent thing added is the most recent thing revoked
+				if (!allIUs.isEmpty()) {
+					added = true;
+					allIUs.remove(allIUs.size()-1);
+				}
 				break;
 			default:
 				break;

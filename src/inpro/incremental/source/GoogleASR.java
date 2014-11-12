@@ -47,7 +47,7 @@ public class GoogleASR extends IUSourceModule {
 	@S4String(defaultValue = "en-US")
 	public final static String PROP_ASR_LANG = "lang";
 	private String languageCode;
-	
+	private GoogleJSONListener jsonlistener;
 	private FrontEndBackedAudioInputStream ais;
 
 	public GoogleASR(BaseDataProcessor frontend) {
@@ -66,7 +66,7 @@ public class GoogleASR extends IUSourceModule {
 			// setup connection with Google
 			HttpURLConnection upCon = getUpConnection(pair);
 			// start listening on return connection (separate thread)
-			GoogleJSONListener jsonlistener = new GoogleJSONListener(pair);
+			jsonlistener = new GoogleJSONListener(pair);
 			Thread listenerThread = new Thread(jsonlistener);
 			listenerThread.start();
 			// push audio to Google (on this thread)
@@ -188,6 +188,10 @@ public class GoogleASR extends IUSourceModule {
 		stream.flush();
 		stream.close();
 	}
+	
+	public GoogleJSONListener getJSONListener() {
+		return this.jsonlistener;
+	}
 
 	public class GoogleJSONListener implements Runnable {
 		
@@ -255,12 +259,13 @@ public class GoogleASR extends IUSourceModule {
 			
 			double currentTimestamp = getTimestamp();
 			
-			double delta = (currentTimestamp - getStartTime()) / words.size();
+			double delta = (currentTimestamp - getStartTime()) / (double) words.size();
+			System.out.println("delta:" + delta + " " + currentTimestamp + " " + getStartTime());
 			int i = 1;
 			for (String word : words) {
 				double startTime = prevTime + delta * (i-1);
 				double endTime = prevTime + delta * i;
-				SegmentIU siu = new SegmentIU(new Label(startTime, endTime, word)); 
+				SegmentIU siu = new SegmentIU(new Label(startTime/1000.0, endTime/1000.0, word)); 
 				List<IU> gIns = new LinkedList<IU>();
 				gIns.add(siu);
 				WordIU wiu = new WordIU(word, null, gIns);
@@ -300,7 +305,7 @@ public class GoogleASR extends IUSourceModule {
 		}
 		
 		public double getTimestamp() {
-			return  (System.currentTimeMillis() / 1000L);
+			return  (System.currentTimeMillis());
 		}
 		
 		public IUList<WordIU> getChunkHyps() {
