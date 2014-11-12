@@ -20,7 +20,7 @@ import edu.cmu.sphinx.util.props.S4String;
 /**
  * An IU left buffer that prints its contents to STDOUT.
  * The format used resembles wavesurfer label files 
- * @author timo
+ * @author timo, casey
  */
 public class LabelWriter extends FrameAwarePushBuffer {
 	
@@ -34,15 +34,11 @@ public class LabelWriter extends FrameAwarePushBuffer {
     public final static String PROP_WRITE_STDOUT = "writeToStdOut";
 	
     @S4String(defaultValue = "")
-    public final static String PROP_FILE_PATH= "filePath";    
-    
-    @S4String(defaultValue = "")
     public final static String PROP_FILE_NAME = "fileName";    
     
     private boolean writeToFile;
     private boolean commitsOnly;
     private boolean writeToStdOut = true;
-    private String filePath;
     private static String fileName;
     int frameOutput = -1;
     
@@ -53,9 +49,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		writeToFile = ps.getBoolean(PROP_WRITE_FILE);
 		commitsOnly = ps.getBoolean(PROP_COMMITS_ONLY);
 		writeToStdOut = ps.getBoolean(PROP_WRITE_STDOUT);
-		filePath = ps.getString(PROP_FILE_PATH);
 		fileName = ps.getString(PROP_FILE_NAME);
-		filePath = RecoCommandLineParser.getLabelPath();
 	}
 
 	@Override
@@ -102,7 +96,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 			}
 			else toOut += "\n" + iu.toLabelLine();
 		
-			prevIU = iu;
+			prevIU = iu; 
 		}
 		
 		toOut += "\n\n";

@@ -244,8 +244,4 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		return dataThrottle;
 	}
 	
-	public static String getLabelPath() {
-		return labelPath;
-	}
-	
 }
