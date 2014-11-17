@@ -8,6 +8,5 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="extra.inpro.synthesis.visual.VisualTTS"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Inpro"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea -Dinpro.tts.voice=de6"/>
-<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:Inpro/bin}"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea -Dmary.version=external"/>
 </launchConfiguration>

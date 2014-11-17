@@ -18,7 +18,8 @@ import javax.sound.sampled.AudioSystem;
 import org.apache.log4j.Logger;
 
 /**
- * our connection to mary; with support for versions 3.6 and 4.1
+ * our connection to mary; with support for Marytts 5.1+ and external
+ * Mary servers (use this if you need MBROLA output)
  * 
  * The server host and port can be selected with
  * "mary.host" and "mary.port", which defaults to localhost:59125.
@@ -30,10 +31,9 @@ import org.apache.log4j.Logger;
  */
 public abstract class MaryAdapter {
 
-	enum CompatibilityMode { MARY36EXTERNAL, MARY4EXTERNAL, MARY4INTERNAL, MARY5INTERNAL;	
+	enum CompatibilityMode { MARYEXTERNAL, MARY5INTERNAL;	
 		public static CompatibilityMode fromString(String mode) {
-			if ("3".equals(mode)) return MARY36EXTERNAL;
-			if ("4".equals(mode)) return MARY4EXTERNAL; 
+			if ("external".equals(mode)) return MARYEXTERNAL;
 			if ("internal".equals(mode)) return MARY5INTERNAL;
 			return MARY5INTERNAL;
 		}
@@ -53,11 +53,19 @@ public abstract class MaryAdapter {
 	public static void initializeMary(CompatibilityMode compatibilityMode) {
 		logger.info("initializing Mary in compatibility mode " + compatibilityMode);
 		maryAdapter = null;
-		assert compatibilityMode.equals(CompatibilityMode.MARY5INTERNAL) : "InproTK does not support old versions of MaryTTS anymore.";
 		try {
-			maryAdapter = new MaryAdapter5internal();
+			switch (compatibilityMode) {
+			case MARYEXTERNAL:
+				maryAdapter = new MaryAdapterExternal();
+				break;
+			case MARY5INTERNAL:
+				maryAdapter = new MaryAdapter5internal();
+				break;
+			default:
+				throw new RuntimeException("InproTK does not support old versions of MaryTTS anymore.");
+			}
 		} catch (Exception e) {
-			logger.info("could not start MaryAdapter5internal");
+			logger.info("could not start MaryAdapter");
 			e.printStackTrace();
 		}	
 	}

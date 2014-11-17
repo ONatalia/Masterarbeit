@@ -55,6 +55,8 @@ public class MaryAdapter5internal extends MaryAdapter {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		MaryDataType input = MaryDataType.get(inputType);
 		MaryDataType output = MaryDataType.get(outputType);
+		assert !(inputType.equals("MBROLA") || outputType.equals("MBROLA")) : 
+			"There's no MBROLA support in internalized Mary 5, please use an external Mary 4 server";
 
 		Locale mLocale = MaryUtils.string2locale(System.getProperty("inpro.tts.language", "de"));
 		String voiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
