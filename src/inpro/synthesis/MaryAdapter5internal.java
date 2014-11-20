@@ -32,7 +32,6 @@ import marytts.util.MaryUtils;
 
 public class MaryAdapter5internal extends MaryAdapter {
 
-	public static final String DEFAULT_VOICE = System.getProperty("mary.voice", "bits1-hsmm");
 	private static MaryAdapter maryAdapter;
 	private MaryInterface maryInterface;
 
@@ -59,7 +58,7 @@ public class MaryAdapter5internal extends MaryAdapter {
 			"There's no MBROLA support in internalized Mary 5, please use an external Mary 4 server";
 
 		Locale mLocale = MaryUtils.string2locale(System.getProperty("inpro.tts.language", "de"));
-		String voiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
+		String voiceName = System.getProperty("inpro.tts.voice", System.getProperty("inpro.tts.voice", "bits1-hsmm"));
 		maryInterface.setVoice(voiceName);
 		Voice voice = Voice.getVoice(voiceName);
 		AudioFormat audioFormat = voice.dbAudioFormat();
@@ -145,7 +144,7 @@ public class MaryAdapter5internal extends MaryAdapter {
 	}
 	
 	public static HMMData getDefaultHMMData() {
-		String defaultVoiceName = System.getProperty("inpro.tts.voice", DEFAULT_VOICE);
+		String defaultVoiceName = System.getProperty("inpro.tts.voice", System.getProperty("inpro.tts.voice", "bits1-hsmm"));
 		Voice voice = Voice.getVoice(defaultVoiceName);
 		assert (voice instanceof HMMVoice);
         return ((HMMVoice) voice).getHMMData();

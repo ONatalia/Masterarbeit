@@ -28,9 +28,6 @@ public class SysSegmentIU extends SegmentIU {
 	Label originalLabel;
 	/** the speech synthesis HMM models to be used for this segment */
 	public HMMData hmmdata;
-	/** HMM optimization helper */
-	private static PHTSParameterGeneration paramGen;
-
 
 	/** the feature vector as it was derived from surrounding symbolic information (ideally from within the IU network, de-facto by MaryTTS) */
 	public FeatureVector fv;
@@ -207,7 +204,7 @@ public class SysSegmentIU extends SegmentIU {
 			maxSuccessors--;
 		}
 		// make sure we have a paramGenerator
-		if (paramGen == null) { paramGen = new PHTSParameterGeneration(hmmdata); }
+		PHTSParameterGeneration paramGen = new PHTSParameterGeneration(hmmdata);
 		FullPStream pstream = paramGen.buildFullPStreamFor(localHMMs);
 		hmmSynthesisFeatures = new ArrayList<FullPFeatureFrame>(length);
 		for (int i = start; i < start + length; i++)
