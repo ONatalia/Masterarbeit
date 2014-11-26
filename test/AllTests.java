@@ -21,6 +21,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	inpro.incremental.processor.ThreadingModuleTest.class,
 	inpro.incremental.source.CurrentASRHypothesisTest.class,
 	inpro.incremental.source.GoogleASRTest.class, 
+	inpro.incremental.unit.GradualSynthesisProgressTest.class,
 	inpro.incremental.unit.HesitationIUTest.class,
 	//inpro.incremental.unit.IncrementalCARTTest.class, // there aren't any tests in this anymore
 	inpro.incremental.unit.IUPathTest.class,

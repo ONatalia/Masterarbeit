@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import inpro.apps.SimpleMonitor;
-import inpro.apps.util.MonitorCommandLineParser;
 import inpro.audio.DispatchStream;
 import inpro.incremental.IUModule;
 import inpro.incremental.processor.SynthesisModule;
