@@ -30,7 +30,8 @@ public class InstantIOInformerModule extends IUModule {
  	@S4String(defaultValue = "outslot")
 	public final static String OUTSLOT_PROP = "outslot";
  	
- 	private String fullScope;
+ 	private String id;
+ 	private String outslot;
 
 	/* (non-Javadoc)
 	 * @see inpro.incremental.IUModule#newProperties(edu.cmu.sphinx.util.props.PropertySheet)
@@ -39,15 +40,18 @@ public class InstantIOInformerModule extends IUModule {
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		log.info("Setting up InstantIOInformerModule");
-		String id = ps.getString(ID_PROP);
-		String outslot = ps.getString(OUTSLOT_PROP);
-		fullScope = id +"/"+ outslot;
+		id = ps.getString(ID_PROP);
+		outslot = ps.getString(OUTSLOT_PROP);
 
 		IIONamespaceBuilder.setSlotFlags(new SlotFlags(true, true));
-		IIONamespaceBuilder.prepareNamespace("");
+		IIONamespaceBuilder.prepareNamespace(id);
 		
 		ArrayList<AbstractSlot> slots = new ArrayList<AbstractSlot>();
-		slots.add(new AbstractSlot(fullScope, String.class));
+		AbstractSlot slot = new AbstractSlot();
+		slot.setLabel(outslot);
+		slot.setType(String.class);
+		slot.setNamespace(id);
+		slots.add(slot);
 		
 		IIONamespaceBuilder.initializeOutSlots(slots);
 	
@@ -66,7 +70,7 @@ public class InstantIOInformerModule extends IUModule {
 		
 		for (EditMessage<? extends IU> edit : edits) {
 //			System.out.println("PUSHING TO INSTANTIO: " + edit);
-			IIONamespaceBuilder.write(fullScope, edit.getIU().toPayLoad(), "");
+			IIONamespaceBuilder.write(outslot, edit.getIU().toPayLoad(), id);
 		}
 	}
 

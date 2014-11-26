@@ -29,21 +29,25 @@ public class InstantIOListenerModule extends ListenerModule implements AbstractS
 	public final static String ID_PROP = "id";
  	
  	private String inSlot;
+ 	private String id;
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		log.info("Setting up InstantIOListenerModule");
 		inSlot = ps.getString(INSLOT_PROP);
-		String id = ps.getString(ID_PROP);
-		System.out.println(id + " " + inSlot);
+		id = ps.getString(ID_PROP);
 		IIONamespaceBuilder.setSlotFlags(new SlotFlags(true, true));
-		IIONamespaceBuilder.prepareNamespace("");
+		IIONamespaceBuilder.prepareNamespace(id);
 		
 		ArrayList<AbstractSlot> slots = new ArrayList<AbstractSlot>();
-		slots.add(new AbstractSlot(id + "/" + inSlot, String.class));
-		
+		AbstractSlot slot = new AbstractSlot();
+		slot.setLabel(inSlot);
+		slot.setType(String.class);
+		slot.setNamespace(id);
+		slots.add(slot);
 		IIONamespaceBuilder.initializeInSlots(slots);
+		
 		IIONamespaceBuilder.setMasterInSlotListener(this);
 		
 		this.setID(ps.getString(ID_PROP));
