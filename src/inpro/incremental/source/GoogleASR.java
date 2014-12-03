@@ -46,9 +46,14 @@ public class GoogleASR extends IUSourceModule {
 
 	@S4String(defaultValue = "en-US")
 	public final static String PROP_ASR_LANG = "lang";
+	
+	@S4String(defaultValue = "AIzaSyCXHs3mzb1IyfGx2tYxDC1ClgYUv0x8Kw8") // default to Timo's key! Really you should use your own.
+	public final static String PROP_API_KEY = "apiKey";
+	
 	private String languageCode;
 	private GoogleJSONListener jsonlistener;
 	private FrontEndBackedAudioInputStream ais;
+	private String googleAPIkey;
 
 	public GoogleASR(BaseDataProcessor frontend) {
 		ais = new FrontEndBackedAudioInputStream(frontend);
@@ -58,6 +63,7 @@ public class GoogleASR extends IUSourceModule {
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		languageCode = ps.getString(PROP_ASR_LANG);
+		googleAPIkey = ps.getString(PROP_API_KEY);
 	}
 	
 	public void recognize() {
@@ -87,8 +93,6 @@ public class GoogleASR extends IUSourceModule {
 	/** get connection to Google */
 	private HttpURLConnection getUpConnection(String pair) throws IOException {
 		HttpURLConnection connection;
-		//String googleAPIkey = "AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"; // API key, preferrably, use your own
-		String googleAPIkey = "AIzaSyCXHs3mzb1IyfGx2tYxDC1ClgYUv0x8Kw8"; // Timo's key
 
 		String upstream = "https://www.google.com/speech-api/full-duplex/v1/up?"
 				+ "key="
