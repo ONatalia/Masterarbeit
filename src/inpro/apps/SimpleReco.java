@@ -172,6 +172,7 @@ public class SimpleReco {
 		AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);
 		// make sure that audio is in the right format 
 		AudioFormat f = ais.getFormat();
+		/*
 		if (f.getChannels() != 1 ||
 			!(f.getEncoding().equals(Encoding.PCM_SIGNED) || f.getEncoding().toString().equals("FLAC")) || 
 			Math.abs(f.getSampleRate() - 16000f) > 1f ||
@@ -183,6 +184,7 @@ public class SimpleReco {
 			logger.info("sample size: " + f.getSampleSizeInBits());
 			System.exit(1);
 		}
+		*/
 		sds.setInputStream(ais, audioURL.getFile());
 		if (clp.playAtRealtime()) {
 			BaseDataProcessor throttle = (BaseDataProcessor) cm.lookup("dataThrottle");

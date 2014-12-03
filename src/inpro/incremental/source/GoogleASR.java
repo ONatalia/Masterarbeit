@@ -85,8 +85,9 @@ public class GoogleASR extends IUSourceModule {
 	private HttpURLConnection getUpConnection(String pair) throws IOException {
 		HttpURLConnection connection;
 		//String googleAPIkey = "AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"; // API key, preferrably, use your own
-		String googleAPIkey = "AIzaSyCXHs3mzb1IyfGx2tYxDC1ClgYUv0x8Kw8"; // Timo's key
-
+		//String googleAPIkey = "AIzaSyCXHs3mzb1IyfGx2tYxDC1ClgYUv0x8Kw8"; // Timo's key
+		String googleAPIkey = "AIzaSyBJbDtcdABOzZ4xExvMbNeyRtx-ZpU3NeM"; // Spyros's key
+		
 		String upstream = "https://www.google.com/speech-api/full-duplex/v1/up?"
 				+ "key="
 				+ googleAPIkey
@@ -103,7 +104,7 @@ public class GoogleASR extends IUSourceModule {
 		connection.setInstanceFollowRedirects(false);
 		connection.setRequestMethod("POST");
 		connection.setRequestProperty("Transfer-Encoding", "chunked");
-		connection.setRequestProperty("Content-Type", "audio/x-flac; rate=16000");
+		connection.setRequestProperty("Content-Type", "audio/x-flac; rate=44100");
 		connection.setRequestProperty("User-Agent",
 			"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36");
 		connection.setConnectTimeout(60000);
@@ -326,6 +327,12 @@ public class GoogleASR extends IUSourceModule {
 		public void setStartTime(double startTime) {
 			this.startTime = startTime;
 		}
+		
+	}
+
+	public void setLanguageCode(String lcode) {
+		// TODO Auto-generated method stub
+		languageCode = lcode;
 		
 	}
 

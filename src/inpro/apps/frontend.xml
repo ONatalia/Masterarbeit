@@ -98,7 +98,7 @@
         <propertylist name="listeners">
         	<item>pitchToTed</item>
         	<item>baseData</item>
-            <item>prosodyMonitor</item>
+            <!--item>prosodyMonitor</item-->
         </propertylist>
     </component>
     
