@@ -18,9 +18,6 @@ import java.util.List;
 import javaFlacEncoder.FLACFileWriter;
 
 import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 
 import org.json.JSONArray;
@@ -163,10 +160,8 @@ public class GoogleASR extends IUSourceModule {
 		ByteArrayOutputStream boas = new ByteArrayOutputStream();
 		AudioInputStream ais;
 //		Printer.printWithTime(TAG, "recording started");
-		int i = 0;
 		while (run) {
 //			System.err.println("sending chunk " + i);
-			i++;
 			int cnt = -1;
 			// read data from the audio input stream
 			cnt = ai.read(tempBuffer, 0, buffer_size);
@@ -315,6 +310,7 @@ public class GoogleASR extends IUSourceModule {
 				if (diffs != null && !diffs.isEmpty())
 					listener.hypChange(null, diffs);
 			}
+			notifyListeners();
 		}
 		
 		public double getTimestamp() {

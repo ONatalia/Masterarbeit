@@ -1,37 +1,64 @@
 package inpro.incremental.source;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import inpro.apps.SimpleReco;
 import inpro.apps.util.RecoCommandLineParser;
+import inpro.incremental.IUModule;
+import inpro.incremental.sink.CurrentHypothesisViewer;
 import inpro.incremental.sink.LabelWriter;
 import inpro.incremental.source.GoogleASR.GoogleJSONListener;
+import inpro.incremental.unit.EditMessage;
+import inpro.incremental.unit.IU;
 import inpro.sphinx.frontend.DataThrottle;
 
 import org.junit.Test;
 
+import static org.junit.Assert.*;
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.util.props.PropertyException;
 
 public class GoogleASRTest {
 
-//	@Test
-//	public void testWithSomeFile() throws PropertyException, IOException, UnsupportedAudioFileException {
-//		SimpleReco sr = new SimpleReco(new RecoCommandLineParser("-F", "file:/home/casey/Desktop/TAKE/r2/r2/18/audio.wav"));
-//		BaseDataProcessor realtime = new DataThrottle();
-//		realtime.setPredecessor(sr.setupFileInput());
-//		GoogleASR gasr = new GoogleASR(realtime);
-//		
-//		LabelWriter label = new LabelWriter();
-//		label.writeToFile();
-//		label.setFileName("/home/casey/Desktop/test");
-//		gasr.addListener(label);
-//		gasr.recognize();
-//	}
+
+	@Test
+	public void testWithSomeFile() throws PropertyException, IOException, UnsupportedAudioFileException {
+		SimpleReco sr = new SimpleReco(new RecoCommandLineParser("-F", "file:res/once16.wav"));
+		BaseDataProcessor realtime = new DataThrottle();
+		realtime.setPredecessor(sr.setupFileInput());
+		GoogleASR gasr = new GoogleASR(realtime);
+		LabelWriter label = new LabelWriter();
+		//label.writeToFile();
+		//label.setFileName("/home/casey/Desktop/test");
+		gasr.addListener(label);
+		MyIUModule mymod = new MyIUModule();
+		gasr.addListener(mymod);
+		gasr.addListener(new CurrentHypothesisViewer().show());
+		gasr.recognize();
+		assertTrue(mymod.wordsToBeRecognized.isEmpty());
+	}
 	
+	private class MyIUModule extends IUModule {
+		Queue<String> wordsToBeRecognized = new LinkedList(Arrays.asList("once", "upon", "a", "time", "in", "ancient", "greece")); 
+		@Override
+		protected void leftBufferUpdate(Collection<? extends IU> ius,
+				List<? extends EditMessage<? extends IU>> edits) {
+			for (EditMessage edit : edits) {
+				if (edit.getType().isCommit()) {
+					System.err.println("now checking commit of" + edit);
+					assertTrue(edit.getIU().toPayLoad().equals(wordsToBeRecognized.poll()));
+				}
+			}
+		}
+	}
+
 	@Test 
 	public void testJSONParser() {
 		
