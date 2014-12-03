@@ -43,9 +43,14 @@ public class GoogleASR extends IUSourceModule {
 
 	@S4String(defaultValue = "en-US")
 	public final static String PROP_ASR_LANG = "lang";
-	private String languageCode;
 	
+	@S4String(defaultValue = "AIzaSyCXHs3mzb1IyfGx2tYxDC1ClgYUv0x8Kw8") // default to Timo's key! Really you should use your own.
+	public final static String PROP_API_KEY = "apiKey";
+	
+	private String languageCode;
+	private GoogleJSONListener jsonlistener;
 	private FrontEndBackedAudioInputStream ais;
+	private String googleAPIkey;
 
 	public GoogleASR(BaseDataProcessor frontend) {
 		ais = new FrontEndBackedAudioInputStream(frontend);
@@ -55,6 +60,7 @@ public class GoogleASR extends IUSourceModule {
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		languageCode = ps.getString(PROP_ASR_LANG);
+		googleAPIkey = ps.getString(PROP_API_KEY);
 	}
 	
 	public void recognize() {
@@ -63,7 +69,7 @@ public class GoogleASR extends IUSourceModule {
 			// setup connection with Google
 			HttpURLConnection upCon = getUpConnection(pair);
 			// start listening on return connection (separate thread)
-			GoogleJSONListener jsonlistener = new GoogleJSONListener(pair);
+			jsonlistener = new GoogleJSONListener(pair);
 			Thread listenerThread = new Thread(jsonlistener);
 			listenerThread.start();
 			// push audio to Google (on this thread)
@@ -84,10 +90,7 @@ public class GoogleASR extends IUSourceModule {
 	/** get connection to Google */
 	private HttpURLConnection getUpConnection(String pair) throws IOException {
 		HttpURLConnection connection;
-		//String googleAPIkey = "AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw"; // API key, preferrably, use your own
-		//String googleAPIkey = "AIzaSyCXHs3mzb1IyfGx2tYxDC1ClgYUv0x8Kw8"; // Timo's key
-		String googleAPIkey = "AIzaSyBJbDtcdABOzZ4xExvMbNeyRtx-ZpU3NeM"; // Spyros's key
-		
+
 		String upstream = "https://www.google.com/speech-api/full-duplex/v1/up?"
 				+ "key="
 				+ googleAPIkey
@@ -104,7 +107,7 @@ public class GoogleASR extends IUSourceModule {
 		connection.setInstanceFollowRedirects(false);
 		connection.setRequestMethod("POST");
 		connection.setRequestProperty("Transfer-Encoding", "chunked");
-		connection.setRequestProperty("Content-Type", "audio/x-flac; rate=44100");
+		connection.setRequestProperty("Content-Type", "audio/x-flac; rate=16000");
 		connection.setRequestProperty("User-Agent",
 			"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36");
 		connection.setConnectTimeout(60000);
@@ -157,10 +160,8 @@ public class GoogleASR extends IUSourceModule {
 		ByteArrayOutputStream boas = new ByteArrayOutputStream();
 		AudioInputStream ais;
 //		Printer.printWithTime(TAG, "recording started");
-		int i = 0;
 		while (run) {
 //			System.err.println("sending chunk " + i);
-			i++;
 			int cnt = -1;
 			// read data from the audio input stream
 			cnt = ai.read(tempBuffer, 0, buffer_size);
@@ -186,6 +187,10 @@ public class GoogleASR extends IUSourceModule {
 		stream.flush();
 		stream.close();
 	}
+	
+	public GoogleJSONListener getJSONListener() {
+		return this.jsonlistener;
+	}
 
 	public class GoogleJSONListener implements Runnable {
 		
@@ -197,8 +202,7 @@ public class GoogleASR extends IUSourceModule {
 		private IUList<WordIU> chunkHyps;
 		private int lastResultIndex;
 		private WordIU prev;
-		
-		
+		private double initialTime;
 		
 		public GoogleJSONListener(String pair) throws IOException {
 			prevTime = 0;
@@ -206,7 +210,16 @@ public class GoogleASR extends IUSourceModule {
 			setLastResultIndex(-1);
 			prev = TextualWordIU.FIRST_ATOMIC_WORD_IU;
 			this.con = getDownConnection(pair);
+			setInitialTime(getTimestamp());
 			setStartTime(getTimestamp());
+		}
+
+		private void setInitialTime(double timestamp) {
+			initialTime = timestamp;
+		}
+		
+		private double getInitialTime() {
+			return initialTime;
 		}
 
 		@Override
@@ -226,7 +239,6 @@ public class GoogleASR extends IUSourceModule {
 		}
 		
 		public void parseJSON(String decodedString) {
-			System.out.println(decodedString);
 			JSONObject json = new JSONObject(decodedString);
 			JSONArray result = json.getJSONArray("result");
 			if (result.length() == 0) return;
@@ -253,12 +265,13 @@ public class GoogleASR extends IUSourceModule {
 			
 			double currentTimestamp = getTimestamp();
 			
-			double delta = (currentTimestamp - getStartTime()) / words.size();
+			double delta = (currentTimestamp - getStartTime()) / (double) words.size();
+			int currentFrame = (int) (currentTimestamp - getInitialTime()) / 10; // I have no clue why 
 			int i = 1;
 			for (String word : words) {
 				double startTime = prevTime + delta * (i-1);
 				double endTime = prevTime + delta * i;
-				SegmentIU siu = new SegmentIU(new Label(startTime, endTime, word)); 
+				SegmentIU siu = new SegmentIU(new Label(startTime/1000.0, endTime/1000.0, word)); 
 				List<IU> gIns = new LinkedList<IU>();
 				gIns.add(siu);
 				WordIU wiu = new WordIU(word, null, gIns);
@@ -289,15 +302,19 @@ public class GoogleASR extends IUSourceModule {
 			}
 			
 //			The diffs represents what edits it takes to get from prevList to list, send that to the right buffer
-			System.out.println(diffs);
-			if (diffs != null && !diffs.isEmpty()) {
-				rightBuffer.setBuffer(diffs);
+			for (PushBuffer listener : iulisteners) {
+				
+				if (listener instanceof FrameAware)
+					((FrameAware) listener).setCurrentFrame(currentFrame);
+				// update frame count in frame-aware pushbuffers
+				if (diffs != null && !diffs.isEmpty())
+					listener.hypChange(null, diffs);
 			}
 			notifyListeners();
 		}
 		
 		public double getTimestamp() {
-			return  (System.currentTimeMillis() / 1000L);
+			return  (System.currentTimeMillis());
 		}
 		
 		public IUList<WordIU> getChunkHyps() {
@@ -327,12 +344,6 @@ public class GoogleASR extends IUSourceModule {
 		public void setStartTime(double startTime) {
 			this.startTime = startTime;
 		}
-		
-	}
-
-	public void setLanguageCode(String lcode) {
-		// TODO Auto-generated method stub
-		languageCode = lcode;
 		
 	}
 

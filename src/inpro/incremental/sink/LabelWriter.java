@@ -42,7 +42,6 @@ public class LabelWriter extends FrameAwarePushBuffer {
     private boolean writeToFile;
     private boolean commitsOnly;
     private boolean writeToStdOut = true;
-    private String filePath;
     private static String fileName;
     int frameOutput = -1;
     
@@ -53,15 +52,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		writeToFile = ps.getBoolean(PROP_WRITE_FILE);
 		commitsOnly = ps.getBoolean(PROP_COMMITS_ONLY);
 		writeToStdOut = ps.getBoolean(PROP_WRITE_STDOUT);
-		filePath = ps.getString(PROP_FILE_PATH);
-//		use the one given in the command line by default
 		fileName = RecoCommandLineParser.getLabelPath();
-//		otherwise, use the config file
-		String fileName2 = ps.getString(PROP_FILE_NAME);
-		if (!fileName2.isEmpty())
-			fileName = fileName2;
-		System.out.println("LabelWriter writing to " + fileName);
-		
 	}
 
 	@Override
@@ -77,19 +68,22 @@ public class LabelWriter extends FrameAwarePushBuffer {
 			case ADD:
 				if (!commitsOnly) {
 					added = true;
-					toOut += "\n" + iu.toLabelLine();
 					allIUs.add(iu);
 				}
 				break;
 			case COMMIT:
 				if (commitsOnly) {
 					added = true;
-					toOut += "\n" + iu.toLabelLine();
 					allIUs.add(iu);
 				}
 				break;
 			case REVOKE:
-				allIUs.remove(iu);
+//				when revoking, we can assume that we are working with a stack;
+//				hence, the most recent thing added is the most recent thing revoked
+				if (!allIUs.isEmpty()) {
+					added = true;
+					allIUs.remove(allIUs.size()-1);
+				}
 				break;
 			default:
 				break;
@@ -139,10 +133,6 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	public void reset() {
 		super.reset();
 		frameOutput = -1;
-	}
-	
-	public void writeToFile() {
-		writeToFile = true;
 	}
 	
 }
