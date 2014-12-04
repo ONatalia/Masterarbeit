@@ -63,6 +63,10 @@ public class GoogleASR extends IUSourceModule {
 		googleAPIkey = ps.getString(PROP_API_KEY);
 	}
 	
+	public void setAPIKey(String apiKey) {
+		this.googleAPIkey = apiKey;
+	}
+	
 	public void recognize() {
 		try {
 			String pair = getPair();
@@ -266,16 +270,18 @@ public class GoogleASR extends IUSourceModule {
 			double currentTimestamp = getTimestamp();
 			
 			double delta = (currentTimestamp - getStartTime()) / (double) words.size();
-			int currentFrame = (int) (currentTimestamp - getInitialTime()) / 10; // I have no clue why 
-			int i = 1;
+			int currentFrame = (int) (currentTimestamp - getInitialTime()) / 10; // I have no clue why we divide by 10, something with the timestamp 
+			double i = 1.0;
+			double lastEndTime = 0.0;
 			for (String word : words) {
 				double startTime = prevTime + delta * (i-1);
 				double endTime = prevTime + delta * i;
+//				System.out.println(word + " " + startTime + " " + endTime + " " + startTime/1000.0 + " " +  endTime/1000.0);
 				SegmentIU siu = new SegmentIU(new Label(startTime/1000.0, endTime/1000.0, word)); 
+				lastEndTime = endTime;
 				List<IU> gIns = new LinkedList<IU>();
 				gIns.add(siu);
-				WordIU wiu = new WordIU(word, null, gIns);
-				wiu.setSameLevelLink(prev);
+				WordIU wiu = new WordIU(word, prev, gIns);
 				prev = wiu;
 				currentHyps.add(wiu);
 				i++;
@@ -295,20 +301,22 @@ public class GoogleASR extends IUSourceModule {
 				prev = TextualWordIU.FIRST_ATOMIC_WORD_IU;
 				
 			}
+			LinkedList<WordIU> ius = new LinkedList<WordIU>();
+			for (EditMessage<WordIU> edit: diffs) ius.add(edit.getIU()); 
 			
 			if (startNewChunk(i)) {
 				setStartTime(getTimestamp());
-				prevTime += delta;
+				prevTime = lastEndTime;
 			}
 			
 //			The diffs represents what edits it takes to get from prevList to list, send that to the right buffer
 			for (PushBuffer listener : iulisteners) {
-				
+				if (listener == null) continue;
 				if (listener instanceof FrameAware)
 					((FrameAware) listener).setCurrentFrame(currentFrame);
 				// update frame count in frame-aware pushbuffers
 				if (diffs != null && !diffs.isEmpty())
-					listener.hypChange(null, diffs);
+					listener.hypChange(ius, diffs);
 			}
 			notifyListeners();
 		}
@@ -333,7 +341,7 @@ public class GoogleASR extends IUSourceModule {
 			this.lastResultIndex = lastResultIndex;
 		}
 		
-		public boolean startNewChunk(int i) {
+		public boolean startNewChunk(double i) {
 			return i > getLastResultIndex();
 		}
 
