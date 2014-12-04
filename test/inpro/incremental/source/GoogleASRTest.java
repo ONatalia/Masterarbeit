@@ -34,6 +34,7 @@ public class GoogleASRTest {
 		BaseDataProcessor realtime = new DataThrottle();
 		realtime.setPredecessor(sr.setupFileInput());
 		GoogleASR gasr = new GoogleASR(realtime);
+		gasr.setAPIKey("AIzaSyCXHs3mzb1IyfGx2tYxDC1ClgYUv0x8Kw8");
 		LabelWriter label = new LabelWriter();
 		//label.writeToFile();
 		//label.setFileName("/home/casey/Desktop/test");

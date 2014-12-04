@@ -93,16 +93,9 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		}
 		
 		toOut = String.format(Locale.US, "Time: %.2f", 
-				currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
-		IU prevIU = null;
+		currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
 		for (IU iu : allIUs) {
-			
-			if (prevIU != null && (iu.startTime() < prevIU.endTime())) {
-				toOut += "\n" + String.format(Locale.US,	"%.2f\t%.2f\t%s", prevIU.endTime(), iu.endTime(), iu.toPayLoad());
-			}
-			else toOut += "\n" + iu.toLabelLine();
-		
-			prevIU = iu;
+			toOut += "\n" + iu.toLabelLine();
 		}
 		
 		toOut += "\n\n";
