@@ -42,11 +42,11 @@ public class AudioUtils {
 	
 	public static AudioInputStream get16kAudioStreamForVocodingStream(VocodingAudioStream source) {
 		if (source.getSamplingRate() == 48000) {
-			// TODO: handle 48000 incrementally by averaging or picking every second sample
+			// handle 48000 incrementally by averaging or picking every third sample
 			DoubleDataSource skippingSource = new SkipStream(source, 3);
 			return new DDSAudioInputStream(skippingSource, new AudioFormat(16000, 16, 1, true, false));
 		} else if (source.getSamplingRate() == 32000) {
-			// TODO: handle 32000 incrementally by averaging or picking every second sample
+			// handle 32000 incrementally by averaging or picking every second sample
 			DoubleDataSource skippingSource = new SkipStream(source, 2);
 			return new DDSAudioInputStream(skippingSource, new AudioFormat(16000, 16, 1, true, false));
 		} else {
