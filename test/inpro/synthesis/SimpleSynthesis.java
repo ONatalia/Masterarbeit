@@ -17,6 +17,8 @@ public class SimpleSynthesis {
 
 	@Test
 	public void test() {
+		System.setProperty("inpro.tts.language", "de");
+		System.setProperty("inpro.tts.voice", "bits1-hsmm");
 		DispatchStream d = SimpleMonitor.setupDispatcher();
 		d.playTTS("Dies ist ein Satz und Du machst Platz.", true);
 		// wait for synthesis:

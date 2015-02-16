@@ -21,7 +21,7 @@ public class GradualSynthesisProgressTest {
 	public void testEnglish() {
 		System.setProperty("inpro.tts.language", "en_US");
 		System.setProperty("inpro.tts.voice", "cmu-slt-hsmm");
-		test("This is a very long and at least somewhat complex utterance.", 4000);
+		test("This is a very long and at least somewhat complex utterance.", 3000);
 	}
 	
 	@Test(timeout=60000)

@@ -2,6 +2,8 @@ package inpro.incremental.processor;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
+import inpro.apps.SimpleMonitor;
+import inpro.incremental.sink.LabelWriter;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.ChunkIU;
 import inpro.incremental.unit.IU.IUUpdateListener;
@@ -10,9 +12,28 @@ import inpro.incremental.unit.IU.Progress;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
-public class SynthesisModulePauseStopUnitTest extends SynthesisModuleAdaptationUnitTest {
+public class SynthesisModulePauseStopUnitTest extends SynthesisModuleTestBase {
+
+	@Before
+	public void setupMinimalSynthesisEnvironment() {
+        System.setProperty("inpro.tts.language", "de");
+		System.setProperty("inpro.tts.voice", "bits1-hsmm");
+		dispatcher = SimpleMonitor.setupDispatcher();
+		myIUModule = new TestIUModule();
+		asm = new AdaptableSynthesisModule(dispatcher);
+		asm.addListener(new LabelWriter());
+		myIUModule.addListener(asm);
+	}
+
+	@After
+	public void waitForSynthesis() {
+		dispatcher.waitUntilDone();
+		myIUModule.reset();
+	}
 
 	@Test(timeout=60000)
 	public void testPauseResumeAfterOngoingWord() throws InterruptedException {
@@ -120,6 +141,4 @@ public class SynthesisModulePauseStopUnitTest extends SynthesisModuleAdaptationU
 		}
 	}
 
-	// ignore tests from super class
-	@Override public void testScaleTempo() {}	
 }

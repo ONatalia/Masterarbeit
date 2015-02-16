@@ -5,19 +5,13 @@ import static org.junit.Assert.*;
 import inpro.apps.SimpleMonitor;
 import inpro.incremental.processor.AdaptableSynthesisModule;
 import inpro.incremental.sink.LabelWriter;
-import inpro.incremental.unit.IU;
-import inpro.incremental.unit.IU.IUUpdateListener;
-import inpro.incremental.unit.ChunkIU;
 
-import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SynthesisModuleAdaptationUnitTest extends SynthesisModuleUnitTest {
+public class SynthesisModuleAdaptationUnitTest extends SynthesisModuleTestBase {
 	
-	AdaptableSynthesisModule asm;
-	
-	@Override
 	@Before
 	public void setupMinimalSynthesisEnvironment() {
         System.setProperty("inpro.tts.language", "de");
@@ -27,6 +21,12 @@ public class SynthesisModuleAdaptationUnitTest extends SynthesisModuleUnitTest {
 		asm = new AdaptableSynthesisModule(dispatcher);
 		asm.addListener(new LabelWriter());
 		myIUModule.addListener(asm);
+	}
+
+	@After
+	public void waitForSynthesis() {
+		dispatcher.waitUntilDone();
+		myIUModule.reset();
 	}
 
 	/**
@@ -54,28 +54,5 @@ public class SynthesisModuleAdaptationUnitTest extends SynthesisModuleUnitTest {
 					deviationOfFactor < 1.1 && deviationOfFactor > 0.91);
 		}
 	}
-	
-	protected void startChunk(String s) {
-		ChunkIU chunk = new ChunkIU(s);
-		chunk.preSynthesize();
-		chunk.addUpdateListener(new IUUpdateListener() {
-			@Override
-			public void update(IU updatedIU) {
-				Logger.getLogger(SynthesisModuleAdaptationUnitTest.class).info(
-						"update message on IU " + updatedIU.toString() + 
-						" with progress " + updatedIU.getProgress());
-			}
-		});
-		myIUModule.addIUAndUpdate(chunk);
-	}
-
-	// ignore tests from super class
-	@Override public void testLeftBufferUpdateWithSomeUtterances() {}
-	@Override public void testLeftBufferUpdateWithPreSynthesis() {}	
-	@Override public void testPreSynthesisTiming() {}	
-	@Override public void testAddWordOnUpdate() {}
-	@Override public void testHesitations() {}
-	@Override public void testInternationalisationUS() {}
-	@Override public void testInternationalisationGB() {}
 	
 }

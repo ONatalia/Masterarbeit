@@ -30,6 +30,8 @@ public class RevokingTest {
 
 	@Test(timeout=30000)
 	public void test() {
+		System.setProperty("inpro.tts.language", "de");
+		System.setProperty("inpro.tts.voice", "bits1-hsmm");
 		MaryAdapter.getInstance();
 		DispatchStream dispatcher = SimpleMonitor.setupDispatcher();
 
@@ -68,7 +70,7 @@ public class RevokingTest {
 		s.say("Dies ist die westführende westliche Weststraßen-Straße.", "Dies ist die Weststraße.", false, false);
 		delay(500);
 		reduceOffset(s);
-		delay(20000);
+		delay(15000);
 	}
 	
 	private void delay(int i) {

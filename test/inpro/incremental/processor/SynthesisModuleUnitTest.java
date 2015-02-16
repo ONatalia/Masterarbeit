@@ -2,17 +2,11 @@ package inpro.incremental.processor;
 
 import static org.junit.Assert.*;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import inpro.apps.SimpleMonitor;
-import inpro.audio.DispatchStream;
-import inpro.incremental.IUModule;
 import inpro.incremental.processor.SynthesisModule;
 import inpro.incremental.sink.LabelWriter;
-import inpro.incremental.unit.EditMessage;
-import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.HesitationIU;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.ChunkIU;
@@ -22,18 +16,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SynthesisModuleUnitTest {
+public class SynthesisModuleUnitTest extends SynthesisModuleTestBase {
 
-	private static String[][] testList = {
-		{ "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun" }, 
-		{ "Nimm bitte das Kreuz und lege es in den Kopf des Elefanten." },
-		{ "Nimm bitte das Kreuz", "und lege es in den Kopf des Elefanten." },
-		{ "Nimm das Kreuz,", "das rote Kreuz,", "und lege es in den Kopf des Elefanten."}, 
-	};
-	
-	public DispatchStream dispatcher;
-	public TestIUModule myIUModule;
-	
 	@Before
 	public void setupMinimalSynthesisEnvironment() {
         System.setProperty("inpro.tts.language", "de");
@@ -250,26 +234,6 @@ public class SynthesisModuleUnitTest {
         System.setProperty("inpro.tts.language", language);
 	}
 
-	protected static class TestIUModule extends IUModule {
-		protected void leftBufferUpdate(Collection<? extends IU> ius, 
-				List<? extends EditMessage<? extends IU>> edits) { } // do nothing, this is only a source of IUs
-		
-		void addIUAndUpdate(IU iu) {
-			rightBuffer.addToBuffer(iu);
-			notifyListeners();
-		}
-		
-		void revokeIUAndUpdate(IU iu) {
-			rightBuffer.editBuffer(new EditMessage<IU>(EditType.REVOKE, iu));
-			notifyListeners();
-		}
-		
-		@Override
-		public void reset() {
-			rightBuffer.setBuffer(null, null);
-		}
-	}
-	
 	public static void main(String... args) {
 		SynthesisModuleUnitTest smut = new SynthesisModuleUnitTest();
 		smut.setupMinimalSynthesisEnvironment();
