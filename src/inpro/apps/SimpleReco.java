@@ -24,7 +24,6 @@ import org.apache.log4j.PropertyConfigurator;
 
 import edu.cmu.sphinx.decoder.ResultListener;
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
-import edu.cmu.sphinx.frontend.DataProcessor;
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;

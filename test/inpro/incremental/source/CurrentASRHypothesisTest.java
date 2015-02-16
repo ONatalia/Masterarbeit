@@ -43,6 +43,11 @@ public class CurrentASRHypothesisTest {
 	}
 	
 	@Test(timeout=60000)
+	public void testForcedAlignmentWithG2P()  throws PropertyException, IOException, UnsupportedAudioFileException {
+		testConfiguration("-F", "file:res/DE_1234.wav", "-fa", "eins tswei drei fier"); // test forced-alignment
+	}
+	
+	@Test(timeout=60000)
 	public void testIncrementalOutput() throws PropertyException, IOException, UnsupportedAudioFileException {
 		testConfiguration("-F", "file:res/DE_1234.wav", "-Is", "7"); // test smoothing with a common value  
 		testConfiguration("-F", "file:res/DE_1234.wav", "-If", "7"); // test right-context with a common value  
