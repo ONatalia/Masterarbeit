@@ -15,13 +15,13 @@ public class MaryAdapterExternal extends MaryAdapter {
 
 	marytts.client.MaryClient mc41;
 
-	public static final String DEFAULT_VOICE = System.getProperty("mary.voice", "de6");
+	public static final String DEFAULT_VOICE = System.getProperty("inpro.tts.voice", "de6");
 	
 	/** private constructor, this class is a singleton 
 	 * @throws IOException */
 	MaryAdapterExternal() throws IOException {
-        String serverHost = System.getProperty("mary.host", "localhost");
-        int serverPort = Integer.getInteger("mary.port", 59125).intValue();
+        String serverHost = System.getProperty("inpro.tts.mary.host", "localhost");
+        int serverPort = Integer.getInteger("inpro.tts.mary.port", 59125).intValue();
         mc41 = new MaryHttpClient(new Address(serverHost, serverPort), false, false);
 //		mc41 = marytts.client.MaryClient.getMaryClient(
 //	               new marytts.client.http.Address(serverHost, serverPort)

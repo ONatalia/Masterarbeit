@@ -41,7 +41,10 @@ public class FullPFeatureFrame {
     public int getStrParSize() { return strParVec.length; }
 
     public boolean isVoiced() { return voiced; }
+    /** return log-f0 */
     public double getlf0Par() { return lf0Par; }
+    /** return f0 in Hz */
+    public double getF0Par() { return Math.exp(lf0Par); }
     
     public void shiftlf0Par(double pitchShiftInCent) {
     	if (voiced)

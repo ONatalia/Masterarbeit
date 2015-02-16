@@ -65,7 +65,7 @@ public class SynthesisConfig implements Configurable {
 	}
 	
 	public byte[] getDTreeFeatureDefaults() {
-		return dTreeFeatureDefaultsGerman;
+		return dTreeFeatureDefaultsGerman; // FIXME!!
 	}
 
 	public DTreeContext getDTreeContext() {

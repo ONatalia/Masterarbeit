@@ -60,6 +60,8 @@ public class TTSUtil {
 			te.printStackTrace();
 			throw new RuntimeException(te);
 		}
+		//useful for debugging purposes:
+//		System.err.println(content.toString());
 		return content;
 	}
 	
