@@ -432,6 +432,24 @@ public abstract class IU implements Comparable<IU> {
 		return sb.toString();
  	}
 	
+	public String toTreeViaNextSLLString() {
+		StringBuilder sb = new StringBuilder();
+		toTreeViaNextSLLString(sb, "-> ");
+		return sb.toString();
+	}
+	
+	/**
+	 * return a tree representation along next same level links
+	 */
+	public void toTreeViaNextSLLString(StringBuilder sb, String indent) {
+		sb.append(indent);
+		sb.append(toLabelLine());
+		sb.append("\n");
+		for (IU iu : getNextSameLevelLinks()) {
+			iu.toTreeViaNextSLLString(sb, "    " + indent);
+		}
+	}
+	
 	public String toTEDviewXML() {
 		double startTime = startTime();
 		if (Double.isNaN(startTime))
