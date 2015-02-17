@@ -188,7 +188,7 @@ public class SysSegmentIU extends SegmentIU {
 		}
 		// now traverse the predecessor IUs and add their models to the list
 		int start = 0;
-		while (contextIU != this) {
+		while (contextIU != this && contextIU != null) {
 			start += appendSllHtsModel(localHMMs, contextIU);
 			contextIU = (SysSegmentIU) contextIU.getNextSameLevelLink();
 		}
@@ -197,7 +197,8 @@ public class SysSegmentIU extends SegmentIU {
 		awaitContinuation();
 		/** deal with the right context units; increasing this may improve synthesis quality at the cost of computaitonal effort */
 		int maxSuccessors = SynthesisConfig.getDefaultInstance().getHmmOptimizationFutureContext();
-		contextIU = (SysSegmentIU) contextIU.getNextSameLevelLink();
+		if (contextIU != null)
+			contextIU = (SysSegmentIU) contextIU.getNextSameLevelLink();
 		while (contextIU != null && maxSuccessors > 0) {
 			appendSllHtsModel(localHMMs, contextIU);
 			contextIU = (SysSegmentIU) contextIU.getNextSameLevelLink();
