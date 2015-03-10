@@ -12,6 +12,8 @@
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
+        <property name="apiKey" value="AIzaSyBJbDtcdABOzZ4xExvMbNeyRtx-ZpU3NeM"/>
+        <property name="lang" value="en-US"/>
         <!--property name="brutalPruner" value="trivialPruner"/-->
         <propertylist name="hypChangeListeners">
 <!--           <item>${dialogueManager}</item> 

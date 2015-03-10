@@ -127,5 +127,10 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		super.reset();
 		frameOutput = -1;
 	}
+
+	public void writeToFile() {
+		// TODO Auto-generated method stub
+		writeToFile = true;
+	}
 	
 }

@@ -44,13 +44,17 @@ public class GoogleASR extends IUSourceModule {
 	@S4String(defaultValue = "en-US")
 	public final static String PROP_ASR_LANG = "lang";
 	
-	@S4String(defaultValue = "AIzaSyCXHs3mzb1IyfGx2tYxDC1ClgYUv0x8Kw8") // default to Timo's key! Really you should use your own.
+	@S4String(defaultValue = "Default Key") // default to Timo's key! Really you should use your own.
 	public final static String PROP_API_KEY = "apiKey";
+	
+	@S4String(defaultValue = "16000")
+	public final static String PROP_SAMPLING_RATE = "16000";
 	
 	private String languageCode;
 	private GoogleJSONListener jsonlistener;
 	private FrontEndBackedAudioInputStream ais;
 	private String googleAPIkey;
+	private String samplingRate;
 
 	public GoogleASR(BaseDataProcessor frontend) {
 		ais = new FrontEndBackedAudioInputStream(frontend);
@@ -61,10 +65,21 @@ public class GoogleASR extends IUSourceModule {
 		super.newProperties(ps);
 		languageCode = ps.getString(PROP_ASR_LANG);
 		googleAPIkey = ps.getString(PROP_API_KEY);
+		samplingRate = ps.getString(PROP_SAMPLING_RATE);
 	}
 	
 	public void setAPIKey(String apiKey) {
-		this.googleAPIkey = apiKey;
+		googleAPIkey = apiKey;
+	}
+	
+	public void setSamplingRate(String SamplingRate) {
+		samplingRate = SamplingRate;
+	}
+	
+	public void setLanguageCode(String string) {
+		// TODO Auto-generated method stub
+		languageCode = string;
+		
 	}
 	
 	public void recognize() {
@@ -111,7 +126,7 @@ public class GoogleASR extends IUSourceModule {
 		connection.setInstanceFollowRedirects(false);
 		connection.setRequestMethod("POST");
 		connection.setRequestProperty("Transfer-Encoding", "chunked");
-		connection.setRequestProperty("Content-Type", "audio/x-flac; rate=16000");
+		connection.setRequestProperty("Content-Type", "audio/x-flac; rate=" + samplingRate);
 		connection.setRequestProperty("User-Agent",
 			"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36");
 		connection.setConnectTimeout(60000);

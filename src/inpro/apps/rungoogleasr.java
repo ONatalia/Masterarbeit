@@ -22,7 +22,14 @@ public class rungoogleasr {
         realtime.setPredecessor(sr.setupFileInput());
        
         GoogleASR gasr = new GoogleASR(realtime);
-        gasr.setLanguageCode("de-de");
+        //Use your own Google API key! 
+        // Spyros: AIzaSyBJbDtcdABOzZ4xExvMbNeyRtx-ZpU3NeM
+        // AIzaSyBR8gjIWNoEd1PltsZDH_7OhvftJ_eDPhM
+        gasr.setAPIKey("AIzaSyBR8gjIWNoEd1PltsZDH_7OhvftJ_eDPhM");
+        //uncomment line to change the language
+        gasr.setLanguageCode("en-us");
+        // set the sampling rate
+        gasr.setSamplingRate("8000");
         LabelWriter label = new LabelWriter();
         label.writeToFile();
         label.setFileName(args[args.length - 1]);
