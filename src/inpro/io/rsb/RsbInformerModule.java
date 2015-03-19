@@ -1,5 +1,6 @@
 package inpro.io.rsb;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +16,7 @@ import inpro.incremental.IUModule;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 
+
 /**
  * @author casey
  *
@@ -29,9 +31,11 @@ public class RsbInformerModule extends IUModule {
  	@S4String(defaultValue = "")
 	public final static String SCOPE_PROP = "scope";
 
-
  	private String id;	 
  	private String fullScope;
+
+    public Timestamp ts = new Timestamp(new java.util.Date().getTime());
+    
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
@@ -53,12 +57,10 @@ public class RsbInformerModule extends IUModule {
 	@Override
 	protected void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
-		
 		//Simply put the payload of any IU onto the scope
 		for (EditMessage<? extends IU> edit : edits) {
-			RSBNamespaceBuilder.write(fullScope, edit.getIU().toPayLoad());
+			RSBNamespaceBuilder.write(fullScope, createXIOLine(fullScope, edit.getIU().toPayLoad()));
 		}
-		
 	}
 	
 	/**
@@ -83,6 +85,12 @@ public class RsbInformerModule extends IUModule {
 	public void setID(String id) {
 		this.id = id;
 	}
+	
+	public String createXIOLine(String sensor, String value) {
+		return  "<sfstring value=\""  + value + "\" " +  "timestamp=\""+ ts.getTime() +"\" sensorName=\"" + sensor +"\"/>";
+		
+	}
 
 
 }
+

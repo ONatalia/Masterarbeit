@@ -41,6 +41,7 @@ public class InstantIOInformerModule extends IUModule {
 		super.newProperties(ps);
 		log.info("Setting up InstantIOInformerModule");
 		id = ps.getString(ID_PROP);
+		System.out.println("id" + id);
 		outslot = ps.getString(OUTSLOT_PROP);
 
 		IIONamespaceBuilder.setSlotFlags(new SlotFlags(true, true));

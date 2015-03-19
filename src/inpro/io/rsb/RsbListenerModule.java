@@ -75,7 +75,7 @@ public class RsbListenerModule extends ListenerModule implements AbstractSlotLis
 	 */
 	@Override
 	public void newData(Object arg0, Class<?> arg1, String arg2) {
-		process(arg0.toString());
+		process(arg0.toString(), arg2);
 	}
 
 }
