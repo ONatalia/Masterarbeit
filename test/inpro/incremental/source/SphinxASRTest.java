@@ -25,7 +25,7 @@ import edu.cmu.sphinx.util.props.PropertyException;
  * (i.e., do not send revoke/add if nothing changes)
  * @author timo
  */
-public class CurrentASRHypothesisTest {
+public class SphinxASRTest {
 
 	@Test(timeout=60000)
 	public void testBuiltInSLM()  throws PropertyException, IOException, UnsupportedAudioFileException {
@@ -58,7 +58,7 @@ public class CurrentASRHypothesisTest {
 		RecoCommandLineParser clp = new RecoCommandLineParser(recoArgs);
 		ConfigurationManager cm = new ConfigurationManager(clp.getConfigURL());
 		SimpleReco simpleReco = new SimpleReco(cm, clp);
-		CurrentASRHypothesis casrh = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
+		SphinxASR casrh = (SphinxASR) cm.lookup("currentASRHypothesis");
 		TestModule tm = new TestModule();
 		casrh.addListener(tm);
 		simpleReco.recognizeOnce();

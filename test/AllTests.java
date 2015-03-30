@@ -19,7 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	inpro.incremental.processor.SynthesisModulePauseStopUnitTest.class,
 	inpro.incremental.processor.SynthesisModuleAdaptationUnitTest.class,
 	inpro.incremental.processor.ThreadingModuleTest.class,
-	inpro.incremental.source.CurrentASRHypothesisTest.class,
+	inpro.incremental.source.SphinxASRTest.class,
 	inpro.incremental.source.GoogleASRTest.class, 
 	inpro.incremental.unit.GradualSynthesisProgressTest.class,
 	inpro.incremental.unit.HesitationIUTest.class,

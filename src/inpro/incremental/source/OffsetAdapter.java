@@ -23,15 +23,15 @@ import edu.cmu.sphinx.util.props.S4Component;
 
 public class OffsetAdapter extends BaseDataProcessor {
 
-	@S4Component(defaultClass = CurrentASRHypothesis.class, type = CurrentASRHypothesis.class)
+	@S4Component(defaultClass = SphinxASR.class, type = SphinxASR.class)
 	public static final String PROP_CASRH = "casrh";
 	
-	CurrentASRHypothesis casrh;
+	SphinxASR casrh;
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
-		casrh = (CurrentASRHypothesis) ps.getComponent(PROP_CASRH);
+		casrh = (SphinxASR) ps.getComponent(PROP_CASRH);
 	}
 
     private boolean inAudio = false; 

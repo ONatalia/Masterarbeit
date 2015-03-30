@@ -34,9 +34,9 @@ import edu.cmu.sphinx.util.props.S4ComponentList;
  *       (i.e., when there are no alternatives left on the beam)
  * TODO: add support for top-down revokes (i.e., remove hypotheses
  *       from the search space when higher-level tells us to)
- * 
+ *       (I tested before but back then it resulted in horrible overall results)
  */
-public class CurrentASRHypothesis implements Configurable, ResultListener, Monitor {
+public class SphinxASR implements Configurable, ResultListener, Monitor {
 
 	@S4Component(type = FrontEnd.class, mandatory = true)
 	public final static String PROP_ASR_FRONTEND = "frontend"; // NO_UCD (unused code)
@@ -48,11 +48,7 @@ public class CurrentASRHypothesis implements Configurable, ResultListener, Monit
 	@S4ComponentList(type = PushBuffer.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
 	private final List<PushBuffer> listeners = new ArrayList<PushBuffer>();
-	
-//	@S4Component(type = TemporalNGramModel.class, mandatory = false)
-//	public final static String PROP_TNGM = "tngm";
-//	TemporalNGramModel tngm;
-	
+
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		asrDeltifier = (ASRWordDeltifier) ps.getComponent(PROP_ASR_DELTIFIER);
@@ -62,8 +58,6 @@ public class CurrentASRHypothesis implements Configurable, ResultListener, Monit
 		System.err.println("deltifier is " + asrDeltifier);
 		listeners.clear();
 		listeners.addAll(ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class));
-		
-//		tngm = (TemporalNGramModel) ps.getComponent(PROP_TNGM);
 	}
 	
 	public void addListener(PushBuffer pb) {
@@ -94,7 +88,6 @@ public class CurrentASRHypothesis implements Configurable, ResultListener, Monit
 		List<EditMessage<WordIU>> edits = asrDeltifier.getWordEdits();
 		List<WordIU> ius = asrDeltifier.getWordIUs();
 		int currentFrame = asrDeltifier.getCurrentFrame();
-//		if (tngm != null) tngm.setFrame(currentFrame);
 		for (PushBuffer listener : listeners) {
 			// update frame count in frame-aware pushbuffers
 			if (listener instanceof FrameAware)

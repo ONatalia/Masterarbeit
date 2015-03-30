@@ -3,7 +3,7 @@ package demo.inpro.system.greifarm;
 import inpro.apps.SimpleReco;
 import inpro.gui.util.SpeechStateVisualizer;
 import inpro.incremental.deltifier.ASRWordDeltifier;
-import inpro.incremental.source.CurrentASRHypothesis;
+import inpro.incremental.source.SphinxASR;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class GreifarmExperiment implements DropListener {
 	private static final int MAX_GAMES = 1;
 	
 	Random random;
-	private CurrentASRHypothesis casrh;
+	private SphinxASR casrh;
 	private List<ASRWordDeltifier> deltifiers;
 	private RecoRunner rr;
 	private GreifarmActor ga;
@@ -51,7 +51,7 @@ public class GreifarmExperiment implements DropListener {
 		ga = (GreifarmActor) cm.lookup("greifarmActor");
 		ga.greifarmController.dropListener = this;
 		gameScore = ga.gameScore;
-		casrh = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
+		casrh = (SphinxASR) cm.lookup("currentASRHypothesis");
 		deltifiers = new ArrayList<ASRWordDeltifier>(3);
 		deltifiers.add((ASRWordDeltifier) cm.lookup("none"));
 		deltifiers.add((ASRWordDeltifier) cm.lookup("smoothing"));

@@ -4,7 +4,7 @@ import inpro.apps.util.MonitorCommandLineParser;
 import inpro.apps.util.RecoCommandLineParser;
 import inpro.audio.AudioUtils;
 import inpro.incremental.PushBuffer;
-import inpro.incremental.source.CurrentASRHypothesis;
+import inpro.incremental.source.SphinxASR;
 import inpro.sphinx.frontend.RtpRecvProcessor;
 import inpro.util.TimeUtil;
 
@@ -270,7 +270,7 @@ public class SimpleReco {
 	private void setupMonitors() throws PropertyException {
 		ResultListener resultlistener = (ResultListener) cm.lookup("currentASRHypothesis");
 		recognizer.addResultListener(resultlistener);
-		CurrentASRHypothesis casrh = (CurrentASRHypothesis) cm.lookup("currentASRHypothesis");
+		SphinxASR casrh = (SphinxASR) cm.lookup("currentASRHypothesis");
 		if (clp.matchesOutputMode(RecoCommandLineParser.TED_OUTPUT)) {
 			casrh.addListener((PushBuffer) cm.lookup("tedNotifier"));
 		}
