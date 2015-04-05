@@ -8,7 +8,7 @@ public class HesitationIU extends ChunkIU {
 	public static final SysInstallmentIU protoHesitation;
 	
 	static { // setup and lengthen protoHesitation and add HMM features
-		protoHesitation = new SysInstallmentIU("ähm?");
+		protoHesitation = new SysInstallmentIU("ähm?"); //TODO: generalize for other languages
 		//List<SysSegmentIU> segs = protoHesitation.getSegments();
 		//for (IU seg : segs) {
 			//((SysSegmentIU) seg).stretch(2); // unfortunately, stretching hurts synthesis quality -- why?
