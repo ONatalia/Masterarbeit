@@ -96,6 +96,28 @@ public class MaryAdapter5internal extends MaryAdapter {
 	}
 
 	@Override
+	public List<PhraseIU> markup2phraseIUs(String markup) {
+		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class);
+		ihtse.resetUttHMMstore();
+		ihtse.synthesizeAudio = false;
+		InputStream is = markup2maryxml(markup);
+		List<PhraseIU> groundedIn = TTSUtil.phraseIUsFromMaryXML(is, ihtse.getUttData(), true);
+		return groundedIn;
+	}
+
+
+	@Override
+	public List<PhraseIU> fullyCompleteMarkup2phraseIUs(String markup) {
+		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class);
+		ihtse.resetUttHMMstore();
+		ihtse.synthesizeAudio = false;
+		InputStream is = fullyCompleteMarkup2maryxml(markup);
+		List<PhraseIU> groundedIn = TTSUtil.phraseIUsFromMaryXML(is, ihtse.getUttData(), true);
+		return groundedIn;
+	}
+
+
+	@Override
 	public synchronized List<IU> text2IUs(String tts) {
 		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class);
 		ihtse.resetUttHMMstore();

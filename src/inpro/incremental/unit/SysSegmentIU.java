@@ -2,16 +2,20 @@ package inpro.incremental.unit;
 
 import inpro.annotation.Label;
 import inpro.config.SynthesisConfig;
-import inpro.incremental.transaction.ComputeHMMFeatureVector;
 import inpro.synthesis.hts.FullPFeatureFrame;
 import inpro.synthesis.hts.FullPStream;
 import inpro.synthesis.hts.VocodingFramePostProcessor;
 import inpro.synthesis.hts.PHTSParameterGeneration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.Queue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import marytts.features.FeatureVector;
 import marytts.htsengine.HMMData;
@@ -152,17 +156,20 @@ public class SysSegmentIU extends SegmentIU {
 	}
 
 	HTSModel generateHTSModel() {
-		FeatureVector fv = ComputeHMMFeatureVector.featuresForSegmentIU(this);
-		double prevErr = getSameLevelLink() != null & getSameLevelLink() instanceof SysSegmentIU ? ((SysSegmentIU) getSameLevelLink()).getHTSModel().getDurError() : 0f;
-		HTSModel htsModel = hmmdata.getCartTreeSet().generateHTSModel(hmmdata, hmmdata.getFeatureDefinition(), fv, prevErr);
-		return htsModel;
+//		FeatureVector fv = ComputeHMMFeatureVector.featuresForSegmentIU(this);
+//		double prevErr = getSameLevelLink() != null & getSameLevelLink() instanceof SysSegmentIU ? ((SysSegmentIU) getSameLevelLink()).getHTSModel().getDurError() : 0f;
+//		HTSModel htsModel = hmmdata.getCartTreeSet().generateHTSModel(hmmdata, hmmdata.getFeatureDefinition(), fv, prevErr);
+		//possibly throw away htsModel's f0-values if you don't like it:
+		// htsModel.setMaryXmlF0("");
+//		return htsModel;
+		return legacyHTSmodel;
 	}
 	
 	/** helper, append HMM if possible, return emission length */
 	private static int appendSllHtsModel(List<HTSModel> hmms, IU sll) {
 		int length = 0;
 		if (sll != null && sll instanceof SysSegmentIU) {
-			HTSModel hmm = ((SysSegmentIU) sll).legacyHTSmodel;
+			HTSModel hmm = ((SysSegmentIU) sll).getHTSModel(); // document if you feel like you need to change this line (in particular, please document the reason, why this might better be legacyHTSmodel
 			hmms.add(hmm);
 			length = hmm.getTotalDur();
 		}
@@ -208,8 +215,70 @@ public class SysSegmentIU extends SegmentIU {
 		PHTSParameterGeneration paramGen = new PHTSParameterGeneration(hmmdata);
 		FullPStream pstream = paramGen.buildFullPStreamFor(localHMMs);
 		hmmSynthesisFeatures = new ArrayList<FullPFeatureFrame>(length);
-		for (int i = start; i < start + length; i++)
-			hmmSynthesisFeatures.add(pstream.getFullFrame(i));
+		// ponder whether we really want this; in particular, we probably don't want this in no-future incremental use-cases!
+		boolean useMaryF0 = true;
+		Queue<Double> maryF0Values = null; // one per voiced state in this segment's htsModel
+		if (useMaryF0 && htsModel.getMaryXmlF0() != null) {
+			maryF0Values = reconstructMaryF0FromXml(htsModel);
+		}
+		if (maryF0Values == null || maryF0Values.size() == 0)
+			useMaryF0 = false;
+		for (int i = start; i < start + length; i++) {
+			FullPFeatureFrame frame = pstream.getFullFrame(i);
+			if (useMaryF0) {
+				Double maryF0 = maryF0Values.poll();
+				if (maryF0 != null)
+					frame.setf0Par(maryF0);
+			}
+			hmmSynthesisFeatures.add(frame);
+		}
+	}
+	
+	private Queue<Double> reconstructMaryF0FromXml(HTSModel htsModel) {
+		int numVoicedFrames = htsModel.getNumVoiced();
+		if (numVoicedFrames == 0)
+			return null; // there's nothing to be done here!
+		Pattern p = Pattern.compile("(\\d+,\\d+(?:\\.\\d+))");
+		Matcher xml = p.matcher(htsModel.getMaryXmlF0());
+		Double[] f0Values = new Double[numVoicedFrames];
+		Double prevValue = null;
+		while (xml.find()) {
+			String[] parseResult = (xml.group().trim()).split(",");
+			Double value;
+			try { 
+				value = Double.valueOf(parseResult[1]); 
+				if (prevValue == null)
+					prevValue = value;
+			} catch(NumberFormatException nfe) {
+				value = null;
+			}
+			try { 
+				int key = Integer.parseInt(parseResult[0]);
+				if (key == 0) {
+					f0Values[0] = value;
+				} else if (key == 100) {
+					f0Values[numVoicedFrames - 1] = value;
+				} else {
+					int index = (int) ((numVoicedFrames * key) / 100.0);
+					if (index >= 0 && index < numVoicedFrames)
+						f0Values[index] = value;
+				}
+			} catch(NumberFormatException nfe) {
+				logger.warn("ignoring f0 spec in maryXML (cannot parse): \n", nfe);
+			}
+		}
+		if (prevValue == null) {
+			logger.warn("Could not parse any f0 value!");
+			return null;
+		}
+		// make sure that we have a voicing value in place for every voiced frame:
+		for (int i = 0; i < f0Values.length; i++) {
+			if (f0Values[i] == null)
+				f0Values[i] = prevValue;
+			else
+				prevValue = f0Values[i];
+		}
+		return new LinkedList<Double>(Arrays.<Double>asList(f0Values));
 	}
 	
 	/** return the next vocoding parameter frame */

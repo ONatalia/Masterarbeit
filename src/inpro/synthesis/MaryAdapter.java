@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -103,6 +105,42 @@ public abstract class MaryAdapter {
 			e.printStackTrace();
 		}
 		return bais;
+	}
+	
+	/** input: markup that is acceptable to MaryTTS as RAWMARYXML */
+	public InputStream markup2maryxml(String markup) {
+		return getInputStreamFromMary(wrapWithToplevelTag(markup), "RAWMARYXML", "REALISED_ACOUSTPARAMS");
+	}
+	
+	public InputStream fullyCompleteMarkup2maryxml(String markup) {
+		return getInputStreamFromMary(wrapWithToplevelTag(markup), "ACOUSTPARAMS", "REALISED_ACOUSTPARAMS");
+	}
+	
+	/** surround markup with toplevel maryxml-tag, if this is missing */
+	private String wrapWithToplevelTag(String markup) {
+		Pattern wrapTest = Pattern.compile("<maryxml.*</maryxml>", Pattern.DOTALL);
+		Matcher wrapped = wrapTest.matcher(markup);
+		if (!wrapped.find()) {
+			return  "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+					"<maryxml version=\"0.5\" " +
+					"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+					"xmlns=\"http://mary.dfki.de/2002/MaryXML\" " +
+					"xml:lang=\"de\">\n" + 
+					markup + "\n</maryxml>";
+		} else
+			return markup;
+	}
+	
+	public List<PhraseIU> markup2phraseIUs(String markup) {
+		InputStream is = markup2maryxml(markup);
+		List<PhraseIU> groundedIn = TTSUtil.phraseIUsFromMaryXML(is, Collections.<TTSUtil.SynthesisPayload>emptyList(), true);
+		return groundedIn;
+	}
+	
+	public List<PhraseIU> fullyCompleteMarkup2phraseIUs(String markup) {
+		InputStream is = fullyCompleteMarkup2maryxml(markup);
+		List<PhraseIU> groundedIn = TTSUtil.phraseIUsFromMaryXML(is, Collections.<TTSUtil.SynthesisPayload>emptyList(), true);
+		return groundedIn;
 	}
 	
 	public InputStream text2maryxml(String text) {

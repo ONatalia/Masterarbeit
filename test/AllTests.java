@@ -35,6 +35,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	inpro.pitch.util.ShortestPathTest.class,
 	inpro.sphinx.frontend.ConversionUtilTest.class,
 	inpro.sphinx.frontend.MonitorTest.class,
+	inpro.synthesis.MarkupTest.class, 
 	inpro.synthesis.MaryAdapterIUUnitTest.class,
 	inpro.synthesis.MaryAdapterMbrolaUnitTest.class,  
 	inpro.synthesis.RevokingTest.class, 
