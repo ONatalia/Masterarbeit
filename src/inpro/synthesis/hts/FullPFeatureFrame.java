@@ -33,7 +33,7 @@ public class FullPFeatureFrame {
     	);
 	}
 
-	public double[] getMcepParVec() { return mcepParVec; }
+	public double[] getMcepParVec() { return mcepParVec.clone(); }
     public double[] getMagParVec() { return magParVec; }
     public double[] getStrParVec() { return strParVec; }
 

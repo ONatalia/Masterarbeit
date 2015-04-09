@@ -26,6 +26,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	//inpro.incremental.unit.IncrementalCARTTest.class, // there aren't any tests in this anymore
 	inpro.incremental.unit.IUPathTest.class,
 	inpro.incremental.unit.IUUpdateListenerTest.class, 
+	inpro.incremental.unit.MultiplySynthesizedIUsTest.class,
 	inpro.incremental.util.TTSUtilTest.class, 
 	//inpro.irmrsc.parser.SITDBSParserTest.class,
 	//inpro.nlu.AVMComposerTest.class,
