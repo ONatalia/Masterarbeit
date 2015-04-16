@@ -67,7 +67,13 @@ public class TTSUtil {
 	
 	public static List<WordIU> wordIUsFromMaryXML(InputStream is, List<SynthesisPayload> synthesisPayload) {
 		AllContent content = mary2content(is);
-		List<WordIU> words =  content.getWordIUs(synthesisPayload != null ? synthesisPayload.iterator() : Collections.<SynthesisPayload>emptyIterator());
+		List<WordIU> words = null;
+		try {
+			words =  content.getWordIUs(synthesisPayload != null ? synthesisPayload.iterator() : Collections.<SynthesisPayload>emptyIterator());
+		} catch (AssertionError ae) {
+			System.err.println(content.toString());
+			throw ae;
+		}
 		// remove utterance final silences
 		ListIterator<WordIU> fromEnd = words.listIterator(words.size());
 		while (fromEnd.hasPrevious()) {
@@ -227,7 +233,13 @@ public class TTSUtil {
 			List<IU> syllableIUs = new ArrayList<IU>(syllables.size());
 			IU prev = null;
 			for (Syllable s : syllables) {
-				IU sIU = s.toIU(spIterator);
+				IU sIU;
+				try {
+					sIU = s.toIU(spIterator);
+				} catch (AssertionError ae) {
+					System.err.println("Error within word " + this.toString());
+					throw ae;
+				}
 				sIU.connectSLL(prev);
 				syllableIUs.add(sIU);
 				prev = sIU;

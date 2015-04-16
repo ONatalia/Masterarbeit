@@ -14,8 +14,12 @@ import marytts.htsengine.HTSParameterGeneration;
 import marytts.htsengine.HTSUttModel;
 import marytts.htsengine.HMMData.FeatureType;
 
-
-
+/** 
+ * Inpro-clone of MaryTTS's HTSParameterGeneration (but working incrementally)
+ * 
+ * this class performs HSMM observation optimization for all supported types of 
+ * parameter streams (same as in MaryTTS).  
+ */
 public class PHTSParameterGeneration {
 
 	private boolean[] voiced;
