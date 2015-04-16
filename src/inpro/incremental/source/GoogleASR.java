@@ -48,7 +48,7 @@ public class GoogleASR extends IUSourceModule {
 	public final static String PROP_API_KEY = "apiKey";
 	
 	@S4String(defaultValue = "16000")
-	public final static String PROP_SAMPLING_RATE = "16000";
+	public final static String PROP_SAMPLING_RATE = "samplingRate";
 	
 	private String languageCode;
 	private GoogleJSONListener jsonlistener;

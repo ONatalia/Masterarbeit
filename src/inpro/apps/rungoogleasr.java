@@ -27,9 +27,9 @@ public class rungoogleasr {
         // second key: AIzaSyBR8gjIWNoEd1PltsZDH_7OhvftJ_eDPhM
         gasr.setAPIKey("AIzaSyBR8gjIWNoEd1PltsZDH_7OhvftJ_eDPhM");
         //uncomment line to change the language
-        gasr.setLanguageCode("en-us");
+        gasr.setLanguageCode("de-de");
         // set the sampling rate
-        gasr.setSamplingRate("8000");
+        gasr.setSamplingRate("16000");
         LabelWriter label = new LabelWriter();
         label.writeToFile();
         label.setFileName(args[args.length - 1]);
