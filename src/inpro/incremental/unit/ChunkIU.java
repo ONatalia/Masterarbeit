@@ -86,10 +86,11 @@ public class ChunkIU extends WordIU {
 		}
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void preSynthesize() {
 		assert previousSameLevelLink == null : "You shouldn't pre-synthesize something that is already connected";
 		assert groundedIn == null : "You shouldn't pre-synthesize something that is already connected";
-		groundedIn = MaryAdapter.getInstance().text2IUs(this.chunkText);
+		groundedIn = (List) MaryAdapter.getInstance().text2WordIUs(this.chunkText);
 	}
 	
 	@Override

@@ -22,7 +22,8 @@ public class IncrementalCARTTest {
 	//@Test
 	public void test() {
 		MaryAdapter ma = MaryAdapter.getInstance();
-		List<IU> ius = ma.text2IUs("eins zwei drei vier fünf sechs sieben acht");
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		List<IU> ius = (List) ma.text2WordIUs("eins zwei drei vier fünf sechs sieben acht");
 		for (IU iu : ius) {
 			WordIU p = (WordIU) iu;
 			for (SegmentIU s : p.getSegments()) {

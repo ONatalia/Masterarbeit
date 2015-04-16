@@ -31,11 +31,12 @@ public class ChunkBasedInstallmentIU extends SysInstallmentIU {
 	}
 	
 	/** create a chunk from  */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ChunkBasedInstallmentIU(ChunkIU chunk) {
 		super(chunk.toPayLoad(), chunk.getWords());
 		// if the chunk that we're starting from isn't yet pre-synthesized, we have to build the IU structure
 		if (chunk.getWords() == null) {
-			groundedIn = MaryAdapter.getInstance().text2IUs(tts);
+			groundedIn = (List) MaryAdapter.getInstance().text2WordIUs(tts);
 		} else {
 			groundedIn = new ArrayList<IU>(groundedIn); // ensure that the grounded-in lists aren't shared between InstallmentIU and ChunkIU!
 		}

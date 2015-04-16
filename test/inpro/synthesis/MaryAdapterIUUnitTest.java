@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.List;
 
-import inpro.incremental.unit.IU;
+import inpro.incremental.unit.WordIU;
 import inpro.synthesis.MaryAdapter;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,10 +25,10 @@ public class MaryAdapterIUUnitTest {
 	}
 
 	@Test
-	public void testText2IUs() {
+	public void testText2WordIUs() {
 		MaryAdapter ma = MaryAdapter.getInstance();
-		List<IU> ius = ma.text2IUs("eins zwei drei vier fünf sechs sieben acht");
-		assertEquals(ius.size(), 8);
+		List<WordIU> ius = ma.text2WordIUs("eins zwei drei vier fünf sechs sieben acht");
+		assertEquals(8, ius.size());
 	}
 
 }

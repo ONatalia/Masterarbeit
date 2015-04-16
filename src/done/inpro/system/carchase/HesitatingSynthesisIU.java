@@ -13,6 +13,7 @@ import inpro.synthesis.MaryAdapter;
 
 public class HesitatingSynthesisIU extends SysInstallmentIU {
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public HesitatingSynthesisIU(String text) {
 		super(text);
 		// handle <hes> marker at the end separately
@@ -22,7 +23,7 @@ public class HesitatingSynthesisIU extends SysInstallmentIU {
 			tts = tts.replaceAll(" <hes>$", "");
 		} else 
 			addFinalHesitation = false;
-		groundedIn = MaryAdapter.getInstance().text2IUs(tts);
+		groundedIn = (List) MaryAdapter.getInstance().text2WordIUs(tts);
 		// remove utterance final silences
 		IU pred = groundedIn.get(groundedIn.size() - 1);
 		while (((WordIU) pred).isSilence()) {

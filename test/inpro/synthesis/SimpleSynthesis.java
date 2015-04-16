@@ -26,7 +26,7 @@ public class SimpleSynthesis {
 		d.playStream(MaryAdapter.getInstance().text2audio("Dies ist noch ein Satz, mach Platz."), true);
 		// wait for synthesis:
 		d.waitUntilDone();
-		List<IU> wordIUs = MaryAdapter.getInstance().text2IUs("Dies ist noch ein Satz, mach Platz.");
+		List<? extends IU> wordIUs = MaryAdapter.getInstance().text2WordIUs("Dies ist noch ein Satz, mach Platz.");
 		d.playStream(AudioUtils.get16kAudioStreamForVocodingStream(new VocodingAudioStream(new IUBasedFullPStream(wordIUs.get(0)), MaryAdapter5internal.getDefaultHMMData(), true)), true);
 		// wait for synthesis:
 		d.waitUntilDone();
@@ -44,7 +44,7 @@ public class SimpleSynthesis {
 		d.playStream(MaryAdapter.getInstance().text2audio("This is another long and complex sentence."), true);
 		// wait for synthesis:
 		d.waitUntilDone();
-		List<IU> wordIUs = MaryAdapter.getInstance().text2IUs("This is another long and complex sentence.");
+		List<? extends IU> wordIUs = MaryAdapter.getInstance().text2WordIUs("This is another long and complex sentence.");
 		d.playStream(AudioUtils.get16kAudioStreamForVocodingStream(new VocodingAudioStream(new IUBasedFullPStream(wordIUs.get(0)), MaryAdapter5internal.getDefaultHMMData(), true)), true);
 		// wait for synthesis:
 		d.waitUntilDone();

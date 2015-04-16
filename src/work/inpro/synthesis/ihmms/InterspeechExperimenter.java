@@ -62,7 +62,7 @@ public class InterspeechExperimenter {
 	
 	static List<PhraseIU> preprocess(String text, boolean connectPhrases) {
 		MaryAdapter5internal m = (MaryAdapter5internal) MaryAdapter.getInstance();
-		return m.text2phraseIUs(text, connectPhrases);
+		return m.text2PhraseIUs(text, connectPhrases);
 	}
 
 	private int synthesizeOnce(String text) {

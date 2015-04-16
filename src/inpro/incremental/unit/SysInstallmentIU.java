@@ -26,9 +26,10 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	Logger logger = Logger.getLogger(this.getClass());
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SysInstallmentIU(String tts) {
 		super(null, tts);
-		groundedIn = MaryAdapter.getInstance().text2IUs(tts);
+		groundedIn = (List) MaryAdapter.getInstance().text2WordIUs(tts);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // allow cast from List<WordIU> to List<IU>

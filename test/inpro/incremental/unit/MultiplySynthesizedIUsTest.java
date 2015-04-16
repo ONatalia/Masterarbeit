@@ -21,7 +21,8 @@ public class MultiplySynthesizedIUsTest {
 	
 	@Test public void testInvarianceOfFeatureFrameToVocoding() {
 		DispatchStream dispatcher = SimpleMonitor.setupDispatcher();
-		List<IU> words = MaryAdapter.getInstance().text2IUs("Mississippi");
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		List<IU> words = (List) MaryAdapter.getInstance().text2WordIUs("Mississippi");
 		WordIU word = (WordIU) words.get(0);
 		FullPStream stream = new IUBasedFullPStream(word.getFirstSegment());
 		FullPFeatureFrame frame = stream.getNextFrame();
@@ -36,7 +37,8 @@ public class MultiplySynthesizedIUsTest {
 
 	@Test public void testAbilityToSynthesizeAnIUMultipleTimes() {
 		DispatchStream dispatcher = SimpleMonitor.setupDispatcher();
-		List<IU> words = MaryAdapter.getInstance().text2IUs("Dies sollte gleichbleibend gut klingen.");
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		List<IU> words = (List) MaryAdapter.getInstance().text2WordIUs("Dies sollte gleichbleibend gut klingen.");
 		WordIU firstWord = (WordIU) words.get(0);
 		WordIU lastWord = (WordIU) words.get(words.size() - 1);
 		firstWord.connectSLL(lastWord);

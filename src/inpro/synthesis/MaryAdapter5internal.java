@@ -1,7 +1,7 @@
 package inpro.synthesis;
 
-import inpro.incremental.unit.IU;
 import inpro.incremental.unit.PhraseIU;
+import inpro.incremental.unit.WordIU;
 import inpro.incremental.util.TTSUtil;
 import inpro.synthesis.hts.InteractiveHTSEngine;
 import inpro.synthesis.hts.PHTSParameterGeneration;
@@ -9,7 +9,6 @@ import inpro.synthesis.hts.PHTSParameterGeneration;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Locale;
 
@@ -32,12 +31,11 @@ import marytts.util.MaryUtils;
 
 public class MaryAdapter5internal extends MaryAdapter {
 
-	private static MaryAdapter maryAdapter;
 	private MaryInterface maryInterface;
 
 	private static Logger logger = Logger.getLogger(MaryAdapter5internal.class);
 
-	public MaryAdapter5internal() {
+	protected MaryAdapter5internal() {
 		maryInterface = null;
 		try {
 			maryInterface = new LocalMaryInterface();
@@ -47,10 +45,13 @@ public class MaryAdapter5internal extends MaryAdapter {
 		}
 	}
 
+	/** 
+	 * implement the main inprotk<->marytts interaction via mary's interface. 
+	 * (additional data for HMM synthesis is exchanged via subclassing HTSEngine) 
+	 */ 
 	@Override
 	protected ByteArrayOutputStream process(String query, String inputType,
-			String outputType, String audioType) throws UnknownHostException,
-			IOException {
+			String outputType, String audioType) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		MaryDataType input = MaryDataType.get(inputType);
 		MaryDataType output = MaryDataType.get(outputType);
@@ -88,92 +89,65 @@ public class MaryAdapter5internal extends MaryAdapter {
 	        return baos;
 	}
 
-	public static MaryAdapter getInstance() {
-		if (maryAdapter == null) {
-			initializeMary();
-		}
-		return maryAdapter;
-	}
-
+	/** needs to be overridden for IHTSE access */
 	@Override
-	public List<PhraseIU> markup2phraseIUs(String markup) {
+	public List<PhraseIU> fullySpecifiedMarkup2PhraseIUs(String markup) {
 		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class);
 		ihtse.resetUttHMMstore();
 		ihtse.synthesizeAudio = false;
-		InputStream is = markup2maryxml(markup);
+		InputStream is = fullySpecifiedMarkup2maryxml(markup);
+		// useful for looking at Mary's XML (for debugging): 
+		//printStream(is); ihtse.resetUttHMMstore(); is = fullyCompleteMarkup2maryxml(markup);
 		List<PhraseIU> groundedIn = TTSUtil.phraseIUsFromMaryXML(is, ihtse.getUttData(), true);
 		return groundedIn;
 	}
 
-
+	/** needs to be overridden for IHTSE access */
 	@Override
-	public List<PhraseIU> fullyCompleteMarkup2phraseIUs(String markup) {
-		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class);
-		ihtse.resetUttHMMstore();
-		ihtse.synthesizeAudio = false;
-		InputStream is = fullyCompleteMarkup2maryxml(markup);
-		List<PhraseIU> groundedIn = TTSUtil.phraseIUsFromMaryXML(is, ihtse.getUttData(), true);
-		return groundedIn;
-	}
-
-
-	@Override
-	public synchronized List<IU> text2IUs(String tts) {
+	protected synchronized List<? extends WordIU> text2IUs(String tts, boolean keepPhrases, boolean connectPhrases) {
 		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class);
 		ihtse.resetUttHMMstore();
 		ihtse.synthesizeAudio = false;
 		InputStream is = text2maryxml(tts);
-      // useful code for looking at Mary's XML (for debugging): 
-/*		java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(is));
-		String line = null;
+		//printStream(is); ihtse.resetUttHMMstore(); is = markup2maryxml(markup);
 		try {
-			while((line = in.readLine()) != null) {
-			  System.err.println(line);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return createIUsFromInputStream(is, ihtse.getUttData(), keepPhrases, connectPhrases);
+		} catch (AssertionError ae) {
+			is = text2maryxml(tts);
+			java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(is));
+			String line = null;
+			try {
+				while((line = in.readLine()) != null) {
+				  System.err.println(line);
+				}
+			} catch (IOException e) { }
+			throw new RuntimeException(ae);
 		}
-		ihtse.resetUttHMMstore();
-		is = text2maryxml(tts); /**/
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		List<IU> groundedIn = (List) TTSUtil.wordIUsFromMaryXML(is, ihtse.getUttData());
-		return groundedIn;
-	}
-	@Override
-	public synchronized List<PhraseIU> text2phraseIUs(String tts) {
-		return text2phraseIUs(tts, true);
-	}
-	
-	public synchronized List<PhraseIU> text2phraseIUs(String tts, boolean connectedPhrases) {
-		InteractiveHTSEngine ihtse = (InteractiveHTSEngine) ModuleRegistry.getModule(InteractiveHTSEngine.class);
-		ihtse.resetUttHMMstore();
-		InputStream is = text2maryxml(tts);
-/*		java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(is));
-		String line = null;
-		try {
-			while((line = in.readLine()) != null) {
-			  System.err.println(line);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		ihtse.resetUttHMMstore();
-		is = text2maryxml(tts); /**/
-		List<PhraseIU> groundedIn = TTSUtil.phraseIUsFromMaryXML(is, ihtse.getUttData(), connectedPhrases);
-		return groundedIn;
 	}
 	
 	public static HMMData getDefaultHMMData() {
 		String defaultVoiceName = System.getProperty("inpro.tts.voice", System.getProperty("inpro.tts.voice", "bits1-hsmm"));
 		Voice voice = Voice.getVoice(defaultVoiceName);
 		assert (voice instanceof HMMVoice);
-        return ((HMMVoice) voice).getHMMData();
+		return ((HMMVoice) voice).getHMMData();
 	}
 
 	public static PHTSParameterGeneration getNewParamGen() {
 		return new PHTSParameterGeneration(getDefaultHMMData());
+	}
+
+    /** print Mary's XML to stderr */ 
+	@SuppressWarnings("unused")
+	private void printStream(InputStream is) {
+		java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(is));
+		String line = null;
+		try {
+			while((line = in.readLine()) != null) {
+			  System.err.println(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
