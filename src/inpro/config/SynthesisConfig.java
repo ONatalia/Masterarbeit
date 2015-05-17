@@ -1,5 +1,6 @@
 package inpro.config;
 
+import marytts.modules.synthesis.Voice;
 import edu.cmu.sphinx.util.props.Configurable;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -23,7 +24,7 @@ public class SynthesisConfig implements Configurable {
     private static byte[] dTreeFeatureDefaultsGerman = { // on my corpus with BITS-1 voice
         43, 0, 2, 1, 0, 0, 0, 6, 2, 0, 1, 0, 0, 1, 1, 43, 1, 0, 0, 0, 0, 43, 1, 1, 1, 0, 0, 2, 2, 0, 1, 0, 0, 0, 0, 0, 2, 2, 0, 0, 2, 2, 0, 0, 0, 9, 12, 9, 0, 0, 1, 1, 1, 6, 2, 0, 0, 0, 43, 0, 2, 0, 0, 43, 2, 0, 0, 0, 0, 0, 1, 1, 2, 0, 2, 0, 0, 1, 1, 2, 3, 0, 1, 1, 9, 1, 1, 3, 4, 0, 1, 3, 6, 7, 2, 1, 1, 1, 2, 1, 0, 0, 0, 6, 2, 3, 4, 4, 4, 4, 4
     };
-    @SuppressWarnings("unused")
+
 	private static byte[] dTreeFeatureDefaultsEnglish = { // on my corpus with CMU-SLT voice
         1, 0, 2, 2, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 17, 2, 0, 0, 0, 0, 35, 0, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 2, 1, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 6, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 1, 1, 0, 2, 0, 0, 1, 0, 0, 2, 0, 0, 12, 0, 1, 4, 4, 0, 1, 0, 0, 7, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0
     };
@@ -65,7 +66,7 @@ public class SynthesisConfig implements Configurable {
 	}
 	
 	public byte[] getDTreeFeatureDefaults() {
-		return dTreeFeatureDefaultsGerman; // FIXME!!
+		return Voice.getVoice(System.getProperty("mary.voice","bits1-hsmm")).getLocale().getLanguage().equals("de") ? dTreeFeatureDefaultsGerman : dTreeFeatureDefaultsEnglish;
 	}
 
 	public DTreeContext getDTreeContext() {
