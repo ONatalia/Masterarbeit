@@ -76,7 +76,7 @@ public class SphinxASR implements Configurable, ResultListener, Monitor {
 		return asrDeltifier;
 	}
 	
-	public void newResult(Result result) {
+	public synchronized void newResult(Result result) {
 		asrDeltifier.deltify(result);
 		notifyListeners();
 		if (result.isFinal()) {
