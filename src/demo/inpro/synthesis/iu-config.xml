@@ -7,7 +7,7 @@
     <!-- ******************************************************** -->
     <!-- The incremental processing configuration                 -->
     <!-- ******************************************************** -->
-    <component name="currentASRHypothesis" type="inpro.incremental.source.CurrentASRHypothesis">
+    <component name="currentASRHypothesis" type="inpro.incremental.source.SphinxASR">
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
