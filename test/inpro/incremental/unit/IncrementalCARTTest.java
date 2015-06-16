@@ -15,11 +15,12 @@ import marytts.htsengine.HMMData.FeatureType;
 import marytts.htsengine.HTSModel;
 
 import org.junit.Test;
+import org.junit.Ignore;
 
 public class IncrementalCARTTest {
 
 	// do not test this anymore, as legacy and generated models differ in incremental synthesis
-	//@Test
+	@Ignore @Test
 	public void test() {
 		MaryAdapter ma = MaryAdapter.getInstance();
 		@SuppressWarnings({ "unchecked", "rawtypes" })

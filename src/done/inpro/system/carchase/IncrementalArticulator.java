@@ -53,6 +53,7 @@ public class IncrementalArticulator extends StandardArticulator {
 		}
 		
 		// example of how to revoke the most recently added chunk/hesitation
+		@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
 		public void revokeLast() {
 			rightBuffer.editBuffer(new EditMessage(EditType.REVOKE, rightBuffer.getBuffer().get(rightBuffer.getBuffer().size() - 1)));
 			rightBuffer.notify(iulisteners);

@@ -11,7 +11,6 @@ import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DataEndSignal;
 import edu.cmu.sphinx.frontend.DoubleData;
-import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.endpoint.SpeechEndSignal;
 
 public class FrontEndBackedAudioInputStream extends AudioInputStream {

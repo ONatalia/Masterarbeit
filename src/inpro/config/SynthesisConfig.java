@@ -13,7 +13,7 @@ public class SynthesisConfig implements Configurable {
 	@S4Integer(defaultValue = maxHmmContextValue, range = {0, maxHmmContextValue})
 	public final static String PROP_HMM_OPT_PAST = "hmmOptPastContext";
 	/** the (maximum) number of phonemes to consider preceding the current phone during HMM optimization */
-	private int hmmOptimizationFutureContext = maxHmmContextValue;
+	private int hmmOptimizationFutureContext = 2; //maxHmmContextValue;
 	
 	@S4Integer(defaultValue = maxHmmContextValue, range = {0, maxHmmContextValue})
 	public final static String PROP_HMM_OPT_FUTURE = "hmmOptFutureContext";
@@ -62,7 +62,7 @@ public class SynthesisConfig implements Configurable {
 	}
 
 	public int getHmmOptimizationFutureContext() {
-		return 2;//hmmOptimizationFutureContext;
+		return hmmOptimizationFutureContext;
 	}
 	
 	public byte[] getDTreeFeatureDefaults() {

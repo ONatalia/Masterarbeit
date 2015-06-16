@@ -35,7 +35,8 @@ public class DialogAsrResult extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	static Logger log = Logger.getLogger(DialogAsrResult.class.getName());
-	public static double previousTimestamp = -1;
+	// TODO: the following is NOT good style.
+	public static double previousTimestamp = -1; 
 	private Thread prevResetThread;
        
 	
@@ -112,19 +113,20 @@ public class DialogAsrResult extends HttpServlet {
           } // end of while
           
 //        set some of the shared information for each utterance hyp
-          if (this.previousTimestamp == -1) this.previousTimestamp = timestamp;
+          if (DialogAsrResult.previousTimestamp == -1) 
+        	  DialogAsrResult.previousTimestamp = timestamp;
           
           for (AsrHyp hyp : asrHyps) {
         	  log.debug("new hyp: " + hyp);
         	  hyp.setUtteranceKey(utteranceKey);
         	  hyp.setTimestamp(timestamp/1000.0 - TimeUtil.startupTime/1000.0);
-        	  hyp.setPreviousTimestamp(Math.abs(this.previousTimestamp/1000.0 - TimeUtil.startupTime/1000.0));
+        	  hyp.setPreviousTimestamp(Math.abs(DialogAsrResult.previousTimestamp/1000.0 - TimeUtil.startupTime/1000.0));
         	  hyp.setFinal(isFinal);
           }
           
           updateResetThread();
           
-          this.previousTimestamp = timestamp;
+          DialogAsrResult.previousTimestamp = timestamp;
 //          if (isFinal) webSpeech.setStartTime(); // reset start time if endpointing detected the end of an utterance
 //        this is where you would send the results along to something else, in this case the WebSpeech that makes IUs out of them
           webSpeech.setNewHyps(asrHyps);

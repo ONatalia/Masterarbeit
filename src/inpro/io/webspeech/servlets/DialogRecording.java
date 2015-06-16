@@ -1,12 +1,10 @@
 package inpro.io.webspeech.servlets;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -60,23 +58,6 @@ public class DialogRecording extends HttpServlet {
 	}
 		
 	
-	/**
-	 * Gets the value from a multipart data stream, only works for variables that have strings as values. 
-	 * 
-	 * @param part Part object
-	 * @return String value
-	 * @throws IOException
-	 */
-	private String getValue(Part part) throws IOException {
-	    BufferedReader reader = new BufferedReader(new InputStreamReader(part.getInputStream(), "UTF-8"));
-	    StringBuilder value = new StringBuilder();
-	    char[] buffer = new char[1024];
-	    for (int length = 0; (length = reader.read(buffer)) > 0;) {
-	        value.append(buffer, 0, length);
-	    }
-	    return value.toString();
-	}
-
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */

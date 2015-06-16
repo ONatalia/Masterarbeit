@@ -138,9 +138,7 @@ public class TTSUtil {
 		@XmlAttribute private String tone;
 		@XmlAttribute private int breakIndex;
 		@XmlAttribute private String pitchOffset;
-		private transient double pitchOffsetValue;
 		@XmlAttribute private String pitchRange;
-		private transient double pitchRangeValue;
 		@XmlElement(name = "t")
 		private List<Word> words;
 

@@ -80,7 +80,8 @@ public class HTSModelComparator {
     }
     
     /** to be used when computing summary statistics for MCP and STR features */
-    private static double aggregatedError(SummaryStatistics[] stats, SummaryStatistics[] error) {
+    @SuppressWarnings("unused")
+	private static double aggregatedError(SummaryStatistics[] stats, SummaryStatistics[] error) {
         double squaredAggregatedError = 0f;
         for (int i = 0; i < stats.length; i++) {
           double normalizedError = error[i].getMean() / stats[i].getStandardDeviation();
