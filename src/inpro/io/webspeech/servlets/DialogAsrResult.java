@@ -1,19 +1,8 @@
 package inpro.io.webspeech.servlets;
 
 import inpro.io.webspeech.WebSpeech;
-import inpro.io.webspeech.model.AsrHyp;
-import inpro.util.TimeUtil;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,9 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.json.simple.parser.ContainerFactory;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
  * @author casey
@@ -57,6 +43,7 @@ public class DialogAsrResult extends HttpServlet {
 	 */
     @Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	/*
 		if (prevResetThread != null) {
 			prevResetThread.interrupt();
 		}
@@ -135,43 +122,7 @@ public class DialogAsrResult extends HttpServlet {
         catch(ParseException pe){
           pe.printStackTrace();
         }
-	}
-
-	private ArrayList<AsrHyp> getHyps(String value) {
-		ArrayList<AsrHyp> asrHyps = new ArrayList<AsrHyp>();
-		HashMap<Integer,AsrHyp> buffer = new HashMap<Integer,AsrHyp>();
-		value = value.substring(2,value.length()-2);
-//    	Somewhat hacky, but we get the hyps and confidence scores from the string itself
-    	
-		String[] splitValue = value.split("\\}, \\{");
-		for (int j=0; j<splitValue.length; j++) {
-			value = splitValue[j];
-			System.out.println(value);
-	    	String hyps = value.substring(value.indexOf("hyps=")+5);
-	    	hyps = hyps.substring(hyps.indexOf("[")+1,hyps.indexOf("]"));
-	    	String confs = value.substring(value.indexOf("confidence=")+11);
-	    	int cutoff = confs.indexOf("]");
-	    	confs = confs.substring(confs.indexOf("[")+1,cutoff);
-	    	String[] confSplit = confs.split(", ");
-	    	String[] hypSplit = hyps.split(", ");
-//    		step through each hyp and add a new AsrHyp object for each
-    		for (int i=0; i<hypSplit.length; i++) {
-    			if (!buffer.containsKey(i)) {
-    				AsrHyp hyp = new AsrHyp(hypSplit[i], Double.parseDouble(confSplit[i]));
-    				buffer.put(i,  hyp);
-    			}
-    			else {
-    				buffer.get(i).appendHyp(hypSplit[i]);
-    			}
-    		}
-    		value = value.substring(cutoff);
-		}
-		
-		for (Integer i : buffer.keySet()) {
-			asrHyps.add(buffer.get(i));
-		}
-		
-		return asrHyps;
+        */
 	}
 
 	private void updateResetThread() {

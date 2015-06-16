@@ -146,7 +146,7 @@ public class WebSpeech extends IUSourceModule {
 		}
 		
 //		This calculates the differences between the current IU list and the previous, based on payload
-		List<EditMessage<WordIU>> diffs = prevList.diffByPayload(list);
+		List<EditMessage<WordIU>> diffs = prevList.diff(list);
 		prevList = list;
 		
 //		The diffs represents what edits it takes to get from prevList to list, send that to the right buffer

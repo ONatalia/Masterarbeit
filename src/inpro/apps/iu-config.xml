@@ -31,6 +31,14 @@
 -->
         </propertylist>
     </component>
+
+    <component name="GoogleASRHypothesis" type="inpro.incremental.source.GoogleASR">
+        <property name="apiKey" value="AIzaSyBJbDtcdABOzZ4xExvMbNeyRtx-ZpU3NeM"/>
+        <property name="lang" value="de-de"/>
+        <property name="frontend" value="${frontend}"/>
+        <propertylist name="hypChangeListeners">
+	</propertylist>
+    </component>
     
     <component name="topdownrevoketestmodule" type="work.inpro.sphinx.topdownrevoke.TopDownRevokeTestModule" />
     
