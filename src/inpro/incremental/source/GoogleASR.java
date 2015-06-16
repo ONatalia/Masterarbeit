@@ -54,7 +54,7 @@ public class GoogleASR extends IUSourceModule {
 	private GoogleJSONListener jsonlistener;
 	private FrontEndBackedAudioInputStream ais;
 	private String googleAPIkey;
-	private String samplingRate;
+	private String samplingRate = "16000";
 
 	public GoogleASR(BaseDataProcessor frontend) {
 		ais = new FrontEndBackedAudioInputStream(frontend);
