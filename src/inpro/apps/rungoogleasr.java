@@ -7,7 +7,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.util.props.PropertyException;
 import inpro.apps.util.RecoCommandLineParser;
-import inpro.incremental.sink.CurrentHypothesisViewer;
 import inpro.incremental.sink.LabelWriter;
 import inpro.incremental.source.GoogleASR;
 import inpro.sphinx.frontend.DataThrottle;

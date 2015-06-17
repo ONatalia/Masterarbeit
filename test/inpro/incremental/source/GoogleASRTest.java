@@ -47,11 +47,11 @@ public class GoogleASRTest {
 	}
 	
 	private class MyIUModule extends IUModule {
-		Queue<String> wordsToBeRecognized = new LinkedList(Arrays.asList("once", "upon", "a", "time", "in", "ancient", "greece")); 
+		Queue<String> wordsToBeRecognized = new LinkedList<String>(Arrays.asList("once", "upon", "a", "time", "in", "ancient", "greece")); 
 		@Override
 		protected void leftBufferUpdate(Collection<? extends IU> ius,
 				List<? extends EditMessage<? extends IU>> edits) {
-			for (EditMessage edit : edits) {
+			for (EditMessage<? extends IU> edit : edits) {
 				if (edit.getType().isCommit()) {
 					System.err.println("now checking commit of" + edit);
 					assertTrue(edit.getIU().toPayLoad().equals(wordsToBeRecognized.poll()));
