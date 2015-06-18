@@ -20,7 +20,7 @@ import edu.cmu.sphinx.util.props.S4String;
 /**
  * An IU left buffer that prints its contents to STDOUT.
  * The format used resembles wavesurfer label files 
- * @author timo, casey
+ * @author timo
  */
 public class LabelWriter extends FrameAwarePushBuffer {
 	
@@ -33,6 +33,9 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	@S4Boolean(defaultValue = true)
     public final static String PROP_WRITE_STDOUT = "writeToStdOut";
 	
+    @S4String(defaultValue = "")
+    public final static String PROP_FILE_PATH= "filePath";    
+    
     @S4String(defaultValue = "")
     public final static String PROP_FILE_NAME = "fileName";    
     
@@ -49,7 +52,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		writeToFile = ps.getBoolean(PROP_WRITE_FILE);
 		commitsOnly = ps.getBoolean(PROP_COMMITS_ONLY);
 		writeToStdOut = ps.getBoolean(PROP_WRITE_STDOUT);
-		fileName = ps.getString(PROP_FILE_NAME);
+		fileName = RecoCommandLineParser.getLabelPath();
 	}
 
 	@Override
@@ -65,19 +68,22 @@ public class LabelWriter extends FrameAwarePushBuffer {
 			case ADD:
 				if (!commitsOnly) {
 					added = true;
-					toOut += "\n" + iu.toLabelLine();
 					allIUs.add(iu);
 				}
 				break;
 			case COMMIT:
 				if (commitsOnly) {
 					added = true;
-					toOut += "\n" + iu.toLabelLine();
 					allIUs.add(iu);
 				}
 				break;
 			case REVOKE:
-				allIUs.remove(iu);
+//				when revoking, we can assume that we are working with a stack;
+//				hence, the most recent thing added is the most recent thing revoked
+				if (!allIUs.isEmpty()) {
+					added = true;
+					allIUs.remove(allIUs.size()-1);
+				}
 				break;
 			default:
 				break;
@@ -87,21 +93,14 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		}
 		
 		toOut = String.format(Locale.US, "Time: %.2f", 
-				currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
-		IU prevIU = null;
+		currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
 		for (IU iu : allIUs) {
-			
-			if (prevIU != null && (iu.startTime() < prevIU.endTime())) {
-				toOut += "\n" + String.format(Locale.US,	"%.2f\t%.2f\t%s", prevIU.endTime(), iu.endTime(), iu.toPayLoad());
-			}
-			else toOut += "\n" + iu.toLabelLine();
-		
-			prevIU = iu; 
+			toOut += "\n" + iu.toLabelLine();
 		}
 		
 		toOut += "\n\n";
 		/* If there were only commits, or if there are not IUs, then print out as specified */
-		if (ius.size() > 0 && added) { // && frameOutput != currentFrame) {
+		if (edits.size() > 0 && added) { // && frameOutput != currentFrame) {
 			frameOutput = currentFrame;
 			if (writeToFile) {
 				try {
@@ -119,7 +118,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	}
 	
 	/** A file name can be specified here, if not specified in the config file */
-	public static void setFileName(String name) {
+	public void setFileName(String name) {
 		fileName = name;
 	}
 
@@ -127,6 +126,11 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	public void reset() {
 		super.reset();
 		frameOutput = -1;
+	}
+
+	public void writeToFile() {
+		// TODO Auto-generated method stub
+		writeToFile = true;
 	}
 	
 }

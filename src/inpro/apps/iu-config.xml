@@ -8,7 +8,7 @@
     <!-- The incremental processing configuration                 -->
     <!-- ******************************************************** -->
     <!--component name="currentASRHypothesis" type="test.inpro.sphinx.RevokingSphinxASRSource"-->
-    <component name="currentASRHypothesis" type="inpro.incremental.source.CurrentASRHypothesis">
+    <component name="currentASRHypothesis" type="inpro.incremental.source.SphinxASR">
         <property name="frontend" value="${frontend}"/>
         <property name="asrFilter" value="${deltifier}"/>
         <property name="baseData" value="${baseData}"/>
@@ -30,6 +30,14 @@
            <item>iSS</item>
 -->
         </propertylist>
+    </component>
+
+    <component name="GoogleASRHypothesis" type="inpro.incremental.source.GoogleASR">
+        <property name="apiKey" value="AIzaSyBJbDtcdABOzZ4xExvMbNeyRtx-ZpU3NeM"/>
+        <property name="lang" value="de-de"/>
+        <property name="frontend" value="${frontend}"/>
+        <propertylist name="hypChangeListeners">
+	</propertylist>
     </component>
     
     <component name="topdownrevoketestmodule" type="work.inpro.sphinx.topdownrevoke.TopDownRevokeTestModule" />

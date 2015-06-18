@@ -1,7 +1,6 @@
 package inpro.apps.util;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 
 public class RTPCommandLineParser extends CommonCommandLineParser {
 
@@ -60,7 +59,7 @@ public class RTPCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-c")) {
 				i++;
-				configURL = new URL(args[i]);
+				configURL = anyToURL(args[i]);
 			}
 			else if (args[i].equals("-v")) {
 				verbose = true;
@@ -71,7 +70,7 @@ public class RTPCommandLineParser extends CommonCommandLineParser {
 			else if (args[i].equals("-F")) {
 				inputMode = FILE_INPUT;
 				i++;
-				audioURL = new URL(args[i]);
+				audioURL = anyToURL(args[i]);
 			}
 			else if (args[i].equals("-D")) {
 				inputMode = OAA_DISPATCHER_INPUT;

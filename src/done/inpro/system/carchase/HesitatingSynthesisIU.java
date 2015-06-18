@@ -1,9 +1,11 @@
 package done.inpro.system.carchase;
 
+import java.util.Collections;
 import java.util.List;
 
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.SegmentIU;
+import inpro.incremental.unit.SyllableIU;
 import inpro.incremental.unit.SysInstallmentIU;
 import inpro.incremental.unit.SysSegmentIU;
 import inpro.incremental.unit.WordIU;
@@ -11,6 +13,7 @@ import inpro.synthesis.MaryAdapter;
 
 public class HesitatingSynthesisIU extends SysInstallmentIU {
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public HesitatingSynthesisIU(String text) {
 		super(text);
 		// handle <hes> marker at the end separately
@@ -20,7 +23,7 @@ public class HesitatingSynthesisIU extends SysInstallmentIU {
 			tts = tts.replaceAll(" <hes>$", "");
 		} else 
 			addFinalHesitation = false;
-		groundedIn = MaryAdapter.getInstance().text2IUs(tts);
+		groundedIn = (List) MaryAdapter.getInstance().text2WordIUs(tts);
 		// remove utterance final silences
 		IU pred = groundedIn.get(groundedIn.size() - 1);
 		while (((WordIU) pred).isSilence()) {
@@ -61,7 +64,7 @@ public class HesitatingSynthesisIU extends SysInstallmentIU {
 	public static class HesitationIU extends WordIU implements IU.IUUpdateListener {
 		@SuppressWarnings({ "unchecked", "rawtypes" }) // the cast for GRINs
 		public HesitationIU(WordIU sll) {
-			super("<hes>", sll, (List) inpro.incremental.unit.HesitationIU.protoHesitation.getSegments());
+			super("<hes>", sll, (List) Collections.singletonList(new SyllableIU(null,(List) inpro.incremental.unit.HesitationIU.protoHesitation.getSegments())));
 			if (sll != null) {
 				shiftBy(sll.endTime());
 				//Integer lastPitch = ((SysSegmentIU) sll.getLastSegment()).getLastPitchValue();
@@ -80,7 +83,7 @@ public class HesitatingSynthesisIU extends SysInstallmentIU {
 		}
 
 		private void setToZeroDuration() {
-			for (IU iu : groundedIn) {
+			for (IU iu : groundedIn.get(0).groundedIn()) {
 				((SysSegmentIU) iu).setNewDuration(0f);
 			}
 		}
@@ -88,13 +91,13 @@ public class HesitatingSynthesisIU extends SysInstallmentIU {
 		@Override
 		public void update(IU updatedIU) {
 			System.err.println("update in " + updatedIU);
-			SysSegmentIU mUnit = (SysSegmentIU) groundedIn.get(1);
+			SysSegmentIU mUnit = (SysSegmentIU) groundedIn.get(0).groundedIn().get(1);
 			// stretch the first segment of a completion if it comes in during the second segment (/m/) of the hesitation 
 			// question: why in the world would this heuristic make sense?
 			if (isOngoing() && updatedIU == mUnit && nextSameLevelLinks != null) {
 				IU somethingbelow = nextSameLevelLinks.get(0).groundedIn().get(0);
 				System.err.println(somethingbelow.toString());
-				((SysSegmentIU) somethingbelow).stretch(1.2);
+				((SysSegmentIU) somethingbelow).stretchFromOriginal(1.2);
 			}
 		}
 

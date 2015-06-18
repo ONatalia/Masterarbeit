@@ -26,7 +26,7 @@ public class CarChaseExperimenter {
 	
 	private static long globalTimeOffsetMS;
 	
-	private static final String CONFIGURATION = "configs/config3.1";
+	private static final String CONFIGURATION = "configs/config3.5";
 
 	CarChaseExperimenter() {
 		dispatcher = SimpleMonitor.setupDispatcher();
@@ -143,7 +143,7 @@ public class CarChaseExperimenter {
 	/** an action for the world or for iTTS */
 	public static class Action {
 		int start; // in milliseconds
-		public Object appData;
+		public Object installmentIU;
 		public Action() {}
 		Action(int t) { this.start = t; }
 		public int getStart() { return start; }

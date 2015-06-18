@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import marytts.htsengine.CartTreeSet;
+import marytts.htsengine.GVModelSet;
 import marytts.htsengine.HMMData;
 import marytts.htsengine.HTSModel;
 import marytts.htsengine.HTSPStream;
@@ -13,8 +14,12 @@ import marytts.htsengine.HTSParameterGeneration;
 import marytts.htsengine.HTSUttModel;
 import marytts.htsengine.HMMData.FeatureType;
 
-
-
+/** 
+ * Inpro-clone of MaryTTS's HTSParameterGeneration (but working incrementally)
+ * 
+ * this class performs HSMM observation optimization for all supported types of 
+ * parameter streams (same as in MaryTTS).  
+ */
 public class PHTSParameterGeneration {
 
 	private boolean[] voiced;
@@ -78,7 +83,7 @@ public class PHTSParameterGeneration {
 			} else
 				pStreamMap.put(type, calculateNormalStream(hmms, type));
 		}
-		return new HTSFullPStream(pStreamMap.get(FeatureType.MCP), 
+		return new HTSFullPStream(pStreamMap.get(FeatureType.MGC), 
 								  pStreamMap.get(FeatureType.STR),
 								  pStreamMap.get(FeatureType.MAG),
 								  pStreamMap.get(FeatureType.LF0),
@@ -90,9 +95,15 @@ public class PHTSParameterGeneration {
 		assert type != FeatureType.LF0;
 		CartTreeSet ms = htsData.getCartTreeSet();
 		// initialize pStream
-		int maxIterationsGV = (type == FeatureType.MCP) ? htsData.getMaxMgcGvIter() : htsData.getMaxLf0GvIter();
+		int maxIterationsGV = (type == FeatureType.MGC) ? htsData.getMaxMgcGvIter() : htsData.getMaxLf0GvIter();
 		int length = lengthOfEmissions(hmms, type);
-		HTSPStream pStream = new HTSPStream(ms.getVsize(type), length, type, maxIterationsGV);
+		HTSPStream pStream = null;
+		try {
+			pStream = new HTSPStream(ms.getVsize(type), length, type, maxIterationsGV);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// fill in data into pStream
 		int uttFrame = 0; // count all frames
 		for (HTSModel hmm : hmms) {
@@ -103,9 +114,11 @@ public class PHTSParameterGeneration {
 		            pStream.setVseq(uttFrame, hmm.getVariance(type, state));
 					uttFrame++;
 		}}}
-		boolean useGV = useGVperType(type);
-		pStream.mlpg(htsData, useGV);
-		return pStream;
+		// ensure that we set variances to inf at the last frame (similarly to v/uv boundaries) to avoid downwards slopes
+		for (int k = 1; k < ms.getVsize(type); k++) {
+			pStream.setIvseq(uttFrame - 1, k, 0.0);
+		}
+		return optimizeStream(pStream, type);
 	}
 	
 	/** 
@@ -122,7 +135,13 @@ public class PHTSParameterGeneration {
 			voicedLength += hmm.getNumVoiced();
 			totalLength += hmm.getTotalDur();
 		}
-		HTSPStream pStream = new HTSPStream(ms.getLf0Stream(), voicedLength, FeatureType.LF0, maxIterationsGV);
+		HTSPStream pStream = null;
+		try {
+			pStream = new HTSPStream(ms.getLf0Stream(), voicedLength, FeatureType.LF0, maxIterationsGV);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// figure out voicing
 		int uttFrame = 0; // count all frames
 		int lf0Frame = 0; // count all voiced frames
@@ -137,14 +156,14 @@ public class PHTSParameterGeneration {
 					boolean boundary = !prevVoicing; // if the last state was voiceless and this one is voiced, we have a boundary  
 					for (int frame = 0; frame < hmm.getDur(state); frame++) {
 						// copy pdfs for types 
-						pStream.setMseq(lf0Frame, hmm.getLf0Mean(state));
+						pStream.setMseq(lf0Frame, hmm.getMean(FeatureType.LF0, state));
 						if (boundary) {// the variances for dynamic features are set to inf on v/uv boundary
 							pStream.setIvseq(lf0Frame, 0, HTSParameterGeneration.finv(hmm.getLf0Variance(state, 0)));
 							for (int k = 1; k < ms.getLf0Stream(); k++)
 								pStream.setIvseq(lf0Frame, k, 0.0);
 							boundary = false; // clear flag: we've set the boundary
 						} else {
-							pStream.setVseq(lf0Frame, hmm.getLf0Variance(state));
+							pStream.setVseq(lf0Frame, hmm.getVariance(FeatureType.LF0, state));
 						}
 						lf0Frame++;
 					}
@@ -153,18 +172,47 @@ public class PHTSParameterGeneration {
 				prevVoicing = hmm.getVoiced(state);
 			}
 		}
-		boolean useGV = useGVperType(FeatureType.LF0);
+		// ensure that we set variances to inf at the last frame (similarly to v/uv boundaries) to avoid downwards slopes
+		if (lf0Frame > 0) for (int k = 1; k < ms.getLf0Stream(); k++) {
+			pStream.setIvseq(lf0Frame - 1, k, 0.0);
+		}
+		return optimizeStream(pStream, FeatureType.LF0);
+	}
+	
+	private HTSPStream optimizeStream(HTSPStream pStream, FeatureType type) {
+		boolean useGV = useGVperType(type);
+		setGVMeanVar(pStream, type);
 		pStream.mlpg(htsData, useGV);
 		return pStream;
 	}
 
 	private boolean useGVperType(FeatureType type) {
 		switch (type) {
-		case STR: return htsData.getUseGV() && htsData.getPdfStrGVFile() != null;
-		case MAG: return htsData.getUseGV() && htsData.getPdfMagGVFile() != null;
+		case STR: return htsData.getUseGV() && htsData.getPdfStrGVStream() != null;
+		case MAG: return htsData.getUseGV() && htsData.getPdfMagGVStream() != null;
 		//TODO: find out why GV for MCP doesn't work and make it work 
-		case MCP: return false; //htsData.getUseGV(); // for some reason, MCP GV does not work incrementally!
+		case MGC: return false; //htsData.getUseGV(); // for some reason, MCP GV does not work incrementally!
 		default: return htsData.getUseGV(); // LF0 and DUR
+		}
+//		return false;
+	}
+
+	private void setGVMeanVar(HTSPStream pStream, FeatureType type) {
+		GVModelSet gvms = htsData.getGVModelSet();
+		switch (type) {
+		case STR: 
+			pStream.setGvMeanVar(gvms.getGVmeanStr(), gvms.getGVcovInvStr());
+			break;
+		case MAG:
+			pStream.setGvMeanVar(gvms.getGVmeanMag(), gvms.getGVcovInvMag());
+			break;
+		case MGC:
+			pStream.setGvMeanVar(gvms.getGVmeanMgc(), gvms.getGVcovInvMgc());
+			break;
+		case LF0:
+			pStream.setGvMeanVar(gvms.getGVmeanLf0(), gvms.getGVcovInvLf0());
+			break; 
+		default: throw new RuntimeException("don't call me with " + type.toString()); 
 		}
 	}
 

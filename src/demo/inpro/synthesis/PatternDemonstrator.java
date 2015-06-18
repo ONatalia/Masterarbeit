@@ -2,6 +2,8 @@ package demo.inpro.synthesis;
 
 import inpro.apps.SimpleMonitor;
 import inpro.audio.DispatchStream;
+import inpro.incremental.sink.CurrentHypothesisViewer;
+import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.SegmentIU;
 import inpro.incremental.unit.SysSegmentIU;
@@ -39,6 +41,9 @@ public abstract class PatternDemonstrator extends JPanel {
 	final JEditorPane generatedText;
 	/** the IU holding the incrementally synthesized installment */
 	TreeStructuredInstallmentIU installment;
+	
+	CurrentHypothesisViewer viewer;
+	
 	DispatchStream dispatcher;
 	
 	IUUpdateListener iuUpdateRepainter = new IUUpdateListener() {
@@ -49,7 +54,8 @@ public abstract class PatternDemonstrator extends JPanel {
 			if (newProgress != previousProgress) {
 				previousProgress = newProgress;
 				synchronized(generatedText) {
-					generatedText.setText(installment.toMarkedUpString());
+					viewer.hypChange(installment.getWords(), new ArrayList<EditMessage<IU>>() );
+					 //TODO: Even if CHV does not use the edit messages they should be supported here
 				}
 			}
 		}
@@ -121,7 +127,9 @@ public abstract class PatternDemonstrator extends JPanel {
 						}
 					}
 				}
-				generatedText.setText(installment.toMarkedUpString());
+				
+				viewer.hypChange(installment.getWords(), new ArrayList<EditMessage<IU>>());
+				//TODO: Even if CHV does not use the edit messages they should be supported here
 			} else 
 				System.err.println("too late");
 		}
@@ -130,7 +138,8 @@ public abstract class PatternDemonstrator extends JPanel {
 	protected PatternDemonstrator() {
 		MaryAdapter.getInstance();
 		dispatcher = SimpleMonitor.setupDispatcher();
-		generatedText  = new JEditorPane("text/html", "");
+		viewer = new CurrentHypothesisViewer();
+		generatedText  = viewer.getTextField();
 		generatedText.setPreferredSize(new JTextField(30).getPreferredSize());
 		generatedText.setEditable(false);
 	}
@@ -146,6 +155,7 @@ public abstract class PatternDemonstrator extends JPanel {
 	public static void createAndShowGUI(PatternDemonstrator panel) {
 		/** startup mary */
 		MaryAdapter.getInstance();
+		
 		/** disable global variance optimization */
 		//((HMMVoice) Voice.getVoice(MaryAdapter4internal.DEFAULT_VOICE)).getHMMData().setUseGV(false);
 		JFrame frame = new JFrame(panel.applicationName());

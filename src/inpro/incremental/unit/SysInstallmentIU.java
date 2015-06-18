@@ -1,10 +1,9 @@
 package inpro.incremental.unit;
 
 import inpro.annotation.Label;
-import inpro.audio.DDS16kAudioInputStream;
+import inpro.audio.AudioUtils;
 import inpro.synthesis.MaryAdapter;
-import inpro.synthesis.MaryAdapter4internal;
-import inpro.synthesis.PitchMark;
+import inpro.synthesis.MaryAdapter5internal;
 import inpro.synthesis.hts.FullPFeatureFrame;
 import inpro.synthesis.hts.FullPStream;
 import inpro.synthesis.hts.IUBasedFullPStream;
@@ -27,14 +26,15 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	Logger logger = Logger.getLogger(this.getClass());
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SysInstallmentIU(String tts) {
 		super(null, tts);
-		groundedIn = MaryAdapter.getInstance().text2IUs(tts);
+		groundedIn = (List) MaryAdapter.getInstance().text2WordIUs(tts);
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // allow cast from List<WordIU> to List<IU>
 	public SysInstallmentIU(String tts, List<WordIU> words) {
-		this(tts);
+		super(null, tts);
 		groundedIn = (List) words;
 	}
 	
@@ -53,13 +53,14 @@ public class SysInstallmentIU extends InstallmentIU {
 		for (WordIU w : words) {
 			List<SysSegmentIU> newSegments = new ArrayList<SysSegmentIU>();
 			for (SegmentIU seg : w.getSegments()) {
-				// TODO: these will have to become SysSegementIUs when I add pitch-scaling!
+				// TODO: the following needs to be reworked to restart from a newly generated feature vector
 				newSegments.add(new SysSegmentIU(new Label(
 						(seg.l.getStart() - startTime) * scale, 
 						(seg.l.getEnd() - startTime) * scale, 
 						seg.l.getLabel()
-				), seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).pitchMarks : Collections.<PitchMark>emptyList(),
-				   seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).htsModel : null,
+				), seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).legacyHTSmodel : null,
+				   seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).fv : null,
+			       seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).hmmdata : null,
 				   seg instanceof SysSegmentIU ? ((SysSegmentIU) seg).hmmSynthesisFeatures : Collections.<FullPFeatureFrame>emptyList()));
 			}
 			// connect same-level-links
@@ -104,17 +105,8 @@ public class SysInstallmentIU extends InstallmentIU {
 	
 	public AudioInputStream getAudio() {
         boolean immediateReturn = true;
-		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), MaryAdapter4internal.getDefaultHMMData(), immediateReturn);
-        return new DDS16kAudioInputStream(vas);
-	}
-	
-	public String toMaryXML() {
-		StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<maryxml xmlns=\"http://mary.dfki.de/2002/MaryXML\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"0.5\" xml:lang=\"de\">\n<p>\n<s>\n<phrase>\n");
-		for (WordIU word : getWords()) {
-			word.appendMaryXML(sb);
-		}
-		sb.append("</phrase>\n</s>\n</p>\n</maryxml>");
-		return sb.toString();
+		VocodingAudioStream vas = new VocodingAudioStream(getFullPStream(), MaryAdapter5internal.getDefaultHMMData(), immediateReturn);
+        return AudioUtils.get16kAudioStreamForVocodingStream(vas);
 	}
 	
 	public String toMbrola() {

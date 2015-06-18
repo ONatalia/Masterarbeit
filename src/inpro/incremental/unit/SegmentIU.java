@@ -98,8 +98,10 @@ public class SegmentIU extends IU {
 
 	public void updateLabel(Label l) {
 		//assert (this.l.getLabel().equals(l.getLabel())) : "my label is " + this.l.toString() + ", was asked to update with " + l.toString();
+		boolean needsUpdate = !this.l.equals(l);
 		this.l = l;
-		notifyListeners();
+		if (needsUpdate)
+			notifyListeners();
 	}
 	
 	@Override
@@ -157,11 +159,6 @@ public class SegmentIU extends IU {
 		return TYPE_MAPPING.get(this.l.getLabel());
 	}
 	
-	@SuppressWarnings("unused") 
-	public void appendMaryXML(StringBuilder sb) {
-		throw new UnsupportedOperationException("only SysSegmentIUs can be converted to MaryXML!");
-	}
-
 	public void shiftBy(double offset, boolean recurse) {
 		Label l = this.l;
 		this.l = new Label(l.getStart() + offset, l.getEnd() + offset, l.getLabel());

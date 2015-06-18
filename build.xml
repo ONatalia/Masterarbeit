@@ -267,4 +267,112 @@
 			<report format="frames" todir="${junit.output.dir}" />
 		</junitreport>
 	</target>
+    <property environment="env"/>
+    <property name="ECLIPSE_HOME" value="../../../../../usr/lib/eclipse"/>
+    <property name="workspace_loc:Inpro/bin" value="bin"/>
+    <property name="workspace_loc:Inpro" value="."/>
+    <property name="build_files" value=""/>
+    <property name="junit.output.dir" value="junit"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+	<property name="jarFile" value="inproTK.jar" />
+
+	<!-- properties used by Citec's Jenkins -->
+	<property name="dir" location="." />
+	<property name="dir.src" location="${dir}/src" />
+	<property name="dir.lib" location="${dir}/lib" />
+	<property name="dir.bin" location="${dir}/bin" />
+    <path id="Inpro.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="lib/weka.jar"/>
+        <pathelement location="lib/drej.jar"/>
+        <pathelement location="lib/sphinx4/jsapi.jar"/>
+        <pathelement location="lib/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+        <pathelement location="lib/trident.jar"/>
+        <pathelement location="lib/snakeyaml-1.9.jar"/>
+        <pathelement location="lib/jrtp_1.0a.jar"/>
+        <pathelement location="lib/common-for-convenience/jflac-1.3.jar"/>
+        <pathelement location="lib/common-for-convenience/log4j-1.2.15.jar"/>
+        <pathelement location="lib/common-for-convenience/jdom1-1.1.1.jar"/>
+        <pathelement location="lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
+        <pathelement location="lib/oaa2/antlr-oaa.jar"/>
+        <pathelement location="lib/oaa2/oaa2.jar"/>
+        <pathelement location="lib/io/rsb-0.10.0.jar"/>
+        <pathelement location="lib/io/venice-java.jar"/>
+        <pathelement location="lib/tomcat/annotations-api.jar"/>
+        <pathelement location="lib/tomcat/bootstrap.jar"/>
+        <pathelement location="lib/tomcat/catalina-ant.jar"/>
+        <pathelement location="lib/tomcat/catalina-ha.jar"/>
+        <pathelement location="lib/tomcat/catalina-tribes.jar"/>
+        <pathelement location="lib/tomcat/catalina.jar"/>
+        <pathelement location="lib/tomcat/commons-daemon.jar"/>
+        <pathelement location="lib/tomcat/ecj-4.3.1.jar"/>
+        <pathelement location="lib/tomcat/el-api.jar"/>
+        <pathelement location="lib/tomcat/jasper-el.jar"/>
+        <pathelement location="lib/tomcat/jasper.jar"/>
+        <pathelement location="lib/tomcat/json-simple-1.1.1.jar"/>
+        <pathelement location="lib/tomcat/jsp-api.jar"/>
+        <pathelement location="lib/tomcat/servlet-api.jar"/>
+        <pathelement location="lib/tomcat/tomcat-api.jar"/>
+        <pathelement location="lib/tomcat/tomcat-coyote.jar"/>
+        <pathelement location="lib/tomcat/tomcat-dbcp.jar"/>
+        <pathelement location="lib/tomcat/tomcat-i18n-es.jar"/>
+        <pathelement location="lib/tomcat/tomcat-i18n-fr.jar"/>
+        <pathelement location="lib/tomcat/tomcat-i18n-ja.jar"/>
+        <pathelement location="lib/tomcat/tomcat-jdbc.jar"/>
+        <pathelement location="lib/tomcat/tomcat-juli.jar"/>
+        <pathelement location="lib/tomcat/tomcat-util.jar"/>
+        <pathelement location="lib/tomcat/tomcat7-websocket.jar"/>
+        <pathelement location="lib/tomcat/websocket-api.jar"/>
+        <pathelement location="lib/oaa2/backport-util-concurrent.jar"/>
+        <pathelement location="lib/xmlrpc/xmlrpc-client-3.1.3.jar"/>
+        <pathelement location="lib/xmlrpc/xmlrpc-common-3.1.3.jar"/>
+        <pathelement location="lib/xmlrpc/xmlrpc-server-3.1.3.jar"/>
+        <pathelement location="lib/junit-4.10.jar"/>
+        <pathelement location="lib/common-for-convenience/jgraphx.jar"/>
+        <pathelement location="lib/sphinx4/sphinx4.jar"/>
+        <pathelement location="lib/common-for-convenience/commons-math3.jar"/>
+        <pathelement location="lib/mary5/marytts-runtime-5.1-SNAPSHOT-jar-with-dependencies.jar"/>
+        <pathelement location="lib/mary5/marytts-client-5.1-SNAPSHOT-jar-with-dependencies.jar"/>
+        <pathelement location="lib/mary5/marytts-lang-de-5.1-SNAPSHOT.jar"/>
+        <pathelement location="lib/mary5/marytts-lang-en-5.1-SNAPSHOT.jar"/>
+        <pathelement location="lib/mary5/voice-cmu-slt-hsmm-5.1-SNAPSHOT.jar"/>
+        <pathelement location="lib/mary5/voice-bits1-hsmm-5.0-SNAPSHOT.jar"/>
+    </path>
+   
+	<!-- targets used by Citec's Jenkins -->
+	<target name="jar" depends="build">
+		<tstamp>
+		  <format property="NOW" pattern="YYYY-MM-dd HH:mm:ss zzz" locale="en,US"/>
+		</tstamp>
+	    <exec executable="git" outputproperty="git.revision">
+	      <arg value="rev-parse"/>
+	      <arg value="HEAD"/>
+	    </exec>
+		<jar destfile="${jarFile}" basedir="${dir.bin}">
+			<manifest>
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Built-On" value="${NOW}" />
+				<attribute name="Git-Revision" value="${git.revision}" />
+				<attribute name="Implementation-Title" value="inproTK" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="install" depends="jar">
+		<available file="${env.prefix}" property="prefix.valid" value="false" />
+		<fail unless="prefix.valid" message="env.prefix is not valid, please set an appropriate path." />
+		<echo message="Installing to ${env.prefix}" />
+		<mkdir dir="${env.prefix}/share" />
+		<mkdir dir="${env.prefix}/share/java" />
+		<copy file="${jarFile}" todir="${env.prefix}/share/java" />
+		<chmod perm="775" file="${env.prefix}/share/java/${jarFile}" />
+		<copy todir="${env.prefix}/share/java">
+			<fileset dir="${dir.lib}" />
+		</copy>
+		<chmod perm="775">
+			<fileset dir="${env.prefix}/share/java/" />
+		</chmod>
+    </target>
 </project>

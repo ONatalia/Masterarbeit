@@ -72,7 +72,7 @@ public class ResultUtil {
 		}
 		Collections.reverse(outputTokens);
 		// this removes leading silence when nothing has been recognized yet
-		if (((WordSearchState) outputTokens.get(0).getSearchState()).getPronunciation().getWord().isSentenceStartWord()
+		if ((outputTokens.get(0) instanceof WordSearchState) && ((WordSearchState) outputTokens.get(0).getSearchState()).getPronunciation().getWord().isSentenceStartWord()
 		) {
 			outputTokens.remove(0);
 			if ((outputTokens.get(0).getSearchState() instanceof UnitSearchState)

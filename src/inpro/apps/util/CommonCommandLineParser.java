@@ -1,5 +1,6 @@
 package inpro.apps.util;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -37,7 +38,7 @@ public abstract class CommonCommandLineParser {
 			verbose = false;
 			inputMode = UNSPECIFIED_INPUT;
 			configURL = CommonCommandLineParser.class.getResource("../config.xml");
-			audioURL = new URL("file:res/DE_1234.wav");
+			audioURL = anyToURL("file:res/DE_1234.wav");
 			parse(args);
 			success = checkConfiguration();
 		} catch (Exception e) {
@@ -78,6 +79,40 @@ public abstract class CommonCommandLineParser {
 
 	public boolean matchesOutputMode(int mode) {
 		return (outputMode & mode) == mode;
+	}
+	
+	/**
+	 * getURLForPath try to use the given path to either make
+	 * directly an URL or use it as path to a file and take
+	 * the URL from there
+	 * @param path URL or normal path
+	 * @return URL if it is able to build one directly or out of path
+	 */
+	protected URL anyToURL(String path)
+	{
+		URL result;
+		//first try to read the given string as an URL
+		try
+		{
+			result = new URL(path);
+			return result;
+		}
+		catch(MalformedURLException e)
+		{
+			System.err.println(path + " is no URL - I'll try to use it as path.");
+		}
+		/*if it wasn't a string try to read it as file path
+		 *the catching part should be useless since there will be a file not found exception
+		 */
+		try {
+			result = new File(path).toURI().toURL();
+			return result;
+		} catch (MalformedURLException e) {
+			System.err.println("The Argument " + path + " is no path.");
+		}
+		System.exit(1);
+		return null;
+		
 	}
 
 	

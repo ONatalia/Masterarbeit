@@ -1,9 +1,6 @@
 package inpro.io.xmlrpc;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcException;
@@ -15,12 +12,7 @@ import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Integer;
 import edu.cmu.sphinx.util.props.S4String;
-import inpro.incremental.IUModule;
-import inpro.incremental.unit.EditMessage;
-import inpro.incremental.unit.EditType;
-import inpro.incremental.unit.IU;
 import inpro.io.ListenerModule;
-import inpro.io.SensorIU;
 
 public class XmlRpcListenerModule extends ListenerModule {
 	

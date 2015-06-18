@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 public class TextCommandLineParser extends CommonCommandLineParser {
 
@@ -48,7 +47,7 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-c")) {
 				i++;
-				configURL = new URL(args[i]);
+				configURL = anyToURL(args[i]);
 			}
 			else if (args[i].equals("-v")) {
 				verbose = true;
@@ -66,7 +65,7 @@ public class TextCommandLineParser extends CommonCommandLineParser {
 			else if (args[i].equals("-F")) {
 				i++;
 				try {
-					textReader = new InputStreamReader(new URL(args[i]).openStream());
+					textReader = new InputStreamReader(anyToURL(args[i]).openStream());
 				} catch (IOException e) {
 					System.err.println("Could not open URL " + args[i]);
 					e.printStackTrace();

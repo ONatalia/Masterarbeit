@@ -1,7 +1,6 @@
 package inpro.apps.util;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 
 public class MonitorCommandLineParser extends CommonCommandLineParser {
 
@@ -14,7 +13,7 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 	public int outputMode;
 	int dataMode;
 
-	public MonitorCommandLineParser(String[] args) {
+	public MonitorCommandLineParser(String... args) {
 		super(args);
 	}
 
@@ -29,6 +28,7 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -M             recevice from microphone");
 		System.err.println("    -OAA           receive and interpret OAA dispatch messages");
 		System.err.println("    -RTP           receive RTP stream");
+		System.err.println("    -D             run as a built-in dispatcher (used internally)");
 		System.err.println("    -lp	port       optional port to listen on (default: 42000)");
 		System.err.println("    -t sphinx|raw  raw data or encoded Sphinx DoubleData (default: sphinx)");
 		System.err.println("output selection:");
@@ -65,7 +65,7 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-c")) {
 				i++;
-				configURL = new URL(args[i]);
+				configURL = anyToURL(args[i]);
 			}
 			else if (args[i].equals("-v")) {
 				verbose = true;
@@ -73,7 +73,7 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 			else if (args[i].equals("-F")) {
 				outputMode |= FILE_OUTPUT;
 				i++;
-				audioURL = new URL(args[i]);
+				audioURL = anyToURL(args[i]);
 			}
 			else if (args[i].equals("-S")) {
 				outputMode |= SPEAKER_OUTPUT;
@@ -86,6 +86,9 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-RTP")) {
 				inputMode = RTP_INPUT;
+			}
+			else if (args[i].equals("-D")) {
+				inputMode = DISPATCHER_OBJECT_INPUT;
 			}
 			else if (args[i].equals("-t")) {
 				i++;

@@ -129,7 +129,7 @@ public class CarChaseViewer extends JPanel {
 			logger.debug("start angle: " + carAngle + " , target angle: " + carTargetAngle);
 			timeline.addPropertyToInterpolate("carAngle", carAngle, carTargetAngle);
 			timeline.setDuration(action.duration);
-			action.appData = timeline;
+			action.installmentIU = timeline;
 		}
 	}
 
@@ -140,12 +140,12 @@ public class CarChaseViewer extends JPanel {
 			if (timeline != null && !timeline.isDone()) {
 				timeline.end();
 			}
-			if (action.appData == null) {
+			if (action.installmentIU == null) {
 				precompute(action);
 			}
 			carIsReverseGear = action.isReverseGear();
-			assert action.appData instanceof Timeline;
-			this.timeline = (Timeline) action.appData;
+			assert action.installmentIU instanceof Timeline;
+			this.timeline = (Timeline) action.installmentIU;
 			timeline.playSkipping(10);
 		}
 	}

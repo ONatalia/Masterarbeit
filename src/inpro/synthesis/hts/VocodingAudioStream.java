@@ -116,6 +116,8 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
     
     boolean firstDelivery = true;
     
+    Logger logger = Logger.getLogger("Vocoding Audio Stream");
+    
     /** for backward compatibility with Mary */
     public VocodingAudioStream(HTSParameterGeneration pdf2par, HMMData htsData, boolean immediateReturn) {
         this(new HTSFullPStream(pdf2par), htsData, immediateReturn);
@@ -188,7 +190,7 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
         double[] xpulseSignal = null;
         double[] xnoiseSignal = null;
         
-        if (mixedExcitation && htsData.getPdfStrFile() != null ) {  
+        if (mixedExcitation && htsData.getPdfStrStream() != null ) {  
           xpulseSignal = new double[orderM];
           xnoiseSignal = new double[orderM];
           /* initialise xp_sig and xn_sig */ // -> automatically initialized to 0.0
@@ -199,22 +201,22 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
           //Check if the number of filters is equal to the order of strpst 
           //i.e. the number of filters is equal to the number of generated strengths per frame.
           if(htsData.getNumFilters() != fullPStream.getStrParSize()) {
-            HTSVocoder.logger.debug("htsMLSAVocoder: error num mix-excitation filters =" + numM + " in configuration file is different from generated str order=" + fullPStream.getStrParSize());
+            logger.debug("htsMLSAVocoder: error num mix-excitation filters =" + numM + " in configuration file is different from generated str order=" + fullPStream.getStrParSize());
             throw new RuntimeException("htsMLSAVocoder: error num mix-excitation filters = " + numM + " in configuration file is different from generated str order=" + fullPStream.getStrParSize());
           }
-          HTSVocoder.logger.info("HMM speech generation with mixed-excitation.");
+          logger.info("HMM speech generation with mixed-excitation.");
         } else
-          HTSVocoder.logger.info("HMM speech generation without mixed-excitation.");  
+          logger.info("HMM speech generation without mixed-excitation.");  
         
-        if( fourierMagnitudes && htsData.getPdfMagFile() != null)
-          HTSVocoder.logger.info("Pulse generated with Fourier Magnitudes.");
+        if( fourierMagnitudes && htsData.getPdfMagStream() != null)
+          logger.info("Pulse generated with Fourier Magnitudes.");
         else
-          HTSVocoder.logger.info("Pulse generated as a unit pulse.");
+          logger.info("Pulse generated as a unit pulse.");
         
         if (beta != 0.0)
-          HTSVocoder.logger.info("Postfiltering applied with beta=" + beta);
+          logger.info("Postfiltering applied with beta=" + beta);
         else
-          HTSVocoder.logger.info("No postfiltering applied.");
+          logger.info("No postfiltering applied.");
 
         double f0Std = htsData.getF0Std();
         double f0Shift = htsData.getF0Mean();
@@ -288,7 +290,7 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
           
           if (stage == 0){         
             /* postfiltering, this is done if beta>0.0 */
-            HTSVocoder.postfilter_mcp(mc, (mcepOrder-1), alpha, beta);
+            HTSVocoder.postfilter_mgc(mc, (mcepOrder-1), alpha, beta);
             /* mc2b: transform mel-cepstrum to MLSA digital filter coefficients */   
             HTSVocoder.mc2b(mc, CC, (mcepOrder-1), alpha);
             for (int i = 0; i < mcepOrder; i++)
@@ -473,5 +475,9 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
 //    	}
         return d / maxAmplitude;
     } 
+    
+    public int getSamplingRate() {
+    	return htsData.getRate();
+    }
     
 }

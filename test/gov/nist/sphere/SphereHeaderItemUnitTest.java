@@ -2,6 +2,7 @@ package gov.nist.sphere;
 
 import static org.junit.Assert.*;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import gov.nist.sphere.SphereHeaderItem;
@@ -16,7 +17,7 @@ public class SphereHeaderItemUnitTest {
 	private static SphereHeaderItem shi;
 	private static SphereHeaderItem fhi;
 	
-	@Test
+	@Before
 	public void testCreateHeaderItemForType() {
 		ihi=SphereHeaderItem.createHeaderItemForType("i", testString, i);
 		ihi1=SphereHeaderItem.createHeaderItemForType("i", testString, "+"+i);

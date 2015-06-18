@@ -1,21 +1,45 @@
-_____________________________________________________________
-  _                                         _           _   
- (_)_ __  _ __  _ __ ___    _ __  _ __ ___ (_) ___  ___| |_ 
- | | '_ \| '_ \| '__/ _ \  | '_ \| '__/ _ \| |/ _ \/ __| __|
- | | | | | |_) | | | (_) | | |_) | | | (_) | |  __/ (__| |_ 
- |_|_| |_| .__/|_|  \___/  | .__/|_|  \___// |\___|\___|\__|
-         |_|               |_|           |__/               
-_____________________________________________________________
+    _____________________________________________________________
+      _                                         _           _   
+     (_)_ __  _ __  _ __ ___    _ __  _ __ ___ (_) ___  ___| |_ 
+     | | '_ \| '_ \| '__/ _ \  | '_ \| '__/ _ \| |/ _ \/ __| __|
+     | | | | | |_) | | | (_) | | |_) | | | (_) | |  __/ (__| |_ 
+     |_|_| |_| .__/|_|  \___/  | .__/|_|  \___// |\___|\___|\__|
+             |_|               |_|           |__/               
+    _____________________________________________________________
 
-README to the JAVA sources (and programs) in the inpro project 
-(thus mainly the ASR, TTS, and closely connected modules).
+# InproTK
 
-0. Resources
+InproTK is a toolkit for incremental processing, to be precise, 
+incremental spoken language processing, and even more precise, 
+incremental situated spoken interaction processing (i.e., dialogue).
 
-The res/ directory contains a few wave files, and some other
-useful scripts and stuff.
+InproTK is being used for building speech-based human-computer 
+interfaces for speech-based manipulation, flexible spoken output, 
+multi-modal integration, and full-fledged dialogue systems. 
 
-1. Applications
+The core of InproTK is its _Incremental Unit_ architecture, which 
+provides data structures (the _IU network_) to manage the changing 
+hypotheses of a system about the state of affairs while input is 
+being processed (and hence, more knowledge is integrated into the 
+system). As part of the architecture, the IU network is manipulated 
+by _IU modules_, which, based on changes to existing IUs, generate 
+their own IUs, or purge IUs from the network. 
+It is highly convenient for a module to be informed about the 
+hypothesis states either in terms of the full state (all IUs), 
+or in terms of what has changed since the last state (all edits); 
+InproTK provides both views to IU modules. 
+
+InproTK comes with a collection of pre-existing IU modules: 
+* incremental speech recognition based on CMU Sphinx-4,
+* incremental speech recognition based on Google's cloud-based 
+  speech recognizer via Google Chrome (or Chromium),
+* incremental speech synthesis based on MaryTTS
+* semantic tagging, some syntax/semantics generation based on RMRS,
+* an information state-based dialogue manager, but also integration 
+  with the OpenDial dialogue management toolkit
+* debugging modules for visualizing and logging the IU network evolution.
+
+## Applications
 
 All generic applications reside in the inpro.apps package.
 This directory is also where the default configuration files
@@ -46,4 +70,3 @@ not run on the local machine.
 - SimpleMonitor: Likewise, this program can be used to output data
 that is sent to the monitor via RTP.
 
-2. Examples

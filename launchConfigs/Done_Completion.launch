@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/Inpro/src/inpro/apps/SimpleReco.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/CDC-1.0%Foundation-1.0"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="inpro.apps.SimpleReco"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-c file:done/inpro/system/completion/completion-config.xml -O -C -rt -F file:done/inpro/system/completion/k73nord2.wav -lm file:done/inpro/system/completion/nordwind.lm"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Inpro"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dmary.version=internal -Dmary.voice=bits1-hsmm -DturnCompleter[fullUtterance]=&quot;der nordwind blies mit aller macht; aber je mehr er blies, desto fester hüllte sich der wanderer in seinen mantel ein; endlich gab der nordwind den kampf auf; nun erwärmte die sonne die luft mit ihren freundlichen strahlen, und schon nach wenigen augenblicken zog der wanderer seinen mantel aus; da musste der nordwind zugeben, dass die sonne von ihnen beiden der stärkere war&quot;"/>
+<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:Inpro/bin}"/>
+</launchConfiguration>

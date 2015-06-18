@@ -7,7 +7,7 @@ import inpro.apps.util.TextCommandLineParser;
 import inpro.incremental.PushBuffer;
 import inpro.incremental.processor.TextBasedFloorTracker;
 import inpro.incremental.sink.FrameAwarePushBuffer;
-import inpro.incremental.source.CurrentASRHypothesis;
+import inpro.incremental.source.SphinxASR;
 import inpro.incremental.source.IUDocument;
 
 import java.awt.Font;
@@ -65,11 +65,11 @@ public class SimpleText extends JPanel implements ActionListener {
 
 	private static final Logger logger = Logger.getLogger(SimpleText.class);
 
-	@S4Component(type = CurrentASRHypothesis.class)
+	@S4Component(type = SphinxASR.class)
 	public final static String PROP_CURRENT_HYPOTHESIS = "currentASRHypothesis";
 	
 	@S4ComponentList(type = FrameAwarePushBuffer.class)
-	public final static String PROP_HYP_CHANGE_LISTENERS = CurrentASRHypothesis.PROP_HYP_CHANGE_LISTENERS;
+	public final static String PROP_HYP_CHANGE_LISTENERS = SphinxASR.PROP_HYP_CHANGE_LISTENERS;
 	
 //	@S4Component(type = CurrentEyeTrackingPoint.class)
 //	public final static String PROP_CURRENT_EYETRACKING = "currentEyeTrackingPoint";		

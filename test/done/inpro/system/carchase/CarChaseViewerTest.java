@@ -7,7 +7,6 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Test;
 import done.inpro.system.carchase.CarChaseExperimenter.WorldAction;
 
@@ -22,7 +21,7 @@ public class CarChaseViewerTest {
 		}
 	}
 	
-	@Test
+	@Test(timeout=60000)
 	public void test() throws InvocationTargetException, InterruptedException {
 		final CarChaseViewer panel = new CarChaseViewer();
 		SwingUtilities.invokeAndWait(new Runnable() {

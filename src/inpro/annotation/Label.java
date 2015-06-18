@@ -78,6 +78,21 @@ public class Label {
 		sb.append((int) ((end - start) * TimeUtil.SECOND_TO_MILLISECOND_FACTOR));
 		return sb;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Label))
+			return false;
+		Label o = (Label) obj;
+		return Math.abs(start - o.start) < 0.0001 // deviations smaller than 1/10 of a ms can probably be ignored
+			&& Math.abs(end - o.end) < 0.0001
+			&& label.equals(o.label);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
 
 	private static List<Pattern> tgPatterns = Arrays.asList( 
 			Pattern.compile("^\\s*xmin = (\\d*(\\.\\d+)?)\\s*$"), 

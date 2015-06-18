@@ -39,11 +39,19 @@ public class WordIU extends IU {
 		this(spelling, null, sll, groundedIn);
 	}
 	
-	protected WordIU(String word, Pronunciation pron, WordIU sll, List<IU> groundedIn) {
+	public WordIU(String token, boolean isSilence, WordIU sll, List<IU> groundedIn) {
+		this(token, null, sll, groundedIn, isSilence);
+	}
+	
+	public WordIU(String word, Pronunciation pron, WordIU sll, List<IU> groundedIn) {
+		this(word, pron, sll, groundedIn, "<sil>".equals(word));
+	}
+	
+	protected WordIU(String word, Pronunciation pron, WordIU sll, List<IU> groundedIn, boolean isSilence) {
 		super(sll, groundedIn, true);
 		this.pron = pron;
 		this.word = word;
-		isSilence = this.word.equals("<sil>");
+		this.isSilence = isSilence;
 	}
 	
 	/**
@@ -140,6 +148,7 @@ public class WordIU extends IU {
 		for (Label label : newLabels) {
 			segIt.next().updateLabel(label);
 		}
+		notifyListeners();
 	}
 	
 	/**
@@ -264,22 +273,6 @@ public class WordIU extends IU {
 			sb.append(seg.toMbrolaLine());
 		}
 		return sb;
-	}
-	
-	public void appendMaryXML(StringBuilder sb) {
-		if ("<sil>".equals(toPayLoad())) {
-			sb.append("<boundary duration='");
-			sb.append(duration());
-			sb.append("'/>\n");
-		} else { 
-			sb.append("<t>\n");
-			sb.append(toPayLoad().replace("<", "&lt;").replace(">", "&lt;"));
-			sb.append("\n<syllable>\n");
-			for (SegmentIU seg : getSegments()) {
-				seg.appendMaryXML(sb);
-			}
-			sb.append("</syllable>\n</t>\n");
-		}
 	}
 	
 	/** returns a new list with all silent words removed */

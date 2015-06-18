@@ -1,11 +1,12 @@
 package inpro.apps;
 
+import inpro.apps.SimpleMonitor;
 import inpro.apps.util.MonitorCommandLineParser;
 import inpro.apps.util.RecoCommandLineParser;
 import inpro.audio.AudioUtils;
 import inpro.incremental.PushBuffer;
-import inpro.incremental.source.CurrentASRHypothesis;
 import inpro.sphinx.frontend.RsbStreamInputSource;
+import inpro.incremental.source.SphinxASR;
 import inpro.sphinx.frontend.RtpRecvProcessor;
 import inpro.util.TimeUtil;
 
@@ -24,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import edu.cmu.sphinx.decoder.ResultListener;
+import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.frontend.DataProcessor;
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.Microphone;
@@ -218,17 +220,31 @@ public class SimpleReco {
 		vumeter.getVuMeterDialog().setLocation(690, 100);
 
 	}
+	
+	private void setupVuMeter() {
+		try {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				@Override
+				public void run() {
+					vumeter = new VUMeterMonitor();			
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		vumeter.getVuMeterDialog().setLocation(690, 100);
+	}
 
-	public void setupMicrophoneWithEndpointing() {
-		FrontEnd fe = (FrontEnd) cm.lookup("frontend");
-		final Microphone mic = (Microphone) cm.lookup("microphone");
+	public BaseDataProcessor setupMicrophoneWithEndpointing()  {
+    	Microphone mic = (Microphone) cm.lookup("microphone");
 		FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
-		setupVuMeter(mic);
+		setupVuMeter();
 		vumeter.setPredecessor(mic);
 		endpoint.setPredecessor(vumeter);
 		endpoint.initialize();
 		setupMicrophone(mic);
-		fe.setPredecessor(endpoint);
+		return endpoint;
 	}
 
 	public void setupRsbInputSourceWithEndpointing() {
@@ -246,11 +262,42 @@ public class SimpleReco {
 		fe.setPredecessor(endpoint);
 	}
 
-	public void allocateRecognizer() {
-		if (recognizer != null
-				&& recognizer.getState() == Recognizer.State.DEALLOCATED) {
-			logger.info("Allocating recognizer...");
-			recognizer.allocate();
+
+	public BaseDataProcessor setupFileInput() throws UnsupportedAudioFileException, IOException {
+		StreamDataSource sds = (StreamDataSource) cm.lookup("streamDataSource");
+		sds.initialize();
+		URL audioURL = clp.getAudioURL();
+		logger.info("input from " + audioURL.toString());
+		AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);
+		// make sure that audio is in the right format 
+		AudioFormat f = ais.getFormat();
+		if (f.getChannels() != 1 ||
+			!(f.getEncoding().equals(Encoding.PCM_SIGNED) || f.getEncoding().toString().equals("FLAC")) || 
+			Math.abs(f.getSampleRate() - 16000f) > 1f ||
+			f.getSampleSizeInBits() != 16) {
+			logger.fatal("Your audio is not in the right format:\nYou must use mono channel,\nPCM signed data,\nsampled at 16000 Hz,\nwith 2 bytes per sample.\nExiting...");
+			logger.info("channels: " + f.getChannels());
+			logger.info("encoding: " + f.getEncoding());
+			logger.info("sample rate: " + f.getSampleRate());
+			logger.info("sample size: " + f.getSampleSizeInBits());
+			System.exit(1);
+		}
+		sds.setInputStream(ais, audioURL.getFile());
+		if (clp.playAtRealtime()) {
+			BaseDataProcessor throttle = (BaseDataProcessor) cm.lookup("dataThrottle");
+			throttle.initialize();
+			BaseDataProcessor feMonitor = (BaseDataProcessor) cm.lookup("feMonitor");
+			feMonitor.initialize();
+			setupVuMeter();
+			BaseDataProcessor endpointing = (BaseDataProcessor) cm.lookup("endpointing");
+			endpointing.initialize();
+			throttle.setPredecessor(sds);
+			vumeter.setPredecessor(throttle);
+			feMonitor.setPredecessor(vumeter);
+			endpointing.setPredecessor(feMonitor);
+			return endpointing;
+		} else {
+			return sds;
 		}
 	}
 
@@ -259,7 +306,7 @@ public class SimpleReco {
 		FrontEnd fe = (FrontEnd) cm.lookup("frontend");
 		switch (clp.getInputMode()) {
 		case RecoCommandLineParser.MICROPHONE_INPUT:
-			setupMicrophoneWithEndpointing();
+			fe.setPredecessor(setupMicrophoneWithEndpointing());
 			break;
 		case RecoCommandLineParser.RTP_INPUT:
 			RtpRecvProcessor rtp = (RtpRecvProcessor) cm
@@ -278,50 +325,9 @@ public class SimpleReco {
 		case RecoCommandLineParser.STREAM_INPUT:
 			System.out.println("*******RSB Stream Input");
 			setupRsbInputSourceWithEndpointing();
-
 			break;
 		case RecoCommandLineParser.FILE_INPUT:
-			StreamDataSource sds = (StreamDataSource) cm
-					.lookup("streamDataSource");
-			sds.initialize();
-			if (clp.playAtRealtime()) {
-				DataProcessor throttle = (DataProcessor) cm
-						.lookup("dataThrottle");
-				throttle.initialize();
-				DataProcessor feMonitor = (DataProcessor) cm
-						.lookup("feMonitor");
-				feMonitor.initialize();
-				setupVuMeter(sds);
-				DataProcessor endpointing = (DataProcessor) cm
-						.lookup("endpointing");
-				endpointing.initialize();
-				throttle.setPredecessor(sds);
-				vumeter.setPredecessor(throttle);
-				feMonitor.setPredecessor(vumeter);
-				endpointing.setPredecessor(feMonitor);
-				fe.setPredecessor(endpointing);
-			} else {
-				fe.setPredecessor(sds);
-			}
-			URL audioURL = clp.getAudioURL();
-			logger.info("input from " + audioURL.toString());
-			AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);
-			// make sure that audio is in the right format
-			AudioFormat f = ais.getFormat();
-
-			if (f.getChannels() != 1
-					|| !(f.getEncoding().equals(Encoding.PCM_SIGNED) || f
-							.getEncoding().toString().equals("FLAC"))
-					|| Math.abs(f.getSampleRate() - 16000f) > 1f
-					|| f.getSampleSizeInBits() != 16) {
-				logger.fatal("Your audio is not in the right format:\nYou must use mono channel,\nPCM signed data,\nsampled at 16000 Hz,\nwith 2 bytes per sample.\nExiting...");
-				logger.info("channels: " + f.getChannels());
-				logger.info("encoding: " + f.getEncoding());
-				logger.info("sample rate: " + f.getSampleRate());
-				logger.info("sample size: " + f.getSampleSizeInBits());
-				System.exit(1);
-			}
-			sds.setInputStream(ais, audioURL.getFile());
+			fe.setPredecessor(setupFileInput());
 			break;
 		}
 	}
@@ -377,8 +383,7 @@ public class SimpleReco {
 		ResultListener resultlistener = (ResultListener) cm
 				.lookup("currentASRHypothesis");
 		recognizer.addResultListener(resultlistener);
-		CurrentASRHypothesis casrh = (CurrentASRHypothesis) cm
-				.lookup("currentASRHypothesis");
+		SphinxASR casrh = (SphinxASR) cm.lookup("currentASRHypothesis");
 		if (clp.matchesOutputMode(RecoCommandLineParser.TED_OUTPUT)) {
 			casrh.addListener((PushBuffer) cm.lookup("tedNotifier"));
 		}
@@ -406,7 +411,14 @@ public class SimpleReco {
 			}
 		}
 	}
-
+	
+	public void allocateRecognizer() {
+		if (recognizer != null && recognizer.getState() == Recognizer.State.DEALLOCATED) {
+	    	logger.info("Allocating recognizer...");
+			recognizer.allocate();
+		}
+	}
+	
 	/** call this if you want a single recognition */
 	public void recognizeOnce() {
 		Result result = null;

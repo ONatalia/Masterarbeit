@@ -1,5 +1,7 @@
 package inpro.apps.util;
 
+import inpro.apps.util.CommonCommandLineParser;
+
 import java.net.URL;
 
 public class RecoCommandLineParser extends CommonCommandLineParser {
@@ -30,10 +32,10 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	int incrementalMode;
 	int incrementalModifier;
 	String referenceText;
+	private static String labelPath;
 	
 	/* stores location of a grammar or SLM */ 
-	URL languageModelURL;
-	private static String labelPath;
+	URL languageModelURL; 
 	
 	/**
 	 * @return the languageModelURL
@@ -45,7 +47,6 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	boolean dataThrottle;
 	
 	protected boolean ignoreErrors;
-
 	
 	@Override
 	void printUsage() {
@@ -121,7 +122,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				}
 				else if (args[i].equals("-c")) {
 					i++;
-					configURL = new URL(args[i]);
+					configURL = anyToURL(args[i]);
 				}
 				else if (args[i].equals("-v")) {
 					verbose = true;
@@ -142,6 +143,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				else if (args[i].equals("-M")) { 
 					inputMode = MICROPHONE_INPUT;
 				}
+
 				else if (args[i].equals("-S")) { 
 					inputMode = STREAM_INPUT;
 				}
@@ -153,7 +155,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				else if (args[i].equals("-F")) {
 					inputMode = FILE_INPUT;
 					i++;
-					audioURL = new URL(args[i]);
+					audioURL = anyToURL(args[i]);
 				}
 				else if (args[i].equals("-T")) {
 					outputMode |= TED_OUTPUT;
@@ -186,17 +188,17 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				else if (args[i].equals("-lm")) {
 					recoMode = SLM_RECO;
 					i++;
-					languageModelURL = new URL(args[i]);
+					languageModelURL = anyToURL(args[i]);
 				} 
 				else if (args[i].equals("-gr")) {
 					recoMode = GRAMMAR_RECO;
 					i++;
-					languageModelURL = new URL(args[i]);
+					languageModelURL = anyToURL(args[i]);
 				} 
 				else if (args[i].equals("-Lp")) {
 					i++;
-					labelPath = new String(args[i]);
-				} 				
+					setLabelPath(new String(args[i]));
+				} 					
 				else if (args[i].equals("-rt")) {
 					dataThrottle = true;
 				}
@@ -243,5 +245,12 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	public boolean playAtRealtime() {
 		return dataThrottle;
 	}
-	
+
+	public static String getLabelPath() {
+		return labelPath;
+	}
+
+	public static void setLabelPath(String labelPath) {
+		RecoCommandLineParser.labelPath = labelPath;
+	}	
 }
