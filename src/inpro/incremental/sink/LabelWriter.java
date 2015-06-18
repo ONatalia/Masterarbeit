@@ -1,6 +1,5 @@
 package inpro.incremental.sink;
 
-import inpro.apps.util.RecoCommandLineParser;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.util.TimeUtil;
@@ -34,15 +33,12 @@ public class LabelWriter extends FrameAwarePushBuffer {
     public final static String PROP_WRITE_STDOUT = "writeToStdOut";
 	
     @S4String(defaultValue = "")
-    public final static String PROP_FILE_PATH= "filePath";    
-    
-    @S4String(defaultValue = "")
     public final static String PROP_FILE_NAME = "fileName";    
     
     private boolean writeToFile;
     private boolean commitsOnly;
     private boolean writeToStdOut = true;
-    private static String fileName;
+    private String fileName;
     int frameOutput = -1;
     
     ArrayList<IU> allIUs = new ArrayList<IU>();
@@ -52,7 +48,11 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		writeToFile = ps.getBoolean(PROP_WRITE_FILE);
 		commitsOnly = ps.getBoolean(PROP_COMMITS_ONLY);
 		writeToStdOut = ps.getBoolean(PROP_WRITE_STDOUT);
-		fileName = RecoCommandLineParser.getLabelPath();
+		fileName = ps.getString(PROP_FILE_NAME);
+		// do some magic for lazy people
+		if (!fileName.endsWith("inc_reco")) {
+			fileName = fileName + ".inc_reco";
+		}
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 			frameOutput = currentFrame;
 			if (writeToFile) {
 				try {
-					FileWriter writer = new FileWriter( fileName + ".inc_reco", true);
+					FileWriter writer = new FileWriter(fileName, true);
 					writer.write(toOut);
 					writer.close();
 				} catch (IOException e) {
@@ -117,20 +117,18 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		}
 	}
 	
-	/** A file name can be specified here, if not specified in the config file */
-	public void setFileName(String name) {
-		fileName = name;
-	}
-
 	@Override
 	public void reset() {
 		super.reset();
 		frameOutput = -1;
 	}
 
-	public void writeToFile() {
-		// TODO Auto-generated method stub
-		writeToFile = true;
+	public void setWriteToFile(boolean writeToFile) {
+		this.writeToFile = writeToFile;
+	}
+
+	public void setFileName(String filename) {
+		this.fileName = filename;
 	}
 	
 }

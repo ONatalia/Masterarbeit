@@ -9,6 +9,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	public static final int FAKE_RECO = 2;
 	public static final int GRAMMAR_RECO = 3;
 	public static final int SLM_RECO = 4;
+	public static final int GOOGLE_RECO = 5;
 	
 	public static final int DEFAULT_DELTIFIER = -1;
 	public static final int INCREMENTAL = 0;
@@ -30,7 +31,6 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	int incrementalMode;
 	int incrementalModifier;
 	String referenceText;
-	private static String labelPath;
 	
 	/* stores location of a grammar or SLM */ 
 	URL languageModelURL; 
@@ -42,7 +42,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		return languageModelURL;
 	}
 
-	boolean dataThrottle;
+	private boolean dataThrottle;
 	
 	protected boolean ignoreErrors;
 	
@@ -65,11 +65,12 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -O             output dialogue system responses");
 		System.err.println("    -T             send incremental hypotheses to TEDview");
 		System.err.println("    -L             incremental output using LabelWriter");
+		System.err.println("    -Lp	<path>     write the inc_reco file from LabelWriter to this file/path specification, implies -L");
 		System.err.println("incrementality options:");
 		System.err.println("                   by default, incremental results are generated at every frame");
 		System.err.println("    -N             no incremental output");
-		System.err.println("    -Is <n>        apply smoothing factor");
-		System.err.println("    -If <n>        apply fixed lag");
+		System.err.println("    -Is <n>        apply smoothing factor (only for internal Sphinx-ASR)");
+		System.err.println("    -If <n>        apply fixed lag (only for internal Sphinx-ASR");
 		System.err.println("    -In            no result smoothing/lagging, DEFAULT");
 		System.err.println("    -C             show current incremental ASR hypothesis");
 		System.err.println("special recognition modes:");
@@ -77,9 +78,9 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -tg <file>     do fake recognition from the given reference textgrid");
 		System.err.println("    -gr <URL>      recognize using the given JSGF grammar");
 		System.err.println("    -lm <URL>      recognize using the given language model");
-		System.err.println("                   (-fa, -tg, -gr, and -lm are exclusive)");
+		System.err.println("                   (-fa, -tg, -gr, and -lm are exclusive and all use the Sphinx-4 engine)");
 		System.err.println("    -rt	           when reading from file, run no faster than real-time (includes VAD)");
-		System.err.println("    -Lp	<text>     when set, will write the inc_reco file from LabelWriter to this path");
+		System.err.println("    -G <apiKey>    Google Speech-API with the given API key"); //TODO
 	}
 
 	/**
@@ -108,8 +109,10 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	
 	@Override
 	void parse(String[] args) throws IllegalArgumentException {
+		// set defaults
 		recoMode = REGULAR_RECO;
 		incrementalMode = DEFAULT_DELTIFIER;
+		// look at arguments
 		for (int i = 0; i < args.length; i++) {
 			try {
 				if (args[i].equals("-h")) {
@@ -156,6 +159,11 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				else if (args[i].equals("-L")) {
 					outputMode |= LABEL_OUTPUT;
 				}
+				else if (args[i].equals("-Lp")) {
+					outputMode |= LABEL_OUTPUT;
+					i++;
+					setLabelPath(new String(args[i]));
+				} 					
 				else if (args[i].equals("-C")) {
 					outputMode |= CURRHYP_OUTPUT;
 				} 
@@ -188,12 +196,11 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 					i++;
 					languageModelURL = anyToURL(args[i]);
 				} 
-				else if (args[i].equals("-Lp")) {
-					i++;
-					setLabelPath(new String(args[i]));
-				} 					
 				else if (args[i].equals("-rt")) {
 					dataThrottle = true;
+				}
+				else if (args[i].equals("-G")) {
+					recoMode = GOOGLE_RECO;
 				}
 				else {
 					throw new IllegalArgumentException(args[i]);
@@ -238,12 +245,4 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	public boolean playAtRealtime() {
 		return dataThrottle;
 	}
-
-	public static String getLabelPath() {
-		return labelPath;
-	}
-
-	public static void setLabelPath(String labelPath) {
-		RecoCommandLineParser.labelPath = labelPath;
-	}	
 }

@@ -30,7 +30,7 @@ public class rungoogleasr {
         // set the sampling rate
         gasr.setSamplingRate("16000");
         LabelWriter label = new LabelWriter();
-        label.writeToFile();
+        label.setWriteToFile(true);
         label.setFileName(args[args.length - 1]);
         //gasr.addListener(new CurrentHypothesisViewer().show());
         gasr.addListener(label);

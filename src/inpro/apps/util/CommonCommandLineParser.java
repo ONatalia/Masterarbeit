@@ -30,7 +30,8 @@ public abstract class CommonCommandLineParser {
 	int inputMode;
 	int outputMode;
 	boolean serverMode = false;
-	
+	String labelFilename;
+
 	public CommonCommandLineParser(String[] args) {
 		success = false;
 		try {
@@ -79,6 +80,14 @@ public abstract class CommonCommandLineParser {
 	public boolean matchesOutputMode(int mode) {
 		return (outputMode & mode) == mode;
 	}
+
+	public String getLabelPath() {
+		return labelFilename;
+	}
+
+	public void setLabelPath(String labelPath) {
+		this.labelFilename = labelPath;
+	}	
 	
 	/**
 	 * getURLForPath try to use the given path to either make
@@ -114,5 +123,4 @@ public abstract class CommonCommandLineParser {
 		
 	}
 
-	
 }
