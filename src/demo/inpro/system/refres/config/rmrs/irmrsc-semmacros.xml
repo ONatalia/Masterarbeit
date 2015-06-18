@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	This file defines the semantic macros. Each macro essentially is a
+	rmrsincrement (yielding a rmrs formula when parsed) identified by a
+	long and a (optional) short name.
+-->
+<semmacros>
+
+<!-- ABSTRACT MACROS -->
+
+<defmacro longname="init" shortname=".">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="0" a="1" i="2"/></slots>
+<rels></rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="pop" shortname="-">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots></slots>
+<rels></rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="pass" shortname=".">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="0" a="1" i="2"/></slots>
+<rels></rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="equal" shortname="=">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="0" a="1" i="2"/><hook l="0" a="1" i="2"/></slots>
+<rels></rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="plus-left" shortname=".+">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="3" a="4" i="2"/><hook l="0" a="1" i="2"/></slots>
+<rels></rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="plus-right" shortname="+.">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="0" a="1" i="2"/><hook l="3" a="4" i="2"/></slots>
+<rels></rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="plus-l" shortname="l+">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+  <vdef id="3" type="a"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="0" a="3" i="2"/><hook l="0" a="1" i="2"/></slots>
+<rels></rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="Arg1" shortname="Arg1">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="i"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="3" a="4" i="5"/><hook l="0" a="1" i="2"/></slots>
+<rels><rel type="arg" name="ARG1" a="1" i="5"/></rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="Arg2" shortname="Arg2">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="i"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="3" a="4" i="5"/><hook l="0" a="1" i="2"/></slots>
+<rels><rel type="arg" name="ARG2" a="1" i="5"/></rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="Arg3" shortname="Arg3">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="i"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="3" a="4" i="5"/><hook l="0" a="1" i="2"/></slots>
+<rels><rel type="arg" name="ARG3" a="1" i="5"/></rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="ArgN" shortname="ArgN">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="i"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="3" a="4" i="5"/><hook l="0" a="1" i="2"/></slots>
+<rels><rel type="arg" name="ARGN" a="1" i="5"/></rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<!-- GRAMMAR SPECIFIC MACROS -->
+
+<defmacro longname="quantify" shortname="Q">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="x"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="e"/>
+  <vdef id="6" type="h"/><vdef id="7" type="h"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="0" a="1" i="5"/><hook l="3" a="4" i="2"/></slots>
+<rels>
+  <rel type="arg" name="BV" a="1" i="2"/>
+  <rel type="arg" name="RSTR" a="1" i="6"/>
+  <rel type="arg" name="BODY" a="1" i="7"/>
+</rels>
+<scons><qeq h="6" l="3"/></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="PP" shortname="PP">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="e"/>
+  <vdef id="6" type="l"/><vdef id="7" type="a"/><vdef id="8" type="x"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="3" a="4" i="5"/><hook l="6" a="7" i="8"/></slots>
+<rels>
+  <rel type="arg" name="ARG1" a="4" i="2"/>
+  <rel type="arg" name="ARG2" a="4" i="8"/>
+</rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="PPART" shortname="PPART">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="e"/>
+  <vdef id="6" type="l"/><vdef id="7" type="a"/><vdef id="8" type="x"/>
+  <vdef id="9" type="l"/><vdef id="10" type="a"/><vdef id="11" type="e"/>
+  <vdef id="12" type="h"/><vdef id="13" type="h"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="3" a="4" i="5"/><hook l="9" a="10" i="8"/></slots>
+<rels>
+  <rel type="arg" name="ARG1" a="4" i="2"/>
+  <rel type="arg" name="ARG2" a="4" i="8"/>
+  <rel type="arg" name="BV"   a="7" i="8"/>
+  <rel type="arg" name="RSTR" a="7" i="12"/>
+  <rel type="arg" name="BODY" a="7" i="13"/>
+  <rel type="gram" name="def" l="6" a="7"/>
+</rels>
+<scons><qeq h="12" l="9"/></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="PROAV" shortname="PROAV">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="e"/>
+  <vdef id="6" type="l"/><vdef id="7" type="a"/><vdef id="8" type="x"/>
+  <vdef id="9" type="l"/><vdef id="10" type="a"/><vdef id="11" type="e"/>
+  <vdef id="12" type="h"/><vdef id="13" type="h"/><vdef id="14" type="a"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="3" a="4" i="5"/><hook l="9" a="10" i="8"/></slots>
+<rels>
+  <rel type="arg" name="ARG2" a="4" i="2"/>
+  <rel type="arg" name="ARG1" a="4" i="8"/>
+  <rel type="arg" name="BV"   a="7" i="8"/>
+  <rel type="arg" name="RSTR" a="7" i="12"/>
+  <rel type="arg" name="BODY" a="7" i="13"/>
+  <rel type="gram" name="def" l="6" a="7"/>
+  <rel type="gram" name="dort" l="9" a="14" i="8"/>
+</rels>
+<scons><qeq h="12" l="9"/></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="ADJA" shortname="ADJA">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+  <vdef id="3" type="a"/><vdef id="4" type="e"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="0" a="3" i="4"/></slots>
+<rels><rel type="arg" name="ARG1" a="3" i="2"/></rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="NADJA" shortname="NADJA">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="x"/>
+  <vdef id="3" type="a"/><vdef id="4" type="e"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="0" a="3" i="4"/></slots>
+<rels>
+  <rel type="gram" name="thing" l="0" a="1" i="2" />
+  <rel type="arg" name="ARG1" a="3" i="2"/>
+</rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="ADV" shortname="ADV">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="e"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="3" a="4" i="5"/></slots>
+<rels><rel type="arg" name="ARG1" a="4" i="2"/></rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="imperativ" shortname="imp">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="i"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="x"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="0" a="1" i="2"/></slots>
+<rels>
+  <rel type="arg" name="ARG1" a="1" i="5"/>
+  <rel type="gram" name="addressee" l="3" a="4" i="5"/>
+</rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="econj" shortname="econj">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="e"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="e"/>
+  <vdef id="6" type="l"/><vdef id="7" type="a"/><vdef id="8" type="e"/>
+  <vdef id="9" type="h"/><vdef id="10" type="h"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="3" a="4" i="5"/><hook l="0" a="1" i="2"/><hook l="6" a="7" i="8"/></slots>
+<rels>
+  <rel type="arg" name="LEFT-I"  a="1" i="5"/>
+  <rel type="arg" name="RIGHT-I" a="1" i="8"/>
+  <rel type="arg" name="LEFT-L"  a="1" i="9"/>
+  <rel type="arg" name="RIGHT-L" a="1" i="10"/>
+</rels>
+<scons><qeq h="9" l="3"/><qeq h="10" l="6"/></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="nullevent" shortname="nullevent">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="e"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="0" a="1" i="2"/></slots>
+<rels>
+  <rel type="gram" name="event" l="0" a="1" i="2"/>
+</rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="ppfrag@np" shortname="ppfrag@np">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="e"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="x"/>
+  <vdef id="6" type="l"/><vdef id="7" type="a"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="6" a="7" i="5"/></slots>
+<rels>
+  <rel type="arg" name="ARGN" a="1" i="5"/>
+  <rel type="gram" name="thing" l="3" a="4" i="5"/>
+</rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="SubjRelS" shortname="SubjRelS">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="x"/>
+  <vdef id="3" type="l"/><vdef id="4" type="a"/><vdef id="5" type="e"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="0" a="1" i="2"/><hook l="3" a="4" i="5"/></slots>
+<rels>
+  <rel type="arg" name="ARG1" a="4" i="2"/>
+</rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+<defmacro longname="confirmation" shortname="conf">
+<rmrsincrement>
+<vars>
+  <vdef id="0" type="l"/><vdef id="1" type="a"/><vdef id="2" type="e"/>
+</vars>
+<hook l="0" a="1" i="2"/>
+<slots><hook l="0" a="1" i="2"/></slots>
+<rels>
+</rels>
+<scons></scons>
+</rmrsincrement>
+</defmacro>
+
+
+
+</semmacros>

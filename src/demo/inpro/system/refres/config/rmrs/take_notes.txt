@@ -1,0 +1,127 @@
+
+Notes:
+-treated plurals as singulars
+-beiden and einzigeln are adjectives... perhaps put a number of how many of a certain type might be? a property wold be shape2 if there are, for example, two Xs or color3 if there are three objects that are red), for 1, 2, or >2 (groups)
+
+TODO:
+- something is weird with conjunctions (und, aber, oder, sondern) that use the kon tag. Makes weird RIGHT and LEFT constructions. 
+- wo, wie, was as questions instead of subjunktif
+- das v (das ist richtig)
+
+The following sentences are examples of auxiliary verbs:
+und dann können wir hier schon fast was schreiben nehmen wir das gelbe t hier vorne ja
+mal gucken was wir noch nehmen können 
+ähm oben rechts das einzige hellblaue symbol ich wüsst nicht wie ich s beschreiben soll aber da es das einzige hellblaue symbol ist äh könnte das ja trotzdem klappen genau
+dazu dann von den vier symbolen hier das is ja die ich alle nicht beschreiben kann nimm da mal das erste gelbe richtig
+s also den hier vorne nee das ist falsch der hier vorne auf den ich gerade zeige der in der mitte liegt nein der da drunter kannste den nehmen genau richtig
+und jetzt einmal dieses symbol das hier vorne ist das kann ich immer nicht benennen weil ich nicht weiß was das ist das wo ich gerade draufzeige ja
+das rote in der rechten ecke oben der rote klotz rechts oben roter stein rechts oben soll ich mir jetzt einfach einen anderen aussuchen einfach weiter beschreiben ja richtig
+ähm das grüne in der rechts unteren ecke soll ich jetzt einfach weiterreden oder ja richtig
+also ich soll jetzt einfach sagen ich mein das grüne rechts oben in der ecke zum beispiel ja richtig
+und links aus der zweiten reihe das linke symbol also wir haben ja hier vier reihen oder fünf schon fast und dann möchte ich aus dieser zweiten reihe hier das linke symbol haben richtig
+und dann aus der ecke oben rechts das z den zweiten strich aus dieser gruppe hier vorne möchte ich gerne diesen grauen strich haben ja
+und dazu dann wir haben ja diese fünf zeichen da oben und ich möchte genau das in der mitte haben richtig
+dann aus diesem wirrwarr da oben rechts möchte ich das kreuz in der mitte haben richtig
+nimm das und ähm findest würden blauen striche wo 's richtig t
+<sil> jetz aber mitte in das untere blaue in das untere linke blaue sind zwei ist unten rechts und ich würde das untere haben 's also sich
+ähm das hellgrüne symbol unten links ich wüsst nicht wie ich s beschreiben soll genau
+
+
+:Existant:
+besteht
+sind
+is
+ist
+gibt
+
+:Modal Verbs:
+können
+könnt
+kann
+kannste
+soll
+möcht
+möchte
+würde
+würden
+wüsst
+
+:Posessives:
+mein
+
+:Confirmations:
+ja
+jo
+korrekt
+
+:Comparatives:
+kleineres
+äußerste
+weiter
+
+:Quantifiers:
+alle
+einzige
+ganzen
+keine
+nur
+einzelne
+beiden
+
+:Plurals:
+blöcke
+cs
+farben
+strichen
+symbolen
+kreuzen
+ls
+reihen
+winkeln
+
+:Numbers:
+zwei
+drei
+vier
+fünf
+fünft
+viele
+
+"da" words:
+dabei
+dadrauf
+daneben
+darauf
+darüber
+dasn
+dazu
+dazwischen
+draufgezeigt
+draufzeige
+drunter
+obendrauf
+
+"ge-"
+geformt
+gehabt
+gesehen
+
+:Genitive:
+kreuzes - hat die form eines kreuzes 
+
+:Unsure:
+als  (steht aufm kopf so als tipdas ist unten links das hier vorne)
+sieht ... aus
+das / s / tipdas / 's (das ist richtig)
+denn
+gern (ich möchte gern...)
+gerne
+was
+wie
+wenn
+ob
+irgendwie
+sondern
+weil
+wo
+zwischen

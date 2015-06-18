@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	This file maps syntactic rule identifier to semantic macros
+	(identified by their longname). Make sure each syntactic rule
+	is covered.
+-->
+<semrules>
+<defrule id="fill"><refmacro longname="pass"/></defrule>
+<defrule id="s*/s,kon,s*"><refmacro longname="econj"/></defrule>
+<defrule id="s*/kon,s"><refmacro longname="equal"/></defrule>
+<defrule id="s*/s"><refmacro longname="pass"/></defrule>
+<defrule id="s/vp"><refmacro longname="imperativ"/></defrule>
+<defrule id="s/nadj-np"><refmacro longname="plus-right"/></defrule>
+<defrule id="vp/v-v1"><refmacro longname="equal"/></defrule>
+<defrule id="vp/v1-v"><refmacro longname="equal"/></defrule>
+<defrule id="v1/np-vz"><refmacro longname="Arg2"/></defrule>
+<defrule id="vz/pp-vz"><refmacro longname="plus-left"/></defrule>
+<defrule id="vz/advp-vz"><refmacro longname="plus-left"/></defrule>
+<defrule id="vz/eps"><refmacro longname="pop"/></defrule>
+<defrule id="np/pper"><refmacro longname="pass"/></defrule>
+<defrule id="np/det-n1"><refmacro longname="quantify"/></defrule>
+<defrule id="np/pp-np"><refmacro longname="plus-left"/></defrule>
+<defrule id="np/adv-np"><refmacro longname="plus-left"/></defrule>
+<defrule id="np/adjp-np"><refmacro longname="plus-left"/></defrule>
+<defrule id="np/kon-s*"><refmacro longname="econj"/></defrule>
+<defrule id="n1/adjp-n1"><refmacro longname="plus-l"/></defrule>
+<defrule id="n1/nn-nz"><refmacro longname="plus-right"/></defrule>
+<defrule id="n1/nadj-nz"><refmacro longname="plus-right"/></defrule>
+<defrule id="nz/pp-nz"><refmacro longname="plus-left"/></defrule>
+<defrule id="nz/advp-nz"><refmacro longname="plus-left"/></defrule>
+<defrule id="nz/np-nz"><refmacro longname="plus-left"/></defrule>
+<defrule id="nz/eps"><refmacro longname="pop"/></defrule>
+<defrule id="pp/appr-np"><refmacro longname="PP"/></defrule>
+<defrule id="pp/apprart-n1"><refmacro longname="PPART"/></defrule>
+<defrule id="pp/proav"><refmacro longname="PROAV"/></defrule>
+<defrule id="adjp/adja"><refmacro longname="ADJA"/></defrule>
+<defrule id="nadj/adja"><refmacro longname="NADJA"/></defrule>
+<defrule id="advp/adv"><refmacro longname="ADV"/></defrule>
+<!-- FRAGMENTS -->
+<defrule id="s*/frag"><refmacro longname="nullevent"/></defrule>
+<defrule id="frag/np"><refmacro longname="ArgN"/></defrule>
+<defrule id="frag/pp@np"><refmacro longname="ppfrag@np"/></defrule>
+<defrule id="frag/pp@vp"><refmacro longname="pass"/></defrule>
+<defrule id="frag/adja"><refmacro longname="NADJA"/></defrule>
+<!-- NEW -->
+<defrule id="s/np-vp"><refmacro longname="Arg1"/></defrule>
+<defrule id="v1/vz"><refmacro longname="pass"/></defrule>
+<defrule id="nz/prels-vp"><refmacro longname="SubjRelS"/></defrule>
+<defrule id="s/conf"><refmacro longname="confirmation"/></defrule>
+</semrules>
