@@ -75,6 +75,7 @@ public class PredicateLogicModule extends IUModule {
 		for (EditMessage<? extends IU> edit: edits){
 			IU iu = edit.getIU();
 			if (iu instanceof FormulaIU) {
+				@SuppressWarnings("unchecked")
 				EditMessage<FormulaIU> castedEdit = (EditMessage<FormulaIU>) edit;
 //				System.out.println(castedEdit.getIU().getFormula().toRMRSString()+ " " + castedEdit.getIU().groundedIn().get(0).toPayLoad());
 				allCaIUs.add(castedEdit);
@@ -199,7 +200,8 @@ public class PredicateLogicModule extends IUModule {
 		return name;
 	}
 	
-	private void print(List<EditMessage<SemanticIU>> diffs) {
+	@SuppressWarnings("unused") // it's fine to keep debug methods around
+	private void print(List<EditMessage<SemanticIU>> diffs) { 
 		for (EditMessage<SemanticIU> iu : diffs) {
 			System.out.println(iu);
 		}

@@ -40,7 +40,6 @@ public class PentoTile extends Tile {
 	protected int[][] defVectors = new int[2][BOX_COUNT];
 	
 	private TargetPattern myGrid;
-	private int rank = -1;
 	
 	/** the kind of pentomino tile this object represents */
 	protected char type;
@@ -89,12 +88,6 @@ public class PentoTile extends Tile {
 		generate();  /* creates indiv. boxes and determines clip rectangle */
 	}
 	
-	public PentoTile(int scale, Color interpretColor, int x, int y,
-			char type2, String id, String label, int rank) {
-		this(scale, interpretColor, x, y, type2, id, label);
-		this.rank = rank;
-	}
-
 	public static boolean isValidTile(char c) {
 		return (c == 'F' || c == 'U' || c == 'X'
 			 || c == 'W' || c == 'Y' || c == 'N'

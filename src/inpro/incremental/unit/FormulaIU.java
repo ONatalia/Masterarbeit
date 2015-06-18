@@ -1,7 +1,6 @@
 package inpro.incremental.unit;
 
 import inpro.irmrsc.rmrs.Formula;
-import inpro.irmrsc.rmrs.Relation;
 
 import java.util.Collections;
 import java.util.List;

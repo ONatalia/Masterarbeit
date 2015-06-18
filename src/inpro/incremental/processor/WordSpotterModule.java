@@ -97,7 +97,7 @@ public class WordSpotterModule extends IUModule {
 		for (EditMessage<? extends IU> edit : edits) {
 			IU iu = edit.getIU();
 			if (iu instanceof WordIU) {
-				if (iu != null || iu.getSameLevelLink() != null || iu.getSameLevelLink().toPayLoad().equals(WordIU.FIRST_WORD_IU.toPayLoad())) {
+				if (iu.getSameLevelLink() != null || iu.getSameLevelLink().toPayLoad().equals(WordIU.FIRST_WORD_IU.toPayLoad())) {
 					prevIU = null;
 				}
 		

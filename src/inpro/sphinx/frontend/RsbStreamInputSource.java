@@ -252,7 +252,7 @@ public class RsbStreamInputSource extends BaseDataProcessor {
 		 * Starts the thread, and waits for recorder to be ready
 		 */
 		@Override
-		public void start() {
+		public synchronized void start() {
 			started = false;
 			super.start();
 		}
@@ -288,7 +288,7 @@ public class RsbStreamInputSource extends BaseDataProcessor {
 			logger.info("DataStartSignal added");
 			try {
 				while (!done) {
-					Data data = readData(currentUtterance);
+					Data data = readData();
 					if (data == null) {
 						done = true;
 						break;
@@ -322,7 +322,7 @@ public class RsbStreamInputSource extends BaseDataProcessor {
 		 * @throws java.io.IOException
 		 * @throws InterruptedException
 		 */
-		private Data readData(Utterance utterance) throws IOException,
+		private Data readData() throws IOException,
 				InterruptedException {
 
 			// Read the next chunk of data from the input stream.

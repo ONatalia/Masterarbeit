@@ -9,9 +9,6 @@ import inpro.incremental.unit.IU;
 import inpro.incremental.unit.WordIU;
 import inpro.incremental.source.SphinxASR;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,10 +46,9 @@ public class PentoRMRSDemo {
 	private int max = 1500;
 	private int numFolds = 3;
 	private int foldSize = 150;
-	private double rank = 0.0;
 	private double rankTotal = 0.0;
 	
-	public PentoRMRSDemo() throws IOException {
+	public PentoRMRSDemo() {
 		cm = new ConfigurationManager("src/demo/inpro/system/refres/config/config.xml");
 		cm.setGlobalProperty("sium", "tagger");
 		ps = cm.getPropertySheet(PROP_ASR_HYP);
@@ -60,7 +56,7 @@ public class PentoRMRSDemo {
 	}
 	
 
-	private void run() throws SQLException, InterruptedException, IOException {
+	private void run() throws SQLException, InterruptedException {
 		
 //		context for possible actions that can be taken
 		Context<String,String> actions = new Context<String,String>();
@@ -149,10 +145,8 @@ public class PentoRMRSDemo {
 							boolean gotit = gold.equals(guess);
 							if (r != -1)  {
 								if (last != -1) {
-									rank -= last;
 									inc_results.removeLast();
 								}
-								rank += 1.0/r;
 								current_rank = (int) r;
 								last = 1.0/r;
 								if (gotit) inc_results.add("True");
@@ -225,7 +219,7 @@ public class PentoRMRSDemo {
 		
 	}
 
-	private void processLine(ArrayList<LingEvidence> ling, ResolutionModuleRMRS resolution, String gold) throws IOException {
+	private void processLine(ArrayList<LingEvidence> ling, ResolutionModuleRMRS resolution, String gold) {
 		
 		ArrayList<WordIU> ius = new ArrayList<WordIU>();
 		
@@ -247,7 +241,7 @@ public class PentoRMRSDemo {
 			for (String gid : resolution.getGrounders().keySet()) {
 				
 				Grounder<String, String> grounder = resolution.getGrounders().get(gid);			
-				String guess = null, guess2 = null;
+				String guess = null;
 				
 				if (!grounder.getPosterior().isEmpty()) {
 					guess = grounder.getPosterior().getArgMax().getEntity();
@@ -258,10 +252,8 @@ public class PentoRMRSDemo {
 					boolean gotit = gold.equals(guess);
 					if (r != -1)  {
 						if (last != -1) {
-							rank -= last;
 							incResults.removeLast();
 						}
-						rank += r;
 						last = r;
 						if (gotit) incResults.add("True");
 						else incResults.add("False");
@@ -273,9 +265,6 @@ public class PentoRMRSDemo {
 							
 		}
 		if (incResults.isEmpty()) incResults.add("False");
-		String line = "";
-		for (String l : incResults) line += l + " ";
-//		writer.write(line.trim() +"\n");
 		
 		for (WordIU iu : ius) {
 			edits.add(new EditMessage<IU>(EditType.COMMIT, iu));
@@ -313,12 +302,7 @@ public class PentoRMRSDemo {
 		try {
 			new PentoRMRSDemo().run();
 		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		} 
-		catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

@@ -256,7 +256,6 @@ public class SimpleReco {
 		vumeter.setPredecessor(rsbInputStream);
 		endpoint.setPredecessor(vumeter);
 		vumeter.getVuMeterDialog().setVisible(false);
-		;
 		endpoint.initialize();
 		setupRsbInputSource(rsbInputStream);
 		fe.setPredecessor(endpoint);
