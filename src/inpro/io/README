@@ -12,7 +12,7 @@ You will need the instantreality.jar file from the package downloaded from the I
 
 You will also need the protobuf jar: https://code.google.com/p/protobuf/
 
-Jars for Apache Tomcat and the Robotics Service Bus are included, but please note the licenese (see below).
+Jars for the Robotics Service Bus are included, but please note the licenese (see below).
 
 -------------------------------
 	XMLRPC
@@ -109,52 +109,8 @@ it is pushed to the output. The same pattern goes for XmlRpc and InstantIO.
 
 
 -------------------------------
-     Google Web Speech
--------------------------------
-
-To use the Google Web Speech, you need to install Chrome or Choromium browser. 
-
-You will need to create a .keystore file for ssl/https (necessary otherwise Chrome will
-ask you multiple times if you want to allow access to the microphone). Run the following 
-(keytool is a java program) and answer the questions. This will put a .keystore file
-in your home directory:
-
-keytool -genkey -v -keyalg RSA -alias tomcat -keypass changeit -storepass changeit
-
-
-After starting InproTK with WebSpeech as an IUModule, you can open localhost:8080/dialog
-and you should get a mic interface, asking for permission to access your mic. Click allow, 
-then click start to begin streaming the audio (it may ask for permission again). You can
-change your mic settings by clicking on the video/mic image on the right-hand side of the 
-address bar. 
-
-The above website is hosted by Apache Tomcat, license found here: http://www.apache.org/licenses/LICENSE-2.0
-
-Language codes can be found at the following URL: http://www.science.co.il/language/locale-codes.asp
-Some common ones: de-de, en_uk, en_us, ja
-
-We are doing the best we can with timestamps; Google returns a timestamp that we interpret as the
-end of a chunk (often, more than one word is returned). The timestamp offset is based on when
-you clicked "start" on the Chrome browser page. If you set alignFirstOnly to false in the config
-file, it will set the start time to every time Google detects a new utterance (i.e., after a sizable
-silence gap). 
-
-
--------------------------------
      EXAMPLE CONFIGS
 -------------------------------	
-
-	<!-- Google Web Speech -->
-     <component name="webSpeech" type="inpro.io.webspeech.WebSpeech">
-        <property name="lang" value="de-de"/>
-        <property name="maxAlternatives" value="25"/>
-        <property name="interimResults" value="true"/>
-        <property name="continuous" value="true"/>
-        <property name="alignFirstOnly" value="true"/>
-	    <propertylist name="hypChangeListeners">
-	    </propertylist>
-    </component>
-
 
 	<!-- Venice listener -->
    <component name="listener" type="inpro.io.VeniceListenerModule">
