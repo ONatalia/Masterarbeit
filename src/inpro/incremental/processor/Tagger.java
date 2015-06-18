@@ -33,6 +33,8 @@ public class Tagger extends IUModule {
 	
 	@S4String(defaultValue = "res/PentoAVMapping")
 	public final static String PROP_WORD_SEMANTICS = "lookupTags";
+	
+	public static String lemmas = "";
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
@@ -50,9 +52,12 @@ public class Tagger extends IUModule {
 	protected void leftBufferUpdate(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {
 		List<EditMessage<TagIU>> newEdits = new ArrayList<EditMessage<TagIU>>();
+		
+		
 		for (EditMessage<? extends IU> edit : edits) {
 			WordIU newWord = (WordIU) edit.getIU();
 			if (newWord.getSameLevelLink() == null) continue;
+
 			switch (edit.getType()) {
 				case REVOKE:
 					for (IU tag : newWord.grounds()) {
@@ -63,10 +68,14 @@ public class Tagger extends IUModule {
 					break;
 					
 				case ADD:
+					if (newWord.getSameLevelLink().toPayLoad().equals(WordIU.FIRST_WORD_IU.toPayLoad())) {
+						lemmas = "";
+					}					
 					if (newWord.getAVPairs() != null) {
 						// TODO: bundle tag value + other tag-relevant AVPs.
 						for (AVPair tagPair : newWord.getAVPairs()) {
 							// a word can receive more than one tag
+							if (tagPair.getAttribute().equals("lemma")) lemmas += tagPair.getValue() + " ";
 							if (tagPair.getAttribute().equals("tag")) {
 								// the word did receive some tag, all good.
 								List<? extends IU> antecedents = newWord.getSameLevelLink().grounds();
