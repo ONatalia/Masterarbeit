@@ -28,10 +28,6 @@ class HotSpot<T> extends Point {
 		this(new Point(x, y), item, hotspotSize);
 	}
 	
-	HotSpot(T item, int x, int y, float hotspotSize) {
-		this(new Point(x, y), item, hotspotSize);
-	}
-	
 	boolean matches(Point p) {
 		return (squaredDistance(this, p) < squaredHotspotSize);
 	}

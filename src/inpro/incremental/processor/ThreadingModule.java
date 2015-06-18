@@ -7,7 +7,7 @@ import inpro.incremental.IUModule;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 
-public class ThreadingModule extends IUModule {
+public class ThreadingModule extends IUModule { // NO_UCD (test only): this is/can be included via XML configuration
 
 	final ModuleState mostRecentState = new ModuleState();
 	boolean inShutdown = false;

@@ -55,12 +55,6 @@ public class ChunkIU extends WordIU {
 		return chunkText;
 	}
 	
-	/** the number of white-space delimited tokens in the payload */
-	public int expectedWordCount() {
-		String chunkText = toPayLoad();
-		return chunkText.split("\\s+").length;
-	}
-	
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // the untyped list in the call to Collections.checkedList
 	public List<WordIU> getWords() {
 		if (groundedIn != null)

@@ -606,19 +606,6 @@ public class RMRSComposer extends IUModule {
 		public int resolves(Formula f);
 
 		/**
-		 * A resolve method called whenever a new Formula is created to determine
-		 * what domain concepts it resolves in the world.
-		 * <br />
-		 * The map returns maps (Integer) predicate arguments to possible world objects.
-		 * <br />
-		 * This can be used to further validate the Formula.
-		 *  
-		 * @param f the formula
-		 * @return a map of Formula predicate arguments to lists of objects that the argument can stand for
-		 */
-		public Map<Integer, List<? extends Object>> resolvesObjects(Formula f);
-
-		/**
 		 * A resolve method called to determine if a particular object, identified by a string argument, was among the domain objects that resolved (or indeed the only one that did) <br/>
 		 * Implementers need to make sure that comparison of the string representation and domain objects takes place.
 		 * @param f the formula

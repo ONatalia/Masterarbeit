@@ -119,7 +119,7 @@ public class VocodingAudioStream extends BaseDoubleDataSource implements Runnabl
     Logger logger = Logger.getLogger("Vocoding Audio Stream");
     
     /** for backward compatibility with Mary */
-    public VocodingAudioStream(HTSParameterGeneration pdf2par, HMMData htsData, boolean immediateReturn) {
+    public VocodingAudioStream(HTSParameterGeneration pdf2par, HMMData htsData, boolean immediateReturn) { // NO_UCD (unused code): for backward compatibility with Mary
         this(new HTSFullPStream(pdf2par), htsData, immediateReturn);
     }
     

@@ -21,14 +21,6 @@ public class Variable {
 		this.mType = aType;
 	}
 	
-	public Variable(int ID) {
-		this(ID, Type.UNDERSPEC);
-	}
-
-	public Variable(Type Type) {
-		this(0, Type);
-	}
-	
 	public Variable() {
 		this(0, Type.UNDERSPEC);
 	}

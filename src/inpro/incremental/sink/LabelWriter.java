@@ -39,7 +39,6 @@ public class LabelWriter extends FrameAwarePushBuffer {
     private boolean commitsOnly;
     private boolean writeToStdOut = true;
     private String fileName;
-    int frameOutput = -1;
     
     ArrayList<IU> allIUs = new ArrayList<IU>();
     
@@ -101,7 +100,6 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		toOut += "\n\n";
 		/* If there were only commits, or if there are not IUs, then print out as specified */
 		if (edits.size() > 0 && added) { // && frameOutput != currentFrame) {
-			frameOutput = currentFrame;
 			if (writeToFile) {
 				try {
 					FileWriter writer = new FileWriter(fileName, true);
@@ -120,7 +118,6 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	@Override
 	public void reset() {
 		super.reset();
-		frameOutput = -1;
 	}
 
 	public void setWriteToFile(boolean writeToFile) {

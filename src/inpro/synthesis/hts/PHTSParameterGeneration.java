@@ -11,7 +11,6 @@ import marytts.htsengine.HMMData;
 import marytts.htsengine.HTSModel;
 import marytts.htsengine.HTSPStream;
 import marytts.htsengine.HTSParameterGeneration;
-import marytts.htsengine.HTSUttModel;
 import marytts.htsengine.HMMData.FeatureType;
 
 /** 
@@ -29,38 +28,6 @@ public class PHTSParameterGeneration {
     public PHTSParameterGeneration(HMMData htsData) {
     	this.htsData = htsData;
 	}
-    
-    /** 
-     * incremental formulation for parameter generation, following pHTS
-     * however, this interface is totaly non-incremental and will have to be replaced soon 
-     * */
-    public FullPStream phtsIncrementalParameterGeneration(HTSUttModel um) throws Exception {
-    	ListBackedFullPStream outputFeatureStream = new ListBackedFullPStream();
-    	// foreach phone triplet
-        // we start at 1 and end at max-1, because we're talking triplets
-    	/**/
-        int numModels = um.getNumUttModel() - 2;
-        for (int i = 1; i <= numModels; i++) { 
-            // build and optimize sequence
-        	HTSModel prev = um.getUttModel(i - 1);
-        	HTSModel curr = um.getUttModel(i);
-        	HTSModel next = um.getUttModel(i + 1);
-        	FullPStream pstream = buildFullPStreamFor(Arrays.asList(prev, curr, next));
-            // copy center phone's data to output
-        	// handle first HMM: also copy data for i-1 to output
-        	int startFrame = (i == 1) ? 0 : prev.getTotalDur();
-        	// handle last HMM differently: also copy data for i+1 to output
-        	int length = curr.getTotalDur() + ((i == 1) ? prev.getTotalDur() : 0) + ((i == numModels) ? next.getTotalDur() : 0);
-        	outputFeatureStream.appendFeatures(pstream.getFullFrames(startFrame, length));
-        } /**/
-        /* non-incremental version * /
-        List<HTSModel> hmms = new java.util.ArrayList<HTSModel>(um.getNumUttModel()); 
-        for (int i = 0; i < um.getNumUttModel(); i++) {
-        	hmms.add(um.getUttModel(i));
-        }
-        outputFeatureStream.appendFeatures(buildFullPStreamFor(hmms, htsData.getFeatureSet())); /**/
-        return outputFeatureStream;
-    }
     
     public FullPStream buildFullPStreamFor(List<HTSModel> hmms) {
         // find out what types of streams we're dealing with:

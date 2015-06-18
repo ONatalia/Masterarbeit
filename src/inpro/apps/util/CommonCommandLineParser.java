@@ -10,7 +10,6 @@ public abstract class CommonCommandLineParser {
 	public static final int FILE_INPUT = 1;
 	public static final int MICROPHONE_INPUT = 2;
 	public static final int RTP_INPUT = 3;
-	public static final int OAA_DISPATCHER_INPUT = 4;
 	public static final int DISPATCHER_OBJECT_INPUT = 64;
 	public static final int DISPATCHER_OBJECT_2_INPUT = 128;
 	

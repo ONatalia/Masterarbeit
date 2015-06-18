@@ -21,7 +21,6 @@ public class AVMComposer {
 	private static ArrayList<AVM> worldList = new ArrayList<AVM>();
 	private ArrayList<AVM> avmList;
 	private ArrayList<AVM> resolvedList;
-	private ArrayList<AVM> keepList;
 
  	private Logger logger = Logger.getLogger(AVMComposer.class);
  	
@@ -37,22 +36,6 @@ public class AVMComposer {
 		worldList = AVMWorldUtil.setAVMsFromFile(worldFile, avmStructures);
 		avmList = getAllAVMs();
 		resolvedList = new ArrayList<AVM>(worldList.size());
-		keepList = new ArrayList<AVM>();
-	}
-
-	public AVMComposer(AVMComposer c) {
-		this.avmList = new ArrayList<AVM>(c.avmList.size());
-		for (AVM avm : c.avmList) {
-			this.avmList.add(new AVM(avm));
-		}
-		resolvedList = new ArrayList<AVM>(c.resolvedList.size());
-		for (AVM avm : c.resolvedList) {
-			this.resolvedList.add(new AVM(avm));
-		}
-		keepList = new ArrayList<AVM>(c.keepList.size());
-		for (AVM avm : c.keepList) {
-			this.keepList.add(new AVM(avm));
-		}
 	}
 
 	/**

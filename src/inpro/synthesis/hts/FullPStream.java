@@ -1,8 +1,5 @@
 package inpro.synthesis.hts;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import marytts.htsengine.HTSPStream;
 
 /**
@@ -34,15 +31,6 @@ public abstract class FullPStream {
 		currPosition = newPosition;
 	}
 	
-    /** get a section of the FullPFeatureFrames in the list */
-    public List<FullPFeatureFrame> getFullFrames(int start, int length) {
-		List<FullPFeatureFrame> subList = new ArrayList<FullPFeatureFrame>(length);
-		for (int t = start; t < start + length; t++) {
-			subList.add(getFullFrame(t));
-		}
-		return subList;
-    }
-    
 	public int getMcepParSize() { return getNextFrame().getMcepParSize(); }
 	public int getMcepVSize() { return getMcepParSize() * HTSPStream.NUM; }
 	public int getStrParSize() { return getNextFrame().getStrParSize(); }
@@ -51,7 +39,7 @@ public abstract class FullPStream {
 		return t < getMaxT();
 	}
 	
-	public String deepToString() {
+	public String deepToString() { // NO_UCD (unused code): extended toString methods are generally a good thing to keep around
 		StringBuilder sb = new StringBuilder("FullPStream:\n");
 		int oldPos = currPosition;
 		setNextFrame(0);

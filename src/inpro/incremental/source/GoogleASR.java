@@ -42,7 +42,7 @@ import edu.cmu.sphinx.util.props.S4String;
 /** 
  * Incremental speech recognition based on GoogleASR
  * 
- * Uses Google's Full-Dupex Speech API (Version 1), which uses one 
+ * Uses Google's Full-Duplex Speech API (Version 1), which uses one 
  * HTTP POST connection for uploading audio and one HTTP GET connection
  * for asynchronously receiving intermediate results during recognition.
  * There's no promise of intermediate results, but they do occur every once in a while.
@@ -230,6 +230,7 @@ public class GoogleASR extends IUSourceModule {
 					// get JSON result
 					String decodedString;
 					while ((decodedString = in.readLine()) != null) {
+						System.err.println(decodedString);
 						parseJSON(decodedString);
 					}
 				}

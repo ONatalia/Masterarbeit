@@ -27,19 +27,11 @@ public class Box implements Cloneable {
       color = c;
    }
    
-   Box(int x, int y, int dx, int dy, Color c) {
-      corner = new Point(x, y);
-      dim = new Point(dx, dy);
-      color = c;
+   public void drawSelection(Graphics g) {
+      g.setColor(Color.ORANGE);
+      int borderWidth = 5;
+      g.fillRect(corner.x - borderWidth, corner.y - borderWidth, dim.x + 1 + 2 * borderWidth, dim.y + 1 + 2 * borderWidth);
    }
-    
-	public void drawSelection(Graphics g) {
-		g.setColor(Color.ORANGE);
-		int borderWidth = 5;
-		g.fillRect(corner.x - borderWidth, corner.y - borderWidth, dim.x + 1 + 2 * borderWidth, dim.y + 1 + 2 * borderWidth);
-//		g.setColor(Color.yellow);
-//		g.drawRect(corner.x - 1, corner.y - 1, dim.x + 2, dim.y + 2);
-	}
 
    public void draw(Graphics g) {
       g.setColor(color.brighter());
@@ -94,11 +86,6 @@ public class Box implements Cloneable {
       this.corner = (Point) p.clone();
    }
 
-   public void setPos(int x, int y) {
-      this.corner.x = x;
-      this.corner.y = y;
-   }
-   
    public Rectangle getBoundingBox() {
 	   return new Rectangle(corner, new Dimension(dim.x, dim.y));
    }

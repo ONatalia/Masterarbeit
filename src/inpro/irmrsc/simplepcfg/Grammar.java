@@ -77,10 +77,6 @@ public class Grammar {
 		return mTerminals.contains(sym);
 	}
 	
-	public boolean isNonTerminalSymbol(Symbol sym) {
-		return mNonTerminals.contains(sym);
-	}
-	
 	public boolean isEliminable(Symbol sym) {
 		if (sym.equals(mEnd)) {
 			return true;
@@ -148,7 +144,7 @@ public class Grammar {
 		}
 	}
 	
-	public void info() {
+	public void info() { // NO_UCD (unused code): debug method that might be useful in the future
 		System.out.println("Start: "+mStart);
 		System.out.println("Terminals: "+mTerminals);
 		System.out.println("NonTerminals: "+mNonTerminals);

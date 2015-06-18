@@ -23,7 +23,6 @@ public class RTPCommandLineParser extends CommonCommandLineParser {
 		System.err.println("input selection:");
 		System.err.println("    -M             read data from microphone");
 		System.err.println("    -F <fileURL>   read data from sound file with given URL");
-		System.err.println("    -D             create an OAA dispatcher and send its output");
 		System.err.println("output selection:");
 		System.err.println("    -ip address    destination IP for RTP stream");
 		System.err.println("    -p port        port on destination IP");
@@ -71,9 +70,6 @@ public class RTPCommandLineParser extends CommonCommandLineParser {
 				inputMode = FILE_INPUT;
 				i++;
 				audioURL = anyToURL(args[i]);
-			}
-			else if (args[i].equals("-D")) {
-				inputMode = OAA_DISPATCHER_INPUT;
 			}
 			else if (args[i].equals("-ip")) {
 				i++;

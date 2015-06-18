@@ -5,14 +5,13 @@ import java.util.List;
 
 import inpro.incremental.IUModule;
 import inpro.incremental.sink.LabelWriter;
+import inpro.incremental.source.IUSourceModule;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 
 import org.junit.Test;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-public class ThreadingModuleTest extends IUModule {
+public class ThreadingModuleTest extends IUSourceModule {
 	
 	@Test
 	public void test() {
@@ -61,10 +60,4 @@ public class ThreadingModuleTest extends IUModule {
 		
 	};
 
-	/** I'm a source, don't call me */
-	@Override
-	protected void leftBufferUpdate(Collection<? extends IU> ius,
-			List<? extends EditMessage<? extends IU>> edits) {
-		throw new NotImplementedException(); }
-	
 }

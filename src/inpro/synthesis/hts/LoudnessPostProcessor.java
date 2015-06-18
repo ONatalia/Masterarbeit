@@ -13,10 +13,6 @@ public class LoudnessPostProcessor implements VocodingFramePostProcessor {
 	double spectralEmphasis = 1.0; 
 	double energy = 1.0;
 	
-	public LoudnessPostProcessor() {}
-	public LoudnessPostProcessor(int n) {
-		setLoudness(n);
-	}
 	@Override
 	public FullPFeatureFrame postProcess(FullPFeatureFrame frame) {
 		FullPFeatureFrame fout = new FullPFeatureFrame(frame);

@@ -58,13 +58,6 @@ public class TextBasedFloorTracker extends AbstractFloorTracker {
 	public void reset() { // ignore
 	}
 	
-	public void setExpect() {
-		if (internalState.equals(InternalState.NOT_AWAITING_INPUT)) {
-			internalState = InternalState.AWAITING_INPUT;
-			signalPanel.updateButtons();
-		}
-	}
-	
 	public void setSoT() {
 		assert isNotInInput();
 		signal(InternalState.IN_INPUT, Signal.START);

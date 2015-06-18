@@ -79,7 +79,9 @@ public class FullPFeatureFrame {
 		return darray;
 	}
 	
-	public static FullPFeatureFrame fromString(String s) {
+	// TODO from UCDetector: Method "FullPFeatureFrame.fromString(String)" has 0 references
+	// this functionality should be tested and be referenced by that test
+	public static FullPFeatureFrame fromString(String s) { // NO_UCD (unused code)
 		Matcher m = fromStringPattern.matcher(s);
 		boolean b = m.matches();
 		assert b && m.groupCount() == 5 : s + " does not match " + fromStringPattern.toString();

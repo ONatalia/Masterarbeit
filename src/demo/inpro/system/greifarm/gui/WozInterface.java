@@ -19,7 +19,7 @@ import com.sri.oaa2.agentlib.AgentException;
 import com.sri.oaa2.agentlib.AgentImpl;
 
 @SuppressWarnings("serial")
-public class WozInterface extends JFrame {
+public class WozInterface extends JFrame { // NO_UCD (unused code): it has a main method and is in demo. good enough to be kept around
 
 	AgentImpl agent;
 	

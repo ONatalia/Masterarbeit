@@ -34,7 +34,6 @@ public class CarChaseViewer extends JPanel {
 	Point carPosition;
 	double carAngle;
 	double carTargetAngle;
-	boolean carIsReverseGear = false;
 	private static final double CAR_SCALE = 1f / 4.3f;
 	Timeline timeline;
 	Point targetPoint;
@@ -143,7 +142,6 @@ public class CarChaseViewer extends JPanel {
 			if (action.installmentIU == null) {
 				precompute(action);
 			}
-			carIsReverseGear = action.isReverseGear();
 			assert action.installmentIU instanceof Timeline;
 			this.timeline = (Timeline) action.installmentIU;
 			timeline.playSkipping(10);

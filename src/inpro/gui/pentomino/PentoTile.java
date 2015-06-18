@@ -31,9 +31,6 @@ public class PentoTile extends Tile {
 	protected Color color;         // defaultColor    can be used for resetting
 	protected Color defaultColor;
 
-	final static Color selectedColor = Color.green;
-	final static Color normalColor = Color.gray;
-	
 	private static final int BOX_COUNT = 5; // number of boxes making up the piece
 	private Box[]   boxes = new Box[BOX_COUNT];
 	protected int[][] defVectors = new int[2][BOX_COUNT];
@@ -149,7 +146,7 @@ public class PentoTile extends Tile {
 	@Override
 	public void reset() {
 		super.reset();
-		defVectors = getDefVectors(name.charAt(0));
+		defVectors = getDefVectors(type);
 		generate();
 		setColor(defaultColor);
 	}

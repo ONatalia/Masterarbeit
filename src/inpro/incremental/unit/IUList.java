@@ -24,11 +24,6 @@ public class IUList<IUType extends IU> extends ArrayList<IUType> {
 			firstIU = base.get(0);
 	}
 	
- 	public IUList(IUType firstIU) {
- 		super(Collections.<IUType>singletonList(firstIU));
- 		this.firstIU = firstIU;
- 	}
-
  	/** constructor to create a list with a certain default size) */
 	public IUList(int i) { super(i); }
 

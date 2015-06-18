@@ -7,7 +7,6 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -34,11 +33,7 @@ public class OAAAction extends AbstractAction {
 	protected List<IclTerm> calls;
 	
 	public OAAAction(Agent agent, String name, String goal) throws RecognitionException, TokenStreamException {
-		super(name, null);
-		logger.setLevel(Level.ALL);
-		this.agent = agent;
-		calls = new ArrayList<IclTerm>();
-		calls.add(IclTerm.fromString(goal));
+		this(agent, name, null, goal);
 	}
 	
 	public OAAAction(Agent agent, String name, Icon icon, String goal) throws RecognitionException, TokenStreamException {
@@ -46,11 +41,6 @@ public class OAAAction extends AbstractAction {
 		this.agent = agent;
 		calls = new ArrayList<IclTerm>();
 		calls.add(IclTerm.fromString(goal));
-	}
-	
-	public OAAAction(Agent agent, String name, Icon icon, String goal1, String goal2) throws RecognitionException, TokenStreamException {
-		this(agent, name, icon, goal1);
-		calls.add(IclTerm.fromString(goal2));
 	}
 	
 	public void actionPerformed(ActionEvent arg0) {

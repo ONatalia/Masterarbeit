@@ -1,7 +1,6 @@
 package inpro.nlu;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,10 +36,6 @@ public class AVPairMappingUtil {
 			}
 		}
 		return avPairs;
-	}
-		
-	public static Map<String, List<AVPair>> readAVPairs(String filename) throws IOException {
-		return readAVPairs(new FileInputStream(filename));
 	}
 	
 	public static Map<String, List<AVPair>> readAVPairs(URL url) throws IOException {

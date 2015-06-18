@@ -34,7 +34,6 @@ _____________________________________________________________
  * <li>individual parameters for a certain frame are combined to {@link inpro.synthesis.hts.FullPFeatureFrame}
  * <li>{@code FullPFeatureFrame}s are combined to {@link inpro.synthesis.hts.FullPStream} objects that provide 
  * a list interface 
- * <li>{@link inpro.synthesis.hts.ListBackedFullPStream} implements {@code FullPStream} using an {@code ArrayList}
  * <li>{@link inpro.synthesis.hts.HTSFullPStream} implements {@code FullPStream} based on HTS/Mary's data structures
  * (i.e., implementing the by-column access based on the by-row data provided by HTS/Mary)
  * <li>{@link inpro.synthesis.hts.IUBasedFullPStream} implements {@code FullPStream} by following the forward-pointing 

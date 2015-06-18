@@ -23,16 +23,6 @@ public class SemIU extends IU {
 		this.avps.add(avp);
 	}
 
-	public SemIU(IU sll, IU groundedIn, AVPair avp) {
-		super(sll, Collections.singletonList(groundedIn));
-		this.avps.add(avp);
-	}
-
-	public SemIU(IU sll, IU groundedIn, List<AVPair> avps) {
-		super(sll, Collections.singletonList(groundedIn));
-		this.avps = avps;
-	}
-
 	public AVPair getAVPair() {
 		return this.avps.get(0);
 	}
@@ -45,15 +35,6 @@ public class SemIU extends IU {
 		return this.avps.isEmpty();
 	}
 	
-	/**
-	 * Compares payload of two SemIUs.
-	 * @param siu the SemIU to compare against
-	 * @return true if each SemIUs string representations of their payload (AVPairs)
-	 */
-	public boolean samePayload(SemIU siu) {
-		return (this.avps.equals(siu.avps));
-	}
-
 	@Override
 	public String toPayLoad() {
 		String payLoad;

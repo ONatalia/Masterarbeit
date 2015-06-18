@@ -282,7 +282,7 @@ public class SysSegmentIU extends SegmentIU {
 	}
 	
 	/** return the next vocoding parameter frame */
-	public FullPFeatureFrame getHMMSynthesisFrame(int req) {
+	public synchronized FullPFeatureFrame getHMMSynthesisFrame(int req) {
 		if (hmmSynthesisFeatures == null) {
 			generateParameterFrames();
 		}

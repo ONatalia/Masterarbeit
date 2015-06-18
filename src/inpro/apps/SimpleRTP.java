@@ -25,7 +25,8 @@ import gov.nist.jrtp.RtpException;
 import gov.nist.jrtp.RtpPacket;
 import gov.nist.jrtp.RtpSession;
 
-public class SimpleRTP {
+// TODO from UCDetector: Class "SimpleRTP" has 0 references --> this should at least be referenced by a unit test!! 
+public class SimpleRTP { // NO_UCD (unused code)
 
 	private static DataProcessor getSource(ConfigurationManager cm, RTPCommandLineParser clp) throws PropertyException, UnsupportedAudioFileException, IOException {
 		DataProcessor dp = null;
@@ -56,8 +57,6 @@ public class SimpleRTP {
 				AudioInputStream ais = AudioUtils.getAudioStreamForURL(audioURL);
 	            sds.setInputStream(ais, audioURL.getFile());
 	            dp = sds;
-			break;
-			case RTPCommandLineParser.OAA_DISPATCHER_INPUT:
 			break;
 		}
 		return dp;

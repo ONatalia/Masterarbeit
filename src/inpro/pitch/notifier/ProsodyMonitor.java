@@ -97,13 +97,6 @@ public class ProsodyMonitor extends JPanel implements SignalFeatureListener {
 		double min = Double.MAX_VALUE;
 		double max = Double.MIN_VALUE;
 		
-		void update(List<Double> values) {
-			for (double d : values) {
-				min = Math.min(d, min);
-				max = Math.max(d, max);
-			}
-		}
-		
 		void update(double d) {
 			min = Math.min(d, min);
 			max = Math.max(d, max);

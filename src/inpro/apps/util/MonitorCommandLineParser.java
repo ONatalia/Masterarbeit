@@ -26,7 +26,6 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -v             more verbose output");
 		System.err.println("input selection:");
 		System.err.println("    -M             recevice from microphone");
-		System.err.println("    -OAA           receive and interpret OAA dispatch messages");
 		System.err.println("    -RTP           receive RTP stream");
 		System.err.println("    -D             run as a built-in dispatcher (used internally)");
 		System.err.println("    -lp	port       optional port to listen on (default: 42000)");
@@ -80,9 +79,6 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-M")) {
 				inputMode = MICROPHONE_INPUT;
-			}
-			else if (args[i].equals("-OAA")) {
-				inputMode = OAA_DISPATCHER_INPUT;
 			}
 			else if (args[i].equals("-RTP")) {
 				inputMode = RTP_INPUT;

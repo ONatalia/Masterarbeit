@@ -97,13 +97,6 @@
     <component name="hypViewer" type="inpro.incremental.sink.CurrentHypothesisViewer"/>
 <!--    <component name="iuNetworkViewer" type="inpro.incremental.sink.IUNetworkViewer"/> -->
 
-    <component name="oaaDispatchStream" type="work.inpro.audio.OAADispatchStream">
-        <!-- this is an OAA agent name, it has nothing to do with the identically named component below -->
-        <property name="agentName" value="dispatchStream"/>
-        <property name="goalPrefix" value="x"/>
-        <property name="sendSilence" value="false"/>
-    </component>
-    
     <component name="dotNotifier" type="inpro.incremental.sink.IUNetworkToDOT">
         <property name="runDot" value="true" />
         <property name="outputFormat" value="png" />

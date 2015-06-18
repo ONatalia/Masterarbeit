@@ -80,12 +80,8 @@ public class SimpleMonitor implements RtpListener {
 			case CommonCommandLineParser.RTP_INPUT :
 				createRTPSource();
 			break;
-			case CommonCommandLineParser.OAA_DISPATCHER_INPUT : 
-				Runnable streamDrainer = createDispatcherSource("oaaDispatchStream");
-				startDeamon(streamDrainer, "oaa dispatcher source");
-			break;
 			case CommonCommandLineParser.DISPATCHER_OBJECT_INPUT:
-				streamDrainer = createDispatcherSource("dispatchStream");
+				Runnable streamDrainer = createDispatcherSource("dispatchStream");
 				startDeamon(streamDrainer, "dispatcher object source");
 			break;
 			case CommonCommandLineParser.DISPATCHER_OBJECT_2_INPUT:

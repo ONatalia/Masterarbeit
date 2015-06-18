@@ -34,15 +34,6 @@ public class AVPair {
 	}
 
 	/**
-	 * Copy constructor
-	 * @param avp to copy
-	 */
-	public AVPair(AVPair avp) {
-		this.attribute = avp.attribute;
-		this.value = avp.value;
-	}
-
-	/**
 	 * Handles interfacing AVM construction/unification 
 	 * Convenience constructor to create AVPair from one string,
 	 * where A and V are separated by a colon, like "size:big"
@@ -75,13 +66,6 @@ public class AVPair {
 	 */
 	public void setValue(Object value) {
 		this.value = value;
-	}
-	
-	/**
-	 * Clears this AVPair's value
-	 */
-	public void clearValue() {
-		this.value = null;
 	}
 	
 	/**

@@ -2,7 +2,6 @@ package inpro.gui;
 
 import java.awt.Graphics;
 import java.awt.Image;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -13,10 +12,6 @@ public class ImageTile extends Tile {
 	Image image;
 	Point size;
 	boolean isVisible = true;
-	
-	public ImageTile(String s) throws MalformedURLException {
-		this(new URL(s));
-	}
 	
 	public ImageTile(URL url) {
 		ImageIcon img = new ImageIcon(url);

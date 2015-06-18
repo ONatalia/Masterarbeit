@@ -12,11 +12,6 @@ public class SyllableAwarePronunciation extends Pronunciation {
 
 	List<Integer> syllableBoundaryIndices;
 
-	SyllableAwarePronunciation(Unit[] units, String tag,
-			WordClassification wordClassification, float probability) {
-		this(units, null, tag, wordClassification, probability);
-	}
-
 	SyllableAwarePronunciation(Unit[] units, List<Integer> syllableBoundaries, String tag,
 			WordClassification wordClassification, float probability) {
 		super(units, tag, wordClassification, probability);
