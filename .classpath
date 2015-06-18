@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="demo/inpro/system/pento/|done/inpro/system/calendar/|inpro/io/instantio/" kind="src" path="src"/>
+	<classpathentry excluding="demo/inpro/system/pento/|done/inpro/system/calendar/|inpro/io/instantio/|inpro/io/webspeech/" kind="src" path="src"/>
 	<classpathentry excluding="work/inpro/alchemy/spatial/util/|inpro/io/instantio/" kind="src" path="test"/>
 	<classpathentry kind="lib" path="lib/weka.jar"/>
 	<classpathentry kind="lib" path="lib/drej.jar"/>
@@ -17,30 +17,6 @@
 	<classpathentry kind="lib" path="lib/oaa2/oaa2.jar"/>
 	<classpathentry kind="lib" path="lib/io/rsb-0.10.0.jar"/>
 	<classpathentry kind="lib" path="lib/io/venice-java.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/annotations-api.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/bootstrap.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/catalina-ant.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/catalina-ha.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/catalina-tribes.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/catalina.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/commons-daemon.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/ecj-4.3.1.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/el-api.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/jasper-el.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/jasper.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/jsp-api.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/servlet-api.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/tomcat-api.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/tomcat-coyote.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/tomcat-dbcp.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/tomcat-i18n-es.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/tomcat-i18n-fr.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/tomcat-i18n-ja.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/tomcat-jdbc.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/tomcat-juli.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/tomcat-util.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/tomcat7-websocket.jar"/>
-	<classpathentry kind="lib" path="lib/tomcat/websocket-api.jar"/>
 	<classpathentry kind="lib" path="lib/javaFlacEncoder-0.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/mary5/marytts-client-5.2-SNAPSHOT-jar-with-dependencies.jar"/>
 	<classpathentry kind="lib" path="lib/mary5/marytts-lang-de-5.2-SNAPSHOT.jar"/>
