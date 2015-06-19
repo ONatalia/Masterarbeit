@@ -90,20 +90,4 @@ public class TreeStructuredInstallmentIU extends SysInstallmentIU {
 		return getInitialWord().toTreeViaNextSLLString();
 	}
 	
-	public String toString1() {
-		List<WordIU> words = null;
-		StringBuilder sb = new StringBuilder();
-		int pos = 0;
-		do {
-			words = getWordsAtPos(pos);
-			sb.append("words at position ");
-			sb.append(pos);
-			sb.append(": ");
-			sb.append(words.toString());
-			sb.append("\n");
-			pos++;
-		} while (!words.isEmpty());
-		return sb.toString();
-	}
-
 }

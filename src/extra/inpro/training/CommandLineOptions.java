@@ -14,7 +14,6 @@ class CommandLineOptions {
 	URL configURL = DataCollector.class.getResource("config.xml");
 	URL slideURL = SlideShowPanel.class.getResource("slides.xml");
 	URL uploadURL;
-	boolean verbose = false;
 	
 	CommandLineOptions(String[] args) {
 		try {
@@ -63,9 +62,6 @@ class CommandLineOptions {
 					printUsage("Cannot interpret URL " + args[i]);
 				}
 			}
-			else if (args[i].equals("-v")) {
-				verbose = true;
-			}
 			else {
 				printUsage();
 				System.err.println("Illegal argument: " + args[i]);
@@ -83,7 +79,6 @@ class CommandLineOptions {
 		System.err.println("usage: java extra.inpro.training.DataCollector");
 		System.err.println("options:");
 		System.err.println("    -h	           this screen");
-		System.err.println("    -v             more verbose output");
 		System.err.println("input selection:");
 		System.err.println("    -c <URL>       URL to Sphinx configuration");
 		System.err.println("    -s <URL>       URL to slide-show configuration");

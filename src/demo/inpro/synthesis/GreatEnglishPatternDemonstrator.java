@@ -55,15 +55,6 @@ public class GreatEnglishPatternDemonstrator extends PatternDemonstrator {
 		}
 	}
 	
-	class PieceAction extends AbstractAction {
-		public PieceAction(char type, String name) {
-			super(name, new PentoIcon(7, Color.GRAY, type));
-		}
-		@Override
-		public void actionPerformed(ActionEvent ae) {
-		}		
-	}
-	
 	ButtonGroup actionGroup = new ButtonGroup();
 	JButton actionButton(AbstractAction aa) {
 		JButton b = new JButton(aa);

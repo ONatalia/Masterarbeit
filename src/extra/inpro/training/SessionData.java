@@ -2,7 +2,6 @@ package extra.inpro.training;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -189,17 +188,6 @@ public class SessionData {
 	
 	InputStream postToServer(String url) throws IOException {
 		return postToServer(new URL(url));
-	}
-	
-	/**
-	 * write the archive's content to a local zip file
-	 * @param filename name for the zip file
-	 * @throws IOException when the file cannot be written to
-	 */
-	void saveToFile(String filename) throws IOException {
-		File outFile = new File(filename);
-		FileOutputStream outStream = new FileOutputStream(outFile);
-		toOutputStream(outStream);
 	}
 	
 	/**

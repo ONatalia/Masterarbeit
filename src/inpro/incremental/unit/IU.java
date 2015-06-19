@@ -592,10 +592,6 @@ public abstract class IU implements Comparable<IU> {
 		return userData != null ? userData.get(key) : null;
 	}
 	
-	public String getUserDataAsString(String key) {
-		return String.valueOf(getUserData(key));
-	}
-	
 	/** 
 	 * find an IU in this IU's network
 	 * 

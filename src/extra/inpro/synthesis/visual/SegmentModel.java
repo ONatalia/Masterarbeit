@@ -4,7 +4,6 @@ import inpro.synthesis.PitchMark;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -113,11 +112,6 @@ public class SegmentModel {
         return list;
 	}
 	
-	/** create a segment model from an mbrola-formatted file */
-	public static SegmentModel readFromFile(String filename) throws IOException {
-		return readFromStream(new FileInputStream(filename));
-	}
-	
 	public void saveToFile(File file) throws IOException {
 		FileWriter fw = new FileWriter(file);
 		fw.append(toString());
@@ -218,10 +212,6 @@ public class SegmentModel {
 		if (pm != null) {
 			pm.owner.removePitchMark(pm);
 		}
-	}
-	
-	public Segment getPredecessor(Segment segment) {
-		return getSegmentAt(segment.getStartTime() - 1);
 	}
 	
 	public Segment getSuccessor(Segment segment) {

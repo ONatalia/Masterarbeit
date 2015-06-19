@@ -177,7 +177,7 @@ public abstract class IUModule extends PushBuffer {
 		 * automatically generatees the appropriate edit message and 
 		 * attaches the new IU to the previously last in the buffer. 
 		 */
-		public void addToBufferSetSLL(IU iu) {
+		public void addToBufferSetSLL(IU iu) { // NO_UCD (unused code): this should be tested as it is part of our public API 
 			iu.setSameLevelLink(ius.getLast());
 			addToBuffer(iu);
 		}
@@ -191,7 +191,7 @@ public abstract class IUModule extends PushBuffer {
 			hasUpdates = true;
 		}
 		
-		public void clearBuffer() {
+		public void clearBuffer() { // NO_UCD (unused code): this should be tested as it is part of our public API
 			setBuffer(Collections.<IU>emptyList(), Collections.<EditMessage<IU>>emptyList());
 		}	
 

@@ -13,12 +13,13 @@ public class SynthesisConfig implements Configurable {
 	@S4Integer(defaultValue = maxHmmContextValue, range = {0, maxHmmContextValue})
 	public final static String PROP_HMM_OPT_PAST = "hmmOptPastContext";
 	/** the (maximum) number of phonemes to consider preceding the current phone during HMM optimization */
-	private int hmmOptimizationFutureContext = 2; //maxHmmContextValue;
+	private int hmmOptimizationPastContext = maxHmmContextValue;
 	
-	@S4Integer(defaultValue = maxHmmContextValue, range = {0, maxHmmContextValue})
+	@S4Integer(defaultValue = 2, //maxHmmContextValue, 
+	           range = {0, maxHmmContextValue})
 	public final static String PROP_HMM_OPT_FUTURE = "hmmOptFutureContext";
 	/** the (maximum) number of phonemes to consider following the current phone during HMM optimization */
-	private int hmmOptimizationPastContext = maxHmmContextValue;
+	private int hmmOptimizationFutureContext = 2; //maxHmmContextValue;
 
 	
     private static byte[] dTreeFeatureDefaultsGerman = { // on my corpus with BITS-1 voice
@@ -37,7 +38,9 @@ public class SynthesisConfig implements Configurable {
 	
 	/** for now, this component ignores it's Sphinx-loading capability */
 	@Override
-	public void newProperties(PropertySheet arg0) throws PropertyException {
+	public void newProperties(PropertySheet ps) throws PropertyException {
+		hmmOptimizationPastContext = ps.getInt(PROP_HMM_OPT_PAST);
+		hmmOptimizationFutureContext = ps.getInt(PROP_HMM_OPT_FUTURE);
 	}
 	
 	public void loadJavaProperties() {

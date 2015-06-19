@@ -23,8 +23,6 @@ import marytts.htsengine.HTSModel;
 
 import org.apache.log4j.Logger;
 
-import work.inpro.synthesis.ihmms.HTSModelComparator;
-
 public class SysSegmentIU extends SegmentIU {
 	
 	private static Logger logger = Logger.getLogger(SysSegmentIU.class);

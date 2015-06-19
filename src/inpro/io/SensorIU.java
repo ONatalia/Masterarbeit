@@ -25,8 +25,7 @@ public class SensorIU extends IU {
 	
 	
 	public SensorIU(String data, String source, String scope) {
-		this.data = data;
-		this.setSource(source);
+		this(data, source);
 		this.setScope(scope);
 	}
 	

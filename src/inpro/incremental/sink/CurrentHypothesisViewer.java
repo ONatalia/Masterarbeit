@@ -79,10 +79,6 @@ public class CurrentHypothesisViewer extends PushBuffer {
 		return textField;
 	}
 
-	protected void updateFromIU() {
-
-	}
-
 	@Override
 	public void hypChange(Collection<? extends IU> ius,
 			List<? extends EditMessage<? extends IU>> edits) {

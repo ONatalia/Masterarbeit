@@ -63,11 +63,6 @@ public class LabelFile {
     	return labels;
     }
     
-    public static String getLastLine(String labelFile) throws IOException {
-    	List<String> lines = getLines(labelFile, 0);
-    	return lines.get(lines.size() - 1);
-    }
-    
     private static String getTokenInLine(String labelLine, int token) {
     	String[] tokens = labelLine.split("\\s+");
     	return tokens[token];

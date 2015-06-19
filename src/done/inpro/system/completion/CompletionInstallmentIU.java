@@ -44,7 +44,7 @@ public class CompletionInstallmentIU extends SysInstallmentIU {
 		if (wer > maxWER)
 			myPrefix = null;
 		assert myPrefix != null == wer <= maxWER;
-		return new FuzzyMatchResult(myPrefix, wer);
+		return new FuzzyMatchResult(myPrefix);
 	}
 	
 	/**
@@ -55,11 +55,9 @@ public class CompletionInstallmentIU extends SysInstallmentIU {
 	public class FuzzyMatchResult {
 		List<WordIU> prefix = null;
 		List<WordIU> remainder = Collections.<WordIU>emptyList();
-		double wer = Double.MAX_VALUE;
 		
 		private FuzzyMatchResult() {}
-		private FuzzyMatchResult(Prefix prefix, double wer) {
-			this.wer = wer;
+		private FuzzyMatchResult(Prefix prefix) {
 			this.prefix = prefix;
 			if (prefix != null)
 				this.remainder = prefix.getRemainder();
