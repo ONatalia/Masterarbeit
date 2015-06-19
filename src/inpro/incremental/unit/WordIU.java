@@ -23,6 +23,13 @@ public class WordIU extends IU {
 	private final boolean isSilence;
 	private final Pronunciation pron;
 	private final String word;
+	
+	public static final WordIU FIRST_WORD_IU = new WordIU() {
+		@Override
+		public String toPayLoad() {
+			return "The very first IU";
+		}
+	};
 
 	public WordIU(Pronunciation pron, WordIU sll, List<IU> groundedIn) {
 		this(pron.getWord().getSpelling(), pron, sll, groundedIn);
@@ -61,6 +68,12 @@ public class WordIU extends IU {
 		isSilence = true;
 	}
 	
+	public WordIU() {
+		this.pron = null;
+		this.word = "First WordIU";
+		isSilence = this.word.equals("<sil>");
+	}
+
 	public boolean hasAVPairs() {
 		return avPairs.get(getWord()) != null;
 	}

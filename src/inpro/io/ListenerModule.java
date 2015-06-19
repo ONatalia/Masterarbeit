@@ -22,10 +22,10 @@ public class ListenerModule extends IUModule {
 	 * 
 	 * @param data data to be put onto the right buffer
 	 */
-	protected void process(String data) {
+	protected void process(String data, String scope) {
 			edits = new ArrayList<EditMessage<SensorIU>>();
 			//create an incremental unit and put it onto the right buffer
-			SensorIU iu = new SensorIU(data, this.getID());
+			SensorIU iu = new SensorIU(data, this.getID(),  scope);
 			iu.setSameLevelLink(prevIU);
 			edits.add(new EditMessage<SensorIU>(EditType.ADD, iu));
 			prevIU = iu;
@@ -33,6 +33,10 @@ public class ListenerModule extends IUModule {
 			rightBuffer.setBuffer(edits);
 			super.notifyListeners();
 	}
+	
+	protected void process(String data) {
+		process(data, null);
+}
 
 	/* (non-Javadoc)
 	 * @see inpro.incremental.IUModule#leftBufferUpdate(java.util.Collection, java.util.List)

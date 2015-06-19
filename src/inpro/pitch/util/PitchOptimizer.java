@@ -67,11 +67,6 @@ public class PitchOptimizer extends ShortestPath<PitchCandidate> {
 				}
 			}
 			lastCandidates = candidates;
-
-			//for (PitchCandidate c : candidates) {
-				//System.out.print(String.format(Locale.US, "%.2f#%.2f ", c.pitchHz, c.score));
-			//}
-			//System.out.println("");
 		}
 	}
 	

@@ -12,6 +12,7 @@ public class SensorIU extends IU {
 	
 	private String data;
 	private String source;
+	private String scope;
 	
 	/**
 	 * @param data actual payload
@@ -21,6 +22,14 @@ public class SensorIU extends IU {
 		this.data = data;
 		this.setSource(source);
 	}
+	
+	
+	public SensorIU(String data, String source, String scope) {
+		this.data = data;
+		this.setSource(source);
+		this.setScope(scope);
+	}
+	
 	
 
 	@Override
@@ -40,6 +49,16 @@ public class SensorIU extends IU {
 
 	public void setSource(String source) {
 		this.source = source;
+	}
+
+
+	public String getScope() {
+		return scope;
+	}
+
+
+	public void setScope(String scope) {
+		this.scope = scope;
 	}
 
 }

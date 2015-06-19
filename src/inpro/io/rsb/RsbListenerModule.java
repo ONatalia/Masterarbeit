@@ -1,13 +1,13 @@
-package inpro.io.venice;
+package inpro.io.rsb;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
-import rsb.Event;
-import rsb.Handler;
-import adapter.Listener;
+import venice.lib.AbstractSlot;
+import venice.lib.AbstractSlotListener;
+import venice.lib.networkRSB.RSBNamespaceBuilder;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4String;
@@ -17,44 +17,39 @@ import inpro.io.ListenerModule;
  * @author casey
  *
  */
-public class VeniceListenerModule extends ListenerModule implements Handler {
+public class RsbListenerModule extends ListenerModule implements AbstractSlotListener {
 
-	static Logger log = Logger.getLogger(VeniceListenerModule.class.getName());
+	static Logger log = Logger.getLogger(RsbListenerModule.class.getName());
 	
  	@S4String(defaultValue = "")
 	public final static String ID_PROP = "id";	
  	
  	@S4String(defaultValue = "")
-	public final static String SCOPE_PROP = "scope";	 	
-	
-	Listener<String> listener;
+	public final static String SCOPE_PROP = "scope";	 
+ 	
+ 	private String fullScope;
 	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		String scope = ps.getString(SCOPE_PROP);
 		String id = ps.getString(ID_PROP);
-		String fullScope = makeScope(scope,id);
+		fullScope = makeScope(scope);
 		logger.info("Listening on scope: " + fullScope);
 //		listener from the venice wrapper for RSB
-		listener = new Listener<String>(this, fullScope);
-		this.setID(ps.getString(ID_PROP));
+		
+		ArrayList<AbstractSlot> slots = new ArrayList<AbstractSlot>();
+		slots.add(new AbstractSlot(fullScope, String.class));
+		
+		RSBNamespaceBuilder.initializeProtobuf();
+		RSBNamespaceBuilder.initializeInSlots(slots);
+		RSBNamespaceBuilder.setMasterInSlotListener(this);
+		
+		this.setID(id);
 	}
 	
-	private String makeScope(String scope, String id) {
-		return "/" + scope + "/" + id;
-	}
-	
-	/* (non-Javadoc)
-	 * @see rsb.Handler#internalNotify(rsb.Event)
-	 * This method is called from RSB/venice when new data is received on a specified scope.
-	 * 
-	 */
-	@Override
-	public void internalNotify(Event e) {
-		//example e.getScope(): /dsg/kinect
-		//example e.getData():  TR
-		process(e.getData().toString());
+	private String makeScope(String scope) {
+		return scope;
 	}
 	
 	/**
@@ -72,6 +67,15 @@ public class VeniceListenerModule extends ListenerModule implements Handler {
 		ArrayList<String> splitString = new ArrayList<String>(Arrays.asList(line.split("/")));
 
 		return splitString;
+	}
+
+	/* (non-Javadoc)
+	 * This method is called from RSB/venice when new data is received on a specified scope.
+	 * 
+	 */
+	@Override
+	public void newData(Object arg0, Class<?> arg1, String arg2) {
+		process(arg0.toString(), arg2);
 	}
 
 }

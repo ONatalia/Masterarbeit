@@ -1,0 +1,605 @@
+############################################################################
+# This file is the POS-tagger lexicon.
+#
+# It has one entry per line with two tab-separated fields first the word
+# token, then a comma-separated structure defining both the associated POS-
+# tag as well as the lemma.
+#############################################################################
+# -----------------------------
+# 		VERBEN
+# -----------------------------
+aussuchen	tag:v, lemma:suchen
+sieht	tag:v, lemma:sehen
+soll	tag:v, lemma:sollen
+wüsst	tag:v, lemma:wissen
+haben	tag:v, lemma:haben
+habe	tag:v, lemma:haben
+würden	tag:v, lemma:wurden
+würde	tag:v, lemma:wurden
+kannste	tag:v, lemma:können
+könnte	tag:v, lemma:können
+kannst	tag:v, lemma:können
+kann	tag:v, lemma:können
+können	tag:v, lemma:können
+möchte	tag:v, lemma:möchten
+möcht	tag:v, lemma:möchten
+ist	tag:v, lemma:sein
+is	tag:v, lemma:sein
+sind	tag:v, lemma:sein
+besteht	tag:v, lemma:sein
+gibt	tag:v, lemma:sein
+hinschaue	tag:v, lemma:hinschauen
+zeige	tag:v, lemma:zeigen
+zeigen	tag:v, lemma:zeigen
+weiterreden	tag:v, lemma:weiterreden
+weitermachen	tag:v, lemma:weitermachen
+verstehen	tag:v, lemma:verstehen
+steht	tag:v, lemma:steht
+schreiben	tag:v, lemma:schreiben
+sammeln	tag:v, lemma:sammeln
+passt	tag:v, lemma:passen
+machen	tag:v, lemma:machen
+klingt	tag:v, lemma:klingen
+klappt	tag:v, lemma:klappen
+klappen	tag:v, lemma:klappen
+heißt	tag:v, lemma:heißen
+hat	tag:v, lemma:haben
+hab	tag:v, lemma:haben
+gucken	tag:v, lemma:gucken
+frag	tag:v, lemma:fragen
+bestätigen	tag:v, lemma:bestätigen
+beschreiben	tag:v, lemma:beschreiben
+benennen	tag:v, lemma:benennen
+nennt	tag:v, lemma:nennen
+nennen	tag:v, lemma:nennen
+befindet	tag:v, lemma:finden
+findest	tag:v, lemma:finden
+aussieht	tag:v, lemma:aussehen
+ausgesucht	tag:v, lemma:aussuchen
+suche	tag:v, lemma:suchen
+suchen	tag:v, lemma:suchen
+angefangen	tag:v, lemma:anfangen
+sagen	tag:v, lemma:sagen
+aussuche	tag:v, lemma:nehmen
+auswählen	tag:v, lemma:nehmen
+nimm	tag:v, lemma:nehmen
+nim	tag:v, lemma:nehmen
+nimmst	tag:v, lemma:nehmen
+geh	tag:v, lemma:nehmen
+nehme	tag:v, lemma:nehmen
+nem	tag:v, lemma:nehmen
+nehmen	tag:v, lemma:nehmen
+wähle	tag:v, lemma:nehmen
+wählen	tag:v, lemma:nehmen
+markier	tag:v, lemma:nehmen
+markiere	tag:v, lemma:nehmen
+markieren	tag:v, lemma:nehmen
+lösch	tag:v, lemma:löschen
+lösche	tag:v, lemma:löschen
+löschen	tag:v, lemma:löschen
+leg	tag:v, lemma:legen
+lege	tag:v, lemma:legen
+legen	tag:v, lemma:legen
+beweg	tag:v, lemma:legen
+bewege	tag:v, lemma:legen
+bewegen	tag:v, lemma:legen
+bewegt	tag:v, lemma:legen
+verschieb	tag:v, lemma:legen
+verschiebe	tag:v, lemma:legen
+verschieben	tag:v, lemma:legen
+setz	tag:v, lemma:legen
+setze	tag:v, lemma:legen
+setzen	tag:v, lemma:legen
+pack	tag:v, lemma:legen
+packe	tag:v, lemma:legen
+packen	tag:v, lemma:legen
+ablegen	tag:v, lemma:legen
+füg	tag:v, lemma:legen
+füge	tag:v, lemma:legen
+einfügen	tag:v, lemma:legen
+tu	tag:v, lemma:legen
+tue	tag:v, lemma:legen
+tun	tag:v, lemma:legen
+dreh	tag:v, lemma:drehen
+drehe	tag:v, lemma:drehen
+drehen	tag:v, lemma:drehen
+rotier	tag:v, lemma:drehen
+rotiere	tag:v, lemma:drehen
+rotieren	tag:v, lemma:drehen
+spiegel	tag:v, lemma:spiegeln
+spiegle	tag:v, lemma:spiegeln
+spiegele	tag:v, lemma:spiegeln
+spiegeln	tag:v, lemma:spiegeln
+liegt	tag:v, lemma:liegen
+# -----------------------------
+# 		ARTIKEL
+# -----------------------------
+mein	tag:det, lemma:mein
+'n	tag:det, lemma:indef
+ein	tag:det, lemma:indef
+eine	tag:det, lemma:indef
+einer	tag:det, lemma:indef
+eines	tag:det, lemma:indef
+einen	tag:det, lemma:indef
+einem	tag:det, lemma:indef
+der	tag:prels, tag:det, lemma:def
+die	tag:prels, tag:det, lemma:def
+das	tag:prels, tag:det, lemma:def
+den	tag:det, lemma:def
+dem	tag:det, lemma:def
+dieser	tag:det, lemma:def
+diese	tag:det, lemma:def
+diesen	tag:det, lemma:def
+diesem	tag:det, lemma:def
+dieses	tag:det, lemma:def
+alle	tag:det, lemma:def
+keine	tag:det, lemma:def
+# *new*
+welcher	tag:prels, lemma:def 
+welches	tag:prels, lemma:def
+welche	tag:prels, lemma:def
+was	tag:prels, lemma:was
+wie	tag:prels, lemma:wie
+wo	tag:prels, lemma:wo
+# -----------------------------
+# 		PRONOMEN
+# -----------------------------
+dasn	tag:pper, lemma:pper
+tipdas	tag:pper, lemma:pper
+'s	tag:pper, lemma:pper
+man	tag:pper, lemma:man
+denselben	tag:pper, lemma:pper
+sich	tag:pper, lemma:pper 
+er	tag:pper, lemma:pper
+sie	tag:pper, lemma:pper
+es	tag:pper, lemma:pper
+ihn	tag:pper, lemma:pper
+ihr	tag:pper, lemma:pper
+ihm	tag:pper, lemma:pper
+ich	tag:pper, lemma:pper
+mich	tag:pper, lemma:pper
+mir	tag:pper, lemma:pper
+du	tag:pper, lemma:du
+uns	tag:pper, lemma:wir
+wir	tag:pper, lemma:wir
+# -----------------------------
+# 		ADJEKTIVE
+# -----------------------------
+beiden	tag:adja, lemma:beiden
+ganzen	tag:adja, lemma:ganzen
+einzelne	tag:adja, lemma:einzelne
+einzige	tag:adja, lemma:einzige
+gerne	tag:adja, lemma:gern
+gern	tag:adja, lemma:gern
+viele	tag:adja, lemma:viele
+zwei	tag:adja, lemma:zwei
+drei	tag:adja, lemma:drei
+vier	tag:adja, lemma:vier
+fünf	tag:adja, lemma:fünf
+fünft	tag:adja, lemma:fünf
+kleineres	tag:adja, lemma:kleiner
+äußerste	tag:adja, lemma:äußerst
+weit	tag:adja, lemma:weit
+solche	tag:adja, lemma:solche
+nächste	tag:adja, lemma:nächste
+komisch	tag:adja, lemma:komische
+komische	tag:adja, lemma:komische
+komischer	tag:adja, lemma:komische
+komisches	tag:adja, lemma:komische
+komischen	tag:adja, lemma:komische
+toll	tag:adja, lemma:toll
+tolle	tag:adja, lemma:toll
+tolles	tag:adja, lemma:toll
+toller	tag:adja, lemma:toll
+tollen	tag:adja, lemma:toll
+normal	tag:adja, lemma:normal
+normale	tag:adja, lemma:normal
+normales	tag:adja, lemma:normal
+normaler	tag:adja, lemma:normal
+hässlich	tag:adja, lemma:hässlich
+halb	tag:adja, lemma:halb
+halbe	tag:adja, lemma:halb
+halbes	tag:adja, lemma:halb
+halber	tag:adja, lemma:halb
+klein	tag:adja, lemma:klein
+kleine	tag:adja, lemma:klein
+kleiner	tag:adja, lemma:klein
+kleines	tag:adja, lemma:klein
+kleinen	tag:adja, lemma:klein
+bisschen	tag:adja, lemma:bisschen
+groß	tag:adja, lemma:groß
+große	tag:adja, lemma:groß
+großer	tag:adja, lemma:groß
+großes	tag:adja, lemma:groß
+großen	tag:adja, lemma:groß
+andere	tag:adja, lemma:andere
+anderen	tag:adja, lemma:andere
+allein	tag:adja, lemma:allein
+alleine	tag:adja, lemma:allein
+hell	tag:adja, lemma:hell
+violette	tag:adja, lemma:lila
+lilane	tag:adja, lemma:lila
+lilafarbene	tag:adja, lemma:lila
+lila	tag:adja, lemma:lila
+braune	tag:adja, lemma:braune
+weiß	tag:adja, lemma:weiß
+rosa	tag:adja, lemma:rosa
+rosafarbenen	tag:adja, lemma:rosa
+rosane	tag:adja, lemma:rosa
+pink	tag:adja, lemma:rosa
+hellgrün	tag:adja, lemma:hellgrün
+hellgrüne	tag:adja, lemma:hellgrün
+hellgrünen	tag:adja, lemma:hellgrün
+hellgrünes	tag:adja, lemma:hellgrün
+hellblau	tag:adja, lemma:hellblau
+hellblaue	tag:adja, lemma:hellblau
+hellblauen	tag:adja, lemma:hellblau
+dunkelblau	tag:adja, lemma:dunkelblau
+dunkelblaue	tag:adja, lemma:dunkelblau
+dunkelblauen	tag:adja, lemma:dunkelblau
+dunkelrote	tag:adja, lemma:dunkelrot
+dunkelrot	tag:adja, lemma:dunkelrot
+dunkelroten	tag:adja, lemma:dunkelrot
+türkise	tag:adja, lemma:türkise
+türkisene	tag:adja, lemma:türkise
+rot	tag:adja, lemma:rot
+rote	tag:adja, lemma:rot
+roter	tag:adja, lemma:rot
+rotes	tag:adja, lemma:rot
+roten	tag:adja, lemma:rot
+gelb	tag:adja, lemma:gelb
+gelbe	tag:adja, lemma:gelb
+gelbes	tag:adja, lemma:gelb
+gelber	tag:adja, lemma:gelb
+gelben	tag:adja, lemma:gelb
+grün	tag:adja, lemma:grün
+grüne	tag:adja, lemma:grün
+grünes	tag:adja, lemma:grün
+grüner	tag:adja, lemma:grün
+grünen	tag:adja, lemma:grün
+blau	tag:adja, lemma:blau
+blaue	tag:adja, lemma:blau
+blaues	tag:adja, lemma:blau
+blauen	tag:adja, lemma:blau
+blauer	tag:adja, lemma:blau
+grau	tag:adja, lemma:grau
+graue	tag:adja, lemma:grau
+grauen	tag:adja, lemma:grau
+linke	tag:adja, lemma:links
+linken	tag:adja, lemma:links
+linkes	tag:adja, lemma:links
+linkeste	tag:adja, lemma:links
+linkesten	tag:adja, lemma:links
+rech	tag:adja, lemma:rechts
+rechte	tag:adja, lemma:rechts
+rechten	tag:adja, lemma:rechts
+rechtes	tag:adja, lemma:rechts
+rechter	tag:adja, lemma:rechts
+rechteste	tag:adja, lemma:rechts
+rechtesten	tag:adja, lemma:rechts
+mittlere	tag:adja, lemma:mitte
+mittleren	tag:adja, lemma:mitte
+mittleres	tag:adja, lemma:mitte
+vorne	tag:adja, lemma:vorne
+äußer	tag:adja, lemma:äußer
+äußere	tag:adja, lemma:äußer
+äußeres	tag:adja, lemma:äußer
+äußerer	tag:adja, lemma:äußer
+äußeren	tag:adja, lemma:äußer
+obere	tag:adja, lemma:oben
+oberen	tag:adja, lemma:oben
+oberste	tag:adja, lemma:oben
+obersten	tag:adja, lemma:oben
+untere	tag:adja, lemma:unten
+unteren	tag:adja, lemma:unten
+unterste	tag:adja, lemma:oben
+untersten	tag:adja, lemma:oben
+erste	tag:adja, lemma:erste
+ersten	tag:adja, lemma:erste
+zweite	tag:adja, lemma:zweite
+zweiten	tag:adja, lemma:zweite
+dritte	tag:adja, lemma:dritte
+dritten	tag:adja, lemma:dritte
+vierte	tag:adja, lemma:vierte
+vierten	tag:adja, lemma:vierte
+letzte	tag:adja, lemma:letzte
+letzten	tag:adja, lemma:letzte
+# -----------------------------
+# 		NOMEN
+# -----------------------------
+ranking	tag:nn, lemma:rankin
+hälfte	tag:nn, lemma:hälfte
+beispiel	tag:nn, lemma:beispiel
+blatt	tag:nn, lemma:blatt
+spiel	tag:nn, lemma:spiel
+tetris	tag:nn, lemma:tetris
+sprache	tag:nn, lemma:sprache
+viereck	tag:nn, lemma:viereck
+kopf	tag:nn, lemma:kopf
+farbe	tag:nn, lemma:farbe
+farben	tag:nn, lemma:farbe
+haufen	tag:nn, lemma:gruppe
+gruppen	tag:nn, lemma:gruppe
+wirrwarr	tag:nn, lemma:gruppe
+gruppe	tag:nn, lemma:gruppe
+cluster	tag:nn, lemma:gruppe
+gruppierung	tag:nn, lemma:gruppe
+bildschirm	tag:nn, lemma:bildschirm
+bildrand	tag:nn, lemma:bildrand
+# klotz and stein might also have referred to hand
+klotz	tag:nn, lemma:teil
+stein	tag:nn, lemma:teil
+symbol	tag:nn, lemma:teil
+symbolen	tag:nn, lemma:teil
+element	tag:nn, lemma:teil
+form	tag:nn, lemma:teil
+stück	tag:nn, lemma:teil
+teil	tag:nn, lemma:teil
+ding	tag:nn, lemma:teil
+block	tag:nn, lemma:teil
+blöcke	tag:nn, lemma:teil
+objekt	tag:nn, lemma:teil
+zeichen	tag:nn, lemma:teil
+gegenstand	tag:nn, lemma:teil
+feld	tag:nn, lemma:feld
+kästchen	tag:nn, lemma:feld
+kasten	tag:nn, lemma:kasten
+ecke	tag:nn, lemma:ecke
+ke	tag:nn, lemma:ecke
+winkel	tag:nn, lemma:ecke
+wickel	tag:nn, lemma:ecke
+zeile	tag:nn, lemma:zeile
+# reihen = zeilen oder spalten?
+reihe	tag:nn, lemma:zeile
+reihen	tag:nn, lemma:zeile
+spalte	tag:nn, lemma:spalte
+position	tag:nn, lemma:spalte
+seite	tag:nn, lemma:spalte
+uhrzeigersinn	tag:nn, lemma:uhrzeigersinn
+#mitte	tag:nn, lemma:mitte #see adv
+# TEILNAMEN
+$y	tag:nn, lemma:krücke
+y	tag:nn, lemma:krücke
+ypsilon	tag:nn, lemma:krücke
+ypsilal	tag:nn, lemma:krücke
+krücke	tag:nn, lemma:krücke
+$u	tag:nn, lemma:brücke
+c	tag:nn, lemma:brücke
+cs	tag:nn, lemma:brücke
+$c	tag:nn, lemma:brücke
+brücke	tag:nn, lemma:brücke
+$v	tag:nn, lemma:winkel
+winkeln	tag:nn, lemma:winkel
+dreieck	tag:nn, lemma:winkel
+$f	tag:nn, lemma:pistole
+pistole	tag:nn, lemma:pistole
+kreuz	tag:nn, lemma:kreuz
+#kreuzes is actually genitive
+kreuzes	tag:nn, lemma:kreuz
+kreuzen	tag:nn, lemma:kreuz
+pluszeichen	tag:nn, lemma:kreuz
+plus	tag:nn, lemma:kreuz
+$t	tag:nn, lemma:mast
+t	tag:nn, lemma:mast
+mast	tag:nn, lemma:mast
+balken	tag:nn, lemma:balken
+linie	tag:nn, lemma:balken
+eins	tag:nn, lemma:balken
+strich	tag:nn, lemma:balken
+strichen	tag:nn, lemma:balken
+lange	tag:nn, lemma:lange
+str	tag:nn, lemma:balken
+striche	tag:nn, lemma:balken
+balkens	tag:nn, lemma:balken
+$l	tag:nn, lemma:sieben
+l	tag:nn, lemma:sieben
+ls	tag:nn, lemma:sieben
+sieben	tag:nn, lemma:sieben
+$z	tag:nn, lemma:schlange
+z	tag:nn, lemma:schlange
+s	tag:nn, lemma:schlange
+$s	tag:nn, lemma:schlange
+schlange	tag:nn, lemma:schlange
+gewehr	tag:nn, lemma:gewehr
+bajonett	tag:nn, lemma:gewehr
+$w	tag:nn, lemma:treppe
+treppe	tag:nn, lemma:treppe
+handy	tag:nn, lemma:handy
+hand	tag:nn, lemma:handy
+b	tag:nn, lemma:handy
+matrix	tag:nn, lemma:spielfeld
+spielfeld	tag:nn, lemma:spielfeld
+spielfeldes	tag:nn, lemma:spielfeld
+quadrat	tag:nn, lemma:spielfeld
+quadrates	tag:nn, lemma:spielfeld
+# -----------------------------
+# 		ADVERBEN
+# -----------------------------
+nur	tag:adv, lemma:nur
+weiter	tag:adv, lemma:weiter
+übereinander	tag:adv, lemma:übereinander
+wieder	tag:adv, lemma:wieder
+trotzdem	tag:adv, lemma:trotzdem
+sonst	tag:adv, lemma:sonst
+schon	tag:adv, lemma:schon
+mal	tag:adv, lemma:mal
+kreuzt	tag:adv, lemma:kreuzt
+immer	tag:adv, lemma:immer
+#grad and grader are short for "gerade" not to be confused with the noun "grad"
+grad	tag:adv, lemma:gerade
+grader	tag:adv, lemma:gerade
+gerade	tag:adv, lemma:gerade
+früher	tag:adv, lemma:früher
+quasi	tag:adv, lemma:quasi
+fast	tag:adv, lemma:fast
+bald	tag:adv, lemma:bald
+hier	tag:adv, lemma:hier
+dort	tag:adv, lemma:dort
+so	tag:adv, lemma:so
+da	tag:adv, lemma:dort
+#not sure, there was only one "d" in TAKE
+d	tag:adv, lemma:dort
+außen	tag:adv, lemma:außen
+oben	tag:adv, lemma:oben
+unten	tag:adv, lemma:unten
+runter	tag:adv, lemma:unten
+links	tag:adv, lemma:links
+rechts	tag:adv, lemma:rechts
+ganz	tag:adv, lemma:ganz
+mitte	tag:adv, tag:nn, lemma:mitte
+mittig	tag:adv, tag:nn, lemma:mitte
+mittige	tag:adv, tag:nn, lemma:mitte
+horizontal	tag:adv, lemma:horizontal
+horizontale	tag:adv, lemma:horizontal
+horizontaler	tag:adv, lemma:horizontal
+horizontales	tag:adv, lemma:horizontal
+horizontalen	tag:adv, lemma:horizontal
+umgedrehte	tag:adv, lemma:umgedrehte
+senkrecht	tag:adv, lemma:vertikal
+senkrechte	tag:adv, lemma:vertikal
+senkrechtes	tag:adv, lemma:vertikal
+senkrechter	tag:adv, lemma:vertikal
+senkrechten	tag:adv, lemma:vertikal
+vertikal	tag:adv, lemma:vertikal
+vertikaler	tag:adv, lemma:vertikal
+vertikalen	tag:adv, lemma:vertikal
+vertikales	tag:adv, lemma:vertikal
+diagonal	tag:adv, lemma:diagonal
+diagonale	tag:adv, lemma:diagonal
+diagonales	tag:adv, lemma:diagonal
+diagonaler	tag:adv, lemma:diagonal
+diagonalen	tag:adv, lemma:diagonal
+einmal	tag:adv, lemma:einmal
+zweimal	tag:adv, lemma:zweimal
+nochmal	tag:adv, lemma:nochmal
+nicht	tag:adv, lemma:nicht
+auch	tag:adv, lemma:auch
+# -----------------------------
+# 		SONSTIGES
+# -----------------------------
+aus	tag:appr, lemma:aus
+auf	tag:appr, lemma:auf
+an	tag:appr, lemma:an
+bei	tag:appr, lemma:bei
+zu	tag:appr, lemma:zu
+mit	tag:appr, lemma:mit
+von	tag:appr, lemma:von
+neben	tag:appr, lemma:neben
+zwischen	tag:appr, lemma:zwischen
+gegen	tag:appr, lemma:gegen
+über	tag:appr, lemma:über
+für	tag:appr, lemma:für
+unter	tag:appr, lemma:unter
+ausm	tag:apprart, lemma:aus
+aufs	tag:apprart, lemma:auf
+ins	tag:apprart, lemma:in
+im	tag:apprart, lemma:in
+in	tag:appr, lemma:in
+am	tag:apprart, lemma:an
+aufm	tag:apprart, lemma:auf
+beim	tag:apprart, lemma:bei
+zum	tag:apprart, lemma:zu
+zur	tag:apprart, lemma:zu
+daneben	tag:proav, lemma:neben
+dabei	tag:proav, lemma:bei
+dadrauf	tag:proav, lemma:auf
+darauf	tag:proav, lemma:auf
+obendrauf	tag:proav, lemma:auf
+#the following two are approximations
+draufgezeigt	tag:proav, lemma:auf
+draufzeige	tag:proav, lemma:auf
+darüber	tag:proav, lemma:über
+dazu	tag:proav, lemma:zu
+dazwischen	tag:proav, lemma:zwischen
+drunter	tag:proav, lemma:unter
+darunter	tag:proav, lemma:unter
+# Konnektor
+und	tag:kon, lemma:und
+aber	tag:kon, lemma:aber
+oder	tag:kon, lemma:oder
+sondern	tag:kon, lemma:sondern
+# TODO:
+herum	tag:ptkvz, lemma:herum
+ab	tag:ptkvz, lemma:ab
+hin	tag:ptkvz, lemma:hin
+# -----------------------------
+# 		CONFIRMATIONS
+# -----------------------------
+okay	tag:conf, lemma:conf
+ok	tag:conf, lemma:conf
+gut	tag:conf, lemma:conf
+ja	tag:conf, lemma:conf
+jo	tag:conf, lemma:conf
+joa	tag:conf, lemma:conf
+korrekt	tag:conf, lemma:conf
+richti	tag:conf, lemma:conf
+genau	tag:conf, lemma:conf
+richtig	tag:conf, lemma:conf
+richtige	tag:conf, lemma:conf
+nein	tag:conf, lemma:negconf
+ne	tag:conf, lemma:negconf
+nee	tag:conf, lemma:negconf
+falsch	tag:conf, lemma:negconf
+# -----------------------------
+# 		FILLER and SKIPWORDS
+# -----------------------------
+also	tag:fill
+ah	tag:fill
+aha	tag:fill
+äh	tag:fill
+ähm	tag:fill
+eh	tag:fill
+ehm	tag:fill
+oh	tag:fill
+öh	tag:fill
+öhm	tag:fill
+hm	tag:fill
+hmm	tag:fill
+mhm	tag:fill
+ach	tag:fill
+achso	tag:fill
+bitte	tag:fill
+dann	tag:fill
+nun	tag:fill
+noch	tag:fill
+nach	tag:fill
+jetzt	tag:fill
+jetz	tag:fill
+moment	tag:fill
+aham	tag:fill
+# -----------------------------
+# 		FEEDBACK
+# -----------------------------
+stop	tag:fill
+stopp	tag:fill
+abbrechen	tag:fill
+halt	tag:fill
+n	tag:fill
+o	tag:fill
+un	tag:fill
+sch	tag:fill
+ahm	tag:fill
+r	tag:fill
+zw	tag:fill
+k	tag:fill
+gr	tag:fill
+ro	tag:fill
+uhem	tag:fill
+mh	tag:fill
+re	tag:fill
+eigentlich	tag:fill
+einfach	tag:fill
+zwar	tag:fill
+link	tag:fill
+allerdings	tag:fill
+irgendwie	tag:fill
+denn	tag:fill
+wenn	tag:fill
+ob	tag:fill
+weil	tag:fill
+als	tag:fill
+<sil>	tag:fill
+# -----------------------------
+#    END OF SENTENCE MARKER
+# -----------------------------
+</S>	tag:S!

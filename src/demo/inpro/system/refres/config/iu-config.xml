@@ -1,0 +1,134 @@
+
+    
+    <property name="baseData" value="baseData" />
+    
+    <!-- 
+    
+    Natural Language Understanding
+    
+     -->
+     <component name="currentASRHypothesis" type="inpro.incremental.source.SphinxASR"> 
+        <property name="frontend" value="${frontend}" />
+        <property name="asrFilter" value="${deltifier}" />
+        <property name="brutalPruner" value="trivialPruner"/>
+        <property name="baseData" value="${baseData}" />
+        <propertylist name="hypChangeListeners">
+	    	<item>${sium}</item>
+        </propertylist>
+    </component> 
+
+    <property name="sium" value="sium_ngram"/>
+    
+    <property name="lookupTags" value="file:src/demo/inpro/system/refres/config/rmrs/lookup.tags" />
+    
+	<component name="tagger" type="inpro.incremental.processor.Tagger">
+        <property name="lookupTags" value="${lookupTags}" />
+        <propertylist name="hypChangeListeners">
+			 <item>parser</item>   
+        </propertylist>
+    </component>
+    
+	<property name="grammarFile" value="file:src/demo/inpro/system/refres/config/rmrs/irmrsc-grammar.xml" />
+	<property name="baseBeamFactor" value="0.01" />
+	<property name="beRobust" value="false" />
+
+    <component name="parser" type="inpro.incremental.processor.TagParser">
+    	<property name="grammarFile" value="${grammarFile}" />
+    	<property name="baseBeamFactor" value="${baseBeamFactor}" />
+    	<property name="beRobust" value="${beRobust}" />
+    	<propertylist name="hypChangeListeners">
+			<item>rmrsComposer</item>
+        </propertylist>
+    </component>
+
+    <property name="semMacrosFile" value="file:src/demo/inpro/system/refres/config/rmrs/irmrsc-semmacros.xml" />
+   	<property name="semRulesFile" value="file:src/demo/inpro/system/refres/config/rmrs/irmrsc-semrules.xml" />
+   	<property name="tagLexiconFile" value="file:src/demo/inpro/system/refres/config/rmrs/irmrsc-taglexicon.xml" />
+
+    <component name="rmrsComposer" type="inpro.incremental.processor.RMRSComposer">
+    	<property name="parser" value="parser" />
+    	<property name="resolveReferences" value="false" />
+    	<property name="referencePruning" value="false" />
+    	<property name="malusNoReference" value="0.01" />
+    	<property name="evaluate" value="false" />
+    	<property name="semMacrosFile" value="${semMacrosFile}" />
+    	<property name="semRulesFile" value="${semRulesFile}" />
+    	<property name="tagLexiconFile" value="${tagLexiconFile}" />
+        <propertylist name="hypChangeListeners"> 
+            <item>fol</item>
+        </propertylist> 
+    </component>    
+      
+ 	<component name="fol" type="inpro.incremental.processor.PredicateLogicModule">
+        <propertylist name="hypChangeListeners">
+			 <item>sium_rmrs</item>   
+        </propertylist>
+    </component>  
+     
+	<component name="sium_ngram" type="inpro.incremental.processor.ResolutionModuleNgram">
+		<property name="order" value="3"/>
+		<property name="id" value="object"/>
+        <propertylist name="hypChangeListeners">
+        </propertylist>
+    </component>    
+    
+	<component name="sium_rmrs" type="inpro.incremental.processor.ResolutionModuleRMRS">
+		<property name="id" value="object"/>
+        <propertylist name="hypChangeListeners">
+        </propertylist>
+    </component>      
+    
+	<component name="pentoFrame" type="inpro.incremental.processor.PentoFrame">
+        <propertylist name="hypChangeListeners">
+        </propertylist>
+    </component>      
+    
+    <!--
+    
+    Speech Synthesis
+    
+    -->
+    <component name="synthesis" type="module.Generation">
+        <property name="labelWriter" value="myLabelWriter"/>
+	    <propertylist name="hypChangeListeners">
+	    </propertylist>
+    </component>
+    
+    <component name="myLabelWriter" type="inpro.incremental.sink.LabelWriter">
+        <property name="writeToFile" value="true"/>
+        <property name="writeToStdOut" value="false"/>
+        <property name="filePath" value="/home/oeickmeyer/Desktop/Dumps/"/>
+        <property name="fileName" value="beef"/>
+	    <propertylist name="hypChangeListeners">
+	    </propertylist>
+    </component>
+    
+    
+    <!-- 
+    
+    		ASR Support
+    		
+     -->
+     
+ 	<component name="eotFeatureAggregator" type="inpro.features.EOTFeatureAggregator">
+        <property name="pitchWindows" value="5 10 20 50"/>
+        <property name="energyWindows" value="5 10 20 50"/>
+        <property name="vEnergyWindows" value="5 10 20 50"/>
+        <property name="timeIntoAudio" value="false"/>
+        <property name="includeFrameCount" value="false"/>
+    </component>
+
+    <component name="baseData" type="inpro.incremental.basedata.BaseData">
+        <property name="eotFeatureAggregator" value="eotFeatureAggregator"/>
+    </component>
+    
+	<component name="dispatchStream" type="inpro.audio.DispatchStream">
+		<property name="sendSilence" value="true"/>
+	</component> 
+   
+	<component name="textBasedFloorTracker" type="inpro.incremental.processor.TextBasedFloorTracker" />
+   
+    <property name="deltifier" value="none" />
+    <property name="deltifierParam" value="0"/>
+    <property name="baseData" value="baseData" />
+    <component name="none" type="inpro.incremental.deltifier.ASRWordDeltifier"/>

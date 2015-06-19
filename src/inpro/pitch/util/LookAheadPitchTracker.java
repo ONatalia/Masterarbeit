@@ -47,7 +47,7 @@ import edu.cmu.sphinx.util.props.S4Integer;
 /** 
  * A pitch tracker that uses lookahead and dynamic programming to determine pitch tracks.
  */
-public class LookAheadPitchTracker extends PitchTracker implements Resetable {
+public class LookAheadPitchTracker extends PitchTracker implements Resetable { // NO_UCD (unused code): let's keep it. There should ideally be a demo or comparison between PitchTracker and LookAheadPitchTracker
 
 	@S4Integer(defaultValue = 0)
 	public final static String PROP_LOOK_AHEAD = "lookAhead";

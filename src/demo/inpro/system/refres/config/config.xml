@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config[
+  <!ENTITY iuconfig SYSTEM "./iu-config.xml">
+  <!ENTITY sphinx SYSTEM "./sphinx.xml">
+  <!ENTITY sphinxlang SYSTEM "./sphinx-de.xml">
+  <!ENTITY frontend SYSTEM "./frontend.xml">
+]>
+<!--
+   Sphinx-4 Configuration file
+-->
+
+
+<!-- ******************************************************** -->
+<!--  incremental configuration file                          -->
+<!-- ******************************************************** -->
+<config>
+
+	&sphinx;
+	&sphinxlang;
+	&frontend;
+    &iuconfig;
+
+<!--property name="logLevel" value="FINE"/-->
+
+</config>

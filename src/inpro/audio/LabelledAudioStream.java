@@ -13,7 +13,11 @@ import java.util.Queue;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-
+/**
+ * an audiostream that comes with a labelFile (i.e., TextGrid) and notifies listeners 
+ * when labels in the labelfile are passed by reading the audiostream
+ * TODO: listener-functionality needs a test
+ */
 public class LabelledAudioStream extends AudioInputStream {
 
 	Queue<Label> labels;

@@ -1,10 +1,12 @@
 package inpro.apps;
 
+import inpro.apps.SimpleMonitor;
 import inpro.apps.util.MonitorCommandLineParser;
 import inpro.apps.util.RecoCommandLineParser;
 import inpro.audio.AudioUtils;
 import inpro.incremental.PushBuffer;
 import inpro.incremental.sink.LabelWriter;
+import inpro.sphinx.frontend.RsbStreamInputSource;
 import inpro.incremental.source.SphinxASR;
 import inpro.sphinx.frontend.RtpRecvProcessor;
 import inpro.util.TimeUtil;
@@ -25,6 +27,7 @@ import org.apache.log4j.PropertyConfigurator;
 
 import edu.cmu.sphinx.decoder.ResultListener;
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
+import edu.cmu.sphinx.frontend.DataProcessor;
 import edu.cmu.sphinx.frontend.FrontEnd;
 import edu.cmu.sphinx.frontend.util.Microphone;
 import edu.cmu.sphinx.frontend.util.StreamDataSource;
@@ -37,60 +40,77 @@ import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertyException;
 
 public class SimpleReco {
-	
+
 	private static final Logger logger = Logger.getLogger(SimpleReco.class);
-	
+
 	private final RecoCommandLineParser clp;
 	private final ConfigurationManager cm;
 	private final Recognizer recognizer;
-	
-	public SimpleReco() throws PropertyException, IOException, UnsupportedAudioFileException {
+
+	public SimpleReco() throws PropertyException, IOException,
+			UnsupportedAudioFileException {
 		this(new RecoCommandLineParser());
 	}
-	
-	public SimpleReco(ConfigurationManager cm) throws PropertyException, IOException, UnsupportedAudioFileException {
+
+	public SimpleReco(ConfigurationManager cm) throws PropertyException,
+			IOException, UnsupportedAudioFileException {
 		this(cm, new RecoCommandLineParser());
 	}
-	
-	public SimpleReco(RecoCommandLineParser clp) throws PropertyException, IOException, UnsupportedAudioFileException {
+
+	public SimpleReco(RecoCommandLineParser clp) throws PropertyException,
+			IOException, UnsupportedAudioFileException {
 		this(new ConfigurationManager(clp.getConfigURL()), clp);
 	}
-	
-	public SimpleReco(ConfigurationManager cm, RecoCommandLineParser clp) throws IOException, PropertyException, UnsupportedAudioFileException {
+
+	public SimpleReco(ConfigurationManager cm, RecoCommandLineParser clp)
+			throws IOException, PropertyException,
+			UnsupportedAudioFileException {
 		this.clp = clp;
 		this.cm = cm;
-    	setupDeltifier();
+		setupDeltifier();
 
-    	setupDecoder();
-    	logger.info("Setting up source...");
+		setupDecoder();
+		logger.info("Setting up source...");
 
-    	setupSource();
-    	logger.info("Setting up monitors...");
+		setupSource();
+		logger.info("Setting up monitors...");
 
-    	this.recognizer = (Recognizer) cm.lookup("recognizer");
-    	assert recognizer != null;
-    	setupMonitors();
-    	allocateRecognizer();
-    	logger.info("Configuration has finished");
-    	TimeUtil.startupTime = System.currentTimeMillis();
+		this.recognizer = (Recognizer) cm.lookup("recognizer");
+		assert recognizer != null;
+		setupMonitors();
+		allocateRecognizer();
+		logger.info("Configuration has finished");
+		TimeUtil.startupTime = System.currentTimeMillis();
 	}
-	
+
 	private void setupDeltifier() {
 		String ASRfilter = null;
 		switch (clp.getIncrementalMode()) {
-			case RecoCommandLineParser.FIXEDLAG_INCREMENTAL : ASRfilter = "fixedLag"; break;
-			case RecoCommandLineParser.INCREMENTAL : ASRfilter = "none"; break;
-			case RecoCommandLineParser.NON_INCREMENTAL : ASRfilter = "nonIncr"; break;
-			case RecoCommandLineParser.SMOOTHED_INCREMENTAL : ASRfilter = "smoothing"; break;
-			case RecoCommandLineParser.DEFAULT_DELTIFIER : break;
-			default : throw new RuntimeException("something's wrong");
+		case RecoCommandLineParser.FIXEDLAG_INCREMENTAL:
+			ASRfilter = "fixedLag";
+			break;
+		case RecoCommandLineParser.INCREMENTAL:
+			ASRfilter = "none";
+			break;
+		case RecoCommandLineParser.NON_INCREMENTAL:
+			ASRfilter = "nonIncr";
+			break;
+		case RecoCommandLineParser.SMOOTHED_INCREMENTAL:
+			ASRfilter = "smoothing";
+			break;
+		case RecoCommandLineParser.DEFAULT_DELTIFIER:
+			break;
+		default:
+			throw new RuntimeException("something's wrong");
 		}
 		if (ASRfilter != null) {
 			logger.info("Setting ASR filter to " + ASRfilter);
 			cm.setGlobalProperty("deltifier", ASRfilter);
 			if (!ASRfilter.equals("none")) {
-				logger.info("Setting filter parameter to " + clp.getIncrementalModifier());
-				cm.setGlobalProperty("deltifierParam", Integer.toString(clp.getIncrementalModifier()));
+				logger.info("Setting filter parameter to "
+						+ clp.getIncrementalModifier());
+				cm.setGlobalProperty("deltifierParam",
+						Integer.toString(clp.getIncrementalModifier()));
 			}
 		} else {
 			logger.info("Leaving ASR filter at config-file's value.");
@@ -98,7 +118,7 @@ public class SimpleReco {
 	}
 
 	public static void setupMicrophone(final Microphone mic) {
-		// create a Thread to start up the microphone (this avoid a problem 
+		// create a Thread to start up the microphone (this avoids a problem
 		// with microphone initialization hanging and taking forever)
 		Thread micInitializer = new Thread("microphone initializer") {
 			@Override
@@ -133,17 +153,63 @@ public class SimpleReco {
 				}
 			}
 		};
-		Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook, "microphone shutdown hook"));
+		Runtime.getRuntime().addShutdownHook(
+				new Thread(shutdownHook, "microphone shutdown hook"));
 	}
-	
+
+	public static void setupRsbInputSource(final RsbStreamInputSource rsbInput) {
+		// create a Thread to start up the microphone (this avoid a problem
+		// with microphone initialization hanging and taking forever)
+		Thread RsbInputSourceInitializer = new Thread(
+				"RsbInputSource initializer") {
+			@Override
+			public void run() {
+				rsbInput.initialize();
+			}
+		};
+		RsbInputSourceInitializer.start();
+		try {
+			RsbInputSourceInitializer.join(3000); // allow the microphone 3
+													// seconds to initialize
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		if (!rsbInput.startRecording()) {
+			logger.fatal("Could not open RsbInputSource. Exiting...");
+			throw new RuntimeException(
+					"Could not open RsbInputSource. Exiting...");
+		}
+		Runnable shutdownHook = new Runnable() {
+			public void run() {
+				logger.info("Shutting down RsbInputSource.");
+				Thread rsbInputStopper = new Thread("shutdown RsbInputSource") {
+					@Override
+					public void run() {
+						rsbInput.stopRecording();
+					}
+				};
+				rsbInputStopper.start();
+				try {
+					rsbInputStopper.join(3000);
+				} catch (InterruptedException ie) {
+					ie.printStackTrace();
+				}
+			}
+		};
+		Runtime.getRuntime().addShutdownHook(
+				new Thread(shutdownHook, "microphone shutdown hook"));
+	}
+
 	VUMeterMonitor vumeter;
-	
-	private void setupVuMeter() {
+
+	private void setupVuMeter(final DataProcessor mic) {
 		try {
 			SwingUtilities.invokeAndWait(new Runnable() {
 				@Override
 				public void run() {
-					vumeter = new VUMeterMonitor();			
+					vumeter = new VUMeterMonitor();
+					if (mic != null)
+						vumeter.setPredecessor(mic);
 				}
 			});
 		} catch (Exception e) {
@@ -151,8 +217,13 @@ public class SimpleReco {
 			throw new RuntimeException(e);
 		}
 		vumeter.getVuMeterDialog().setLocation(690, 100);
+
 	}
 	
+	private void setupVuMeter() {
+		setupVuMeter(null);
+	}
+
 	public BaseDataProcessor setupMicrophoneWithEndpointing()  {
     	Microphone mic = (Microphone) cm.lookup("microphone");
 		FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
@@ -163,6 +234,21 @@ public class SimpleReco {
 		setupMicrophone(mic);
 		return endpoint;
 	}
+
+	public void setupRsbInputSourceWithEndpointing() {
+		FrontEnd fe = (FrontEnd) cm.lookup("frontend");
+		final RsbStreamInputSource rsbInputStream = (RsbStreamInputSource) cm
+				.lookup("RsbStreamInputSource");
+		FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
+		setupVuMeter(rsbInputStream);
+		vumeter.setPredecessor(rsbInputStream);
+		endpoint.setPredecessor(vumeter);
+		vumeter.getVuMeterDialog().setVisible(false);
+		endpoint.initialize();
+		setupRsbInputSource(rsbInputStream);
+		fe.setPredecessor(endpoint);
+	}
+
 
 	public BaseDataProcessor setupFileInput() throws UnsupportedAudioFileException, IOException {
 		StreamDataSource sds = (StreamDataSource) cm.lookup("streamDataSource");
@@ -201,75 +287,88 @@ public class SimpleReco {
 			return sds;
 		}
 	}
-	
-	protected void setupSource() throws PropertyException, UnsupportedAudioFileException, IOException {
-    	FrontEnd fe = (FrontEnd) cm.lookup("frontend");
+
+	protected void setupSource() throws PropertyException,
+			UnsupportedAudioFileException, IOException {
+		FrontEnd fe = (FrontEnd) cm.lookup("frontend");
 		switch (clp.getInputMode()) {
-			case RecoCommandLineParser.MICROPHONE_INPUT:
-				fe.setPredecessor(setupMicrophoneWithEndpointing());
+		case RecoCommandLineParser.MICROPHONE_INPUT:
+			fe.setPredecessor(setupMicrophoneWithEndpointing());
 			break;
-			case RecoCommandLineParser.RTP_INPUT:
-				RtpRecvProcessor rtp = (RtpRecvProcessor) cm.lookup("RTPDataSource");
-				// find component with name RTPDataSource, 
-				// set the component's property recvPort
-				// to the property clp.rtpPort (which is a string)
-				cm.getPropertySheet("RTPDataSource").setInt("recvPort", clp.rtpPort);
-				rtp.initialize();
-				FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
-				endpoint.setPredecessor(rtp);
-				endpoint.initialize();
-				fe.setPredecessor(endpoint);
+		case RecoCommandLineParser.RTP_INPUT:
+			RtpRecvProcessor rtp = (RtpRecvProcessor) cm
+					.lookup("RTPDataSource");
+			// find component with name RTPDataSource,
+			// set the component's property recvPort
+			// to the property clp.rtpPort (which is a string)
+			cm.getPropertySheet("RTPDataSource")
+					.setInt("recvPort", clp.rtpPort);
+			rtp.initialize();
+			FrontEnd endpoint = (FrontEnd) cm.lookup("endpointing");
+			endpoint.setPredecessor(rtp);
+			endpoint.initialize();
+			fe.setPredecessor(endpoint);
 			break;
-			case RecoCommandLineParser.FILE_INPUT:
-				fe.setPredecessor(setupFileInput());
+		case RecoCommandLineParser.STREAM_INPUT:
+			System.out.println("*******RSB Stream Input");
+			setupRsbInputSourceWithEndpointing();
+			break;
+		case RecoCommandLineParser.FILE_INPUT:
+			fe.setPredecessor(setupFileInput());
 			break;
 		}
 	}
-	
+
 	private void setupDecoder() throws IOException {
-    	if (clp.isRecoMode(RecoCommandLineParser.FORCED_ALIGNER_RECO)) {
-    		logger.info("Running in forced alignment mode.");
-    		logger.info("Will try to recognize: " + clp.getReference());
-        	cm.setGlobalProperty("linguist", "flatLinguist");
-        	cm.setGlobalProperty("grammar", "forcedAligner");
-	    	Linguist linguist = (Linguist) cm.lookup("flatLinguist");
-	    	linguist.allocate();
-	    	AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
-	    	forcedAligner.setText(clp.getReference());
-    	} else if (clp.isRecoMode(RecoCommandLineParser.FAKE_RECO)) {
-    		logger.info("Running in fake recognition mode.");
-    		logger.info("Reading transcript from: " + clp.getReference());
-        	cm.setGlobalProperty("searchManager", "fakeSearch");
-        	cm.getPropertySheet("fakeSearch").setString("transcriptName", clp.getReference());
-    	} else if (clp.isRecoMode(RecoCommandLineParser.GRAMMAR_RECO)) {
-        	URL lmUrl = clp.getLanguageModelURL();
-    		logger.info("Running with grammar " + lmUrl);
-        	cm.setGlobalProperty("linguist", "flatLinguist");
-        	cm.setGlobalProperty("searchManager", "simpleSearch");
-        	Pattern regexp = Pattern.compile("^(.*)/(.*?).gram$");
-        	Matcher regexpResult = regexp.matcher(lmUrl.toString());
-        	if (!regexpResult.matches()) { 
-        		throw new RuntimeException("mal-formatted grammar URL."); 
-        	}
-        	String grammarLocation = regexpResult.group(1);
-        	String grammarName = regexpResult.group(2);
-        	logger.info(grammarLocation);
-        	cm.getPropertySheet("jsgfGrammar").setString("grammarLocation", grammarLocation);
-        	logger.info(grammarName);
-        	cm.getPropertySheet("jsgfGrammar").setString("grammarName", grammarName);
-    	} else if (clp.isRecoMode(RecoCommandLineParser.SLM_RECO)) {
-    		logger.info("Running with language model " + clp.getLanguageModelURL().toString());
-        	cm.setGlobalProperty("linguist", "lexTreeLinguist");
-    		String lmLocation = clp.getLanguageModelURL().toString();
-    		cm.getPropertySheet("ngram").setString("location", lmLocation);
-    	} else {
-    		logger.info("Loading recognizer...");
-    	}
+		if (clp.isRecoMode(RecoCommandLineParser.FORCED_ALIGNER_RECO)) {
+			logger.info("Running in forced alignment mode.");
+			logger.info("Will try to recognize: " + clp.getReference());
+			cm.setGlobalProperty("linguist", "flatLinguist");
+			cm.setGlobalProperty("grammar", "forcedAligner");
+			Linguist linguist = (Linguist) cm.lookup("flatLinguist");
+			linguist.allocate();
+			AlignerGrammar forcedAligner = (AlignerGrammar) cm
+					.lookup("forcedAligner");
+			forcedAligner.setText(clp.getReference());
+		} else if (clp.isRecoMode(RecoCommandLineParser.FAKE_RECO)) {
+			logger.info("Running in fake recognition mode.");
+			logger.info("Reading transcript from: " + clp.getReference());
+			cm.setGlobalProperty("searchManager", "fakeSearch");
+			cm.getPropertySheet("fakeSearch").setString("transcriptName",
+					clp.getReference());
+		} else if (clp.isRecoMode(RecoCommandLineParser.GRAMMAR_RECO)) {
+			URL lmUrl = clp.getLanguageModelURL();
+			logger.info("Running with grammar " + lmUrl);
+			cm.setGlobalProperty("linguist", "flatLinguist");
+			cm.setGlobalProperty("searchManager", "simpleSearch");
+			Pattern regexp = Pattern.compile("^(.*)/(.*?).gram$");
+			Matcher regexpResult = regexp.matcher(lmUrl.toString());
+			if (!regexpResult.matches()) {
+				throw new RuntimeException("mal-formatted grammar URL.");
+			}
+			String grammarLocation = regexpResult.group(1);
+			String grammarName = regexpResult.group(2);
+			logger.info(grammarLocation);
+			cm.getPropertySheet("jsgfGrammar").setString("grammarLocation",
+					grammarLocation);
+			logger.info(grammarName);
+			cm.getPropertySheet("jsgfGrammar").setString("grammarName",
+					grammarName);
+		} else if (clp.isRecoMode(RecoCommandLineParser.SLM_RECO)) {
+			logger.info("Running with language model "
+					+ clp.getLanguageModelURL().toString());
+			cm.setGlobalProperty("linguist", "lexTreeLinguist");
+			String lmLocation = clp.getLanguageModelURL().toString();
+			cm.getPropertySheet("ngram").setString("location", lmLocation);
+		} else {
+			logger.info("Loading recognizer...");
+		}
 	}
 
 	@SuppressWarnings("unused")
 	private void setupMonitors() throws PropertyException {
-		ResultListener resultlistener = (ResultListener) cm.lookup("currentASRHypothesis");
+		ResultListener resultlistener = (ResultListener) cm
+				.lookup("currentASRHypothesis");
 		recognizer.addResultListener(resultlistener);
 		SphinxASR casrh = (SphinxASR) cm.lookup("currentASRHypothesis");
 		if (clp.matchesOutputMode(RecoCommandLineParser.TED_OUTPUT)) {
@@ -290,9 +389,9 @@ public class SimpleReco {
 		}
 		// this is a little hacky, but so be it
 		if (clp.matchesOutputMode(RecoCommandLineParser.DISPATCHER_OBJECT_OUTPUT)) {
-			MonitorCommandLineParser clp = new MonitorCommandLineParser(new String[] {
-					"-F", "file:/tmp/monitor.raw", "-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
-				});
+			MonitorCommandLineParser clp = new MonitorCommandLineParser(
+					new String[] { "-F", "file:/tmp/monitor.raw", "-S", "-M" // -M is just a placeholder here, it's immediately overridden in the next line:
+					});
 			clp.setInputMode(MonitorCommandLineParser.DISPATCHER_OBJECT_INPUT);
 			try {
 				new SimpleMonitor(clp, cm);
@@ -313,53 +412,60 @@ public class SimpleReco {
 	/** call this if you want a single recognition */
 	public void recognizeOnce() {
 		Result result = null;
-    	do {
-    		if (clp.ignoreErrors()) {
+		do {
+
+			if (clp.ignoreErrors()) {
 				try {
-			    	result = recognizer.recognize();
+					result = recognizer.recognize();
 				} catch (Throwable e) { // also includes AssertionError
 					e.printStackTrace();
-					logger.warn("Something's wrong further down, trying to continue anyway" , e);
+					logger.warn(
+							"Something's wrong further down, trying to continue anyway",
+							e);
 				}
-    		} else {
-    			result = recognizer.recognize();
-    		}
-	        if (result != null) {
-	        	// Normal Output
-	        	logger.info("RESULT: " + result.toString());
-	        } else {
-	        	logger.info("Result: null");
-	        }
-    	} while ((result != null) && (result.getDataFrames() != null) && (result.getDataFrames().size() > 4));
+			} else {
+				result = recognizer.recognize();
+			}
+			if (result != null) {
+				// Normal Output
+				logger.info("RESULT: " + result.toString());
+			} else {
+				logger.info("Result: null");
+			}
+		} while ((result != null) && (result.getDataFrames() != null)
+				&& (result.getDataFrames().size() > 4));
 	}
-	
+
 	/** call this if you want recognition to loop forever */
 	public void recognizeInfinitely() {
-		while(true) {
+		while (true) {
 			recognizeOnce();
-    		recognizer.resetMonitors();
-		}		
+			recognizer.resetMonitors();
+		}
 	}
-	
-	/** call this if you want to implement recognition looping yourself */ 
+
+	/** call this if you want to implement recognition looping yourself */
 	public Recognizer getRecognizer() {
 		return recognizer;
 	}
-	
-	public static void main(String[] args) throws IOException, PropertyException, UnsupportedAudioFileException {
+
+	public static void main(String[] args) throws IOException,
+			PropertyException, UnsupportedAudioFileException {
 		PropertyConfigurator.configure("log4j.properties");
-    	RecoCommandLineParser clp = new RecoCommandLineParser(args);
-    	if (!clp.parsedSuccessfully()) { 
-			throw new IllegalArgumentException("No arguments given or illegal combination of arguments.");
-    	}
-    	SimpleReco simpleReco = new SimpleReco(clp);
-    	if (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)) {
-    		System.err.println("Starting recognition, use Ctrl-C to stop...\n");
-    		simpleReco.recognizeInfinitely();
-    	} else {
-    		simpleReco.recognizeOnce();
-    	}
-    	simpleReco.getRecognizer().deallocate();
-    	System.exit(0);
+		RecoCommandLineParser clp = new RecoCommandLineParser(args);
+		if (!clp.parsedSuccessfully()) {
+			throw new IllegalArgumentException(
+					"No arguments given or illegal combination of arguments.");
+		}
+		SimpleReco simpleReco = new SimpleReco(clp);
+		if (clp.isInputMode(RecoCommandLineParser.MICROPHONE_INPUT)
+				|| clp.isInputMode(RecoCommandLineParser.STREAM_INPUT)) {
+			System.err.println("Starting recognition, use Ctrl-C to stop...\n");
+			simpleReco.recognizeInfinitely();
+		} else {
+			simpleReco.recognizeOnce();
+		}
+		simpleReco.getRecognizer().deallocate();
+		System.exit(0);
 	}
 }

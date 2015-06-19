@@ -59,6 +59,18 @@ public abstract class Canvas extends JPanel implements ActionListener, Resetable
 		showTiles = show;
 		repaint();
 	}
+	
+	public Tile getDraggingTile() {
+		return this.draggingTile;
+	}
+	
+	public void releaseAllTiles() {
+		for (Tile p : getTiles()) {
+			if (p.isSelected()) {
+				p.unselect();
+			}
+		}
+	}
 /*	
 	protected void shuffleTiles(Random rnd, List<Point> positions) {
 		Collections.shuffle(positions, rnd);

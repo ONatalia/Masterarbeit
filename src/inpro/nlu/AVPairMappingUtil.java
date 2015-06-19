@@ -21,6 +21,7 @@ public class AVPairMappingUtil {
 		Map<String, List<AVPair>> avPairs = new HashMap<String, List<AVPair>>();
 		String line;
 		while ((line = lbr.readLine()) != null) {
+//			System.out.println(line);
 			if (line.startsWith("#") || line.matches("^\\s*$")) continue;
 			String[] tokens = line.split("\\s*\t\\s*");
 			assert (tokens.length == 2) : "Error parsing " + line;

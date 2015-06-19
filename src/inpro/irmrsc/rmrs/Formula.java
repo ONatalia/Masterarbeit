@@ -34,6 +34,7 @@ public class Formula extends VariableEnvironment
 	
 	/** Variable Equalities */
 	private List<VariableIDPair> mEqs;
+
 	
 	public Formula(Formula f) {
 		// deep copy vars, not only copying collections
@@ -114,6 +115,10 @@ public class Formula extends VariableEnvironment
 				// TODO: cnt mismatches, reduce gracefully
 			}
 		}
+	}
+	
+	public Hook getMainHook() {
+		return this.mHook;
 	}
 	
 	public boolean isReduced () {
@@ -330,7 +335,9 @@ public class Formula extends VariableEnvironment
 	public List<SimpleAssertion> getUnscopedPredicateLogic() {
 		List<SimpleAssertion> l = new ArrayList<SimpleAssertion>();
 		// find all anchors ids
-		for (Variable v : mVariables.values()) {
+		TreeSet<Integer> ordered = new TreeSet<Integer>(mVariables.keySet());
+		for (Integer key : ordered) {
+			Variable v = mVariables.get(key);
 			if (v.getType() == Variable.Type.ANCHOR) {
 				int aid = v.getID();
 				String name = "_";

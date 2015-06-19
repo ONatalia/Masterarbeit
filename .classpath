@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="demo/inpro/system/pento/|done/inpro/system/calendar/|inpro/io/instantio/|inpro/io/webspeech/" kind="src" path="src"/>
-	<classpathentry excluding="work/inpro/alchemy/spatial/util/|inpro/io/instantio/" kind="src" path="test"/>
+	<classpathentry excluding="done/inpro/system/calendar/GenerateStimuli.java|done/inpro/system/calendar/GenerationModule.java|done/inpro/system/calendar/NoiseThread.java|done/inpro/system/calendar/NoisySynthesisModule.java|done/inpro/system/calendar/PhraseBasedInstallmentIU.java|done/inpro/system/calendar/PhraseIU.java|done/inpro/system/calendar/SynthesisModule.java|demo/inpro/system/pento/|done/inpro/system/calendar/EventGeneration.java" kind="src" path="src"/>
+	<classpathentry excluding="work/inpro/alchemy/spatial/util/" kind="src" path="test"/>
 	<classpathentry kind="lib" path="lib/weka.jar"/>
 	<classpathentry kind="lib" path="lib/drej.jar"/>
 	<classpathentry kind="lib" path="lib/sphinx4/jsapi.jar"/>
@@ -15,8 +15,7 @@
 	<classpathentry kind="lib" path="lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
 	<classpathentry kind="lib" path="lib/oaa2/antlr-oaa.jar"/>
 	<classpathentry kind="lib" path="lib/oaa2/oaa2.jar"/>
-	<classpathentry kind="lib" path="lib/io/rsb-0.10.0.jar"/>
-	<classpathentry kind="lib" path="lib/io/venice-java.jar"/>
+	<classpathentry kind="lib" path="lib/ws-commons-util-1.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/javaFlacEncoder-0.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/mary5/marytts-client-5.2-SNAPSHOT-jar-with-dependencies.jar"/>
 	<classpathentry kind="lib" path="lib/mary5/marytts-lang-de-5.2-SNAPSHOT.jar"/>
@@ -25,14 +24,22 @@
 	<classpathentry kind="lib" path="lib/mary5/marytts-runtime-5.2-SNAPSHOT-jar-with-dependencies.jar"/>
 	<classpathentry kind="lib" path="lib/mary5/voice-bits1-hsmm-5.1.jar"/>
 	<classpathentry kind="lib" path="lib/json-20140107.jar"/>
+	<classpathentry kind="lib" path="lib/common-for-convenience/sqlite.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/oaa2/backport-util-concurrent.jar"/>
-	<classpathentry kind="lib" path="lib/xmlrpc/xmlrpc-client-3.1.3.jar"/>
-	<classpathentry kind="lib" path="lib/xmlrpc/xmlrpc-common-3.1.3.jar"/>
-	<classpathentry kind="lib" path="lib/xmlrpc/xmlrpc-server-3.1.3.jar"/>
 	<classpathentry kind="lib" path="lib/junit-4.10.jar"/>
 	<classpathentry kind="lib" path="lib/common-for-convenience/jgraphx.jar"/>
 	<classpathentry kind="lib" path="lib/sphinx4/sphinx4.jar"/>
 	<classpathentry kind="lib" path="lib/common-for-convenience/commons-math3.jar"/>
+	<classpathentry kind="lib" path="lib/remote/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/remote/instantreality.jar"/>
+	<classpathentry kind="lib" path="lib/remote/protobuf-java-2.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/remote/rsb-0.10.2.jar"/>
+	<classpathentry kind="lib" path="lib/remote/rst-0.10.1.jar"/>
+	<classpathentry kind="lib" path="lib/remote/venicelib.jar"/>
+	<classpathentry kind="lib" path="lib/remote/xmlrpc-client-3.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/remote/xmlrpc-common-3.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/remote/xmlrpc-server-3.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/sium.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

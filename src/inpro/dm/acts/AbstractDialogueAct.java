@@ -6,32 +6,6 @@ public abstract class AbstractDialogueAct {
 	protected boolean done = false;
 
 	/**
-	 * Setter for whether this act has been performed.
-	 * Successful only if not done already.
-	 * @return success of this method
-	 */
-	public boolean doThis() {
-		if (this.done) {
-			return false;
-		}
-		this.done = true;
-		return this.done;
-	}
-
-	/**
-	 * Setter to undo this act.
-	 * Successful only if done already.
-	 * @return success of this method
-	 */
-	public boolean undoThis() {
-		if (this.done) {
-			this.done = false;
-			return true;
-		}
-		return false;
-	}
-
-	/**
 	 * Returns whether this act has been performed.
 	 * @return true if so
 	 */

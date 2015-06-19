@@ -43,6 +43,8 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	/** the product of the derivations probability and the lookahead probability -- not used at the moment */
 	private double mFigureOfMerit;
 	
+	private String fullString = null;
+	
 	public CandidateAnalysis(List<String> mDerivation, List<String> mLastDerive, CandidateAnalysis mAntecedent,
 			Deque<Symbol> mStack, double mProbability, double mFigureOfMerit) {
 		this.mDerivation = new ArrayList<String>(mDerivation);
@@ -147,6 +149,7 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	}
 	
 	private CandidateAnalysis match_intern(String deriveIdentifier) {
+//		fullString = null;
 		// prepare derivation
 		List<String> newDerivation =  new ArrayList<String>(mDerivation);
 		newDerivation.add(deriveIdentifier);
@@ -170,6 +173,7 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	 * @return the resulting new candidate analysis
 	 */
 	public CandidateAnalysis insert(Symbol insertedToken) {
+//		fullString = null;
 		String deriveIdentifier = "i("+insertedToken.getSymbol()+")";
 		List<String> newDerivation =  new ArrayList<String>(mDerivation);
 		newDerivation.add(deriveIdentifier);
@@ -182,12 +186,14 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 
 	/** simply adds a filler to this derivation without changing anything else */
 	public void consumeFiller(String fillername) {
+//		fullString = null;
 		this.mDerivation.add(fillername);
 		this.mLastDerive.add(fillername);
 	}
 	
 	/** links this analysis to an antecedent analysis */
 	public void newIncrementalStep(CandidateAnalysis oldCA) {
+//		fullString = null;
 		this.mLastDerive = new ArrayList<String>();
 		this.mAntecedent = oldCA;
 	}
@@ -300,10 +306,13 @@ public class CandidateAnalysis implements Comparable<CandidateAnalysis>{
 	}
 	
 	public String toFullString() {
-		return "D=" + mDerivation + " "
-				+ "LD=" + mLastDerive + " "
-				+ "P=" + new DecimalFormat("#.#########").format(mProbability) + "%\\n"
-				+ "S=" + mStack;
+		if (fullString == null) {
+			fullString = "D=" + mDerivation + " "
+					+ "LD=" + mLastDerive + " "
+					+ "P=" + new DecimalFormat("#.#########").format(mProbability) + "%\\n"
+					+ "S=" + mStack;
+		}
+		return fullString;
 	}
 	
 	@Override

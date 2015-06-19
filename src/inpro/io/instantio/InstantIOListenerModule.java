@@ -1,19 +1,15 @@
 package inpro.io.instantio;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
-import inpro.incremental.IUModule;
-import inpro.incremental.unit.EditMessage;
-import inpro.incremental.unit.EditType;
-import inpro.incremental.unit.IU;
 import inpro.io.ListenerModule;
-import inpro.io.SensorIU;
 
 import org.apache.log4j.Logger;
-import org.instantreality.InstantIO.InSlot;
 
+import venice.lib.AbstractSlot;
+import venice.lib.AbstractSlotListener;
+import venice.lib.networkIIO.IIONamespaceBuilder;
+import venice.lib.networkIIO.SlotFlags;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4String;
@@ -22,48 +18,48 @@ import edu.cmu.sphinx.util.props.S4String;
  * @author casey
  *
  */
-public class InstantIOListenerModule extends ListenerModule implements InSlot.Listener {
+public class InstantIOListenerModule extends ListenerModule implements AbstractSlotListener {
 	
 	static Logger log = Logger.getLogger(InstantIOListenerModule.class.getName());
 	
 	@S4String(defaultValue = "")
 	public final static String INSLOT_PROP = "inslot";
 	
+ 	@S4String(defaultValue = "")
+	public final static String ID_PROP = "id";
+ 	
+ 	private String inSlot;
+ 	private String id;
+	
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		super.newProperties(ps);
 		log.info("Setting up InstantIOListenerModule");
-		String inslot = ps.getString(INSLOT_PROP);
-		this.setID(inslot);
-		InstantIOListener.getInstance().addInSlotListener(inslot, this);
-		System.out.println("instantIO listener listening...");
+		inSlot = ps.getString(INSLOT_PROP);
+		id = ps.getString(ID_PROP);
+		IIONamespaceBuilder.setSlotFlags(new SlotFlags(true, true));
+		IIONamespaceBuilder.prepareNamespace(id);
+		
+		ArrayList<AbstractSlot> slots = new ArrayList<AbstractSlot>();
+		AbstractSlot slot = new AbstractSlot();
+		slot.setLabel(inSlot);
+		slot.setType(String.class);
+		slot.setNamespace(id);
+		slots.add(slot);
+		IIONamespaceBuilder.initializeInSlots(slots);
+		
+		IIONamespaceBuilder.setMasterInSlotListener(this);
+		
+		this.setID(ps.getString(ID_PROP));
 	}
 
 	/* (non-Javadoc)
-	 * @see org.instantreality.InstantIO.InSlot.Listener#newData(org.instantreality.InstantIO.InSlot)
-	 * 
 	 * Anything received on the InstantIO network on the namespace for this object is sent through this method.
 	 * 
 	 */
 	@Override
-	public void newData(InSlot data) {
-		try {
-			process(data.pop().toString());
-		}
-		catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-	}
-
-	@Override
-	public void startInSlot(InSlot arg0) {
-		
-	}
-
-	@Override
-	public void stopInSlot(InSlot arg0) {
-		
+	public void newData(Object arg0, Class<?> arg1, String arg2) {
+		process(arg0.toString());		
 	}
 
 }
