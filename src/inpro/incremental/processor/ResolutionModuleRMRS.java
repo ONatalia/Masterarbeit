@@ -251,18 +251,22 @@ public class ResolutionModuleRMRS extends ResolutionModuleNgram {
 			if (siu.hasLeft()) {
 				getCurrentHyp(siu.getLeftID()).setDistribution(getGrounder(siu.getLeftID()).getPosterior());
 				getCurrentHyp(siu).setName(siu.getLeftID());
-				newEdits.add(new EditMessage<SlotIU>(editType, getCurrentHyp(siu.getLeftID())));
+				SlotIU currentHyp =  getCurrentHyp(siu.getLeftID());
+				if (!currentHyp.isCommitted())  newEdits.add(new EditMessage<SlotIU>(editType,currentHyp));
 			}
 			
 			if (siu.hasRight()) {
 				getCurrentHyp(siu.getRightID()).setDistribution(getGrounder(siu.getRightID()).getPosterior());
 				getCurrentHyp(siu).setName(siu.getRightID());
-				newEdits.add(new EditMessage<SlotIU>(editType, getCurrentHyp(siu.getRightID())));
+				SlotIU currentHyp =  getCurrentHyp(siu.getRightID());
+				if (!currentHyp.isCommitted()) newEdits.add(new EditMessage<SlotIU>(editType,currentHyp));
 			}
 			getCurrentHyp(siu).setDistribution(getGrounder(siu).getPosterior());
 			getCurrentHyp(siu).setName(siu.getSemID());
 			getCurrentHyp(siu).setIsHead(siu.isHead());
-			newEdits.add(new EditMessage<SlotIU>(editType, getCurrentHyp(siu)));
+			
+			SlotIU currentHyp = getCurrentHyp(siu);
+			if (!currentHyp.isCommitted()) newEdits.add(new EditMessage<SlotIU>(editType, currentHyp));
 			rightBuffer.setBuffer(newEdits);
 		}
 	}

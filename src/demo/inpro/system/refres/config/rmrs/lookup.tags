@@ -14,7 +14,6 @@ soll	tag:v, lemma:sollen
 wüsst	tag:v, lemma:wissen
 haben	tag:v, lemma:haben
 habe	tag:v, lemma:haben
-haben	tag:v, lemma:haben
 würden	tag:v, lemma:wurden
 würde	tag:v, lemma:wurden
 kannste	tag:v, lemma:können
@@ -46,7 +45,6 @@ klappen	tag:v, lemma:klappen
 heißt	tag:v, lemma:heißen
 hat	tag:v, lemma:haben
 hab	tag:v, lemma:haben
-haben	tag:v, lemma:haben
 gucken	tag:v, lemma:gucken
 frag	tag:v, lemma:fragen
 bestätigen	tag:v, lemma:bestätigen
@@ -264,7 +262,6 @@ blaue	tag:adja, lemma:blau
 blaues	tag:adja, lemma:blau
 blauen	tag:adja, lemma:blau
 blauer	tag:adja, lemma:blau
-blauen	tag:adja, lemma:blau
 grau	tag:adja, lemma:grau
 graue	tag:adja, lemma:grau
 grauen	tag:adja, lemma:grau
@@ -372,7 +369,6 @@ cs	tag:nn, lemma:brücke
 $c	tag:nn, lemma:brücke
 brücke	tag:nn, lemma:brücke
 $v	tag:nn, lemma:winkel
-winkel	tag:nn, lemma:winkel
 winkeln	tag:nn, lemma:winkel
 dreieck	tag:nn, lemma:winkel
 $f	tag:nn, lemma:pistole
@@ -477,7 +473,6 @@ einmal	tag:adv, lemma:einmal
 zweimal	tag:adv, lemma:zweimal
 nochmal	tag:adv, lemma:nochmal
 nicht	tag:adv, lemma:nicht
-noch	tag:adv, lemma:noch
 auch	tag:adv, lemma:auch
 # -----------------------------
 # 		SONSTIGES
@@ -513,8 +508,6 @@ obendrauf	tag:proav, lemma:auf
 #the following two are approximations
 draufgezeigt	tag:proav, lemma:auf
 draufzeige	tag:proav, lemma:auf
-obendrauf	tag:proav, lemma:auf
-obendrauf	tag:proav, lemma:auf
 darüber	tag:proav, lemma:über
 dazu	tag:proav, lemma:zu
 dazwischen	tag:proav, lemma:zwischen
@@ -586,7 +579,6 @@ o	tag:fill
 un	tag:fill
 sch	tag:fill
 ahm	tag:fill
-hm	tag:fill
 r	tag:fill
 zw	tag:fill
 k	tag:fill
