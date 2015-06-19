@@ -108,7 +108,8 @@ public class PitchTracker extends BaseDataProcessor {
 	 * calculate score of a given signalBuffer and downsample the signalBuffer on the way.
 	 * NOTE: this is currently not used in the algorithm implemented below.
 	 */
-	public double[] amdf(double[] signal) {
+	@SuppressWarnings("unused") // we don't use this at the moment, but let's keep it around
+	private double[] amdf(double[] signal) { 
 		double[] amdf = new double[maxLag + 2];
 		int numSamples = signal.length;
 		if (minLag < 2) {
@@ -192,7 +193,8 @@ public class PitchTracker extends BaseDataProcessor {
 	 * @param candidates
 	 * @return the selected candidate 
 	 */
-	PitchCandidate trackingCandidateSelection(List<PitchCandidate> candidates) {
+	@SuppressWarnings("unused") // not used in the code, but let's keep it around just in case
+	private PitchCandidate trackingCandidateSelection(List<PitchCandidate> candidates) {
 		// check if there is a candidate corresponding to the last best candidate
 		for (Iterator<PitchCandidate> iter = candidates.iterator(); iter.hasNext(); ) {
 			PitchCandidate candidate = iter.next();
@@ -214,7 +216,8 @@ public class PitchTracker extends BaseDataProcessor {
 	}
 	
 	/** select the candidate with the highest quality (deepest minimum in the lagScoreTrajectory */
-	static PitchCandidate bestCandidateSelection(List<PitchCandidate> candidates) {
+	@SuppressWarnings("unused") // not used in the code, but let's keep it around just in case
+	private static PitchCandidate bestCandidateSelection(List<PitchCandidate> candidates) {
 		PitchCandidate bestCandidate = candidates.get(0);
 		for (PitchCandidate candidate : candidates) {
 			if (candidate.getScore() < bestCandidate.getScore()) {

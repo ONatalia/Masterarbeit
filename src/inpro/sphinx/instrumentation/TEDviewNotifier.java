@@ -15,7 +15,7 @@ import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Integer;
 
-public class TEDviewNotifier extends LabelWriter {
+public class TEDviewNotifier extends LabelWriter { // NO_UCD (unused code): this is called from XML
     @S4Integer(defaultValue = 2000)
     public final static String PROP_ZEITGEIST_PORT = "zeitgeistPort";
 

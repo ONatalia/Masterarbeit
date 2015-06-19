@@ -237,11 +237,6 @@ public class ResolutionModuleRMRS extends ResolutionModuleNgram {
 	}
 
 	@Override
-	protected void removeGround(IU iu) {
-//		TODO: throws NPE?
-	}
-
-	@Override
 	protected void setRightBuffer(EditType editType, IU iu) {
 
 		if (iu instanceof SemanticIU) {

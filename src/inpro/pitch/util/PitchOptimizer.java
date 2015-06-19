@@ -32,17 +32,9 @@ public class PitchOptimizer extends ShortestPath<PitchCandidate> {
     private PitchCandidate start = new PitchCandidate();
     private List<PitchCandidate> lastCandidates = null;
     private int numFrames = 0;
-    int lookback; // the list of pitch candidates never grows larger than this many entries. 
-    			  // pitch is -- after all -- a local phenomenon and the decision should hardly
-                  // change if we look back more than (by default) 10 s.
 	
-    public PitchOptimizer (int lookback) {
-    	init();
-    	this.lookback = lookback;
-    }
-    
     public PitchOptimizer() {
-    	this(1000);
+    	init();
     }
     
 	public void init() {
@@ -75,11 +67,6 @@ public class PitchOptimizer extends ShortestPath<PitchCandidate> {
 				}
 			}
 			lastCandidates = candidates;
-
-			//for (PitchCandidate c : candidates) {
-				//System.out.print(String.format(Locale.US, "%.2f#%.2f ", c.pitchHz, c.score));
-			//}
-			//System.out.println("");
 		}
 	}
 	

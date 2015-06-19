@@ -75,7 +75,6 @@ public class ResolutionModuleNgram extends IUModule {
 				
 			case REVOKE:
 //				this makes the (reasonable) assumption that only the most recent ADD can be revoked
-				removeGround(iu);
 				revoke(iu);
 				setRightBuffer(EditType.REVOKE, iu);
 				break;
@@ -90,12 +89,7 @@ public class ResolutionModuleNgram extends IUModule {
 		currentHyp.groundIn(iu);
 	}
 	
-	protected void removeGround(IU iu) {
-//		TODO: this throws a NPE for some reason, even though the IU has grounded before with the sent iu
-//		currentHyp.removeGrin(iu);
-	}
-
-	protected void setRightBuffer(EditType editType, IU iu) {
+	protected void setRightBuffer(EditType editType, @SuppressWarnings("unused") IU iu) { // the second parameter is used in an inheriting class
 		List<EditMessage<SlotIU>> newEdits = new ArrayList<EditMessage<SlotIU>>();
 		currentHyp.setDistribution(getGrounder().getPosterior());
 		newEdits.add(new EditMessage<SlotIU>(editType, currentHyp));

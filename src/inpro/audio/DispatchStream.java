@@ -178,13 +178,6 @@ public class DispatchStream extends InputStream implements Configurable {
 		}
 	}
 	
-	public void playSilence(int ms, boolean skipQueue) {
-		if (skipQueue)
-			setStream(new SilenceStream(ms));
-		else
-			addStream(new SilenceStream(ms));		
-	}
-	
 	public void playStream(InputStream audioStream) {
 		playStream(audioStream, true);
 	}
@@ -233,17 +226,6 @@ public class DispatchStream extends InputStream implements Configurable {
 		}
 	}
 	
-	/** a flag to interrupt output; used by read() to determine whether it should send silence or data */
-	boolean isInterrupted = false;
-	public void interruptPlayback() {
-		isInterrupted = true;
-	}	
-	public void continuePlayback() {
-		isInterrupted = false;
-	}
-	
-
-	
 	/* * InputStream implementation * */
 	
 	@Override
@@ -281,14 +263,10 @@ public class DispatchStream extends InputStream implements Configurable {
 				nextStream();
 			}
 			while (stream != null) {
-				if (isInterrupted) {
-					Arrays.fill(b, off, len, (byte) 0);
-				} else {
-					bytesRead = stream.read(b, off, len);
-					if (bytesRead == -1) {
-						nextStream();
-					} else break;
-				}
+				bytesRead = stream.read(b, off, len);
+				if (bytesRead == -1) {
+					nextStream();
+				} else break;
 			}
 			if (bytesRead < len) { // if the stream could not provide enough bytes, then it's probably ended
 				if (sendSilence && !inShutdown) { 

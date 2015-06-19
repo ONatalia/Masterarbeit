@@ -90,33 +90,6 @@ public class IUNetworkInformationState extends AbstractInformationState implemen
 	}
 	
 	/**
-	 * Constructor building contributions network from a
-	 * single root IU's grounded in links.
-	 * @param root
-	 */
-	public IUNetworkInformationState(ContribIU root) {
-		this.root = root;
-		this.addGrinIUs(root);
-
-	}
-
-	/**
-	 * Convenience method that recursively adds any new IUs grounded in a given IU
-	 * to the contributions network.
-	 * @param iu the IU and its GrIns to add to the contribution network.
-	 */
-	private void addGrinIUs(ContribIU iu) {
-		if (!this.contributions.contains(iu)) {
-			this.contributions.add(iu);
-			for (IU grin : iu.grounds()) {
-				if (grin instanceof ContribIU) {
-					this.addGrinIUs((ContribIU) grin);
-				}
-			}
-		}
-	}
-
-	/**
 	 * Setter method for the IS's next input to process.
 	 * @param sem the next semantic input to process.
 	 */

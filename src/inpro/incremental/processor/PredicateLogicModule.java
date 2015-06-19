@@ -20,7 +20,6 @@ import inpro.incremental.unit.SemanticIU;
 import inpro.incremental.unit.utils.IUUtils;
 import inpro.irmrsc.parser.CandidateAnalysis;
 import inpro.irmrsc.rmrs.Formula;
-import inpro.irmrsc.rmrs.Relation;
 import inpro.irmrsc.rmrs.SimpleAssertion;
 
 public class PredicateLogicModule extends IUModule {
@@ -174,30 +173,6 @@ public class PredicateLogicModule extends IUModule {
 		}
 		
 		rightBuffer.setBuffer(diffs);
-	}
-	
-	private String findAnchorName(Formula formula, Relation relation) {
-		String name = null;
-		for (Relation rel : formula.getRelations()) {
-//			if (!relationIsAcceptableType(rel)) continue;
-			if (rel.getType().equals(Relation.Type.ARGREL)) continue;
-			if (rel == relation) continue;
-			if (rel.getAnchor() == relation.getAnchor())
-				name = rel.getName();
-		}
-		return name;
-	}
-	
-	private String findArgumentName(Formula formula, Relation relation) {
-		String name = null;
-		for (Relation rel : formula.getRelations()) {
-//			if (!relationIsAcceptableType(rel)) continue;
-			if (rel.getType().equals(Relation.Type.ARGREL)) continue;
-			if (rel == relation) continue;
-			if (rel.getArgument() == relation.getArgument())
-				name = rel.getName();
-		}
-		return name;
 	}
 	
 	@SuppressWarnings("unused") // it's fine to keep debug methods around
