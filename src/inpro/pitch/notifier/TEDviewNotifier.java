@@ -1,6 +1,6 @@
 package inpro.pitch.notifier;
 
-import inpro.incremental.util.TedAdapter;
+import inpro.util.TedAdapter;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;

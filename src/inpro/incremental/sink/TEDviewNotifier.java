@@ -4,7 +4,7 @@ import inpro.incremental.FrameAware;
 import inpro.incremental.IUModule;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
-import inpro.incremental.util.TedAdapter;
+import inpro.util.TedAdapter;
 
 import java.util.List;
 import java.util.Collection;

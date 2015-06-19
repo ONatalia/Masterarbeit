@@ -144,7 +144,7 @@ public class SysSegmentIU extends SegmentIU {
 		if (htsModel != null) {
 		assert this.legacyHTSmodel != null;
 		// for evaluation of various incremental FV computation strategies:
-			HTSModelComparator.compare(htsModel, legacyHTSmodel);
+		//	HTSModelComparator.compare(htsModel, legacyHTSmodel);
 		//	IncrementalCARTTest.same(htsModel, legacyHTSmodel);
 			return htsModel;
 		} else 

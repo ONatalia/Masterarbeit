@@ -1,4 +1,4 @@
-package inpro.incremental.util;
+package inpro.util;
 
 import java.io.IOException;
 import java.io.PrintWriter;
