@@ -1,6 +1,7 @@
 package inpro.apps.util;
 
 import inpro.apps.util.CommonCommandLineParser;
+import inpro.util.PathUtil;
 
 import java.net.URL;
 
@@ -125,7 +126,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				}
 				else if (args[i].equals("-c")) {
 					i++;
-					configURL = anyToURL(args[i]);
+					configURL = PathUtil.anyToURL(args[i]);
 				}
 				else if (args[i].equals("-v")) {
 					verbose = true;
@@ -158,7 +159,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				else if (args[i].equals("-F")) {
 					inputMode = FILE_INPUT;
 					i++;
-					audioURL = anyToURL(args[i]);
+					audioURL = PathUtil.anyToURL(args[i]);
 				}
 				else if (args[i].equals("-T")) {
 					outputMode |= TED_OUTPUT;
@@ -196,12 +197,12 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				else if (args[i].equals("-lm")) {
 					recoMode = SLM_RECO;
 					i++;
-					languageModelURL = anyToURL(args[i]);
+					languageModelURL = PathUtil.anyToURL(args[i]);
 				} 
 				else if (args[i].equals("-gr")) {
 					recoMode = GRAMMAR_RECO;
 					i++;
-					languageModelURL = anyToURL(args[i]);
+					languageModelURL = PathUtil.anyToURL(args[i]);
 				} 
 				else if (args[i].equals("-rt")) {
 					dataThrottle = true;

@@ -1,5 +1,7 @@
 package inpro.apps.util;
 
+import inpro.util.PathUtil;
+
 import java.net.MalformedURLException;
 
 public class MonitorCommandLineParser extends CommonCommandLineParser {
@@ -64,7 +66,7 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 			}
 			else if (args[i].equals("-c")) {
 				i++;
-				configURL = anyToURL(args[i]);
+				configURL = PathUtil.anyToURL(args[i]);
 			}
 			else if (args[i].equals("-v")) {
 				verbose = true;
@@ -72,7 +74,7 @@ public class MonitorCommandLineParser extends CommonCommandLineParser {
 			else if (args[i].equals("-F")) {
 				outputMode |= FILE_OUTPUT;
 				i++;
-				audioURL = anyToURL(args[i]);
+				audioURL = PathUtil.anyToURL(args[i]);
 			}
 			else if (args[i].equals("-S")) {
 				outputMode |= SPEAKER_OUTPUT;

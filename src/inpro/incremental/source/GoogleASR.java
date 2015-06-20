@@ -4,11 +4,13 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -34,6 +36,7 @@ import inpro.incremental.unit.IUList;
 import inpro.incremental.unit.SegmentIU;
 import inpro.incremental.unit.TextualWordIU;
 import inpro.incremental.unit.WordIU;
+import inpro.util.PathUtil;
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -66,6 +69,14 @@ public class GoogleASR extends IUSourceModule {
 	public final static String PROP_SAMPLING_RATE = "samplingRate";
 	private String samplingRate = "16000";
 	
+	@S4String(defaultValue = "")
+	public final static String PROP_READ_JSON_DUMP = "importJSONDump";
+	private URL jsonDumpInput;
+	
+	@S4String(defaultValue = "")
+	public final static String PROP_WRITE_JSON_DUMP = "exportJSONDump";
+	private File jsonDumpOutput;
+	
 	/** used by google as a signal that audio transmission has ended */
 	private final static byte[] FINAL_CHUNK = new byte[] { '0', '\r', '\n', '\r', '\n' };
 	/** size of the output buffer, how much audio to send to google at a time */
@@ -86,18 +97,20 @@ public class GoogleASR extends IUSourceModule {
 		setLanguageCode(ps.getString(PROP_ASR_LANG));
 		setAPIKey(ps.getString(PROP_API_KEY));
 		setSamplingRate(ps.getString(PROP_SAMPLING_RATE));
-	}
-	
-	public void setAPIKey(String apiKey) {
-		googleAPIkey = apiKey;
-	}
-	
-	public void setSamplingRate(String SamplingRate) {
-		samplingRate = SamplingRate;
-	}
-	
-	public void setLanguageCode(String string) {
-		languageCode = string;
+		try {
+			if (!"".equals(ps.getString(PROP_READ_JSON_DUMP))) {
+					setImportFile(PathUtil.anyToURL(ps.getString(PROP_READ_JSON_DUMP)));
+			} else {
+				setImportFile(null);
+			}
+		} catch (MalformedURLException e) {
+			throw new PropertyException(e);
+		}
+		if (!"".equals(ps.getString(PROP_WRITE_JSON_DUMP))) {
+			setExportFile(new File(ps.getString(PROP_WRITE_JSON_DUMP)));
+		} else {
+			setExportFile(null);
+		}
 	}
 	
 	/** write audio to stream and push results to listeners of our RightBuffer */
@@ -354,4 +367,24 @@ public class GoogleASR extends IUSourceModule {
 		
 	}
 
+	private void setImportFile(URL url) {
+		jsonDumpInput = url;
+	}
+
+	private void setExportFile(File file) {
+		jsonDumpOutput = file;
+	}
+
+	public void setAPIKey(String apiKey) {
+		googleAPIkey = apiKey;
+	}
+	
+	public void setSamplingRate(String SamplingRate) {
+		samplingRate = SamplingRate;
+	}
+	
+	public void setLanguageCode(String string) {
+		languageCode = string;
+	}
+	
 }
