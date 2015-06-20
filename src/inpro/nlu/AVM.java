@@ -422,7 +422,7 @@ public class AVM {
 	 * Builds a short string representation of the AVM containing only its type.
 	 * @return Short string representation of the AVM
 	 */
-	public String toShortString() {
+	public String toShortString() { // NO_UCD (unused code): keeping toStrings around is generally a good idea
 		return "[" + this.type + "]";
 	}
 
@@ -431,7 +431,7 @@ public class AVM {
 	 * Use AVM.toString() for something more readible.
 	 * @return Long string representation of the AVM
 	 */
-	public String toLongString() {
+	public String toLongString() { // NO_UCD (unused code): keeping toStrings around is generally a good idea
 		StringBuilder str = new StringBuilder("[");
 		str.append(this.type);
 		if (this.monotonic)

@@ -29,7 +29,6 @@ import org.junit.runners.Suite.SuiteClasses;
 	inpro.incremental.unit.MultiplySynthesizedIUsTest.class,
 	inpro.incremental.util.TTSUtilTest.class, 
 	//inpro.irmrsc.parser.SITDBSParserTest.class,
-	//inpro.nlu.AVMComposerTest.class,
 	inpro.nlu.AVMWorldUtilTest.class,
 	inpro.nlu.AVPairMappingUtilTest.class,
 	inpro.pitch.util.ShortestPathTest.class,

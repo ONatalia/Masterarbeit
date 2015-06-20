@@ -100,6 +100,7 @@ public class GoogleASR extends IUSourceModule {
 		languageCode = string;
 	}
 	
+	/** write audio to stream and push results to listeners of our RightBuffer */
 	public void recognize() {
 		try {
 			String pair = getPair();
@@ -116,7 +117,7 @@ public class GoogleASR extends IUSourceModule {
 			upCon.disconnect();
 
 			// on data end, end listening thread and tear down connection with google
-			Thread.sleep(100);
+			Thread.sleep(400);
 			jsonlistener.shutdown();
 			listenerThread.join();
 		} catch (Exception e) {
@@ -201,6 +202,12 @@ public class GoogleASR extends IUSourceModule {
 		stream.close();
 	}
 	
+	/** 
+	 * listen for incoming JSON results coming from Google's downstream connection
+	 * 
+	 * incoming results are analyzed, turned into IUs, amended with (guessed) time-stamp information, 
+	 * and finally pushed to our RightBuffer and listener updated 
+	 */
 	public class GoogleJSONListener implements Runnable {
 		HttpURLConnection con;
 		boolean inShutdown = false;
@@ -219,7 +226,7 @@ public class GoogleASR extends IUSourceModule {
 			prev = TextualWordIU.FIRST_ATOMIC_WORD_IU;
 			this.con = getDownConnection(pair);
 			initialTime = getTimestamp();
-			setStartTime(getTimestamp());
+			setStartTime(initialTime);
 		}
 
 		@Override
@@ -235,8 +242,10 @@ public class GoogleASR extends IUSourceModule {
 					}
 				}
 			} catch (Exception e) {
+				con.disconnect();
 				throw new RuntimeException(e);
 			}
+			con.disconnect();
 		}
 		
 		public void parseJSON(String decodedString) {
@@ -254,7 +263,7 @@ public class GoogleASR extends IUSourceModule {
 		private void updateCurrentHyps(String transcript, int resultIndex, boolean isFinal) {
 			List<String> words = Arrays.asList(transcript.toLowerCase().trim().split("\\s+"));
 			IUList<WordIU> currentHyps = new IUList<WordIU>();
-//			keep working on the frontier
+			// keep working on the frontier
 			if (startNewChunk(resultIndex)) {
 				currentHyps.clear();
 				chunkHyps.clear();
@@ -267,7 +276,6 @@ public class GoogleASR extends IUSourceModule {
 			for (String word : words) {
 				double startTime = prevTime + delta * (wordIndex - 1);
 				double endTime = prevTime + delta * wordIndex;
-//				System.out.println(word + " " + startTime + " " + endTime + " " + startTime/1000.0 + " " +  endTime/1000.0);
 				SegmentIU siu = new SegmentIU(new Label(startTime/1000.0, endTime/1000.0, word)); 
 				lastEndTime = endTime;
 				List<IU> gIns = new LinkedList<IU>();
@@ -277,12 +285,12 @@ public class GoogleASR extends IUSourceModule {
 				currentHyps.add(wiu);
 				wordIndex++;
 			}
-//			This calculates the differences between the current IU list and the previous, based on payload
+			// This calculates the differences between the current IU list and the previous, based on payload
 			List<EditMessage<WordIU>> diffs = chunkHyps.diffByPayload(currentHyps);
 			chunkHyps.clear();
 			chunkHyps.addAll(currentHyps);
 			if (isFinal) {
-//				add remaining WordIUs and commit
+				// add remaining WordIUs and commit
 				for (WordIU wordIU : chunkHyps) {
 					diffs.add(new EditMessage<WordIU>(EditType.COMMIT, wordIU));
 				}
@@ -296,7 +304,7 @@ public class GoogleASR extends IUSourceModule {
 				setStartTime(getTimestamp());
 				prevTime = lastEndTime;
 			}
-//			The diffs represents what edits it takes to get from prevList to list, send that to the right buffer
+			// The diffs represents what edits it takes to get from prevList to list, send that to the right buffer
 			for (PushBuffer listener : iulisteners) {
 				if (listener == null) continue;
 				if (listener instanceof FrameAware)
