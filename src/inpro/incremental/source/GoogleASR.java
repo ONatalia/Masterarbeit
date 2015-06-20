@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,6 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +39,7 @@ import inpro.incremental.unit.SegmentIU;
 import inpro.incremental.unit.TextualWordIU;
 import inpro.incremental.unit.WordIU;
 import inpro.util.PathUtil;
+import inpro.util.TimeUtil;
 import edu.cmu.sphinx.frontend.BaseDataProcessor;
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -88,6 +91,7 @@ public class GoogleASR extends IUSourceModule {
 
 	public GoogleASR(BaseDataProcessor frontend) {
 		ais = new FrontEndBackedAudioInputStream(frontend);
+		iulisteners = new ArrayList<PushBuffer>(1); // avoid nullpointer exceptions
 	}
 
 	/** enable Sphinx configuration */
@@ -217,9 +221,15 @@ public class GoogleASR extends IUSourceModule {
 	
 	class LiveJSONListener extends GoogleJSONListener {
 		HttpURLConnection con;
-
+		/** used to terminate this thread */
+		boolean inShutdown = false;
+		
 		LiveJSONListener(String pair) throws IOException {
 			this.con = getDownConnection(pair);
+		}
+		
+		void shutdown() {
+			inShutdown = true;
 		}
 		
 		@Override
@@ -228,12 +238,10 @@ public class GoogleASR extends IUSourceModule {
 				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 				while (!inShutdown) {
 					// get JSON result
-					String decodedString;
-					while ((decodedString = in.readLine()) != null) {
-						System.err.println(decodedString);
-						parseJSON(decodedString);
-					}
+					String decodedString = in.readLine();
+					processJSON(decodedString);
 				}
+				terminateDump();
 			} catch (Exception e) {
 				con.disconnect();
 				throw new RuntimeException(e);
@@ -249,25 +257,49 @@ public class GoogleASR extends IUSourceModule {
 	 * and finally pushed to our RightBuffer and listener updated 
 	 */
 	abstract class GoogleJSONListener implements Runnable {
-		boolean inShutdown = false;
-		
-		private double startTime;
-		private double prevTime;
+		private long initialTime; // in milliseconds
+		private long chunkStartTime; // in milliseconds
+		private long prevEndTime; // in milliseconds
 		private IUList<WordIU> chunkHyps;
 		private int lastResultIndex;
 		private WordIU prev;
-		private double initialTime;
+		private FileWriter dumpOutput;
 		
-		GoogleJSONListener() {
-			prevTime = 0;
+		GoogleJSONListener() throws IOException {
+			prevEndTime = 0;
 			chunkHyps = new IUList<WordIU>();
 			setLastResultIndex(-1);
 			prev = TextualWordIU.FIRST_ATOMIC_WORD_IU;
 			initialTime = getTimestamp();
-			setStartTime(initialTime);
+			setChunkStartTime(initialTime);
+			if (jsonDumpOutput != null) {
+				dumpOutput = new FileWriter(jsonDumpOutput);
+			}
+		}
+		
+		/* functionality of passing results to a dumpFile */
+
+		void processJSON(String decodedString) throws IOException {
+			if (decodedString != null) {
+				if (dumpOutput != null) {
+					dumpOutput.write(Long.toString(getTotalElapsedTime()));
+					dumpOutput.write("\t");
+					dumpOutput.write(decodedString);
+					dumpOutput.write("\n");
+				}
+				parseJSON(decodedString);
+			}
 		}
 
-		public void parseJSON(String decodedString) {
+		synchronized void terminateDump() throws IOException {
+			if (dumpOutput != null)
+				dumpOutput.close();
+			dumpOutput = null;
+		}
+
+		/* actual result analysis below */
+		
+		private void parseJSON(String decodedString) {
 			JSONObject json = new JSONObject(decodedString);
 			JSONArray result = json.getJSONArray("result");
 			if (result.length() > 0) {
@@ -283,19 +315,18 @@ public class GoogleASR extends IUSourceModule {
 			List<String> words = Arrays.asList(transcript.toLowerCase().trim().split("\\s+"));
 			IUList<WordIU> currentHyps = new IUList<WordIU>();
 			// keep working on the frontier
-			if (startNewChunk(resultIndex)) {
+			if (startsNewChunk(resultIndex)) {
 				currentHyps.clear();
 				chunkHyps.clear();
 			}
-			double currentTimestamp = getTimestamp();
-			double delta = (currentTimestamp - getStartTime()) / words.size();
-			int currentFrame = (int) (currentTimestamp - getInitialTime()) / 10; // I have no clue why we divide by 10, something with the timestamp 
+			double delta = getElapsedChunkTime() / words.size();
+			int currentFrame = (int) (getTotalElapsedTime() * TimeUtil.MILLISECOND_TO_FRAME_FACTOR); 
 			int wordIndex = 1;
-			double lastEndTime = 0.0;
+			long lastEndTime = 0;
 			for (String word : words) {
-				double startTime = prevTime + delta * (wordIndex - 1);
-				double endTime = prevTime + delta * wordIndex;
-				SegmentIU siu = new SegmentIU(new Label(startTime/1000.0, endTime/1000.0, word)); 
+				long startTime = prevEndTime + (int) (delta * (wordIndex - 1));
+				long endTime = prevEndTime + (int) (delta * wordIndex);
+				SegmentIU siu = new SegmentIU(new Label(startTime/TimeUtil.SECOND_TO_MILLISECOND_FACTOR, endTime/TimeUtil.SECOND_TO_MILLISECOND_FACTOR, word)); 
 				lastEndTime = endTime;
 				List<IU> gIns = new LinkedList<IU>();
 				gIns.add(siu);
@@ -319,9 +350,9 @@ public class GoogleASR extends IUSourceModule {
 			}
 			LinkedList<WordIU> ius = new LinkedList<WordIU>();
 			for (EditMessage<WordIU> edit: diffs) ius.add(edit.getIU()); 
-			if (startNewChunk(wordIndex)) {
-				setStartTime(getTimestamp());
-				prevTime = lastEndTime;
+			if (startsNewChunk(wordIndex)) {
+				setChunkStartTime(getTimestamp());
+				prevEndTime = lastEndTime;
 			}
 			// The diffs represents what edits it takes to get from prevList to list, send that to the right buffer
 			for (PushBuffer listener : iulisteners) {
@@ -335,49 +366,43 @@ public class GoogleASR extends IUSourceModule {
 			notifyListeners();
 		}
 		
-		public double getTimestamp() {
-			return  (System.currentTimeMillis());
+		abstract void shutdown();
+		
+		long getTimestamp() {
+			return  System.currentTimeMillis();
 		}
 		
-		public IUList<WordIU> getChunkHyps() {
-			return chunkHyps;
+		private long getTotalElapsedTime() {
+			return getTimestamp() - initialTime;
 		}
-
-		public void shutdown() {
-			inShutdown = true;
+		
+		private long getElapsedChunkTime() {
+			return getTimestamp() - chunkStartTime;
 		}
-
-		public int getLastResultIndex() {
+		
+		private void setChunkStartTime(long startTime) {
+			this.chunkStartTime = startTime;
+		}
+		
+		private int getLastResultIndex() {
 			return lastResultIndex;
 		}
 
-		public void setLastResultIndex(int lastResultIndex) {
+		private void setLastResultIndex(int lastResultIndex) {
 			this.lastResultIndex = lastResultIndex;
 		}
 		
-		public boolean startNewChunk(double i) {
+		private boolean startsNewChunk(double i) {
 			return i > getLastResultIndex();
 		}
 
-		private double getInitialTime() {
-			return initialTime;
-		}
-
-		public double getStartTime() {
-			return startTime;
-		}
-
-		public void setStartTime(double startTime) {
-			this.startTime = startTime;
-		}
-		
 	}
 
-	private void setImportFile(URL url) {
+	void setImportFile(URL url) {
 		jsonDumpInput = url;
 	}
 
-	private void setExportFile(File file) {
+	void setExportFile(File file) {
 		jsonDumpOutput = file;
 	}
 

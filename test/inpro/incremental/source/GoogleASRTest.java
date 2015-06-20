@@ -1,5 +1,6 @@
 package inpro.incremental.source;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,6 +19,7 @@ import inpro.incremental.source.GoogleASR.GoogleJSONListener;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.sphinx.frontend.DataThrottle;
+import inpro.util.PathUtil;
 
 import org.junit.Test;
 
@@ -27,6 +29,22 @@ import edu.cmu.sphinx.util.props.PropertyException;
 
 public class GoogleASRTest {
 
+	@Test
+	public void testRepeatableBehaviour() throws IOException, PropertyException, UnsupportedAudioFileException {
+		SimpleReco sr = new SimpleReco(new RecoCommandLineParser("-F", "file:res/once16.wav"));
+		BaseDataProcessor realtime = new DataThrottle();
+		realtime.setPredecessor(sr.setupFileInput());
+		GoogleASR gasr = new GoogleASR(realtime);
+		gasr.setAPIKey("AIzaSyCXHs3mzb1IyfGx2tYxDC1ClgYUv0x8Kw8");
+		File tempFile = File.createTempFile("google", ".timedjson");
+		gasr.setExportFile(tempFile);
+		gasr.recognize();
+		// recognize again, this time from previously generated dump
+		gasr.setExportFile(null);
+		gasr.setImportFile(PathUtil.anyToURL(tempFile));
+		realtime.setPredecessor(sr.setupFileInput());
+		gasr.recognize();
+	}
 
 	@Test
 	public void testWithSomeFile() throws PropertyException, IOException, UnsupportedAudioFileException {
@@ -61,7 +79,7 @@ public class GoogleASRTest {
 	}
 
 	@Test 
-	public void testJSONParser() {
+	public void testJSONParser() throws IOException {
 		LinkedList<String> json = new LinkedList<String>();
 		json.add("{\"result\":[]}");
 		json.add("{\"result\":[{\"alternative\":[{\"transcript\":\"und\"}],\"stability\":0.0099999998}],\"result_index\":0}");
@@ -80,7 +98,10 @@ public class GoogleASRTest {
 		json.add("{\"result\":[{\"alternative\":[{\"transcript\":\" richtig\",\"confidence\":0.68098658},{\"transcript\":\" wichtig\"},{\"transcript\":\" f dich\"},{\"transcript\":\" richtig u\"}],\"final\":true}],\"result_index\":2}");
 		
 		GoogleASR gasr = new GoogleASR(new DataThrottle());
-		GoogleJSONListener gjson = gasr.new GoogleJSONListener() {public void run() {}};
+		GoogleJSONListener gjson = gasr.new GoogleJSONListener() {
+			public void run() {} 
+			void shutdown() {}
+		};
 		LabelWriter label = new LabelWriter();
 		gasr.addListener(label);
 		
@@ -90,7 +111,7 @@ public class GoogleASRTest {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			gjson.parseJSON(j);
+			gjson.processJSON(j);
 		}
 	}
 	

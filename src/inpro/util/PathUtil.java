@@ -27,4 +27,8 @@ public class PathUtil {
 			return result;
 		}
 	}
+	
+	public static URL anyToURL(File file) throws MalformedURLException {
+		return file.toURI().toURL();
+	}
 }
