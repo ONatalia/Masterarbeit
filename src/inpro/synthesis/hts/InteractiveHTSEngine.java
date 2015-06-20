@@ -1,8 +1,5 @@
 package inpro.synthesis.hts;
 
-import inpro.incremental.util.TTSUtil.SynthesisPayload;
-import inpro.synthesis.MaryAdapter5internal;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,9 +39,8 @@ public class InteractiveHTSEngine extends HTSEngine {
     	Voice voice = d.getDefaultVoice();
     	assert (voice instanceof HMMVoice) : "Not an HMM voice: " + voice;
     	HMMData hmmData = ((HMMVoice) voice).getHMMData();
-    	if (hmmData == null)
-    		hmmData = MaryAdapter5internal.getDefaultHMMData();
-        HTSUttModel um = processTargetList(targetFeaturesList, segmentsAndBoundaries, hmmData);
+    	assert hmmData != null : "can't synthesize from a HMMVoice without HMM data...";
+    	HTSUttModel um = processTargetList(targetFeaturesList, segmentsAndBoundaries, hmmData);
         assert um.getNumModel() == targetFeaturesList.size() : "UttModel size is " + um.getNumModel() + ", but targetFeaturesList size is " + targetFeaturesList.size();
         for (int i = 0; i < um.getNumModel(); i++) {
         	uttData.add(new SynthesisPayload(targetFeaturesList.get(i).getFeatureVector(), um.getUttModel(i), hmmData));

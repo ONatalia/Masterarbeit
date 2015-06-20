@@ -3,6 +3,7 @@ package inpro.synthesis;
 import inpro.incremental.unit.PhraseIU;
 import inpro.incremental.unit.WordIU;
 import inpro.incremental.util.TTSUtil;
+import inpro.synthesis.hts.SynthesisPayload;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -171,7 +172,7 @@ public abstract class MaryAdapter {
 	/** turn text (including prosodic markup) into lists of WordIUs */ 
 	protected List<? extends WordIU> text2IUs(String tts, boolean keepPhrases, boolean connectPhrases) {
 		InputStream is = text2maryxml(tts);
-		return createIUsFromInputStream(is, Collections.<TTSUtil.SynthesisPayload>emptyList(), keepPhrases, connectPhrases);
+		return createIUsFromInputStream(is, Collections.<SynthesisPayload>emptyList(), keepPhrases, connectPhrases);
 	}
 	
 	/* * * method to turn ACOUSTPARAMS data into PhraseIU structures * * */	
@@ -179,13 +180,13 @@ public abstract class MaryAdapter {
 	@SuppressWarnings("unchecked")
 	public List<PhraseIU> fullySpecifiedMarkup2PhraseIUs(String markup) {
 		InputStream is = fullySpecifiedMarkup2maryxml(markup);
-		return (List<PhraseIU>) createIUsFromInputStream(is, Collections.<TTSUtil.SynthesisPayload>emptyList(), true, true);
+		return (List<PhraseIU>) createIUsFromInputStream(is, Collections.<SynthesisPayload>emptyList(), true, true);
 	}
 	
 	/* * * helper for creating word/phrase IU structures using TTSUtil * * */
 	
 	/** actually create the IU structure using TTSUtil */
-	protected static List<? extends WordIU> createIUsFromInputStream(InputStream is, List<TTSUtil.SynthesisPayload> synload, 
+	protected static List<? extends WordIU> createIUsFromInputStream(InputStream is, List<SynthesisPayload> synload, 
 			boolean keepPhrases, boolean connectPhrases) {
 		if (keepPhrases) {
 			return TTSUtil.phraseIUsFromMaryXML(is, synload, connectPhrases);

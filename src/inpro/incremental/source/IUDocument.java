@@ -1,7 +1,7 @@
 package inpro.incremental.source;
 
 import inpro.incremental.PushBuffer;
-import inpro.incremental.sink.FrameAwarePushBuffer;
+import inpro.incremental.FrameAware;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IUList;
@@ -50,8 +50,8 @@ public class IUDocument extends PlainDocument {
 			//logger.debug("notifying about" + edits);
 			currentFrame += 100;
 			for (PushBuffer listener : listeners) {
-				if (listener instanceof FrameAwarePushBuffer) {
-					((FrameAwarePushBuffer) listener).setCurrentFrame(currentFrame);
+				if (listener instanceof FrameAware) {
+					((FrameAware) listener).setCurrentFrame(currentFrame);
 				}
 				// notify
 				if (wordIUs != null)

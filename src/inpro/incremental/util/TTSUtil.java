@@ -6,6 +6,7 @@ import inpro.incremental.unit.PhraseIU;
 import inpro.incremental.unit.SyllableIU;
 import inpro.incremental.unit.SysSegmentIU;
 import inpro.incremental.unit.WordIU;
+import inpro.synthesis.hts.SynthesisPayload;
 import inpro.util.TimeUtil;
 
 import java.io.IOException;
@@ -300,28 +301,13 @@ public class TTSUtil {
 			assert spIterator != null;
 			if (spIterator.hasNext()) { // the HMM case
 				SynthesisPayload sp = spIterator.next();
-				HTSModel hmm = sp.htsModel;
+				HTSModel hmm = sp.getHTSModel();
 				assert (sampaLabel.equals(hmm.getPhoneName())) : " oups, wrong segment alignment: " + sampaLabel + " != " + hmm.getPhoneName();
-				segIU = new SysSegmentIU(l, hmm, sp.fv, sp.hmmdata, null);
+				segIU = new SysSegmentIU(l, hmm, sp.getFeatureVector(), sp.getHMMData(), null);
 			} else { // the standard case: no HMM synthesis with this segment
 				segIU = new SysSegmentIU(l);
 			}
 			return segIU;
-		}
-	}
-	
-	public static class SynthesisPayload {
-		FeatureVector fv;
-		HTSModel htsModel;
-		HMMData hmmdata;
-		public SynthesisPayload(FeatureVector fv, HTSModel htsModel, HMMData hmmdata) {
-			this.fv = fv;
-			this.htsModel = htsModel;					
-			this.hmmdata = hmmdata;
-		}
-		@Override
-		public String toString() {
-			return "synthesis payload for " + htsModel.getPhoneName();
 		}
 	}
 	
