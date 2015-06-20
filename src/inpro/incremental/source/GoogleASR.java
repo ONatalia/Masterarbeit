@@ -120,7 +120,7 @@ public class GoogleASR extends IUSourceModule {
 			// setup connection with Google
 			HttpURLConnection upCon = getUpConnection(pair);
 			// start listening on return connection (separate thread)
-			GoogleJSONListener jsonlistener = new GoogleJSONListener(pair);
+			GoogleJSONListener jsonlistener = new LiveJSONListener(pair);
 			Thread listenerThread = new Thread(jsonlistener);
 			listenerThread.start();
 			// push audio to Google (on this thread)
@@ -215,33 +215,13 @@ public class GoogleASR extends IUSourceModule {
 		stream.close();
 	}
 	
-	/** 
-	 * listen for incoming JSON results coming from Google's downstream connection
-	 * 
-	 * incoming results are analyzed, turned into IUs, amended with (guessed) time-stamp information, 
-	 * and finally pushed to our RightBuffer and listener updated 
-	 */
-	public class GoogleJSONListener implements Runnable {
+	class LiveJSONListener extends GoogleJSONListener {
 		HttpURLConnection con;
-		boolean inShutdown = false;
-		
-		private double startTime;
-		private double prevTime;
-		private IUList<WordIU> chunkHyps;
-		private int lastResultIndex;
-		private WordIU prev;
-		private double initialTime;
-		
-		public GoogleJSONListener(String pair) throws IOException {
-			prevTime = 0;
-			chunkHyps = new IUList<WordIU>();
-			setLastResultIndex(-1);
-			prev = TextualWordIU.FIRST_ATOMIC_WORD_IU;
-			this.con = getDownConnection(pair);
-			initialTime = getTimestamp();
-			setStartTime(initialTime);
-		}
 
+		LiveJSONListener(String pair) throws IOException {
+			this.con = getDownConnection(pair);
+		}
+		
 		@Override
 		public void run() {
 			try {
@@ -260,7 +240,33 @@ public class GoogleASR extends IUSourceModule {
 			}
 			con.disconnect();
 		}
+	}
+	
+	/** 
+	 * listen for incoming JSON results coming from Google's downstream connection
+	 * 
+	 * incoming results are analyzed, turned into IUs, amended with (guessed) time-stamp information, 
+	 * and finally pushed to our RightBuffer and listener updated 
+	 */
+	abstract class GoogleJSONListener implements Runnable {
+		boolean inShutdown = false;
 		
+		private double startTime;
+		private double prevTime;
+		private IUList<WordIU> chunkHyps;
+		private int lastResultIndex;
+		private WordIU prev;
+		private double initialTime;
+		
+		GoogleJSONListener() {
+			prevTime = 0;
+			chunkHyps = new IUList<WordIU>();
+			setLastResultIndex(-1);
+			prev = TextualWordIU.FIRST_ATOMIC_WORD_IU;
+			initialTime = getTimestamp();
+			setStartTime(initialTime);
+		}
+
 		public void parseJSON(String decodedString) {
 			JSONObject json = new JSONObject(decodedString);
 			JSONArray result = json.getJSONArray("result");
