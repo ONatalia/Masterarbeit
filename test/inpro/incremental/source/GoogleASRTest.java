@@ -1,7 +1,10 @@
 package inpro.incremental.source;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -36,14 +39,29 @@ public class GoogleASRTest {
 		realtime.setPredecessor(sr.setupFileInput());
 		GoogleASR gasr = new GoogleASR(realtime);
 		gasr.setAPIKey("AIzaSyCXHs3mzb1IyfGx2tYxDC1ClgYUv0x8Kw8");
-		File tempFile = File.createTempFile("google", ".timedjson");
-		gasr.setExportFile(tempFile);
+		File liveTempFile = File.createTempFile("google", ".timedjson");
+		gasr.setExportFile(liveTempFile);
 		gasr.recognize();
 		// recognize again, this time from previously generated dump
-		gasr.setExportFile(null);
-		gasr.setImportFile(PathUtil.anyToURL(tempFile));
+		File replayedTempFile = File.createTempFile("googleAgain", ".timedjson");
+		gasr.setExportFile(replayedTempFile);
+		gasr.setImportFile(PathUtil.anyToURL(liveTempFile));
 		realtime.setPredecessor(sr.setupFileInput());
 		gasr.recognize();
+		// now compare the content from google-connected run1 with replayed run2:
+		BufferedReader orig = new BufferedReader(new InputStreamReader(new FileInputStream(liveTempFile)));
+		BufferedReader repl = new BufferedReader(new InputStreamReader(new FileInputStream(replayedTempFile)));
+		String origLine, replLine;
+		while ((origLine = orig.readLine()) != null && (replLine = repl.readLine()) != null) {
+			String[] origSplit = origLine.split("\t", 2);
+			String[] replSplit = replLine.split("\t", 2);
+			assertTrue("content of live and replayed JSON differs", origSplit[1].equals(replSplit[1]));
+			int origTime = Integer.parseInt(origSplit[0]);
+			int replTime = Integer.parseInt(replSplit[0]);
+			assertTrue("deviation of more than 2ms between live and replayed JSON timings", Math.abs(origTime - replTime) < 2);
+		}
+		assertTrue("one of the files is longer than the other", (orig.readLine() == null && repl.readLine() == null));
+		orig.close(); repl.close();
 	}
 
 	@Test

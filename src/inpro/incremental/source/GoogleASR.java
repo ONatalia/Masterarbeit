@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -121,18 +122,27 @@ public class GoogleASR extends IUSourceModule {
 	public void recognize() {
 		try {
 			String pair = getPair();
-			// setup connection with Google
-			HttpURLConnection upCon = getUpConnection(pair);
-			// start listening on return connection (separate thread)
-			GoogleJSONListener jsonlistener = new LiveJSONListener(pair);
+			GoogleJSONListener jsonlistener;
+			OutputStream upStream;
+			if (jsonDumpInput == null) {
+				// setup connection with Google
+				HttpURLConnection upCon = getUpConnection(pair);
+				// push audio to Google (on this thread)
+				upStream = new DataOutputStream(upCon.getOutputStream());
+				// start listening on return connection (separate thread)
+				jsonlistener = new LiveJSONListener(pair);
+			} else {
+				// get downstream 
+				jsonlistener = new PlaybackJSONListener(jsonDumpInput);
+				// send upstream to /dev/null
+				upStream = new OutputStream() {
+					@Override public void write(int b) throws IOException { }
+				};
+			}
 			Thread listenerThread = new Thread(jsonlistener);
 			listenerThread.start();
-			// push audio to Google (on this thread)
-			DataOutputStream stream = new DataOutputStream(upCon.getOutputStream());
 			// write to stream
-			writeToStream(stream, ais);
-			upCon.disconnect();
-
+			writeToStream(upStream, ais);
 			// on data end, end listening thread and tear down connection with google
 			Thread.sleep(400);
 			jsonlistener.shutdown();
@@ -193,7 +203,7 @@ public class GoogleASR extends IUSourceModule {
 	/** write audio data to the stream that is connected to our Google-Upstream
 	 * @throws IOException 
 	 * @throws LineUnavailableException */
-	private void writeToStream(DataOutputStream stream, AudioInputStream ai) throws IOException, LineUnavailableException {
+	private void writeToStream(OutputStream stream, AudioInputStream ai) throws IOException, LineUnavailableException {
 		byte tempBuffer[] = new byte[BUFFER_SIZE];
 		FLACFileWriter ffw = new FLACFileWriter(); // initialize just once instead of within the loop
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFFER_SIZE); // initialize just once instead of within the loop
@@ -219,6 +229,7 @@ public class GoogleASR extends IUSourceModule {
 		stream.close();
 	}
 	
+	/** connect to Google and receive JSON results */
 	class LiveJSONListener extends GoogleJSONListener {
 		HttpURLConnection con;
 		/** used to terminate this thread */
@@ -250,6 +261,35 @@ public class GoogleASR extends IUSourceModule {
 		}
 	}
 	
+	/** consume timed JSON results from a file or URL */
+	class PlaybackJSONListener extends GoogleJSONListener {
+		BufferedReader input;
+		public PlaybackJSONListener(URL jsonDumpInput) throws IOException {
+			input = new BufferedReader(new InputStreamReader(jsonDumpInput.openStream()));
+		}
+
+		void shutdown() { } // ignore this
+		
+		@Override
+		public void run() {
+			try {
+				String timedJSON;
+				while ((timedJSON = input.readLine()) != null) {
+					String[] split = timedJSON.split("\t", 2);
+					int time = Integer.parseInt(split[0]);
+					String json = split[1];
+					long remainingDelay = time - getTotalElapsedTime();
+					assert remainingDelay > 0 : remainingDelay;
+					Thread.sleep(remainingDelay);
+					processJSON(json);
+				}
+				terminateDump();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	
 	/** 
 	 * listen for incoming JSON results coming from Google's downstream connection
 	 * 
@@ -270,11 +310,11 @@ public class GoogleASR extends IUSourceModule {
 			chunkHyps = new IUList<WordIU>();
 			setLastResultIndex(-1);
 			prev = TextualWordIU.FIRST_ATOMIC_WORD_IU;
-			initialTime = getTimestamp();
-			setChunkStartTime(initialTime);
 			if (jsonDumpOutput != null) {
 				dumpOutput = new FileWriter(jsonDumpOutput);
 			}
+			initialTime = getTimestamp();
+			setChunkStartTime(initialTime);
 		}
 		
 		/* functionality of passing results to a dumpFile */
@@ -372,7 +412,7 @@ public class GoogleASR extends IUSourceModule {
 			return  System.currentTimeMillis();
 		}
 		
-		private long getTotalElapsedTime() {
+		protected long getTotalElapsedTime() {
 			return getTimestamp() - initialTime;
 		}
 		
