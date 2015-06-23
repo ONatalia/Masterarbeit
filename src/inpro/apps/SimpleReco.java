@@ -6,7 +6,9 @@ import inpro.apps.util.RecoCommandLineParser;
 import inpro.audio.AudioUtils;
 import inpro.incremental.PushBuffer;
 import inpro.incremental.sink.LabelWriter;
+import inpro.sphinx.frontend.DataThrottle;
 import inpro.sphinx.frontend.RsbStreamInputSource;
+import inpro.incremental.source.GoogleASR;
 import inpro.incremental.source.SphinxASR;
 import inpro.sphinx.frontend.RtpRecvProcessor;
 import inpro.util.TimeUtil;
@@ -46,6 +48,7 @@ public class SimpleReco {
 	private final RecoCommandLineParser clp;
 	private final ConfigurationManager cm;
 	private final Recognizer recognizer;
+	private final GoogleASR gasr;
 
 	public SimpleReco() throws PropertyException, IOException,
 			UnsupportedAudioFileException {
@@ -67,18 +70,31 @@ public class SimpleReco {
 			UnsupportedAudioFileException {
 		this.clp = clp;
 		this.cm = cm;
+		// setup standard (sphinx-based) speech recognition:
 		setupDeltifier();
-
 		setupDecoder();
 		logger.info("Setting up source...");
-
 		setupSource();
-		logger.info("Setting up monitors...");
 
 		this.recognizer = (Recognizer) cm.lookup("recognizer");
 		assert recognizer != null;
+
+		logger.info("Setting up monitors...");
 		setupMonitors();
 		allocateRecognizer();
+		// deal with GoogleASR based on the above:
+		if (clp.isRecoMode(RecoCommandLineParser.GOOGLE_RECO)) {
+			logger.info("Setting up source...");
+			BaseDataProcessor realtime = new DataThrottle();
+			realtime.setPredecessor(setupFileInput());
+			gasr = new GoogleASR(realtime);
+			gasr.newProperties(cm.getPropertySheet("googleASR"));
+			gasr.setAPIKey(clp.getGoogleAPIkey());
+			gasr.setExportFile(clp.getGoogleDumpOutput());
+			gasr.setImportFile(clp.getGoogleDumpInput());
+			SphinxASR casrh = (SphinxASR) cm.lookup("currentASRHypothesis");
+			gasr.iulisteners = casrh.iulisteners;
+		} else { gasr = null; }
 		logger.info("Configuration has finished");
 		TimeUtil.startupTime = System.currentTimeMillis();
 	}
@@ -249,7 +265,6 @@ public class SimpleReco {
 		fe.setPredecessor(endpoint);
 	}
 
-
 	public BaseDataProcessor setupFileInput() throws UnsupportedAudioFileException, IOException {
 		StreamDataSource sds = (StreamDataSource) cm.lookup("streamDataSource");
 		sds.initialize();
@@ -411,33 +426,29 @@ public class SimpleReco {
 	
 	/** call this if you want a single recognition */
 	public void recognizeOnce() {
-		Result result = null;
-		do {
-
-			if (clp.ignoreErrors()) {
-				try {
-					result = recognizer.recognize();
-				} catch (Throwable e) { // also includes AssertionError
-					e.printStackTrace();
-					logger.warn(
-							"Something's wrong further down, trying to continue anyway",
-							e);
-				}
-			} else {
+		if (clp.isRecoMode(RecoCommandLineParser.GOOGLE_RECO)) {
+			gasr.recognize();
+		} else {
+			// for Sphinx:
+			Result result = null;
+			do {
 				result = recognizer.recognize();
-			}
-			if (result != null) {
-				// Normal Output
-				logger.info("RESULT: " + result.toString());
-			} else {
-				logger.info("Result: null");
-			}
-		} while ((result != null) && (result.getDataFrames() != null)
-				&& (result.getDataFrames().size() > 4));
+				if (result != null) {
+					// Normal Output
+					logger.info("RESULT: " + result.toString());
+				} else {
+					logger.info("Result: null");
+				}
+			} while ((result != null) && (result.getDataFrames() != null)
+					&& (result.getDataFrames().size() > 4));
+		}
 	}
 
 	/** call this if you want recognition to loop forever */
 	public void recognizeInfinitely() {
+		if (clp.isRecoMode(RecoCommandLineParser.GOOGLE_RECO)) {
+			throw new RuntimeException("live recognition using Google is not yet implemented. Sorry.");
+		}
 		while (true) {
 			recognizeOnce();
 			recognizer.resetMonitors();

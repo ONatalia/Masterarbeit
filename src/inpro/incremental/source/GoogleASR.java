@@ -139,7 +139,7 @@ public class GoogleASR extends IUSourceModule {
 					@Override public void write(int b) throws IOException { }
 				};
 			}
-			Thread listenerThread = new Thread(jsonlistener);
+			Thread listenerThread = new Thread(jsonlistener, "Google recognition thread");
 			listenerThread.start();
 			// write to stream
 			writeToStream(upStream, ais);
@@ -247,11 +247,11 @@ public class GoogleASR extends IUSourceModule {
 		public void run() {
 			try {
 				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-				while (!inShutdown) {
-					// get JSON result
-					String decodedString = in.readLine();
+				String decodedString;
+				while (!inShutdown && (decodedString = in.readLine()) != null) {
+					//System.err.println(decodedString);
 					processJSON(decodedString);
-				}
+				} 
 				terminateDump();
 			} catch (Exception e) {
 				con.disconnect();
@@ -438,18 +438,18 @@ public class GoogleASR extends IUSourceModule {
 
 	}
 
-	void setImportFile(URL url) {
+	public void setImportFile(URL url) {
 		jsonDumpInput = url;
 	}
 
-	void setExportFile(File file) {
+	public void setExportFile(File file) {
 		jsonDumpOutput = file;
 	}
 
 	public void setAPIKey(String apiKey) {
 		googleAPIkey = apiKey;
 	}
-	
+
 	public void setSamplingRate(String SamplingRate) {
 		samplingRate = SamplingRate;
 	}
@@ -457,5 +457,5 @@ public class GoogleASR extends IUSourceModule {
 	public void setLanguageCode(String string) {
 		languageCode = string;
 	}
-	
+
 }

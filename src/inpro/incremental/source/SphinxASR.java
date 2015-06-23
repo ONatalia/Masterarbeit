@@ -47,7 +47,7 @@ public class SphinxASR implements Configurable, ResultListener, Monitor {
 	
 	@S4ComponentList(type = PushBuffer.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
-	private final List<PushBuffer> listeners = new ArrayList<PushBuffer>();
+	public final List<PushBuffer> iulisteners = new ArrayList<PushBuffer>();
 
 	@Override
 	public void newProperties(PropertySheet ps) throws PropertyException {
@@ -56,12 +56,12 @@ public class SphinxASR implements Configurable, ResultListener, Monitor {
 			asrDeltifier = new ASRWordDeltifier();
 		}
 		System.err.println("deltifier is " + asrDeltifier);
-		listeners.clear();
-		listeners.addAll(ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class));
+		iulisteners.clear();
+		iulisteners.addAll(ps.getComponentList(PROP_HYP_CHANGE_LISTENERS, PushBuffer.class));
 	}
 	
 	public void addListener(PushBuffer pb) {
-		listeners.add(pb);
+		iulisteners.add(pb);
 	}
 	
 	/** 
@@ -88,7 +88,7 @@ public class SphinxASR implements Configurable, ResultListener, Monitor {
 		List<EditMessage<WordIU>> edits = asrDeltifier.getWordEdits();
 		List<WordIU> ius = asrDeltifier.getWordIUs();
 		int currentFrame = asrDeltifier.getCurrentFrame();
-		for (PushBuffer listener : listeners) {
+		for (PushBuffer listener : iulisteners) {
 			// update frame count in frame-aware pushbuffers
 			if (listener instanceof FrameAware)
 				((FrameAware) listener).setCurrentFrame(currentFrame);
@@ -129,7 +129,7 @@ public class SphinxASR implements Configurable, ResultListener, Monitor {
 			edits.add(new EditMessage<WordIU>(EditType.COMMIT, iu));
 			iu.commit();
 		}
-		for (PushBuffer listener : listeners) {
+		for (PushBuffer listener : iulisteners) {
 			listener.hypChange(ius, edits);
 		}
 		this.reset();

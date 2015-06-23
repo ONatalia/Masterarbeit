@@ -3,6 +3,7 @@ package inpro.apps.util;
 import inpro.apps.util.CommonCommandLineParser;
 import inpro.util.PathUtil;
 
+import java.io.File;
 import java.net.URL;
 
 public class RecoCommandLineParser extends CommonCommandLineParser {
@@ -38,6 +39,10 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	/* stores location of a grammar or SLM */ 
 	URL languageModelURL; 
 	
+	String googleAPIkey;
+	File googleDumpOutput;
+	URL googleDumpInput;
+	
 	/**
 	 * @return the languageModelURL
 	 */
@@ -47,8 +52,6 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 
 	private boolean dataThrottle;
 	
-	protected boolean ignoreErrors;
-	
 	@Override
 	void printUsage() {
 		System.err.println("simple sphinx recognizer for the inpro project");
@@ -57,7 +60,6 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -h	           this screen");
 		System.err.println("    -c <URL>       sphinx configuration file to use (reasonable default)");
 		System.err.println("    -v             more verbose output (speed and memory tracker)");
-		System.err.println("    -f             force operation, i.e. try to ignore all errors");
 		System.err.println("input selection:");
 		System.err.println("    -M             read data from microphone");
 		System.err.println("    -S             read data from RsbStreamInput");
@@ -84,7 +86,10 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		System.err.println("    -lm <URL>      recognize using the given language model");
 		System.err.println("                   (-fa, -tg, -gr, and -lm are exclusive and all use the Sphinx-4 engine)");
 		System.err.println("    -rt	           when reading from file, run no faster than real-time (includes VAD)");
-		System.err.println("    -G <apiKey>    Google Speech-API with the given API key"); //TODO
+		System.err.println("    -G <apiKey>    Google Speech-API with the given API key");
+		System.err.println("    -Gin <URL>     use a pre-recorded JSON-dump instead of live Google ASR");
+		System.err.println("    -Gout <file>   dump Google JSON results to a file");
+		System.err.println();
 	}
 
 	/**
@@ -130,9 +135,6 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				}
 				else if (args[i].equals("-v")) {
 					verbose = true;
-				}
-				else if (args[i].equals("-f")) {
-					ignoreErrors = true;
 				}
 				else if (args[i].equals("-fa")) {
 					i++; 
@@ -209,6 +211,18 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				}
 				else if (args[i].equals("-G")) {
 					recoMode = GOOGLE_RECO;
+					i++;
+					googleAPIkey = args[i];
+				}
+				else if (args[i].equals("-Gin")) {
+					recoMode = GOOGLE_RECO;
+					i++;
+					googleDumpInput = PathUtil.anyToURL(args[i]);
+				}
+				else if (args[i].equals("-Gout")) {
+					recoMode = GOOGLE_RECO;
+					i++;
+					googleDumpOutput = new File(args[i]);
 				}
 				else {
 					throw new IllegalArgumentException(args[i]);
@@ -238,10 +252,6 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 		return !(incrementalMode == NON_INCREMENTAL);
 	}
 	
-	public boolean ignoreErrors() {
-		return ignoreErrors;
-	}
-	
 	public int getIncrementalMode() {
 		return incrementalMode;
 	}
@@ -252,5 +262,17 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 	
 	public boolean playAtRealtime() {
 		return dataThrottle;
+	}
+	
+	public String getGoogleAPIkey() {
+		return googleAPIkey;
+	}
+	
+	public File getGoogleDumpOutput() {
+		return googleDumpOutput;
+	}
+	
+	public URL getGoogleDumpInput() {
+		return googleDumpInput;
 	}
 }

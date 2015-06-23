@@ -33,7 +33,7 @@ public abstract class IUModule extends PushBuffer {
 
 	@S4ComponentList(type = PushBuffer.class)
 	public final static String PROP_HYP_CHANGE_LISTENERS = "hypChangeListeners";
-	protected List<PushBuffer> iulisteners;
+	public List<PushBuffer> iulisteners;
 	
     @S4Integer(defaultValue = 2000)
     public final static String PROP_TEDVIEW_LOG_PORT = "tedLogPort";
