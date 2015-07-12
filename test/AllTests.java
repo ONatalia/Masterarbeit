@@ -36,7 +36,7 @@ import org.junit.runners.Suite.SuiteClasses;
 	inpro.sphinx.frontend.MonitorTest.class,
 	inpro.synthesis.MarkupTest.class, 
 	inpro.synthesis.MaryAdapterIUUnitTest.class,
-	inpro.synthesis.MaryAdapterMbrolaUnitTest.class,  
+	//inpro.synthesis.MaryAdapterMbrolaUnitTest.class, // Mary 5 does not support MBROLA any longer  
 	inpro.synthesis.RevokingTest.class, 
 	inpro.synthesis.SimpleSynthesis.class, 
 //	work.inpro.alchemy.spatial.util.SpatialRandomUnitTest.class
