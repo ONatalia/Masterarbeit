@@ -51,12 +51,11 @@ public class RecoCommandLineParserUnitTest {
 	@Test
 	public void testOtherArguments()
 	{
-		String[] args = {"-M", "-O", "-v", "-f", "-N"};
+		String[] args = {"-M", "-O", "-v", "-N"};
 		RecoCommandLineParser pars = new RecoCommandLineParser(args);
 		assertEquals(CommonCommandLineParser.MICROPHONE_INPUT,pars.getInputMode());
 		assertEquals(CommonCommandLineParser.DISPATCHER_OBJECT_OUTPUT, pars.outputMode);
 		assertTrue(pars.verbose());
-		assertTrue(pars.ignoreErrors());
 		assertEquals(RecoCommandLineParser.NON_INCREMENTAL, pars.incrementalMode);
 		assertTrue(pars.parsedSuccessfully());
 		
@@ -66,7 +65,6 @@ public class RecoCommandLineParserUnitTest {
 		assertEquals(CommonCommandLineParser.TED_OUTPUT, pars2.outputMode);
 		assertEquals(22, pars2.rtpPort);
 		assertFalse(pars2.verbose());
-		assertFalse(pars2.ignoreErrors());
 		assertEquals(RecoCommandLineParser.SMOOTHED_INCREMENTAL, pars2.incrementalMode);
 		assertEquals(5, pars2.incrementalModifier);
 		assertTrue(pars2.parsedSuccessfully());

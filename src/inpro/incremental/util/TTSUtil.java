@@ -30,10 +30,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
-import marytts.features.FeatureVector;
-import marytts.htsengine.HMMData;
-import marytts.htsengine.HTSModel;
-
 /**
  * utility functions to build IU sub-networks from MaryXML
  */
@@ -301,9 +297,8 @@ public class TTSUtil {
 			assert spIterator != null;
 			if (spIterator.hasNext()) { // the HMM case
 				SynthesisPayload sp = spIterator.next();
-				HTSModel hmm = sp.getHTSModel();
-				assert (sampaLabel.equals(hmm.getPhoneName())) : " oups, wrong segment alignment: " + sampaLabel + " != " + hmm.getPhoneName();
-				segIU = new SysSegmentIU(l, hmm, sp.getFeatureVector(), sp.getHMMData(), null);
+				assert (sampaLabel.equals(sp.getHTSModel().getPhoneName())) : " oups, wrong segment alignment: " + sampaLabel + " != " + sp.getHTSModel().getPhoneName();
+				segIU = new SysSegmentIU(l, sp.getHTSModel(), sp.getFeatureVector(), sp.getHMMData(), null);
 			} else { // the standard case: no HMM synthesis with this segment
 				segIU = new SysSegmentIU(l);
 			}

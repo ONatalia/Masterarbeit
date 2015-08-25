@@ -6,59 +6,67 @@
               as the first entry and export the buildfile again. -->
 <project basedir="." default="build" name="Inpro">
 	<property environment="env" />
-	<property name="ECLIPSE_HOME" value="../../../../../usr/lib/eclipse" />
 	<property name="workspace_loc:Inpro/bin" value="bin" />
-	<property name="maryBase" value="../itts/openmary-4.3.0-svn" />
 	<property name="workspace_loc:Inpro" value="." />
-	<property name="build_files" value="" />
 	<property name="junit.output.dir" value="junit" />
 	<property name="debuglevel" value="source,lines,vars" />
-	<property name="target" value="1.6" />
-	<property name="source" value="1.6" />
+	<property name="target" value="1.7" />
+	<property name="source" value="1.7" />
 	<path id="Inpro.classpath">
 		<pathelement location="bin" />
-		<pathelement location="lib/mary3/java-diff.jar" />
 		<pathelement location="lib/weka.jar" />
 		<pathelement location="lib/drej.jar" />
 		<pathelement location="lib/sphinx4/jsapi.jar" />
 		<pathelement location="lib/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar" />
-		<pathelement location="lib/mary4/commons-collections-3.2.1.jar" />
-		<pathelement location="lib/mary4/commons-io-1.4.jar" />
-		<pathelement location="lib/mary4/commons-lang-2.4.jar" />
-		<pathelement location="lib/mary4/freetts-de.jar" />
-		<pathelement location="lib/mary4/freetts.jar" />
-		<pathelement location="lib/mary4/freetts-en_us.jar" />
-		<pathelement location="lib/mary4/jtok.jar" />
-		<pathelement location="lib/mary4/maxent-2.5.1.jar" />
-		<pathelement location="lib/mary4/opennlp-tools-1.4.1.jar" />
-		<pathelement location="lib/mary3/maryclient.jar" />
 		<pathelement location="lib/trident.jar" />
 		<pathelement location="lib/snakeyaml-1.9.jar" />
 		<pathelement location="lib/jrtp_1.0a.jar" />
-		<pathelement location="lib/mary4/mary-common.jar" />
-		<pathelement location="lib/mary4/mary-de.jar" />
-		<pathelement location="lib/mary4/mary-en.jar" />
-		<pathelement location="lib/mary4/mary-mbrola.jar" />
-		<pathelement location="lib/mary4/signalproc.jar" />
-		<pathelement location="lib/mary4/mary-freetts.jar" />
 		<pathelement location="lib/common-for-convenience/jflac-1.3.jar" />
 		<pathelement location="lib/common-for-convenience/log4j-1.2.15.jar" />
 		<pathelement location="lib/common-for-convenience/jdom1-1.1.1.jar" />
 		<pathelement location="lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar" />
 		<pathelement location="lib/oaa2/antlr-oaa.jar" />
 		<pathelement location="lib/oaa2/oaa2.jar" />
+        <pathelement location="lib/ws-commons-util-1.0.2.jar"/>
+        <pathelement location="lib/javaFlacEncoder-0.3.1.jar"/>
+        <pathelement location="lib/mary5/marytts-client-5.2-SNAPSHOT-jar-with-dependencies.jar"/>
+        <pathelement location="lib/mary5/marytts-lang-de-5.2-SNAPSHOT.jar"/>
+        <pathelement location="lib/mary5/marytts-lang-en-5.2-SNAPSHOT.jar"/>
+        <pathelement location="lib/mary5/marytts-lang-es-5.2-SNAPSHOT.jar"/>
+        <pathelement location="lib/mary5/marytts-runtime-5.2-SNAPSHOT-jar-with-dependencies.jar"/>
+        <pathelement location="lib/mary5/voice-bits1-hsmm-5.1.jar"/>
+        <pathelement location="lib/json-20140107.jar"/>
+        <pathelement location="lib/common-for-convenience/sqlite.jar"/>
 		<pathelement location="lib/oaa2/backport-util-concurrent.jar" />
-		<pathelement location="lib/xmlrpc/xmlrpc-client-3.1.3.jar" />
-		<pathelement location="lib/xmlrpc/xmlrpc-common-3.1.3.jar" />
-		<pathelement location="lib/xmlrpc/xmlrpc-server-3.1.3.jar" />
 		<pathelement location="lib/junit-4.10.jar" />
 		<pathelement location="lib/common-for-convenience/jgraphx.jar" />
 		<pathelement location="lib/sphinx4/sphinx4.jar" />
 		<pathelement location="lib/common-for-convenience/commons-math3.jar" />
-		<pathelement location="lib/rsb-0.10.2.jar" />
-		<pathelement location="lib/rst-0.10.1.jar" />
-		<pathelement location="lib/protobuf-java-2.4.1.jar" />
+        <pathelement location="lib/remote/commons-logging-1.1.jar"/>
+        <pathelement location="lib/remote/instantreality.jar"/>
+        <pathelement location="lib/remote/protobuf-java-2.4.1.jar"/>
+        <pathelement location="lib/remote/rsb-0.10.2.jar"/>
+        <pathelement location="lib/remote/rst-0.10.1.jar"/>
+        <pathelement location="lib/remote/venicelib.jar"/>
+        <pathelement location="lib/remote/xmlrpc-client-3.1.3.jar"/>
+        <pathelement location="lib/remote/xmlrpc-common-3.1.3.jar"/>
+        <pathelement location="lib/remote/xmlrpc-server-3.1.3.jar"/>
+        <pathelement location="lib/sium.jar"/>
 	</path>
+    <path id="run.Demo_EN_SimpleTextSynthesis.classpath">
+        <pathelement location="lib/mary5/voice-dfki-prudence-hsmm-5.1.jar"/>
+        <pathelement location="lib/mary5/voice-cmu-slt-hsmm-5.2-SNAPSHOT.jar"/>
+        <path refid="Inpro.classpath"/>
+    </path>
+    <path id="run.Demo_EN_ProsodyDemonstrator.classpath">
+        <pathelement location="lib/mary5/voice-cmu-slt-hsmm-5.2-SNAPSHOT.jar"/>
+        <pathelement location="lib/mary5/voice-dfki-prudence-hsmm-5.1.jar"/>
+        <path refid="Inpro.classpath"/>
+    </path>
+    <path id="run.Demo_EN_GreatPatternDemonstrator.classpath">
+        <pathelement location="lib/mary5/voice-cmu-slt-hsmm-5.2-SNAPSHOT.jar"/>
+        <path refid="Inpro.classpath"/>
+    </path>
 	<target name="init">
 		<mkdir dir="bin" />
 		<copy includeemptydirs="false" todir="bin">
@@ -108,14 +116,14 @@
 	</target>
 	<target name="Demo_EN_SimpleTextSynthesis">
 		<java classname="inpro.apps.SimpleText" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-			<jvmarg line="-ea -Dmary.base=${maryBase} -Dinpro.tts.tempoScaling=0.7  -Dinpro.tts.voice=cmu-slt-hsmm -Dinpro.tts.language=en-US -da" />
+			<jvmarg line="-ea -Dinpro.tts.tempoScaling=0.7  -Dinpro.tts.voice=cmu-slt-hsmm -Dinpro.tts.language=en-US -da" />
 			<arg line="-O -c file:demo/inpro/synthesis/config.xml" />
 			<classpath refid="Inpro.classpath" />
 		</java>
 	</target>
 	<target name="Demo_SimplePatternDemonstrator">
 		<java classname="demo.inpro.synthesis.SimplePatternDemonstrator" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
-			<jvmarg line="-ea -Dmary.base=${maryBase}" />
+			<jvmarg line="-ea" />
 			<classpath refid="Inpro.classpath" />
 		</java>
 	</target>
@@ -127,18 +135,12 @@
 	</target>
 	<target name="Demo_ProsodyDemonstrator">
 		<java classname="demo.inpro.synthesis.ProsodyDemonstrator" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
-			<jvmarg line="-Dmary.base=${maryBase} -Dinpro.tts.voice=bits1-hsmm -Dmary.voice=bits1-hsmm -Dinpro.tts.language=de -ea -Dinpro.tts.tempoScaling=1.0" />
+			<jvmarg line="-Dinpro.tts.voice=bits1-hsmm -Dmary.voice=bits1-hsmm -Dinpro.tts.language=de -ea -Dinpro.tts.tempoScaling=1.0" />
 			<classpath refid="Inpro.classpath" />
 		</java>
 	</target>
 	<target name="Extra_DataCollector">
 		<java classname="extra.inpro.training.DataCollector" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
-			<classpath refid="Inpro.classpath" />
-		</java>
-	</target>
-	<target name="Demo_FR_ProsodyDemonstrator">
-		<java classname="demo.inpro.synthesis.ProsodyDemonstrator" dir="${workspace_loc:Inpro}/bin" failonerror="true" fork="yes">
-			<jvmarg line="-Dmary.base=/home/timo/uni/projekte/itts/openmary-4.3.0-svn -Dinpro.tts.demo.longUtt=&quot;Bonjour Metz!&quot; -Dinpro.tts.voice=cmu-slt-hsmm -Dmary.voice=enst-dennys-hsmm -Dinpro.tts.language=fr -da" />
 			<classpath refid="Inpro.classpath" />
 		</java>
 	</target>
@@ -167,13 +169,6 @@
 			<classpath refid="Inpro.classpath" />
 		</java>
 	</target>
-	<target name="IHMMSExperimenter-EN">
-		<java classname="work.inpro.synthesis.ihmms.IHMMSExperimenter" failonerror="true" fork="yes">
-			<jvmarg line="-ea -Dmary.base=${maryBase} -Dinpro.tts.voice=cmu-slt-hsmm -Dmary.voice=cmu-slt-hsmm -Dinpro.tts.language=en-US -da" />
-			<arg line="/home/timo/uni/lehre/abschlussarbeiten/03_sven/analysis/english/sentences" />
-			<classpath refid="Inpro.classpath" />
-		</java>
-	</target>
 	<target name="Extra_VisualTTS">
 		<java classname="extra.inpro.synthesis.visual.VisualTTS" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
 			<jvmarg line="-ea -Dmary.base=${maryBase} -Dinpro.tts.voice=de6" />
@@ -189,13 +184,6 @@
 		<java classname="inpro.apps.SimpleReco" dir="${workspace_loc:Inpro/bin}" failonerror="true" fork="yes">
 			<jvmarg line="-Dmary.version=internal -Dmary.voice=bits1-hsmm -Dmary.base=${maryBase} -DturnCompleter[fullUtterance]=&quot;der nordwind blies mit aller macht; aber je mehr er blies, desto fester hüllte sich der wanderer in seinen mantel ein; endlich gab der nordwind den kampf auf; nun erwärmte die sonne die luft mit ihren freundlichen strahlen, und schon nach wenigen augenblicken zog der wanderer seinen mantel aus; da musste der nordwind zugeben, dass die sonne von ihnen beiden der stärkere war&quot;" />
 			<arg line="-c file:done/inpro/system/completion/completion-config.xml -O -C -rt -F file:done/inpro/system/completion/k73nord2.wav -lm file:done/inpro/system/completion/nordwind.lm" />
-			<classpath refid="Inpro.classpath" />
-		</java>
-	</target>
-	<target name="IHMMSExperimenter-DE">
-		<java classname="work.inpro.synthesis.ihmms.IHMMSExperimenter" failonerror="true" fork="yes">
-			<jvmarg line="-ea -Dmary.base=${maryBase}" />
-			<arg line="/home/timo/uni/lehre/abschlussarbeiten/03_sven/analysis/deutsch/erlangensaetze.txt&#10;/home/timo/uni/lehre/abschlussarbeiten/03_sven/analysis/deutsch/kohlersaetze.txt&#10;/home/timo/uni/lehre/abschlussarbeiten/03_sven/analysis/deutsch/cnetsaetze.txt&#10;/home/timo/uni/lehre/abschlussarbeiten/03_sven/analysis/deutsch/berlinersaetze.txt&#10;/home/timo/uni/lehre/abschlussarbeiten/03_sven/analysis/deutsch/tillmannkohlersaetze.txt&#10;/home/timo/uni/lehre/abschlussarbeiten/03_sven/analysis/deutsch/siemenssaetze.txt&#10;/home/timo/uni/lehre/abschlussarbeiten/03_sven/analysis/deutsch/stuttgartersaetze.txt&#10;/home/timo/uni/lehre/abschlussarbeiten/03_sven/analysis/deutsch/marburgersaetze.txt&#10;/home/timo/uni/lehre/abschlussarbeiten/03_sven/analysis/deutsch/schiefersommersaetze.txt" />
 			<classpath refid="Inpro.classpath" />
 		</java>
 	</target>
@@ -216,7 +204,7 @@
 		<junit fork="yes" printsummary="withOutAndErr">
 			<formatter type="xml" />
 			<test name="AllTests" todir="${junit.output.dir}" />
-			<jvmarg line="-ea -Dmary.base=${maryBase}" />
+			<jvmarg line="-ea"/>
 			<classpath refid="Inpro.classpath" />
 		</junit>
 	</target>
@@ -268,14 +256,12 @@
 		</junitreport>
 	</target>
     <property environment="env"/>
-    <property name="ECLIPSE_HOME" value="../../../../../usr/lib/eclipse"/>
     <property name="workspace_loc:Inpro/bin" value="bin"/>
     <property name="workspace_loc:Inpro" value="."/>
-    <property name="build_files" value=""/>
     <property name="junit.output.dir" value="junit"/>
     <property name="debuglevel" value="source,lines,vars"/>
-    <property name="target" value="1.6"/>
-    <property name="source" value="1.6"/>
+    <property name="target" value="1.7"/>
+    <property name="source" value="1.7"/>
 	<property name="jarFile" value="inproTK.jar" />
 
 	<!-- properties used by Citec's Jenkins -->
@@ -283,63 +269,7 @@
 	<property name="dir.src" location="${dir}/src" />
 	<property name="dir.lib" location="${dir}/lib" />
 	<property name="dir.bin" location="${dir}/bin" />
-    <path id="Inpro.classpath">
-        <pathelement location="bin"/>
-        <pathelement location="lib/weka.jar"/>
-        <pathelement location="lib/drej.jar"/>
-        <pathelement location="lib/sphinx4/jsapi.jar"/>
-        <pathelement location="lib/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-        <pathelement location="lib/trident.jar"/>
-        <pathelement location="lib/snakeyaml-1.9.jar"/>
-        <pathelement location="lib/jrtp_1.0a.jar"/>
-        <pathelement location="lib/common-for-convenience/jflac-1.3.jar"/>
-        <pathelement location="lib/common-for-convenience/log4j-1.2.15.jar"/>
-        <pathelement location="lib/common-for-convenience/jdom1-1.1.1.jar"/>
-        <pathelement location="lib/WSJ_8gau_13dCep_16k_40mel_130Hz_6800Hz.jar"/>
-        <pathelement location="lib/oaa2/antlr-oaa.jar"/>
-        <pathelement location="lib/oaa2/oaa2.jar"/>
-        <pathelement location="lib/io/rsb-0.10.0.jar"/>
-        <pathelement location="lib/io/venice-java.jar"/>
-        <pathelement location="lib/tomcat/annotations-api.jar"/>
-        <pathelement location="lib/tomcat/bootstrap.jar"/>
-        <pathelement location="lib/tomcat/catalina-ant.jar"/>
-        <pathelement location="lib/tomcat/catalina-ha.jar"/>
-        <pathelement location="lib/tomcat/catalina-tribes.jar"/>
-        <pathelement location="lib/tomcat/catalina.jar"/>
-        <pathelement location="lib/tomcat/commons-daemon.jar"/>
-        <pathelement location="lib/tomcat/ecj-4.3.1.jar"/>
-        <pathelement location="lib/tomcat/el-api.jar"/>
-        <pathelement location="lib/tomcat/jasper-el.jar"/>
-        <pathelement location="lib/tomcat/jasper.jar"/>
-        <pathelement location="lib/tomcat/json-simple-1.1.1.jar"/>
-        <pathelement location="lib/tomcat/jsp-api.jar"/>
-        <pathelement location="lib/tomcat/servlet-api.jar"/>
-        <pathelement location="lib/tomcat/tomcat-api.jar"/>
-        <pathelement location="lib/tomcat/tomcat-coyote.jar"/>
-        <pathelement location="lib/tomcat/tomcat-dbcp.jar"/>
-        <pathelement location="lib/tomcat/tomcat-i18n-es.jar"/>
-        <pathelement location="lib/tomcat/tomcat-i18n-fr.jar"/>
-        <pathelement location="lib/tomcat/tomcat-i18n-ja.jar"/>
-        <pathelement location="lib/tomcat/tomcat-jdbc.jar"/>
-        <pathelement location="lib/tomcat/tomcat-juli.jar"/>
-        <pathelement location="lib/tomcat/tomcat-util.jar"/>
-        <pathelement location="lib/tomcat/tomcat7-websocket.jar"/>
-        <pathelement location="lib/tomcat/websocket-api.jar"/>
-        <pathelement location="lib/oaa2/backport-util-concurrent.jar"/>
-        <pathelement location="lib/xmlrpc/xmlrpc-client-3.1.3.jar"/>
-        <pathelement location="lib/xmlrpc/xmlrpc-common-3.1.3.jar"/>
-        <pathelement location="lib/xmlrpc/xmlrpc-server-3.1.3.jar"/>
-        <pathelement location="lib/junit-4.10.jar"/>
-        <pathelement location="lib/common-for-convenience/jgraphx.jar"/>
-        <pathelement location="lib/sphinx4/sphinx4.jar"/>
-        <pathelement location="lib/common-for-convenience/commons-math3.jar"/>
-        <pathelement location="lib/mary5/marytts-runtime-5.1-SNAPSHOT-jar-with-dependencies.jar"/>
-        <pathelement location="lib/mary5/marytts-client-5.1-SNAPSHOT-jar-with-dependencies.jar"/>
-        <pathelement location="lib/mary5/marytts-lang-de-5.1-SNAPSHOT.jar"/>
-        <pathelement location="lib/mary5/marytts-lang-en-5.1-SNAPSHOT.jar"/>
-        <pathelement location="lib/mary5/voice-cmu-slt-hsmm-5.1-SNAPSHOT.jar"/>
-        <pathelement location="lib/mary5/voice-bits1-hsmm-5.0-SNAPSHOT.jar"/>
-    </path>
+	<property name="dir.test" location="${dir}/test" />
    
 	<!-- targets used by Citec's Jenkins -->
 	<target name="jar" depends="build">
@@ -351,6 +281,8 @@
 	      <arg value="HEAD"/>
 	    </exec>
 		<jar destfile="${jarFile}" basedir="${dir.bin}">
+			<fileset dir="${dir.src}" includes="**/*.java" />
+			<fileset dir="${dir.test}" includes="**/*.java" />
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Built-On" value="${NOW}" />

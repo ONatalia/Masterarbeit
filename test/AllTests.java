@@ -7,13 +7,13 @@ import org.junit.runners.Suite.SuiteClasses;
 	done.inpro.system.carchase.CarChaseViewerTest.class,
 	done.inpro.system.carchase.HesitatingSynthesisIUTest.class,
 	done.inpro.system.carchase.MyYamlTest.class,
-	gov.nist.sphere.SphereExceptionUnitTest.class, 
+	gov.nist.sphere.SphereExceptionUnitTest.class,
 	gov.nist.sphere.SphereHeaderItemUnitTest.class,
-	inpro.annotation.AnnotationUtilUnitTest.class, 
-	inpro.annotation.LabelUnitTest.class, 
-	inpro.annotation.TextGridUnitTest.class, 
+	inpro.annotation.AnnotationUtilUnitTest.class,
+	inpro.annotation.LabelUnitTest.class,
+	inpro.annotation.TextGridUnitTest.class,
 	inpro.apps.util.RecoCommandLineParserUnitTest.class,
-	inpro.audio.DispatchStreamTest.class, 
+	inpro.audio.DispatchStreamTest.class,
 	inpro.incremental.util.TTSUtilTest.class,
 	inpro.incremental.processor.SynthesisModuleUnitTest.class,
 	inpro.incremental.processor.SynthesisModulePauseStopUnitTest.class,
@@ -32,15 +32,15 @@ import org.junit.runners.Suite.SuiteClasses;
 	inpro.nlu.AVMWorldUtilTest.class,
 	inpro.nlu.AVPairMappingUtilTest.class,
 	inpro.pitch.util.ShortestPathTest.class,
+	inpro.sphinx.frontend.RsbStreamInputTest.class,
 	inpro.sphinx.frontend.ConversionUtilTest.class,
 	inpro.sphinx.frontend.MonitorTest.class,
 	inpro.synthesis.MarkupTest.class, 
 	inpro.synthesis.MaryAdapterIUUnitTest.class,
 	//inpro.synthesis.MaryAdapterMbrolaUnitTest.class, // Mary 5 does not support MBROLA any longer  
 	inpro.synthesis.RevokingTest.class, 
-	inpro.synthesis.SimpleSynthesis.class, 
-//	work.inpro.alchemy.spatial.util.SpatialRandomUnitTest.class
-	})
+	inpro.synthesis.SimpleSynthesis.class
+})
 public class AllTests {
 
 }

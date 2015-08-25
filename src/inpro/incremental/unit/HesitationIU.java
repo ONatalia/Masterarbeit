@@ -18,8 +18,10 @@ public class HesitationIU extends ChunkIU {
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // the casts for GRINs
 	public HesitationIU() {
 		super("<hes>", ChunkIU.ChunkType.NONFINAL);
-		this.groundedIn = (List) Collections.singletonList(new SyllableIU(null, (List) protoHesitation.getSegments()));
-		protoHesitation.scaleDeepCopyAndStartAtZero(1f); // create new IU substructure for the next protohesitation
+		synchronized (protoHesitation) {
+			this.groundedIn = (List) Collections.singletonList(new SyllableIU(null, (List) protoHesitation.getSegments()));
+			protoHesitation.scaleDeepCopyAndStartAtZero(1f); // create new IU substructure for the next protohesitation
+		}
 	}
 	
 	@Override

@@ -13,7 +13,7 @@ import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
 import inpro.incremental.unit.IU.IUUpdateListener;
 
-public class SynthesisModuleTestBase {
+public abstract class SynthesisModuleTestBase {
 
 	protected static String[][] testList = {
 		{ "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun" }, 
