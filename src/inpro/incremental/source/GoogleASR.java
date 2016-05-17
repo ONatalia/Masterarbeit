@@ -32,6 +32,7 @@ import inpro.annotation.Label;
 import inpro.audio.FrontEndBackedAudioInputStream;
 import inpro.incremental.FrameAware;
 import inpro.incremental.PushBuffer;
+import inpro.incremental.source.GoogleASR.PlaybackJSONListener;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
@@ -75,20 +76,62 @@ public class GoogleASR extends IUSourceModule {
 	
 	@S4String(defaultValue = "")
 	public final static String PROP_READ_JSON_DUMP = "importJSONDump";
+	//private URL jsonDumpInput;
 	private URL jsonDumpInput;
 	
+	public URL getJsonDumpInput() {
+		return jsonDumpInput;
+	}
+
 	@S4String(defaultValue = "")
 	public final static String PROP_WRITE_JSON_DUMP = "exportJSONDump";
 	private File jsonDumpOutput;
+	private GoogleJSONListener jsonlistener;
 	
+	public GoogleJSONListener getJsonlistenerAsLive(String pair) {
+		try {
+			jsonlistener=new LiveJSONListener(pair);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return jsonlistener;
+	}
+	
+	public GoogleJSONListener getJsonlistenerAsPlay() {
+		try {
+			jsonlistener=new PlaybackJSONListener(jsonDumpInput);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return jsonlistener;
+	}
+
+
+	
+
 	/** used by google as a signal that audio transmission has ended */
 	private final static byte[] FINAL_CHUNK = new byte[] { '0', '\r', '\n', '\r', '\n' };
 	/** size of the output buffer, how much audio to send to google at a time */
 	private final static int BUFFER_SIZE = 320; // 2000 samples = 250ms; 320 = 10ms
 	/** that's who we pretend to be when talking with Google */
 	private final static String UA_STRING = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36";
+	private int Status=0;
 	
+	public int getStatus() {
+		return Status;
+	}
+
+	public void setStatus(int status) {
+		Status = status;
+	}
+
 	private final FrontEndBackedAudioInputStream ais;
+
+	public FrontEndBackedAudioInputStream getAis() {
+		return ais;
+	}
 
 	public GoogleASR(BaseDataProcessor frontend) {
 		ais = new FrontEndBackedAudioInputStream(frontend);
@@ -120,9 +163,10 @@ public class GoogleASR extends IUSourceModule {
 	
 	/** write audio to stream and push results to listeners of our RightBuffer */
 	public void recognize() {
+		setStatus(1);
 		try {
 			String pair = getPair();
-			GoogleJSONListener jsonlistener;
+			//GoogleJSONListener jsonlistener;
 			OutputStream upStream;
 			if (jsonDumpInput == null) {
 				// setup connection with Google
@@ -140,20 +184,23 @@ public class GoogleASR extends IUSourceModule {
 				};
 			}
 			Thread listenerThread = new Thread(jsonlistener, "Google recognition thread");
+			
 			listenerThread.start();
+			
 			// write to stream
 			writeToStream(upStream, ais);
 			// on data end, end listening thread and tear down connection with google
 			Thread.sleep(400);
 			jsonlistener.shutdown();
 			listenerThread.join();
+			setStatus(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	/** get connection to Google that we use for uploading our audio data */
-	private HttpURLConnection getUpConnection(String pair) throws IOException {
+	public HttpURLConnection getUpConnection(String pair) throws IOException {
 		HttpURLConnection connection;
 
 		String upstream = "https://www.google.com/speech-api/full-duplex/v1/up?"
@@ -195,7 +242,12 @@ public class GoogleASR extends IUSourceModule {
 	}
 
 	/** generate a random ID that can be used to couple up- and downstream URLs */
-	private String getPair() {
+	/*private String getPair() {
+		SecureRandom random = new SecureRandom();
+		return new BigInteger(96, random).toString(32);
+	}*/
+	
+	public String getPair() {
 		SecureRandom random = new SecureRandom();
 		return new BigInteger(96, random).toString(32);
 	}
@@ -203,7 +255,7 @@ public class GoogleASR extends IUSourceModule {
 	/** write audio data to the stream that is connected to our Google-Upstream
 	 * @throws IOException 
 	 * @throws LineUnavailableException */
-	private void writeToStream(OutputStream stream, AudioInputStream ai) throws IOException, LineUnavailableException {
+	public void writeToStream(OutputStream stream, AudioInputStream ai) throws IOException, LineUnavailableException {
 		byte tempBuffer[] = new byte[BUFFER_SIZE];
 		FLACFileWriter ffw = new FLACFileWriter(); // initialize just once instead of within the loop
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFFER_SIZE); // initialize just once instead of within the loop
@@ -230,16 +282,16 @@ public class GoogleASR extends IUSourceModule {
 	}
 	
 	/** connect to Google and receive JSON results */
-	class LiveJSONListener extends GoogleJSONListener {
+	public class LiveJSONListener extends GoogleJSONListener {
 		HttpURLConnection con;
 		/** used to terminate this thread */
 		boolean inShutdown = false;
 		
-		LiveJSONListener(String pair) throws IOException {
+		public LiveJSONListener(String pair) throws IOException {
 			this.con = getDownConnection(pair);
 		}
 		
-		void shutdown() {
+		public void shutdown() {
 			inShutdown = true;
 		}
 		
@@ -249,7 +301,7 @@ public class GoogleASR extends IUSourceModule {
 				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 				String decodedString;
 				while (!inShutdown && (decodedString = in.readLine()) != null) {
-					//System.err.println(decodedString);
+					System.err.println(decodedString);
 					processJSON(decodedString);
 				} 
 				terminateDump();
@@ -262,13 +314,13 @@ public class GoogleASR extends IUSourceModule {
 	}
 	
 	/** consume timed JSON results from a file or URL */
-	class PlaybackJSONListener extends GoogleJSONListener {
+	public class PlaybackJSONListener extends GoogleJSONListener {
 		BufferedReader input;
 		public PlaybackJSONListener(URL jsonDumpInput) throws IOException {
 			input = new BufferedReader(new InputStreamReader(jsonDumpInput.openStream()));
 		}
 
-		void shutdown() { } // ignore this
+		public void shutdown() { } // ignore this
 		
 		@Override
 		public void run() {
@@ -296,7 +348,7 @@ public class GoogleASR extends IUSourceModule {
 	 * incoming results are analyzed, turned into IUs, amended with (guessed) time-stamp information, 
 	 * and finally pushed to our RightBuffer and listener updated 
 	 */
-	abstract class GoogleJSONListener implements Runnable {
+	public abstract class GoogleJSONListener implements Runnable {
 		private long initialTime; // in milliseconds
 		private long chunkStartTime; // in milliseconds
 		private long prevEndTime; // in milliseconds
@@ -406,7 +458,7 @@ public class GoogleASR extends IUSourceModule {
 			notifyListeners();
 		}
 		
-		abstract void shutdown();
+		public abstract void shutdown();
 		
 		long getTimestamp() {
 			return  System.currentTimeMillis();

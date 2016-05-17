@@ -34,7 +34,8 @@
     
     <component name="googleASR" type="inpro.incremental.source.GoogleASR">
     	<property name="samplingRate" value="16000"/>
-    	<property name="lang" value="en-US"/>
+    	<!--<property name="lang" value="en-US"/>  -->
+    	 <property name="lang" value="de-de"/>
     </component>
 
     <component name="GoogleASRHypothesis" type="inpro.incremental.source.GoogleASR">

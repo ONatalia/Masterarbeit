@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE config[
-  <!ENTITY iuconfig SYSTEM "./iu-config.xml">
+ <!ENTITY iuconfig SYSTEM "./iu-config.xml">
+<!-- <!ENTITY iuconfig SYSTEM "./iu-config-fa.xml">-->
   <!ENTITY sphinx SYSTEM "./sphinx.xml">
   <!ENTITY sphinxlang SYSTEM "./sphinx-de.xml">
   <!ENTITY frontend SYSTEM "./frontend.xml">

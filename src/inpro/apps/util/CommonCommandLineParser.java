@@ -39,6 +39,7 @@ public abstract class CommonCommandLineParser {
 			verbose = false;
 			inputMode = UNSPECIFIED_INPUT;
 			configURL = CommonCommandLineParser.class.getResource("../config.xml");
+			
 			audioURL = PathUtil.anyToURL("file:res/DE_1234.wav");
 			parse(args);
 			success = checkConfiguration();

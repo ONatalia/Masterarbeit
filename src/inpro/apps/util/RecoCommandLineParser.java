@@ -168,7 +168,7 @@ public class RecoCommandLineParser extends CommonCommandLineParser {
 				}
 				else if (args[i].equals("-L")) {
 					outputMode |= LABEL_OUTPUT;
-				}
+				} 
 				else if (args[i].equals("-Lp")) {
 					outputMode |= LABEL_OUTPUT;
 					i++;

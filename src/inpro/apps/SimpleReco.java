@@ -394,6 +394,7 @@ public class SimpleReco {
 			cm.getPropertySheet("labelWriter2").setString(LabelWriter.PROP_FILE_NAME, clp.getLabelPath());
 			LabelWriter lw = (LabelWriter) cm.lookup("labelWriter2");
 			casrh.addListener(lw);
+			logger.info ("output");
 		}
 		if (clp.matchesOutputMode(RecoCommandLineParser.CURRHYP_OUTPUT)) {
 			casrh.addListener((PushBuffer) cm.lookup("hypViewer"));
@@ -431,11 +432,16 @@ public class SimpleReco {
 		} else {
 			// for Sphinx:
 			Result result = null;
+			String phones=null;
 			do {
+				
 				result = recognizer.recognize();
+				
 				if (result != null) {
 					// Normal Output
+					phones=result.getBestPronunciationResult();
 					logger.info("RESULT: " + result.toString());
+					logger.info("PHONES: " + phones);
 				} else {
 					logger.info("Result: null");
 				}

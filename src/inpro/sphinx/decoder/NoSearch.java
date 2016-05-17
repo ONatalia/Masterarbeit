@@ -1,6 +1,7 @@
 package inpro.sphinx.decoder;
 
 import edu.cmu.sphinx.decoder.search.SearchManager;
+
 import edu.cmu.sphinx.frontend.Data;
 import edu.cmu.sphinx.frontend.DataProcessingException;
 import edu.cmu.sphinx.frontend.FrontEnd;

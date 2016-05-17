@@ -1,5 +1,6 @@
 package inpro.incremental.sink;
 
+import inpro.apps.SimpleReco;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.IU;
 import inpro.util.TimeUtil;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+
+import org.apache.log4j.Logger;
 
 import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
@@ -22,6 +25,9 @@ import edu.cmu.sphinx.util.props.S4String;
  * @author timo
  */
 public class LabelWriter extends FrameAwarePushBuffer {
+	
+	
+	private static final Logger logger = Logger.getLogger(LabelWriter.class);
 	
 	@S4Boolean(defaultValue = false)
     public final static String PROP_WRITE_FILE = "writeToFile";
@@ -59,10 +65,13 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		/* Get the time first */
 		String toOut = String.format(Locale.US, "Time: %.2f", 
 				currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
+		//logger.info ("add time");
 		/* Then go through all the IUs, ignoring commits */
 		boolean added = false;
 		for (EditMessage<? extends IU> edit : edits) {
 			IU iu = edit.getIU();
+			
+			//logger.info("label writer read"+iu.toString());
 			switch (edit.getType()) {
 			case ADD:
 				if (!commitsOnly) {
@@ -93,6 +102,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		
 		toOut = String.format(Locale.US, "Time: %.2f", 
 		currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
+		
 		for (IU iu : allIUs) {
 			toOut += "\n" + iu.toLabelLine();
 		}
@@ -111,6 +121,8 @@ public class LabelWriter extends FrameAwarePushBuffer {
 			}
 			if (writeToStdOut) {
 				System.out.println(toOut);
+				logger.info ("print toOut");
+				
 			}
 		}
 	}
