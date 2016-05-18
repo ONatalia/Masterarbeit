@@ -6,6 +6,7 @@
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
+<booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="inpro.apps.SimpleText"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-O -c file:src/demo/inpro/synthesis/config.xml -C"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Inpro"/>

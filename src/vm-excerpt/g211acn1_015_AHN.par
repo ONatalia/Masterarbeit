@@ -1,0 +1,21 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AHN
+LBD:
+TR2:	0	mhm . <#> 
+ORT:	0	mhm
+KAN:	0	mhm
+NOI:	0;1	<#>
+DAS: 0	@(BACKCHANNEL AB)
+MAU:	0	1759	-1	<p:>
+MAU:	1760	5119	0	m
+MAU:	6880	959	0	m
+MAU:	7840	1759	-1	<p:>
+PRO: 0	PM3
+TLN:	0	DE>EN	 mhm .
+TLN:	0	DE>JA	 uuN .

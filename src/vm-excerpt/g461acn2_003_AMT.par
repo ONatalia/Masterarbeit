@@ -1,0 +1,21 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AMT
+LBD:
+TR2:	0	<Ger"ausch> @3ja . <Ger"ausch> 
+SUP:	0	g461acn1_000_AMU.par	noch3@ <A>3@>
+ORT:	0	ja
+KAN:	0	j'a:
+NOI:	-1;0	<Ger"ausch>
+NOI:	0;1	<Ger"ausch>
+MAU:	0	2879	-1	<p:>
+MAU:	2880	1119	0	j
+MAU:	4000	2239	0	a:
+MAU:	6240	2719	-1	<p:>
+POS:	0	ITJ
+LMA:	0	ja

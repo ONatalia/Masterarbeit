@@ -1,0 +1,28 @@
+64	{"result":[]}
+1121	{"result":[{"alternative":[{"transcript":"ja"}],"stability":0.0099999998}],"result_index":0}
+1329	{"result":[{"alternative":[{"transcript":"ja das"}],"stability":0.0099999998}],"result_index":0}
+1593	{"result":[{"alternative":[{"transcript":"ja das go"}],"stability":0.0099999998}],"result_index":0}
+1682	{"result":[{"alternative":[{"transcript":"ja das gut"}],"stability":0.0099999998}],"result_index":0}
+1734	{"result":[{"alternative":[{"transcript":"ja das gute"}],"stability":0.0099999998}],"result_index":0}
+1797	{"result":[{"alternative":[{"transcript":"ja"}],"stability":0.89999998},{"alternative":[{"transcript":" das gute"}],"stability":0.0099999998}],"result_index":0}
+1958	{"result":[{"alternative":[{"transcript":"ja"}],"stability":0.89999998},{"alternative":[{"transcript":" das guten"}],"stability":0.0099999998}],"result_index":0}
+2052	{"result":[{"alternative":[{"transcript":"ja das"}],"stability":0.89999998},{"alternative":[{"transcript":" gut und dir"}],"stability":0.0099999998}],"result_index":0}
+2213	{"result":[{"alternative":[{"transcript":"ja das"}],"stability":0.89999998},{"alternative":[{"transcript":" gut wenn dir das"}],"stability":0.0099999998}],"result_index":0}
+2512	{"result":[{"alternative":[{"transcript":"ja das"}],"stability":0.89999998},{"alternative":[{"transcript":" gut wenn du das für"}],"stability":0.0099999998}],"result_index":0}
+2564	{"result":[{"alternative":[{"transcript":"ja das"}],"stability":0.89999998},{"alternative":[{"transcript":" gut wenn du das für mich"}],"stability":0.0099999998}],"result_index":0}
+2729	{"result":[{"alternative":[{"transcript":"ja das gut"}],"stability":0.89999998},{"alternative":[{"transcript":" wenn du das für mich"}],"stability":0.0099999998}],"result_index":0}
+2828	{"result":[{"alternative":[{"transcript":"ja das gut wenn"}],"stability":0.89999998},{"alternative":[{"transcript":" du das für mich"}],"stability":0.0099999998}],"result_index":0}
+2833	{"result":[{"alternative":[{"transcript":"ja das gut wenn"}],"stability":0.89999998},{"alternative":[{"transcript":" du das für mich riesig"}],"stability":0.0099999998}],"result_index":0}
+2848	{"result":[{"alternative":[{"transcript":"ja das gut wenn"}],"stability":0.89999998},{"alternative":[{"transcript":" du das für mich Reserve"}],"stability":0.0099999998}],"result_index":0}
+2849	{"result":[{"alternative":[{"transcript":"ja das gut wenn du das für"}],"stability":0.89999998},{"alternative":[{"transcript":" mich reserviert"}],"stability":0.0099999998}],"result_index":0}
+2852	{"result":[{"alternative":[{"transcript":"ja das gut wenn du das für mich"}],"stability":0.89999998},{"alternative":[{"transcript":" reserviert"}],"stability":0.0099999998}],"result_index":0}
+2858	{"result":[{"alternative":[{"transcript":"ja das gut wenn du das für mich"}],"stability":0.89999998},{"alternative":[{"transcript":" reservieren"}],"stability":0.0099999998}],"result_index":0}
+2872	{"result":[{"alternative":[{"transcript":"ja das gut wenn du das für mich"}],"stability":0.89999998},{"alternative":[{"transcript":" reserviert"}],"stability":0.0099999998}],"result_index":0}
+2912	{"result":[{"alternative":[{"transcript":"ja das gut wenn du das für mich"}],"stability":0.89999998},{"alternative":[{"transcript":" reservieren"}],"stability":0.0099999998}],"result_index":0}
+2983	{"result":[{"alternative":[{"transcript":"ja das gut wenn du das für mich"}],"stability":0.89999998},{"alternative":[{"transcript":" reservieren kann"}],"stability":0.0099999998}],"result_index":0}
+3070	{"result":[{"alternative":[{"transcript":"ja das gut wenn du das für mich"}],"stability":0.89999998},{"alternative":[{"transcript":" reservieren können"}],"stability":0.0099999998}],"result_index":0}
+3436	{"result":[{"alternative":[{"transcript":"ja das gut wenn du das für mich"}],"stability":0.89999998},{"alternative":[{"transcript":" reserviert"}],"stability":0.0099999998}],"result_index":0}
+3509	{"result":[{"alternative":[{"transcript":"ja das gut wenn du das für mich"}],"stability":0.89999998},{"alternative":[{"transcript":" reservieren können auf dem"}],"stability":0.0099999998}],"result_index":0}
+3785	{"result":[{"alternative":[{"transcript":"ja das gut wenn du das für mich"}],"stability":0.89999998},{"alternative":[{"transcript":" reservieren können auf den Arm"}],"stability":0.0099999998}],"result_index":0}
+3849	{"result":[{"alternative":[{"transcript":"ja das gut wenn du das für mich"}],"stability":0.89999998},{"alternative":[{"transcript":" reserviert auf den Namen"}],"stability":0.0099999998}],"result_index":0}
+4225	{"result":[{"alternative":[{"transcript":"ja das gut wenn du das für mich"}],"stability":0.89999998},{"alternative":[{"transcript":" reserviert auf den Namen knie"}],"stability":0.0099999998}],"result_index":0}

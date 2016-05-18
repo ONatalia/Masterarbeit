@@ -1,0 +1,7 @@
+69	{"result":[]}
+1858	{"result":[{"alternative":[{"transcript":"und wie sieht s Preis"}],"stability":0.0099999998}],"result_index":0}
+2063	{"result":[{"alternative":[{"transcript":"preise"}],"stability":0.0099999998}],"result_index":0}
+2086	{"result":[{"alternative":[{"transcript":"und wie sieht es preislich"}],"stability":0.0099999998}],"result_index":0}
+2256	{"result":[{"alternative":[{"transcript":"und wie sieht es preislich auch"}],"stability":0.0099999998}],"result_index":0}
+2324	{"result":[{"alternative":[{"transcript":"und wie sieht es preislich aus"}],"stability":0.0099999998}],"result_index":0}
+2375	{"result":[{"alternative":[{"transcript":"und wie sieht es preislich"}],"stability":0.89999998},{"alternative":[{"transcript":" aus"}],"stability":0.0099999998}],"result_index":0}

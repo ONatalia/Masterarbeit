@@ -1,0 +1,23 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AIE
+LBD:
+TR2:	0	<Ger"ausch> @7mhm . <Ger"ausch> 
+SUP:	0	g245acn2_025_AFB.par	gut7@ ,
+ORT:	0	mhm
+KAN:	0	mhm
+NOI:	-1;0	<Ger"ausch>
+NOI:	0;1	<Ger"ausch>
+DAS: 0	@(BACKCHANNEL AB)
+MAU:	0	1759	-1	<p:>
+MAU:	1760	1759	0	m
+MAU:	3520	3519	0	m
+MAU:	7040	319	-1	<p:>
+PRO: 0	PM3
+TLN:	0	DE>EN	 mhm .
+TLN:	0	DE>JA	 uuN .

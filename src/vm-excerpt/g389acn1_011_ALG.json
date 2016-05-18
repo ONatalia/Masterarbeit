@@ -1,0 +1,9 @@
+100	{"result":[]}
+1075	{"result":[{"alternative":[{"transcript":"mach mal"}],"stability":0.0099999998}],"result_index":0}
+1507	{"result":[{"alternative":[{"transcript":"mach mal ob"}],"stability":0.0099999998}],"result_index":0}
+1566	{"result":[{"alternative":[{"transcript":"nach mallorca"}],"stability":0.0099999998}],"result_index":0}
+1589	{"result":[{"alternative":[{"transcript":"mach mal okay"}],"stability":0.0099999998}],"result_index":0}
+1615	{"result":[{"alternative":[{"transcript":"mach mal ok"}],"stability":0.0099999998}],"result_index":0}
+1688	{"result":[{"alternative":[{"transcript":"mach mal okay"}],"stability":0.0099999998}],"result_index":0}
+1810	{"result":[{"alternative":[{"transcript":"mach mal"}],"stability":0.89999998},{"alternative":[{"transcript":" okay"}],"stability":0.0099999998}],"result_index":0}
+2051	{"result":[{"alternative":[{"transcript":"mach mal ok","confidence":0.60694849},{"transcript":"ach mal okay"},{"transcript":"mach mal okay"},{"transcript":"nochmal ok"},{"transcript":"8 x ok"},{"transcript":"ok"},{"transcript":"nochmal okay"},{"transcript":"ach mein ok"},{"transcript":"lach mal okay"},{"transcript":"achtmal ok"}],"final":true}],"result_index":0}

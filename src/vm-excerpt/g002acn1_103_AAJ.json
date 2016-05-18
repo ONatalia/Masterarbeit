@@ -1,0 +1,9 @@
+58	{"result":[]}
+768	{"result":[{"alternative":[{"transcript":"ich"}],"stability":0.0099999998}],"result_index":0}
+925	{"result":[{"alternative":[{"transcript":"ich dann"}],"stability":0.0099999998}],"result_index":0}
+1059	{"result":[{"alternative":[{"transcript":"ich denk"}],"stability":0.0099999998}],"result_index":0}
+1101	{"result":[{"alternative":[{"transcript":"ich denke"}],"stability":0.0099999998}],"result_index":0}
+1227	{"result":[{"alternative":[{"transcript":"ich denke ich"}],"stability":0.0099999998}],"result_index":0}
+1240	{"result":[{"alternative":[{"transcript":"ich danke Ihnen"}],"stability":0.0099999998}],"result_index":0}
+1319	{"result":[{"alternative":[{"transcript":"ich"}],"stability":0.89999998},{"alternative":[{"transcript":" danke Ihnen"}],"stability":0.0099999998}],"result_index":0}
+1608	{"result":[{"alternative":[{"transcript":"ich danke Ihnen","confidence":0.88252068},{"transcript":"ich danke ihnen"},{"transcript":"ich denke ihnen"},{"transcript":"ich dank ihnen"},{"transcript":"ich sage Ihnen"},{"transcript":"ich danken ihnen"},{"transcript":"ich sage ihnen"},{"transcript":"ich Dank ihnen"},{"transcript":"Ich Dank ihnen"},{"transcript":"ich denk ihnen"}],"final":true}],"result_index":0}

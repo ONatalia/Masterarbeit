@@ -1,0 +1,65 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: ALK
+LBD:
+TR2:	0	@24mhm , <P> <Ger"ausch>
+TR2:	1	mhm , <P> <Schmatzen> <A>
+TR2:	2	ja . <Ger"ausch> <P>
+TR2:	3	ja25@ ,
+TR2:	4	gut25@ . <Ger"ausch> 
+SUP:	0	g415acn2_040_AKI.par	'ne24@ Stunde24@ . 
+SUP:	3,4	g415acn2_043_AKI.par	<Ger"ausch> +/@25aber/+ <!1 a'> @25obwohl ,
+ORT:	0	mhm
+ORT:	1	mhm
+ORT:	2	ja
+ORT:	3	ja
+ORT:	4	gut
+KAN:	0	mhm
+KAN:	1	mhm
+KAN:	2	j'a:
+KAN:	3	j'a:
+KAN:	4	g'u:t
+NOI:	0;1	<Ger"ausch>
+NOI:	1;2	<Schmatzen> <A>
+NOI:	2;3	<Ger"ausch>
+NOI:	4;5	<Ger"ausch>
+SYN:	2	1	DM
+SYN:	3	1	DM
+SYN:	4	1	DM
+FUN:	2	0	-
+FUN:	2	1	--
+FUN:	3	0	-
+FUN:	3	1	--
+FUN:	4	0	-
+FUN:	4	1	--
+LEX:	2	0	PTKANT
+LEX:	3	0	PTKANT
+LEX:	4	0	ITJ
+MAU:	0	1919	-1	<p:>
+MAU:	1920	6079	0	m
+MAU:	8000	7199	0	m
+MAU:	15200	3519	-1	<p:>
+MAU:	18720	5119	1	m
+MAU:	23840	1279	1	m
+MAU:	25120	14719	-1	<p:>
+MAU:	39840	1759	2	j
+MAU:	41600	3679	2	a:
+MAU:	45280	16319	-1	<p:>
+MAU:	61600	1599	3	j
+MAU:	63200	4799	3	a:
+MAU:	68000	479	4	g
+MAU:	68480	2399	4	u:
+MAU:	70880	1119	4	t
+MAU:	72000	959	-1	<p:>
+POS:	2	ITJ
+POS:	3	ITJ
+POS:	4	ADJD
+LMA:	2	ja
+LMA:	3	ja
+LMA:	4	gut
+TLN:	0,1,2,3,4	DE>EN	 mhm , mhm , yes . well , good .

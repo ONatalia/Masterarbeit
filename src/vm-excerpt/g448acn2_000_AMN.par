@@ -1,0 +1,68 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AMN
+LBD:
+TR2:	0	guten <!1 guddn>
+TR2:	1	<:<#Rascheln> Tag:> ,
+TR2:	2	Frau
+TR2:	3	~Voggesser . <A> <#Klopfen> 
+ORT:	0	guten
+ORT:	1	Tag
+ORT:	2	Frau
+ORT:	3	Voggesser
+KAN:	0	g'u:t@n
+KAN:	1	t'a:k
+KAN:	2	fr'aU
+KAN:	3	vOgEs6
+NOI:	1	<#Rascheln>
+NOI:	3;4	<A> <#Klopfen>
+SYN:	0	1	ADJX
+SYN:	0,1	0	NX
+SYN:	0,1	1	DM
+SYN:	2,3	0	NX
+SYN:	2,3	1	DM
+FUN:	0	0	HD
+FUN:	0	1	-
+FUN:	0,1	0	-
+FUN:	0,1	1	--
+FUN:	1	0	HD
+FUN:	2	0	-
+FUN:	2,3	0	-
+FUN:	2,3	1	--
+FUN:	3	0	-
+LEX:	0	0	ADJA
+LEX:	1	0	NN
+LEX:	2	0	NN
+LEX:	3	0	NE
+MAU:	0	1279	-1	<p:>
+MAU:	1280	1439	0	g
+MAU:	2720	959	0	u:
+MAU:	3680	799	0	d
+MAU:	4480	479	0	n
+MAU:	4960	639	1	t
+MAU:	5600	2079	1	a:
+MAU:	7680	559	1	k
+MAU:	8240	559	2	f
+MAU:	8800	479	2	r
+MAU:	9280	1119	2	aU
+MAU:	10400	1119	-1	<p:>
+MAU:	11520	639	3	v
+MAU:	12160	959	3	O
+MAU:	13120	1119	3	g
+MAU:	14240	1599	3	E
+MAU:	15840	1919	3	s
+MAU:	17760	5279	3	6
+MAU:	23040	5439	-1	<p:>
+POS:	0	ADJA
+POS:	1	NN
+POS:	2	NN
+POS:	3	NE
+LMA:	0	gut
+LMA:	1	Tag
+LMA:	2	Frau
+LMA:	3	Voggesser

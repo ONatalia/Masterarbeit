@@ -1,0 +1,32 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: ALQ
+LBD:
+TR2:	0	ja . <A> <P>19@>
+TR2:	1	<"ahm>19@> <A> <Ger"ausch> <*T>t 
+SUP:	0,1	g409acn1_031_ALR.par	<#Quietschen> @19ja , @19dann @19schauen <!1 schau'>
+ORT:	0	ja
+ORT:	1	<"ahm>
+KAN:	0	j'a:
+KAN:	1	Q'E:m
+NOI:	0;1	<A>
+NOI:	1;2	<A> <Ger"ausch>
+SYN:	0	1	DM
+FUN:	0	0	-
+FUN:	0	1	--
+LEX:	0	0	PTKANT
+MAU:	0	1439	-1	<p:>
+MAU:	1440	1279	0	j
+MAU:	2720	3039	0	a:
+MAU:	5760	10719	-1	<p:>
+MAU:	16480	9119	1	E:
+MAU:	25600	479	1	m
+MAU:	26080	319	-1	<p:>
+POS:	0	ITJ
+LMA:	0	ja
+TLN:	0,1	DE>EN	 yes . 

@@ -1,0 +1,196 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AIF
+LBD:
+TR2:	0	<Ger"ausch> <#> <:<Ger"ausch> gut:> ,
+TR2:	1	<:<Ger"ausch> ~Fronleichnam:> . <Schmatzen> <A> <#Klopfen> <P> <#Klopfen> <#Klopfen> <Ger"ausch> <#Klopfen> <#Klopfen>
+TR2:	2	ja ,
+TR2:	3	<:<#Klopfen> vorzugsweise:> <!1 pforzugsweise>
+TR2:	4	Dienstag
+TR2:	5	und <!1 un'>
+TR2:	6	Mittwoch ,
+TR2:	7	#neunter
+TR2:	8	<:<#Klopfen> und:>
+TR2:	9	#zehnter
+TR2:	10	<:<#> Juni:> . 
+ORT:	0	gut
+ORT:	1	Fronleichnam
+ORT:	2	ja
+ORT:	3	vorzugsweise
+ORT:	4	Dienstag
+ORT:	5	und
+ORT:	6	Mittwoch
+ORT:	7	neunter
+ORT:	8	und
+ORT:	9	zehnter
+ORT:	10	Juni
+KAN:	0	g'u:t
+KAN:	1	fro:n#l'aICna:m
+KAN:	2	j'a:
+KAN:	3	f'o:6tsu:ksv"aIz@
+KAN:	4	d'i:nsta:k
+KAN:	5	Q'Unt+
+KAN:	6	m'ItvOx
+KAN:	7	n'OYnt6
+KAN:	8	Q'Unt+
+KAN:	9	ts'e:nt6
+KAN:	10	j'u:ni
+NOI:	-1;0	<Ger"ausch> <#>
+NOI:	0	<Ger"ausch>
+NOI:	1;2	<Schmatzen> <A> <#Klopfen> <#Klopfen> <#Klopfen> <Ger"ausch> <#Klopfen> <#Klopfen>
+NOI:	1	<Ger"ausch>
+NOI:	3	<#Klopfen>
+NOI:	8	<#Klopfen>
+NOI:	10	<#>
+DAS: 0,1	@(CLARIFY AB)
+DAS: 2,3,4,5,6,7,8,9,10	@(SUGGEST AB)
+SYN:	0	1	DM
+SYN:	1	1	NX
+SYN:	2	1	DM
+SYN:	3	1	ADVX
+SYN:	3,4,5,6,7,8,9,10	0	NX
+SYN:	4	1	NX
+SYN:	4,5,6	0	NX
+SYN:	4,5,6,7,8,9,10	0	NX
+SYN:	6	1	NX
+SYN:	7	1	ADJX
+SYN:	7,8,9	0	ADJX
+SYN:	7,8,9,10	0	NX
+SYN:	9	1	ADJX
+FUN:	0	0	-
+FUN:	0	1	--
+FUN:	1	0	HD
+FUN:	1	1	--
+FUN:	2	0	-
+FUN:	2	1	--
+FUN:	3	0	HD
+FUN:	3	1	-
+FUN:	3,4,5,6,7,8,9,10	0	--
+FUN:	4	0	HD
+FUN:	4	1	-
+FUN:	4,5,6	0	HD
+FUN:	4,5,6,7,8,9,10	0	HD
+FUN:	5	0	-
+FUN:	6	0	HD
+FUN:	6	1	-
+FUN:	7	0	HD
+FUN:	7	1	-
+FUN:	7,8,9	0	-
+FUN:	7,8,9,10	0	APP
+FUN:	8	0	-
+FUN:	9	0	HD
+FUN:	9	1	-
+FUN:	10	0	HD
+LEX:	0	0	ITJ
+LEX:	1	0	NE
+LEX:	2	0	PTKANT
+LEX:	3	0	ADV
+LEX:	4	0	NN
+LEX:	5	0	KON
+LEX:	6	0	NN
+LEX:	7	0	ADJA
+LEX:	8	0	KON
+LEX:	9	0	ADJA
+LEX:	10	0	NN
+MAU:	0	1439	-1	<p:>
+MAU:	1440	479	0	g
+MAU:	1920	1439	0	u:
+MAU:	3360	479	0	t
+MAU:	3840	1439	1	f
+MAU:	5280	1119	1	r
+MAU:	6400	639	1	o:
+MAU:	7040	479	1	n
+MAU:	7520	2559	1	l
+MAU:	10080	2399	1	aI
+MAU:	12480	1759	1	C
+MAU:	14240	1919	1	n
+MAU:	16160	799	1	a:
+MAU:	16960	4319	1	m
+MAU:	21280	34399	-1	<p:>
+MAU:	55680	3999	2	j
+MAU:	59680	4479	2	a:
+MAU:	64160	6879	-1	<p:>
+MAU:	71040	1119	3	f
+MAU:	72160	799	3	O
+MAU:	72960	1439	3	6
+MAU:	74400	479	3	t
+MAU:	74880	639	3	s
+MAU:	75520	1119	3	u:
+MAU:	76640	479	3	k
+MAU:	77120	799	3	s
+MAU:	77920	1279	3	v
+MAU:	79200	3039	3	aI
+MAU:	82240	1439	3	z
+MAU:	83680	2239	3	@
+MAU:	85920	1439	-1	<p:>
+MAU:	87360	639	4	d
+MAU:	88000	1919	4	i:
+MAU:	89920	1439	4	n
+MAU:	91360	1599	4	s
+MAU:	92960	959	4	t
+MAU:	93920	1919	4	a:
+MAU:	95840	959	4	k
+MAU:	96800	1279	5	U
+MAU:	98080	1119	5	n
+MAU:	99200	799	6	m
+MAU:	100000	1119	6	I
+MAU:	101120	1279	6	t
+MAU:	102400	1279	6	v
+MAU:	103680	639	6	O
+MAU:	104320	3199	6	x
+MAU:	107520	3519	-1	<p:>
+MAU:	111040	1439	7	n
+MAU:	112480	1599	7	OY
+MAU:	114080	1119	7	n
+MAU:	115200	959	7	t
+MAU:	116160	1119	7	6
+MAU:	117280	639	8	Q
+MAU:	117920	799	8	U
+MAU:	118720	639	8	n
+MAU:	119360	1279	-1	<p:>
+MAU:	120640	479	9	t
+MAU:	121120	959	9	s
+MAU:	122080	959	9	e:
+MAU:	123040	1279	9	n
+MAU:	124320	1279	9	t
+MAU:	125600	1599	9	6
+MAU:	127200	799	-1	<p:>
+MAU:	128000	1439	10	j
+MAU:	129440	1919	10	u:
+MAU:	131360	1279	10	n
+MAU:	132640	2559	10	i
+MAU:	135200	1279	-1	<p:>
+PRO: 0;1	PM3
+PRO: 1;2	PM3
+PRO: 2;3	PM3
+PRO: 6;7	PM3
+PRO: 10	PM3
+POS:	0	ADJD
+POS:	1	NE
+POS:	2	ITJ
+POS:	3	ADV
+POS:	4	NN
+POS:	5	KON
+POS:	6	NN
+POS:	7	ORD
+POS:	8	KON
+POS:	9	ORD
+POS:	10	NN
+LMA:	0	gut
+LMA:	1	Fronleichnam
+LMA:	2	ja
+LMA:	3	vorzugsweise
+LMA:	4	Dienstag
+LMA:	5	und
+LMA:	6	Mittwoch
+LMA:	7	neunt
+LMA:	8	und
+LMA:	9	zehnt
+LMA:	10	Juni
+TLN:	0,1,2,3,4,5,6,7,8,9,10	DE>EN	 good , ~Corpus ~Christi . well , preferably Tuesday and Wednesday , ninth and tenth of June .
+TLN:	0,1,2,3,4,5,6,7,8,9,10	DE>JA	 ii deshou ~seitaisetsu . ee #rokugatsu #kokonoka to #tooka kayoubi to suiyoubi o yuuseNteki ni .

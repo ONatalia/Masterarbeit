@@ -1,0 +1,159 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: ALW
+LBD:
+TR2:	0	#s<Z>iebzig
+TR2:	1	Minuten ,
+TR2:	2	hab'
+TR2:	3	ich
+TR2:	4	mir
+TR2:	5	aufgeschrieben12@ ,
+TR2:	6	ist12@ <!1 is'>
+TR2:	7	die12@
+TR2:	8	reine12@
+TR2:	9	Flugzeit12@ <!1 Flugzeig> . 
+SUP:	5,6,7,8,9	g418acn2_030_ALX.par	@12ach , @12ist <!1 's'> @12ja @12nicht <!1 nich'> @12so<Z> @12lang . <P> <A>
+ORT:	0	siebzig
+ORT:	1	Minuten
+ORT:	2	habe
+ORT:	3	ich
+ORT:	4	mir
+ORT:	5	aufgeschrieben
+ORT:	6	ist
+ORT:	7	die
+ORT:	8	reine
+ORT:	9	Flugzeit
+KAN:	0	z'i:ptsIC
+KAN:	1	min'u:t@n
+KAN:	2	h'a:b@+
+KAN:	3	Q'IC+
+KAN:	4	m'i:6+
+KAN:	5	Q'aUfg@Sr"i:b@n
+KAN:	6	Q'Ist+
+KAN:	7	d'i:+
+KAN:	8	r'aIn@
+KAN:	9	fl'u:k#ts"aIt
+SYN:	0	1	ADJX
+SYN:	0,1	0	NX
+SYN:	0,1	1	VF
+SYN:	0,1,6,7,8,9	0	SIMPX
+SYN:	2	1	VXFIN
+SYN:	2	2	LK
+SYN:	2,3,4,5	0	SIMPX
+SYN:	3	1	NX
+SYN:	3,4	0	MF
+SYN:	4	1	NX
+SYN:	5	1	VXINF
+SYN:	5	2	VC
+SYN:	6	1	VXFIN
+SYN:	6	2	LK
+SYN:	7,8,9	0	NX
+SYN:	7,8,9	1	MF
+SYN:	8	1	ADJX
+FUN:	0	0	HD
+FUN:	0	1	-
+FUN:	0,1	0	PRED
+FUN:	0,1	1	-
+FUN:	0,1,6,7,8,9	0	--
+FUN:	1	0	HD
+FUN:	2	0	HD
+FUN:	2	1	HD
+FUN:	2	2	-
+FUN:	2,3,4,5	0	--
+FUN:	3	0	HD
+FUN:	3	1	ON
+FUN:	3,4	0	-
+FUN:	4	0	HD
+FUN:	4	1	OD
+FUN:	5	0	HD
+FUN:	5	1	OV
+FUN:	5	2	-
+FUN:	6	0	HD
+FUN:	6	1	HD
+FUN:	6	2	-
+FUN:	7	0	-
+FUN:	7,8,9	0	ON
+FUN:	7,8,9	1	-
+FUN:	8	0	HD
+FUN:	8	1	-
+FUN:	9	0	HD
+LEX:	0	0	CARD
+LEX:	1	0	NN
+LEX:	2	0	VAFIN
+LEX:	3	0	PPER
+LEX:	4	0	PRF
+LEX:	5	0	VVPP
+LEX:	6	0	VAFIN
+LEX:	7	0	ART
+LEX:	8	0	ADJA
+LEX:	9	0	NN
+MAU:	0	1439	-1	<p:>
+MAU:	1440	1599	0	z
+MAU:	3040	1439	0	i:
+MAU:	4480	959	0	p
+MAU:	5440	959	0	t
+MAU:	6400	639	0	s
+MAU:	7040	959	0	I
+MAU:	8000	639	0	C
+MAU:	8640	1119	1	m
+MAU:	9760	799	1	i
+MAU:	10560	639	1	n
+MAU:	11200	1439	1	u:
+MAU:	12640	639	1	n
+MAU:	13280	1279	2	h
+MAU:	14560	1279	2	a:
+MAU:	15840	479	2	b
+MAU:	16320	639	3	I
+MAU:	16960	479	3	C
+MAU:	17440	1279	4	m
+MAU:	18720	639	4	6
+MAU:	19360	1279	5	aU
+MAU:	20640	799	5	f
+MAU:	21440	479	5	g
+MAU:	21920	479	5	@
+MAU:	22400	1119	5	S
+MAU:	23520	1119	5	r
+MAU:	24640	959	5	i:
+MAU:	25600	1119	5	m
+MAU:	26720	799	6	I
+MAU:	27520	959	6	s
+MAU:	28480	479	7	d
+MAU:	28960	1119	7	i:
+MAU:	30080	639	8	r
+MAU:	30720	959	8	aI
+MAU:	31680	639	8	n
+MAU:	32320	639	8	@
+MAU:	32960	799	9	f
+MAU:	33760	799	9	l
+MAU:	34560	799	9	u:
+MAU:	35360	479	9	k
+MAU:	35840	639	9	t
+MAU:	36480	959	9	s
+MAU:	37440	1599	9	aI
+MAU:	39040	479	9	t
+MAU:	39520	1119	-1	<p:>
+POS:	0	CARD
+POS:	1	NN
+POS:	2	VAFIN
+POS:	3	PPER
+POS:	4	PPER
+POS:	5	VVPP
+POS:	6	VAFIN
+POS:	7	ART
+POS:	8	ADJA
+POS:	9	NN
+LMA:	0	siebzig
+LMA:	1	Minute
+LMA:	2	haben
+LMA:	3	pper
+LMA:	4	pper
+LMA:	5	aufschreiben
+LMA:	6	sein
+LMA:	7	d
+LMA:	8	rein
+LMA:	9	Flugzeit

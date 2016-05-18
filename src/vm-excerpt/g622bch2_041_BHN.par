@@ -1,0 +1,24 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: BHN
+LBD:
+TR2:	0	<Ger"ausch> gut . 
+ORT:	0	gut
+KAN:	0	g'u:t
+NOI:	-1;0	<Ger"ausch>
+SYN:	0	1	DM
+FUN:	0	0	-
+FUN:	0	1	--
+LEX:	0	0	ITJ
+MAU:	0	1119	-1	<p:>
+MAU:	1120	479	0	g
+MAU:	1600	1439	0	u:
+MAU:	3040	1599	0	t
+MAU:	4640	1119	-1	<p:>
+POS:	0	ADJD
+LMA:	0	gut

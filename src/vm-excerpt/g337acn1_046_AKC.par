@@ -1,0 +1,394 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AKC
+LBD:
+TR2:	0	<Ger"ausch> @22also ,
+TR2:	1	@22ich
+TR2:	2	hab'
+TR2:	3	dann
+TR2:	4	an
+TR2:	5	dem
+TR2:	6	Mittwoch
+TR2:	7	<:<#Klopfen> drauf:>
+TR2:	8	+/hab'
+TR2:	9	<:<#> ich<Z>:>/+ <Ger"ausch> <#Rascheln> <#Klopfen>
+TR2:	10	<"ah> <#> <#Klopfen>
+TR2:	11	geh'
+TR2:	12	ich
+TR2:	13	auf
+TR2:	14	'n
+TR2:	15	Konzert <;ungrammatisch> ,
+TR2:	16	<:<#Rascheln> also:>
+TR2:	17	-/<:<#Klopfen> is<Z>t:>/- <!1 is'> <A> <Ger"ausch>
+TR2:	18	<:<Ger"ausch> ein:>
+TR2:	19	<:<Ger"ausch> Kneipenbesuch:>
+TR2:	20	+/w"ar'/+
+TR2:	21	w"ar'
+TR2:	22	schon
+TR2:	23	in
+TR2:	24	Ordnung , <A> <#Klopfen> <#Quietschen> <#Klopfen> <#Klopfen> <P>23@>
+TR2:	25	beim23@ <Ger"ausch> <*T>t 
+SUP:	0,1	g337acn2_044_AKB.par	haben22@ . <Ger"ausch> 
+SUP:	24,25	g337acn2_047_AKB.par	@23ja<Z> , <:<#> @23m<Z>u"s:> @23es
+ORT:	0	also
+ORT:	1	ich
+ORT:	2	habe
+ORT:	3	dann
+ORT:	4	an
+ORT:	5	dem
+ORT:	6	Mittwoch
+ORT:	7	drauf
+ORT:	8	habe
+ORT:	9	ich
+ORT:	10	<"ah>
+ORT:	11	gehe
+ORT:	12	ich
+ORT:	13	auf
+ORT:	14	ein
+ORT:	15	Konzert
+ORT:	16	also
+ORT:	17	ist
+ORT:	18	ein
+ORT:	19	Kneipenbesuch
+ORT:	20	w"are
+ORT:	21	w"are
+ORT:	22	schon
+ORT:	23	in
+ORT:	24	Ordnung
+ORT:	25	beim
+KAN:	0	Q'alzo+
+KAN:	1	Q'IC+
+KAN:	2	h'a:b@+
+KAN:	3	d'an+
+KAN:	4	Q'an+
+KAN:	5	d'e:m+
+KAN:	6	m'ItvOx
+KAN:	7	dr'aUf+
+KAN:	8	h'a:b@+
+KAN:	9	Q'IC+
+KAN:	10	Q'E:
+KAN:	11	g'e:@
+KAN:	12	Q'IC+
+KAN:	13	QaUf+
+KAN:	14	Q'aIn+
+KAN:	15	kOnts'E6t
+KAN:	16	Q'alzo+
+KAN:	17	Q'Ist+
+KAN:	18	Q'aIn+
+KAN:	19	kn'aIp@n#b@z"u:x
+KAN:	20	v'E:r@+
+KAN:	21	v'E:r@+
+KAN:	22	So:n+
+KAN:	23	QIn+
+KAN:	24	Q'O6dnUN
+KAN:	25	b'aIm+
+NOI:	-1;0	<Ger"ausch>
+NOI:	7	<#Klopfen>
+NOI:	9	<#>
+NOI:	10;11	<#> <#Klopfen>
+NOI:	16	<#Rascheln>
+NOI:	17;18	<A> <Ger"ausch>
+NOI:	17	<#Klopfen>
+NOI:	18	<Ger"ausch>
+NOI:	19	<Ger"ausch>
+NOI:	24;25	<A> <#Klopfen> <#Quietschen> <#Klopfen> <#Klopfen>
+NOI:	25;26	<Ger"ausch>
+DAS: 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15	@(DEVIATE_SCENARIO BA)
+DAS: 16,17,18,19,20,21,22,23,24	@(ACCEPT BA)
+DAS: 25	@(NOT_CLASSIFIABLE BA)
+SYN:	0	1	ADVX
+SYN:	0	2	DM
+SYN:	1	1	NX
+SYN:	1	2	VF
+SYN:	1,2,3	0	SIMPX
+SYN:	2	1	VXFIN
+SYN:	2	2	LK
+SYN:	3	1	ADVX
+SYN:	3	2	MF
+SYN:	4,5,6,7	0	PX
+SYN:	4,5,6,7	1	VF
+SYN:	4,5,6,7,11,12,13,14,15	0	SIMPX
+SYN:	5,6	0	NX
+SYN:	5,6,7	0	NX
+SYN:	7	1	PX
+SYN:	8	1	VXFIN
+SYN:	8	2	LK
+SYN:	8,9	0	SIMPX
+SYN:	9	1	NX
+SYN:	9	2	MF
+SYN:	11	1	VXFIN
+SYN:	11	2	LK
+SYN:	12	1	NX
+SYN:	12,13,14,15	0	MF
+SYN:	13,14,15	0	PX
+SYN:	14,15	0	NX
+SYN:	16	1	ADVX
+SYN:	16	2	VF
+SYN:	16,17	0	SIMPX
+SYN:	17	1	VXFIN
+SYN:	17	2	LK
+SYN:	18,19	0	NX
+SYN:	18,19	1	VF
+SYN:	18,19,21,22,23,24	0	SIMPX
+SYN:	20	1	VXFIN
+SYN:	21	1	VXFIN
+SYN:	21	2	LK
+SYN:	22	1	ADVX
+SYN:	22,23,24	0	MF
+SYN:	23,24	0	PX
+SYN:	24	1	NX
+FUN:	0	0	HD
+FUN:	0	1	-
+FUN:	0	2	--
+FUN:	1	0	HD
+FUN:	1	1	ON
+FUN:	1	2	-
+FUN:	1,2,3	0	--
+FUN:	2	0	HD
+FUN:	2	1	HD
+FUN:	2	2	-
+FUN:	3	0	HD
+FUN:	3	1	MOD
+FUN:	3	2	-
+FUN:	4	0	-
+FUN:	4,5,6,7	0	V-MOD
+FUN:	4,5,6,7	1	-
+FUN:	4,5,6,7,11,12,13,14,15	0	--
+FUN:	5	0	-
+FUN:	5,6	0	HD
+FUN:	5,6,7	0	HD
+FUN:	6	0	HD
+FUN:	7	0	HD
+FUN:	7	1	-
+FUN:	8	0	HD
+FUN:	8	1	HD
+FUN:	8	2	-
+FUN:	8,9	0	--
+FUN:	9	0	HD
+FUN:	9	1	ON
+FUN:	9	2	-
+FUN:	11	0	HD
+FUN:	11	1	HD
+FUN:	11	2	-
+FUN:	12	0	HD
+FUN:	12	1	ON
+FUN:	12,13,14,15	0	-
+FUN:	13	0	-
+FUN:	13,14,15	0	V-MOD
+FUN:	14	0	-
+FUN:	14,15	0	HD
+FUN:	15	0	HD
+FUN:	16	0	HD
+FUN:	16	1	MOD
+FUN:	16	2	-
+FUN:	16,17	0	--
+FUN:	17	0	HD
+FUN:	17	1	HD
+FUN:	17	2	-
+FUN:	18	0	-
+FUN:	18,19	0	ON
+FUN:	18,19	1	-
+FUN:	18,19,21,22,23,24	0	--
+FUN:	19	0	HD
+FUN:	20	0	HD
+FUN:	20	1	--
+FUN:	21	0	HD
+FUN:	21	1	HD
+FUN:	21	2	-
+FUN:	22	0	HD
+FUN:	22	1	MOD
+FUN:	22,23,24	0	-
+FUN:	23	0	-
+FUN:	23,24	0	PRED
+FUN:	24	0	HD
+FUN:	24	1	HD
+FUN:	25	0	--
+LEX:	0	0	ADV
+LEX:	1	0	PPER
+LEX:	2	0	VAFIN
+LEX:	3	0	ADV
+LEX:	4	0	APPR
+LEX:	5	0	ART
+LEX:	6	0	NN
+LEX:	7	0	PROP
+LEX:	8	0	VAFIN
+LEX:	9	0	PPER
+LEX:	11	0	VVFIN
+LEX:	12	0	PPER
+LEX:	13	0	APPR
+LEX:	14	0	ART
+LEX:	15	0	NN
+LEX:	16	0	ADV
+LEX:	17	0	VAFIN
+LEX:	18	0	ART
+LEX:	19	0	NN
+LEX:	20	0	VAFIN
+LEX:	21	0	VAFIN
+LEX:	22	0	ADV
+LEX:	23	0	APPR
+LEX:	24	0	NN
+LEX:	25	0	APPRART
+MAU:	0	639	-1	<p:>
+MAU:	640	479	0	Q
+MAU:	1120	1919	0	a
+MAU:	3040	1759	0	l
+MAU:	4800	479	0	z
+MAU:	5280	639	0	o
+MAU:	5920	959	1	I
+MAU:	6880	479	1	C
+MAU:	7360	479	2	h
+MAU:	7840	1599	2	a:
+MAU:	9440	479	2	b
+MAU:	9920	1119	3	d
+MAU:	11040	1759	3	a
+MAU:	12800	1119	3	n
+MAU:	13920	1119	4	a
+MAU:	15040	639	4	n
+MAU:	15680	479	5	d
+MAU:	16160	639	5	e:
+MAU:	16800	1119	5	m
+MAU:	17920	479	6	m
+MAU:	18400	1119	6	I
+MAU:	19520	1439	6	t
+MAU:	20960	479	6	v
+MAU:	21440	1279	6	O
+MAU:	22720	1599	6	x
+MAU:	24320	1279	7	d
+MAU:	25600	479	7	r
+MAU:	26080	3519	7	aU
+MAU:	29600	2239	7	f
+MAU:	31840	2239	8	h
+MAU:	34080	1439	8	a:
+MAU:	35520	479	8	b
+MAU:	36000	959	9	I
+MAU:	36960	3359	9	C
+MAU:	40320	6879	-1	<p:>
+MAU:	47200	2719	10	E:
+MAU:	49920	1119	11	g
+MAU:	51040	1599	11	e:
+MAU:	52640	639	12	I
+MAU:	53280	1119	12	j
+MAU:	54400	1439	13	aU
+MAU:	55840	479	13	f
+MAU:	56320	1759	14	n
+MAU:	58080	1439	15	k
+MAU:	59520	479	15	O
+MAU:	60000	799	15	n
+MAU:	60800	639	15	t
+MAU:	61440	959	15	s
+MAU:	62400	1119	15	E
+MAU:	63520	1919	15	6
+MAU:	65440	479	15	t
+MAU:	65920	1599	16	a
+MAU:	67520	479	16	l
+MAU:	68000	959	16	z
+MAU:	68960	2079	16	o
+MAU:	71040	2239	17	s
+MAU:	73280	1599	17	t
+MAU:	74880	9599	-1	<p:>
+MAU:	84480	479	18	Q
+MAU:	84960	1119	18	aI
+MAU:	86080	1759	18	n
+MAU:	87840	799	19	k
+MAU:	88640	479	19	n
+MAU:	89120	2879	19	aI
+MAU:	92000	479	19	p
+MAU:	92480	799	19	@
+MAU:	93280	479	19	n
+MAU:	93760	479	19	b
+MAU:	94240	479	19	@
+MAU:	94720	2079	19	z
+MAU:	96800	2239	19	u:
+MAU:	99040	959	19	x
+MAU:	100000	1279	20	v
+MAU:	101280	2719	20	E:
+MAU:	104000	479	20	r
+MAU:	104480	639	20	@
+MAU:	105120	479	21	v
+MAU:	105600	1119	21	E:
+MAU:	106720	799	21	6
+MAU:	107520	1599	22	S
+MAU:	109120	6719	22	o:
+MAU:	115840	3679	22	N
+MAU:	119520	9759	-1	<p:>
+MAU:	129280	479	23	n
+MAU:	129760	5919	-1	<p:>
+MAU:	135680	479	24	Q
+MAU:	136160	639	24	O
+MAU:	136800	4319	24	6
+MAU:	141120	639	24	n
+MAU:	141760	479	24	U
+MAU:	142240	1279	24	N
+MAU:	143520	479	25	b
+MAU:	144000	2239	25	aI
+MAU:	146240	4959	25	m
+MAU:	151200	319	-1	<p:>
+PRO: 0;1	DS1
+PRO: 3;4	IC2
+PRO: 7;8	IRB
+PRO: 9;10	IRE
+PRO: 15;16	SM3
+PRO: 16;17	DS1
+PRO: 16;17	IRX
+PRO: 17;18	IRN
+PRO: 19;20	IRB
+PRO: 20;21	IRE
+PRO: 21;22	AC1
+PRO: 22;23	AC1
+PRO: 24;25	SM3
+POS:	0	ADV
+POS:	1	PPER
+POS:	2	VAFIN
+POS:	3	ADV
+POS:	4	APPR
+POS:	5	ART
+POS:	6	NN
+POS:	7	PAV
+POS:	8	VAFIN
+POS:	9	PPER
+POS:	11	VVFIN
+POS:	12	PPER
+POS:	13	APPR
+POS:	14	ART
+POS:	15	NN
+POS:	16	ADV
+POS:	17	VAFIN
+POS:	18	ART
+POS:	19	NN
+POS:	20	VAFIN
+POS:	21	VAFIN
+POS:	22	ADV
+POS:	23	APPR
+POS:	24	NN
+POS:	25	APPRART
+LMA:	0	also
+LMA:	1	pper
+LMA:	2	haben
+LMA:	3	dann
+LMA:	4	an
+LMA:	5	d
+LMA:	6	Mittwoch
+LMA:	7	drauf
+LMA:	8	haben
+LMA:	9	pper
+LMA:	11	gehen
+LMA:	12	pper
+LMA:	13	auf
+LMA:	14	ein
+LMA:	15	Konzert
+LMA:	16	also
+LMA:	17	sein
+LMA:	18	ein
+LMA:	19	Kneipenbesuch
+LMA:	20	sein
+LMA:	21	sein
+LMA:	22	schon
+LMA:	23	in
+LMA:	24	Ordnung
+LMA:	25	beim
+TLN:	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25	DE>EN	 well , I have then on the Wednesday after I have , I am going to a concert , well # # a bar visit would certainly # # be alright , at the

@@ -1,0 +1,26 @@
+89	{"result":[]}
+972	{"result":[{"alternative":[{"transcript":"also"}],"stability":0.0099999998}],"result_index":0}
+1080	{"result":[{"alternative":[{"transcript":"also ich"}],"stability":0.0099999998}],"result_index":0}
+1258	{"result":[{"alternative":[{"transcript":"also ich hab"}],"stability":0.0099999998}],"result_index":0}
+1286	{"result":[{"alternative":[{"transcript":"also ich habe"}],"stability":0.0099999998}],"result_index":0}
+1393	{"result":[{"alternative":[{"transcript":"also ich habe da"}],"stability":0.0099999998}],"result_index":0}
+1473	{"result":[{"alternative":[{"transcript":"also ich habe das"}],"stability":0.0099999998}],"result_index":0}
+1542	{"result":[{"alternative":[{"transcript":"also ich habe dann"}],"stability":0.0099999998}],"result_index":0}
+1611	{"result":[{"alternative":[{"transcript":"also ich habe deine"}],"stability":0.0099999998}],"result_index":0}
+1686	{"result":[{"alternative":[{"transcript":"also"}],"stability":0.89999998},{"alternative":[{"transcript":" ich habe deine"}],"stability":0.0099999998}],"result_index":0}
+1772	{"result":[{"alternative":[{"transcript":"also ich"}],"stability":0.89999998},{"alternative":[{"transcript":" habe deinen"}],"stability":0.0099999998}],"result_index":0}
+1861	{"result":[{"alternative":[{"transcript":"also ich"}],"stability":0.89999998},{"alternative":[{"transcript":" habe deine"}],"stability":0.0099999998}],"result_index":0}
+1994	{"result":[{"alternative":[{"transcript":"also ich"}],"stability":0.89999998},{"alternative":[{"transcript":" habe deinen"}],"stability":0.0099999998}],"result_index":0}
+2065	{"result":[{"alternative":[{"transcript":"also ich habe"}],"stability":0.89999998},{"alternative":[{"transcript":" deinen"}],"stability":0.0099999998}],"result_index":0}
+2146	{"result":[{"alternative":[{"transcript":"also ich habe"}],"stability":0.89999998},{"alternative":[{"transcript":" deine mit"}],"stability":0.0099999998}],"result_index":0}
+2332	{"result":[{"alternative":[{"transcript":"also ich habe"}],"stability":0.89999998},{"alternative":[{"transcript":" deine Mitte"}],"stability":0.0099999998}],"result_index":0}
+2359	{"result":[{"alternative":[{"transcript":"also ich habe"}],"stability":0.89999998},{"alternative":[{"transcript":" dann am mittwoch"}],"stability":0.0099999998}],"result_index":0}
+2528	{"result":[{"alternative":[{"transcript":"also ich habe"}],"stability":0.89999998},{"alternative":[{"transcript":" dann am mittwoch den"}],"stability":0.0099999998}],"result_index":0}
+2584	{"result":[{"alternative":[{"transcript":"also ich habe"}],"stability":0.89999998},{"alternative":[{"transcript":" dann am Mittwoch da"}],"stability":0.0099999998}],"result_index":0}
+2630	{"result":[{"alternative":[{"transcript":"also ich habe"}],"stability":0.89999998},{"alternative":[{"transcript":" dann am mittwoch drauf"}],"stability":0.0099999998}],"result_index":0}
+2689	{"result":[{"alternative":[{"transcript":"also ich habe dann am"}],"stability":0.89999998},{"alternative":[{"transcript":" mittwoch drauf"}],"stability":0.0099999998}],"result_index":0}
+2810	{"result":[{"alternative":[{"transcript":"also ich habe dann am"}],"stability":0.89999998},{"alternative":[{"transcript":" mittwoch drauf habe"}],"stability":0.0099999998}],"result_index":0}
+2825	{"result":[{"alternative":[{"transcript":"also ich habe dann am mittwoch drauf"}],"stability":0.89999998},{"alternative":[{"transcript":" habe"}],"stability":0.0099999998}],"result_index":0}
+2833	{"result":[{"alternative":[{"transcript":"also ich habe dann am mittwoch drauf"}],"stability":0.89999998},{"alternative":[{"transcript":" habe ich"}],"stability":0.0099999998}],"result_index":0}
+3131	{"result":[{"alternative":[{"transcript":"also ich habe dann am mittwoch drauf habe"}],"stability":0.89999998},{"alternative":[{"transcript":" ich"}],"stability":0.0099999998}],"result_index":0}
+3499	{"result":[{"alternative":[{"transcript":"also ich habe dann am mittwoch drauf habe ich","confidence":0.83266485},{"transcript":"also ich habe dann am Mittwoch drauf habe ich"},{"transcript":"also ich habe dann am Mittwoch darauf habe ich"},{"transcript":"also ich habe dann am mittwoch darauf habe ich"},{"transcript":"also ich habe deine Mittwoch darauf habe ich"},{"transcript":"also ich habe deine mittwoch drauf habe ich"},{"transcript":"also ich habe dann an den mittwoch drauf habe ich"},{"transcript":"also ich hab dann am Mittwoch darauf habe ich"},{"transcript":"also ich habe dann einen mittwoch drauf habe ich"},{"transcript":"also ich habe dann an dem mittwoch drauf habe ich"}],"final":true}],"result_index":0}

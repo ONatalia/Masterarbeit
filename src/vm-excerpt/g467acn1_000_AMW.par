@@ -1,0 +1,47 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AMW
+LBD:
+TR2:	0	guten
+TR2:	1	<:<#Klopfen> Tag:> ,
+TR2:	2	Herr
+TR2:	3	~Freyer . <#Rascheln> 
+ORT:	0	guten
+ORT:	1	Tag
+ORT:	2	Herr
+ORT:	3	Freyer
+KAN:	0	g'u:t@n
+KAN:	1	t'a:k
+KAN:	2	h'E6
+KAN:	3	fr'aI6
+NOI:	1	<#Klopfen>
+NOI:	3;4	<#Rascheln>
+MAU:	0	2239	-1	<p:>
+MAU:	2240	479	0	g
+MAU:	2720	959	0	u:
+MAU:	3680	1279	0	t
+MAU:	4960	639	0	@
+MAU:	5600	479	0	n
+MAU:	6080	639	1	t
+MAU:	6720	1919	1	a:
+MAU:	8640	479	1	k
+MAU:	9120	799	2	E
+MAU:	9920	479	2	6
+MAU:	10400	1119	3	f
+MAU:	11520	479	3	r
+MAU:	12000	1759	3	aI
+MAU:	13760	3199	3	6
+MAU:	16960	1599	-1	<p:>
+POS:	0	ADJA
+POS:	1	NN
+POS:	2	NN
+POS:	3	NE
+LMA:	0	gut
+LMA:	1	Tag
+LMA:	2	Herr
+LMA:	3	Freyer

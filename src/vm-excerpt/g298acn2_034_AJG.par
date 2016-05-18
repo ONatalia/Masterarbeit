@@ -1,0 +1,30 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AJG
+LBD:
+TR2:	0	<Ger"ausch> <:<#> genau:> . <A> 
+ORT:	0	genau
+KAN:	0	g@n'aU+
+NOI:	-1;0	<Ger"ausch>
+NOI:	0;1	<A>
+NOI:	0	<#> 
+DAS: 0	@(ACCEPT AB)
+SYN:	0	1	DM
+FUN:	0	0	-
+FUN:	0	1	--
+LEX:	0	0	ITJ
+MAU:	0	1119	-1	<p:>
+MAU:	1120	799	0	g
+MAU:	1920	639	0	@
+MAU:	2560	2079	0	n
+MAU:	4640	4479	0	aU
+MAU:	9120	2239	-1	<p:>
+PRO: 0	PM3
+POS:	0	ADJD
+LMA:	0	genau
+TLN:	0	DE>EN	 right .

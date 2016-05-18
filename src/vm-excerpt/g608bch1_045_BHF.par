@@ -1,0 +1,223 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: BHF
+LBD:
+TR2:	0	<Schmatzen> <A> ja<Z> ,
+TR2:	1	das
+TR2:	2	ist <!2 das>
+TR2:	3	gut .
+TR2:	4	<:<#Rascheln> wenn:>
+TR2:	5	<:<#Rascheln> Sie:>
+TR2:	6	<:<#Rascheln> das:>
+TR2:	7	f"ur
+TR2:	8	mich
+TR2:	9	reservieren
+TR2:	10	<:<#> k"onnten:>
+TR2:	11	<:<#Rascheln> auf:>
+TR2:	12	<:<#Rascheln> den:>
+TR2:	13	<:<#Rascheln> Namen:> <!1 Nam'>
+TR2:	14	~Knipp20@ . 
+SUP:	14	g608bch2_046_BHG.par	@20mhm . <Schmatzen> <A>
+ORT:	0	ja
+ORT:	1	das
+ORT:	2	ist
+ORT:	3	gut
+ORT:	4	wenn
+ORT:	5	Sie
+ORT:	6	das
+ORT:	7	f"ur
+ORT:	8	mich
+ORT:	9	reservieren
+ORT:	10	k"onnten
+ORT:	11	auf
+ORT:	12	den
+ORT:	13	Namen
+ORT:	14	Knipp
+KAN:	0	j'a:
+KAN:	1	das+
+KAN:	2	Q'Ist+
+KAN:	3	g'u:t
+KAN:	4	v'En+
+KAN:	5	z'i:+
+KAN:	6	das+
+KAN:	7	f'y:6+
+KAN:	8	m'IC+
+KAN:	9	rezE6v'i:r@n
+KAN:	10	k'9nt@n
+KAN:	11	QaUf+
+KAN:	12	de:n+
+KAN:	13	n'a:m@n
+KAN:	14	kn'Ip
+NOI:	-1;0	<Schmatzen> <A>
+NOI:	4	<#Rascheln>
+NOI:	5	<#Rascheln>
+NOI:	6	<#Rascheln>
+NOI:	10	<#>
+NOI:	11	<#Rascheln>
+NOI:	12	<#Rascheln>
+NOI:	13	<#Rascheln>
+SYN:	0	1	DM
+SYN:	1	1	NX
+SYN:	1	2	VF
+SYN:	1,2,3	0	SIMPX
+SYN:	2	1	VXFIN
+SYN:	2	2	LK
+SYN:	3	1	ADJX
+SYN:	3	2	MF
+SYN:	4	1	C
+SYN:	4,5,6,7,8,9,10,11,12,13,14	0	SIMPX
+SYN:	5	1	NX
+SYN:	5,6,7,8	0	MF
+SYN:	6	1	NX
+SYN:	7,8	0	PX
+SYN:	8	1	NX
+SYN:	9	1	VXINF
+SYN:	9,10	0	VC
+SYN:	10	1	VXFIN
+SYN:	11,12,13,14	0	PX
+SYN:	11,12,13,14	1	NF
+SYN:	12,13,14	0	NX
+SYN:	13	1	NX
+SYN:	13,14	0	NX
+SYN:	14	1	NX
+FUN:	0	0	-
+FUN:	0	1	--
+FUN:	1	0	HD
+FUN:	1	1	ON
+FUN:	1	2	-
+FUN:	1,2,3	0	--
+FUN:	2	0	HD
+FUN:	2	1	HD
+FUN:	2	2	-
+FUN:	3	0	HD
+FUN:	3	1	PRED
+FUN:	3	2	-
+FUN:	4	0	-
+FUN:	4	1	-
+FUN:	4,5,6,7,8,9,10,11,12,13,14	0	--
+FUN:	5	0	HD
+FUN:	5	1	ON
+FUN:	5,6,7,8	0	-
+FUN:	6	0	HD
+FUN:	6	1	OA
+FUN:	7	0	-
+FUN:	7,8	0	FOPP
+FUN:	8	0	HD
+FUN:	8	1	HD
+FUN:	9	0	HD
+FUN:	9	1	OV
+FUN:	9,10	0	-
+FUN:	10	0	HD
+FUN:	10	1	HD
+FUN:	11	0	-
+FUN:	11,12,13,14	0	V-MOD
+FUN:	11,12,13,14	1	-
+FUN:	12	0	-
+FUN:	12,13,14	0	HD
+FUN:	13	0	HD
+FUN:	13	1	HD
+FUN:	13,14	0	HD
+FUN:	14	0	HD
+FUN:	14	1	-
+LEX:	0	0	PTKANT
+LEX:	1	0	PDS
+LEX:	2	0	VAFIN
+LEX:	3	0	ADJD
+LEX:	4	0	KOUS
+LEX:	5	0	PPER
+LEX:	6	0	PDS
+LEX:	7	0	APPR
+LEX:	8	0	PPER
+LEX:	9	0	VVINF
+LEX:	10	0	VMFIN
+LEX:	11	0	APPR
+LEX:	12	0	ART
+LEX:	13	0	NN
+LEX:	14	0	NE
+MAU:	0	4159	-1	<p:>
+MAU:	4160	4959	0	j
+MAU:	9120	1119	0	a:
+MAU:	10240	639	1	d
+MAU:	10880	1279	1	a
+MAU:	12160	1439	1	s
+MAU:	13600	639	2	s
+MAU:	14240	1599	3	g
+MAU:	15840	1119	3	u:
+MAU:	16960	639	3	t
+MAU:	17600	479	4	v
+MAU:	18080	959	4	E
+MAU:	19040	639	4	n
+MAU:	19680	479	5	z
+MAU:	20160	799	5	i:
+MAU:	20960	799	6	d
+MAU:	21760	1119	6	a
+MAU:	22880	959	6	s
+MAU:	23840	639	7	f
+MAU:	24480	639	7	y:
+MAU:	25120	479	7	6
+MAU:	25600	639	8	m
+MAU:	26240	639	8	I
+MAU:	26880	1279	8	C
+MAU:	28160	1759	9	r
+MAU:	29920	639	9	e
+MAU:	30560	1279	9	z
+MAU:	31840	479	9	E
+MAU:	32320	479	9	6
+MAU:	32800	799	9	v
+MAU:	33600	1119	9	i:
+MAU:	34720	799	9	6
+MAU:	35520	799	9	n
+MAU:	36320	1279	10	k
+MAU:	37600	799	10	9
+MAU:	38400	1279	10	Q
+MAU:	39680	799	10	n
+MAU:	40480	1279	11	aU
+MAU:	41760	639	11	f
+MAU:	42400	1119	12	d
+MAU:	43520	799	12	e:
+MAU:	44320	479	12	n
+MAU:	44800	479	13	n
+MAU:	45280	1919	13	a:
+MAU:	47200	1119	13	m
+MAU:	48320	1119	-1	<p:>
+MAU:	49440	1599	14	k
+MAU:	51040	1279	14	n
+MAU:	52320	639	14	I
+MAU:	52960	2559	14	p
+MAU:	55520	3199	-1	<p:>
+POS:	0	ITJ
+POS:	1	PDS
+POS:	2	VAFIN
+POS:	3	ADJD
+POS:	4	KOUS
+POS:	5	PPER
+POS:	6	PDS
+POS:	7	APPR
+POS:	8	PRF
+POS:	9	VVINF
+POS:	10	VMFIN
+POS:	11	APPR
+POS:	12	ART
+POS:	13	NN
+POS:	14	NE
+LMA:	0	ja
+LMA:	1	d
+LMA:	2	sein
+LMA:	3	gut
+LMA:	4	wenn
+LMA:	5	pper
+LMA:	6	d
+LMA:	7	f"ur
+LMA:	8	prf
+LMA:	9	reservieren
+LMA:	10	k"onnen
+LMA:	11	auf
+LMA:	12	d
+LMA:	13	Name
+LMA:	14	Knipp
+TLN:	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14	DE>EN	 yes , that is good . if you could book that for me under the name of ~Knipp .

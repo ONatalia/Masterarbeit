@@ -1,0 +1,21 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AAJ
+LBD:
+TR2:	0	@18un<_T> <*T>t 
+SUP:	0	g001acn2_057_AAK.par	u<Z>nd18@ <!1 un'>
+ORT:	0	un
+KAN:	0	QUn
+DAS: 0	@(NOT_CLASSIFIABLE AB)
+MAU:	0	799	-1	<p:>
+MAU:	800	1119	0	Q
+MAU:	1920	1119	0	U
+MAU:	3040	3519	0	n
+MAU:	6560	319	-1	<p:>
+TLN:	0	DE>EN	 # #
+TLN:	0	DE>JA	 

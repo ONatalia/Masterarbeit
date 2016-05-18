@@ -1,0 +1,290 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: ALG
+LBD:
+TR2:	0	<#Klopfen> ach ,
+TR2:	1	Mai ,
+TR2:	2	okay . <A> <P>
+TR2:	3	<h"as>
+TR2:	4	<"ah>
+TR2:	5	<:<#Klopfen> da:>
+TR2:	6	geht
+TR2:	7	<:<#Klopfen> 's:>
+TR2:	8	bei
+TR2:	9	<:<#Klopfen> mir:>
+TR2:	10	auch .
+TR2:	11	das
+TR2:	12	sind <!2 dasin'>
+TR2:	13	ja
+TR2:	14	<:<#Klopfen> #zwei:>
+TR2:	15	Tage ,
+TR2:	16	<:<#Klopfen> also:>
+TR2:	17	dieser
+TR2:	18	Montag5@
+TR2:	19	und5@
+TR2:	20	<:<#Klopfen> Dienstag5@:> ,
+TR2:	21	mhm . <A> <#Klopfen> 
+SUP:	18,19,20	g389acn2_012_ALH.par	<Ger"ausch> @5genau . <Ger"ausch> 
+ORT:	0	ach
+ORT:	1	Mai
+ORT:	2	okay
+ORT:	3	<h"as>
+ORT:	4	<"ah>
+ORT:	5	da
+ORT:	6	geht
+ORT:	7	es
+ORT:	8	bei
+ORT:	9	mir
+ORT:	10	auch
+ORT:	11	das
+ORT:	12	sind
+ORT:	13	ja
+ORT:	14	zwei
+ORT:	15	Tage
+ORT:	16	also
+ORT:	17	dieser
+ORT:	18	Montag
+ORT:	19	und
+ORT:	20	Dienstag
+ORT:	21	mhm
+KAN:	0	Q'ax
+KAN:	1	m'aI
+KAN:	2	Qok'e:
+KAN:	3	<usb>
+KAN:	4	Q'E:
+KAN:	5	d'a:+
+KAN:	6	g'e:t
+KAN:	7	Q'Es+
+KAN:	8	baI+
+KAN:	9	m'i:6+
+KAN:	10	QaUx+
+KAN:	11	das+
+KAN:	12	z'Int+
+KAN:	13	j'a:
+KAN:	14	tsv'aI
+KAN:	15	t'a:g@
+KAN:	16	Q'alzo+
+KAN:	17	d'i:z6+
+KAN:	18	m'o:nta:k
+KAN:	19	Q'Unt+
+KAN:	20	d'i:nsta:k
+KAN:	21	mhm
+NOI:	-1;0	<#Klopfen>
+NOI:	2;3	<A>
+NOI:	5	<#Klopfen>
+NOI:	7	<#Klopfen>
+NOI:	9	<#Klopfen>
+NOI:	14	<#Klopfen>
+NOI:	16	<#Klopfen>
+NOI:	20	<#Klopfen>
+NOI:	21;22	<A> <#Klopfen>
+DAS: 0,1,2	@(ACCEPT AB)
+DAS: 3,4,5,6,7,8,9,10	@(ACCEPT AB)
+DAS: 11,12,13,14,15,16,17,18,19,20,21	@(INFORM AB)
+SYN:	0	1	DM
+SYN:	1	1	NX
+SYN:	2	1	DM
+SYN:	5	1	ADVX
+SYN:	5	2	VF
+SYN:	5,6,7,8,9,10	0	SIMPX
+SYN:	6	1	VXFIN
+SYN:	6	2	LK
+SYN:	7	1	NX
+SYN:	7,8,9,10	0	MF
+SYN:	8,9	0	PX
+SYN:	9	1	NX
+SYN:	10	1	ADVX
+SYN:	11	1	NX
+SYN:	11	2	VF
+SYN:	11,12,13,14,15	0	SIMPX
+SYN:	12	1	VXFIN
+SYN:	12	2	LK
+SYN:	13	1	ADVX
+SYN:	13,14,15	0	MF
+SYN:	14	1	ADJX
+SYN:	14,15	0	NX
+SYN:	16	1	ADVX
+SYN:	16	2	DM
+SYN:	17,18,19,20	0	NX
+SYN:	18	1	NX
+SYN:	18,19,20	0	NX
+SYN:	20	1	NX
+FUN:	0	0	-
+FUN:	0	1	--
+FUN:	1	0	HD
+FUN:	1	1	--
+FUN:	2	0	-
+FUN:	2	1	--
+FUN:	5	0	HD
+FUN:	5	1	MOD
+FUN:	5	2	-
+FUN:	5,6,7,8,9,10	0	--
+FUN:	6	0	HD
+FUN:	6	1	HD
+FUN:	6	2	-
+FUN:	7	0	HD
+FUN:	7	1	ON
+FUN:	7,8,9,10	0	-
+FUN:	8	0	-
+FUN:	8,9	0	FOPP
+FUN:	9	0	HD
+FUN:	9	1	HD
+FUN:	10	0	HD
+FUN:	10	1	MOD
+FUN:	11	0	HD
+FUN:	11	1	ON
+FUN:	11	2	-
+FUN:	11,12,13,14,15	0	--
+FUN:	12	0	HD
+FUN:	12	1	HD
+FUN:	12	2	-
+FUN:	13	0	HD
+FUN:	13	1	MOD
+FUN:	13,14,15	0	-
+FUN:	14	0	HD
+FUN:	14	1	-
+FUN:	14,15	0	PRED
+FUN:	15	0	HD
+FUN:	16	0	HD
+FUN:	16	1	-
+FUN:	16	2	--
+FUN:	17	0	-
+FUN:	17,18,19,20	0	--
+FUN:	18	0	HD
+FUN:	18	1	-
+FUN:	18,19,20	0	HD
+FUN:	19	0	-
+FUN:	20	0	HD
+FUN:	20	1	-
+LEX:	0	0	ITJ
+LEX:	1	0	NN
+LEX:	2	0	ITJ
+LEX:	5	0	ADV
+LEX:	6	0	VVFIN
+LEX:	7	0	PPER
+LEX:	8	0	APPR
+LEX:	9	0	PPER
+LEX:	10	0	ADV
+LEX:	11	0	PDS
+LEX:	12	0	VAFIN
+LEX:	13	0	ADV
+LEX:	14	0	CARD
+LEX:	15	0	NN
+LEX:	16	0	ADV
+LEX:	17	0	PDAT
+LEX:	18	0	NN
+LEX:	19	0	KON
+LEX:	20	0	NN
+MAU:	0	1279	-1	<p:>
+MAU:	1280	799	0	Q
+MAU:	2080	799	0	a
+MAU:	2880	1119	0	x
+MAU:	4000	1439	1	m
+MAU:	5440	3039	1	aI
+MAU:	8480	799	2	Q
+MAU:	9280	959	2	o
+MAU:	10240	1279	2	k
+MAU:	11520	2399	2	e:
+MAU:	13920	11679	3	<usb>
+MAU:	25600	2879	-1	<p:>
+MAU:	28480	1119	4	Q
+MAU:	29600	3839	4	E:
+MAU:	33440	1279	5	d
+MAU:	34720	1439	5	a:
+MAU:	36160	959	6	g
+MAU:	37120	1279	6	e:
+MAU:	38400	639	6	t
+MAU:	39040	479	7	s
+MAU:	39520	1119	8	b
+MAU:	40640	1279	8	aI
+MAU:	41920	959	9	m
+MAU:	42880	959	9	i:
+MAU:	43840	799	9	6
+MAU:	44640	2879	10	aU
+MAU:	47520	799	10	x
+MAU:	48320	799	11	d
+MAU:	49120	479	11	a
+MAU:	49600	479	11	s
+MAU:	50080	639	12	z
+MAU:	50720	639	12	n
+MAU:	51360	479	13	j
+MAU:	51840	639	13	a:
+MAU:	52480	959	14	t
+MAU:	53440	639	14	s
+MAU:	54080	639	14	v
+MAU:	54720	2239	14	aI
+MAU:	56960	1119	15	t
+MAU:	58080	1919	15	a:
+MAU:	60000	479	15	g
+MAU:	60480	479	15	@
+MAU:	60960	639	16	a
+MAU:	61600	959	16	l
+MAU:	62560	639	16	z
+MAU:	63200	639	16	o
+MAU:	63840	479	17	d
+MAU:	64320	959	17	i:
+MAU:	65280	1119	17	z
+MAU:	66400	959	17	6
+MAU:	67360	639	18	m
+MAU:	68000	2879	18	o:
+MAU:	70880	479	18	n
+MAU:	71360	1119	18	t
+MAU:	72480	1919	18	a:
+MAU:	74400	799	18	k
+MAU:	75200	799	19	U
+MAU:	76000	1119	19	n
+MAU:	77120	1279	20	d
+MAU:	78400	1759	20	i:
+MAU:	80160	1439	20	n
+MAU:	81600	1759	20	s
+MAU:	83360	959	20	t
+MAU:	84320	1919	20	a:
+MAU:	86240	1919	20	k
+MAU:	88160	2079	21	m
+MAU:	90240	3199	21	m
+MAU:	93440	2399	-1	<p:>
+POS:	0	ITJ
+POS:	1	NN
+POS:	2	ITJ
+POS:	5	ADV
+POS:	6	VVFIN
+POS:	7	PPER
+POS:	8	APPR
+POS:	9	PPER
+POS:	10	ADV
+POS:	11	PDS
+POS:	12	VAFIN
+POS:	13	ADV
+POS:	14	CARD
+POS:	15	NN
+POS:	16	ADV
+POS:	17	PDAT
+POS:	18	NN
+POS:	19	KON
+POS:	20	NN
+LMA:	0	ach
+LMA:	1	Mai
+LMA:	2	okay
+LMA:	5	da
+LMA:	6	gehen
+LMA:	7	pper
+LMA:	8	bei
+LMA:	9	pper
+LMA:	10	auch
+LMA:	11	d
+LMA:	12	sein
+LMA:	13	ja
+LMA:	14	zwei
+LMA:	15	Tag
+LMA:	16	also
+LMA:	17	dieser
+LMA:	18	Montag
+LMA:	19	und
+LMA:	20	Dienstag
+TLN:	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21	DE>EN	 oh , May , okay . it works for me then as well . that is two days , that is this Monday and Tuesday , mhm .
+TLN:	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21	DE>JA	 aa #gogatsu desu ka ii deshou . sono koro wa watakushi no hou mo tsugou ga ii desu . maa #futsuka kaN desu ne tsumari kono getsuyoubi to kayoubi desu ne uuN . 

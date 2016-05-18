@@ -1,0 +1,40 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: BHI
+LBD:
+TR2:	0	f"ur
+TR2:	1	die
+TR2:	2	"Ubernachtung ? <Ger"ausch> 
+ORT:	0	f"ur
+ORT:	1	die
+ORT:	2	"Ubernachtung
+KAN:	0	f'y:6+
+KAN:	1	d'i:+
+KAN:	2	Qy:b6n'axtUN
+NOI:	2;3	<Ger"ausch>
+MAU:	0	1759	-1	<p:>
+MAU:	1760	1759	0	f
+MAU:	3520	639	0	Y
+MAU:	4160	639	1	d
+MAU:	4800	799	1	i:
+MAU:	5600	799	2	y:
+MAU:	6400	799	2	b
+MAU:	7200	1119	2	6
+MAU:	8320	639	2	n
+MAU:	8960	1119	2	a
+MAU:	10080	1279	2	x
+MAU:	11360	959	2	t
+MAU:	12320	1599	2	U
+MAU:	13920	479	2	N
+MAU:	14400	799	-1	<p:>
+POS:	0	APPR
+POS:	1	ART
+POS:	2	NN
+LMA:	0	f"ur
+LMA:	1	d
+LMA:	2	"Ubernachtung

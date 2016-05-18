@@ -1,0 +1,39 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: BHG
+LBD:
+TR2:	0	<Ger"ausch> @26ja ,
+TR2:	1	@26genau . <Ger"ausch> 
+SUP:	0,1	g607bch1_063_BHF.par	zur"uck26@ ? oder26@ fliegt26@
+ORT:	0	ja
+ORT:	1	genau
+KAN:	0	j'a:
+KAN:	1	g@n'aU+
+NOI:	-1;0	<Ger"ausch>
+NOI:	1;2	<Ger"ausch>
+SYN:	0	1	DM
+SYN:	1	1	DM
+FUN:	0	0	-
+FUN:	0	1	--
+FUN:	1	0	-
+FUN:	1	1	--
+LEX:	0	0	PTKANT
+LEX:	1	0	ITJ
+MAU:	0	959	-1	<p:>
+MAU:	960	3359	0	j
+MAU:	4320	1279	0	a:
+MAU:	5600	479	1	g
+MAU:	6080	2399	1	@
+MAU:	8480	959	1	n
+MAU:	9440	2719	1	aU
+MAU:	12160	319	-1	<p:>
+POS:	0	ITJ
+POS:	1	ADJD
+LMA:	0	ja
+LMA:	1	genau
+TLN:	0,1	DE>EN	 yes , exactly .

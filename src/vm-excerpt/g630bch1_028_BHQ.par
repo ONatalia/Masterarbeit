@@ -1,0 +1,89 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: BHQ
+LBD:
+TR2:	0	@19k"onnen <!1 k"onn'>
+TR2:	1	@19Sie <!1 Se>
+TR2:	2	<@19<%>
+TR2:	3	@19vor
+TR2:	4	@19Ort
+TR2:	5	@19kucken .
+TR2:	6	<%> <*T>t 
+SUP:	0,1,2,3,4,5	g630bch2_027_BHR.par	da19@ vor19@ Ort19@ noch19@ mal19@ <!1 ma'> schauen19@ . <#Rascheln> 
+ORT:	0	k"onnen
+ORT:	1	Sie
+ORT:	2	<%>
+ORT:	3	vor
+ORT:	4	Ort
+ORT:	5	kucken
+ORT:	6	<%>
+KAN:	0	k'9n@n
+KAN:	1	z'i:+
+KAN:	2	<usb>
+KAN:	3	f'o:6+
+KAN:	4	Q'O6t
+KAN:	5	k'Uk@n
+KAN:	6	<usb>
+NOI:	5;6	<%>
+SYN:	0	1	VXFIN
+SYN:	0	2	LK
+SYN:	0,1,3,4,5	0	SIMPX
+SYN:	1	1	NX
+SYN:	1,3,4	0	MF
+SYN:	3,4	0	PX
+SYN:	4	1	NX
+SYN:	5	1	VXINF
+SYN:	5	2	VC
+FUN:	0	0	HD
+FUN:	0	1	HD
+FUN:	0	2	-
+FUN:	0,1,3,4,5	0	--
+FUN:	1	0	HD
+FUN:	1	1	ON
+FUN:	1,3,4	0	-
+FUN:	3	0	-
+FUN:	3,4	0	V-MOD
+FUN:	4	0	HD
+FUN:	4	1	HD
+FUN:	5	0	HD
+FUN:	5	1	OV
+FUN:	5	2	-
+LEX:	0	0	VMFIN
+LEX:	1	0	PPER
+LEX:	3	0	APPR
+LEX:	4	0	NN
+LEX:	5	0	VVINF
+MAU:	0	1279	-1	<p:>
+MAU:	1280	959	0	k
+MAU:	2240	1439	0	9
+MAU:	3680	639	0	n
+MAU:	4320	2559	0	@
+MAU:	6880	479	0	n
+MAU:	7360	639	1	z
+MAU:	8000	1439	2	<usb>
+MAU:	9440	799	3	f
+MAU:	10240	639	3	o:
+MAU:	10880	1599	4	O
+MAU:	12480	639	4	6
+MAU:	13120	479	4	t
+MAU:	13600	1759	5	k
+MAU:	15360	639	5	U
+MAU:	16000	1279	5	k
+MAU:	17280	4399	5	N
+MAU:	21680	1039	6	<usb>
+MAU:	22720	1439	-1	<p:>
+POS:	0	VMFIN
+POS:	1	PPER
+POS:	3	APPR
+POS:	4	NN
+POS:	5	VVINF
+LMA:	0	k"onnen
+LMA:	1	pper
+LMA:	3	vor
+LMA:	4	Ort
+LMA:	5	kucken

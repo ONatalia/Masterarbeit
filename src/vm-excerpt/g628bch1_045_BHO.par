@@ -1,0 +1,102 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: BHO
+LBD:
+TR2:	0	ja<Z> ,
+TR2:	1	und <!1 un'>
+TR2:	2	wie
+TR2:	3	sieht
+TR2:	4	das
+TR2:	5	preislich<Z>
+TR2:	6	aus ? 
+ORT:	0	ja
+ORT:	1	und
+ORT:	2	wie
+ORT:	3	sieht
+ORT:	4	das
+ORT:	5	preislich
+ORT:	6	aus
+KAN:	0	j'a:
+KAN:	1	Q'Unt+
+KAN:	2	v'i:+
+KAN:	3	z'i:t
+KAN:	4	das+
+KAN:	5	pr'aIslIC
+KAN:	6	QaUs+
+SYN:	0	1	DM
+SYN:	1	1	KOORD
+SYN:	1,2,3,4,5,6	0	SIMPX
+SYN:	2	1	ADJX
+SYN:	2	2	VF
+SYN:	3	1	VXFIN
+SYN:	3	2	LK
+SYN:	4	1	NX
+SYN:	4,5	0	MF
+SYN:	5	1	ADVX
+SYN:	6	1	VC
+FUN:	0	0	-
+FUN:	0	1	--
+FUN:	1	0	-
+FUN:	1	1	-
+FUN:	1,2,3,4,5,6	0	--
+FUN:	2	0	HD
+FUN:	2	1	PRED
+FUN:	2	2	-
+FUN:	3	0	HD
+FUN:	3	1	HD
+FUN:	3	2	-
+FUN:	4	0	HD
+FUN:	4	1	ON
+FUN:	4,5	0	-
+FUN:	5	0	HD
+FUN:	5	1	V-MOD
+FUN:	6	0	VPT
+FUN:	6	1	-
+LEX:	0	0	PTKANT
+LEX:	1	0	KON
+LEX:	2	0	PWAV
+LEX:	3	0	VVFIN
+LEX:	4	0	PDS
+LEX:	5	0	ADV
+LEX:	6	0	PTKVZ
+MAU:	0	1279	-1	<p:>
+MAU:	1280	1599	0	j
+MAU:	2880	799	0	a:
+MAU:	3680	799	1	U
+MAU:	4480	799	1	n
+MAU:	5280	959	2	v
+MAU:	6240	1119	2	i:
+MAU:	7360	1439	3	z
+MAU:	8800	959	3	i:
+MAU:	9760	959	4	d
+MAU:	10720	479	4	a
+MAU:	11200	1119	4	s
+MAU:	12320	1119	5	p
+MAU:	13440	2079	5	r
+MAU:	15520	1919	5	aI
+MAU:	17440	1279	5	s
+MAU:	18720	959	5	l
+MAU:	19680	959	5	I
+MAU:	20640	1279	5	C
+MAU:	21920	3999	6	aU
+MAU:	25920	2399	6	s
+MAU:	28320	1759	-1	<p:>
+POS:	0	ITJ
+POS:	1	KON
+POS:	2	PWAV
+POS:	3	VVFIN
+POS:	4	PDS
+POS:	5	ADJD
+POS:	6	PTKVZ
+LMA:	0	ja
+LMA:	1	und
+LMA:	2	wie
+LMA:	3	sehen
+LMA:	4	d
+LMA:	5	preislich
+LMA:	6	aus

@@ -1,0 +1,25 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: ALK
+LBD:
+TR2:	0	@23ja . <Ger"ausch> 
+SUP:	0	g413acn2_040_AKI.par	ist23@ <!1 is'>
+ORT:	0	ja
+KAN:	0	j'a:
+NOI:	0;1	<Ger"ausch>
+SYN:	0	1	DM
+FUN:	0	0	-
+FUN:	0	1	--
+LEX:	0	0	PTKANT
+MAU:	0	2399	-1	<p:>
+MAU:	2400	1279	0	j
+MAU:	3680	3999	0	a:
+MAU:	7680	319	-1	<p:>
+POS:	0	ITJ
+LMA:	0	ja
+TLN:	0	DE>EN	 yes . 

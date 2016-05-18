@@ -1,0 +1,111 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AMI
+LBD:
+TR2:	0	<Ger"ausch> <:<#Klopfen> @22ja:> <!1 juptz> <A> <Ger"ausch> <Lachen> <#Klopfen> <Lachen>
+TR2:	1	ins
+TR2:	2	Theater , <P>23@> <Lachen>23@> <A>23@>
+TR2:	3	<:<Lachen> <#Klopfen> oder:>
+TR2:	4	<:<Lachen> in:>
+TR2:	5	'ne
+TR2:	6	Kneipe . 
+SUP:	0	g436acn1_056_AMH.par	i=22@ <*T>t 
+SUP:	2	g436acn1_058_AMH.par	<:<Lachen> <#Rascheln> @23na:> <:<Lachen> <#Klopfen> @23gut:> . 
+ORT:	0	ja
+ORT:	1	ins
+ORT:	2	Theater
+ORT:	3	oder
+ORT:	4	in
+ORT:	5	eine
+ORT:	6	Kneipe
+KAN:	0	j'a:
+KAN:	1	Q'Ins+
+KAN:	2	teQ'a:t6
+KAN:	3	Q'o:d6+
+KAN:	4	QIn+
+KAN:	5	Q'aIn@+
+KAN:	6	kn'aIp@
+NOI:	-1;0	<Ger"ausch>
+NOI:	0;1	<A> <Ger"ausch> <Lachen> <#Klopfen> <Lachen>
+NOI:	0	<#Klopfen>
+NOI:	3	<Lachen> <#Klopfen>
+NOI:	4	<Lachen>
+SYN:	0	1	DM
+SYN:	1,2	0	PX
+SYN:	1,2,3,4,5,6	0	PX
+SYN:	2	1	NX
+SYN:	4,5,6	0	PX
+SYN:	5,6	0	NX
+FUN:	0	0	-
+FUN:	0	1	--
+FUN:	1	0	-
+FUN:	1,2	0	-
+FUN:	1,2,3,4,5,6	0	--
+FUN:	2	0	HD
+FUN:	2	1	HD
+FUN:	3	0	-
+FUN:	4	0	-
+FUN:	4,5,6	0	-
+FUN:	5	0	-
+FUN:	5,6	0	HD
+FUN:	6	0	HD
+LEX:	0	0	PTKANT
+LEX:	1	0	APPRART
+LEX:	2	0	NN
+LEX:	3	0	KON
+LEX:	4	0	APPR
+LEX:	5	0	ART
+LEX:	6	0	NN
+MAU:	0	4159	-1	<p:>
+MAU:	4160	1279	0	j
+MAU:	5440	1119	0	a:
+MAU:	6560	9599	-1	<p:>
+MAU:	16160	3039	1	Q
+MAU:	19200	479	1	I
+MAU:	19680	639	1	n
+MAU:	20320	479	1	s
+MAU:	20800	31839	-1	<p:>
+MAU:	52640	3999	2	t
+MAU:	56640	1279	2	e
+MAU:	57920	1439	2	Q
+MAU:	59360	2399	2	a:
+MAU:	61760	2079	2	t
+MAU:	63840	1439	2	6
+MAU:	65280	11999	-1	<p:>
+MAU:	77280	3679	3	Q
+MAU:	80960	2559	3	o:
+MAU:	83520	2079	3	d
+MAU:	85600	1119	3	6
+MAU:	86720	13919	-1	<p:>
+MAU:	100640	3359	4	Q
+MAU:	104000	3359	4	I
+MAU:	107360	479	4	n
+MAU:	107840	1919	5	Q
+MAU:	109760	4959	5	aI
+MAU:	114720	1279	5	n
+MAU:	116000	1119	5	@
+MAU:	117120	1759	6	k
+MAU:	118880	1759	6	n
+MAU:	120640	2719	6	aI
+MAU:	123360	1759	6	p
+MAU:	125120	1279	6	@
+MAU:	126400	3839	-1	<p:>
+POS:	0	ADV
+POS:	1	APPRART
+POS:	2	NN
+POS:	3	KON
+POS:	4	APPR
+POS:	5	ART
+POS:	6	NN
+LMA:	0	ja
+LMA:	1	ins
+LMA:	2	Theater
+LMA:	3	oder
+LMA:	4	in
+LMA:	5	ein
+LMA:	6	Kneipe

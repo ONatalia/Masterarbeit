@@ -1,0 +1,138 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AAJ
+LBD:
+TR2:	0	<#Klopfen> @46ich
+TR2:	1	@46dank'
+TR2:	2	@46Ihnen <#>
+TR2:	3	<:<#> @46u<Z>nd:>
+TR2:	4	@46wir
+TR2:	5	@46sehen
+TR2:	6	@46uns
+TR2:	7	@46dann . 
+SUP:	0,1,2,3,4,5,6,7	g002acn2_101_AAK.par	freue46@ <:<#Mikrowind> mich46@:> , <P>46@> <#> +/<:<#> auf<Z>46@:>/+ auf46@
+ORT:	0	ich
+ORT:	1	danke
+ORT:	2	Ihnen
+ORT:	3	und
+ORT:	4	wir
+ORT:	5	sehen
+ORT:	6	uns
+ORT:	7	dann
+KAN:	0	Q'IC+
+KAN:	1	d'aNk@
+KAN:	2	Q'i:n@n+
+KAN:	3	Q'Unt+
+KAN:	4	v'i:6+
+KAN:	5	z'e:@n
+KAN:	6	Q'Uns+
+KAN:	7	d'an+
+NOI:	-1;0	<#Klopfen>
+NOI:	2;3	<#>
+NOI:	3	<#>
+DAS: 0,1,2,3	@(THANK AB)
+DAS: 4,5,6,7	@(BYE AB)
+SYN:	0	1	NX
+SYN:	0	2	VF
+SYN:	0,1,2	0	SIMPX
+SYN:	1	1	VXFIN
+SYN:	1	2	LK
+SYN:	2	1	NX
+SYN:	2	2	MF
+SYN:	3	1	KOORD
+SYN:	3,4,5,6,7	0	SIMPX
+SYN:	4	1	NX
+SYN:	4	2	VF
+SYN:	5	1	VXFIN
+SYN:	5	2	LK
+SYN:	6	1	NX
+SYN:	6,7	0	MF
+SYN:	7	1	ADVX
+FUN:	0	0	HD
+FUN:	0	1	ON
+FUN:	0	2	-
+FUN:	0,1,2	0	--
+FUN:	1	0	HD
+FUN:	1	1	HD
+FUN:	1	2	-
+FUN:	2	0	HD
+FUN:	2	1	OD
+FUN:	2	2	-
+FUN:	3	0	-
+FUN:	3	1	-
+FUN:	3,4,5,6,7	0	--
+FUN:	4	0	HD
+FUN:	4	1	ON
+FUN:	4	2	-
+FUN:	5	0	HD
+FUN:	5	1	HD
+FUN:	5	2	-
+FUN:	6	0	HD
+FUN:	6	1	OA
+FUN:	6,7	0	-
+FUN:	7	0	HD
+FUN:	7	1	MOD
+LEX:	0	0	PPER
+LEX:	1	0	VVFIN
+LEX:	2	0	PPER
+LEX:	3	0	KON
+LEX:	4	0	PPER
+LEX:	5	0	VVFIN
+LEX:	6	0	PRF
+LEX:	7	0	ADV
+MAU:	0	1759	-1	<p:>
+MAU:	1760	1119	0	Q
+MAU:	2880	1599	0	I
+MAU:	4480	959	0	C
+MAU:	5440	799	-1	<p:>
+MAU:	6240	639	1	d
+MAU:	6880	1439	1	a
+MAU:	8320	639	1	N
+MAU:	8960	479	1	k
+MAU:	9440	799	1	@
+MAU:	10240	639	2	i:
+MAU:	10880	639	2	n
+MAU:	11520	1759	2	@
+MAU:	13280	3199	2	n
+MAU:	16480	3039	-1	<p:>
+MAU:	19520	3199	3	U
+MAU:	22720	639	3	n
+MAU:	23360	1119	4	v
+MAU:	24480	639	4	i:
+MAU:	25120	479	4	6
+MAU:	25600	799	5	z
+MAU:	26400	799	5	e:
+MAU:	27200	479	5	n
+MAU:	27680	1279	6	U
+MAU:	28960	639	6	n
+MAU:	29600	639	6	s
+MAU:	30240	479	7	d
+MAU:	30720	1439	7	a
+MAU:	32160	3679	7	n
+MAU:	35840	639	-1	<p:>
+PRO: 2;3	SC3
+PRO: 2;3	IZB
+PRO: 7	SM3
+POS:	0	PPER
+POS:	1	VVFIN
+POS:	2	PPER
+POS:	3	KON
+POS:	4	PPER
+POS:	5	VVFIN
+POS:	6	PRF
+POS:	7	ADV
+LMA:	0	pper
+LMA:	1	danken
+LMA:	2	pper
+LMA:	3	und
+LMA:	4	pper
+LMA:	5	sehen
+LMA:	6	prf
+LMA:	7	dann
+TLN:	0,1,2,3,4,5,6,7	DE>EN	 I thank you , and we will see each other then .
+TLN:	0,1,2,3,4,5,6,7	DE>JA	 doumo arigatou gozaimashita soredewa sono toki ni oai itashimashou .

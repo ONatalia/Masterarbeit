@@ -1,0 +1,3 @@
+55	{"result":[]}
+1242	{"result":[{"alternative":[{"transcript":"genau"}],"stability":0.0099999998}],"result_index":0}
+1323	{"result":[{"alternative":[{"transcript":"genau","confidence":0.83855498},{"transcript":"was genau"},{"transcript":"das genau"},{"transcript":"genauer"}],"final":true}],"result_index":0}

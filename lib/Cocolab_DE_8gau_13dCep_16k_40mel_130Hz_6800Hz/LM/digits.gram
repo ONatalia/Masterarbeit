@@ -1,0 +1,9 @@
+#JSGF V1.0;
+
+/**
+ * JSGF Digits Grammar for Hello World example
+ */
+
+grammar digits;
+
+public <numbers> = ( eins | zwei | drei | vier | fünf | sechs | sieben | acht | neun | null) * ;

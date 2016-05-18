@@ -1,0 +1,17 @@
+48	{"result":[]}
+1102	{"result":[{"alternative":[{"transcript":"okay"}],"stability":0.0099999998}],"result_index":0}
+1109	{"result":[{"alternative":[{"transcript":"ok"}],"stability":0.0099999998}],"result_index":0}
+1422	{"result":[{"alternative":[{"transcript":"ok ja"}],"stability":0.0099999998}],"result_index":0}
+1471	{"result":[{"alternative":[{"transcript":"ok an"}],"stability":0.0099999998}],"result_index":0}
+1700	{"result":[{"alternative":[{"transcript":"ok Schalke"}],"stability":0.0099999998}],"result_index":0}
+1867	{"result":[{"alternative":[{"transcript":"ok"}],"stability":0.89999998},{"alternative":[{"transcript":" ja gut"}],"stability":0.0099999998}],"result_index":0}
+2029	{"result":[{"alternative":[{"transcript":"ok"}],"stability":0.89999998},{"alternative":[{"transcript":" ja gute"}],"stability":0.0099999998}],"result_index":0}
+2109	{"result":[{"alternative":[{"transcript":"ok"}],"stability":0.89999998},{"alternative":[{"transcript":" ja gut an"}],"stability":0.0099999998}],"result_index":0}
+2184	{"result":[{"alternative":[{"transcript":"ok"}],"stability":0.89999998},{"alternative":[{"transcript":" ja gut dann"}],"stability":0.0099999998}],"result_index":0}
+2463	{"result":[{"alternative":[{"transcript":"ok"}],"stability":0.89999998},{"alternative":[{"transcript":" ja gute nacht"}],"stability":0.0099999998}],"result_index":0}
+2554	{"result":[{"alternative":[{"transcript":"ok"}],"stability":0.89999998},{"alternative":[{"transcript":" ja gut dann machen"}],"stability":0.0099999998}],"result_index":0}
+2640	{"result":[{"alternative":[{"transcript":"ok ja"}],"stability":0.89999998},{"alternative":[{"transcript":" gut dann machen wir"}],"stability":0.0099999998}],"result_index":0}
+2863	{"result":[{"alternative":[{"transcript":"ok ja"}],"stability":0.89999998},{"alternative":[{"transcript":" gut dann machen wir so"}],"stability":0.0099999998}],"result_index":0}
+3090	{"result":[{"alternative":[{"transcript":"ok ja"}],"stability":0.89999998},{"alternative":[{"transcript":" gut dann machen wir so da"}],"stability":0.0099999998}],"result_index":0}
+3184	{"result":[{"alternative":[{"transcript":"ok ja"}],"stability":0.89999998},{"alternative":[{"transcript":" gut dann machen wir so dann"}],"stability":0.0099999998}],"result_index":0}
+3303	{"result":[{"alternative":[{"transcript":"ok ja gut dann machen"}],"stability":0.89999998},{"alternative":[{"transcript":" wir so dann"}],"stability":0.0099999998}],"result_index":0}

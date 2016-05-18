@@ -1,0 +1,14 @@
+82	{"result":[]}
+837	{"result":[{"alternative":[{"transcript":"guten"}],"stability":0.0099999998}],"result_index":0}
+921	{"result":[{"alternative":[{"transcript":"guten Tag"}],"stability":0.0099999998}],"result_index":0}
+1154	{"result":[{"alternative":[{"transcript":"guten tag frau"}],"stability":0.0099999998}],"result_index":0}
+1313	{"result":[{"alternative":[{"transcript":"guten Tag was"}],"stability":0.0099999998}],"result_index":0}
+1388	{"result":[{"alternative":[{"transcript":"guten Tag hoffe"}],"stability":0.0099999998}],"result_index":0}
+1623	{"result":[{"alternative":[{"transcript":"guten tag frau von"}],"stability":0.0099999998}],"result_index":0}
+1716	{"result":[{"alternative":[{"transcript":"guten Tag verfolge"}],"stability":0.0099999998}],"result_index":0}
+1789	{"result":[{"alternative":[{"transcript":"guten tag frau Vogel"}],"stability":0.0099999998}],"result_index":0}
+1819	{"result":[{"alternative":[{"transcript":"guten"}],"stability":0.89999998},{"alternative":[{"transcript":" tag frau Vogel"}],"stability":0.0099999998}],"result_index":0}
+1861	{"result":[{"alternative":[{"transcript":"guten"}],"stability":0.89999998},{"alternative":[{"transcript":" Tag Frau vergessen"}],"stability":0.0099999998}],"result_index":0}
+1945	{"result":[{"alternative":[{"transcript":"guten"}],"stability":0.89999998},{"alternative":[{"transcript":" tag war vorgestern"}],"stability":0.0099999998}],"result_index":0}
+2103	{"result":[{"alternative":[{"transcript":"guten"}],"stability":0.89999998},{"alternative":[{"transcript":" Tag Frau vergessen"}],"stability":0.0099999998}],"result_index":0}
+2258	{"result":[{"alternative":[{"transcript":"guten Tag Frau vergessen","confidence":0.73530519},{"transcript":"guten tag frau vergessen"},{"transcript":"guten Tag Herr vergessen"},{"transcript":"guten Tag was vergessen"},{"transcript":"guten Tag vergessen"},{"transcript":"guten tag herr vergessen"},{"transcript":"guten tag was vergessen"},{"transcript":"guten Tag noch vergessen"},{"transcript":"guten tag noch vergessen"},{"transcript":"guten tag war vorgestern haben"}],"final":true}],"result_index":0}

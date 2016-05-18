@@ -1,0 +1,18 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: BHN
+LBD:
+TR2:	0	<Ger"ausch> @15mhm . 
+SUP:	0	g621bch1_039_BHM.par	M"arz15@ . <A>15@> <#>
+ORT:	0	mhm
+KAN:	0	mhm
+NOI:	-1;0	<Ger"ausch>
+MAU:	0	1439	-1	<p:>
+MAU:	1440	799	0	m
+MAU:	2240	3839	0	m
+MAU:	6080	1599	-1	<p:>

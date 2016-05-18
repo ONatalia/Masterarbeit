@@ -1,0 +1,108 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AAK
+LBD:
+TR2:	0	da% <;oder dann>
+TR2:	1	halten <!1 halt'>
+TR2:	2	wir
+TR2:	3	das <!1 des>
+TR2:	4	mal <!1 ma'>
+TR2:	5	<:<#Klopfen> fest:> ,
+TR2:	6	de<Z>r40@ <*T>t 
+SUP:	6	g002acn1_094_AAJ.par	<:<#> @40also%:> , <Ger"ausch>
+ORT:	0	da
+ORT:	1	halten
+ORT:	2	wir
+ORT:	3	das
+ORT:	4	mal
+ORT:	5	fest
+ORT:	6	der
+KAN:	0	d'a:+
+KAN:	1	h'altEn
+KAN:	2	v'i:6+
+KAN:	3	das+
+KAN:	4	m'a:l+
+KAN:	5	f'Est+
+KAN:	6	d'e:6+
+NOI:	5	<#Klopfen>
+DAS: 0,1,2,3,4,5	@(CLOSE BA)
+DAS: 6	@(NOT_CLASSIFIABLE BA)
+SYN:	0	1	ADVX
+SYN:	0	2	VF
+SYN:	0,1,2,3,4,5	0	SIMPX
+SYN:	1	1	VXFIN
+SYN:	1	2	LK
+SYN:	2	1	NX
+SYN:	2,3,4	0	MF
+SYN:	3	1	NX
+SYN:	4	1	ADVX
+SYN:	5	1	VC
+FUN:	0	0	HD
+FUN:	0	1	MOD
+FUN:	0	2	-
+FUN:	0,1,2,3,4,5	0	--
+FUN:	1	0	HD
+FUN:	1	1	HD
+FUN:	1	2	-
+FUN:	2	0	HD
+FUN:	2	1	ON
+FUN:	2,3,4	0	-
+FUN:	3	0	HD
+FUN:	3	1	OA
+FUN:	4	0	HD
+FUN:	4	1	MOD
+FUN:	5	0	VPT
+FUN:	5	1	-
+FUN:	6	0	--
+LEX:	0	0	ADV
+LEX:	1	0	VVFIN
+LEX:	2	0	PPER
+LEX:	3	0	PDS
+LEX:	4	0	ADV
+LEX:	5	0	PTKVZ
+LEX:	6	0	ART
+MAU:	0	639	-1	<p:>
+MAU:	640	479	0	d
+MAU:	1120	1439	0	a:
+MAU:	2560	639	1	h
+MAU:	3200	479	1	a
+MAU:	3680	479	1	l
+MAU:	4160	479	1	t
+MAU:	4640	479	1	E
+MAU:	5120	479	2	v
+MAU:	5600	639	2	@
+MAU:	6240	479	3	d
+MAU:	6720	639	3	a
+MAU:	7360	479	3	s
+MAU:	7840	479	4	m
+MAU:	8320	1599	4	a:
+MAU:	9920	1279	5	f
+MAU:	11200	1279	5	E
+MAU:	12480	1119	5	s
+MAU:	13600	1279	-1	<p:>
+MAU:	14880	799	6	d
+MAU:	15680	2399	6	e:
+MAU:	18080	4479	6	6
+MAU:	22560	319	-1	<p:>
+PRO: 5;6	SM3
+POS:	0	ADV
+POS:	1	VVFIN
+POS:	2	PPER
+POS:	3	PDS
+POS:	4	ADV
+POS:	5	PTKVZ
+POS:	6	PRELS
+LMA:	0	da
+LMA:	1	halten
+LMA:	2	pper
+LMA:	3	d
+LMA:	4	mal
+LMA:	5	fest
+LMA:	6	d
+TLN:	0,1,2,3,4,5,6	DE>EN	 then let us hold on to that . # #
+TLN:	0,1,2,3,4,5,6	DE>JA	 soredewa maa kore wa kakutei to iu koto de

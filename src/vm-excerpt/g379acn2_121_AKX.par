@@ -1,0 +1,25 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AKX
+LBD:
+TR2:	0	@53gut . <Ger"ausch> 
+SUP:	0	g379acn1_120_AKY.par	alles53@
+ORT:	0	gut
+KAN:	0	g'u:t
+NOI:	0;1	<Ger"ausch>
+SYN:	0	1	DM
+FUN:	0	0	-
+FUN:	0	1	--
+LEX:	0	0	ITJ
+MAU:	0	1919	-1	<p:>
+MAU:	1920	799	0	g
+MAU:	2720	1759	0	u:
+MAU:	4480	7359	0	t
+MAU:	11840	639	-1	<p:>
+POS:	0	ADJD
+LMA:	0	gut

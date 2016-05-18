@@ -1,0 +1,250 @@
+LHD: Partitur 1.2.13
+REP: Muenchen
+SNB: 2
+SAM: 16000
+SBF: 01
+SSB: 16
+NCH: 1
+SPN: AKQ
+LBD:
+TR2:	0	u<Z>nd<Z> , <P> <#> <#Klopfen>
+TR2:	1	tja , <#Klopfen>
+TR2:	2	wir
+TR2:	3	sehen
+TR2:	4	uns
+TR2:	5	dann . <P>28@> <#Klopfen>
+TR2:	6	vielleicht28@
+TR2:	7	laufen <!1 l"auf>
+TR2:	8	wir <!1 ma>
+TR2:	9	uns
+TR2:	10	ja
+TR2:	11	vorher
+TR2:	12	noch <!1 no'>
+TR2:	13	mal <!1 mai>
+TR2:	14	"ubern
+TR2:	15	Weg . <A>29@>
+TR2:	16	als=29@ <Ger"ausch> <*T>t 
+SUP:	5,6	g363acn1_072_AKP.par	<#> @28ja , @28genau . <Ger"ausch> 
+SUP:	15,16	g363acn1_073_AKP.par	<#Klopfen> @29w"ar' @29sch"on . <Lachen> <A> <#Klopfen> 
+ORT:	0	und
+ORT:	1	tja
+ORT:	2	wir
+ORT:	3	sehen
+ORT:	4	uns
+ORT:	5	dann
+ORT:	6	vielleicht
+ORT:	7	laufen
+ORT:	8	wir
+ORT:	9	uns
+ORT:	10	ja
+ORT:	11	vorher
+ORT:	12	noch
+ORT:	13	mal
+ORT:	14	"ubern
+ORT:	15	Weg
+ORT:	16	als
+KAN:	0	Q'Unt+
+KAN:	1	tj'a
+KAN:	2	v'i:6+
+KAN:	3	z'e:@n
+KAN:	4	Q'Uns+
+KAN:	5	d'an+
+KAN:	6	fil'aICt+
+KAN:	7	l'aUf@n
+KAN:	8	v'i:6+
+KAN:	9	Q'Uns+
+KAN:	10	j'a:
+KAN:	11	f'o:6h"e:6+
+KAN:	12	n'Ox+
+KAN:	13	m'a:l+
+KAN:	14	Qy:b6n+
+KAN:	15	v'e:k
+KAN:	16	Qals+
+NOI:	0;1	<#> <#Klopfen>
+NOI:	1;2	<#Klopfen>
+NOI:	5;6	<#Klopfen>
+NOI:	16;17	<Ger"ausch>
+DAS: 0,1,2,3,4,5	@(BYE BA)
+DAS: 6,7,8,9,10,11,12,13,14,15	@(INFORM BA)
+DAS: 16	@(NOT_CLASSIFIABLE BA)
+SYN:	0	1	KOORD
+SYN:	0,2,3,4,5	0	SIMPX
+SYN:	1	1	DM
+SYN:	2	1	NX
+SYN:	2	2	VF
+SYN:	3	1	VXFIN
+SYN:	3	2	LK
+SYN:	4	1	NX
+SYN:	4,5	0	MF
+SYN:	5	1	ADVX
+SYN:	6	1	ADVX
+SYN:	6	2	VF
+SYN:	6,7,8,9,10,11,12,13,14,15	0	SIMPX
+SYN:	7	1	VXFIN
+SYN:	7	2	LK
+SYN:	8	1	NX
+SYN:	8,9,10,11,12,13,14,15	0	MF
+SYN:	9	1	NX
+SYN:	10	1	ADVX
+SYN:	11	1	ADVX
+SYN:	12	1	ADVX
+SYN:	13	1	ADVX
+SYN:	14,15	0	PX
+SYN:	15	1	NX
+FUN:	0	0	-
+FUN:	0	1	-
+FUN:	0,2,3,4,5	0	--
+FUN:	1	0	-
+FUN:	1	1	--
+FUN:	2	0	HD
+FUN:	2	1	ON
+FUN:	2	2	-
+FUN:	3	0	HD
+FUN:	3	1	HD
+FUN:	3	2	-
+FUN:	4	0	HD
+FUN:	4	1	OA
+FUN:	4,5	0	-
+FUN:	5	0	HD
+FUN:	5	1	MOD
+FUN:	6	0	HD
+FUN:	6	1	MOD
+FUN:	6	2	-
+FUN:	6,7,8,9,10,11,12,13,14,15	0	--
+FUN:	7	0	HD
+FUN:	7	1	HD
+FUN:	7	2	-
+FUN:	8	0	HD
+FUN:	8	1	ON
+FUN:	8,9,10,11,12,13,14,15	0	-
+FUN:	9	0	HD
+FUN:	9	1	OD
+FUN:	10	0	HD
+FUN:	10	1	MOD
+FUN:	11	0	HD
+FUN:	11	1	V-MOD
+FUN:	12	0	HD
+FUN:	12	1	MOD
+FUN:	13	0	HD
+FUN:	13	1	MOD
+FUN:	14	0	-
+FUN:	14,15	0	OPP
+FUN:	15	0	HD
+FUN:	15	1	HD
+LEX:	0	0	KON
+LEX:	1	0	ITJ
+LEX:	2	0	PPER
+LEX:	3	0	VVFIN
+LEX:	4	0	PRF
+LEX:	5	0	ADV
+LEX:	6	0	ADV
+LEX:	7	0	VVFIN
+LEX:	8	0	PPER
+LEX:	9	0	PRF
+LEX:	10	0	ADV
+LEX:	11	0	ADV
+LEX:	12	0	ADV
+LEX:	13	0	ADV
+LEX:	14	0	APPRART
+LEX:	15	0	NN
+MAU:	0	1599	-1	<p:>
+MAU:	1600	639	0	Q
+MAU:	2240	639	0	U
+MAU:	2880	7359	0	n
+MAU:	10240	3999	1	t
+MAU:	14240	479	1	j
+MAU:	14720	479	1	a
+MAU:	15200	13279	-1	<p:>
+MAU:	28480	479	2	v
+MAU:	28960	1279	2	i:
+MAU:	30240	4159	2	6
+MAU:	34400	5919	-1	<p:>
+MAU:	40320	479	3	z
+MAU:	40800	1599	3	e:
+MAU:	42400	2399	3	e:
+MAU:	44800	799	3	n
+MAU:	45600	1279	4	U
+MAU:	46880	799	4	n
+MAU:	47680	1279	4	s
+MAU:	48960	959	5	d
+MAU:	49920	1599	5	a
+MAU:	51520	1759	5	n
+MAU:	53280	2399	-1	<p:>
+MAU:	55680	799	6	f
+MAU:	56480	959	6	i
+MAU:	57440	479	6	l
+MAU:	57920	639	6	aI
+MAU:	58560	2399	-1	<p:>
+MAU:	60960	3039	7	l
+MAU:	64000	639	7	aU
+MAU:	64640	479	7	f
+MAU:	65120	479	7	m
+MAU:	65600	479	8	v
+MAU:	66080	2239	8	6
+MAU:	68320	1599	-1	<p:>
+MAU:	69920	1599	9	U
+MAU:	71520	639	9	n
+MAU:	72160	479	9	s
+MAU:	72640	479	10	j
+MAU:	73120	1599	10	a:
+MAU:	74720	1919	11	f
+MAU:	76640	1119	11	o:
+MAU:	77760	479	11	6
+MAU:	78240	639	11	e:
+MAU:	78880	639	11	6
+MAU:	79520	799	12	n
+MAU:	80320	1759	12	O
+MAU:	82080	799	13	m
+MAU:	82880	1439	13	a:
+MAU:	84320	639	13	l
+MAU:	84960	959	14	y:
+MAU:	85920	639	14	b
+MAU:	86560	799	14	6
+MAU:	87360	639	14	n
+MAU:	88000	639	15	v
+MAU:	88640	2239	15	e:
+MAU:	90880	959	15	k
+MAU:	91840	3199	-1	<p:>
+MAU:	95040	1119	16	a
+MAU:	96160	7199	16	l
+MAU:	103360	1279	16	s
+MAU:	104640	2719	-1	<p:>
+PRO: 0	IZB
+PRO: 1;2	DS1
+PRO: 5;6	SM3
+PRO: 11;12	AC1
+PRO: 12;13	AC1
+PRO: 15;16	SM3
+POS:	0	KON
+POS:	1	ITJ
+POS:	2	PPER
+POS:	3	VVFIN
+POS:	4	PRF
+POS:	5	ADV
+POS:	6	ADV
+POS:	7	VVFIN
+POS:	8	PPER
+POS:	9	PRF
+POS:	10	ADV
+POS:	11	ADV
+POS:	12	ADV
+POS:	13	ADV
+POS:	14	APPRART
+POS:	15	NN
+LMA:	0	und
+LMA:	1	tja
+LMA:	2	pper
+LMA:	3	sehen
+LMA:	4	prf
+LMA:	5	dann
+LMA:	6	vielleicht
+LMA:	7	laufen
+LMA:	8	pper
+LMA:	9	prf
+LMA:	10	ja
+LMA:	11	vorher
+LMA:	12	noch
+LMA:	13	mal
+LMA:	14	"ubern
+LMA:	15	Weg
+TLN:	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16	DE>EN	 and , well , I will see you then . maybe we will even happen to meet each other again beforehand . 
