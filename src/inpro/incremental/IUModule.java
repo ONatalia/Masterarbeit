@@ -51,6 +51,10 @@ public abstract class IUModule extends PushBuffer {
 	/** the right buffer of this module */
 	protected final RightBuffer rightBuffer = new RightBuffer();
 	
+	public RightBuffer getBuffer(){
+		return rightBuffer;
+	}
+	
 	public IUModule() {
 		logger = Logger.getLogger(this.getClass());
 	}

@@ -76,6 +76,11 @@
         <property name="signedData" value="true"/>
     </component>
     
+    <component name="inputStreamSphinx" type="edu.cmu.sphinx.frontend.util.StreamDataSource.dataStream">
+    </component>
+     <component name="inputStreamGoogle" type="edu.cmu.sphinx.frontend.util.StreamDataSource.dataStream">
+    </component>
+    
     <component name="streamDataSourceGoogle" type="edu.cmu.sphinx.frontend.util.StreamDataSource">
         <property name="sampleRate" value="16000"/>
         <property name="bitsPerSample" value="16"/>
