@@ -1,0 +1,31 @@
+logger.info("Setting up source...");
+			BaseDataProcessor realtime = new DataThrottle();
+			//FrontEnd feg=(FrontEnd)cm.lookup("googlefrontend");
+			FrontEnd fe=(FrontEnd)cm.lookup("frontend");
+			
+			StreamDataSource sds = (StreamDataSource) cm.lookup("streamDataSource");
+			sds.initialize();
+			AudioInputStream ais=setupAis(fe);
+			aisFormat=ais.getFormat();
+			soundData = new byte [(int) (ais.getFrameLength()*ais.getFormat().getFrameSize())*ais.getFormat().getChannels()];
+			ais.read(soundData, 0, soundData.length);
+			AudioInputStream ais1 = new AudioInputStream(new ByteArrayInputStream(
+					soundData), ais.getFormat(), soundData.length);
+			//AudioInputStream ais1=setupAis(fe);
+			
+			sds.setInputStream(ais1, "sphinx");
+			StreamDataSource sds1 = (StreamDataSource) cm.lookup("streamDataSourceGoogle");
+			sds1.initialize();
+			//fe.setPredecessor(setupFileInput(fe));
+			fe.setPredecessor(sds);
+			sds1.setInputStream(ais, "google");
+			//realtime.setPredecessor(setupFileInput(fe));
+			realtime.setPredecessor(sds1);
+			
+			
+			StreamDataSource sds = (StreamDataSource) cm.lookup("streamDataSource");
+		sds.initialize();
+		AudioInputStream ais1 = new AudioInputStream(new ByteArrayInputStream(
+				soundData), aisFormat, soundData.length);
+		
+		sds.setInputStream(ais1, "sphinx");

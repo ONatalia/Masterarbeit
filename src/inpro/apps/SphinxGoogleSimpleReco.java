@@ -424,13 +424,25 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		
 		gasr.recognize(); 
-		logger.info("Time google start: "+System.currentTimeMillis());
-	
-		//this.recognizer = (Recognizer) cm.lookup("recognizer");
-		//assert recognizer != null;
+		/*logger.info("Time google start: "+System.currentTimeMillis());
+		StreamDataSource sdsS = (StreamDataSource) cm.lookup("streamDataSource");
+		
+		sdsS.initialize();
+		
+		
 
+		AudioInputStream aisS = new AudioInputStream(new ByteArrayInputStream(
+		rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
+		AudioInputStream aisG = new AudioInputStream(new ByteArrayInputStream(
+				rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
+	
+       
+		sdsS.setInputStream(aisS, "sphinx");
+		this.recognizer = (Recognizer) cm.lookup("recognizer");
+		assert recognizer != null;
+*/
 		//logger.info("Setting up monitors...");
-		setupMonitors();
+		/*setupMonitors();
 		allocateRecognizer();
 		
 			
@@ -440,11 +452,13 @@ public class SphinxGoogleSimpleReco extends IUModule{
 			do {
 				
 				
-			
+				
 				result = recognizer.recognize();
+				 
+			
 				
 				
-				
+				logger.info("GSR status"+gasr.getStatus());
 				logger.info("clp.getReferenceText()"+clp.getReference());
 				
 				if (result != null) {
@@ -467,6 +481,16 @@ public class SphinxGoogleSimpleReco extends IUModule{
 				}
 			} while ((result != null) && (result.getDataFrames() != null)
 					&& (result.getDataFrames().size() > 4));
+			
+			
+			
+			
+			
+			
+			*/
+			
+			
+			
 			
 
 		
@@ -626,7 +650,9 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		
 				
-				/*updateInputStream(starttimes.get(0),endtimes.get(endtimes.size()-1));				
+				updateInputStream(starttimes.get(0),endtimes.get(endtimes.size()-1));	
+				//setupMonitors();
+				//allocateRecognizer();
 			
 				this.recognizer = (Recognizer) cm.lookup("recognizer");
 				assert recognizer != null;
@@ -679,7 +705,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 				&& (result.getDataFrames() != null)&& (result.getDataFrames().size() > 4)
 				);
 		
-		this.getBuffer().clearBuffer();*/
+		this.getBuffer().clearBuffer();
 	}
 	
 	
@@ -716,11 +742,12 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		int startInBytes = 0;
 		int endInBytes = 0;
 		float startInSec=0;
-		float offset=0.685f;
+		float offset=0.990f;
 		float endInSec=0;
 			
 		if (startInMillies==0)
 			{startInSec=(float)(startInMillies/1000.0f);
+			
 			
 			}else
 			{startInSec=(float)(startInMillies/1000.0f)-offset;
@@ -740,7 +767,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		byte [] buffer =Arrays.copyOfRange(rais.getSoundData(), 0, endInBytes);
 		
 		//AudioInputStream aisS = new AudioInputStream(new ByteArrayInputStream(
-				//rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
+			//rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
 		logger.info("startInSec"+startInSec);
 		logger.info("endInSec"+endInSec);
 		logger.info("Start in Bytes"+startInBytes );

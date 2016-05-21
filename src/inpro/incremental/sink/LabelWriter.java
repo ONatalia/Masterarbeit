@@ -71,13 +71,13 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		boolean added = false;
 		//remove ius from the list
 	
-	//if (!allIUs.isEmpty()){
-			//allIUs.removeAll(ius);
-			//}
+	if (!allIUs.isEmpty()){
+			allIUs.removeAll(ius);
+			}
 		for (EditMessage<? extends IU> edit : edits) {
 			IU iu = edit.getIU();
 			
-			logger.info("label writer read: "+iu.toString());
+			//logger.info("label writer read: "+iu.toString());
 			switch (edit.getType()) {
 			case ADD:
 				if (!commitsOnly) {
