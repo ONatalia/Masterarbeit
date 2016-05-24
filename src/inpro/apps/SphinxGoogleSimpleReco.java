@@ -13,6 +13,7 @@ import inpro.sphinx.frontend.RsbStreamInputSource;
 import inpro.incremental.source.GoogleASR;
 import inpro.incremental.source.SphinxASR;
 import inpro.incremental.unit.EditMessage;
+import inpro.incremental.unit.EditType;
 import inpro.incremental.unit.IU;
 import inpro.util.TimeUtil;
 
@@ -61,8 +62,9 @@ public class SphinxGoogleSimpleReco extends IUModule{
 	private Recognizer recognizer;
 	private final GoogleASR gasr;
 	private RecognizerInputStream rais;
-	//Map <Integer,String> hyps=null; 
 	private TreeMap <Integer,String> hyps=new TreeMap <Integer,String>();;
+
+	
 
 	
 	public SphinxGoogleSimpleReco() throws PropertyException, IOException,
@@ -535,62 +537,77 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		ArrayList<Float> starttimes=new ArrayList<Float>();
 		ArrayList<Float> endtimes=new ArrayList<Float>();
+		
 		TreeMap<Integer, String> hypsclone = new TreeMap<Integer, String>();
 		hypsclone=(TreeMap<Integer, String>)hyps.clone();
 		String text=new String ();
-		/*//int prevLastiuNumber=0;
-		int lastIunumber=0;
 		
-		if (!hyps.isEmpty()){
-			prevLastiuNumber=hyps.lastKey();
-			lastIunumber=hyps.lastKey();
-		}
-		
-		*/
 		
 		
 		if (!edits.isEmpty()) {
 			
 			
-			for (IU iu : ius) {
-				logger.info("IU:"+iu.toString());
+			
+				
+			
+				
+					
+			//for (IU iu : ius) {
+			
+			//for (int i=1; i<11; i++){
+				//logger.info("IU:"+iu.toString());
+				for (int i=0; i<edits.size(); i++){
+						
+						
+				//Integer iuNumber=Integer.parseInt(iu.toString().split("\\s+")[0].replace("IU:", "").replace(",", ""));
+				//Integer iuNumber=iu.getID();
+				
+				//String word=iu.toString().split("\\s+")[3]+" ";
 				
 				
-				Integer iuNumber=Integer.parseInt(iu.toString().split("\\s+")[0].replace("IU:", "").replace(",", ""));
-				String word=iu.toString().split("\\s+")[3]+" ";
 				
 				
-				if ((!hyps.isEmpty()&&iuNumber>hypsclone.lastKey()||(hyps.isEmpty()))){
-					for (Entry<Integer, String> entry : hypsclone.entrySet()) {
-						if (entry.getKey()<iuNumber){
-							hyps.remove(entry.getKey());
-							
-						}
-					}
+				//add
+				if (edits.get(i).getType()==EditType.ADD){
+					
+					
+					Integer iuNumber=edits.get(i).getIU ().getID();
+					
+					String word=edits.get(i).getIU ().toString().split("\\s+")[3]+" ";
+					logger.info("Add Type: "+edits.get(i).getType());
 					
 					hyps.put(iuNumber, word); 
 					
 					
 						
-					
+				//delete	
 				}
-					else if (iuNumber<=hypsclone.lastKey()){
+					else if (edits.get(i).getType()==EditType.REVOKE){
+						
+						logger.info("Revoke: "+edits.get(i).getType());
+						
+						
+						String word=edits.get(i).getIU ().toString().split("\\s+")[3]+" ";
+						
 						for (Entry<Integer, String> entry : hypsclone.entrySet()) {
 							 if (entry.getValue().equals(word)){
+								hyps.remove(entry.getKey());
 								 
-								 hyps.remove(entry.getKey());
 							 }
 							  
+							 
 							}
 					}
 					
-					/*else if (iuNumber<=lastIunumber){
+				
+				//commit
+					else if (edits.get(i).getType()==EditType.COMMIT){
 						
 						
 						
-						for (Entry<Integer, String> entry : hypsclone.entrySet()) {
+					/*for (Entry<Integer, String> entry : hypsclone.entrySet()) {
 						 
-							//logger.info("hyps clone entry:"+hypsclone.entrySet());
+							
 							if (entry.getKey()<iuNumber){
 								hyps.remove(entry.getKey());
 								
@@ -598,26 +615,30 @@ public class SphinxGoogleSimpleReco extends IUModule{
 												
 							
 						 }
-						 hyps.put(iuNumber, word);
+						 hyps.put(iuNumber, word);*/
 						 
 									 
 						 
 						}
-										*/
+										
 					
 					else {
 						
 						
-						logger.info("else");
+						logger.info("no changes");
 					}
+				//}
 				
-						
+				
+				for (IU iu : ius) {
+					
+					
 				
 				starttimes.add((float) getStart(iu));
 				endtimes.add((float) getEnd(iu));
 				
-					
-						
+				
+				}		
 				
 				
 			} 
@@ -705,7 +726,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 				&& (result.getDataFrames() != null)&& (result.getDataFrames().size() > 4)
 				);
 		
-		this.getBuffer().clearBuffer();
+		gasr.getBuffer().clearBuffer();
 	}
 	
 	
@@ -742,7 +763,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		int startInBytes = 0;
 		int endInBytes = 0;
 		float startInSec=0;
-		float offset=0.990f;
+		float offset=0.690f;
 		float endInSec=0;
 			
 		if (startInMillies==0)

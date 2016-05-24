@@ -10,4 +10,12 @@ public enum EditType {
 		return this.equals(COMMIT);
 	}
 	
+	public boolean isRevoke() {
+		return this.equals(REVOKE);
+	}
+	
+	public boolean isADD() {
+		return this.equals(ADD);
+	}
+	
 }
