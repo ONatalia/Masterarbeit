@@ -534,9 +534,8 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		System.err.println("This is left buffer update");
 		logger.info("Time by update: "+System.currentTimeMillis());
 		
-		
-		ArrayList<Float> starttimes=new ArrayList<Float>();
-		ArrayList<Float> endtimes=new ArrayList<Float>();
+		ArrayList<Double> starttimes=new ArrayList<Double>();
+		ArrayList<Double> endtimes=new ArrayList<Double>();
 		
 		TreeMap<Integer, String> hypsclone = new TreeMap<Integer, String>();
 		hypsclone=(TreeMap<Integer, String>)hyps.clone();
@@ -547,98 +546,68 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		if (!edits.isEmpty()) {
 			
 			
-			
+			for (int i=0; i<edits.size(); i++){
 				
-			
-				
-					
-			//for (IU iu : ius) {
-			
-			//for (int i=1; i<11; i++){
-				//logger.info("IU:"+iu.toString());
-				for (int i=0; i<edits.size(); i++){
+				logger.info("edits"+edits.toString());
 						
-						
-				//Integer iuNumber=Integer.parseInt(iu.toString().split("\\s+")[0].replace("IU:", "").replace(",", ""));
-				//Integer iuNumber=iu.getID();
-				
-				//String word=iu.toString().split("\\s+")[3]+" ";
+			//add
+			if (edits.get(i).getType()==EditType.ADD){
 				
 				
+				Integer iuNumber=edits.get(i).getIU ().getID();
+				
+				String word=edits.get(i).getIU ().toString().split("\\s+")[3]+" ";
+				logger.info("Add Type: "+edits.get(i).getType());
+				
+				hyps.put(iuNumber, word); 
 				
 				
-				//add
-				if (edits.get(i).getType()==EditType.ADD){
+			
+				starttimes.add((double) edits.get(i).getIU ().startTime());
+				endtimes.add((double) edits.get(i).getIU ().endTime());
+				
 					
+			//delete	
+			}
+				else if (edits.get(i).getType()==EditType.REVOKE){
 					
-					Integer iuNumber=edits.get(i).getIU ().getID();
+					logger.info("Revoke: "+edits.get(i).getType());
+					
 					
 					String word=edits.get(i).getIU ().toString().split("\\s+")[3]+" ";
-					logger.info("Add Type: "+edits.get(i).getType());
 					
-					hyps.put(iuNumber, word); 
-					
-					
-						
-				//delete	
-				}
-					else if (edits.get(i).getType()==EditType.REVOKE){
-						
-						logger.info("Revoke: "+edits.get(i).getType());
-						
-						
-						String word=edits.get(i).getIU ().toString().split("\\s+")[3]+" ";
-						
-						for (Entry<Integer, String> entry : hypsclone.entrySet()) {
-							 if (entry.getValue().equals(word)){
-								hyps.remove(entry.getKey());
-								 
-							 }
-							  
-							 
-							}
-					}
-					
-				
-				//commit
-					else if (edits.get(i).getType()==EditType.COMMIT){
-						
-						
-						
-					/*for (Entry<Integer, String> entry : hypsclone.entrySet()) {
-						 
-							
-							if (entry.getKey()<iuNumber){
-								hyps.remove(entry.getKey());
+					for (Entry<Integer, String> entry : hypsclone.entrySet()) {
+						 if (entry.getValue().equals(word)){
+							hyps.remove(entry.getKey());
 								
-							}
-												
-							
+							starttimes.remove((double) edits.get(i).getIU ().startTime());
+							endtimes.remove((double) edits.get(i).getIU ().endTime());
 						 }
-						 hyps.put(iuNumber, word);*/
-						 
-									 
+						  
 						 
 						}
-										
+				}
+				
+			
+			//commit
+				else if (edits.get(i).getType()==EditType.COMMIT){
 					
-					else {
-						
-						
-						logger.info("no changes");
+					logger.info("Commit"+edits.get(i).getType());
+						 
+					 
 					}
-				//}
+									
 				
-				
-				for (IU iu : ius) {
+				else {
 					
 					
+					logger.info("no changes");
+				}
+	
+			
 				
-				starttimes.add((float) getStart(iu));
-				endtimes.add((float) getEnd(iu));
 				
 				
-				}		
 				
 				
 			} 
@@ -671,7 +640,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		
 				
-				updateInputStream(starttimes.get(0),endtimes.get(endtimes.size()-1));	
+				updateInputStream(starttimes,endtimes);	
 				//setupMonitors();
 				//allocateRecognizer();
 			
@@ -757,25 +726,33 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 	}
 	
-	public void updateInputStream (float startInMillies, float endInMillies){
+	public void updateInputStream (ArrayList<Double> starttimes, ArrayList<Double> endtimes){
 		
 			
 		int startInBytes = 0;
 		int endInBytes = 0;
-		float startInSec=0;
-		float offset=0.690f;
-		float endInSec=0;
+		double startInSec=0;
+		double offset=0;
+		//double offset=0.690;
+		double endInSec=0;
+		logger.info("startInSec"+starttimes.get(0));
+		logger.info("endInSec"+endInSec);
+		
 			
-		if (startInMillies==0)
-			{startInSec=(float)(startInMillies/1000.0f);
+		if (starttimes.get(0)==0)
+			{startInSec=starttimes.get(0);
+			offset=endtimes.get(0)-0.030;
+			logger.info("offset: "+offset);
 			
 			
 			}else
-			{startInSec=(float)(startInMillies/1000.0f)-offset;
+			{startInSec=starttimes.get(0)-offset;
 			
 			}	
 		
-		endInSec=(float)(endInMillies/1000.0f)-offset;
+		endInSec=endtimes.get(endtimes.size()-1)-offset;
+		logger.info("startInSec"+startInSec);
+		logger.info("endInSec"+endInSec);
 			
 		startInBytes=(int)((rais.getChannels()*rais.getSiteInBits()* rais.getSampleRate()/8.0f) *(startInSec));			
 		endInBytes=(int)((rais.getChannels()*rais.getSiteInBits()* rais.getSampleRate()/8.0f)*(endInSec));
@@ -789,8 +766,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		//AudioInputStream aisS = new AudioInputStream(new ByteArrayInputStream(
 			//rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
-		logger.info("startInSec"+startInSec);
-		logger.info("endInSec"+endInSec);
+		
 		logger.info("Start in Bytes"+startInBytes );
 		logger.info("End in Bytes"+endInBytes );
 		logger.info("Buffer.length"+buffer.length );
