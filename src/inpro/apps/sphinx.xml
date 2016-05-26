@@ -54,6 +54,22 @@
 -->
         </propertylist>
     </component>
+    
+    <component name="recognizerFA" type="edu.cmu.sphinx.recognizer.Recognizer">
+        <property name="decoder" value="decoderFA"/>
+        <propertylist name="monitors">
+<!--
+        	<item>threadingListener</item>
+        	<item>currentASRHypothesis</item>
+        	<item>confiDancer</item>
+            <item>labelWriter </item>
+        	<item>speedTracker </item>
+            <item>memoryTracker </item>
+            <item>newWordNotifierAgent </item>
+			<item>TEDviewNotifier</item>
+-->
+        </propertylist>
+    </component>
 
     <component name="threadingListener" type="inpro.sphinx.instrumentation.ThreadingListener">
         <property name="recognizer" value="${recognizer}"/>
@@ -69,6 +85,12 @@
     <!-- ******************************************************** -->
     <component name="decoder" type="edu.cmu.sphinx.decoder.Decoder">
         <property name="searchManager" value="${searchManager}"/>
+        <property name="fireNonFinalResults" value="true"/>
+        <property name="featureBlockSize" value="${step}"/>
+    </component>
+    
+    <component name="decoderFA" type="edu.cmu.sphinx.decoder.Decoder">
+        <property name="searchManager" value="searchManagerFA"/>
         <property name="fireNonFinalResults" value="true"/>
         <property name="featureBlockSize" value="${step}"/>
     </component>
@@ -94,6 +116,18 @@
     <component name="wordPruningSearch" type="edu.cmu.sphinx.decoder.search.WordPruningBreadthFirstSearchManager">
         <property name="logMath" value="logMath"/>
         <property name="linguist" value="${linguist}"/>
+        <property name="pruner" value="trivialPruner"/>
+        <property name="scorer" value="${scorer}"/>
+        <property name="activeListManager" value="activeListManager"/>
+        <property name="buildWordLattice" value="true"/>
+        <property name="acousticLookaheadFrames" value="1.7"/>
+        <property name="relativeBeamWidth" value="${relativeBeamWidth}"/>
+        <property name="keepAllTokens" value="true"/>
+    </component>
+    
+     <component name="searchManagerFA" type="edu.cmu.sphinx.decoder.search.WordPruningBreadthFirstSearchManager">
+        <property name="logMath" value="logMath"/>
+        <property name="linguist" value="linguistFA"/>
         <property name="pruner" value="trivialPruner"/>
         <property name="scorer" value="${scorer}"/>
         <property name="activeListManager" value="activeListManager"/>
@@ -170,6 +204,16 @@
     <component name="flatLinguist" type="edu.cmu.sphinx.linguist.flat.FlatLinguist">
         <property name="logMath" value="logMath"/>
         <property name="grammar" value="${grammar}"/>
+        <property name="acousticModel" value="acousticModel"/>
+        <property name="wordInsertionProbability" value="${wordInsertionProbability}"/>
+        <property name="silenceInsertionProbability" value="${silenceInsertionProbability}"/>
+        <property name="languageWeight" value="${languageWeight}"/>
+        <property name="unitManager" value="unitManager"/>
+    </component>
+    
+    <component name="linguistFA" type="edu.cmu.sphinx.linguist.flat.FlatLinguist">
+        <property name="logMath" value="logMath"/>
+        <property name="grammar" value="forcedAligner"/>
         <property name="acousticModel" value="acousticModel"/>
         <property name="wordInsertionProbability" value="${wordInsertionProbability}"/>
         <property name="silenceInsertionProbability" value="${silenceInsertionProbability}"/>

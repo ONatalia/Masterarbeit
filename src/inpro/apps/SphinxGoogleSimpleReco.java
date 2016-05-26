@@ -60,6 +60,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 	private final GoogleSphinxRCLP clp;
 	private final ConfigurationManager cm;
 	private Recognizer recognizer;
+	private Recognizer recognizerFA;
 	private final GoogleASR gasr;
 	private RecognizerInputStream rais;
 	private TreeMap <Integer,String> hyps=new TreeMap <Integer,String>();;
@@ -89,16 +90,20 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		this.cm = cm;
 		// setup standard (sphinx-based) speech recognition:
 		setupDeltifier();
-		setupDecoder();
+		//setupDecoder();
 		logger.info("Setting up source...");
 		setupSource();
 
 		this.recognizer = (Recognizer) cm.lookup("recognizer");
 		assert recognizer != null;
+		
+		this.recognizerFA = (Recognizer) cm.lookup("recognizerFA");
+		assert recognizerFA != null;
 
 		logger.info("Setting up monitors...");
-		//setupMonitors();
-		//allocateRecognizer();
+		setupMonitors();
+		allocateRecognizer();
+		allocateRecognizerFA();
 		//// deal with GoogleASR based on the above:
 		
 		
@@ -111,8 +116,10 @@ public class SphinxGoogleSimpleReco extends IUModule{
 			FrontEnd fe=(FrontEnd)cm.lookup("frontend");
 			StreamDataSource sdsG = (StreamDataSource) cm.lookup("streamDataSourceGoogle");
 			StreamDataSource sdsS = (StreamDataSource) cm.lookup("streamDataSource");
+			StreamDataSource sdsFA = (StreamDataSource) cm.lookup("streamDataSourceFA");
 			sdsG.initialize();
 			sdsS.initialize();
+			sdsFA.initialize();
 			
 			AudioInputStream ais=setupAis(fe);
 			rais=new RecognizerInputStream (ais);
@@ -121,12 +128,16 @@ public class SphinxGoogleSimpleReco extends IUModule{
 			rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
 			AudioInputStream aisG = new AudioInputStream(new ByteArrayInputStream(
 					rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
+			AudioInputStream aisFA = new AudioInputStream(new ByteArrayInputStream(
+					rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
 		
 	        sdsG.setInputStream(aisG, "google");
 			sdsS.setInputStream(aisS, "sphinx");
+			sdsFA.setInputStream(aisFA,"FA");
 			
 			realtime.setPredecessor(sdsG);
 			fe.setPredecessor(sdsS);
+			fe.setPredecessor(sdsFA);
 			
 			
 			
@@ -183,6 +194,19 @@ public class SphinxGoogleSimpleReco extends IUModule{
 	}
 
 	
+	
+	public void startGoogleThread (final GoogleASR gasr){
+		Thread GooogleThread =new Thread(
+						"Google Thread") {
+					@Override
+					public void run() {
+						gasr.recognize ();
+					}
+				};
+				GooogleThread.start();
+				
+				
+	}
 	public static void setupRsbInputSource(final RsbStreamInputSource rsbInput) {
 		// create a Thread to start up the microphone (this avoid a problem
 		// with microphone initialization hanging and taking forever)
@@ -376,6 +400,9 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		ResultListener resultlistener = (ResultListener) cm
 				.lookup("currentASRHypothesis");
 		recognizer.addResultListener(resultlistener);
+		ResultListener resultlistenerFA = (ResultListener) cm
+				.lookup("currentASRHypothesis");
+		recognizerFA.addResultListener(resultlistenerFA);
 		SphinxASR casrh = (SphinxASR) cm.lookup("currentASRHypothesis");
 		if (clp.matchesOutputMode(GoogleSphinxRCLP.TED_OUTPUT)) {
 			casrh.addListener((PushBuffer) cm.lookup("tedNotifier"));
@@ -413,6 +440,13 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		if (recognizer != null && recognizer.getState() == Recognizer.State.DEALLOCATED) {
 	    	logger.info("Allocating recognizer...");
 			recognizer.allocate();
+		}
+	}
+	
+	public void allocateRecognizerFA() {
+		if (recognizerFA != null && recognizerFA.getState() == Recognizer.State.DEALLOCATED) {
+	    	logger.info("Allocating recognizer...");
+			recognizerFA.allocate();
 		}
 	}
 	
@@ -509,6 +543,10 @@ public class SphinxGoogleSimpleReco extends IUModule{
 	public Recognizer getRecognizer() {
 		return recognizer;
 	}
+	
+	public Recognizer getRecognizerFA() {
+		return recognizerFA;
+	}
 
 	public static void main(String[] args) throws IOException,
 			PropertyException, UnsupportedAudioFileException {
@@ -521,11 +559,27 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		
 		SphinxGoogleSimpleReco gschsimpleReco = new SphinxGoogleSimpleReco(clp);
-		gschsimpleReco.recognizeOnce();
+		//gschsimpleReco.recognizeOnce();
 		
+		gschsimpleReco.recognizeSimultaneously();
+		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		gschsimpleReco.getRecognizer().deallocate();
+		gschsimpleReco.getRecognizerFA().deallocate();
 		System.exit(0);
+	}
+
+	private void recognizeSimultaneously() {
+		SphinxThread spth=new SphinxThread (recognizer);
+		spth.start();
+		startGoogleThread(gasr);
+		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -644,16 +698,16 @@ public class SphinxGoogleSimpleReco extends IUModule{
 				//setupMonitors();
 				//allocateRecognizer();
 			
-				this.recognizer = (Recognizer) cm.lookup("recognizer");
-				assert recognizer != null;
+				//this.recognizer = (Recognizer) cm.lookup("recognizer");
+				//assert recognizer != null;
 
 				logger.info("Setting up monitors...");
 				setupMonitors();
-				allocateRecognizer();
+				
 		
 		Result result = null;
-		logger.info("Recognizer sate" +recognizer.getState().toString());
-		
+		//logger.info("Recognizer sate" +recognizer.getState().toString());
+		logger.info("Recognizer sate" +recognizerFA.getState().toString());
 		
 		 
 		do {
@@ -661,8 +715,8 @@ public class SphinxGoogleSimpleReco extends IUModule{
 			
 			
 		
-			result = recognizer.recognize();
-			
+			//result = recognizer.recognize();
+			result = recognizerFA.recognize();
 	
 			
 			
@@ -758,7 +812,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		endInBytes=(int)((rais.getChannels()*rais.getSiteInBits()* rais.getSampleRate()/8.0f)*(endInSec));
 			
 		  
-		StreamDataSource sdsS = (StreamDataSource) cm.lookup("streamDataSource");
+		StreamDataSource sdsS = (StreamDataSource) cm.lookup("streamDataSourceFA");
 		sdsS.initialize();
 		
 		//byte [] buffer =Arrays.copyOfRange(rais.getSoundData(), startInBytes, endInBytes);
