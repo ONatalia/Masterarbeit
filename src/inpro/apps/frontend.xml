@@ -38,7 +38,7 @@
         </propertylist>
     </component>
     
-    <component name="googlefrontend" type="edu.cmu.sphinx.frontend.FrontEnd">
+    <component name="frontendFA" type="edu.cmu.sphinx.frontend.FrontEnd">
         <propertylist name="pipeline">
             <item>pitchTracker</item>
             <item>baseDataAdapter1</item>

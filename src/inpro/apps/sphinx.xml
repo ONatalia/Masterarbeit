@@ -12,6 +12,7 @@
 	     (and hence, how often resultListeners are called) -->
     <property name="step" value="1"/>
     <property name="recognizer" value="recognizer"/>
+    
     <property name="scorer" value="simpleScorer"/>
 
     <!-- alternatives: flatLinguist | lexTreeLinguist -->
@@ -170,6 +171,11 @@
     <component name="trivialPruner" type="edu.cmu.sphinx.decoder.pruner.SimplePruner"/>
 
     <component name="simpleScorer" type="edu.cmu.sphinx.decoder.scorer.SimpleAcousticScorer">
+        <property name="frontend" value="${frontend}"/>
+        <property name="scoreablesKeepFeature" value="true"/>
+    </component>
+    
+    <component name="simpleScorerFA" type="edu.cmu.sphinx.decoder.scorer.SimpleAcousticScorer">
         <property name="frontend" value="${frontend}"/>
         <property name="scoreablesKeepFeature" value="true"/>
     </component>

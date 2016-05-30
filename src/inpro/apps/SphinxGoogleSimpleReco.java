@@ -64,8 +64,9 @@ public class SphinxGoogleSimpleReco extends IUModule{
 	private final GoogleASR gasr;
 	private RecognizerInputStream rais;
 	private TreeMap <Integer,String> hyps=new TreeMap <Integer,String>();;
-
-	
+	ArrayList<Double> starttimes=new ArrayList<Double>();
+	ArrayList<Double> endtimes=new ArrayList<Double>();
+	//double offset=0;
 
 	
 	public SphinxGoogleSimpleReco() throws PropertyException, IOException,
@@ -114,6 +115,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 			
 			BaseDataProcessor realtime = new DataThrottle();
 			FrontEnd fe=(FrontEnd)cm.lookup("frontend");
+			FrontEnd feFA=(FrontEnd)cm.lookup("frontendFA");
 			StreamDataSource sdsG = (StreamDataSource) cm.lookup("streamDataSourceGoogle");
 			StreamDataSource sdsS = (StreamDataSource) cm.lookup("streamDataSource");
 			StreamDataSource sdsFA = (StreamDataSource) cm.lookup("streamDataSourceFA");
@@ -128,21 +130,29 @@ public class SphinxGoogleSimpleReco extends IUModule{
 			rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
 			AudioInputStream aisG = new AudioInputStream(new ByteArrayInputStream(
 					rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
-			AudioInputStream aisFA = new AudioInputStream(new ByteArrayInputStream(
-					rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
 		
 	        sdsG.setInputStream(aisG, "google");
 			sdsS.setInputStream(aisS, "sphinx");
-			sdsFA.setInputStream(aisFA,"FA");
+			sdsFA.setInputStream(aisS, "FA");
 			
 			realtime.setPredecessor(sdsG);
+			
+			//AlignerGrammar forcedAligner=(AlignerGrammar) cm.lookup("forcedAligner");
+			//forcedAligner.setText(clp.getReference());
+			
+			//fe.setPredecessor(sdsFA);
 			fe.setPredecessor(sdsS);
-			fe.setPredecessor(sdsFA);
+			feFA.setPredecessor(sdsFA);
+			
+			 
+			
+			
 			
 			
 			
 			
 			gasr = new GoogleASR(realtime);
+			
 			gasr.newProperties(cm.getPropertySheet("googleASR"));
 			gasr.setAPIKey(clp.getGoogleAPIkey());
 			gasr.setExportFile(clp.getGoogleDumpOutput());
@@ -576,10 +586,18 @@ public class SphinxGoogleSimpleReco extends IUModule{
 	}
 
 	private void recognizeSimultaneously() {
+		
+		
+		startGoogleThread(gasr);
 		SphinxThread spth=new SphinxThread (recognizer);
 		spth.start();
-		startGoogleThread(gasr);
 		
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -588,86 +606,61 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		System.err.println("This is left buffer update");
 		logger.info("Time by update: "+System.currentTimeMillis());
 		
-		ArrayList<Double> starttimes=new ArrayList<Double>();
-		ArrayList<Double> endtimes=new ArrayList<Double>();
+		//ArrayList<Double> starttimes=new ArrayList<Double>();
+		//ArrayList<Double> endtimes=new ArrayList<Double>();
 		
 		TreeMap<Integer, String> hypsclone = new TreeMap<Integer, String>();
 		hypsclone=(TreeMap<Integer, String>)hyps.clone();
 		String text=new String ();
 		
-		
-		
-		if (!edits.isEmpty()) {
+		for (EditMessage<? extends IU> edit : edits) {
 			
 			
-			for (int i=0; i<edits.size(); i++){
-				
-				logger.info("edits"+edits.toString());
-						
-			//add
-			if (edits.get(i).getType()==EditType.ADD){
-				
-				
-				Integer iuNumber=edits.get(i).getIU ().getID();
-				
-				String word=edits.get(i).getIU ().toString().split("\\s+")[3]+" ";
-				logger.info("Add Type: "+edits.get(i).getType());
-				
-				hyps.put(iuNumber, word); 
-				
-				
+			String word=new String();
 			
-				starttimes.add((double) edits.get(i).getIU ().startTime());
-				endtimes.add((double) edits.get(i).getIU ().endTime());
+			//logger.info("label writer read: "+iu.toString());
+			switch (edit.getType()) {
+			case ADD:
 				
+					Integer iuNumber=edit.getIU ().getID();
 					
-			//delete	
-			}
-				else if (edits.get(i).getType()==EditType.REVOKE){
-					
-					logger.info("Revoke: "+edits.get(i).getType());
+					word=edit.getIU ().toString().split("\\s+")[3]+" ";
 					
 					
-					String word=edits.get(i).getIU ().toString().split("\\s+")[3]+" ";
+					hyps.put(iuNumber, word); 
 					
-					for (Entry<Integer, String> entry : hypsclone.entrySet()) {
-						 if (entry.getValue().equals(word)){
-							hyps.remove(entry.getKey());
-								
-							starttimes.remove((double) edits.get(i).getIU ().startTime());
-							endtimes.remove((double) edits.get(i).getIU ().endTime());
-						 }
-						  
-						 
-						}
-				}
+					
 				
-			
-			//commit
-				else if (edits.get(i).getType()==EditType.COMMIT){
-					
-					logger.info("Commit"+edits.get(i).getType());
-						 
+					starttimes.add((double) edit.getIU ().startTime());
+					endtimes.add((double) edit.getIU ().endTime());
+				
+				break;
+			case COMMIT:
+				
+				break;
+			case REVOKE:
+//				when revoking, we can assume that we are working with a stack;
+//				hence, the most recent thing added is the most recent thing revoked
+			    word=edit.getIU ().toString().split("\\s+")[3]+" ";
+				
+				for (Entry<Integer, String> entry : hypsclone.entrySet()) {
+					 if (entry.getValue().equals(word)){
+						hyps.remove(entry.getKey());
+							
+						starttimes.remove((double) edit.getIU ().startTime());
+						endtimes.remove((double) edit.getIU ().endTime());
+					 }
+					  
 					 
 					}
-									
-				
-				else {
-					
-					
-					logger.info("no changes");
-				}
-	
+				break;
+			default:
+				break;
 			
-				
-				
-				
-				
-				
-			} 
-		} else {
-			logger.info("empty"); 
-		} 
+			}
+
+		}
+		
 		
 		
 		
@@ -692,7 +685,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		
 		
-		
+			
 				
 				updateInputStream(starttimes,endtimes);	
 				//setupMonitors();
@@ -705,7 +698,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 				setupMonitors();
 				
 		
-		Result result = null;
+				Result result = null;
 		//logger.info("Recognizer sate" +recognizer.getState().toString());
 		logger.info("Recognizer sate" +recognizerFA.getState().toString());
 		
@@ -750,6 +743,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 				);
 		
 		gasr.getBuffer().clearBuffer();
+		
 	}
 	
 	
@@ -786,37 +780,40 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		int startInBytes = 0;
 		int endInBytes = 0;
 		double startInSec=0;
-		double offset=0;
-		//double offset=0.690;
+		//double offset=0;
+	    double offset=0.700;
 		double endInSec=0;
-		logger.info("startInSec"+starttimes.get(0));
-		logger.info("endInSec"+endInSec);
+		double delay=0.080;
+		
 		
 			
 		if (starttimes.get(0)==0)
-			{startInSec=starttimes.get(0);
-			offset=endtimes.get(0)-0.030;
-			logger.info("offset: "+offset);
-			
+			{
+			startInSec=offset;
+			endInSec=offset;
 			
 			}else
-			{startInSec=starttimes.get(0)-offset;
-			
+			{
+				startInSec=starttimes.get(0)-offset;
+				//endInSec=endtimes.get(endtimes.size()-1)-starttimes.get(0);
 			}	
 		
 		endInSec=endtimes.get(endtimes.size()-1)-offset;
+		logger.info("stimes:get0"+starttimes.get(0));
+		logger.info("etimes:get0"+endtimes.get(endtimes.size()-1));
 		logger.info("startInSec"+startInSec);
 		logger.info("endInSec"+endInSec);
 			
 		startInBytes=(int)((rais.getChannels()*rais.getSiteInBits()* rais.getSampleRate()/8.0f) *(startInSec));			
 		endInBytes=(int)((rais.getChannels()*rais.getSiteInBits()* rais.getSampleRate()/8.0f)*(endInSec));
 			
-		  
-		StreamDataSource sdsS = (StreamDataSource) cm.lookup("streamDataSourceFA");
-		sdsS.initialize();
+		FrontEnd feFA=(FrontEnd)cm.lookup("frontendFA"); 
+		StreamDataSource sdsFA = (StreamDataSource) cm.lookup("streamDataSourceFA");
+		sdsFA.initialize();
 		
 		//byte [] buffer =Arrays.copyOfRange(rais.getSoundData(), startInBytes, endInBytes);
 		byte [] buffer =Arrays.copyOfRange(rais.getSoundData(), 0, endInBytes);
+		
 		
 		//AudioInputStream aisS = new AudioInputStream(new ByteArrayInputStream(
 			//rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
@@ -828,7 +825,8 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		AudioInputStream aisS = new AudioInputStream(new ByteArrayInputStream(buffer),rais.getFormat(), buffer.length);;
 				
-		sdsS.setInputStream(aisS, "sphinx");
+		sdsFA.setInputStream(aisS, "sphinx");
+		feFA.setPredecessor(sdsFA);
 				
 				
 		}
