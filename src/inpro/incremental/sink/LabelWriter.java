@@ -113,6 +113,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		
 		for (IU iu : allIUs) {
 			toOut += "\n" + iu.toLabelLine();
+			
 		}
 		
 		toOut += "\n\n";
@@ -129,6 +130,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 			}
 			if (writeToStdOut) {
 				System.out.println(toOut);
+				
 				logger.info ("print toOut");
 				
 			}

@@ -384,3 +384,700 @@ Time: 2.50
 2.456	2.468	uns
 2.468	2.480	dann
 
+Time: 0.72
+0.000	0.725	ich
+
+Time: 0.99
+0.725	0.988	nicht
+
+Time: 1.01
+0.988	0.998	ich
+0.998	1.008	dann
+
+Time: 1.01
+0.988	0.998	ich
+1.009	1.010	danke
+
+Time: 1.82
+0.988	0.998	ich
+1.009	1.010	danke
+1.550	1.820	ihnen
+
+Time: 1.97
+0.988	0.998	ich
+
+Time: 1.98
+0.988	0.998	ich
+1.977	1.983	danke
+
+Time: 2.11
+0.988	0.998	ich
+1.977	1.983	danke
+2.063	2.103	ihnen
+
+Time: 2.73
+0.988	0.998	ich
+1.977	1.983	danke
+2.063	2.103	ihnen
+2.523	2.560	und
+2.560	2.597	wir
+2.597	2.634	sehen
+2.634	2.671	uns
+2.671	2.708	dann
+
+Time: 0.72
+0.000	0.725	ich
+
+Time: 1.00
+0.725	0.999	nicht
+
+Time: 1.01
+0.999	1.001	ich
+1.001	1.003	dann
+
+Time: 1.01
+0.999	1.001	ich
+1.007	1.011	danke
+
+Time: 1.25
+0.999	1.001	ich
+1.007	1.011	danke
+1.165	1.242	ihnen
+
+Time: 1.57
+0.999	1.001	ich
+
+Time: 1.59
+0.999	1.001	ich
+1.574	1.580	danke
+
+Time: 1.89
+0.999	1.001	ich
+1.574	1.580	danke
+1.782	1.883	ihnen
+
+Time: 2.79
+0.999	1.001	ich
+1.574	1.580	danke
+1.782	1.883	ihnen
+2.558	2.602	und
+2.602	2.646	wir
+2.646	2.690	sehen
+2.690	2.734	uns
+2.734	2.778	dann
+
+Time: 0.71
+0.000	0.719	ich
+
+Time: 0.98
+0.719	0.977	nicht
+
+Time: 0.98
+0.977	0.978	ich
+0.978	0.979	dann
+
+Time: 0.98
+0.977	0.978	ich
+0.980	0.981	danke
+
+Time: 1.26
+0.977	0.978	ich
+0.980	0.981	danke
+1.165	1.257	ihnen
+
+Time: 1.57
+0.977	0.978	ich
+
+Time: 1.58
+0.977	0.978	ich
+1.572	1.576	danke
+
+Time: 1.87
+0.977	0.978	ich
+1.572	1.576	danke
+1.766	1.861	ihnen
+
+Time: 2.68
+0.977	0.978	ich
+1.572	1.576	danke
+1.766	1.861	ihnen
+2.485	2.521	und
+2.521	2.557	wir
+2.557	2.593	sehen
+2.593	2.629	uns
+2.629	2.665	dann
+
+Time: 0.70
+0.000	0.703	ich
+
+Time: 0.97
+0.703	0.973	nicht
+
+Time: 1.00
+0.973	0.987	ich
+0.987	1.001	dann
+
+Time: 1.00
+1.002	1.003	danke
+
+Time: 1.26
+1.002	1.003	danke
+1.177	1.264	ihnen
+
+Time: 1.58
+
+Time: 1.60
+1.588	1.598	danke
+
+Time: 2.13
+1.588	1.598	danke
+1.948	2.123	ihnen
+
+Time: 2.68
+1.588	1.598	danke
+1.948	2.123	ihnen
+2.495	2.530	und
+2.530	2.565	wir
+2.565	2.600	sehen
+2.600	2.635	uns
+2.635	2.670	dann
+
+Time: 0.71
+0.000	0.716	ich
+
+Time: 0.97
+0.716	0.973	nicht
+
+Time: 0.99
+0.973	0.982	ich
+0.982	0.991	dann
+
+Time: 1.01
+1.000	1.009	danke
+
+Time: 1.27
+1.000	1.009	danke
+1.181	1.267	ihnen
+
+Time: 1.57
+
+Time: 1.59
+1.576	1.582	danke
+
+Time: 1.88
+1.576	1.582	danke
+1.776	1.873	ihnen
+
+Time: 2.52
+1.576	1.582	danke
+1.776	1.873	ihnen
+2.437	2.450	und
+2.450	2.463	wir
+2.463	2.476	sehen
+2.476	2.489	uns
+2.489	2.502	dann
+
+Time: 1.08
+0.000	1.082	ein
+
+Time: 1.27
+1.082	1.274	1
+
+Time: 1.51
+1.274	1.506	12
+
+Time: 2.11
+2.071	2.107	123
+
+Time: 2.86
+2.846	2.850	1
+2.850	2.854	2
+2.854	2.858	3
+2.858	2.862	4
+
+Time: 2.92
+0.000	2.929	ja
+
+Time: 3.09
+0.000	2.929	ja
+3.012	3.095	genau
+
+Time: 3.47
+
+Time: 3.52
+3.495	3.521	genau
+
+Time: 5.15
+3.495	3.521	genau
+4.945	5.013	also
+5.013	5.081	vorliegen
+5.081	5.149	genau
+
+Time: 0.81
+0.000	0.812	gute
+
+Time: 1.03
+0.812	1.033	guten
+
+Time: 1.15
+1.033	1.147	gudrun
+
+Time: 1.20
+1.147	1.201	gutschein
+
+Time: 1.35
+1.201	1.274	gut
+1.274	1.347	online
+
+Time: 1.39
+1.347	1.369	gudrun
+1.369	1.391	leiche
+
+Time: 1.71
+1.547	1.703	leichter
+
+Time: 1.71
+1.703	1.709	fronleichnam
+
+Time: 4.58
+1.703	1.709	fronleichnam
+3.198	4.576	ja
+
+Time: 6.17
+1.703	1.709	fronleichnam
+3.198	4.576	ja
+6.157	6.164	vorzugsweise
+
+Time: 7.14
+1.703	1.709	fronleichnam
+3.198	4.576	ja
+6.157	6.164	vorzugsweise
+7.034	7.133	dienstag
+
+Time: 7.17
+1.703	1.709	fronleichnam
+3.198	4.576	ja
+6.157	6.164	vorzugsweise
+7.034	7.133	dienstag
+7.154	7.161	und
+
+Time: 7.52
+1.703	1.709	fronleichnam
+3.198	4.576	ja
+6.157	6.164	vorzugsweise
+7.034	7.133	dienstag
+7.154	7.161	und
+7.433	7.501	mittwoch
+
+Time: 8.63
+1.703	1.709	fronleichnam
+3.198	4.576	ja
+6.157	6.164	vorzugsweise
+7.034	7.133	dienstag
+7.154	7.161	und
+7.433	7.501	mittwoch
+8.606	8.608	19
+
+Time: 8.83
+1.703	1.709	fronleichnam
+3.198	4.576	ja
+6.157	6.164	vorzugsweise
+7.034	7.133	dienstag
+7.154	7.161	und
+7.433	7.501	mittwoch
+8.606	8.608	19
+8.782	8.811	juni
+
+Time: 0.86
+0.000	0.868	gute
+
+Time: 1.03
+0.868	1.032	guten
+
+Time: 1.17
+1.032	1.165	gudrun
+
+Time: 1.23
+1.165	1.228	gutschein
+
+Time: 1.35
+1.228	1.289	gut
+1.289	1.350	online
+
+Time: 1.42
+1.350	1.386	gudrun
+1.386	1.422	leiche
+
+Time: 1.72
+1.571	1.720	leichter
+
+Time: 1.73
+1.720	1.722	fronleichnam
+
+Time: 4.59
+1.720	1.722	fronleichnam
+3.201	4.588	ja
+
+Time: 6.20
+1.720	1.722	fronleichnam
+3.201	4.588	ja
+6.191	6.200	vorzugsweise
+
+Time: 7.15
+1.720	1.722	fronleichnam
+3.201	4.588	ja
+6.191	6.200	vorzugsweise
+7.038	7.143	dienstag
+
+Time: 7.19
+1.720	1.722	fronleichnam
+3.201	4.588	ja
+6.191	6.200	vorzugsweise
+7.038	7.143	dienstag
+7.170	7.179	und
+
+Time: 7.62
+1.720	1.722	fronleichnam
+3.201	4.588	ja
+6.191	6.200	vorzugsweise
+7.038	7.143	dienstag
+7.170	7.179	und
+7.523	7.609	mittwoch
+
+Time: 8.66
+1.720	1.722	fronleichnam
+3.201	4.588	ja
+6.191	6.200	vorzugsweise
+7.038	7.143	dienstag
+7.170	7.179	und
+7.523	7.609	mittwoch
+8.639	8.641	19
+
+Time: 8.97
+1.720	1.722	fronleichnam
+3.201	4.588	ja
+6.191	6.200	vorzugsweise
+7.038	7.143	dienstag
+7.170	7.179	und
+7.523	7.609	mittwoch
+8.639	8.641	19
+8.905	8.949	juni
+
+Time: 0.71
+0.000	0.715	ich
+
+Time: 1.00
+0.715	0.994	nicht
+
+Time: 1.02
+0.994	1.007	ich
+1.007	1.020	dann
+
+Time: 1.02
+1.021	1.022	danke
+
+Time: 1.28
+1.021	1.022	danke
+1.192	1.277	ihnen
+
+Time: 1.58
+
+Time: 1.59
+1.581	1.583	danke
+
+Time: 1.91
+1.581	1.583	danke
+1.797	1.904	ihnen
+
+Time: 2.64
+1.581	1.583	danke
+1.797	1.904	ihnen
+2.519	2.541	und
+2.541	2.563	wir
+2.563	2.585	sehen
+2.585	2.607	uns
+2.607	2.629	dann
+
+Time: 0.72
+0.000	0.726	ich
+
+Time: 1.00
+0.726	1.004	nicht
+
+Time: 1.02
+1.004	1.013	ich
+1.013	1.022	dann
+
+Time: 1.04
+1.028	1.034	danke
+
+Time: 1.29
+1.028	1.034	danke
+1.200	1.283	ihnen
+
+Time: 1.60
+
+Time: 1.61
+1.602	1.603	danke
+
+Time: 1.89
+1.602	1.603	danke
+1.793	1.888	ihnen
+
+Time: 2.64
+1.602	1.603	danke
+1.793	1.888	ihnen
+2.482	2.510	und
+2.510	2.538	wir
+2.538	2.566	sehen
+2.566	2.594	uns
+2.594	2.622	dann
+
+Time: 0.71
+0.000	0.711	ich
+
+Time: 1.30
+0.711	1.306	nicht
+
+Time: 1.32
+1.306	1.315	ich
+1.315	1.324	dann
+
+Time: 1.33
+1.325	1.326	danke
+
+Time: 1.33
+1.325	1.326	danke
+1.328	1.329	ihnen
+
+Time: 2.06
+
+Time: 2.07
+2.061	2.065	danke
+
+Time: 2.17
+2.061	2.065	danke
+2.131	2.164	ihnen
+
+Time: 0.72
+0.000	0.728	ich
+
+Time: 1.00
+0.728	1.000	nicht
+
+Time: 1.01
+1.000	1.004	ich
+1.004	1.008	dann
+
+Time: 1.03
+1.017	1.026	danke
+
+Time: 1.28
+1.017	1.026	danke
+1.198	1.284	ihnen
+
+Time: 1.59
+
+Time: 1.60
+1.594	1.598	danke
+
+Time: 1.88
+1.594	1.598	danke
+1.782	1.874	ihnen
+
+Time: 2.64
+1.594	1.598	danke
+1.782	1.874	ihnen
+2.510	2.535	und
+2.535	2.560	wir
+2.560	2.585	sehen
+2.585	2.610	uns
+2.610	2.635	dann
+
+Time: 0.72
+0.000	0.727	ich
+
+Time: 1.00
+0.727	0.997	nicht
+
+Time: 1.02
+0.997	1.008	ich
+1.008	1.019	dann
+
+Time: 1.04
+1.029	1.039	danke
+
+Time: 1.28
+1.029	1.039	danke
+1.197	1.276	ihnen
+
+Time: 1.58
+
+Time: 1.59
+1.587	1.593	danke
+
+Time: 1.91
+1.587	1.593	danke
+1.801	1.905	ihnen
+
+Time: 2.84
+1.587	1.593	danke
+1.801	1.905	ihnen
+2.568	2.619	und
+2.619	2.670	wir
+2.670	2.721	sehen
+2.721	2.772	uns
+2.772	2.823	dann
+
+Time: 0.72
+0.000	0.721	ich
+
+Time: 1.19
+0.721	1.188	nicht
+
+Time: 1.20
+1.188	1.196	ich
+1.196	1.204	dann
+
+Time: 1.21
+1.188	1.196	ich
+1.209	1.214	danke
+
+Time: 1.27
+1.188	1.196	ich
+1.209	1.214	danke
+1.250	1.268	ihnen
+
+Time: 1.58
+1.188	1.196	ich
+
+Time: 1.59
+1.188	1.196	ich
+1.585	1.592	danke
+
+Time: 1.91
+1.188	1.196	ich
+1.585	1.592	danke
+1.804	1.910	ihnen
+
+Time: 2.80
+1.188	1.196	ich
+1.585	1.592	danke
+1.804	1.910	ihnen
+2.564	2.609	und
+2.609	2.654	wir
+2.654	2.699	sehen
+2.699	2.744	uns
+2.744	2.789	dann
+
+Time: 0.71
+0.000	0.717	ich
+
+Time: 0.99
+0.717	0.992	nicht
+
+Time: 1.03
+0.992	1.011	ich
+1.011	1.030	dann
+
+Time: 1.03
+0.992	1.011	ich
+1.030	1.030	danke
+
+Time: 1.27
+0.992	1.011	ich
+1.030	1.030	danke
+1.190	1.270	ihnen
+
+Time: 1.58
+0.992	1.011	ich
+
+Time: 1.59
+0.992	1.011	ich
+1.583	1.589	danke
+
+Time: 1.99
+0.992	1.011	ich
+1.583	1.589	danke
+1.855	1.988	ihnen
+
+Time: 2.57
+0.992	1.011	ich
+1.583	1.589	danke
+1.855	1.988	ihnen
+2.486	2.500	und
+2.500	2.514	wir
+2.514	2.528	sehen
+2.528	2.542	uns
+2.542	2.556	dann
+
+Time: 0.73
+0.000	0.733	ich
+
+Time: 0.98
+0.733	0.977	nicht
+
+Time: 1.00
+0.977	0.986	ich
+0.986	0.995	dann
+
+Time: 1.01
+1.000	1.005	danke
+
+Time: 1.27
+1.000	1.005	danke
+1.179	1.266	ihnen
+
+Time: 1.58
+
+Time: 1.59
+1.584	1.585	danke
+
+Time: 1.91
+1.584	1.585	danke
+1.801	1.909	ihnen
+
+Time: 2.52
+1.584	1.585	danke
+1.801	1.909	ihnen
+2.437	2.451	und
+2.451	2.465	wir
+2.465	2.479	sehen
+2.479	2.493	uns
+2.493	2.507	dann
+
+Time: 0.73
+0.000	0.732	ich
+
+Time: 0.99
+0.732	0.991	nicht
+
+Time: 1.01
+0.991	1.000	ich
+1.000	1.009	dann
+
+Time: 1.03
+1.019	1.029	danke
+
+Time: 1.27
+1.019	1.029	danke
+1.191	1.272	ihnen
+
+Time: 1.59
+
+Time: 1.59
+1.590	1.591	danke
+
+Time: 1.91
+1.590	1.591	danke
+1.805	1.912	ihnen
+
+Time: 2.83
+1.590	1.591	danke
+1.805	1.912	ihnen
+2.584	2.632	und
+2.632	2.680	wir
+2.680	2.728	sehen
+2.728	2.776	uns
+2.776	2.824	dann
+

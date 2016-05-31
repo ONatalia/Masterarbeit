@@ -190,7 +190,8 @@ public class GoogleASR extends IUSourceModule {
 			// write to stream
 			writeToStream(upStream, ais);
 			// on data end, end listening thread and tear down connection with google
-			Thread.sleep(400);
+			//Thread.sleep(400);
+			Thread.sleep(4000);
 			jsonlistener.shutdown();
 			listenerThread.join();
 			setStatus(0);
