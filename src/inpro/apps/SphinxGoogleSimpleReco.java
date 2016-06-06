@@ -1,6 +1,8 @@
 package inpro.apps;
 
+
 import inpro.apps.SimpleMonitor;
+
 import inpro.apps.util.GoogleSphinxRCLP;
 import inpro.apps.util.MonitorCommandLineParser;
 import inpro.apps.util.RecognizerInputStream;
@@ -27,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.Map.Entry;
 
 
@@ -52,6 +56,7 @@ import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.cmu.sphinx.util.props.PropertyException;
+import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 
 public class SphinxGoogleSimpleReco extends IUModule{
 
@@ -64,10 +69,9 @@ public class SphinxGoogleSimpleReco extends IUModule{
 	private final GoogleASR gasr;
 	private RecognizerInputStream rais;
 	private TreeMap <Integer,String> hyps=new TreeMap <Integer,String>();;
-	//ArrayList<Double> starttimes=new ArrayList<Double>();
-	//ArrayList<Double> endtimes=new ArrayList<Double>();
 	ArrayList<IU> hypsIus=new ArrayList<IU>();
-	double totaltime=0;
+	private SynchronousQueue <BlockingQueueData> bq=new SynchronousQueue <BlockingQueueData>();
+	
 
 	
 	public SphinxGoogleSimpleReco() throws PropertyException, IOException,
@@ -118,10 +122,10 @@ public class SphinxGoogleSimpleReco extends IUModule{
 			FrontEnd fe=(FrontEnd)cm.lookup("frontend");
 			FrontEnd feFA=(FrontEnd)cm.lookup("frontendFA");
 			StreamDataSource sdsG = (StreamDataSource) cm.lookup("streamDataSourceGoogle");
-			StreamDataSource sdsS = (StreamDataSource) cm.lookup("streamDataSource");
+			//StreamDataSource sdsS = (StreamDataSource) cm.lookup("streamDataSource");
 			StreamDataSource sdsFA = (StreamDataSource) cm.lookup("streamDataSourceFA");
 			sdsG.initialize();
-			sdsS.initialize();
+			//sdsS.initialize();
 			sdsFA.initialize();
 			
 			AudioInputStream ais=setupAis(fe);
@@ -135,7 +139,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 					rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
 		
 	        sdsG.setInputStream(aisG, "google");
-	        sdsS.setInputStream(aisS, "sphinx");
+	        //sdsS.setInputStream(aisS, "sphinx");
 			
 			sdsFA.setInputStream(aisFA, "FA");
 			
@@ -147,8 +151,8 @@ public class SphinxGoogleSimpleReco extends IUModule{
 			//forcedAligner.setText(clp.getReference());
 			
 			
-			fe.setPredecessor(sdsS);
-			feFA.setPredecessor(sdsFA);
+			fe.setPredecessor(sdsFA);
+			//feFA.setPredecessor(sdsFA);
 			
 			 
 			
@@ -595,12 +599,13 @@ public class SphinxGoogleSimpleReco extends IUModule{
 	private void recognizeSimultaneously() {
 		
 		
+		
+		SphinxThread spth=new SphinxThread (recognizerFA,bq,cm,rais);
+		spth.start();
 		startGoogleThread(gasr);
-		//SphinxThread spth=new SphinxThread (recognizer);
-		//spth.start();
 		
 		try {
-			Thread.sleep(300);
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -619,7 +624,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		TreeMap<Integer, String> hypsclone = new TreeMap<Integer, String>();
 		hypsclone=(TreeMap<Integer, String>)hyps.clone();
 		String text=new String ();
-		
+		BlockingQueueData bqd=new BlockingQueueData(); 
 		
 		
 		
@@ -701,6 +706,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		for (IU iu:hypsIus){
 		starttimes.add(iu.startTime());
 		endtimes.add(iu.endTime());
+		
 	}
 		
 
@@ -714,7 +720,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		
 		
-			try {
+			/*try {
 				setText(text);
 				logger.info("text"+text);
 			} catch (IOException e) {
@@ -722,12 +728,16 @@ public class SphinxGoogleSimpleReco extends IUModule{
 				e.printStackTrace();
 			}
 			
-			   
+			   */
 		
 		
-			
+			bqd.setText(text);
+			bqd.setStarttimes(starttimes);
+			bqd.setEndtimes(endtimes);
+			bq.clear();
+			bq.offer(bqd);
 				
-				updateInputStream(starttimes,endtimes);	
+				/*updateInputStream(starttimes,endtimes);	
 				//setupMonitors();
 				//allocateRecognizer();
 			
@@ -784,7 +794,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 				&& (result.getDataFrames() != null)&& (result.getDataFrames().size() > 4)
 				);
 		
-		gasr.getBuffer().clearBuffer();
+		gasr.getBuffer().clearBuffer();*/
 		
 	}
 	

@@ -33,7 +33,18 @@
     <!-- ******************************************************** -->
     <!-- The Dictionary configuration                            -->
     <!-- ******************************************************** -->
-    <component name="dictionary" type="edu.cmu.sphinx.linguist.dictionary.FullDictionary"> 
+    <!--  <component name="dictionary" type="edu.cmu.sphinx.linguist.dictionary.FullDictionary"> 
+        <property name="dictionaryPath" value="file:../res/Cocolab_DE.lex"/>
+        <property name="fillerPath" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab_DE.filler"/>
+        <property name="addSilEndingPronunciation" value="false"/>
+        <property name="allowMissingWords" value="true"/>
+        <property name="createMissingWords" value="true"/>
+       <property name="g2pModelPath" value="file:../res/Cocolab_DE-g2p-4.fst.ser"/>  
+        <property name="g2pMaxPron" value="1"/>
+        <property name="unitManager" value="unitManager"/>
+    </component> -->
+    
+     <component name="dictionary" type="edu.cmu.sphinx.linguist.dictionary.FullDictionary"> 
         <property name="dictionaryPath" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab_DE.lex"/>
         <property name="fillerPath" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab_DE.filler"/>
 <!--        <property name="addSilEndingPronunciation" value="false"/>
@@ -43,6 +54,7 @@
         <property name="g2pMaxPron" value="2"/>
 -->        <property name="unitManager" value="unitManager"/>
     </component>
+   
 
     <!-- ******************************************************** -->
     <!-- The acoustic model and unit manager configuration        -->
