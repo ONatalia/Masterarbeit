@@ -5,27 +5,42 @@
     <!-- ******************************************************** -->
     <!-- The Grammar  configuration                               -->
     <!-- ******************************************************** -->
-    <component name="jsgfGrammar" type="edu.cmu.sphinx.jsgf.JSGFGrammar">
+    <component name="jsgfGrammar" type="inpro.apps.MyJSGFGrammar">
+    <!-- <component name="jsgfGrammar" type="edu.cmu.sphinx.jsgf.JSGFGrammar"> -->
         <property name="dictionary" value="dictionary"/>
-        <property name="grammarLocation" value="file:src/inpro/domains/pentomino/resources/"/>
-        <property name="grammarName" value="pento"/>
+        <!--<property name="grammarLocation" value="file:src/inpro/domains/pentomino/resources/"/>  -->
+         <property name="grammarLocation" value=" file:../res/"/>
+        <property name="grammarName" value="phones1"/>
         <property name="logMath" value="logMath"/>
     </component>
     
-    <component name="ngram" type="edu.cmu.sphinx.linguist.language.ngram.SimpleNGramModel">
+    <component name="myjsgfGrammar" type="inpro.apps.MyJSGFGrammar">
+    <!-- <component name="jsgfGrammar" type="edu.cmu.sphinx.jsgf.JSGFGrammar"> -->
+        <property name="dictionary" value="dictionary"/>
+        <!--<property name="grammarLocation" value="file:src/inpro/domains/pentomino/resources/"/>  -->
+         <property name="grammarLocation" value=" file:../res/"/>
+        <property name="grammarName" value="phones1"/>
+        <property name="logMath" value="logMath"/>
+    </component>
+    
+   <component name="ngram" type="inpro.apps.MySimpleNGramModel">   
+  <!-- <component name="ngram" type="edu.cmu.sphinx.linguist.language.ngram.SimpleNGramModel">  --> 
         <property name="dictionary" value="dictionary"/>
         <property name="logMath" value="logMath"/>
         <!-- dies lässt sich mit dem -lm switch in SimpleReco verbiegen -->
-        <property name="location" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/LM/inproCorpora_all.lm"/>
+        <!-- <property name="location" value=" file:../res/inproCorpora_all.lm"/>   -->   
+         <property name="location" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/LM/inproCorpora_all.lm"/> 
         <property name="maxDepth" value="3"/>
         <property name="unigramWeight" value=".7"/>
     </component>
     
     <!-- this second ngram model can be used to blend multiple language models using interpolatedLM defined in sphinx.xml -->
     <component name="ngram2" type="edu.cmu.sphinx.linguist.language.ngram.SimpleNGramModel">
+   
         <property name="dictionary" value="dictionary"/>
         <property name="logMath" value="logMath"/>
-        <property name="location" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/LM/inproCorpora_all.lm"/>
+         <property name="location" value=" file:../res/LM/inproCorpora_all.lm"/>    
+       <!-- <property name="location" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/LM/inproCorpora_all.lm"/> --> 
         <property name="maxDepth" value="3"/>
         <property name="unigramWeight" value=".7"/>
     </component>
@@ -45,14 +60,15 @@
     </component> -->
     
      <component name="dictionary" type="edu.cmu.sphinx.linguist.dictionary.FullDictionary"> 
-        <property name="dictionaryPath" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab_DE.lex"/>
+       <!-- <property name="dictionaryPath" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab_DE.lex"/> --> 
+        <property name="dictionaryPath" value="file:../res/Cocolab_DE.lex"/> 
         <property name="fillerPath" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/dict/Cocolab_DE.filler"/>
-<!--        <property name="addSilEndingPronunciation" value="false"/>
+       <property name="addSilEndingPronunciation" value="false"/>
         <property name="allowMissingWords" value="true"/>
-        <property name="createMissingWords" value="true"/>
-        <property name="g2pModelPath" value="file:///home/timo/uni/projekte/inpro-git/res/Cocolab_DE-g2p-4.fst.ser"/>
-        <property name="g2pMaxPron" value="2"/>
--->        <property name="unitManager" value="unitManager"/>
+       <property name="createMissingWords" value="true"/> 
+       <property name="g2pModelPath" value="file:../res/Cocolab_DE-g2p-4.fst.ser"/>
+        <property name="g2pMaxPron" value="2"/> --> 
+        <property name="unitManager" value="unitManager"/>
     </component>
    
 
@@ -65,4 +81,15 @@
 		<property name="location" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz"/>
 		<property name="modelDefinition" value="etc/Cocolab_DE.2000.mdef"/>
 		<property name="dataLocation" value="cd_cont_2000_8/"/>
+    </component>
+    
+     <component name="sphinx3LoaderLoop" type="edu.cmu.sphinx.linguist.acoustic.tiedstate.Sphinx3Loader">
+        <property name="logMath" value="logMath"/>
+        <property name="unitManager" value="unitManager"/>
+        <property name="location" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz"/>
+		<property name="modelDefinition" value="etc/Cocolab_DE.2000.mdef"/>
+		<property name="dataLocation" value="cd_cont_2000_8/"/>
+		<!-- <property name="location" value="file:../res/sphinx_wsj_si84_cont_3no_8000_32"/>
+		<property name="modelDefinition" value="model_architecture/wsj_si84_cont_3no_8000.mdef"/>
+		<property name="dataLocation" value="model_parameters/wsj_si84_cont_3no_8000_32.cd/"/> -->
     </component>

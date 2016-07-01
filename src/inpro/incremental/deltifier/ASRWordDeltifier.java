@@ -3,6 +3,7 @@ package inpro.incremental.deltifier;
 import inpro.annotation.Label;
 import inpro.incremental.unit.EditMessage;
 import inpro.incremental.unit.EditType;
+import inpro.incremental.unit.IU;
 import inpro.incremental.unit.IUList;
 import inpro.incremental.unit.SegmentIU;
 import inpro.incremental.unit.WordIU;
@@ -27,6 +28,8 @@ import edu.cmu.sphinx.instrumentation.Resetable;
 import edu.cmu.sphinx.linguist.SearchState;
 import edu.cmu.sphinx.linguist.UnitSearchState;
 import edu.cmu.sphinx.linguist.WordSearchState;
+import edu.cmu.sphinx.linguist.acoustic.Unit;
+import edu.cmu.sphinx.linguist.acoustic.UnitManager;
 import edu.cmu.sphinx.linguist.dictionary.Pronunciation;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.Configurable;
@@ -188,8 +191,39 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 						addSilenceWord = true;
 						break;
 					}
+					
+				} else if (name.equals("F")||(name.equals("j"))||(name.equals("B"))||(name.equals("C"))||(name.equals("D"))
+						||(name.equals("Q"))||(name.equals("s"))||(name.equals("E:"))) {
+					if (!wordIt.hasNext()) {  // wordIt = iteration over the Hypothesis, word by word
+						newIt.previous();
+						break;
+					}
+					
+					//Pronunciation pron = ((WordSearchState) newToken.getSearchState()).getPronunciation();
+					// iterate over the last hypothesis word by word
+					WordIU prevIU = wordIt.next();
+					// check if the words matches and break once we reach the point where they don't match anymore
+					if (!prevIU.spellingEquals(name)) {
+						wordIt.previous(); // go back the one word that didn't match anymore
+						newIt.previous();
+						break;
+					}
+					
+					/*wordIt.previous();
+					WordIU currWord = wordIt.next(); 
+					currWord.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, name)));
+					currSegmentIt = currWord.getSegments().iterator();*/
+					
+					
+						
+					
+					
+				//else if search unit is a phone	
+					
 				} else {
-					// this assertion does seem to hurt anymore
+					
+					
+					
 					assert false : newSearchState.getClass().toString() + newSearchState.toString();
 				}
 				segmentStartTime = segmentEndTime;
@@ -258,8 +292,13 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 			// on WordSearchStates, we build an IU and add it
 			if (newSearchState instanceof WordSearchState) {
 				Pronunciation pron = ((WordSearchState) newSearchState).getPronunciation();
+				/*System.out.println ("pron"+pron.toString());
+				System.out.println ("pron"+pron.getUnits().toString());
+				
+				System.out.println ("pron"+pron.getProbability());*/
 				WordIU newIU = WordUtil.wordFromPronunciation(pron);			
 				currSegmentIt = newIU.getSegments().iterator();
+				System.out.println ("add:"+newIU);
 				edits.add(new EditMessage<WordIU>(EditType.ADD, newIU));	
 			} 
 			//on UnitSearchStates, we find the unit's timing and update the segmentIU
@@ -272,8 +311,25 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 					WordIU newIU = new WordIU(null);
 					newIU.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, "SIL")));
 					edits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
+					
+					
+			//to do: else if SearchUnit is a phone		
+				} else if (name.equals("F")||(name.equals("v"))||(name.equals("Q"))||(name.equals("E:"))||(name.equals("s"))||(name.equals("j"))) {
+				//} else if (name.equals("j")) {
+					WordIU newIU = new WordIU(name,null);
+					currSegmentIt = newIU.getSegments().iterator();
+					System.out.println ("add:"+newIU);
+					edits.add(new EditMessage<WordIU>(EditType.ADD, newIU));	
+					
+				
+				
+				
 				} else {
-					assert false : "Should this really happen?" + newSearchState + "; " + name;
+					
+						
+				
+				assert false : "Should this really happen?" + newSearchState + "; " + name;
+					
 				}
 				segmentStartTime = segmentEndTime;
 			} else {

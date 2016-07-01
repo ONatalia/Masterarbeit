@@ -1,0 +1,9 @@
+#JSGF V1.0;
+
+/**
+ * JSGF Digits Grammar for Hello World example
+ */
+
+grammar phones;
+
+public <phones> = (2: | 6 | 9 | @ | C | E | E: | I | N | O | OY | Q | S | SIL | U | Y | Z  | a | a: | aI | aU | h | i | i: | k | l | m | n | o | o: | p| r | s |  t | u | u: | v | x | y: | z| g | h )*;

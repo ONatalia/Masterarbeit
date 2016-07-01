@@ -16,7 +16,7 @@
     <property name="scorer" value="simpleScorer"/>
 
     <!-- alternatives: flatLinguist | lexTreeLinguist -->
-    <property name="linguist"   value="lexTreeLinguist"/> 
+    <property name="linguist"   value="flatLinguist"/> 
 
     <!-- alternatives: fakeSearch | simpleSearch | wordPruningSearch -->
     <property name="searchManager" value="wordPruningSearch"/>
@@ -207,10 +207,15 @@
         <!--property name="showCompilationProgress" value="false"/-->
     </component>
 
-    <component name="flatLinguist" type="edu.cmu.sphinx.linguist.flat.FlatLinguist">
+    <component name="flatLinguist" type="edu.cmu.sphinx.linguist.flat.FlatLinguist"> 
+    <!--  <component name="flatLinguist" type="inpro.apps.MyFlatLinguist"> -->
         <property name="logMath" value="logMath"/>
         <property name="grammar" value="${grammar}"/>
         <property name="acousticModel" value="acousticModel"/>
+       <!-- <property name="phoneLoopAcousticModel" value="phoneLoopAcousticModel"/> 
+        <property name="addOutOfGrammarBranch" value="true"/>   
+         <property name="outOfGrammarProbability" value="0.5"/>   
+          <property name="phoneInsertionProbability" value="0.5"/>     -->
         <property name="wordInsertionProbability" value="${wordInsertionProbability}"/>
         <property name="silenceInsertionProbability" value="${silenceInsertionProbability}"/>
         <property name="languageWeight" value="${languageWeight}"/>
@@ -219,7 +224,8 @@
     
     <component name="linguistFA" type="edu.cmu.sphinx.linguist.flat.FlatLinguist">
         <property name="logMath" value="logMath"/>
-        <property name="grammar" value="forcedAligner"/>
+       <!-- <property name="grammar" value="forcedAligner"/>  -->  
+         <property name="grammar" value="myjsgfGrammar"/>
         <property name="acousticModel" value="acousticModel"/>
         <property name="wordInsertionProbability" value="${wordInsertionProbability}"/>
         <property name="silenceInsertionProbability" value="${silenceInsertionProbability}"/>
@@ -231,6 +237,7 @@
     <!-- The Grammar  configuration                               -->
     <!-- ******************************************************** -->
     <component name="forcedAligner" type="edu.cmu.sphinx.linguist.language.grammar.AlignerGrammar">
+    
         <property name="dictionary" value="dictionary"/>
         <property name="addSilenceWords" value="true"/>
         <property name="addFillerWords" value="false"/>
@@ -261,6 +268,11 @@
         <property name="loader" value="sphinx3Loader"/>
         <property name="unitManager" value="unitManager"/>
     </component>
+    
+     <component name="phoneLoopAcousticModel" type="edu.cmu.sphinx.linguist.acoustic.tiedstate.TiedStateAcousticModel">
+        <property name="loader" value="sphinx3LoaderLoop"/>
+        <property name="unitManager" value="unitManager"/>
+    </component>
 
     <component name="unitManager" type="edu.cmu.sphinx.linguist.acoustic.UnitManager"/>
 
@@ -271,8 +283,10 @@
         <property name="recognizer" value="${recognizer}"/>
         <property name="intermediateResults" value="true"/>
         <property name="finalResult" value="false"/>
-        <property name="wordAlignment" value="true"/>
-        <property name="phoneAlignment" value="false"/>
+        <property name="wordAlignment" value="false"/>
+        <!--<property name="wordAlignment" value="true"/>  -->
+        <property name="phoneAlignment" value="true"/>
+         <!--<property name="phoneAlignment" value="false"/>  -->
         <property name="step" value="${step}"/>
         <property name="fileOutput" value="false"/>
         <property name="fileBaseName" value=""/>
@@ -313,5 +327,3 @@
                type="edu.cmu.sphinx.result.SausageMaker">
         <property name="languageWeight" value="${languageWeight}"/>
     </component>
-
-    

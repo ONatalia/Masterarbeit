@@ -4,6 +4,8 @@
 <!-- <!ENTITY iuconfig SYSTEM "./iu-config-fa.xml">-->
   <!ENTITY sphinx SYSTEM "./sphinx.xml">
   <!ENTITY sphinxlang SYSTEM "./sphinx-de.xml">
+  
+  
   <!ENTITY frontend SYSTEM "./frontend.xml">
 ]>
 <!--
@@ -17,7 +19,7 @@
 <config>
 
 	&sphinx;
-	&sphinxlang;
+	&sphinxlang;  
 	&frontend;
     &iuconfig;
 

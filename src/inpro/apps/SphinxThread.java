@@ -81,7 +81,12 @@ public class SphinxThread extends Thread {
 					// Normal Output
 					String phones=result.getBestPronunciationResult();
 					//AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
+					
 					//forcedAligner.getInitialNode().dump();
+					
+					MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
+					
+					jsgf.getInitialNode().dump();
 					result.toString();
 					
 					
@@ -90,7 +95,7 @@ public class SphinxThread extends Thread {
 					
 					
 				} else {
-					
+					logger.info("result null");
 					
 				}
 				
@@ -108,7 +113,8 @@ public class SphinxThread extends Thread {
 	private void updateInputStream(ArrayList<Double> starttimes, ArrayList<Double> endtimes) {
 		
 		int endInBytes = 0;
-		double startInSec=0;
+		//double startInSec=0;
+		//double offset_start=0.300;
 		double offset=0.400;
 	   
 		double endInSec=0;
@@ -116,10 +122,10 @@ public class SphinxThread extends Thread {
 		
 			
 		/*if (starttimes.get(0)==0){
-			endInSec=offset;
+			endInSec=offset_start;
 		}else {
 			
-			//endInSec=endtimes.get(endtimes.size()-1)-starttimes.get(0);
+			endInSec=endtimes.get(endtimes.size()-1)-starttimes.get(0)+offset_start;
 			//endInSec=endtimes.get(endtimes.size()-1)-offset;
 			
 		}*/
@@ -158,8 +164,12 @@ public class SphinxThread extends Thread {
 	}
 
 	private void setText(String text) {
-		AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
-		forcedAligner.setText(text);
+		//AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
+		//MyAlignerGrammar forcedAligner = (MyAlignerGrammar) cm.lookup("forcedAligner");
+		//forcedAligner.setText(text);
+		
+		MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
+		jsgf.setText(text);
 		
 	}
 

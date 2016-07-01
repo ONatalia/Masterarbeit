@@ -120,7 +120,7 @@ public class GoogleSphinxRCLP extends RecoCommandLineParser {
 					
 					recoMode = GOOGLE_SPHINX_RECO;
 					//referenceText = "das ist meine Aussage";
-					referenceText = "ich danke ihnen und wir sehen uns dann 19";
+					referenceText = "eins zwei";
 					
 					i++;
 					googleAPIkey = args[i];

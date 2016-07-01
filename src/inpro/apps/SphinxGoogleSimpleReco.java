@@ -3,6 +3,7 @@ package inpro.apps;
 
 import inpro.apps.SimpleMonitor;
 
+
 import inpro.apps.util.GoogleSphinxRCLP;
 import inpro.apps.util.MonitorCommandLineParser;
 import inpro.apps.util.RecognizerInputStream;
@@ -52,6 +53,7 @@ import edu.cmu.sphinx.frontend.util.StreamDataSource;
 import edu.cmu.sphinx.frontend.util.VUMeterMonitor;
 import edu.cmu.sphinx.linguist.Linguist;
 import edu.cmu.sphinx.linguist.language.grammar.AlignerGrammar;
+
 import edu.cmu.sphinx.recognizer.Recognizer;
 import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
@@ -406,6 +408,9 @@ public class SphinxGoogleSimpleReco extends IUModule{
 			
 			linguist.allocate();
 			
+			//MyAlignerGrammar forcedAligner = (MyAlignerGrammar) cm
+					//.lookup("forcedAligner");
+			
 			AlignerGrammar forcedAligner = (AlignerGrammar) cm
 					.lookup("forcedAligner");
 			forcedAligner.setText(clp.getReference());
@@ -479,7 +484,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		
 		
-		//gasr.recognize(); 
+		gasr.recognize(); 
 		/*logger.info("Time google start: "+System.currentTimeMillis());
 		StreamDataSource sdsS = (StreamDataSource) cm.lookup("streamDataSource");
 		
@@ -504,6 +509,8 @@ public class SphinxGoogleSimpleReco extends IUModule{
 			
 			Result result = null;
 			AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
+			//MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
+			//jsgf.setText(clp.getReference());
 			forcedAligner.setText(clp.getReference());
 			
 			do {
@@ -522,7 +529,9 @@ public class SphinxGoogleSimpleReco extends IUModule{
 					// Normal Output
 					String phones=result.getBestPronunciationResult();
 					forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
+					//jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
 					forcedAligner.getInitialNode().dump();
+					//jsgf.getInitialNode().dump();
 					logger.info("RESULT: " + result.toString());
 					logger.info("PHONES: " + phones);
 					logger.info("Normal: recognizer after google");
@@ -604,12 +613,16 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		spth.start();
 		startGoogleThread(gasr);
 		
+		
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
+		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -818,6 +831,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		
 		clp.setReferenceText(text);	
+		//MyAlignerGrammar forcedAligner = (MyAlignerGrammar) cm.lookup("forcedAligner");
 		AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
 		forcedAligner.setText(clp.getReference());
 	   

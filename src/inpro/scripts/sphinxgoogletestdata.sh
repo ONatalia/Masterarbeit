@@ -14,6 +14,9 @@ java inpro.apps.SimpleReco -F file:../res/g002acn1_103_AAJ.wav  -O -C -L -Lp ../
 #starts SimpleReco  (Sphinx) Once
 java inpro.apps.SimpleReco -F file:../res/g002acn1_103_AAJ.wav -O -In -C -L -Lp ../res/sphinx/sphinx -v -T
 
+#alignment once
+-F file:../res/DE_1234.wav -O -In -C -L -Lp ../res/sphinx/sphinx -v -T -fa "eins zwei"
+
 
 #starts Google with TestData from excerpt folder
 for file in /Users/Natalia/inprotk/src/vm-excerpt/*.wav; do java inpro.apps.SimpleReco -F file:"$file" -O -C -L -G AIzaSyCXHs3mzb1IyfGx2tYxDC1ClgYUv0x8Kw8 -Gout /tmp/Googledump.json -Lp ${file%%.wav}.google_inc_reco;done 
@@ -25,6 +28,12 @@ java inpro.apps.SimpleReco -F file:/Users/Natalia/inprotk/src/vm-excerpt/g001acn
 
 #starts GoogleSphinx with TestData from excerpt folder
 for file in /Users/Natalia/inprotk/src/vm-excerpt/*.wav; do java inpro.apps.SimpleReco -F file:"$file" -O -C -L -G AIzaSyCXHs3mzb1IyfGx2tYxDC1ClgYUv0x8Kw8 -Gout /tmp/Googledump.json -Lp ${file%%.wav}.google_inc_reco;done 
+
+
+#starts Sphinx in FA mode
+for file in /Users/Natalia/inprotk/src/vm-excerpt/g001acn_058_AAJ.wav; do java inpro.apps.SimpleReco -F file:/Users/Natalia/inprotk/src/vm-excerpt/*.wav -O -In -C -L -v -T -fa „un“-Lp ${file%%.wav}.google_inc_reco;done 
+
+
 
 
  

@@ -1,6 +1,7 @@
 package demo.inpro.system.greifarm;
 
 import inpro.apps.SimpleReco;
+
 import inpro.gui.util.SpeechStateVisualizer;
 import inpro.incremental.deltifier.ASRWordDeltifier;
 import inpro.incremental.source.SphinxASR;

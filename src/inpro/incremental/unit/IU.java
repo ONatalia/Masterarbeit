@@ -195,7 +195,7 @@ public abstract class IU implements Comparable<IU> {
     public void connectSLL(IU link) {
     	//if (previousSameLevelLink == null) {
     		setSameLevelLink(link);
-    		if (link != null && groundedIn != null) {
+    		if (link != null && groundedIn != null && groundedIn.size()>0) {
     			IU firstGrounding = groundedIn.get(0);
     			IU prevLast;
     			if (link.groundedIn != null && !link.groundedIn.isEmpty()) {

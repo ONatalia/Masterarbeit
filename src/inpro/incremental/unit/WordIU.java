@@ -68,6 +68,18 @@ public class WordIU extends IU {
 		isSilence = true;
 	}
 	
+	
+	public WordIU(String string,WordIU sll) {
+		super(sll, Collections.nCopies(1, 
+				(IU) new SyllableIU(null, Collections.nCopies(1, 
+							(IU) new SegmentIU(string, null)))), 
+		true);
+		this.pron = Pronunciation.UNKNOWN;
+		this.word = string;
+		isSilence = false;
+	}
+	
+	
 	public WordIU() {
 		this.pron = null;
 		this.word = "First WordIU";
@@ -340,6 +352,11 @@ public class WordIU extends IU {
 	/** three-way minimum used internally in getWER */
 	private static final int min(int a, int b, int c) {
 		return Math.min(Math.min(a, b), c);
+	}
+
+	public boolean spellingEquals(String name) {
+		// TODO Auto-generated method stub
+		return this.getWord().equals(name);
 	}
 	
 }

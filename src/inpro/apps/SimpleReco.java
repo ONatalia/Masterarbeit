@@ -342,8 +342,11 @@ public class SimpleReco {
 			cm.setGlobalProperty("grammar", "forcedAligner");
 			Linguist linguist = (Linguist) cm.lookup("flatLinguist");
 			linguist.allocate();
+			//MyJSGFGrammar jsgfGrammar=(MyJSGFGrammar) cm.lookup("jsgfGrammar");
+			//jsgfGrammar.setText(clp.getReference());
 			AlignerGrammar forcedAligner = (AlignerGrammar) cm
 					.lookup("forcedAligner");
+			
 			forcedAligner.setText(clp.getReference());
 		} else if (clp.isRecoMode(RecoCommandLineParser.FAKE_RECO)) {
 			logger.info("Running in fake recognition mode.");

@@ -1,0 +1,9 @@
+#JSGF V1.0;
+
+/**
+ * JSGF Digits Grammar for Hello World example
+ */
+
+grammar phones1;
+
+public <phones1> = (a | a: | aI | aU )*;
