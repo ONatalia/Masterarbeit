@@ -1,5 +1,4 @@
-
-    <property name="deltifier" value="none"/>
+<property name="deltifier" value="none"/>
     <property name="deltifierParam" value="0"/>
     <property name="baseData" value="baseData"/>
     <property name="dialogueManager" value="echoDialogueManager"/>
@@ -36,6 +35,7 @@
     	<property name="samplingRate" value="16000"/>
     	<!--<property name="lang" value="en-US"/>  -->
     	 <property name="lang" value="de-de"/>
+    	 
     </component>
 
     <component name="GoogleASRHypothesis" type="inpro.incremental.source.GoogleASR">
@@ -46,6 +46,12 @@
 	</propertylist>
     </component>
     
+   <!--  <component name="GoogleSphinxFA" type="inpro.apps.SphinxGoogleSimpleReco">
+        
+        <propertylist name="hypChangeListeners">
+	</propertylist>
+    </component>
+     -->
     <component name="topdownrevoketestmodule" type="work.inpro.sphinx.topdownrevoke.TopDownRevokeTestModule" />
     
     <component name="iSS" type="inpro.incremental.processor.SynthesisModule">
@@ -115,4 +121,3 @@
     <component name="dispatchStream2" type="inpro.audio.DispatchStream">
         <property name="sendSilence" value="true"/>
     </component>
-    

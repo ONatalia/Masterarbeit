@@ -174,7 +174,15 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				// in the FA case, SIL-phonemes are not covered by SIL-words. duh.
 				if (currSegmentIt.hasNext()) {
 					currSegmentIt.next().updateLabel(new Label(segmentStartTime, segmentEndTime, name));
-				} else if (name.equals("SIL")) {
+				} else if (name.equals("SIL")||name.equals("2:")||(name.equals("6"))||(name.equals("9"))||(name.equals("@"))||(name.equals("C"))
+						||(name.equals("E"))||(name.equals("E:"))||(name.equals("I"))||
+						(name.equals("N"))||(name.equals("O"))||(name.equals("OY"))||(name.equals("Q"))||(name.equals("S"))||(name.equals("SIL"))
+						||(name.equals("U"))||(name.equals("Y"))||(name.equals("Z"))||
+						(name.equals("a"))||(name.equals("a:"))||(name.equals("aU"))||(name.equals("i"))||(name.equals("i:"))||(name.equals("f"))||
+						(name.equals("k"))||(name.equals("l"))||(name.equals("m"))||(name.equals("n"))||(name.equals("o"))||(name.equals("o:"))
+						||(name.equals("p"))||(name.equals("r"))||(name.equals("s"))||(name.equals("j"))||
+						(name.equals("t"))||(name.equals("u"))||(name.equals("u:"))||(name.equals("v"))||(name.equals("x"))||
+						(name.equals("y:"))||(name.equals("z"))||(name.equals("g"))||(name.equals("d"))||(name.equals("e:"))||(name.equals("aI"))||(name.equals("h"))) {
 					if (wordIt.hasNext()) {
 						if (wordIt.next().isSilence()) {
 							wordIt.previous();
@@ -192,8 +200,15 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 						break;
 					}
 					
-				} else if (name.equals("F")||(name.equals("j"))||(name.equals("B"))||(name.equals("C"))||(name.equals("D"))
-						||(name.equals("Q"))||(name.equals("s"))||(name.equals("E:"))) {
+				} /*else if (name.equals("2:")||(name.equals("6"))||(name.equals("9"))||(name.equals("@"))||(name.equals("C"))
+						||(name.equals("E"))||(name.equals("E:"))||(name.equals("I"))||
+						(name.equals("N"))||(name.equals("O"))||(name.equals("OY"))||(name.equals("Q"))||(name.equals("S"))||(name.equals("SIL"))
+						||(name.equals("U"))||(name.equals("Y"))||(name.equals("Z"))||
+						(name.equals("a"))||(name.equals("a:"))||(name.equals("aU"))||(name.equals("i"))||(name.equals("i:"))||
+						(name.equals("k"))||(name.equals("l"))||(name.equals("m"))||(name.equals("n"))||(name.equals("o"))||(name.equals("o:"))
+						||(name.equals("p"))||(name.equals("r"))||(name.equals("s"))||(name.equals("j"))||
+						(name.equals("t"))||(name.equals("u"))||(name.equals("u:"))||(name.equals("v"))||(name.equals("x"))||
+						(name.equals("y:"))||(name.equals("z"))||(name.equals("g"))||(name.equals("d"))||(name.equals("e:"))||(name.equals("aI"))||(name.equals("h"))) {
 					if (!wordIt.hasNext()) {  // wordIt = iteration over the Hypothesis, word by word
 						newIt.previous();
 						break;
@@ -209,10 +224,10 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 						break;
 					}
 					
-					/*wordIt.previous();
+					wordIt.previous();
 					WordIU currWord = wordIt.next(); 
 					currWord.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, name)));
-					currSegmentIt = currWord.getSegments().iterator();*/
+					currSegmentIt = currWord.getSegments().iterator();
 					
 					
 						
@@ -220,11 +235,11 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 					
 				//else if search unit is a phone	
 					
-				} else {
+				}*/ else {
 					
 					
 					
-					assert false : newSearchState.getClass().toString() + newSearchState.toString();
+					assert false : newSearchState.getClass().toString() + newSearchState.toString()+"name:"+name;
 				}
 				segmentStartTime = segmentEndTime;
 			} else {
@@ -307,14 +322,34 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 				String name = ((UnitSearchState) newSearchState).getUnit().getName();
 				if (currSegmentIt.hasNext()) {
 					currSegmentIt.next().updateLabel(new Label(segmentStartTime, segmentEndTime, name));
-				} else if (name.equals("SIL")) {
+				} else if (name.equals("SIL")||name.equals("2:")||(name.equals("6"))||(name.equals("9"))||(name.equals("@"))||(name.equals("C"))
+						||(name.equals("E"))||(name.equals("E:"))||(name.equals("I"))||
+						(name.equals("N"))||(name.equals("O"))||(name.equals("OY"))||(name.equals("Q"))||(name.equals("S"))||(name.equals("SIL"))
+						||(name.equals("U"))||(name.equals("Y"))||(name.equals("Z"))||
+						(name.equals("a"))||(name.equals("a:"))||(name.equals("aU"))||(name.equals("i"))||(name.equals("i:"))||
+						(name.equals("k"))||(name.equals("l"))||(name.equals("m"))||(name.equals("n"))||(name.equals("o"))||(name.equals("o:"))
+						||(name.equals("p"))||(name.equals("r"))||(name.equals("s"))||
+						(name.equals("t"))||(name.equals("u"))||(name.equals("u:"))||(name.equals("v"))||(name.equals("x"))||
+						(name.equals("y:"))||(name.equals("z"))||(name.equals("g"))||(name.equals("d"))
+						||(name.equals("e:"))||(name.equals("aI"))||(name.equals("e"))||(name.equals("j"))||(name.equals("f"))
+						||(name.equals("h"))) {
 					WordIU newIU = new WordIU(null);
 					newIU.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, "SIL")));
 					edits.add(new EditMessage<WordIU>(EditType.ADD, newIU));
 					
 					
 			//to do: else if SearchUnit is a phone		
-				} else if (name.equals("F")||(name.equals("v"))||(name.equals("Q"))||(name.equals("E:"))||(name.equals("s"))||(name.equals("j"))) {
+				/*} else if (name.equals("2:")||(name.equals("6"))||(name.equals("9"))||(name.equals("@"))||(name.equals("C"))
+						||(name.equals("E"))||(name.equals("E:"))||(name.equals("I"))||
+						(name.equals("N"))||(name.equals("O"))||(name.equals("OY"))||(name.equals("Q"))||(name.equals("S"))||(name.equals("SIL"))
+						||(name.equals("U"))||(name.equals("Y"))||(name.equals("Z"))||
+						(name.equals("a"))||(name.equals("a:"))||(name.equals("aU"))||(name.equals("i"))||(name.equals("i:"))||
+						(name.equals("k"))||(name.equals("l"))||(name.equals("m"))||(name.equals("n"))||(name.equals("o"))||(name.equals("o:"))
+						||(name.equals("p"))||(name.equals("r"))||(name.equals("s"))||
+						(name.equals("t"))||(name.equals("u"))||(name.equals("u:"))||(name.equals("v"))||(name.equals("x"))||
+						(name.equals("y:"))||(name.equals("z"))||(name.equals("g"))||(name.equals("d"))
+						||(name.equals("e:"))||(name.equals("aI"))||(name.equals("e"))||(name.equals("j"))
+						||(name.equals("h"))) {
 				//} else if (name.equals("j")) {
 					WordIU newIU = new WordIU(name,null);
 					currSegmentIt = newIU.getSegments().iterator();
@@ -322,13 +357,13 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 					edits.add(new EditMessage<WordIU>(EditType.ADD, newIU));	
 					
 				
-				
+				*/
 				
 				} else {
 					
 						
 				
-				assert false : "Should this really happen?" + newSearchState + "; " + name;
+				assert false : "Should this really happen?:state:" + newSearchState + ";name: " + name;
 					
 				}
 				segmentStartTime = segmentEndTime;

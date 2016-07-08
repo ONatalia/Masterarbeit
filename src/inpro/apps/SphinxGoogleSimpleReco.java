@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.Map.Entry;
 
 
@@ -72,7 +73,8 @@ public class SphinxGoogleSimpleReco extends IUModule{
 	private RecognizerInputStream rais;
 	private TreeMap <Integer,String> hyps=new TreeMap <Integer,String>();;
 	ArrayList<IU> hypsIus=new ArrayList<IU>();
-	private SynchronousQueue <BlockingQueueData> bq=new SynchronousQueue <BlockingQueueData>();
+	//private SynchronousQueue <BlockingQueueData> bq=new SynchronousQueue <BlockingQueueData>();
+	private PriorityBlockingQueue <BlockingQueueData> bq =new PriorityBlockingQueue <BlockingQueueData>();
 	
 
 	
@@ -491,7 +493,6 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		sdsS.initialize();
 		
 		
-
 		AudioInputStream aisS = new AudioInputStream(new ByteArrayInputStream(
 		rais.getSoundData()), rais.getFormat(), rais.getSoundData().length);
 		AudioInputStream aisG = new AudioInputStream(new ByteArrayInputStream(
@@ -503,7 +504,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		assert recognizer != null;
 */
 		//logger.info("Setting up monitors...");
-		setupMonitors();
+		//setupMonitors();
 		allocateRecognizerFA();
 		
 			
@@ -512,6 +513,9 @@ public class SphinxGoogleSimpleReco extends IUModule{
 			//MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
 			//jsgf.setText(clp.getReference());
 			forcedAligner.setText(clp.getReference());
+			
+			//MyLMGrammar lm=(MyLMGrammar) cm.lookup("ngramGrammar");
+			//lm.setText(clp.getReference());
 			
 			do {
 				
@@ -528,9 +532,9 @@ public class SphinxGoogleSimpleReco extends IUModule{
 				if (result != null) {
 					// Normal Output
 					String phones=result.getBestPronunciationResult();
-					forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
+					//forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
 					//jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
-					forcedAligner.getInitialNode().dump();
+					//forcedAligner.getInitialNode().dump();
 					//jsgf.getInitialNode().dump();
 					logger.info("RESULT: " + result.toString());
 					logger.info("PHONES: " + phones);
@@ -589,16 +593,16 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		
 		SphinxGoogleSimpleReco gschsimpleReco = new SphinxGoogleSimpleReco(clp);
-		//gschsimpleReco.recognizeOnce();
+		gschsimpleReco.recognizeOnce();
 		
-		gschsimpleReco.recognizeSimultaneously();
+		//gschsimpleReco.recognizeSimultaneously();
 		
-		try {
+		/*try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 		gschsimpleReco.getRecognizer().deallocate();
 		gschsimpleReco.getRecognizerFA().deallocate();
@@ -611,7 +615,17 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		SphinxThread spth=new SphinxThread (recognizerFA,bq,cm,rais);
 		spth.start();
-		startGoogleThread(gasr);
+		//startGoogleThread(gasr);
+		gasr.recognize();
+		/*logger.info("take data after google is finished:");
+		try {
+			logger.info(("Text:"+bq.take().getText().toString()));
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}*/
+		
+		
 		
 		
 		try {
@@ -628,7 +642,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void leftBufferUpdate(Collection<? extends IU> ius, List<? extends EditMessage<? extends IU>> edits) {
-		System.err.println("This is left buffer update");
+		logger.info("This is left buffer update");
 		logger.info("Time by update: "+System.currentTimeMillis());
 		
 		ArrayList<Double> starttimes=new ArrayList<Double>();
@@ -733,7 +747,7 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		
 		
-			/*try {
+			try {
 				setText(text);
 				logger.info("text"+text);
 			} catch (IOException e) {
@@ -741,14 +755,28 @@ public class SphinxGoogleSimpleReco extends IUModule{
 				e.printStackTrace();
 			}
 			
-			   */
+			   
 		
 		
 			bqd.setText(text);
 			bqd.setStarttimes(starttimes);
 			bqd.setEndtimes(endtimes);
-			bq.clear();
-			bq.offer(bqd);
+			logger.info(("bq is empty"+bq.isEmpty()));
+			boolean added;
+			
+			if (bq.size()>0){
+				bq.remove();
+				logger.info ("remove");
+			}
+			
+			added = bq.offer(bqd);
+			//added = bq.add(bqd);
+			logger.info ("added"+added);
+			
+			
+			
+			
+			
 				
 				/*updateInputStream(starttimes,endtimes);	
 				//setupMonitors();
@@ -758,7 +786,6 @@ public class SphinxGoogleSimpleReco extends IUModule{
 				//assert recognizer != null;
 				//SphinxThread spth=new SphinxThread (recognizer);
 				//spth.start();
-
 				logger.info("Setting up monitors...");
 				setupMonitors();
 				

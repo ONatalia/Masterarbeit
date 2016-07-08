@@ -6,4 +6,4 @@
 
 grammar phones1;
 
-public <phones1> = (a | a: | aI | aU )*;
+public <phones1> = (Q| aI | n | s| aI | t | s| aI | d | r | f | i: | 6 )*;

@@ -8,6 +8,7 @@ import edu.cmu.sphinx.decoder.search.Token;
 import edu.cmu.sphinx.linguist.SearchState;
 import edu.cmu.sphinx.linguist.UnitSearchState;
 import edu.cmu.sphinx.linguist.WordSearchState;
+import edu.cmu.sphinx.linguist.dflat.DynamicFlatLinguist;
 import edu.cmu.sphinx.linguist.flat.PronunciationState;
 import edu.cmu.sphinx.linguist.flat.SentenceHMMState;
 import edu.cmu.sphinx.linguist.lextree.LexTreeLinguist;
@@ -117,11 +118,20 @@ public class ResultUtil {
 				|| searchState instanceof PronunciationState) {
 			// this is flat linguist
 			hasWordTokensLast = false;
+			
+			
+		} else if (searchState instanceof DynamicFlatLinguist) {
+			// this is dynamicflat linguist
+			hasWordTokensLast = true;	
+			
 		} else {
 			// if you see this error, then you must extend the above.
-			assert searchState != null : token;
-			assert false : searchState.getClass().toString();
-		    hasWordTokensLast = false;
+			//assert searchState != null : token;
+			
+			//assert false : searchState.getClass().toString();
+			
+		    //hasWordTokensLast = false;
+		    hasWordTokensLast = true;
 		}
 		return hasWordTokensLast; 
 	}

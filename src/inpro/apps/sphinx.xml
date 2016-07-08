@@ -15,14 +15,14 @@
     
     <property name="scorer" value="simpleScorer"/>
 
-    <!-- alternatives: flatLinguist | lexTreeLinguist -->
-    <property name="linguist"   value="flatLinguist"/> 
+    <!-- alternatives: flatLinguist | lexTreeLinguist| dynamicFlatLinguist -->
+    <property name="linguist"   value="dynamicFlatLinguist"/> 
 
     <!-- alternatives: fakeSearch | simpleSearch | wordPruningSearch -->
     <property name="searchManager" value="wordPruningSearch"/>
     
     <!-- alternatives: ngramGrammar | jsgfGrammar | forcedAligner; only relevant with flatLinguist -->
-    <property name="grammar" value="jsgfGrammar"/>
+    <property name="grammar" value="ngramGrammar"/>
     
     <property name="frontend" value="frontend"/>
     <!-- The minimum amount of time in speech (in milliseconds) to be considered as utterance start -->
@@ -222,10 +222,28 @@
         <property name="unitManager" value="unitManager"/>
     </component>
     
-    <component name="linguistFA" type="edu.cmu.sphinx.linguist.flat.FlatLinguist">
+    
+    <component name="dynamicFlatLinguist" type="edu.cmu.sphinx.linguist.dflat.DynamicFlatLinguist"> 
+    <!--  <component name="flatLinguist" type="inpro.apps.MyFlatLinguist"> -->
         <property name="logMath" value="logMath"/>
-       <!-- <property name="grammar" value="forcedAligner"/>  -->  
-         <property name="grammar" value="myjsgfGrammar"/>
+        <property name="grammar" value="${grammar}"/>
+        <property name="acousticModel" value="acousticModel"/>
+       <!-- <property name="phoneLoopAcousticModel" value="phoneLoopAcousticModel"/> 
+        <property name="addOutOfGrammarBranch" value="true"/>   
+         <property name="outOfGrammarProbability" value="0.5"/>   
+          <property name="phoneInsertionProbability" value="0.5"/>     -->
+        <property name="wordInsertionProbability" value="${wordInsertionProbability}"/>
+        <property name="silenceInsertionProbability" value="${silenceInsertionProbability}"/>
+        <property name="languageWeight" value="${languageWeight}"/>
+        <property name="unitManager" value="unitManager"/>
+    </component>
+    
+  <!-- <component name="linguistFA" type="edu.cmu.sphinx.linguist.flat.FlatLinguist">   -->
+     <component name="linguistFA" type="edu.cmu.sphinx.linguist.dflat.DynamicFlatLinguist">  
+        <property name="logMath" value="logMath"/>
+       <property name="grammar" value="forcedAligner"/>   
+       <!-- <property name="grammar" value="ngramGrammar"/>   -->
+        <!--  <property name="grammar" value="myjsgfGrammar"/>--> 
         <property name="acousticModel" value="acousticModel"/>
         <property name="wordInsertionProbability" value="${wordInsertionProbability}"/>
         <property name="silenceInsertionProbability" value="${silenceInsertionProbability}"/>
@@ -244,9 +262,11 @@
         <property name="logMath" value="logMath"/>
     </component>
 
-    <component name="ngramGrammar" type="edu.cmu.sphinx.linguist.language.grammar.LMGrammar">
+    <!-- <component name="ngramGrammar" type="edu.cmu.sphinx.linguist.language.grammar.LMGrammar"> -->
+      <component name="ngramGrammar" type="inpro.apps.MyLMGrammar">
         <property name="dictionary" value="dictionary"/>
         <property name="languageModel" value="ngram"/>
+         <property name="logMath" value="logMath"/>
     </component>
     
     <component name="interpolatedLM" type="edu.cmu.sphinx.linguist.language.ngram.InterpolatedLanguageModel">

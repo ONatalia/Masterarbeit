@@ -36,7 +36,7 @@
     	<property name="samplingRate" value="16000"/>
     	<property name="lang" value="de-de"/>
     	<!--<property name="lang" value="en-US"/>  -->
-    	<!-- <item>currentASRHypothesis</item>  -->
+    	<item>currentASRHypothesis</item>  
     </component>
     
      <component name="faModule" type="inpro.incremental.processor.FAModule">

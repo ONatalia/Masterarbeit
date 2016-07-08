@@ -19,18 +19,30 @@ import edu.cmu.sphinx.result.Result;
 import edu.cmu.sphinx.util.props.ConfigurationManager;
 import edu.emory.mathcs.backport.java.util.concurrent.BlockingQueue;
 import inpro.apps.util.RecognizerInputStream;
+import inpro.incremental.sink.LabelWriter;
+import inpro.incremental.source.SphinxASR;
 
 public class SphinxThread extends Thread {
 	
 	private Recognizer recognizer;
 	private boolean running = true;
 	private static final Logger logger = Logger.getLogger(SphinxThread.class);
-	private SynchronousQueue<BlockingQueueData> bq;
+	private PriorityBlockingQueue<BlockingQueueData> bq;
 	private ConfigurationManager cm;
 	private RecognizerInputStream rais;
+	private double offset=0;
 
 
-	public SphinxThread(Recognizer recognizer,SynchronousQueue<BlockingQueueData> bq, ConfigurationManager cm,RecognizerInputStream rais) {
+	/*public SphinxThread(Recognizer recognizer,SynchronousQueue<BlockingQueueData> bq, ConfigurationManager cm,RecognizerInputStream rais) {
+		// TODO Au
+		this.recognizer=recognizer;
+		this.bq=bq;
+		this.cm=cm;
+		this.rais=rais;
+		
+	}*/
+	
+	public SphinxThread(Recognizer recognizer,PriorityBlockingQueue<BlockingQueueData> bq, ConfigurationManager cm,RecognizerInputStream rais) {
 		// TODO Au
 		this.recognizer=recognizer;
 		this.bq=bq;
@@ -43,15 +55,20 @@ public class SphinxThread extends Thread {
 		
 	while (running)	{
 		BlockingQueueData data=null;
+		
+		
+		logger.info ("queue status:"+bq.isEmpty());
+		
+		
+		
+		
 		try {
-			
 			data=bq.take();
-			logger.info("take data:+"+data.getText());
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();			
-			
+			e.printStackTrace();
 		}
+		logger.info("take data:+"+data.getText());
 		
 		//set Text;
 		setText(data.getText());
@@ -61,9 +78,7 @@ public class SphinxThread extends Thread {
 		//updateInputStream‚
 		updateInputStream(data.getStarttimes(),data.getEndtimes());
 		
-		ResultListener resultlistenerFA = (ResultListener) cm
-				.lookup("currentASRHypothesis");
-		recognizer.addResultListener(resultlistenerFA);
+		
 		
 		Result result = null;
 		
@@ -80,13 +95,13 @@ public class SphinxThread extends Thread {
 				if (result != null) {
 					// Normal Output
 					String phones=result.getBestPronunciationResult();
-					//AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
+					AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
 					
 					//forcedAligner.getInitialNode().dump();
 					
-					MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
+					//MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
 					
-					jsgf.getInitialNode().dump();
+					//jsgf.getInitialNode().dump();
 					result.toString();
 					
 					
@@ -102,7 +117,7 @@ public class SphinxThread extends Thread {
 			} while ((result != null) && (result.getDataFrames() != null)
 					&& (result.getDataFrames().size() > 4));;
 			
-			//recognizer.resetMonitors();	
+			recognizer.resetMonitors();	
 			logger.info("reset monitors");
 	}	
 			
@@ -114,22 +129,26 @@ public class SphinxThread extends Thread {
 		
 		int endInBytes = 0;
 		//double startInSec=0;
-		//double offset_start=0.300;
-		double offset=0.400;
+		double offset_start=0.300;
+		offset=0.400;
+		//double offset=0.900;
 	   
 		double endInSec=0;
 		
 		
 			
 		/*if (starttimes.get(0)==0){
-			endInSec=offset_start;
+			//endInSec=offset_start;
+			offset=endtimes.get(0);
+			logger.info("offset"+offset);
+			
 		}else {
 			
-			endInSec=endtimes.get(endtimes.size()-1)-starttimes.get(0)+offset_start;
-			//endInSec=endtimes.get(endtimes.size()-1)-offset;
+			//endInSec=endtimes.get(endtimes.size()-1)-starttimes.get(0)+offset_start;
+			endInSec=endtimes.get(endtimes.size()-1)-offset;
 			
-		}*/
-		
+		}
+		*/
 		endInSec=endtimes.get(endtimes.size()-1)-offset;
 	
 		logger.info("stimes:first"+starttimes.get(0));
@@ -164,12 +183,15 @@ public class SphinxThread extends Thread {
 	}
 
 	private void setText(String text) {
-		//AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
-		//MyAlignerGrammar forcedAligner = (MyAlignerGrammar) cm.lookup("forcedAligner");
-		//forcedAligner.setText(text);
 		
-		MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
-		jsgf.setText(text);
+		AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
+		//MyAlignerGrammar forcedAligner = (MyAlignerGrammar) cm.lookup("forcedAligner");
+		forcedAligner.setText(text);
+		
+		//MyLMGrammar lm=(MyLMGrammar) cm.lookup("ngramGrammar");
+		//lm.setText(text);
+		//MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
+		//jsgf.setText(text);
 		
 	}
 

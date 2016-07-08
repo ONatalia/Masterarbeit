@@ -52,6 +52,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		writeToFile = ps.getBoolean(PROP_WRITE_FILE);
 		commitsOnly = ps.getBoolean(PROP_COMMITS_ONLY);
+		//commitsOnly=true;
 		writeToStdOut = ps.getBoolean(PROP_WRITE_STDOUT);
 		fileName = ps.getString(PROP_FILE_NAME);
 		// do some magic for lazy people
@@ -71,13 +72,13 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		boolean added = false;
 		//remove ius from the list
 	
-	if (!allIUs.isEmpty()){
-		allIUs.removeAll(ius);
-			}
+	//if (!allIUs.isEmpty()){
+		//allIUs.removeAll(ius);
+			//}
 		for (EditMessage<? extends IU> edit : edits) {
 			IU iu = edit.getIU();
 			
-			logger.info("label writer read: "+iu.toString());
+			logger.info("label writer read: "+iu.toString()+"edit type"+edit.getType().toString());
 			switch (edit.getType()) {
 			case ADD:
 				if (!commitsOnly) {
@@ -88,10 +89,10 @@ public class LabelWriter extends FrameAwarePushBuffer {
 				}
 				break;
 			case COMMIT:
-				if (commitsOnly) {
+				//if (commitsOnly) {
 					added = true;
-					allIUs.add(iu);
-				}
+					//allIUs.add(iu);
+				//}
 				break;
 			case REVOKE:
 //				when revoking, we can assume that we are working with a stack;
