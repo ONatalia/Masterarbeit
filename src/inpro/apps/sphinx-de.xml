@@ -5,12 +5,12 @@
     <!-- ******************************************************** -->
     <!-- The Grammar  configuration                               -->
     <!-- ******************************************************** -->
-    <component name="jsgfGrammar" type="inpro.apps.MyJSGFGrammar">
-    <!-- <component name="jsgfGrammar" type="edu.cmu.sphinx.jsgf.JSGFGrammar"> -->
+    <!--  <component name="jsgfGrammar" type="inpro.apps.JSGFGrammar">-->
+     <component name="jsgfGrammar" type="edu.cmu.sphinx.jsgf.JSGFGrammar"> 
         <property name="dictionary" value="dictionary"/>
         <!--<property name="grammarLocation" value="file:src/inpro/domains/pentomino/resources/"/>  -->
          <property name="grammarLocation" value=" file:../res/"/>
-        <property name="grammarName" value="phones1"/>
+        <property name="grammarName" value="phones"/>
         <property name="logMath" value="logMath"/>
     </component>
     
@@ -19,7 +19,7 @@
         <property name="dictionary" value="dictionary"/>
         <!--<property name="grammarLocation" value="file:src/inpro/domains/pentomino/resources/"/>  -->
          <property name="grammarLocation" value=" file:../res/"/>
-        <property name="grammarName" value="phones1"/>
+        <property name="grammarName" value="phones"/>
         <property name="logMath" value="logMath"/>
     </component>
     
@@ -28,8 +28,9 @@
         <property name="dictionary" value="dictionary"/>
         <property name="logMath" value="logMath"/>
         <!-- dies lässt sich mit dem -lm switch in SimpleReco verbiegen -->
-         <property name="location" value=" file:../res/texts.lm"/>   
-       <!-- <property name="location" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/LM/inproCorpora_all.lm"/>  -->
+        <!-- <property name="location" value=" file:../res/texts.lm"/>   -->
+        <property name="location" value=" file:../res/Cocolab_Verbmobil.lm"/>   
+       <!-- <property name="location" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/LM/inproCorpora_all.lm"/>   -->
         <property name="maxDepth" value="3"/>
         <property name="unigramWeight" value=".7"/>
     </component>

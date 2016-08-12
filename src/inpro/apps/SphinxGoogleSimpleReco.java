@@ -173,8 +173,11 @@ public class SphinxGoogleSimpleReco extends IUModule{
 			gasr.setImportFile(clp.getGoogleDumpInput());
 			SphinxASR casrh = (SphinxASR) cm.lookup("currentASRHypothesis");
 			
+			
 			gasr.iulisteners.add(this);
-			this.iulisteners=casrh.iulisteners;
+			//this.iulisteners=casrh.iulisteners;
+			logger.info ("google listeners"+gasr.iulisteners.get(0).toString());
+			
 			
 		}else { gasr = null; }
 		
@@ -593,9 +596,9 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		
 		SphinxGoogleSimpleReco gschsimpleReco = new SphinxGoogleSimpleReco(clp);
-		gschsimpleReco.recognizeOnce();
+		//gschsimpleReco.recognizeOnce();
 		
-		//gschsimpleReco.recognizeSimultaneously();
+		gschsimpleReco.recognizeSimultaneously();
 		
 		/*try {
 			Thread.sleep(5000);
@@ -747,13 +750,13 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		
 		
 		
-			try {
+			/*try {
 				setText(text);
 				logger.info("text"+text);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 			
 			   
 		

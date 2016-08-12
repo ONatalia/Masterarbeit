@@ -31,6 +31,7 @@ public class SphinxThread extends Thread {
 	private ConfigurationManager cm;
 	private RecognizerInputStream rais;
 	private double offset=0;
+	private long start=0;
 
 
 	/*public SphinxThread(Recognizer recognizer,SynchronousQueue<BlockingQueueData> bq, ConfigurationManager cm,RecognizerInputStream rais) {
@@ -52,8 +53,12 @@ public class SphinxThread extends Thread {
 	}
 	
 	public void run (){
+	
+	
 		
 	while (running)	{
+		
+		
 		BlockingQueueData data=null;
 		
 		
@@ -75,18 +80,21 @@ public class SphinxThread extends Thread {
 		
 		
 		
-		//updateInputStream‚
+		//updateInputStream
 		updateInputStream(data.getStarttimes(),data.getEndtimes());
 		
 		
 		
 		Result result = null;
 		
-			
+		
 			do {
 				
 				
-				//logger.info ("Recognizer state"+recognizer.getState().toString());
+				
+				if (start==0){
+					start=System.currentTimeMillis();
+				}
 				result = recognizer.recognize();
 				 
 			
@@ -95,11 +103,12 @@ public class SphinxThread extends Thread {
 				if (result != null) {
 					// Normal Output
 					String phones=result.getBestPronunciationResult();
-					AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
+					//AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
 					
 					//forcedAligner.getInitialNode().dump();
 					
 					//MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
+					
 					
 					//jsgf.getInitialNode().dump();
 					result.toString();
@@ -118,7 +127,10 @@ public class SphinxThread extends Thread {
 					&& (result.getDataFrames().size() > 4));;
 			
 			recognizer.resetMonitors();	
+			
 			logger.info("reset monitors");
+			long duration=System.currentTimeMillis()-start;
+			logger.info("duration"+duration);
 	}	
 			
 			
@@ -184,14 +196,14 @@ public class SphinxThread extends Thread {
 
 	private void setText(String text) {
 		
-		AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
+		//AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
 		//MyAlignerGrammar forcedAligner = (MyAlignerGrammar) cm.lookup("forcedAligner");
-		forcedAligner.setText(text);
+	    //forcedAligner.setText(text);
 		
 		//MyLMGrammar lm=(MyLMGrammar) cm.lookup("ngramGrammar");
 		//lm.setText(text);
-		//MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
-		//jsgf.setText(text);
+		MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
+		jsgf.setText(text);
 		
 	}
 

@@ -242,6 +242,7 @@ public class MyLMGrammar extends Grammar {
 	        
 		}	
 			
+			//wordGrammarNodes.add(firstNode);
         	logger.info("Done creating grammar node");
 
 			// now connect all the GrammarNodes together

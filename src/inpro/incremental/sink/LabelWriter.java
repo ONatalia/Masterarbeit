@@ -45,6 +45,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
     private boolean commitsOnly;
     private boolean writeToStdOut = true;
     private String fileName;
+    private int lastframe=0;
     
     ArrayList<IU> allIUs = new ArrayList<IU>();
     
@@ -52,7 +53,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 	public void newProperties(PropertySheet ps) throws PropertyException {
 		writeToFile = ps.getBoolean(PROP_WRITE_FILE);
 		commitsOnly = ps.getBoolean(PROP_COMMITS_ONLY);
-		//commitsOnly=true;
+		commitsOnly=true;
 		writeToStdOut = ps.getBoolean(PROP_WRITE_STDOUT);
 		fileName = ps.getString(PROP_FILE_NAME);
 		// do some magic for lazy people
@@ -66,6 +67,11 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		/* Get the time first */
 		String toOut = String.format(Locale.US, "Time: %.2f", 
 				currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
+		long starttime=System.currentTimeMillis();
+		long endtime=0;
+		logger.info ("start time:"+starttime);
+		
+		
 		//logger.info ("add time");
 		/* Then go through all the IUs, ignoring commits */
 		
@@ -90,9 +96,13 @@ public class LabelWriter extends FrameAwarePushBuffer {
 				break;
 			case COMMIT:
 				//if (commitsOnly) {
+				if (commitsOnly) {
 					added = true;
-					//allIUs.add(iu);
-				//}
+					allIUs.add(iu);
+					
+					
+				}
+					//}
 				break;
 			case REVOKE:
 //				when revoking, we can assume that we are working with a stack;
@@ -100,6 +110,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 				if (!allIUs.isEmpty()) {
 					added = true;
 					allIUs.remove(allIUs.size()-1);
+					
 				}
 				break;
 			default:
@@ -109,8 +120,24 @@ public class LabelWriter extends FrameAwarePushBuffer {
 
 		}
 		
+		//endtime=System.currentTimeMillis()-starttime;
 		toOut = String.format(Locale.US, "Time: %.2f", 
 		currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
+		
+		
+		//addedTime+=endtime;
+		
+		//logger.info("addedTime:"+addedTime);
+		
+		
+		//toOut = String.format(Locale.US, "Time: %.2f", 
+				//currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
+		
+		
+		
+		logger.info("currentframe:"+currentFrame);
+		logger.info("lastframe:"+lastframe);
+		//if (currentFrame>lastframe){
 		
 		for (IU iu : allIUs) {
 			toOut += "\n" + iu.toLabelLine();
@@ -135,6 +162,12 @@ public class LabelWriter extends FrameAwarePushBuffer {
 				logger.info ("print toOut");
 				
 			}
+			
+		}
+		
+		//}
+		if (currentFrame>lastframe){
+		lastframe=currentFrame;
 		}
 	}
 	

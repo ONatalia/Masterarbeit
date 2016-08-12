@@ -1,7 +1,7 @@
 #JSGF V1.0;
 
 /**
- * JSGF Digits Grammar for Hello World example
+ * JSGF Digits Grammar 
  */
 
 grammar digits;

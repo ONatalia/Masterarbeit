@@ -85,6 +85,11 @@ public class SphinxASR implements Configurable, ResultListener, Monitor {
 	}
 	
 	protected void notifyListeners() {
+		
+		//try to clear listeners
+		
+		
+		
 		List<EditMessage<WordIU>> edits = asrDeltifier.getWordEdits();
 		List<WordIU> ius = asrDeltifier.getWordIUs();
 		int currentFrame = asrDeltifier.getCurrentFrame();

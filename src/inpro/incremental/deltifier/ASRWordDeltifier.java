@@ -331,7 +331,7 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 						||(name.equals("p"))||(name.equals("r"))||(name.equals("s"))||
 						(name.equals("t"))||(name.equals("u"))||(name.equals("u:"))||(name.equals("v"))||(name.equals("x"))||
 						(name.equals("y:"))||(name.equals("z"))||(name.equals("g"))||(name.equals("d"))
-						||(name.equals("e:"))||(name.equals("aI"))||(name.equals("e"))||(name.equals("j"))||(name.equals("f"))
+						||(name.equals("e:"))||(name.equals("aI"))||(name.equals("e"))||(name.equals("j"))||(name.equals("f"))||(name.equals("b"))
 						||(name.equals("h"))) {
 					WordIU newIU = new WordIU(null);
 					newIU.updateSegments(Collections.nCopies(1, new Label(segmentStartTime, segmentEndTime, "SIL")));
