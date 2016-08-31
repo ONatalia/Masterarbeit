@@ -1,0 +1,8 @@
+176	{"result":[]}
+847	{"result":[{"alternative":[{"transcript":"gute"}],"stability":0.0099999998}],"result_index":0}
+859	{"result":[{"alternative":[{"transcript":"guten"}],"stability":0.0099999998}],"result_index":0}
+888	{"result":[{"alternative":[{"transcript":"guten Tag"}],"stability":0.0099999998}],"result_index":0}
+1271	{"result":[{"alternative":[{"transcript":"guten"}],"stability":0.89999998},{"alternative":[{"transcript":" Tag"}],"stability":0.0099999998}],"result_index":0}
+1291	{"result":[{"alternative":[{"transcript":"guten"}],"stability":0.89999998},{"alternative":[{"transcript":" Tag ja"}],"stability":0.0099999998}],"result_index":0}
+1299	{"result":[{"alternative":[{"transcript":"guten Tag"}],"stability":0.89999998},{"alternative":[{"transcript":" ja"}],"stability":0.0099999998}],"result_index":0}
+1322	{"result":[{"alternative":[{"transcript":"guten Tag ja","confidence":0.68805629},{"transcript":"guten Tag Eier"},{"transcript":"guten Tag Herr"},{"transcript":"guten Tag"},{"transcript":"Guten Tag Eier"},{"transcript":"guten Tag Frau"},{"transcript":"guten Tag ja ja"},{"transcript":"guten Tag Herr ja"},{"transcript":"guten Tag ich ja"}],"final":true}],"result_index":0}

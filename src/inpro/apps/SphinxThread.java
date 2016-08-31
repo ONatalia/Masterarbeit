@@ -32,19 +32,15 @@ public class SphinxThread extends Thread {
 	private RecognizerInputStream rais;
 	private double offset=0;
 	private long start=0;
-
-
-	/*public SphinxThread(Recognizer recognizer,SynchronousQueue<BlockingQueueData> bq, ConfigurationManager cm,RecognizerInputStream rais) {
-		// TODO Au
-		this.recognizer=recognizer;
-		this.bq=bq;
-		this.cm=cm;
-		this.rais=rais;
-		
-	}*/
+	//alignemnt+recognition with jsgf grammar
+	private boolean alRecJsgf=false;
+	//alignment+recognition with language model
+	private boolean alRecLM=false;
 	
+
+
 	public SphinxThread(Recognizer recognizer,PriorityBlockingQueue<BlockingQueueData> bq, ConfigurationManager cm,RecognizerInputStream rais) {
-		// TODO Au
+	
 		this.recognizer=recognizer;
 		this.bq=bq;
 		this.cm=cm;
@@ -103,14 +99,6 @@ public class SphinxThread extends Thread {
 				if (result != null) {
 					// Normal Output
 					String phones=result.getBestPronunciationResult();
-					//AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
-					
-					//forcedAligner.getInitialNode().dump();
-					
-					//MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
-					
-					
-					//jsgf.getInitialNode().dump();
 					result.toString();
 					
 					
@@ -140,27 +128,15 @@ public class SphinxThread extends Thread {
 	private void updateInputStream(ArrayList<Double> starttimes, ArrayList<Double> endtimes) {
 		
 		int endInBytes = 0;
-		//double startInSec=0;
-		double offset_start=0.300;
+		
 		offset=0.400;
-		//double offset=0.900;
+		
 	   
 		double endInSec=0;
 		
 		
 			
-		/*if (starttimes.get(0)==0){
-			//endInSec=offset_start;
-			offset=endtimes.get(0);
-			logger.info("offset"+offset);
-			
-		}else {
-			
-			//endInSec=endtimes.get(endtimes.size()-1)-starttimes.get(0)+offset_start;
-			endInSec=endtimes.get(endtimes.size()-1)-offset;
-			
-		}
-		*/
+		
 		endInSec=endtimes.get(endtimes.size()-1)-offset;
 	
 		logger.info("stimes:first"+starttimes.get(0));
@@ -174,7 +150,7 @@ public class SphinxThread extends Thread {
 		endInBytes=(int)((rais.getChannels()*rais.getSiteInBits()* rais.getSampleRate()/8.0f)*(endInSec));
 		logger.info("endInBytes"+endInBytes);
 			
-		//FrontEnd feFA=(FrontEnd)cm.lookup("frontendFA"); 
+		
 		StreamDataSource sdsFA = (StreamDataSource) cm.lookup("streamDataSourceFA");
 		sdsFA.initialize();
 		
@@ -188,7 +164,7 @@ public class SphinxThread extends Thread {
 		AudioInputStream aisS = new AudioInputStream(new ByteArrayInputStream(buffer),rais.getFormat(), buffer.length);;
 				
 		sdsFA.setInputStream(aisS, "sphinxFA");
-		//feFA.setPredecessor(sdsFA);
+		
 		
 				
 		
@@ -196,14 +172,22 @@ public class SphinxThread extends Thread {
 
 	private void setText(String text) {
 		
-		//AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
-		//MyAlignerGrammar forcedAligner = (MyAlignerGrammar) cm.lookup("forcedAligner");
-	    //forcedAligner.setText(text);
+		if (alRecJsgf==true) {
+			MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
+			jsgf.setText(text);
+		}else if (alRecLM==true){
+			MyLMGrammar lm=(MyLMGrammar) cm.lookup("ngramGrammar");
+			lm.setText(text);
+		}else {
+			AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
+			//MyAlignerGrammar forcedAligner = (MyAlignerGrammar) cm.lookup("forcedAligner");
+		    forcedAligner.setText(text);
+		}
 		
-		//MyLMGrammar lm=(MyLMGrammar) cm.lookup("ngramGrammar");
-		//lm.setText(text);
-		MyJSGFGrammar jsgf= (MyJSGFGrammar) cm.lookup("myjsgfGrammar");
-		jsgf.setText(text);
+		
+		
+		
+		
 		
 	}
 

@@ -28,8 +28,8 @@
         <property name="dictionary" value="dictionary"/>
         <property name="logMath" value="logMath"/>
         <!-- dies lässt sich mit dem -lm switch in SimpleReco verbiegen -->
-        <!-- <property name="location" value=" file:../res/texts.lm"/>   -->
-        <property name="location" value=" file:../res/Cocolab_Verbmobil.lm"/>   
+      <property name="location" value=" file:../res/texts.lm"/>     
+       <!--<property name="location" value=" file:../res/Cocolab_Verbmobil.lm"/>    -->       
        <!-- <property name="location" value="resource:/Cocolab_DE_8gau_13dCep_16k_40mel_130Hz_6800Hz/LM/inproCorpora_all.lm"/>   -->
         <property name="maxDepth" value="3"/>
         <property name="unigramWeight" value=".7"/>

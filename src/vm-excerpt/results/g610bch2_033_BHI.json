@@ -1,0 +1,9 @@
+190	{"result":[]}
+896	{"result":[{"alternative":[{"transcript":"für die"}],"stability":0.0099999998}],"result_index":0}
+1042	{"result":[{"alternative":[{"transcript":"Philipp"}],"stability":0.0099999998}],"result_index":0}
+1189	{"result":[{"alternative":[{"transcript":"Fieber"}],"stability":0.0099999998}],"result_index":0}
+1203	{"result":[{"alternative":[{"transcript":"zitieren"}],"stability":0.0099999998}],"result_index":0}
+1205	{"result":[{"alternative":[{"transcript":"Fieber nach"}],"stability":0.0099999998}],"result_index":0}
+1225	{"result":[{"alternative":[{"transcript":"sie über Nacht"}],"stability":0.0099999998}],"result_index":0}
+1227	{"result":[{"alternative":[{"transcript":"für die Übernachtung"}],"stability":0.0099999998}],"result_index":0}
+1238	{"result":[{"alternative":[{"transcript":"für die Übernachtung","confidence":0.82806307},{"transcript":"für die übernachtung"},{"transcript":"City übernachtung"},{"transcript":"City Übernachtung"},{"transcript":"finde übernachtung"},{"transcript":"für die Uebernachtung"},{"transcript":"übernachtung"},{"transcript":"Übernachtung"},{"transcript":"Ferdi übernachtung"},{"transcript":"finde Uebernachtung"}],"final":true}],"result_index":0}

@@ -1,0 +1,30 @@
+184	{"result":[]}
+825	{"result":[{"alternative":[{"transcript":"gute"}],"stability":0.0099999998}],"result_index":0}
+1070	{"result":[{"alternative":[{"transcript":"guten"}],"stability":0.0099999998}],"result_index":0}
+1188	{"result":[{"alternative":[{"transcript":"Gudrun"}],"stability":0.0099999998}],"result_index":0}
+1254	{"result":[{"alternative":[{"transcript":"Gutschein"}],"stability":0.0099999998}],"result_index":0}
+1257	{"result":[{"alternative":[{"transcript":"gut online"}],"stability":0.0099999998}],"result_index":0}
+1403	{"result":[{"alternative":[{"transcript":"Gudrun Leiche"}],"stability":0.0099999998}],"result_index":0}
+1707	{"result":[{"alternative":[{"transcript":"Gudrun leichter"}],"stability":0.0099999998}],"result_index":0}
+1716	{"result":[{"alternative":[{"transcript":"Fronleichnam"}],"stability":0.0099999998}],"result_index":0}
+2455	{"result":[{"alternative":[{"transcript":"Fronleichnam"}],"stability":0.89999998}],"result_index":0}
+3226	{"result":[{"alternative":[{"transcript":"Fronleichnam","confidence":0.8227706},{"transcript":"gut von Laichingen"},{"transcript":"Route von Laichingen"},{"transcript":"gut von Leichlingen"},{"transcript":"Gudrun Leichnam"},{"transcript":"Route von Leichlingen"},{"transcript":"Gut von Laichingen"},{"transcript":"gut von Leichnam"},{"transcript":"Gut von Leichlingen"},{"transcript":"Gudrun Laichingen"}],"final":true}],"result_index":0}
+4597	{"result":[{"alternative":[{"transcript":" ja"}],"stability":0.0099999998}],"result_index":1}
+5229	{"result":[{"alternative":[{"transcript":" ja"}],"stability":0.89999998},{"alternative":[{"transcript":" voll"}],"stability":0.0099999998}],"result_index":1}
+5313	{"result":[{"alternative":[{"transcript":" ja"}],"stability":0.89999998},{"alternative":[{"transcript":" von"}],"stability":0.0099999998}],"result_index":1}
+5669	{"result":[{"alternative":[{"transcript":" ja"}],"stability":0.89999998},{"alternative":[{"transcript":" vor zwei"}],"stability":0.0099999998}],"result_index":1}
+5786	{"result":[{"alternative":[{"transcript":" ja"}],"stability":0.89999998},{"alternative":[{"transcript":" vorzugsweise"}],"stability":0.0099999998}],"result_index":1}
+5839	{"result":[{"alternative":[{"transcript":" ja"}],"stability":0.89999998},{"alternative":[{"transcript":" vorzugsweise die"}],"stability":0.0099999998}],"result_index":1}
+6148	{"result":[{"alternative":[{"transcript":" ja"}],"stability":0.89999998},{"alternative":[{"transcript":" vorzugsweise DIN"}],"stability":0.0099999998}],"result_index":1}
+6160	{"result":[{"alternative":[{"transcript":" ja"}],"stability":0.89999998},{"alternative":[{"transcript":" vorzugsweise Dienst"}],"stability":0.0099999998}],"result_index":1}
+6187	{"result":[{"alternative":[{"transcript":" ja vorzugsweise"}],"stability":0.89999998},{"alternative":[{"transcript":" Dienst"}],"stability":0.0099999998}],"result_index":1}
+6467	{"result":[{"alternative":[{"transcript":" ja vorzugsweise"}],"stability":0.89999998},{"alternative":[{"transcript":" Dienstag"}],"stability":0.0099999998}],"result_index":1}
+6504	{"result":[{"alternative":[{"transcript":" ja vorzugsweise"}],"stability":0.89999998},{"alternative":[{"transcript":" Dienstag und"}],"stability":0.0099999998}],"result_index":1}
+6827	{"result":[{"alternative":[{"transcript":" ja vorzugsweise"}],"stability":0.89999998},{"alternative":[{"transcript":" Dienstag und mit"}],"stability":0.0099999998}],"result_index":1}
+6849	{"result":[{"alternative":[{"transcript":" ja vorzugsweise"}],"stability":0.89999998},{"alternative":[{"transcript":" Dienstag und Mittwoch"}],"stability":0.0099999998}],"result_index":1}
+7148	{"result":[{"alternative":[{"transcript":" ja vorzugsweise Dienstag"}],"stability":0.89999998},{"alternative":[{"transcript":" und Mittwoch"}],"stability":0.0099999998}],"result_index":1}
+7181	{"result":[{"alternative":[{"transcript":" ja vorzugsweise Dienstag und"}],"stability":0.89999998},{"alternative":[{"transcript":" Mittwoch"}],"stability":0.0099999998}],"result_index":1}
+7531	{"result":[{"alternative":[{"transcript":" ja vorzugsweise Dienstag und Mittwoch"}],"stability":0.89999998},{"alternative":[{"transcript":" 9"}],"stability":0.0099999998}],"result_index":1}
+8135	{"result":[{"alternative":[{"transcript":" ja vorzugsweise Dienstag und Mittwoch"}],"stability":0.89999998},{"alternative":[{"transcript":" 19"}],"stability":0.0099999998}],"result_index":1}
+8642	{"result":[{"alternative":[{"transcript":" ja vorzugsweise Dienstag und Mittwoch"}],"stability":0.89999998},{"alternative":[{"transcript":" 19. Juni"}],"stability":0.0099999998}],"result_index":1}
+8745	{"result":[{"alternative":[{"transcript":" ja vorzugsweise Dienstag und Mittwoch 19. Juni","confidence":0.70823741},{"transcript":" ja vorzugsweise Dienstag \u0026 Mittwoch 19. Juni"},{"transcript":" ja Sonntag 20 Dienstag und Mittwoch 19. Juni"},{"transcript":" ja vorzugsweise Dienstag und Mittwoch 19 July"},{"transcript":" ja Volksweise Dienstag und Mittwoch 19. Juni"},{"transcript":" ja Sonntag 20 Dienstag \u0026 Mittwoch 19. Juni"},{"transcript":" ja vorzugsweise Dienstag \u0026 Mittwoch 19 July"},{"transcript":" ja vorzugsweise Dienstag und Mittwoch 19"},{"transcript":" ja Volksweise Dienstag \u0026 Mittwoch 19. Juni"},{"transcript":" ja vorzugsweise Dienstag und Mittwoch 19 Jun"}],"final":true}],"result_index":1}

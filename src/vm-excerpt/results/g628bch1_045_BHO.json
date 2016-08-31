@@ -1,0 +1,11 @@
+120	{"result":[]}
+1028	{"result":[{"alternative":[{"transcript":"ja und wie"}],"stability":0.0099999998}],"result_index":0}
+1039	{"result":[{"alternative":[{"transcript":"ja und wie sie"}],"stability":0.0099999998}],"result_index":0}
+1049	{"result":[{"alternative":[{"transcript":"ja und wie sieht"}],"stability":0.0099999998}],"result_index":0}
+1053	{"result":[{"alternative":[{"transcript":"ja und wie sieht es"}],"stability":0.0099999998}],"result_index":0}
+1340	{"result":[{"alternative":[{"transcript":"ja und wie sieht es bei"}],"stability":0.0099999998}],"result_index":0}
+1587	{"result":[{"alternative":[{"transcript":"ja und wie"}],"stability":0.89999998},{"alternative":[{"transcript":" sieht es Preis"}],"stability":0.0099999998}],"result_index":0}
+1607	{"result":[{"alternative":[{"transcript":"ja und wie sieht"}],"stability":0.89999998},{"alternative":[{"transcript":" es preislich"}],"stability":0.0099999998}],"result_index":0}
+1615	{"result":[{"alternative":[{"transcript":"ja und wie sieht es"}],"stability":0.89999998},{"alternative":[{"transcript":" preislich"}],"stability":0.0099999998}],"result_index":0}
+2431	{"result":[{"alternative":[{"transcript":"ja und wie sieht es"}],"stability":0.89999998},{"alternative":[{"transcript":" preislich aus"}],"stability":0.0099999998}],"result_index":0}
+2572	{"result":[{"alternative":[{"transcript":"ja und wie sieht es preislich aus","confidence":0.89512414},{"transcript":"Ja und wie sieht es preislich aus"},{"transcript":"und wie sieht es preislich aus"},{"transcript":"ja und wie sieht es preislich Aus"},{"transcript":"Ja und wie sieht es preislich Aus"},{"transcript":"ja und wie sieht das preislich aus"},{"transcript":"und wie sieht es preislich Aus"},{"transcript":"Ja und wie sieht das preislich aus"},{"transcript":"wie sieht es preislich aus"},{"transcript":"und wie sieht das preislich aus"}],"final":true}],"result_index":0}

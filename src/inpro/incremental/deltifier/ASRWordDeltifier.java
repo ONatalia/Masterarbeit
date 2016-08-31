@@ -480,5 +480,4 @@ public class ASRWordDeltifier implements Configurable, Resetable, ASRResultKeepe
 	public String toString() {
 		return "basic ASRWordDeltifier";
 	}
-	
 }

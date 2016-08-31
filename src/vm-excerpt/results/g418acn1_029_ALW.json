@@ -1,0 +1,24 @@
+174	{"result":[]}
+861	{"result":[{"alternative":[{"transcript":"70"}],"stability":0.0099999998}],"result_index":0}
+1224	{"result":[{"alternative":[{"transcript":"70 min"}],"stability":0.0099999998}],"result_index":0}
+1241	{"result":[{"alternative":[{"transcript":"70"}],"stability":0.0099999998}],"result_index":0}
+1257	{"result":[{"alternative":[{"transcript":"70 Minuten"}],"stability":0.0099999998}],"result_index":0}
+1623	{"result":[{"alternative":[{"transcript":"70 Minuten habe"}],"stability":0.0099999998}],"result_index":0}
+1625	{"result":[{"alternative":[{"transcript":"70"}],"stability":0.89999998},{"alternative":[{"transcript":" Minuten habe ich"}],"stability":0.0099999998}],"result_index":0}
+1654	{"result":[{"alternative":[{"transcript":"70"}],"stability":0.89999998},{"alternative":[{"transcript":" Minuten habe ich mir"}],"stability":0.0099999998}],"result_index":0}
+1654	{"result":[{"alternative":[{"transcript":"70"}],"stability":0.89999998},{"alternative":[{"transcript":" Minuten habe ich mir auch"}],"stability":0.0099999998}],"result_index":0}
+2415	{"result":[{"alternative":[{"transcript":"70"}],"stability":0.89999998},{"alternative":[{"transcript":" Minuten habe ich mir auf der"}],"stability":0.0099999998}],"result_index":0}
+2415	{"result":[{"alternative":[{"transcript":"70 Minuten"}],"stability":0.89999998},{"alternative":[{"transcript":" habe ich mir aufgeschrieben"}],"stability":0.0099999998}],"result_index":0}
+2416	{"result":[{"alternative":[{"transcript":"70 Minuten habe"}],"stability":0.89999998},{"alternative":[{"transcript":" ich mir aufgeschrieben"}],"stability":0.0099999998}],"result_index":0}
+2585	{"result":[{"alternative":[{"transcript":"70 Minuten habe ich"}],"stability":0.89999998},{"alternative":[{"transcript":" mir aufgeschrieben"}],"stability":0.0099999998}],"result_index":0}
+2595	{"result":[{"alternative":[{"transcript":"70 Minuten habe ich"}],"stability":0.89999998},{"alternative":[{"transcript":" mir aufgeschrieben ist"}],"stability":0.0099999998}],"result_index":0}
+2611	{"result":[{"alternative":[{"transcript":"70 Minuten habe ich mir"}],"stability":0.89999998},{"alternative":[{"transcript":" aufgeschrieben ist"}],"stability":0.0099999998}],"result_index":0}
+2666	{"result":[{"alternative":[{"transcript":"70 Minuten habe ich mir"}],"stability":0.89999998},{"alternative":[{"transcript":" aufgeschrieben ist ja"}],"stability":0.0099999998}],"result_index":0}
+3022	{"result":[{"alternative":[{"transcript":"70 Minuten habe ich mir"}],"stability":0.89999998},{"alternative":[{"transcript":" aufgeschrieben ist ja ein"}],"stability":0.0099999998}],"result_index":0}
+3099	{"result":[{"alternative":[{"transcript":"70 Minuten habe ich mir"}],"stability":0.89999998},{"alternative":[{"transcript":" aufgeschrieben ist ja meine"}],"stability":0.0099999998}],"result_index":0}
+3176	{"result":[{"alternative":[{"transcript":"70 Minuten habe ich mir aufgeschrieben"}],"stability":0.89999998},{"alternative":[{"transcript":" ist ja meine"}],"stability":0.0099999998}],"result_index":0}
+3257	{"result":[{"alternative":[{"transcript":"70 Minuten habe ich mir aufgeschrieben"}],"stability":0.89999998},{"alternative":[{"transcript":" ist ja meine Frau"}],"stability":0.0099999998}],"result_index":0}
+3284	{"result":[{"alternative":[{"transcript":"70 Minuten habe ich mir aufgeschrieben"}],"stability":0.89999998},{"alternative":[{"transcript":" ist ja meine Flug"}],"stability":0.0099999998}],"result_index":0}
+3299	{"result":[{"alternative":[{"transcript":"70 Minuten habe ich mir aufgeschrieben ist"}],"stability":0.89999998},{"alternative":[{"transcript":" ja reine Flugzeit"}],"stability":0.0099999998}],"result_index":0}
+3314	{"result":[{"alternative":[{"transcript":"70 Minuten habe ich mir aufgeschrieben ist ja"}],"stability":0.89999998},{"alternative":[{"transcript":" reine Flugzeit"}],"stability":0.0099999998}],"result_index":0}
+3516	{"result":[{"alternative":[{"transcript":"70 Minuten habe ich mir aufgeschrieben ist ja meine Flugzeug","confidence":0.67726117},{"transcript":"70 Minuten habe ich mir aufgeschrieben ist ja meine Flugzeuge"},{"transcript":"70 Minuten habe ich mir aufgeschrieben ist ja meine Flugzeit"},{"transcript":"70 Minuten habe ich mir aufgeschrieben ist ja reine Flugzeit"},{"transcript":"70 Minuten habe ich mir aufgeschrieben ist ja eine Flugzeug"},{"transcript":"70 Minuten habe ich mir aufgeschrieben ist die reine Flugzeit"},{"transcript":"70 Minuten habe ich mir aufgeschrieben ist mir meine Flugzeit"},{"transcript":"70 Minuten habe ich mir aufgeschrieben ist er ein Flugzeug"},{"transcript":"70 Minuten habe ich mir aufgeschrieben ist er meine Flugzeit"},{"transcript":"70 Minuten habe ich mir aufgeschrieben es wäre eine Flugzeug"}],"final":true}],"result_index":0}

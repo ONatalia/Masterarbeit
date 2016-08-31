@@ -338,20 +338,23 @@ public class SimpleReco {
 		if (clp.isRecoMode(RecoCommandLineParser.FORCED_ALIGNER_RECO)) {
 			logger.info("Running in forced alignment mode.");
 			logger.info("Will try to recognize: " + clp.getReference());
-			cm.setGlobalProperty("linguist", "flatLinguist");
-			//cm.setGlobalProperty("linguist", "dynamicFlatLinguist");
+			//cm.setGlobalProperty("linguist", "flatLinguist");
+			cm.setGlobalProperty("linguist", "dynamicFlatLinguist");
 			//cm.setGlobalProperty("grammar", "myjsgfGrammar");
-			cm.setGlobalProperty("grammar", "forcedAligner");
+			//cm.setGlobalProperty("grammar", "forcedAligner");
+			cm.setGlobalProperty ("grammar","ngramGrammar");
 		
-			//Linguist linguist = (Linguist) cm.lookup("dynamicFlatLinguist");
-			Linguist linguist = (Linguist) cm.lookup("flatLinguist");
+			Linguist linguist = (Linguist) cm.lookup("dynamicFlatLinguist");
+			//Linguist linguist = (Linguist) cm.lookup("flatLinguist");
 			
 			linguist.allocate();
 			//MyJSGFGrammar jsgfGrammar=(MyJSGFGrammar) cm.lookup("myjsgfGrammar");
 			//jsgfGrammar.setText(clp.getReference());
-			AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
+			MyLMGrammar lm=(MyLMGrammar) cm.lookup("ngramGrammar");
+			lm.setText(clp.getReference());
+			//AlignerGrammar forcedAligner = (AlignerGrammar) cm.lookup("forcedAligner");
 			
-			forcedAligner.setText(clp.getReference());
+			//forcedAligner.setText(clp.getReference());
 			//MyLMGrammar lm=(MyLMGrammar) cm.lookup("ngramGrammar");
 			//lm.setText(clp.getReference());
 			

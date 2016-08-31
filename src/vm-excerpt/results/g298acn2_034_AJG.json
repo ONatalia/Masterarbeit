@@ -1,0 +1,3 @@
+195	{"result":[]}
+833	{"result":[{"alternative":[{"transcript":"genau"}],"stability":0.0099999998}],"result_index":0}
+850	{"result":[{"alternative":[{"transcript":"genau","confidence":0.93466842},{"transcript":"genauer"},{"transcript":"gymno"},{"transcript":"Kino"}],"final":true}],"result_index":0}

@@ -32,6 +32,7 @@ import edu.cmu.sphinx.jsgf.parser.JSGFParser;
 import edu.cmu.sphinx.jsgf.rule.*;
 import edu.cmu.sphinx.linguist.dictionary.Dictionary;
 import edu.cmu.sphinx.linguist.language.grammar.Grammar;
+import edu.cmu.sphinx.linguist.language.grammar.GrammarArc;
 import edu.cmu.sphinx.linguist.language.grammar.GrammarNode;
 import edu.cmu.sphinx.util.LogMath;
 import edu.cmu.sphinx.util.props.ConfigurationManagerUtils;
@@ -39,6 +40,7 @@ import edu.cmu.sphinx.util.props.PropertyException;
 import edu.cmu.sphinx.util.props.PropertySheet;
 import edu.cmu.sphinx.util.props.S4Component;
 import edu.cmu.sphinx.util.props.S4String;
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * <h3>Defines a BNF-style grammar based on JSGF grammar rules in a file.</h3>
@@ -208,6 +210,7 @@ public class MyJSGFGrammar extends Grammar {
 	private int wordSkipRange;
 
 	protected GrammarNode finalNode;
+	protected GrammarNode lastNode;
     
     
     private final List<String> tokens = new ArrayList<String>();
@@ -659,8 +662,9 @@ public class MyJSGFGrammar extends Grammar {
             newGrammar();
 
             firstNode = createGrammarNode("<sil>");
-            GrammarNode finalNode = createGrammarNode("<sil>");
-            finalNode.setFinalNode(true);
+            //GrammarNode lastNode = createGrammarNode("<sil>");
+             lastNode = createGrammarNode("<sil>");
+            lastNode.setFinalNode(true);
 
             // go through each rule and create a network of GrammarNodes
             // for each of them
@@ -675,7 +679,7 @@ public class MyJSGFGrammar extends Grammar {
                     ruleStack.pop();
 
                     firstNode.add(publicRuleGraph.getStartNode(), 0.0f);
-                    publicRuleGraph.getEndNode().add(finalNode, 0.0f);
+                    publicRuleGraph.getEndNode().add(lastNode, 0.0f);
                     publicRuleGraph.getStartNode().add(graph.getStartNode(),
                             0.0f);
                     graph.getEndNode().add(publicRuleGraph.getEndNode(), 0.0f);
@@ -703,22 +707,42 @@ public class MyJSGFGrammar extends Grammar {
 			final GrammarNode wordNode = createGrammarNode(word.toLowerCase());
 			wordGrammarNodes.add(wordNode);
 		}
+		//firstNode.
+		 
+		 
 		wordGrammarNodes.add(firstNode);
+		
+		
+		for (int i=0; i<wordGrammarNodes.size()-1;i++){
+			if (wordGrammarNodes.get(i).equals(firstNode)||(wordGrammarNodes.get(i).equals(finalNode))){
+				wordGrammarNodes.remove(wordGrammarNodes.get(i));
+			}
+		}
 		
 		logger.info("Done creating grammar node");
 		
 
 		// now connect all the GrammarNodes together
 		initialNode.add(branchNode, LogMath.getLogOne());
+		
+		createBaseGrammar(wordGrammarNodes, branchNode, lastNode);
 
-		createBaseGrammar(wordGrammarNodes, branchNode, finalNode);
+		if (modelRepeats) {
+			addForwardJumps(wordGrammarNodes, branchNode, lastNode);
+		}
+		if (modelSkips) {
+			addBackwardJumps(wordGrammarNodes, branchNode, lastNode);
+		}
+		
+
+		/*createBaseGrammar(wordGrammarNodes, branchNode, finalNode);
 
 		if (modelRepeats) {
 			addForwardJumps(wordGrammarNodes, branchNode, finalNode);
 		}
 		if (modelSkips) {
 			addBackwardJumps(wordGrammarNodes, branchNode, finalNode);
-		}
+		}*/
 		
 		
     	

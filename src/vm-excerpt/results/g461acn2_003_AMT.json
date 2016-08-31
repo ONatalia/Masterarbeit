@@ -1,0 +1,3 @@
+171	{"result":[]}
+725	{"result":[{"alternative":[{"transcript":"ja"}],"stability":0.0099999998}],"result_index":0}
+733	{"result":[{"alternative":[{"transcript":"ja","confidence":0},{"transcript":"Ja"},{"transcript":"ya"},{"transcript":"jaaa"}],"final":true}],"result_index":0}

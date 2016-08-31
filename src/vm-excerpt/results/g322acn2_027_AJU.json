@@ -1,0 +1,9 @@
+173	{"result":[]}
+3042	{"result":[{"alternative":[{"transcript":"ja"}],"stability":0.0099999998}],"result_index":0}
+3162	{"result":[{"alternative":[{"transcript":"ja genau"}],"stability":0.0099999998}],"result_index":0}
+3495	{"result":[{"alternative":[{"transcript":"ja"}],"stability":0.89999998},{"alternative":[{"transcript":" genau"}],"stability":0.0099999998}],"result_index":0}
+3521	{"result":[{"alternative":[{"transcript":"ja genau"}],"stability":0.89999998}],"result_index":0}
+4951	{"result":[{"alternative":[{"transcript":"ja genau"}],"stability":0.89999998},{"alternative":[{"transcript":" am I falling"}],"stability":0.0099999998}],"result_index":0}
+4956	{"result":[{"alternative":[{"transcript":"ja genau"}],"stability":0.89999998},{"alternative":[{"transcript":" also vorliegen"}],"stability":0.0099999998}],"result_index":0}
+5003	{"result":[{"alternative":[{"transcript":"ja genau"}],"stability":0.89999998},{"alternative":[{"transcript":" also vorliegen genau"}],"stability":0.0099999998}],"result_index":0}
+5245	{"result":[{"alternative":[{"transcript":"ja genau also vorliegen genau","confidence":0.77218229},{"transcript":"ja genau also Vorliegen genau"},{"transcript":"ja genau also vor liegen genau"},{"transcript":"ja genau also vorliegend genau"},{"transcript":"ja genauso vorliegen genau"},{"transcript":"ja genauso Vorliegen genau"},{"transcript":"ja genau so vorliegen genau"},{"transcript":"ja genau so vorlegen genau"},{"transcript":"ja genau vorliegen genau"},{"transcript":"ja genau so Vorliegen genau"}],"final":true}],"result_index":0}

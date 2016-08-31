@@ -1,0 +1,6 @@
+171	{"result":[]}
+3646	{"result":[{"alternative":[{"transcript":"ja"}],"stability":0.0099999998}],"result_index":0}
+4886	{"result":[{"alternative":[{"transcript":"ja"}],"stability":0.89999998}],"result_index":0}
+5017	{"result":[{"alternative":[{"transcript":"ja"}],"stability":0.89999998},{"alternative":[{"transcript":" ja"}],"stability":0.0099999998}],"result_index":0}
+5073	{"result":[{"alternative":[{"transcript":"ja"}],"stability":0.89999998},{"alternative":[{"transcript":" ja gut"}],"stability":0.0099999998}],"result_index":0}
+5092	{"result":[{"alternative":[{"transcript":"ja ja gut","confidence":0.90202045},{"transcript":"ja ja"},{"transcript":"Ja ja gut"},{"transcript":"ja Yahoo"},{"transcript":"ja gut"},{"transcript":"oh ja ja"},{"transcript":"na ja ja"},{"transcript":"Ja Yahoo"},{"transcript":"ne ja ja"},{"transcript":"nein ja ja"}],"final":true}],"result_index":0}

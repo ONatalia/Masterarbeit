@@ -96,12 +96,12 @@ public class LabelWriter extends FrameAwarePushBuffer {
 				break;
 			case COMMIT:
 				//if (commitsOnly) {
-				if (commitsOnly) {
+				//if (commitsOnly) {
 					added = true;
 					allIUs.add(iu);
 					
 					
-				}
+				//}
 					//}
 				break;
 			case REVOKE:
@@ -125,19 +125,14 @@ public class LabelWriter extends FrameAwarePushBuffer {
 		currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
 		
 		
-		//addedTime+=endtime;
-		
-		//logger.info("addedTime:"+addedTime);
-		
-		
-		//toOut = String.format(Locale.US, "Time: %.2f", 
-				//currentFrame * TimeUtil.FRAME_TO_SECOND_FACTOR);
 		
 		
 		
 		logger.info("currentframe:"+currentFrame);
 		logger.info("lastframe:"+lastframe);
-		//if (currentFrame>lastframe){
+		
+		//add only new results
+		if (currentFrame>lastframe){
 		
 		for (IU iu : allIUs) {
 			toOut += "\n" + iu.toLabelLine();
@@ -165,7 +160,7 @@ public class LabelWriter extends FrameAwarePushBuffer {
 			
 		}
 		
-		//}
+		}
 		if (currentFrame>lastframe){
 		lastframe=currentFrame;
 		}

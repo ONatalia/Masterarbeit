@@ -1,0 +1,7 @@
+167	{"result":[]}
+4557	{"result":[{"alternative":[{"transcript":"bitte"}],"stability":0.0099999998}],"result_index":0}
+4696	{"result":[{"alternative":[{"transcript":"XDA"}],"stability":0.0099999998}],"result_index":0}
+4715	{"result":[{"alternative":[{"transcript":"ins Theater"}],"stability":0.0099999998}],"result_index":0}
+5649	{"result":[{"alternative":[{"transcript":"ins Theater"}],"stability":0.89999998}],"result_index":0}
+8606	{"result":[{"alternative":[{"transcript":"ins Theater"}],"stability":0.89999998},{"alternative":[{"transcript":" und verbleibe"}],"stability":0.0099999998}],"result_index":0}
+8607	{"result":[{"alternative":[{"transcript":"ins Theater und verbleibe","confidence":0.69293833},{"transcript":"im Theater und verbleibe"},{"transcript":"Jobs im Theater"},{"transcript":"ins Theater"},{"transcript":"junges Theater und verbleibe"},{"transcript":"im Theater"},{"transcript":"Jobs Theater und verbleibe"},{"transcript":"ins Theater und bleibe"},{"transcript":"junges Theater"},{"transcript":"im Theater und bleibe"}],"final":true}],"result_index":0}

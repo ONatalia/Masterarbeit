@@ -1,0 +1,16 @@
+193	{"result":[]}
+711	{"result":[{"alternative":[{"transcript":"ich"}],"stability":0.0099999998}],"result_index":0}
+959	{"result":[{"alternative":[{"transcript":"nicht"}],"stability":0.0099999998}],"result_index":0}
+973	{"result":[{"alternative":[{"transcript":"ich dann"}],"stability":0.0099999998}],"result_index":0}
+983	{"result":[{"alternative":[{"transcript":"ich danke"}],"stability":0.0099999998}],"result_index":0}
+1512	{"result":[{"alternative":[{"transcript":"ich danke Ihnen"}],"stability":0.0099999998}],"result_index":0}
+1581	{"result":[{"alternative":[{"transcript":"ich"}],"stability":0.89999998},{"alternative":[{"transcript":" danke Ihnen"}],"stability":0.0099999998}],"result_index":0}
+1589	{"result":[{"alternative":[{"transcript":"ich danke"}],"stability":0.89999998},{"alternative":[{"transcript":" Ihnen"}],"stability":0.0099999998}],"result_index":0}
+2333	{"result":[{"alternative":[{"transcript":"ich danke Ihnen"}],"stability":0.89999998}],"result_index":0}
+2334	{"result":[{"alternative":[{"transcript":"ich danke Ihnen"}],"stability":0.89999998},{"alternative":[{"transcript":" und"}],"stability":0.0099999998}],"result_index":0}
+2492	{"result":[{"alternative":[{"transcript":"ich danke Ihnen"}],"stability":0.89999998},{"alternative":[{"transcript":" und wir"}],"stability":0.0099999998}],"result_index":0}
+2525	{"result":[{"alternative":[{"transcript":"ich danke Ihnen"}],"stability":0.89999998},{"alternative":[{"transcript":" unsere"}],"stability":0.0099999998}],"result_index":0}
+2602	{"result":[{"alternative":[{"transcript":"ich danke Ihnen"}],"stability":0.89999998},{"alternative":[{"transcript":" und wir sind"}],"stability":0.0099999998}],"result_index":0}
+2658	{"result":[{"alternative":[{"transcript":"ich danke Ihnen"}],"stability":0.89999998},{"alternative":[{"transcript":" und wir sehen uns"}],"stability":0.0099999998}],"result_index":0}
+2683	{"result":[{"alternative":[{"transcript":"ich danke Ihnen"}],"stability":0.89999998},{"alternative":[{"transcript":" und wir sehen uns dann"}],"stability":0.0099999998}],"result_index":0}
+2775	{"result":[{"alternative":[{"transcript":"ich danke Ihnen und wir sehen uns dann","confidence":0.97396207},{"transcript":"ich danke Ihnen und wir sehen uns an"},{"transcript":"ich danke Ihnen und wir sehen uns dann bitte"},{"transcript":"ich danke Ihnen und wir sehen uns bald"},{"transcript":"ich danke Ihnen und wir sehen und dann"},{"transcript":"ich danke Ihnen unseren und dann"},{"transcript":"ich danke Ihnen und wir sehn uns dann bitte"},{"transcript":"ich danke Ihnen und wir gehen und dann"},{"transcript":"ich danke Ihnen und wir in und dann"},{"transcript":"ich danke Ihnen und wir den und dann"}],"final":true}],"result_index":0}

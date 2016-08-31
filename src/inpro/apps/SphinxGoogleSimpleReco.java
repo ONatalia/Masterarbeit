@@ -619,6 +619,13 @@ public class SphinxGoogleSimpleReco extends IUModule{
 		SphinxThread spth=new SphinxThread (recognizerFA,bq,cm,rais);
 		spth.start();
 		//startGoogleThread(gasr);
+		/*try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
 		gasr.recognize();
 		/*logger.info("take data after google is finished:");
 		try {
